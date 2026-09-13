@@ -34,7 +34,7 @@ const calculateHorizontalDefaultBoundingBoxes = ({
   computedGap,
   boundingRect,
 }: CalculateLayoutBoundingBoxesParams): Record<string, LayoutBoundingBox> => {
-  const widths = calculateMainAxisSizes(children, boundingRect, component)
+  const widths = calculateMainAxisSizes(children, boundingRect, component, computedGap)
   let nextLeft = boundingRect.x
   const boundingBoxes: Record<string, LayoutBoundingBox> = {}
 
@@ -67,7 +67,7 @@ const calculateVerticalDefaultBoundingBoxes = ({
   computedGap,
   boundingRect,
 }: CalculateLayoutBoundingBoxesParams): Record<string, LayoutBoundingBox> => {
-  const heights = calculateMainAxisSizes(children, boundingRect, component)
+  const heights = calculateMainAxisSizes(children, boundingRect, component, computedGap)
   let nextTop = boundingRect.y
   const boundingBoxes: Record<string, LayoutBoundingBox> = {}
 
@@ -98,12 +98,10 @@ const calculateMainAxisSizes = (
   children: (PanelSchema | PocketClusterSchema)[],
   parentBoundingBox: RectSchema,
   parent: RootPanelSchema | PanelSchema,
+  computedGap: BigNumber,
 ): Record<string, BigNumber> => {
   const parentSpace = parent.layoutOrientation === 'horizontal' ? parentBoundingBox.width : parentBoundingBox.height
-  const gapSpace = parent.autoLayoutGap
-    ? ZERO
-    : BigNumber.maximum(new BigNumber(children.length).minus(1), ZERO).times(new BigNumber(parent.layoutGap))
-  const availableComponentSpace = BigNumber.maximum(parentSpace.minus(gapSpace), ZERO)
+  const gapSpace = BigNumber.maximum(new BigNumber(children.length).minus(1), ZERO).times(computedGap)
   const sizesById: Record<string, BigNumber> = {}
 
   for (const child of children) {
@@ -115,20 +113,17 @@ const calculateMainAxisSizes = (
   }
 
   const fixedComponentSpace = Object.values(sizesById).reduce((sum, componentSize) => sum.plus(componentSize), ZERO)
-  const autoComponentCount = new BigNumber(children.filter((child) => isMainAxisAuto(child, parent)).length)
-  const autoSizeCount = parent.autoLayoutGap
-    ? autoComponentCount.plus(BigNumber.maximum(new BigNumber(children.length).minus(1), ZERO))
-    : autoComponentCount
-  const autoComponentSize = autoSizeCount.isZero()
-    ? ZERO
-    : BigNumber.maximum(availableComponentSpace.minus(fixedComponentSpace), ZERO).dividedBy(autoSizeCount)
+  const autoChildren = children.filter((child) => isMainAxisAuto(child, parent))
+  const availableAutoSpace = BigNumber.maximum(parentSpace.minus(gapSpace).minus(fixedComponentSpace), ZERO)
+  const autoComponentSize =
+    autoChildren.length === 0 ? ZERO : availableAutoSpace.dividedBy(new BigNumber(autoChildren.length))
+  let remainingAutoSpace = availableAutoSpace
 
-  for (const child of children) {
-    if (!isMainAxisAuto(child, parent)) {
-      continue
-    }
+  for (const [index, child] of autoChildren.entries()) {
+    const size = index === autoChildren.length - 1 ? remainingAutoSpace : autoComponentSize
 
-    sizesById[child.id] = autoComponentSize
+    sizesById[child.id] = size
+    remainingAutoSpace = remainingAutoSpace.minus(size)
   }
 
   return sizesById
