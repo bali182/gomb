@@ -494,6 +494,7 @@ export const HU = {
     selectionOrange: 'Narancs',
     selectionYellow: 'Sárga',
     selectionWhite: 'Fehér',
+    transparent: 'Átlátszó',
   } satisfies Record<ColorKey, string>,
   cards: {
     'ID-1-landscape': 'ID-1 (fekvő)',

@@ -2,11 +2,12 @@ import { Menu } from '@chakra-ui/react'
 import { FC } from 'react'
 import {
   cardColors,
-  modelColors,
+  leatherColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
   strokeColors,
+  threadColors,
 } from '../../../data/colors'
 import { useColors } from '../../../hooks/useColors'
 import { useProject } from '../../../hooks/useProject'
@@ -18,8 +19,8 @@ export const ColorsMenuGroup: FC = () => {
   const t = useTranslation()
   const { project } = useProject()
   const { updateColorSettings } = useProjectOperations()
-  const leatherColorValues = useColors(modelColors)
-  const threadColorValues = useColors(modelColors)
+  const leatherColorValues = useColors(leatherColors)
+  const threadColorValues = useColors(threadColors)
   const stitchHoleColorValues = useColors(stitchHoleColors)
   const stitchLineColorValues = useColors(stitchLineColors)
   const strokeColorValues = useColors(strokeColors)

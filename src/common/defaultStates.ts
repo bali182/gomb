@@ -1,11 +1,12 @@
 import { STROKE_THICKNESS } from './constants/drawing'
 import {
   cardColors,
-  modelColors,
+  leatherColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
   strokeColors,
+  threadColors,
 } from './data/colors'
 import { MagicFixSettingsSchema } from './schemas/magic-fix-3/magicFixSettings3'
 import { PdfExportSettingsSchema } from './schemas/pdfExport'
@@ -46,11 +47,11 @@ export const defaultMagicFix3Settings: MagicFixSettingsSchema = {
 }
 
 export const defaultColorSettings: ColorSettingsSchema = {
-  leatherColor: modelColors.natural,
+  leatherColor: leatherColors.natural,
   stitchHoleColor: stitchHoleColors.black,
   stitchLineColor: stitchLineColors.black,
   strokeColor: strokeColors.black,
   selectionColor: selectionColors.selectionBlue,
   cardColor: cardColors.mediumGreen,
-  threadColor: modelColors.white,
+  threadColor: threadColors.white,
 }

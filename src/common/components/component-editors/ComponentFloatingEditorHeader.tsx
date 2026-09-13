@@ -2,7 +2,7 @@ import { Button, ColorSwatch, HStack, Input, type PopoverRootProps } from '@chak
 import { useCallback, useMemo, useRef, type ReactElement } from 'react'
 import type { IconType } from 'react-icons'
 
-import { modelColors } from '../../data/colors'
+import { leatherColors } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
 import type { BaseComponentSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
@@ -86,7 +86,7 @@ const HeaderColorInput = ({ isResetEnabled, issue, onChange, onReset, value }: H
     },
     [onChange, onReset],
   )
-  const popoverLeatherColors = useColors(modelColors)
+  const popoverLeatherColors = useColors(leatherColors)
   const isInvalid = isDefined(issue) && issue.severity === 'error'
 
   return (

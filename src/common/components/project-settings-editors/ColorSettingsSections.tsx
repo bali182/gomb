@@ -2,11 +2,12 @@ import { useCallback, type FC } from 'react'
 
 import {
   cardColors,
-  modelColors,
+  leatherColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
   strokeColors,
+  threadColors,
 } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
 import type { EditableSchema } from '../../schemas/editable'
@@ -24,8 +25,8 @@ type ProjectComponentSettingsSectionProps = {
 
 export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = ({ editable, issues, onChange }) => {
   const t = useTranslation()
-  const leatherColorValues = useColors(modelColors)
-  const threadColorValues = useColors(modelColors)
+  const leatherColorValues = useColors(leatherColors)
+  const threadColorValues = useColors(threadColors)
   const stitchHoleColorValues = useColors(stitchHoleColors)
   const stitchLineColorValues = useColors(stitchLineColors)
   const strokeColorValues = useColors(strokeColors)

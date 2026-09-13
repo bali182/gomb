@@ -26,7 +26,7 @@ const addAlpha = (color: string): string => {
   if (!isDefined(parsed)) {
     return color
   }
-  return formatHex8({ ...parsed, alpha: 0.3 })
+  return formatHex8({ ...parsed, alpha: Math.min(parsed.alpha ?? 1, 0.3) })
 }
 
 const exportIdentifiers: DrawAreaExportIdentifiers = {

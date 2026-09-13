@@ -1,4 +1,4 @@
-import { converter, formatHex } from 'culori'
+import { converter, formatHex, formatHex8 } from 'culori'
 
 import { clamp } from './clamp'
 
@@ -14,8 +14,10 @@ export const getComponentColor = (baseColor: string, nestingLevel: number): stri
 
   const maxLightness = Math.max(color.l, COMPONENT_COLOR_MAX_LIGHTNESS)
 
-  return formatHex({
+  const adjustedColor = {
     ...color,
     l: clamp(color.l + nestingLevel * COMPONENT_COLOR_LIGHTNESS_STEP, color.l, maxLightness).toNumber(),
-  })
+  }
+
+  return (color.alpha ?? 1) === 1 ? formatHex(adjustedColor) : formatHex8(adjustedColor)
 }

@@ -13,11 +13,7 @@ export const FileMenu: FC<CommonMenuProps> = ({ children }) => {
 
 export const EditMenu: FC<CommonMenuProps> = ({ children }) => {
   const t = useTranslation()
-  return (
-    <BaseMenu title={t.editor.menus.edit.name} autoFocus>
-      {children}
-    </BaseMenu>
-  )
+  return <BaseMenu title={t.editor.menus.edit.name}>{children}</BaseMenu>
 }
 
 export const ViewMenu: FC<CommonMenuProps> = ({ children }) => {
@@ -27,5 +23,9 @@ export const ViewMenu: FC<CommonMenuProps> = ({ children }) => {
 
 export const ProjectMenu: FC<CommonMenuProps> = ({ children }) => {
   const t = useTranslation()
-  return <BaseMenu title={t.editor.menus.project.name}>{children}</BaseMenu>
+  return (
+    <BaseMenu title={t.editor.menus.project.name} autoFocus={true}>
+      {children}
+    </BaseMenu>
+  )
 }

@@ -3,6 +3,7 @@ const darkGray = '#4c5156'
 const mediumGray = '#7d8489'
 const lightGray = '#bdc4c9'
 const white = '#fdfdfc'
+const transparent = '#ffffff00'
 
 const darkBrown = '#633116'
 const mediumBrown = '#9a5328'
@@ -42,6 +43,46 @@ const grayScaleColors = {
   white,
 } as const
 
+const grayScaleColorsWithTransparent = {
+  black,
+  darkGray,
+  lightGray,
+  white,
+  transparent,
+} as const
+
+const brownColors = {
+  darkBrown,
+  mediumBrown,
+  lightBrown,
+  natural,
+  bone,
+} as const
+
+const redColors = {
+  burgundy,
+  red,
+  pink,
+  orange,
+  yellow,
+} as const
+
+const blueColors = {
+  navy,
+  indigo,
+  mediumBlue,
+  lightBlue,
+  purple,
+} as const
+
+const greenColors = {
+  darkGreen,
+  olive,
+  mediumGreen,
+  lightGreen,
+  cyan,
+} as const
+
 export const stitchHoleColors = grayScaleColors
 
 export const stitchLineColors = grayScaleColors
@@ -64,43 +105,23 @@ export const cardColors = {
   yellow,
 } as const
 
-export const modelColors = {
-  // Grayscale
-  black,
-  darkGray,
-  mediumGray,
-  lightGray,
-  white,
-
-  // Browns
-  darkBrown,
-  mediumBrown,
-  lightBrown,
-  natural,
-  bone,
-
-  // Reds
-  burgundy,
-  red,
-  pink,
-  orange,
-  yellow,
-
-  // Blues
-  navy,
-  indigo,
-  mediumBlue,
-  lightBlue,
-  purple,
-
-  //Greens
-  darkGreen,
-  olive,
-  mediumGreen,
-  lightGreen,
-  cyan,
+export const leatherColors = {
+  ...grayScaleColorsWithTransparent,
+  ...brownColors,
+  ...redColors,
+  ...blueColors,
+  ...greenColors,
 } as const
 
-export type ModelColorKey = keyof typeof modelColors
+export const threadColors = {
+  ...grayScaleColors,
+  ...brownColors,
+  ...redColors,
+  ...blueColors,
+  ...greenColors,
+} as const
+
+export type LeatherColorKey = keyof typeof leatherColors
 export type SelectionColorKey = keyof typeof selectionColors
-export type ColorKey = ModelColorKey | SelectionColorKey
+export type ThreadColorKey = keyof typeof threadColors
+export type ColorKey = LeatherColorKey | SelectionColorKey | ThreadColorKey

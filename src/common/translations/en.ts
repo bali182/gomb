@@ -492,6 +492,7 @@ export const EN: typeof HU = {
     selectionOrange: 'Orange',
     selectionYellow: 'Yellow',
     selectionWhite: 'White',
+    transparent: 'Transparent',
   } satisfies Record<ColorKey, string>,
   cards: {
     'ID-1-landscape': 'ID-1 (landscape)',
