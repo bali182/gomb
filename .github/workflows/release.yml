@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  verify-main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify branch
+        run: test "$GITHUB_REF" = refs/heads/main
+
+  prepare:
+    needs: verify-main
+    uses: ./.github/workflows/release-prepare.yml
+    with:
+      bump: ${{ inputs.bump }}
+
+  build-web:
+    needs: prepare
+    uses: ./.github/workflows/build-web.yml
+    with:
+      commit: ${{ needs.prepare.outputs.commit }}
+
+  build-desktop-mac:
+    needs: prepare
+    uses: ./.github/workflows/build-desktop-mac.yml
+    with:
+      commit: ${{ needs.prepare.outputs.commit }}
+
+  build-desktop-windows:
+    needs: prepare
+    uses: ./.github/workflows/build-desktop-windows.yml
+    with:
+      commit: ${{ needs.prepare.outputs.commit }}
+
+  publish:
+    needs:
+      - prepare
+      - build-web
+      - build-desktop-mac
+      - build-desktop-windows
+    uses: ./.github/workflows/release-publish.yml
+    with:
+      commit: ${{ needs.prepare.outputs.commit }}
+      version: ${{ needs.prepare.outputs.version }}
