@@ -34,20 +34,19 @@ const selectionOrange = '#fc621a'
 const selectionYellow = '#eba500'
 const selectionWhite = '#ffffff'
 
-export const stitchHoleColors = {
+const grayScaleColors = {
   black,
+  darkGray,
+  mediumGray,
+  lightGray,
   white,
 } as const
 
-export const stitchLineColors = {
-  black,
-  white,
-} as const
+export const stitchHoleColors = grayScaleColors
 
-export const strokeColors = {
-  black,
-  white,
-} as const
+export const stitchLineColors = grayScaleColors
+
+export const strokeColors = grayScaleColors
 
 export const selectionColors = {
   selectionBlue,
