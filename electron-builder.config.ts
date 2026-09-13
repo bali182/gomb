@@ -3,6 +3,7 @@ import type { Configuration } from 'electron-builder'
 const config: Configuration = {
   appId: 'com.gomb.app',
   productName: 'Gomb',
+  icon: 'app-icon.svg',
   directories: {
     output: 'release',
   },

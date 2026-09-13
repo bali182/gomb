@@ -12,6 +12,7 @@ export default defineConfig(({ command, mode }) => {
       emptyOutDir: true,
       outDir: resolve('dist'),
     },
+    publicDir: resolve('public'),
     root: resolve('src/web'),
   }
 })
