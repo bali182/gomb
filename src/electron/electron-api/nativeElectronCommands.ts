@@ -7,23 +7,23 @@ type NativeElectronCommand = CommandSchema<NativeElectronCommandIdSchema>
 export const nativeElectronCommands: NativeElectronCommand[] = [
   {
     id: 'copy',
-    shortcut: { default: ['CommandOrControl', 'KeyC'] },
+    shortcut: { default: ['CommandOrControl', 'C'] },
   },
   {
     id: 'paste',
-    shortcut: { default: ['CommandOrControl', 'KeyV'] },
+    shortcut: { default: ['CommandOrControl', 'V'] },
   },
   {
     id: 'cut',
-    shortcut: { default: ['CommandOrControl', 'KeyX'] },
+    shortcut: { default: ['CommandOrControl', 'X'] },
   },
   {
     id: 'close-window',
-    shortcut: { default: ['CommandOrControl', 'KeyW'] },
+    shortcut: { default: ['CommandOrControl', 'W'] },
   },
   {
     id: 'quit',
-    shortcut: { default: ['CommandOrControl', 'KeyQ'] },
+    shortcut: { default: ['CommandOrControl', 'Q'] },
   },
   {
     id: 'devtools',
@@ -31,6 +31,6 @@ export const nativeElectronCommands: NativeElectronCommand[] = [
   },
   {
     id: 'select-all',
-    shortcut: { default: ['CommandOrControl', 'KeyA'] },
+    shortcut: { default: ['CommandOrControl', 'A'] },
   },
 ]

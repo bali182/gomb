@@ -22,6 +22,7 @@ export const createNativeCommandHandler =
       altKey: input.alt,
       code: input.code,
       ctrlKey: input.control,
+      key: input.key,
       metaKey: input.meta,
       shiftKey: input.shift,
     }

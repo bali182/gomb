@@ -33,17 +33,17 @@ export const useElectronCommands = (): ElectronCommandMap => {
       save: {
         id: 'save',
         disabled: !hasProjectAndIsDirty,
-        shortcut: { default: ['CommandOrControl', 'KeyS'] },
+        shortcut: { default: ['CommandOrControl', 'S'] },
       },
       'save-as': {
         id: 'save-as',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyS'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'S'] },
       },
       open: {
         id: 'open',
         disabled: false,
-        shortcut: { default: ['CommandOrControl', 'KeyO'] },
+        shortcut: { default: ['CommandOrControl', 'O'] },
       },
       // Edit - Change increments
       'increment-small': {

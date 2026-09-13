@@ -24,7 +24,7 @@ export const useWebCommands = (): WebCommandMap => {
       'download-project': {
         id: 'download-project',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'KeyS'] },
+        shortcut: { default: ['CommandOrControl', 'S'] },
       },
     } satisfies WebCommandMap
   }, [commonCommands, hasOpenProject])

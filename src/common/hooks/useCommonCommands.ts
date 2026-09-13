@@ -17,25 +17,25 @@ export const useCommonCommands = ({ canRedo, canUndo, hasOpenProject }: UseCommo
       'export-pdf': {
         id: 'export-pdf',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyP'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'P'] },
       },
       'export-svg': {
         id: 'export-svg',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyE'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'E'] },
       },
       // Edit - Undo/Redo
       undo: {
         id: 'undo',
         disabled: !canUndo,
-        shortcut: { default: ['CommandOrControl', 'KeyZ'] },
+        shortcut: { default: ['CommandOrControl', 'Z'] },
       },
       redo: {
         id: 'redo',
         disabled: !canRedo,
         shortcut: {
-          default: ['Control', 'KeyY'],
-          mac: ['Command', 'Shift', 'KeyZ'],
+          default: ['Control', 'Y'],
+          mac: ['Command', 'Shift', 'Z'],
         },
       },
       // Edit - Change increments
@@ -67,28 +67,28 @@ export const useCommonCommands = ({ canRedo, canUndo, hasOpenProject }: UseCommo
       'stitch-line-visibility': {
         id: 'stitch-line-visibility',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyL'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'L'] },
       },
       'stitch-hole-visibility': {
         id: 'stitch-hole-visibility',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyF'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'F'] },
       },
       'stitches-visibility': {
         id: 'stitches-visibility',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyU'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'U'] },
       },
       'stitch-count-visibility': {
         id: 'stitch-count-visibility',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyX'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'X'] },
       },
       // View scaling
       scaling: {
         id: 'scaling',
         disabled: false,
-        shortcut: { default: ['CommandOrControl', 'Shift', 'KeyV'] },
+        shortcut: { default: ['CommandOrControl', 'Shift', 'V'] },
       },
     } satisfies CommonCommandsMap
   }, [canRedo, canUndo, hasOpenProject])
