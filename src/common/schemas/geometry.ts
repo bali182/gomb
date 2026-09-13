@@ -28,6 +28,13 @@ export type RectSchema = {
   height: BigNumber
 }
 
+export type NumberRectSchema = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export type SizeSchema = {
   width: BigNumber
   height: BigNumber

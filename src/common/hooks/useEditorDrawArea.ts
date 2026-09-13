@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { STITCH_LINE_LABEL_COLOR, STITCH_LINE_LABEL_STROKE_COLOR, STROKE_THICKNESS } from '../constants/drawing'
+import { STITCH_LINE_LABEL_BACKGROUND_COLOR, STITCH_LINE_LABEL_COLOR, STROKE_THICKNESS } from '../constants/drawing'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { produce } from '../utils/produce'
@@ -223,8 +223,8 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
 
   const stitchRouteLabelStyles = useMemo<DrawAreaStitchRouteLabelStyles>(
     () => ({
+      getLabelBackgroundColor: produce(STITCH_LINE_LABEL_BACKGROUND_COLOR),
       getLabelColor: produce(STITCH_LINE_LABEL_COLOR),
-      getLabelStrokeColor: produce(STITCH_LINE_LABEL_STROKE_COLOR),
       getLabelFontFamily: produce('sans-serif'),
       getLabelFontSize: produce(3.2),
     }),

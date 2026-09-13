@@ -62,10 +62,10 @@ const drawAreaDefaultMarkerStyles: DrawAreaMarkerStyles = {
 }
 
 const stitchRouteLabelStyles: DrawAreaStitchRouteLabelStyles = {
+  getLabelBackgroundColor: produce(undefined),
   getLabelColor: produce(undefined),
   getLabelFontFamily: produce(undefined),
   getLabelFontSize: produce(undefined),
-  getLabelStrokeColor: produce(undefined),
 }
 
 export const defaultDrawAreaContext: DrawAreaContextValue = {

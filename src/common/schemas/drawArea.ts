@@ -65,8 +65,8 @@ export type DrawAreaExportTextStyles = {
 }
 
 export type DrawAreaStitchRouteLabelStyles = {
+  getLabelBackgroundColor: () => string | undefined
   getLabelColor: () => string | undefined
-  getLabelStrokeColor: () => string | undefined
   getLabelFontFamily: () => string | undefined
   getLabelFontSize: () => number | string | undefined
 }
