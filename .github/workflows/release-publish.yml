@@ -43,6 +43,7 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           COMMIT: ${{ inputs.commit }}
           VERSION: ${{ inputs.version }}
         run: |
