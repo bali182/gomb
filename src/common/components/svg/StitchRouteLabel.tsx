@@ -1,6 +1,11 @@
 import { type CSSProperties, type FC, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { PiNeedle } from 'react-icons/pi'
 
-import { STITCH_ROUTE_LABEL_HORIZONTAL_PADDING, STITCH_ROUTE_LABEL_VERTICAL_PADDING } from '../../constants/drawing'
+import {
+  STITCH_ROUTE_LABEL_HORIZONTAL_PADDING,
+  STITCH_ROUTE_LABEL_ICON_GAP,
+  STITCH_ROUTE_LABEL_VERTICAL_PADDING,
+} from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { NumberRectSchema } from '../../schemas/geometry'
@@ -44,9 +49,10 @@ export const StitchRouteLabel: FC<StitchRouteLabelProps> = ({ route }) => {
       return undefined
     }
     return {
-      x: textBounds.x - STITCH_ROUTE_LABEL_HORIZONTAL_PADDING,
+      x: textBounds.x - textBounds.height - STITCH_ROUTE_LABEL_ICON_GAP - STITCH_ROUTE_LABEL_HORIZONTAL_PADDING,
       y: textBounds.y - STITCH_ROUTE_LABEL_VERTICAL_PADDING,
-      width: textBounds.width + STITCH_ROUTE_LABEL_HORIZONTAL_PADDING * 2,
+      width:
+        textBounds.width + textBounds.height + STITCH_ROUTE_LABEL_ICON_GAP + STITCH_ROUTE_LABEL_HORIZONTAL_PADDING * 2,
       height: textBounds.height + STITCH_ROUTE_LABEL_VERTICAL_PADDING * 2,
     }
   }, [textBounds])
@@ -68,6 +74,14 @@ export const StitchRouteLabel: FC<StitchRouteLabelProps> = ({ route }) => {
           width={backgroundBounds.width}
           x={backgroundBounds.x}
           y={backgroundBounds.y}
+        />
+      )}
+      {isDefined(textBounds) && (
+        <PiNeedle
+          color={color}
+          size={textBounds.height}
+          x={textBounds.x - textBounds.height - STITCH_ROUTE_LABEL_ICON_GAP}
+          y={textBounds.y}
         />
       )}
       <text

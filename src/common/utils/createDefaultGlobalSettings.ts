@@ -17,7 +17,7 @@ export const createDefaultGlobalSettings = (theme: ThemeSchema): GlobalSettingsS
     svgExport: defaultSvgExportParams,
     view: {
       scale: 1,
-      stitchCountVisible: true,
+      stitchCountVisible: false,
       stitchHolesVisible: true,
       stitchLinesVisible: true,
       stitchesVisible: true,

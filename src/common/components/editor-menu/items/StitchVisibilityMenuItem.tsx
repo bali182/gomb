@@ -1,6 +1,6 @@
 import { Icon, Menu } from '@chakra-ui/react'
 import { FC, useCallback } from 'react'
-import { PiEye, PiEyeSlash, PiNeedle } from 'react-icons/pi'
+import { PiEye, PiEyeSlash } from 'react-icons/pi'
 import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { CommandSchema, CommonCommandIdSchema } from '../../../schemas/command'
 import { MenuShortcut } from '../MenuShortcut'
@@ -17,9 +17,8 @@ export const StitchVisibilityMenuItem: FC<StitchVisibilityMenuItemProps> = ({ co
 
   return (
     <Menu.Item disabled={command.disabled} onSelect={toggle} value={command.id} closeOnSelect={false}>
-      <PiNeedle />
-      <Menu.ItemText mr="2">{label}</Menu.ItemText>
       {value ? <PiEye /> : <Icon as={PiEyeSlash} color="fg.muted" />}
+      <Menu.ItemText mr="2">{label}</Menu.ItemText>
       <MenuShortcut command={command} noPadding />
     </Menu.Item>
   )
