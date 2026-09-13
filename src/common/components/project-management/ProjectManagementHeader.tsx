@@ -1,18 +1,25 @@
-import { HStack, Icon, Text, VStack } from '@chakra-ui/react'
+import { HStack, Icon, Span, Text, VStack } from '@chakra-ui/react'
 import type { FC } from 'react'
 
 import { ReactComponent as Logo } from '../../../../logo.svg?react'
 import { useTranslation } from '../../translations/translation'
+
+import { version } from '../../../../package.json'
 
 export const ProjectManagementHeader: FC = () => {
   const t = useTranslation()
 
   return (
     <HStack gap="2.5">
-      <Icon as={Logo} boxSize="45px" fill="fg" />
+      <Icon as={Logo} boxSize="40px" fill="fg" />
       <VStack gap="0" align="start">
-        <Text fontSize="large" fontWeight="semibold">
-          {t.app.title}
+        <Text lineHeight="shorter">
+          <Span fontSize="large" fontWeight="semibold" lineHeight="shorter">
+            {t.app.title}
+          </Span>
+          <Span fontSize="xx-small" color="fg.muted" marginLeft="1" fontWeight="normal" lineHeight="shorter">
+            v{version}
+          </Span>
         </Text>
         <Text fontSize="xs" color="fg.muted">
           {t.app.subtitle}
