@@ -29,6 +29,7 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
       flip: ['left-start', 'bottom', 'top', 'right-start'],
       getAnchorElement: () => positioningTarget,
       gutter: 10,
+      overlap: true,
       overflowPadding: 8,
       placement: 'right-start',
       strategy: 'fixed',
