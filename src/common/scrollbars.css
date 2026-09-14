@@ -1,0 +1,14 @@
+*::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+*::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-track {
+  background: var(--chakra-colors-bg-muted);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--chakra-colors-border-emphasized);
+  border-radius: 3px;
+}
