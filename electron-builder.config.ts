@@ -26,6 +26,10 @@ const config: Configuration = {
       },
     ],
   },
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+  },
 }
 
 export default config
