@@ -26,18 +26,18 @@ export const EditorSubProjectTabs: FC = () => {
   }, [createSubProject, navigateToSubProject])
 
   return (
-    <Tabs.Root size="md" value={subProject?.id} variant="outline" width="100%">
+    <Tabs.Root size="sm" value={subProject?.id} variant="subtle" width="100%">
       <Tabs.List _before={{ borderBottomColor: 'bg.panel' }} alignItems="center">
         {project.subProjects.map((subProject) => {
           const rootPanel = accessors.subProject(subProject).rootPanel()
           return (
             <HStack gap="0" key={subProject.id}>
               <Tabs.Trigger
-                as="div"
-                _selected={{ bg: 'bg.panel', borderColor: 'bg.panel', boxShadow: 'md' }}
+                _selected={{ bg: { _dark: 'gray.700', base: 'gray.300' } }}
                 onClick={() => handleSubProjectClick(subProject.id)}
                 pr="2"
                 value={subProject.id}
+                borderRadius="0"
               >
                 <PiWalletDuotone /> {rootPanel.name}
                 <ComponentActionsMenu size="2xs" component={rootPanel} subProjectOnly={true} subProject={subProject} />

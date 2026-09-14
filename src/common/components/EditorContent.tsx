@@ -1,4 +1,13 @@
-import { Box, Button, Card, Heading, Splitter, SplitterPanelData, SplitterResizeEndDetails } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Splitter,
+  SplitterPanelData,
+  SplitterResizeEndDetails,
+} from '@chakra-ui/react'
 import { FC, ReactElement, useCallback, useMemo } from 'react'
 import { PiPlus, PiWarningCircle } from 'react-icons/pi'
 import { useEditorContext } from '../contexts/EditorContext'
@@ -41,54 +50,64 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   )
 
   return (
-    <Splitter.Root
-      defaultSize={settings.app.splitterSizes}
-      height="100%"
-      minHeight="0"
-      minWidth="0"
-      orientation="horizontal"
-      onResizeEnd={handleResizeEnd}
-      panels={panels}
-    >
-      <Splitter.Panel id="draw-area" minHeight="0" minWidth="0">
-        <Box height="100%" minHeight="0" minWidth="0" overflow="hidden" position="relative">
-          {isDefined(subProject) && <DrawArea />}
-          {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
-          {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
+    <Flex direction="column" height="100%" minHeight="0" minWidth="0">
+      <Splitter.Root
+        defaultSize={settings.app.splitterSizes}
+        flex="1"
+        minHeight="0"
+        minWidth="0"
+        orientation="horizontal"
+        onResizeEnd={handleResizeEnd}
+        panels={panels}
+      >
+        <Splitter.Panel id="draw-area" minHeight="0" minWidth="0">
+          <Box height="100%" minHeight="0" minWidth="0" overflow="hidden" position="relative">
+            {isDefined(subProject) && <DrawArea />}
+            {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
+            {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
 
-          <Box left="3" position="absolute" right="3" top="3" zIndex="1">
-            <Box maxWidth="100%" width="fit-content">
-              <EditorMenu menu={menu} projects={projects} />
+            <Box left="3" position="absolute" right="3" top="3" zIndex="1">
+              <Box maxWidth="100%" width="fit-content">
+                <EditorMenu menu={menu} projects={projects} />
+              </Box>
             </Box>
+
+            {isDefined(subProject) && <FloatingEditors />}
           </Box>
+        </Splitter.Panel>
 
-          <Box bottom="0" left="0" overflowX="auto" overflowY="hidden" position="absolute" right="3" zIndex="1">
-            <Box minWidth="100%" width="max-content">
-              <EditorSubProjectTabs />
-            </Box>
+        <Splitter.ResizeTrigger id="draw-area:tree" mt="3" mb="3">
+          <Splitter.ResizeTriggerIndicator />
+        </Splitter.ResizeTrigger>
+
+        <Splitter.Panel id="tree" minHeight="0" minWidth="0">
+          <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
+            <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0">
+              <Card.Header>
+                <Heading size="sm">{t.editor.panels.components.title}</Heading>
+              </Card.Header>
+              <Card.Body flex="1" minHeight="0" overflow="auto" padding="4">
+                {isDefined(subProject) ? <EditorComponentTree /> : <EmptyComponentTreeState />}
+              </Card.Body>
+            </Card.Root>
           </Box>
+        </Splitter.Panel>
+      </Splitter.Root>
 
-          {isDefined(subProject) && <FloatingEditors />}
+      <Box
+        bg="bg.panel"
+        borderColor="border"
+        borderTopWidth="1px"
+        flexShrink="0"
+        overflowX="auto"
+        overflowY="hidden"
+        width="100%"
+      >
+        <Box minWidth="100%" width="max-content">
+          <EditorSubProjectTabs />
         </Box>
-      </Splitter.Panel>
-
-      <Splitter.ResizeTrigger id="draw-area:tree" mt="3" mb="3">
-        <Splitter.ResizeTriggerIndicator />
-      </Splitter.ResizeTrigger>
-
-      <Splitter.Panel id="tree" minHeight="0" minWidth="0">
-        <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
-          <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0">
-            <Card.Header>
-              <Heading size="sm">{t.editor.panels.components.title}</Heading>
-            </Card.Header>
-            <Card.Body flex="1" minHeight="0" overflow="auto" padding="4">
-              {isDefined(subProject) ? <EditorComponentTree /> : <EmptyComponentTreeState />}
-            </Card.Body>
-          </Card.Root>
-        </Box>
-      </Splitter.Panel>
-    </Splitter.Root>
+      </Box>
+    </Flex>
   )
 }
 
