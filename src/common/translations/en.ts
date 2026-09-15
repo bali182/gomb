@@ -142,6 +142,10 @@ export const EN: TranslationSchema = {
           reportIssue: 'Report issue',
           viewLicense: 'License',
         },
+        downloadApp: {
+          name: 'Download app',
+          downloadApp: 'Download',
+        },
       },
     },
     scalingDialog: {

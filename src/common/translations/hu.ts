@@ -141,6 +141,10 @@ export const HU = {
           reportIssue: 'Probléma jelentése',
           viewLicense: 'Licenc',
         },
+        downloadApp: {
+          name: 'App letöltése',
+          downloadApp: 'Letöltés',
+        },
       },
     },
     scalingDialog: {

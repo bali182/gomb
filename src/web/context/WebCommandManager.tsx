@@ -8,7 +8,7 @@ import {
   EDITOR_SMALL_STEP,
   EDITOR_STITCH_HOLE_DISTANCE_STEP,
 } from '../../common/constants/commands'
-import { ISSUES_URL, REPO_URL } from '../../common/constants/links'
+import { APP_DOWNLOAD_URL, ISSUES_URL, REPO_URL } from '../../common/constants/links'
 import { CommandsContext, CommandsContextValue } from '../../common/contexts/CommandsContext'
 import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmitter'
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
@@ -81,6 +81,9 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return setLicenseDialogOpen(true)
         case 'view-source-code':
           window.open(REPO_URL, '_blank', 'noopener,noreferrer')
+          return
+        case 'download-app':
+          window.open(APP_DOWNLOAD_URL, '_blank', 'noopener,noreferrer')
           return
         case 'download-project': {
           if (!isDefined(project)) {

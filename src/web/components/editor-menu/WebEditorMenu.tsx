@@ -9,6 +9,7 @@ import { StitchingSettingsMenuGroup } from '../../../common/components/editor-me
 import { StitchingVisibilityMenuGroup } from '../../../common/components/editor-menu/groups/StitchingVisibilityMenuGroup'
 import { UndoRedoMenuGroup } from '../../../common/components/editor-menu/groups/UndoRedoMenuGroup'
 import { EditMenu, FileMenu, HelpMenu, ProjectMenu, ViewMenu } from '../../../common/components/editor-menu/Menus'
+import { DownloadAppGroup } from './groups/DownloadAppGroup'
 import { DownloadMenuGroup } from './groups/DownloadMenuGroup'
 
 export const WebEditorMenu: FC = () => {
@@ -31,6 +32,7 @@ export const WebEditorMenu: FC = () => {
         <ScalingMenuGroup />
       </ViewMenu>
       <HelpMenu>
+        <DownloadAppGroup />
         <HelpGroup />
       </HelpMenu>
     </>
