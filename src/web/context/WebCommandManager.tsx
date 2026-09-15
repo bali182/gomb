@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react'
+import { LicenseDialog } from '../../common/components/LicenseDialog'
 import { PdfExportDialog } from '../../common/components/PdfExportDialog'
 import { ScalingDialog } from '../../common/components/ScalingDialog'
 import { SvgExportDialog } from '../../common/components/SvgExportDialog'
@@ -7,6 +8,7 @@ import {
   EDITOR_SMALL_STEP,
   EDITOR_STITCH_HOLE_DISTANCE_STEP,
 } from '../../common/constants/commands'
+import { ISSUES_URL, REPO_URL } from '../../common/constants/links'
 import { CommandsContext, CommandsContextValue } from '../../common/contexts/CommandsContext'
 import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmitter'
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
@@ -18,6 +20,7 @@ import { useWebCommands } from '../hooks/useWebCommands'
 import type { WebCommandIdSchema, WebCommandSchema } from '../schemas/webCommands'
 
 export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
+  const [isLicenseDialogOpen, setLicenseDialogOpen] = useState<boolean>(false)
   const [isScalingDialogOpen, setScalingDialogOpen] = useState<boolean>(false)
   const [isSvgExportDialogOpen, setSvgExportDialogOpen] = useState<boolean>(false)
   const [isPdfExportDialogOpen, setPdfExportDialogOpen] = useState<boolean>(false)
@@ -71,6 +74,14 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return setViewSettings({ stitchesVisible: !settings.view.stitchesVisible })
         case 'stitch-count-visibility':
           return setViewSettings({ stitchCountVisible: !settings.view.stitchCountVisible })
+        case 'report-issue':
+          window.open(ISSUES_URL, '_blank', 'noopener,noreferrer')
+          return
+        case 'view-license':
+          return setLicenseDialogOpen(true)
+        case 'view-source-code':
+          window.open(REPO_URL, '_blank', 'noopener,noreferrer')
+          return
         case 'download-project': {
           if (!isDefined(project)) {
             throw new Error(`Cannot download project.`)
@@ -107,6 +118,9 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
       )}
       {!commands['scaling'].disabled && (
         <ScalingDialog isOpen={isScalingDialogOpen} onOpenChange={setScalingDialogOpen} />
+      )}
+      {!commands['view-license'].disabled && (
+        <LicenseDialog isOpen={isLicenseDialogOpen} onOpenChange={setLicenseDialogOpen} />
       )}
     </CommandsContext.Provider>
   )

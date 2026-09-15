@@ -78,6 +78,13 @@ ipcMain.handle(electronIpcChannels.getSettings, () => {
   return _electronApi.getSettings()
 })
 
+ipcMain.handle(electronIpcChannels.openExternal, (_event, url: unknown) => {
+  if (typeof url !== 'string') {
+    throw new Error(`Expected URL string.`)
+  }
+  return _electronApi.openExternal(url)
+})
+
 ipcMain.handle(electronIpcChannels.setSettings, async (_event, request: unknown) => {
   if (!typia.is<SettingsSetRequestSchema>(request)) {
     return { type: 'error' }

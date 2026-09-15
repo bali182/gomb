@@ -6,7 +6,7 @@ import { EN } from './en'
 import { HU } from './hu'
 import type { TranslationSchema } from './translationSchema'
 
-type TranslationLanguage = 'en' | 'hu'
+export type TranslationLanguage = 'en' | 'hu'
 
 register('hu', hu)
 

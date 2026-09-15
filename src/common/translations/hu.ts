@@ -1,7 +1,9 @@
 import type { ColorKey } from '../data/colors'
 import type { CardSchemaId } from '../schemas/valuables'
+import type { TranslationLanguage } from './translation'
 
 export const HU = {
+  language: 'hu' as TranslationLanguage,
   app: {
     title: 'Gomb',
     subtitle: 'Egy egyszerű bőrdíszmű tervező program.',
@@ -133,9 +135,12 @@ export const HU = {
       },
       help: {
         name: 'Segítség',
-        viewSourceCode: 'Forráskód megtekintése',
-        reportIssue: 'Probléma jelentése',
-        viewLicense: 'Licenc',
+        help: {
+          name: 'Segítség',
+          viewSourceCode: 'Forráskód megtekintése',
+          reportIssue: 'Probléma jelentése',
+          viewLicense: 'Licenc',
+        },
       },
     },
     scalingDialog: {

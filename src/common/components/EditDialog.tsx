@@ -14,6 +14,7 @@ type EditDialogProps = PropsWithChildren & {
   canSubmit: boolean
   size?: DialogRootProps['size']
   loading?: boolean
+  hasCancel?: boolean
   onOpenChange: (isOpen: boolean) => void
   onSubmit: () => void
   onResetData: () => void
@@ -30,6 +31,7 @@ export const EditDialog: FC<EditDialogProps> = ({
   size = 'lg',
   loading = false,
   description,
+  hasCancel = true,
   onResetData,
   onOpenChange,
   onSubmit,
@@ -78,9 +80,11 @@ export const EditDialog: FC<EditDialogProps> = ({
             <form onSubmit={handleSubmit} style={formStyle}>
               <Dialog.Body px="0">{children}</Dialog.Body>
               <Dialog.Footer>
-                <Dialog.ActionTrigger asChild>
-                  <Button variant="outline">{t.common.actions.cancel}</Button>
-                </Dialog.ActionTrigger>
+                {hasCancel && (
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline">{t.common.actions.cancel}</Button>
+                  </Dialog.ActionTrigger>
+                )}
                 <Button disabled={!canSubmit} loading={loading} type="submit" variant="solid">
                   {submit}
                 </Button>

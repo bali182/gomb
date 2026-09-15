@@ -131,6 +131,7 @@ export type ElectronApi = {
     request: FileFindExistingFilePathsRequestSchema,
   ) => Promise<FileFindExistingFilePathsResponseSchema>
   getSettings: () => Promise<GlobalSettingsSchema>
+  openExternal: (url: string) => Promise<void>
   read: (request: FileReadRequestSchema) => Promise<FileReadResponseSchema>
   setSettings: (request: SettingsSetRequestSchema) => Promise<SettingsSetResponseSchema>
   suggestPath: (request: FileSuggestPathRequestSchema) => Promise<FileSuggestPathResponseSchema>

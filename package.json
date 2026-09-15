@@ -30,6 +30,7 @@
     "culori": "4.0.2",
     "jotai": "2.20.1",
     "jotai-family": "1.1.0",
+    "markdown-to-jsx": "9.10.2",
     "nanoid": "5.1.16",
     "open-sans-fonts": "1.6.2",
     "pako": "1.0.11",

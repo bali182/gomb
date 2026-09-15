@@ -1,8 +1,10 @@
 import type { ColorKey } from '../data/colors'
 import type { CardSchemaId } from '../schemas/valuables'
-import type { HU } from './hu'
+import type { TranslationLanguage } from './translation'
+import type { TranslationSchema } from './translationSchema'
 
-export const EN: typeof HU = {
+export const EN: TranslationSchema = {
+  language: 'en' as TranslationLanguage,
   app: {
     title: 'Gomb',
     subtitle: 'A simple app for designing leathercraft projects.',
@@ -134,9 +136,12 @@ export const EN: typeof HU = {
       },
       help: {
         name: 'Help',
-        viewSourceCode: 'View source code',
-        reportIssue: 'Report issue',
-        viewLicense: 'License',
+        help: {
+          name: 'Help',
+          viewSourceCode: 'View source code',
+          reportIssue: 'Report issue',
+          viewLicense: 'License',
+        },
       },
     },
     scalingDialog: {
