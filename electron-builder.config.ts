@@ -15,7 +15,7 @@ const config: Configuration = {
         arch: ['arm64'],
       },
     ],
-    identity: null,
+    identity: '-',
     hardenedRuntime: false,
   },
   win: {
