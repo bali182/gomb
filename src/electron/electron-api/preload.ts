@@ -6,6 +6,7 @@ const electronApi: ElectronApi = {
   dialog: (request) => ipcRenderer.invoke(electronIpcChannels.dialog, request),
   findExistingFilePaths: (request) => ipcRenderer.invoke(electronIpcChannels.findExistingFilePaths, request),
   getSettings: () => ipcRenderer.invoke(electronIpcChannels.getSettings),
+  openExternal: (url) => ipcRenderer.invoke(electronIpcChannels.openExternal, url),
   read: (request) => ipcRenderer.invoke(electronIpcChannels.read, request),
   setSettings: (request) => ipcRenderer.invoke(electronIpcChannels.setSettings, request),
   suggestPath: (request) => ipcRenderer.invoke(electronIpcChannels.suggestPath, request),

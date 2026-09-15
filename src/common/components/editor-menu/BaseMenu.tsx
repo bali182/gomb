@@ -1,5 +1,5 @@
 import { Button, Menu, Portal } from '@chakra-ui/react'
-import { FC, ReactElement, useCallback, useEffect, useRef, useState } from 'react'
+import { Children, FC, ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import { PiCaretDown } from 'react-icons/pi'
 import { portalRef } from '../../portalRef'
 import { intersperse } from '../../utils/intersperse'
@@ -7,7 +7,7 @@ import { intersperse } from '../../utils/intersperse'
 export type BaseMenuProps = {
   title: string
   autoFocus?: boolean
-  children: ReactElement[]
+  children: ReactElement[] | ReactElement
 }
 
 export const BaseMenu: FC<BaseMenuProps> = ({ title, autoFocus, children }: BaseMenuProps) => {
@@ -26,7 +26,9 @@ export const BaseMenu: FC<BaseMenuProps> = ({ title, autoFocus, children }: Base
     return () => cancelAnimationFrame(frameId)
   }, [autoFocus, isOpen])
 
-  const withSeparators = intersperse(children, (prev, next) => <Menu.Separator key={`${prev}-${next}-separator`} />)
+  const withSeparators = intersperse(Children.toArray(children), (prev, next) => (
+    <Menu.Separator key={`${prev}-${next}-separator`} />
+  ))
 
   return (
     <Menu.Root onOpenChange={handleOpenChange}>

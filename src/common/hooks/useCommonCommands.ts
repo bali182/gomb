@@ -90,6 +90,19 @@ export const useCommonCommands = ({ canRedo, canUndo, hasOpenProject }: UseCommo
         disabled: false,
         shortcut: { default: ['CommandOrControl', 'Shift', 'V'] },
       },
+      // Help
+      'view-source-code': {
+        id: 'view-source-code',
+        disabled: false,
+      },
+      'report-issue': {
+        id: 'report-issue',
+        disabled: false,
+      },
+      'view-license': {
+        id: 'view-license',
+        disabled: false,
+      },
     } satisfies CommonCommandsMap
   }, [canRedo, canUndo, hasOpenProject])
 

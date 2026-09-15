@@ -27,8 +27,8 @@ export const createNativeCommandHandler =
       shiftKey: input.shift,
     }
 
-    const command = nativeElectronCommands.find((candidate) =>
-      matchesShortcut(candidate.shortcut, baseKeyEvent, platform),
+    const command = nativeElectronCommands.find(
+      (candidate) => isDefined(candidate.shortcut) && matchesShortcut(candidate.shortcut, baseKeyEvent, platform),
     )
 
     if (!isDefined(command)) {

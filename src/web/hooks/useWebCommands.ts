@@ -26,6 +26,11 @@ export const useWebCommands = (): WebCommandMap => {
         disabled: !hasOpenProject,
         shortcut: { default: ['CommandOrControl', 'S'] },
       },
+      // Help
+      'download-app': {
+        id: 'download-app',
+        disabled: false,
+      },
     } satisfies WebCommandMap
   }, [commonCommands, hasOpenProject])
 

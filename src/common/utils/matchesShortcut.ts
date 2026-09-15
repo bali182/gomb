@@ -14,11 +14,11 @@ const isAcceleratorKey = (key: KeySchema): key is AcceleratorKeySchema => {
 }
 
 export const matchesShortcut = (
-  shortcut: CommandShortcutSchema,
+  shortcut: CommandShortcutSchema | undefined,
   event: BasicKeyEventSchema,
   platform: PlatformSchema,
 ): boolean => {
-  if (platform === 'mobile') {
+  if (platform === 'mobile' || !isDefined(shortcut)) {
     return false
   }
   const keys = getCommandShortcut(shortcut, platform)
