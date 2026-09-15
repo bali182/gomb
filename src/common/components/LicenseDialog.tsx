@@ -14,15 +14,16 @@ type LicenseDialogProps = {
 
 const renderLicenseMarkdown = (markdown: string) => {
   return compiler(markdown, {
-    renderRule: (_next, node, renderChildren, state) => {
+    renderRule: (_, node, renderChildren, state) => {
       switch (node.type) {
-        case RuleType.heading:
+        case RuleType.heading: {
           return (
             <Heading key={state.key} size={node.level === 1 ? 'lg' : 'md'}>
               {renderChildren(node.children, state)}
             </Heading>
           )
-        case RuleType.orderedList:
+        }
+        case RuleType.orderedList: {
           return (
             <List.Root as="ol" key={state.key} paddingLeft="8">
               {node.items.map((item, index) => (
@@ -30,15 +31,18 @@ const renderLicenseMarkdown = (markdown: string) => {
               ))}
             </List.Root>
           )
-        case RuleType.paragraph:
+        }
+        case RuleType.paragraph: {
           return (
             <Text my="3" key={state.key}>
               {renderChildren(node.children, state)}
             </Text>
           )
-        case RuleType.text:
+        }
+        case RuleType.text: {
           return node.text
-        case RuleType.textFormatted:
+        }
+        case RuleType.textFormatted: {
           if (node.tag !== 'strong') {
             throw new Error(`Unhandled license markdown format: ${node.tag}`)
           }
@@ -47,8 +51,10 @@ const renderLicenseMarkdown = (markdown: string) => {
               {renderChildren(node.children, state)}
             </Text>
           )
-        default:
+        }
+        default: {
           throw new Error(`Unhandled license markdown node: ${node.type}`)
+        }
       }
     },
   })
