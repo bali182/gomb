@@ -131,6 +131,12 @@ export const HU = {
           lineThickness: 'Vonal vastagsága',
         },
       },
+      help: {
+        name: 'Segítség',
+        viewSourceCode: 'Forráskód megtekintése',
+        reportIssue: 'Probléma jelentése',
+        viewLicense: 'Licenc',
+      },
     },
     scalingDialog: {
       title: 'Skálázás',

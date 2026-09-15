@@ -3,7 +3,7 @@ import { useTranslation } from '../../translations/translation'
 import { BaseMenu } from './BaseMenu'
 
 type CommonMenuProps = {
-  children: ReactElement[]
+  children: ReactElement[] | ReactElement
 }
 
 export const FileMenu: FC<CommonMenuProps> = ({ children }) => {
@@ -28,4 +28,9 @@ export const ProjectMenu: FC<CommonMenuProps> = ({ children }) => {
       {children}
     </BaseMenu>
   )
+}
+
+export const HelpMenu: FC<CommonMenuProps> = ({ children }) => {
+  const t = useTranslation()
+  return <BaseMenu title={t.editor.menus.help.name}>{children}</BaseMenu>
 }

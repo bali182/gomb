@@ -132,6 +132,12 @@ export const EN: typeof HU = {
           lineThickness: 'Line thickness',
         },
       },
+      help: {
+        name: 'Help',
+        viewSourceCode: 'View source code',
+        reportIssue: 'Report issue',
+        viewLicense: 'License',
+      },
     },
     scalingDialog: {
       title: 'Scaling',

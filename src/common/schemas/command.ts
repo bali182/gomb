@@ -121,9 +121,13 @@ export type CommonCommandIdSchema =
   | 'stitches-visibility'
   | 'stitch-count-visibility'
   | 'scaling'
+  // Help menu
+  | 'view-source-code'
+  | 'report-issue'
+  | 'view-license'
 
 export type CommandSchema<C> = {
   id: C
   disabled?: boolean
-  shortcut: CommandShortcutSchema
+  shortcut?: CommandShortcutSchema
 }

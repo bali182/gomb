@@ -33,6 +33,7 @@ export const EditorSubProjectTabs: FC = () => {
           return (
             <HStack gap="0" key={subProject.id}>
               <Tabs.Trigger
+                as="div"
                 _selected={{ bg: { _dark: 'gray.700', base: 'gray.300' } }}
                 onClick={() => handleSubProjectClick(subProject.id)}
                 pr="2"
