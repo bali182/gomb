@@ -178,7 +178,8 @@ export const EN: TranslationSchema = {
       cutHelperDistance: 'Cut helper distance',
     },
     stitchLineModes: {
-      ownStitchLines: 'Own stitch lines only',
+      ownStitchLines: 'Own stitch lines',
+      relatedStitchLines: 'Related stitch lines',
       allStitchLines: 'All stitch lines',
     },
   },

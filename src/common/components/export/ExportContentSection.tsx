@@ -35,6 +35,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
   const stitchLineModeOptions = useMemo<ExportStitchLineModeOption[]>(
     () => [
       { label: t.exportSettings.stitchLineModes.ownStitchLines, value: 'own-stitch-lines' },
+      { label: t.exportSettings.stitchLineModes.relatedStitchLines, value: 'related-stitch-lines' },
       { label: t.exportSettings.stitchLineModes.allStitchLines, value: 'all-stitch-lines' },
     ],
     [t],

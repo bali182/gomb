@@ -1,5 +1,5 @@
-import { PdfExportSettingsSchema } from './pdfExport'
-import { RecentProjectsSchema } from './recentProject'
+import type { PdfExportSettingsSchema } from './pdfExport'
+import type { RecentProjectsSchema } from './recentProject'
 import type { ThemeSchema } from './theme'
 
 export type NumberEditorStepSchema = number | 'stitch-hole-distance'
@@ -14,7 +14,7 @@ export type ColorSettingsSchema = {
   threadColor: string
 }
 
-export type ExportStitchLineModeSchema = 'own-stitch-lines' | 'all-stitch-lines'
+export type ExportStitchLineModeSchema = 'own-stitch-lines' | 'all-stitch-lines' | 'related-stitch-lines'
 
 export type BaseExportSettingsSchema = {
   gap: number

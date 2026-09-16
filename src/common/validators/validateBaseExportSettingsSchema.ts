@@ -8,6 +8,7 @@ import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 export const exportStitchLineModes: Record<ExportStitchLineModeSchema, boolean> = {
   'all-stitch-lines': true,
   'own-stitch-lines': true,
+  'related-stitch-lines': true,
 }
 
 export const validateBaseExportSettingsSchema = (

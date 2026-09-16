@@ -177,8 +177,9 @@ export const HU = {
       cutHelperDistance: 'Vágási segédtávolság',
     },
     stitchLineModes: {
-      ownStitchLines: 'Csak a saját varróvonalak',
-      allStitchLines: 'Összes varróvonal',
+      ownStitchLines: 'Saját varrások',
+      relatedStitchLines: 'Kapcsolódó varrások',
+      allStitchLines: 'Összes varrás',
     },
   },
   svgExport: {
