@@ -47,7 +47,7 @@ type SvgExportElementProps = {
 }
 
 const SvgExportElement: FC<SvgExportElementProps> = ({ element, project, settings }) => {
-  const drawAreaContextValue = useSvgDrawArea(element.subProject, project.stitchingSettings, settings)
+  const drawAreaContextValue = useSvgDrawArea(project.stitchingSettings, settings)
 
   return (
     <ExportDrawAreaContext.Provider value={drawAreaContextValue}>

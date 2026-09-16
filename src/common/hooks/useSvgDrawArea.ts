@@ -14,12 +14,10 @@ import type {
 } from '../schemas/drawArea'
 import { BaseExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
-import type { SubProjectSchema } from '../schemas/subProject'
 import { useTranslation } from '../translations/translation'
 import { produce } from '../utils/produce'
 
 export const useSvgDrawArea = (
-  subProject: SubProjectSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
   settings: BaseExportSettingsSchema,
 ): DrawAreaContextValue => {

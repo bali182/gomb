@@ -4,9 +4,8 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
+import { useSvgDrawArea } from '../hooks/useSvgDrawArea'
 import { exportPdf } from '../logic/exports/exportPdf'
-import { getComputedPdfExport } from '../logic/exports/getComputedPdfExport'
-import { getComputedProject } from '../logic/getComputedProject'
 import type { EditableSchema } from '../schemas/editable'
 import type { PdfExportSettingsSchema, PdfExportUnsuccessfulLayoutSchema } from '../schemas/pdfExport'
 import type { BaseValidationContextSchema } from '../schemas/validation'
@@ -38,6 +37,7 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
   const { project } = useProject()
   const { setPdfExportSettings, settings } = useGlobalSettings()
   const [exportParams, setExportParams] = useState<PdfExportSettingsSchema>(settings.pdfExport)
+  const drawAreaContextValue = useSvgDrawArea(project.stitchingSettings, exportParams)
   const [localPdfExportSettings, setLocalPdfExportSettings] = useState<EditableSchema<PdfExportSettingsSchema>>(() =>
     getEditableSchema(settings.pdfExport, { language: LANGUAGE }),
   )
@@ -83,18 +83,16 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
       return
     }
 
-    const computedProject = getComputedProject(project)
-    const layout = getComputedPdfExport(project, computedProject, submitValidationResult.value)
-
-    if (layout.type === 'unsuccessful-pdf-export') {
-      setFailure({ layout, type: 'unplaceable' })
-      return
-    }
-
     setIsExporting(true)
 
     try {
-      await exportPdf(project, submitValidationResult.value, layout)
+      const layout = await exportPdf(project, submitValidationResult.value, drawAreaContextValue)
+
+      if (layout.type === 'unsuccessful-pdf-export') {
+        setFailure({ layout, type: 'unplaceable' })
+        return
+      }
+
       setPdfExportSettings(submitValidationResult.value)
       onOpenChange(false)
     } catch (error) {
@@ -103,7 +101,7 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
     } finally {
       setIsExporting(false)
     }
-  }, [context, localPdfExportSettings, exportParams, onOpenChange, project, setPdfExportSettings])
+  }, [context, drawAreaContextValue, localPdfExportSettings, exportParams, onOpenChange, project, setPdfExportSettings])
 
   return (
     <EditDialog
