@@ -4,11 +4,27 @@ import { resolve } from 'node:path'
 import { electronBuildTargets } from './src/electron/electron-api/buildPaths'
 import { createViteConfig } from './vite.common'
 
-const developmentContentSecurityPolicy =
-  "base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws://localhost:4000; object-src 'none'"
+const developmentContentSecurityPolicy = `
+  base-uri 'self';
+  default-src 'self';
+  script-src 'self' 'wasm-unsafe-eval';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:;
+  font-src 'self' data:;
+  connect-src 'self' data: ws://localhost:4000;
+  object-src 'none';
+`
 
-const productionContentSecurityPolicy =
-  "base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'"
+const productionContentSecurityPolicy = `
+  base-uri 'self';
+  default-src 'self';
+  script-src 'self' 'wasm-unsafe-eval';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:;
+  font-src 'self' data:;
+  connect-src 'self' data:;
+  object-src 'none';
+`
 
 export default defineConfig(({ command }) => {
   const contentSecurityPolicy = command === 'serve' ? developmentContentSecurityPolicy : productionContentSecurityPolicy
