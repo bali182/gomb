@@ -528,4 +528,8 @@ export const HU = {
     'ID-2-portrait': 'ID-2',
     'ID-3-portrait': 'ID-3',
   } satisfies Record<CardSchemaId, string>,
+  licenseDialog: {
+    title: 'Licenc',
+    close: 'Rendben',
+  },
 }
