@@ -24,7 +24,7 @@ export const defaultStitchingSettings: StitchLineCommonConfigSchema = {
 export const defaultSvgExportParams: BaseExportSettingsSchema = {
   gap: 10,
   padding: 10,
-  stitchLineMode: 'all-stitch-lines',
+  stitchLineMode: 'related-stitch-lines',
   showNames: true,
   showDimensions: true,
   childMarkers: true,

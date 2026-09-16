@@ -1,11 +1,7 @@
 import { Svg } from '@react-pdf/renderer'
-import { useMemo, type FC, type ReactNode } from 'react'
+import type { FC, ReactNode } from 'react'
 
-import { ExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
-import { useSvgDrawArea } from '../../hooks/useSvgDrawArea'
-import { getSvgExportElementLayoutBoundingRect } from '../../logic/exports/getSvgExportElementLayoutBoundingRect'
-import type { PdfExportElement, PdfExportPageSchema, PdfExportSettingsSchema } from '../../schemas/pdfExport'
-import type { ProjectSchema } from '../../schemas/project'
+import type { PdfExportElement, PdfExportPageSchema } from '../../schemas/pdfExport'
 import type { SvgExportElementSchema } from '../../schemas/svgExport'
 import { PdfFrontPocket } from './PdfFrontPocket'
 import { PdfPanel } from './PdfPanel'
@@ -13,20 +9,13 @@ import { PdfTPocket } from './PdfTPocket'
 
 type PdfPageRootProps = {
   page: PdfExportPageSchema
-  project: ProjectSchema
-  settings: PdfExportSettingsSchema
 }
 
-export const PdfPageRoot: FC<PdfPageRootProps> = ({ page, project, settings }) => {
+export const PdfPageRoot: FC<PdfPageRootProps> = ({ page }) => {
   return (
     <>
       {page.elements.map((pageElement) => (
-        <PdfElement
-          key={`${pageElement.element.subProject.id}:${pageElement.element.id}`}
-          element={pageElement}
-          project={project}
-          settings={settings}
-        />
+        <PdfElement key={`${pageElement.element.subProject.id}:${pageElement.element.id}`} element={pageElement} />
       ))}
     </>
   )
@@ -34,33 +23,28 @@ export const PdfPageRoot: FC<PdfPageRootProps> = ({ page, project, settings }) =
 
 type PdfElementProps = {
   element: PdfExportElement
-  project: ProjectSchema
-  settings: PdfExportSettingsSchema
 }
 
-const PdfElement: FC<PdfElementProps> = ({ element: { element, placement }, project, settings }) => {
-  const drawAreaContextValue = useSvgDrawArea(element.subProject, project.stitchingSettings, settings)
-  const sourceRect = useMemo(() => getSvgExportElementLayoutBoundingRect(element), [element])
+const PdfElement: FC<PdfElementProps> = ({ element: { element, placement } }) => {
+  const { boundingRect } = placement
 
   return (
-    <ExportDrawAreaContext.Provider value={drawAreaContextValue}>
-      <Svg
-        fixed
-        height={`${sourceRect.height.toString()}mm`}
-        style={{
-          height: `${sourceRect.height.toString()}mm`,
-          left: `${placement.x.toString()}mm`,
-          position: 'absolute',
-          top: `${placement.y.toString()}mm`,
-          transform: placement.rotation === 90 ? [{ operation: 'rotate', value: [90, 0, 0] }] : undefined,
-          width: `${sourceRect.width.toString()}mm`,
-        }}
-        viewBox={`${sourceRect.x.toString()} ${sourceRect.y.toString()} ${sourceRect.width.toString()} ${sourceRect.height.toString()}`}
-        width={`${sourceRect.width.toString()}mm`}
-      >
-        {renderPdfElement(element)}
-      </Svg>
-    </ExportDrawAreaContext.Provider>
+    <Svg
+      fixed
+      height={`${boundingRect.height.toString()}mm`}
+      style={{
+        height: `${boundingRect.height.toString()}mm`,
+        left: `${placement.x.toString()}mm`,
+        position: 'absolute',
+        top: `${placement.y.toString()}mm`,
+        transform: placement.rotation === 90 ? [{ operation: 'rotate', value: [90, 0, 0] }] : undefined,
+        width: `${boundingRect.width.toString()}mm`,
+      }}
+      viewBox={`${boundingRect.x.toString()} ${boundingRect.y.toString()} ${boundingRect.width.toString()} ${boundingRect.height.toString()}`}
+      width={`${boundingRect.width.toString()}mm`}
+    >
+      {renderPdfElement(element)}
+    </Svg>
   )
 }
 

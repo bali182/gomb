@@ -74,9 +74,8 @@ export const LicenseDialog: FC<LicenseDialogProps> = ({ isOpen, onOpenChange }) 
       canSubmit={true}
       loading={false}
       hasCancel={false}
-      // TODO localisation
-      submit="Ok"
-      title="License"
+      submit={t.licenseDialog.close}
+      title={t.licenseDialog.title}
     >
       <Box gap="6" px="6">
         {renderLicenseMarkdown(t.language === 'hu' ? hungarianLicense : englishLicense)}

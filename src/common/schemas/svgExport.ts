@@ -1,10 +1,10 @@
 import type BigNumber from 'bignumber.js'
 
-import { HasTypeSchema } from './common'
+import type { HasTypeSchema } from './common'
 import type { ComponentSchema, PocketClusterSchema } from './components'
 import type { ComputedStitchHoleSchema, ComputedTPocketSchema, ComputedTopPocketSchema } from './computed'
 import type { PathSchema, RectSchema } from './geometry'
-import { BaseExportSettingsSchema } from './settings'
+import type { BaseExportSettingsSchema } from './settings'
 import type { ResolvedStitchLineSchema } from './stitching'
 import type { SubProjectSchema } from './subProject'
 

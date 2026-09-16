@@ -18,6 +18,8 @@ export type PdfExportSettingsSchema = BaseExportSettingsSchema & {
 
 export type PdfExportPlacementSchema = {
   boundingRect: RectSchema
+  /** The page-space footprint after compact-layout rotation. */
+  placementBoundingRect: RectSchema
   rotation: PdfExportPlacementRotation
   x: BigNumber
   y: BigNumber

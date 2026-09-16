@@ -1,3 +1,4 @@
+import { getComponentDescendants } from '../../operations/subProject/utils/getComponentDescendants'
 import type {
   ComputedPanelSchema,
   ComputedRootPanelSchema,
@@ -7,10 +8,11 @@ import type {
   ComputedTPocketSchema,
 } from '../../schemas/computed'
 import type { PathSchema } from '../../schemas/geometry'
-import { ExportStitchLineModeSchema } from '../../schemas/settings'
+import type { ExportStitchLineModeSchema } from '../../schemas/settings'
 import type { StitchLineCommonConfigSchema, StitchLineSchema } from '../../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/subProject'
 import type { SvgExportStitchLineSchema } from '../../schemas/svgExport'
+import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { clipPathToClosedPath } from '../clipPathToClosedPath'
@@ -31,20 +33,14 @@ export const getSvgExportStitchLines = (
 ): SvgExportStitchLineSchema[] => {
   const candidateStitchLines = getCandidateStitchLines(
     subProject.stitchLines,
-    computedSubProject.stitchLines,
-    getTargetComponentId(target),
+    computedSubProject,
+    subProject,
+    target,
     stitchLineMode,
   )
 
   return candidateStitchLines.flatMap((stitchLine) => {
-    const computedStitchLine = computedSubProject.stitchLines.find(
-      (candidateComputedStitchLine) => candidateComputedStitchLine.stitchLineId === stitchLine.id,
-    )
-
-    if (!isDefined(computedStitchLine)) {
-      return []
-    }
-
+    const computedStitchLine = accessors.computedSubProject(computedSubProject).stitchLine(stitchLine.id)
     const svgExportStitchLine = getSvgExportStitchLine(
       stitchLine,
       computedStitchLine,
@@ -69,21 +65,67 @@ const getTargetComponentId = (target: ComputedSvgExportStitchLineTarget): string
 
 const getCandidateStitchLines = (
   stitchLines: StitchLineSchema[],
-  computedStitchLines: ComputedStitchLineSchema[],
-  ownComponentId: string,
+  computedSubProject: ComputedSubProjectSchema,
+  subProject: SubProjectSchema,
+  target: ComputedSvgExportStitchLineTarget,
   stitchLineMode: ExportStitchLineModeSchema,
 ): StitchLineSchema[] => {
   switch (stitchLineMode) {
     case 'own-stitch-lines':
       return stitchLines.filter((stitchLine) => {
-        const computedStitchLine = computedStitchLines.find(
-          (candidateComputedStitchLine) => candidateComputedStitchLine.stitchLineId === stitchLine.id,
-        )
-        return isDefined(computedStitchLine) && computedStitchLine.componentId === ownComponentId
+        const computedStitchLine = accessors.computedSubProject(computedSubProject).stitchLine(stitchLine.id)
+        return computedStitchLine.componentId === getTargetComponentId(target)
       })
     case 'all-stitch-lines':
       return stitchLines
+    case 'related-stitch-lines':
+      return getContainedStitchLines(stitchLines, computedSubProject, subProject, target)
   }
+}
+
+const getContainedStitchLines = (
+  stitchLines: StitchLineSchema[],
+  computedSubProject: ComputedSubProjectSchema,
+  subProject: SubProjectSchema,
+  target: ComputedSvgExportStitchLineTarget,
+): StitchLineSchema[] => {
+  switch (target.type) {
+    case 'computed-root-panel':
+    case 'computed-panel': {
+      const component = accessors.subProject(subProject).component(target.componentId)
+      const componentIds = new Set(getComponentDescendants(component, subProject))
+      return stitchLines.filter((stitchLine) => {
+        const computedStitchLine = accessors.computedSubProject(computedSubProject).stitchLine(stitchLine.id)
+        return componentIds.has(computedStitchLine.componentId)
+      })
+    }
+    case 'computed-top-pocket':
+      return getPocketClusterComponentBoundsStitchLines(stitchLines, computedSubProject, target.componentId)
+    case 'computed-t-pocket':
+      return getPocketClusterStitchLines(stitchLines, computedSubProject, target.componentId)
+  }
+}
+
+const getPocketClusterComponentBoundsStitchLines = (
+  stitchLines: StitchLineSchema[],
+  computedSubProject: ComputedSubProjectSchema,
+  componentId: string,
+): StitchLineSchema[] => {
+  return stitchLines.filter((stitchLine) => {
+    const computedStitchLine = accessors.computedSubProject(computedSubProject).stitchLine(stitchLine.id)
+    return stitchLine.type === 'component-bounds-stitch-line' && computedStitchLine.componentId === componentId
+  })
+}
+
+const getPocketClusterStitchLines = (
+  stitchLines: StitchLineSchema[],
+  computedSubProject: ComputedSubProjectSchema,
+  componentId: string,
+): StitchLineSchema[] => {
+  return stitchLines.filter((stitchLine) => {
+    const computedStitchLine = accessors.computedSubProject(computedSubProject).stitchLine(stitchLine.id)
+    return computedStitchLine.componentId === componentId
+  })
 }
 
 const getSvgExportStitchLine = (

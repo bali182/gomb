@@ -177,8 +177,9 @@ export const HU = {
       cutHelperDistance: 'Vágási segédtávolság',
     },
     stitchLineModes: {
-      ownStitchLines: 'Csak a saját varróvonalak',
-      allStitchLines: 'Összes varróvonal',
+      ownStitchLines: 'Saját varrások',
+      relatedStitchLines: 'Kapcsolódó varrások',
+      allStitchLines: 'Összes varrás',
     },
   },
   svgExport: {
@@ -527,4 +528,8 @@ export const HU = {
     'ID-2-portrait': 'ID-2',
     'ID-3-portrait': 'ID-3',
   } satisfies Record<CardSchemaId, string>,
+  licenseDialog: {
+    title: 'Licenc',
+    close: 'Rendben',
+  },
 }

@@ -59,7 +59,7 @@ export const useElectronCommands = (): ElectronCommandMap => {
       'increment-stitch-hole-distance': {
         id: 'increment-stitch-hole-distance',
         disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Digit2'] },
+        shortcut: { default: ['CommandOrControl', 'Digit3'] },
       },
     } satisfies ElectronCommandMap
   }, [commonCommands, hasOpenProject, hasProjectAndIsDirty])
