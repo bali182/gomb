@@ -269,6 +269,9 @@ export const EN: TranslationSchema = {
       errors: {
         saveFailed: 'The project could not be saved.',
       },
+      successes: {
+        saveSucceeded: 'Saved',
+      },
     },
     unsavedChangesDialog: {
       title: 'Unsaved changes',

@@ -268,6 +268,9 @@ export const HU = {
       errors: {
         saveFailed: 'A projekt mentése nem sikerült.',
       },
+      successes: {
+        saveSucceeded: 'Mentve',
+      },
     },
     unsavedChangesDialog: {
       title: 'Nem mentett módosítások',

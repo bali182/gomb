@@ -36,6 +36,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     toaster.create({
       description: t.projects.openDialog.errors.openFailed,
       type: 'error',
+      closable: true,
     })
   }, [t.projects.openDialog.errors.openFailed])
 
@@ -43,8 +44,20 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     toaster.create({
       description: t.projects.saveDialog.errors.saveFailed,
       type: 'error',
+      closable: true,
     })
   }, [t.projects.saveDialog.errors.saveFailed])
+
+  const showSaveSucceededToast = useCallback((): void => {
+    toaster.create({
+      description: t.projects.saveDialog.successes.saveSucceeded,
+      type: 'info',
+      duration: 2000,
+      closable: true,
+    })
+  }, [t.projects.saveDialog.successes.saveSucceeded])
+
+  console.log('h')
 
   const writeProject = useCallback(
     async (target: ElectronProjectSchema): Promise<boolean> => {
@@ -169,8 +182,12 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       return
     }
 
-    await writeProject({ ...loadedElectronProject, isDirty: false })
-  }, [electronProject, writeProject])
+    const hasSaved = await writeProject({ ...loadedElectronProject, isDirty: false })
+
+    if (hasSaved) {
+      showSaveSucceededToast()
+    }
+  }, [electronProject, showSaveSucceededToast, writeProject])
 
   const saveProjectAs = useCallback(async (): Promise<void> => {
     const loadedElectronProject = Loadable.get(electronProject)
