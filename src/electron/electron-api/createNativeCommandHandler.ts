@@ -13,7 +13,7 @@ type NativeCommandHandlerParams = {
 
 export const createNativeCommandHandler =
   ({ app, browserWindow, platform }: NativeCommandHandlerParams) =>
-  (_event: Event, input: Input): void => {
+  (event: Event, input: Input): void => {
     if (input.type !== 'keyDown') {
       return
     }
@@ -38,8 +38,10 @@ export const createNativeCommandHandler =
     switch (command.id) {
       case 'copy':
         return browserWindow.webContents.copy()
-      case 'paste':
+      case 'paste': {
+        event.preventDefault()
         return browserWindow.webContents.paste()
+      }
       case 'cut':
         return browserWindow.webContents.cut()
       case 'close-window':
