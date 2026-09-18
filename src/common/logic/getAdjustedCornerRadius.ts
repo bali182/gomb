@@ -26,19 +26,20 @@ type GetAdjustedCornerRadiusParams = BaseCornerRadiusAdjustmentParams & {
  *  - If parentCornerRadius is larger in any corner where component touches the parent, parent radius wins.
  *
  * In any case:
- *  - Radius is capped by Math.min(boundingRect.width, boundingRect.height) / 2
- *  - Or the provided cap.
+ *  - A radius up to Math.min(boundingRect.width, boundingRect.height) / 2 is always kept.
+ *  - Larger radii share the space remaining on their common edge equally.
+ *  - An optional provided cap is an additional hard cap.
  */
 
 export const getAdjustedCornerRadius = (params: GetAdjustedCornerRadiusParams): CornerRadiusSchema => {
   const { parentBoundingRect, boundingRect, cornerRadius, parentCornerRadius, radiusCap } = params
-  const cap = getCornerRadiusCap(radiusCap, boundingRect)
   const parentAdjustedRadius = adjustToParentRadius({
     boundingRect,
     cornerRadius: cornerRadius,
     parentBoundingRect: parentBoundingRect ?? boundingRect,
     parentCornerRadius: parentCornerRadius ?? ZERO_CORNER_RADIUS,
   })
+  const cap = getCornerRadiusCap(radiusCap, boundingRect, parentAdjustedRadius)
   const cappedRadius = capCornerRadius(parentAdjustedRadius, cap)
   return cappedRadius
 }
@@ -106,14 +107,90 @@ const capCornerRadius = (radius: CornerRadiusSchema, cap: CornerRadiusSchema): C
 const getCornerRadiusCap = (
   radiusCap: Partial<CornerRadiusSchema> | BigNumber | undefined,
   boundingRect: RectSchema,
+  cornerRadius: CornerRadiusSchema,
 ): CornerRadiusSchema => {
-  if (isDefined(radiusCap) && BigNumber.isBigNumber(radiusCap)) {
-    return getUniformCornerRadius(radiusCap)
-  }
   const smallerSide = BigNumber.max(BigNumber.min(boundingRect.width, boundingRect.height), 0)
-  const baseRadiusCap = getUniformCornerRadius(smallerSide.div(2))
-  if (isDefined(radiusCap) && typeof radiusCap === 'object') {
-    return { ...baseRadiusCap, ...radiusCap }
+  const guaranteedRadius = smallerSide.div(2)
+  const geometricCap = getGeometricCornerRadiusCap(boundingRect, cornerRadius, guaranteedRadius)
+
+  if (isDefined(radiusCap) && BigNumber.isBigNumber(radiusCap)) {
+    return capCornerRadius(geometricCap, getUniformCornerRadius(radiusCap))
   }
-  return baseRadiusCap
+  if (isDefined(radiusCap) && typeof radiusCap === 'object') {
+    return {
+      bottomLeft: isDefined(radiusCap.bottomLeft)
+        ? BigNumber.minimum(geometricCap.bottomLeft, radiusCap.bottomLeft)
+        : geometricCap.bottomLeft,
+      bottomRight: isDefined(radiusCap.bottomRight)
+        ? BigNumber.minimum(geometricCap.bottomRight, radiusCap.bottomRight)
+        : geometricCap.bottomRight,
+      topLeft: isDefined(radiusCap.topLeft)
+        ? BigNumber.minimum(geometricCap.topLeft, radiusCap.topLeft)
+        : geometricCap.topLeft,
+      topRight: isDefined(radiusCap.topRight)
+        ? BigNumber.minimum(geometricCap.topRight, radiusCap.topRight)
+        : geometricCap.topRight,
+    }
+  }
+  return geometricCap
+}
+
+const getGeometricCornerRadiusCap = (
+  boundingRect: RectSchema,
+  cornerRadius: CornerRadiusSchema,
+  guaranteedRadius: BigNumber,
+): CornerRadiusSchema => {
+  const [topLeftFromTop, topRightFromTop] = getEdgeRadiusCaps(
+    cornerRadius.topLeft,
+    cornerRadius.topRight,
+    boundingRect.width,
+    guaranteedRadius,
+  )
+  const [bottomLeftFromBottom, bottomRightFromBottom] = getEdgeRadiusCaps(
+    cornerRadius.bottomLeft,
+    cornerRadius.bottomRight,
+    boundingRect.width,
+    guaranteedRadius,
+  )
+  const [topLeftFromLeft, bottomLeftFromLeft] = getEdgeRadiusCaps(
+    cornerRadius.topLeft,
+    cornerRadius.bottomLeft,
+    boundingRect.height,
+    guaranteedRadius,
+  )
+  const [topRightFromRight, bottomRightFromRight] = getEdgeRadiusCaps(
+    cornerRadius.topRight,
+    cornerRadius.bottomRight,
+    boundingRect.height,
+    guaranteedRadius,
+  )
+
+  return {
+    bottomLeft: BigNumber.minimum(bottomLeftFromBottom, bottomLeftFromLeft),
+    bottomRight: BigNumber.minimum(bottomRightFromBottom, bottomRightFromRight),
+    topLeft: BigNumber.minimum(topLeftFromTop, topLeftFromLeft),
+    topRight: BigNumber.minimum(topRightFromTop, topRightFromRight),
+  }
+}
+
+const getEdgeRadiusCaps = (
+  firstRadius: BigNumber,
+  secondRadius: BigNumber,
+  edgeLength: BigNumber,
+  guaranteedRadius: BigNumber,
+): readonly [BigNumber, BigNumber] => {
+  const firstExceedsGuaranteedRadius = firstRadius.isGreaterThan(guaranteedRadius)
+  const secondExceedsGuaranteedRadius = secondRadius.isGreaterThan(guaranteedRadius)
+
+  if (firstExceedsGuaranteedRadius && secondExceedsGuaranteedRadius) {
+    const sharedCap = BigNumber.maximum(edgeLength, 0).div(2)
+    return [sharedCap, sharedCap]
+  }
+  if (firstExceedsGuaranteedRadius) {
+    return [BigNumber.maximum(edgeLength.minus(secondRadius), 0), secondRadius]
+  }
+  if (secondExceedsGuaranteedRadius) {
+    return [firstRadius, BigNumber.maximum(edgeLength.minus(firstRadius), 0)]
+  }
+  return [firstRadius, secondRadius]
 }
