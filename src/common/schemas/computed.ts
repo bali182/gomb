@@ -89,7 +89,9 @@ export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster
   BaseComputedSchema &
   HasLayoutBoundingRectSchema &
   HasUncutPathSchema &
-  HasComputedCornerRadiusSchema & {
+  HasComputedCornerRadiusSchema &
+  HasComputedLayoutGapSchema &
+  HasComputedChildrenSchema & {
     frontPocket: ComputedTopPocketSchema
     tPockets: ComputedTPocketSchema[]
   }

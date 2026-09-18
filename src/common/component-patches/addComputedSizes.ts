@@ -20,7 +20,7 @@ export const addComputedSizes = (
       }
       case 'pocket-cluster': {
         const computedCluster = narrowers.assert.computedPocketCluster(computedComponent)
-        return updateAutoSizeComponent(component, computedCluster)
+        return updateAutoLayoutGapComponent(updateAutoSizeComponent(component, computedCluster), computedCluster)
       }
     }
   })
