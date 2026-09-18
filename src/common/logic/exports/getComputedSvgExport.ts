@@ -166,17 +166,28 @@ const getSvgExportPocketElements = (
   computedComponent: ComputedComponentSchema,
   settings: BaseExportSettingsSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
-): [SvgExportFrontPocketSchema, ...SvgExportTPocketSchema[]] => {
+): SvgExportElementSchema[] => {
   if (component.type !== 'pocket-cluster' || computedComponent.type !== 'computed-pocket-cluster') {
     throw new Error(`Expected computed pocket cluster: ${component.id}`)
   }
 
-  return [
+  const pockets: [SvgExportFrontPocketSchema, ...SvgExportTPocketSchema[]] = [
     getSvgExportFrontPocket(subProject, computedSubProject, component, computedComponent, settings, stitchingSettings),
     ...computedComponent.tPockets.map((pocket, pocketIndex) =>
       getSvgExportTPocket(subProject, computedSubProject, component, pocket, pocketIndex, settings, stitchingSettings),
     ),
   ]
+  const children = computedComponent.children.flatMap((child) => {
+    return getSvgExportElementsForComponent(
+      subProject,
+      computedSubProject,
+      child.componentId,
+      settings,
+      stitchingSettings,
+    )
+  })
+
+  return [...pockets, ...children]
 }
 
 const getSvgExportFrontPocket = (

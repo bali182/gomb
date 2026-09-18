@@ -10,6 +10,7 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
 import { Card } from './Card'
 import { HoleHighlights } from './HoleHighlights'
+import { Panel } from './Panel'
 import { StitchLines } from './StitchLines'
 import { TPocket } from './TPocket'
 import { TPocketStitchLines } from './TPocketStitchLines'
@@ -93,6 +94,24 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       </g>
       <StitchLines componentId={pocketCluster.id} />
       <HoleHighlights componentId={pocketCluster.id} />
+      {computedPocketCluster.children.map((component) => {
+        switch (component.type) {
+          case 'computed-panel':
+            return (
+              <Panel componentId={component.componentId} key={component.componentId} nestingLevel={nestingLevel + 1} />
+            )
+          case 'computed-pocket-cluster':
+            return (
+              <PocketCluster
+                componentId={component.componentId}
+                key={component.componentId}
+                nestingLevel={nestingLevel + 1}
+              />
+            )
+          case 'computed-root-panel':
+            throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
+        }
+      })}
     </>
   )
 }
