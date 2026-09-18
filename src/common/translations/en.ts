@@ -324,6 +324,10 @@ export const EN: TranslationSchema = {
       actions: {
         addChild: 'Add item',
       },
+      tabs: {
+        layout: 'Layout',
+        pockets: 'Pockets',
+      },
       layout: {
         title: 'Layout',
         orientation: 'Orientation',

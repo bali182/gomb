@@ -326,6 +326,10 @@ export const HU = {
       actions: {
         addChild: 'Elem hozzáadása',
       },
+      tabs: {
+        layout: 'Elrendezés',
+        pockets: 'Zsebek',
+      },
       layout: {
         title: 'Elrendezés',
         orientation: 'Tájolás',
