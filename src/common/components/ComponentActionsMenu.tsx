@@ -6,7 +6,6 @@ import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
-import { hasComponentChildren } from '../operations/subProject/utils/hasComponentChildren'
 import { portalRef } from '../portalRef'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
@@ -41,8 +40,6 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
   const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent } = useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
-  const canAdd = useMemo((): boolean => hasComponentChildren(component), [component])
-
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
     if (!isDefined(selectedSubProject?.id)) {
@@ -86,13 +83,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const handleAddChild = useCallback(
     (type: ComponentSchema['type']): void => {
-      if (!canAdd) {
-        return
-      }
       addComponent(component.id, type)
       onAddChild(component.id, type)
     },
-    [addComponent, canAdd, component.id, onAddChild],
+    [addComponent, component.id, onAddChild],
   )
 
   const handleDelete = useCallback((): void => {
@@ -186,20 +180,10 @@ type AddChildComponentMenuProps = {
   component: ComponentSchema
 }
 
-const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild, component }) => {
-  const t = useTranslation()
+const possibleChildTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster']
 
-  const possibleTypes = useMemo<ComponentSchema['type'][]>(() => {
-    switch (component.type) {
-      case 'panel':
-      case 'root-panel':
-        return ['panel', 'pocket-cluster']
-      case 'pocket-cluster':
-        return []
-      default:
-        return []
-    }
-  }, [component.type])
+const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild }) => {
+  const t = useTranslation()
 
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
     () => ({
@@ -212,7 +196,7 @@ const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChi
 
   return (
     <>
-      {possibleTypes.map((type) => {
+      {possibleChildTypes.map((type) => {
         const Icon = getModelIcon(type)
         return (
           <Menu.Item key={type} value={type} onSelect={() => onAddChild(type)}>
@@ -221,7 +205,7 @@ const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChi
           </Menu.Item>
         )
       })}
-      {possibleTypes.length > 0 ? <Menu.Separator /> : null}
+      {possibleChildTypes.length > 0 ? <Menu.Separator /> : null}
     </>
   )
 }

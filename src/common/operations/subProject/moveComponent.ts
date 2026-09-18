@@ -2,7 +2,6 @@ import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 import { getComponentParent } from './utils/getComponentParent'
-import { hasComponentChildren } from './utils/hasComponentChildren'
 
 export type MoveComponentParams = {
   componentId: string
@@ -17,7 +16,7 @@ export const moveComponent = (
   const movedComponent = subProject.components[componentId]
   const targetParent = subProject.components[targetParentId]
 
-  if (!isDefined(movedComponent) || movedComponent.type === 'root-panel' || !hasComponentChildren(targetParent)) {
+  if (!isDefined(movedComponent) || movedComponent.type === 'root-panel' || !isDefined(targetParent)) {
     return subProject
   }
 

@@ -4,7 +4,6 @@ import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from '
 import { PiDotsSixVertical } from 'react-icons/pi'
 
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { hasComponentChildren } from '../../operations/subProject/utils/hasComponentChildren'
 import { isDefined } from '../../utils/isDefined'
 import { DropInsideIndicator, ReorderDropIndicator } from './ComponentTreeDropIndicators'
 import { TreeItemVisual } from './TreeItemVisual'
@@ -86,10 +85,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
     if (component.type === 'root-panel') {
       return ['inside']
     }
-    if (hasComponentChildren(component)) {
-      return nodeState.expanded ? ['before', 'inside'] : ['before', 'inside', 'after']
-    }
-    return ['before', 'after']
+    return nodeState.expanded ? ['before', 'inside'] : ['before', 'inside', 'after']
   }, [component, nodeState.expanded])
 
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({

@@ -1,7 +1,6 @@
 import { ComponentSchema } from '../../schemas/components'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
-import { hasComponentChildren } from './utils/hasComponentChildren'
 
 export type AddComponentParams = {
   parentId: string
@@ -11,8 +10,8 @@ export type AddComponentParams = {
 export const addComponent = (subProject: SubProjectSchema, params: AddComponentParams): SubProjectSchema => {
   const parent = subProject.components[params.parentId]
 
-  if (!isDefined(parent) || !hasComponentChildren(parent)) {
-    throw new Error('Missing parent or cannot have child elements')
+  if (!isDefined(parent)) {
+    throw new Error('Missing parent')
   }
 
   return {

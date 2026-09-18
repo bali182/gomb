@@ -10,14 +10,14 @@ import {
 } from 'react-icons/pi'
 
 import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
-import type { HasAutoDimensionsSchema, PanelSchema, RootPanelSchema } from '../../../schemas/components'
+import type { ComponentSchema, HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { useTranslation } from '../../../translations/translation'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type AnchorSectionProps<T> = {
-  parent: RootPanelSchema | PanelSchema
+  parent: ComponentSchema
   editable: EditableSchema<T>
   issues: ValidationIssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void

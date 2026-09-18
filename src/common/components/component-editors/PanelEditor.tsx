@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import type { PanelSchema, RootPanelSchema } from '../../schemas/components'
+import type { ComponentSchema, PanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
@@ -14,7 +14,7 @@ type PanelEditorProps = {
   editable: EditableSchema<PanelSchema>
   issues: ValidationIssuesSchema<PanelSchema>
   onChange: (updated: EditableSchema<PanelSchema>) => void
-  parent: RootPanelSchema | PanelSchema
+  parent: ComponentSchema
 }
 
 export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues, onChange, parent }) => {

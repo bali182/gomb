@@ -6,7 +6,8 @@ import { getUnusedName } from './utils/getUnusedName'
 
 describe('cloneComponentTree', () => {
   it('clones a root tree with its holes and stitch lines', () => {
-    const root = d.rootPanel({ id: 'root', children: ['panel'], name: 'Root' })
+    const root = d.rootPanel({ id: 'root', children: ['pocket-cluster'], name: 'Root' })
+    const pocketCluster = d.pocketCluster({ id: 'pocket-cluster', children: ['panel'], name: 'Pocket cluster' })
     const panel = d.panel({ id: 'panel', name: 'Panel' })
     const hole = d.hole({ id: 'hole', componentId: panel.id, name: 'Hole' })
     const componentStitchLine = d.componentBoundsStitchLine({
@@ -22,7 +23,7 @@ describe('cloneComponentTree', () => {
       targetType: 'hole',
     })
     const subProject = d.subProject({
-      components: [panel],
+      components: [pocketCluster, panel],
       holes: [hole],
       id: 'sub-project',
       root,
@@ -59,9 +60,10 @@ describe('cloneComponentTree', () => {
 
     expect(result?.clonedRootId).toBe('component-clone-1')
     expect(result?.clonedComponents['component-clone-1']).toMatchObject({ children: ['component-clone-2'] })
-    expect(result?.clonedHoles).toMatchObject([{ componentId: 'component-clone-2', id: 'hole-clone-1' }])
+    expect(result?.clonedComponents['component-clone-2']).toMatchObject({ children: ['component-clone-3'] })
+    expect(result?.clonedHoles).toMatchObject([{ componentId: 'component-clone-3', id: 'hole-clone-1' }])
     expect(result?.clonedStitchLines).toMatchObject([
-      { targetId: 'component-clone-2', targetType: 'component' },
+      { targetId: 'component-clone-3', targetType: 'component' },
       { targetId: 'hole-clone-1', targetType: 'hole' },
     ])
   })

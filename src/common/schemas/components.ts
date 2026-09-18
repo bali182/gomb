@@ -57,6 +57,8 @@ export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
  */
 export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   BaseComponentSchema &
+  HasLayoutSchema &
+  HasChildrenSchema &
   HasOffAxisAnchor &
   HasCornerRadiusSchema &
   HasAutoDimensionsSchema &

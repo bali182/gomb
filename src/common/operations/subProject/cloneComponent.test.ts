@@ -122,6 +122,27 @@ describe('cloneComponent', () => {
     ])
   })
 
+  it('clones a pocket cluster and its child tree', () => {
+    const root = d.rootPanel({ id: 'root', children: ['pocket-cluster'], name: 'Root' })
+    const pocketCluster = d.pocketCluster({ id: 'pocket-cluster', children: ['panel'], name: 'Pocket cluster' })
+    const panel = d.panel({ id: 'panel', name: 'Panel' })
+    const clusterSubProject = d.subProject({
+      components: [pocketCluster, panel],
+      id: 'sub-project',
+      root,
+    })
+
+    const result = cloneComponent(clusterSubProject, {
+      componentId: pocketCluster.id,
+      ids,
+      names: cloneComponentNames,
+      settings: fullSettings,
+    })
+
+    expect(result.components.root).toMatchObject({ children: ['pocket-cluster', 'component-clone-1'] })
+    expect(result.components['component-clone-1']).toMatchObject({ children: ['component-clone-2'] })
+  })
+
   it('clones only the root component and its related entities when tree cloning is disabled', () => {
     const result = cloneComponent(subProject, {
       componentId: 'panel',
