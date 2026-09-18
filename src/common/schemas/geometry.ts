@@ -45,6 +45,13 @@ export type CornerRadiusSchema = {
   readonly bottomRight: BigNumber
 }
 
+export type NumberCornerRadiusSchema = {
+  readonly topLeft: number
+  readonly topRight: number
+  readonly bottomLeft: number
+  readonly bottomRight: number
+}
+
 export type PathMoveToSchema = HasTypeSchema<'moveTo'> & { point: PointSchema }
 export type PathLineToSchema = HasTypeSchema<'lineTo'> & { point: PointSchema }
 export type PathArcToSchema = HasTypeSchema<'arcTo'> & { radius: BigNumber; point: PointSchema; reversed: boolean }
