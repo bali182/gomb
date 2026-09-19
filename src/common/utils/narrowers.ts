@@ -1,23 +1,32 @@
-import { HasTypeSchema } from '../schemas/common'
-import { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
-import {
+import type { HasTypeSchema } from '../schemas/common'
+import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
   ComputedComponentSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedRootPanelSchema,
 } from '../schemas/computed'
-import { ComponentBoundsStitchLineSchema, PocketClusterStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
+import type { HoleSchema } from '../schemas/hole'
+import type { ModelObjectSchema } from '../schemas/modelObject'
+import type {
+  ComponentBoundsStitchLineSchema,
+  PocketClusterStitchLineSchema,
+  StitchLineSchema,
+} from '../schemas/stitching'
 
 export const narrowers = {
   is: {
     // Component
-    rootPanel: (input: ComponentSchema): input is RootPanelSchema => {
+    component: (input: ModelObjectSchema): input is ComponentSchema => {
+      return hasType(input, 'root-panel') || hasType(input, 'panel') || hasType(input, 'pocket-cluster')
+    },
+    rootPanel: (input: ModelObjectSchema): input is RootPanelSchema => {
       return hasType(input, 'root-panel')
     },
-    panel: (input: ComponentSchema): input is PanelSchema => {
+    panel: (input: ModelObjectSchema): input is PanelSchema => {
       return hasType(input, 'panel')
     },
-    pocketCluster: (input: ComponentSchema): input is PocketClusterSchema => {
+    pocketCluster: (input: ModelObjectSchema): input is PocketClusterSchema => {
       return hasType(input, 'pocket-cluster')
     },
     // Computed component
@@ -31,22 +40,29 @@ export const narrowers = {
       return hasType(input, 'computed-pocket-cluster')
     },
     // Stitch line
-    componentBoundsStitchLine: (input: StitchLineSchema): input is ComponentBoundsStitchLineSchema => {
+    stitchLine: (input: ModelObjectSchema): input is StitchLineSchema => {
+      return hasType(input, 'component-bounds-stitch-line') || hasType(input, 'pocket-cluster-stitch-line')
+    },
+    componentBoundsStitchLine: (input: ModelObjectSchema): input is ComponentBoundsStitchLineSchema => {
       return hasType(input, 'component-bounds-stitch-line')
     },
-    pocketClusterStitchLine: (input: StitchLineSchema): input is PocketClusterStitchLineSchema => {
+    pocketClusterStitchLine: (input: ModelObjectSchema): input is PocketClusterStitchLineSchema => {
       return hasType(input, 'pocket-cluster-stitch-line')
+    },
+    // Hole
+    hole: (input: ModelObjectSchema): input is HoleSchema => {
+      return hasType(input, 'hole')
     },
   },
   assert: {
     // Component
-    rootPanel: (input: ComponentSchema): RootPanelSchema => {
+    rootPanel: (input: ModelObjectSchema): RootPanelSchema => {
       return assertType(input, 'root-panel')
     },
-    panel: (input: ComponentSchema): PanelSchema => {
+    panel: (input: ModelObjectSchema): PanelSchema => {
       return assertType(input, 'panel')
     },
-    pocketCluster: (input: ComponentSchema): PocketClusterSchema => {
+    pocketCluster: (input: ModelObjectSchema): PocketClusterSchema => {
       return assertType(input, 'pocket-cluster')
     },
     // Computed component
@@ -60,10 +76,10 @@ export const narrowers = {
       return assertType(input, 'computed-pocket-cluster')
     },
     // Stitch line
-    componentBoundsStitchLine: (input: StitchLineSchema): ComponentBoundsStitchLineSchema => {
+    componentBoundsStitchLine: (input: ModelObjectSchema): ComponentBoundsStitchLineSchema => {
       return assertType(input, 'component-bounds-stitch-line')
     },
-    pocketClusterStitchLine: (input: StitchLineSchema): PocketClusterStitchLineSchema => {
+    pocketClusterStitchLine: (input: ModelObjectSchema): PocketClusterStitchLineSchema => {
       return assertType(input, 'pocket-cluster-stitch-line')
     },
   },

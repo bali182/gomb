@@ -1,96 +1,105 @@
 import { useCallback, useMemo, useState } from 'react'
-import { ComponentSchema } from '../schemas/components'
-import { SelectionSchema } from '../schemas/selection'
-import { StitchLineSchema } from '../schemas/stitching'
-import { isDefined } from '../utils/isDefined'
 
-import { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
-import { HoleSchema } from '../schemas/hole'
-import { SubProjectSchema } from '../schemas/subProject'
+import type { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
+import type { HasTypeSchema } from '../schemas/common'
+import type { ModelObjectSchema } from '../schemas/modelObject'
+import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
+import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
+
+type ComponentSelectionSchema = HasTypeSchema<'component'> & { componentId: string }
+type StitchLineSelectionSchema = HasTypeSchema<'stitch-line'> & { stitchLineId: string }
+type HoleSelectionSchema = HasTypeSchema<'hole'> & { holeId: string }
+
+type SelectionSchema = ComponentSelectionSchema | StitchLineSelectionSchema | HoleSelectionSchema
 
 export const useSubProjectSelection = (subProject: SubProjectSchema): SubProjectSelectionContextValue => {
-  const [selection, setSelection] = useState<SelectionSchema | undefined>()
-  const [hoveredStitchLineId, setHoveredStitchLine] = useState<string | undefined>()
-  const [hoveredTreeSelection, setHoveredTreeSelection] = useState<SelectionSchema | undefined>()
+  const [selectionInternal, setSelectionInternal] = useState<SelectionSchema | undefined>()
+  const [hoveredInternal, setHoveredInternal] = useState<SelectionSchema | undefined>()
 
-  const selectedComponent = useMemo<ComponentSchema | undefined>(() => {
-    if (!isDefined(selection) || selection.type !== 'component') {
-      return undefined
-    }
+  const selected = useMemo<ModelObjectSchema | undefined>(() => {
+    return getModelObject(selectionInternal, subProject)
+  }, [selectionInternal, subProject])
 
-    return subProject.components[selection.componentId]
-  }, [subProject.components, selection])
+  const hovered = useMemo<ModelObjectSchema | undefined>(() => {
+    return getModelObject(hoveredInternal, subProject)
+  }, [hoveredInternal, subProject])
 
-  const selectedHole = useMemo<HoleSchema | undefined>(() => {
-    if (!isDefined(selection) || selection.type !== 'hole') {
-      return undefined
-    }
-
-    return subProject.holes.find((hole) => hole.id === selection.holeId)
-  }, [subProject.holes, selection])
-
-  const selectedStitchLine = useMemo<StitchLineSchema | undefined>(() => {
-    if (!isDefined(selection) || selection.type !== 'stitch-line') {
-      return undefined
-    }
-
-    return subProject.stitchLines.find((stitchLine) => stitchLine.id === selection.stitchLineId)
-  }, [subProject.stitchLines, selection])
-
-  const selectComponent = useCallback((componentId: string): void => {
-    setHoveredStitchLine(undefined)
-    setSelection({ componentId, type: 'component' })
+  const select = useCallback((model: ModelObjectSchema): void => {
+    setSelectionInternal(getSelectionSchema(model))
   }, [])
 
-  const selectStitchLine = useCallback((stitchLineId: string): void => {
-    setSelection({ stitchLineId, type: 'stitch-line' })
-  }, [])
-
-  const selectHole = useCallback((holeId: string): void => {
-    setHoveredStitchLine(undefined)
-    setSelection({ holeId, type: 'hole' })
+  const hover = useCallback((model: ModelObjectSchema): void => {
+    setHoveredInternal(getSelectionSchema(model))
   }, [])
 
   const clearSelection = useCallback((): void => {
-    setHoveredStitchLine(undefined)
-    setSelection(undefined)
+    setSelectionInternal(undefined)
   }, [])
 
-  const isComponentSelected = useCallback(
-    (componentId: string): boolean => isDefined(selectedComponent) && componentId === selectedComponent.id,
-    [selectedComponent],
+  const clearHover = useCallback((): void => {
+    setHoveredInternal(undefined)
+  }, [])
+
+  const isSelected = useCallback(
+    (model: ModelObjectSchema): boolean => {
+      return isDefined(selected) && selected.type === model.type && selected.id === model.id
+    },
+    [selected],
   )
 
-  const subProjectSelection = useMemo<SubProjectSelectionContextValue>(
+  const isHovered = useCallback(
+    (model: ModelObjectSchema): boolean => {
+      return isDefined(hovered) && hovered.type === model.type && hovered.id === model.id
+    },
+    [hovered],
+  )
+
+  return useMemo<SubProjectSelectionContextValue>(
     () => ({
+      selected,
+      hovered,
+      select,
+      hover,
       clearSelection,
-      isComponentSelected,
-      selectComponent,
-      selectStitchLine,
-      selectHole,
-      selectedHole,
-      selectedComponent,
-      selectedStitchLine,
-      hoveredStitchLineId,
-      hoveredTreeSelection,
-      editorSelection: selection,
-      setHoveredStitchLine,
-      setHoveredTreeSelection,
+      clearHover,
+      isSelected,
+      isHovered,
     }),
-    [
-      clearSelection,
-      isComponentSelected,
-      selectComponent,
-      selectStitchLine,
-      selectHole,
-      selectedHole,
-      selectedComponent,
-      selectedStitchLine,
-      hoveredStitchLineId,
-      hoveredTreeSelection,
-      selection,
-    ],
+    [hovered, selected, clearHover, clearSelection, hover, isHovered, isSelected, select],
   )
+}
 
-  return subProjectSelection
+const getSelectionSchema = (model: ModelObjectSchema): SelectionSchema | undefined => {
+  if (narrowers.is.component(model)) {
+    return { type: 'component', componentId: model.id }
+  }
+  if (narrowers.is.stitchLine(model)) {
+    return { type: 'stitch-line', stitchLineId: model.id }
+  }
+  if (narrowers.is.hole(model)) {
+    return { type: 'hole', holeId: model.id }
+  }
+  return undefined
+}
+
+const getModelObject = (
+  selection: SelectionSchema | undefined,
+  subProject: SubProjectSchema,
+): ModelObjectSchema | undefined => {
+  if (!isDefined(selection)) {
+    return undefined
+  }
+
+  const optional = accessors.subProject(subProject).optional
+
+  switch (selection.type) {
+    case 'component':
+      return optional.component(selection.componentId)
+    case 'stitch-line':
+      return optional.stitchLine(selection.stitchLineId)
+    case 'hole':
+      return optional.hole(selection.holeId)
+  }
 }

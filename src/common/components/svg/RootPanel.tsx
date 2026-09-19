@@ -1,4 +1,4 @@
-import { useCallback, useState, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
@@ -19,28 +19,26 @@ type RootPanelProps = {
 
 export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
-  const [isHovered, setIsHovered] = useState(false)
   const rootPanel = useComponent<RootPanelSchema>(componentId)
   const computedRootPanel = useComputedComponent<ComputedRootPanelSchema>(componentId)
   const pathData = usePath(computedRootPanel.path)
   const styleParams: DrawAreaComponentStyleParams = {
     component: rootPanel,
-    isHovered,
     nestingLevel,
   }
 
   const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    setIsHovered(true)
-  }, [])
+    selection.hover(rootPanel)
+  }, [rootPanel, selection])
   const handlePointerLeave = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    setIsHovered(false)
-  }, [])
+    selection.clearHover()
+  }, [selection])
   const handleClick = useCallback<MouseEventHandler<SVGPathElement>>(
     (event) => {
       event.stopPropagation()
-      selection.selectComponent(rootPanel.id)
+      selection.select(rootPanel)
     },
-    [rootPanel.id, selection],
+    [rootPanel, selection],
   )
 
   return (

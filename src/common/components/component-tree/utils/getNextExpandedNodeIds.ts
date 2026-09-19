@@ -1,22 +1,25 @@
 import { getComponentAncestorIds } from '../../../operations/subProject/utils/getComponentAncestorIds'
-import { SelectionSchema } from '../../../schemas/selection'
-import { SubProjectSchema } from '../../../schemas/subProject'
+import type { ModelObjectSchema } from '../../../schemas/modelObject'
+import type { SubProjectSchema } from '../../../schemas/subProject'
 import { isDefined } from '../../../utils/isDefined'
+import { narrowers } from '../../../utils/narrowers'
 import { getComponentNodeId, getHoleNodeId } from './treeNodeIds'
 
 export const getNextExpandedNodeIds = (
-  selection: SelectionSchema,
+  selection: ModelObjectSchema,
   subProject: SubProjectSchema,
   expandedIds: string[],
 ): string[] => {
-  switch (selection.type) {
-    case 'component':
-      return getNextExpandedNodeIdsForComponent(selection.componentId, subProject, expandedIds)
-    case 'stitch-line':
-      return getNextExpandedIdsForStitchLine(selection.stitchLineId, subProject, expandedIds)
-    case 'hole':
-      return getNextExpandedIdsForHole(selection.holeId, subProject, expandedIds)
+  if (narrowers.is.component(selection)) {
+    return getNextExpandedNodeIdsForComponent(selection.id, subProject, expandedIds)
   }
+  if (narrowers.is.stitchLine(selection)) {
+    return getNextExpandedIdsForStitchLine(selection.id, subProject, expandedIds)
+  }
+  if (narrowers.is.hole(selection)) {
+    return getNextExpandedIdsForHole(selection.id, subProject, expandedIds)
+  }
+  return expandedIds
 }
 
 const getNextExpandedNodeIdsForComponent = (

@@ -9,13 +9,12 @@ import type { PathSchema } from '../../schemas/geometry'
 type CardProps = {
   owner: PocketClusterSchema
   path: PathSchema
-  isParentHovered: boolean
 }
 
-export const Card: FC<CardProps> = ({ isParentHovered, owner, path }) => {
+export const Card: FC<CardProps> = ({ owner, path }) => {
   const { cardStyles } = useDrawAreaContext()
   const pathData = usePath(path)
-  const styleParams: DrawAreaCardStyleParams = { isParentHovered, owner }
+  const styleParams: DrawAreaCardStyleParams = { owner }
 
   return (
     <path

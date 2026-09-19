@@ -1,43 +1,51 @@
 import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
-import { ComponentSchema } from '../schemas/components'
-import { SelectionSchema } from '../schemas/selection'
-import { StitchLineSchema } from '../schemas/stitching'
-import { SubProjectSchema } from '../schemas/subProject'
+import type { ComponentSchema } from '../schemas/components'
+import { HoleSchema } from '../schemas/hole'
+import type { ModelObjectSchema } from '../schemas/modelObject'
+import type { StitchLineSchema } from '../schemas/stitching'
+import type { SubProjectSchema } from '../schemas/subProject'
 import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
 
 const EmptySet: ReadonlySet<string> = new Set<string>()
 
 export const getSelectionObstructingComponentIds = (
-  selection: SelectionSchema | undefined,
+  selection: ModelObjectSchema | undefined,
   subProject: SubProjectSchema,
 ): ReadonlySet<string> => {
   if (!isDefined(selection)) {
     return EmptySet
   }
-  switch (selection.type) {
-    case 'component':
-      return EmptySet
-    case 'stitch-line':
-      return getStitchLineObstructingComponentIds(selection.stitchLineId, subProject)
-    case 'hole':
-      return getHoleObstructingComponentIds(selection.holeId, subProject)
+  if (narrowers.is.component(selection)) {
+    return getComponentObstructingComponentIds(selection, subProject)
   }
+  if (narrowers.is.stitchLine(selection)) {
+    return getStitchLineObstructingComponentIds(selection, subProject)
+  }
+  if (narrowers.is.hole(selection)) {
+    return getHoleObstructingComponentIds(selection, subProject)
+  }
+  return EmptySet
+}
+
+const getComponentObstructingComponentIds = (
+  component: ComponentSchema,
+  subProject: SubProjectSchema,
+): ReadonlySet<string> => {
+  if (component.type !== 'pocket-cluster') {
+    return EmptySet
+  }
+
+  const obstructingComponentIds = new Set(getComponentDescendants(component, subProject))
+  obstructingComponentIds.delete(component.id)
+
+  return obstructingComponentIds
 }
 
 const getStitchLineObstructingComponentIds = (
-  stitchLineId: string,
+  stitchLine: StitchLineSchema,
   subProject: SubProjectSchema,
 ): ReadonlySet<string> => {
-  if (!isDefined(stitchLineId)) {
-    return EmptySet
-  }
-
-  const stitchLine = subProject.stitchLines.find((s) => s.id === stitchLineId)
-
-  if (!isDefined(stitchLine)) {
-    return EmptySet
-  }
-
   const ownerComponent = getStitchLineOwnerComponent(stitchLine, subProject)
 
   if (!isDefined(ownerComponent)) {
@@ -54,13 +62,7 @@ const getStitchLineObstructingComponentIds = (
   return coveredComponentIds
 }
 
-const getHoleObstructingComponentIds = (holeId: string, subProject: SubProjectSchema): ReadonlySet<string> => {
-  const hole = subProject.holes.find((candidate) => candidate.id === holeId)
-
-  if (!isDefined(hole)) {
-    return EmptySet
-  }
-
+const getHoleObstructingComponentIds = (hole: HoleSchema, subProject: SubProjectSchema): ReadonlySet<string> => {
   const ownerComponent = subProject.components[hole.componentId]
 
   if (!isDefined(ownerComponent)) {

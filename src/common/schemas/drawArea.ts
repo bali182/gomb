@@ -7,17 +7,14 @@ import { SvgExportElementSchema } from './svgExport'
 export type DrawAreaComponentStyleParams = {
   component: ComponentSchema
   nestingLevel: number
-  isHovered: boolean
 }
 
 export type DrawAreaCardStyleParams = {
   owner: PocketClusterSchema
-  isParentHovered: boolean
 }
 
 export type DrawAreaHoleStyleParams = {
   hole: HoleSchema
-  isHovered: boolean
 }
 
 export type DrawAreaComponentStyles = {

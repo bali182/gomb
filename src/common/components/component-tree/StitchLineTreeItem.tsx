@@ -33,11 +33,11 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
     event.stopPropagation()
   }, [])
   const handlePointerEnter = useCallback((): void => {
-    selection.setHoveredTreeSelection({ stitchLineId: stitchLine.id, type: 'stitch-line' })
-  }, [selection, stitchLine.id])
+    selection.hover(stitchLine)
+  }, [selection, stitchLine])
 
   const handlePointerLeave = useCallback((): void => {
-    selection.setHoveredTreeSelection(undefined)
+    selection.clearHover()
   }, [selection])
 
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({

@@ -23,7 +23,8 @@ export const EditorComponentTree: FC = () => {
     showHoles: true,
     showStitchLines: true,
   })
-  const { editorSelection } = selection
+
+  const { selected } = selection
 
   useEffect(() => {
     setExpandedNodeIds((currentExpandedNodeIds) => {
@@ -35,12 +36,12 @@ export const EditorComponentTree: FC = () => {
   }, [collection])
 
   useEffect(() => {
-    if (isDefined(editorSelection)) {
+    if (isDefined(selected)) {
       setExpandedNodeIds((currentExpandedNodeIds) =>
-        getNextExpandedNodeIds(editorSelection, subProject, currentExpandedNodeIds),
+        getNextExpandedNodeIds(selected, subProject, currentExpandedNodeIds),
       )
     }
-  }, [editorSelection, subProject])
+  }, [selected, subProject])
 
   const handleAddChild = useCallback((parentId: string): void => {
     setExpandedNodeIds((currentExpandedNodeIds) =>
@@ -50,7 +51,7 @@ export const EditorComponentTree: FC = () => {
 
   const handleHoleDelete = useCallback(
     (holeId: string): void => {
-      if (selection.selectedHole?.id === holeId) {
+      if (selection.selected?.id === holeId) {
         selection.clearSelection()
       }
     },
@@ -59,7 +60,7 @@ export const EditorComponentTree: FC = () => {
 
   const handleStitchLineDelete = useCallback(
     (stitchLineId: string): void => {
-      if (selection.selectedStitchLine?.id === stitchLineId) {
+      if (selection.selected?.id === stitchLineId) {
         selection.clearSelection()
       }
     },

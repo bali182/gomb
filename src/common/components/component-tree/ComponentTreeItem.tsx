@@ -46,11 +46,11 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   }, [])
 
   const handlePointerEnter = useCallback((): void => {
-    selection.setHoveredTreeSelection({ componentId: component.id, type: 'component' })
-  }, [component.id, selection])
+    selection.hover(component)
+  }, [component, selection])
 
   const handlePointerLeave = useCallback((): void => {
-    selection.setHoveredTreeSelection(undefined)
+    selection.clearHover()
   }, [selection])
 
   const canAcceptAttachment = useMemo<boolean>(() => {
