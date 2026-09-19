@@ -42,9 +42,11 @@ export const calculatePocketClusterStitchLine = (
 
   return {
     stitchLineId: stitchLine.id,
+    type: stitchLine.type,
     targetType: stitchLine.targetType,
     targetId: stitchLine.targetId,
     componentId: stitchLine.targetId,
+    onTop: stitchLine.targetId,
     autoComputedCornerRadius: ZERO_CORNER_RADIUS,
     boundingRect: calculateStitchLineBoundingRect(points),
     routes,

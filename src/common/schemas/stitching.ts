@@ -74,6 +74,10 @@ export type HasVerticalDirectionsSchema = {
   leftStitchDirection: VerticalStitchDirectionSchema
 }
 
+export type HasCustomRenderTarget = {
+  onTop?: string
+}
+
 export type ComponentBoundsStitchLineOwnSchema = HasDirectionalOffsetsSchema &
   HasAutoCornerRadiusSchema &
   HasCornerRadiusSchema &
@@ -81,7 +85,8 @@ export type ComponentBoundsStitchLineOwnSchema = HasDirectionalOffsetsSchema &
   HasHorizontalDirectionsSchema &
   HasStitchedCornersSchema &
   HasStitchedSidesSchema &
-  HasStitchedUnconnectedCornersSchema
+  HasStitchedUnconnectedCornersSchema &
+  HasCustomRenderTarget
 
 export type ComponentBoundsStitchLineSchema = HasTypeSchema<'component-bounds-stitch-line'> &
   HasIdentitySchema &

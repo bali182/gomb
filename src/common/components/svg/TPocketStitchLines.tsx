@@ -2,7 +2,7 @@ import type { FC } from 'react'
 
 import { useProject } from '../../hooks/useProject'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { PocketClusterStitchLineSchema } from '../../schemas/stitching'
+import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { StitchLineRoute } from './StitchLineRoute'
@@ -15,20 +15,16 @@ type TPocketStitchLinesProps = {
 export const TPocketStitchLines: FC<TPocketStitchLinesProps> = ({ componentId, pocketIndex }) => {
   const { project } = useProject()
   const { subProject, computedSubProject } = useSubProject()
-  const stitchLines = subProject.stitchLines.filter(
-    (stitchLine): stitchLine is PocketClusterStitchLineSchema =>
-      stitchLine.targetId === componentId && stitchLine.type === 'pocket-cluster-stitch-line',
-  )
+  const accessor = accessors.subProject(subProject)
+  const computedStitchLines = computedSubProject.stitchLines[componentId] ?? []
 
   return (
     <>
-      {stitchLines.map((stitchLine) => {
-        const computedStitchLine = computedSubProject.stitchLines.find(
-          (computedStitchLine) => computedStitchLine.stitchLineId === stitchLine.id,
-        )
+      {computedStitchLines.map((computedStitchLine) => {
+        const stitchLine = accessor.optional.stitchLine(computedStitchLine.stitchLineId)
 
-        if (!isDefined(computedStitchLine)) {
-          throw new Error(`Computed stitch line not found: ${stitchLine.id}`)
+        if (!isDefined(stitchLine) || stitchLine.type !== 'pocket-cluster-stitch-line') {
+          return null
         }
 
         const route = computedStitchLine.routes[pocketIndex]

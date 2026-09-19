@@ -12,7 +12,7 @@ export const calculateStitchLines = (
   computedComponents: Record<string, ComputedComponentSchema>,
   holes: readonly HoleSchema[],
   computedHoles: readonly ComputedHoleSchema[],
-): ComputedStitchLineSchema[] => {
+): Record<string, ComputedStitchLineSchema[]> => {
   const computedStitchLines: ComputedStitchLineSchema[] = []
 
   for (const stitchLine of stitchLines) {
@@ -24,13 +24,16 @@ export const calculateStitchLines = (
         continue
       }
 
-      computedStitchLines.push(
-        calculateComponentBoundsStitchLine(stitchLine, {
+      const computedStitchLine = calculateComponentBoundsStitchLine(
+        stitchLine,
+        {
           componentId: computedHole.componentId,
           boundingRect: computedHole.boundingRect,
           cornerRadius: computedHole.cornerRadius,
-        }),
+        },
+        computedComponents,
       )
+      computedStitchLines.push(computedStitchLine)
 
       continue
     }
@@ -41,8 +44,26 @@ export const calculateStitchLines = (
     if (!isDefined(component) || !isDefined(computedComponent)) {
       continue
     }
-    computedStitchLines.push(calculateStitchLine(stitchLine, component, computedComponent))
+    const computedStitchLine = calculateStitchLine(stitchLine, component, computedComponent, computedComponents)
+    computedStitchLines.push(computedStitchLine)
   }
 
-  return computedStitchLines
+  return groupByTarget(computedStitchLines)
+}
+
+const groupByTarget = (computedStitchLines: ComputedStitchLineSchema[]): Record<string, ComputedStitchLineSchema[]> => {
+  const stitchLinesByComponentId: Record<string, ComputedStitchLineSchema[]> = {}
+
+  for (const computedStitchLine of computedStitchLines) {
+    const componentId = computedStitchLine.onTop
+    const stitchLines = stitchLinesByComponentId[componentId]
+
+    if (isDefined(stitchLines)) {
+      stitchLines.push(computedStitchLine)
+    } else {
+      stitchLinesByComponentId[componentId] = [computedStitchLine]
+    }
+  }
+
+  return stitchLinesByComponentId
 }
