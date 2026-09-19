@@ -1,7 +1,6 @@
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { getComponentDescendants } from './utils/getComponentDescendants'
-import { hasComponentChildren } from './utils/hasComponentChildren'
 
 export type DeleteComponentParams = {
   componentId: string
@@ -26,7 +25,7 @@ export const deleteComponent = (
         .filter(([id]) => !deletedIds.has(id))
         .map((tuple) => {
           const [id, component] = tuple
-          if (!hasComponentChildren(component) || !component.children.some((child) => deletedIds.has(child))) {
+          if (!component.children.some((child) => deletedIds.has(child))) {
             return tuple
           }
           return [id, { ...component, children: component.children.filter((child) => !deletedIds.has(child)) }]

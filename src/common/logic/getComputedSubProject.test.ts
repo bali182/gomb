@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
 import { defaultStitchingSettings } from '../defaultStates'
-import type { PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type { PanelSchema, PocketClusterSchema, PocketOrientationSchema, RootPanelSchema } from '../schemas/components'
 import type { ComputedComponentSchema } from '../schemas/computed'
+import type { NumberCornerRadiusSchema } from '../schemas/geometry'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getComputedSubProject } from './getComputedSubProject'
@@ -582,5 +584,197 @@ describe('getComputedSubProject layout', () => {
     )
 
     expectBoundingRect(computed.pocketCluster(cluster.id), [0, 30, 100, 30])
+  })
+
+  it.each<{
+    orientation: PocketOrientationSchema
+    expectedChildBoundingRect: ExpectedBoundingRect
+  }>([
+    { orientation: 'up', expectedChildBoundingRect: [0, 20, 20, 20] },
+    { orientation: 'down', expectedChildBoundingRect: [0, 0, 20, 20] },
+    { orientation: 'left', expectedChildBoundingRect: [20, 0, 20, 20] },
+    { orientation: 'right', expectedChildBoundingRect: [0, 0, 20, 20] },
+  ])('lays out children in the $orientation front pocket', ({ orientation, expectedChildBoundingRect }) => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      children: ['child'],
+      orientation,
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const child = d.panel({
+      id: 'child',
+      width: 20,
+      autoWidth: false,
+      height: 20,
+      autoHeight: false,
+      offAxisAnchor: 'start',
+    })
+    const computed = accessors.computedSubProject(
+      getComputedSubProject(
+        d.subProject({ id: 'sub-project', root, components: [cluster, child] }),
+        defaultStitchingSettings,
+      ),
+    )
+
+    expectBoundingRect(computed.panel(child.id), expectedChildBoundingRect)
+  })
+
+  it('uses the cluster layout direction and gap inside its front pocket', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      children: ['first', 'second'],
+      layoutOrientation: 'vertical',
+      layoutGap: 10,
+      orientation: 'up',
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const first = d.panel({ id: 'first', width: 20, autoWidth: false, height: 20, autoHeight: false })
+    const second = d.panel({ id: 'second', width: 20, autoWidth: false, height: 20, autoHeight: false })
+    const computed = accessors.computedSubProject(
+      getComputedSubProject(
+        d.subProject({ id: 'sub-project', root, components: [cluster, first, second] }),
+        defaultStitchingSettings,
+      ),
+    )
+
+    expectBoundingRect(computed.panel(first.id), [40, 20, 20, 20])
+    expectBoundingRect(computed.panel(second.id), [40, 50, 20, 20])
+  })
+
+  it('uses the front pocket size to distribute auto-sized children', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      children: ['first', 'second'],
+      layoutGap: 10,
+      orientation: 'up',
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const first = d.panel({ id: 'first' })
+    const second = d.panel({ id: 'second' })
+    const computed = accessors.computedSubProject(
+      getComputedSubProject(
+        d.subProject({ id: 'sub-project', root, components: [cluster, first, second] }),
+        defaultStitchingSettings,
+      ),
+    )
+
+    expectBoundingRect(computed.panel(first.id), [0, 20, 45, 80])
+    expectBoundingRect(computed.panel(second.id), [55, 20, 45, 80])
+  })
+
+  it('computes nested children below a pocket cluster', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      children: ['nested-cluster'],
+      orientation: 'up',
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const nestedCluster = d.pocketCluster({
+      id: 'nested-cluster',
+      children: ['child'],
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const child = d.panel({ id: 'child' })
+    const computed = accessors.computedSubProject(
+      getComputedSubProject(
+        d.subProject({ id: 'sub-project', root, components: [cluster, nestedCluster, child] }),
+        defaultStitchingSettings,
+      ),
+    )
+
+    expectBoundingRect(computed.pocketCluster(nestedCluster.id), [0, 20, 100, 80])
+    expectBoundingRect(computed.panel(child.id), [0, 40, 100, 60])
+  })
+
+  it.each<{
+    orientation: PocketOrientationSchema
+    expectedCornerRadius: NumberCornerRadiusSchema
+  }>([
+    { orientation: 'up', expectedCornerRadius: { topLeft: 0, topRight: 0, bottomLeft: 13, bottomRight: 14 } },
+    { orientation: 'down', expectedCornerRadius: { topLeft: 11, topRight: 12, bottomLeft: 0, bottomRight: 0 } },
+    { orientation: 'left', expectedCornerRadius: { topLeft: 0, topRight: 12, bottomLeft: 0, bottomRight: 14 } },
+    { orientation: 'right', expectedCornerRadius: { topLeft: 11, topRight: 0, bottomLeft: 13, bottomRight: 0 } },
+  ])('inherits outer cluster radii in the $orientation front pocket', ({ orientation, expectedCornerRadius }) => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      children: ['child'],
+      orientation,
+      pocketCount: 3,
+      pocketStep: 20,
+      topLeftRadius: 11,
+      topRightRadius: 12,
+      bottomLeftRadius: 13,
+      bottomRightRadius: 14,
+      individualRadii: true,
+    })
+    const child = d.panel({ id: 'child', individualRadii: true })
+    const computed = accessors.computedSubProject(
+      getComputedSubProject(
+        d.subProject({ id: 'sub-project', root, components: [cluster, child] }),
+        defaultStitchingSettings,
+      ),
+    )
+    const computedChild = computed.panel(child.id)
+
+    expect({
+      topLeft: computedChild.cornerRadius.topLeft.toNumber(),
+      topRight: computedChild.cornerRadius.topRight.toNumber(),
+      bottomLeft: computedChild.cornerRadius.bottomLeft.toNumber(),
+      bottomRight: computedChild.cornerRadius.bottomRight.toNumber(),
+    }).toEqual(expectedCornerRadius)
+  })
+
+  it('patches a pocket cluster auto layout gap from its front pocket', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+    const cluster = d.pocketCluster({
+      id: 'cluster',
+      width: 100,
+      autoWidth: false,
+      height: 100,
+      autoHeight: false,
+      autoLayoutGap: true,
+      children: ['first', 'second'],
+      orientation: 'up',
+      pocketCount: 3,
+      pocketStep: 10,
+    })
+    const first = d.panel({ id: 'first', width: 20, autoWidth: false })
+    const second = d.panel({ id: 'second', width: 20, autoWidth: false })
+    const subProject = d.subProject({ id: 'sub-project', root, components: [cluster, first, second] })
+    const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+
+    const patched = getPatchedSubProject(subProject, computed)
+
+    expect(patched.components.cluster.layoutGap).toBe(60)
   })
 })

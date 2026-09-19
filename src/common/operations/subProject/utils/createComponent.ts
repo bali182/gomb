@@ -114,6 +114,7 @@ const DEFAULT_PANEL: PanelSchema = {
 }
 
 const DEFAULT_POCKET_CLUSTER: PocketClusterSchema = {
+  ...defaultHasLayout,
   ...defaultHasCornerRadius,
   ...defaultHasFillableSize,
   ...defaultHasOffAxisAnchor,
@@ -121,6 +122,7 @@ const DEFAULT_POCKET_CLUSTER: PocketClusterSchema = {
   type: 'pocket-cluster',
   id: '',
   name: '',
+  children: [],
   orientation: 'up',
   pocketCount: 3,
   pocketStep: 10,

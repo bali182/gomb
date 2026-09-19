@@ -13,7 +13,7 @@ type ComponentEditorProps = {
   editable: EditableSchema<ComponentSchema>
   issues: ValidationIssuesSchema<ComponentSchema>
   onChange: (updated: EditableSchema<ComponentSchema>) => void
-  parent: RootPanelSchema | PanelSchema | undefined
+  parent: ComponentSchema | undefined
 }
 
 export const ComponentEditor: FC<ComponentEditorProps> = (props) => {

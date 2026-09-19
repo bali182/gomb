@@ -20,24 +20,20 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
   const pathData = usePath(route.path)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
   const stitchHoleThickness = stitchLineStyles.getStitchHoleThickness(stitchLine)
-  const isStitchLineActive =
-    selection.selectedStitchLine?.id === stitchLine.id ||
-    selection.hoveredStitchLineId === stitchLine.id ||
-    (selection.hoveredTreeSelection?.type === 'stitch-line' &&
-      selection.hoveredTreeSelection.stitchLineId === stitchLine.id)
+  const isStitchLineActive = selection.isSelected(stitchLine) || selection.isHovered(stitchLine)
   const hitAreaThickness =
     1 + Math.max(stitchLineThickness ?? 0, stitchLine.stitchHoleLength / Math.SQRT2 + (stitchHoleThickness ?? 0))
 
   const handlePointerEnter = useCallback<PointerEventHandler<SVGGElement>>(() => {
-    selection.setHoveredStitchLine(stitchLine.id)
-  }, [selection, stitchLine.id])
+    selection.hover(stitchLine)
+  }, [selection, stitchLine])
 
   const handlePointerLeave = useCallback<PointerEventHandler<SVGGElement>>(
     (event) => {
       if (isSameStitchLineRoute(event.relatedTarget, stitchLine.id)) {
         return
       }
-      selection.setHoveredStitchLine(undefined)
+      selection.clearHover()
     },
     [selection, stitchLine.id],
   )
@@ -45,9 +41,9 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
   const handleClick = useCallback<MouseEventHandler<SVGGElement>>(
     (event) => {
       event.stopPropagation()
-      selection.selectStitchLine(stitchLine.id)
+      selection.select(stitchLine)
     },
-    [selection, stitchLine.id],
+    [selection, stitchLine],
   )
 
   return (

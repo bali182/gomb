@@ -18,7 +18,6 @@ export const ExportPanel: FC<ExportPanelProps> = ({ element }) => {
   const pathData = usePath(element.path)
   const styleParams: DrawAreaComponentStyleParams = {
     component: element.component,
-    isHovered: false,
     nestingLevel: 0,
   }
 

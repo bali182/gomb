@@ -3,7 +3,6 @@ import type { HoleSchema } from '../../schemas/hole'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
-import { hasComponentChildren } from './utils/hasComponentChildren'
 
 export type CloneComponentSettings = {
   cloneComponentTree: boolean
@@ -111,10 +110,6 @@ const collectClonedComponents = (
   visitedComponentIds.add(component.id)
   collectedComponents.push(component)
 
-  if (!hasComponentChildren(component)) {
-    return true
-  }
-
   for (const childId of component.children) {
     const child = subProject.components[childId]
 
@@ -165,14 +160,6 @@ const createComponentClone = (
   clonedComponentName: string,
 ): ComponentSchema => {
   const clonedComponentId = clonedComponentIdBySourceComponentId[sourceComponent.id]
-
-  if (!hasComponentChildren(sourceComponent)) {
-    return {
-      ...sourceComponent,
-      id: clonedComponentId,
-      name: clonedComponentName,
-    }
-  }
 
   return {
     ...sourceComponent,

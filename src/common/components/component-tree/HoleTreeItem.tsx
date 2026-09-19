@@ -41,11 +41,11 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
   }, [])
 
   const handlePointerEnter = useCallback((): void => {
-    selection.setHoveredTreeSelection({ holeId: hole.id, type: 'hole' })
-  }, [hole.id, selection])
+    selection.hover(hole)
+  }, [hole, selection])
 
   const handlePointerLeave = useCallback((): void => {
-    selection.setHoveredTreeSelection(undefined)
+    selection.clearHover()
   }, [selection])
 
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({

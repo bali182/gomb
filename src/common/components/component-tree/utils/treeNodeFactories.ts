@@ -1,5 +1,4 @@
 import { getComponentParent } from '../../../operations/subProject/utils/getComponentParent'
-import { hasComponentChildren } from '../../../operations/subProject/utils/hasComponentChildren'
 import { ComponentSchema } from '../../../schemas/components'
 import { HoleSchema } from '../../../schemas/hole'
 import { StitchLineSchema } from '../../../schemas/stitching'
@@ -19,12 +18,10 @@ export const createComponentTreeNode = (
   const componentIndex = siblingIds.indexOf(component.id)
   const nextSiblingId = componentIndex < 0 ? undefined : siblingIds[componentIndex + 1]
 
-  const childComponentNodes = hasComponentChildren(component)
-    ? component.children
-        .map((childId) => subProject.components[childId])
-        .filter(isDefined)
-        .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
-    : []
+  const childComponentNodes = component.children
+    .map((childId) => subProject.components[childId])
+    .filter(isDefined)
+    .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
 
   const holeNodes = showHoles
     ? subProject.holes

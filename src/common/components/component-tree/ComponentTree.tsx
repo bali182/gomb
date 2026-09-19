@@ -27,6 +27,7 @@ import {
 } from '../../contexts/SubProjectSelectionContext'
 import type { UseSubProjectOperationsOutput } from '../../hooks/useSubProjectOperations'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { ComponentTreeItem } from './ComponentTreeItem'
 import { HoleTreeItem } from './HoleTreeItem'
 import { StitchLineTreeItem } from './StitchLineTreeItem'
@@ -63,19 +64,20 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
   const sensors = useSensors(useSensor(PointerSensor))
 
   const selectedValue = useMemo((): string[] => {
-    const { editorSelection } = selection
-    if (!isDefined(editorSelection)) {
+    if (!isDefined(selection.selected)) {
       return []
     }
-    switch (editorSelection.type) {
-      case 'component':
-        return [getComponentNodeId(editorSelection.componentId)]
-      case 'stitch-line':
-        return [getStitchLineNodeId(editorSelection.stitchLineId)]
-      case 'hole':
-        return [getHoleNodeId(editorSelection.holeId)]
+    if (narrowers.is.component(selection.selected)) {
+      return [getComponentNodeId(selection.selected.id)]
     }
-  }, [selection])
+    if (narrowers.is.stitchLine(selection.selected)) {
+      return [getStitchLineNodeId(selection.selected.id)]
+    }
+    if (narrowers.is.hole(selection.selected)) {
+      return [getHoleNodeId(selection.selected.id)]
+    }
+    return []
+  }, [selection.selected])
 
   const handleExpandedChange = useCallback(
     (details: TreeViewExpandedChangeDetails<ProjectTreeNode>): void => {
@@ -92,11 +94,11 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
       }
       switch (selectedNode.kind) {
         case 'component':
-          return selection.selectComponent(selectedNode.component.id)
+          return selection.select(selectedNode.component)
         case 'stitch-line':
-          return selection.selectStitchLine(selectedNode.stitchLine.id)
+          return selection.select(selectedNode.stitchLine)
         case 'hole':
-          return selection.selectHole(selectedNode.hole.id)
+          return selection.select(selectedNode.hole)
       }
     },
     [selection],

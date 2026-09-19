@@ -107,8 +107,7 @@ const getPdfExportElementLayoutBoundingRect = (
   context: DrawAreaContextValue,
 ): RectSchema => {
   const component = element.type === 'svg-export-panel' ? element.component : element.ownerComponent
-  const borderThickness =
-    context.componentStyles.getBorderThickness({ component, isHovered: false, nestingLevel: 0 }) ?? 0
+  const borderThickness = context.componentStyles.getBorderThickness({ component, nestingLevel: 0 }) ?? 0
   const padding = new BigNumber(borderThickness).dividedBy(2)
   const boundingRect = getSvgExportElementLayoutBoundingRect(element)
 

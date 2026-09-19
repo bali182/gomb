@@ -19,7 +19,6 @@ export const PdfPanel: FC<PdfPanelProps> = ({ element }) => {
   const pathData = usePath(element.path)
   const styleParams: DrawAreaComponentStyleParams = {
     component: element.component,
-    isHovered: false,
     nestingLevel: 0,
   }
 

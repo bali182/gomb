@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { Fragment, useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
@@ -10,6 +10,7 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
 import { Card } from './Card'
 import { HoleHighlights } from './HoleHighlights'
+import { Panel } from './Panel'
 import { StitchLines } from './StitchLines'
 import { TPocket } from './TPocket'
 import { TPocketStitchLines } from './TPocketStitchLines'
@@ -21,30 +22,28 @@ type PocketClusterProps = {
 
 export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
-  const [isHovered, setIsHovered] = useState(false)
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
   const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
   const pathData = usePath(computedPocketCluster.path)
   const frontPocketPathData = usePath(computedPocketCluster.frontPocket.path)
-  const isSelected = selection.isComponentSelected(pocketCluster.id) || isHovered
+  const isSelected = selection.isSelected(pocketCluster) || selection.isHovered(pocketCluster)
   const clusterStyleParams: DrawAreaComponentStyleParams = {
     component: pocketCluster,
-    isHovered,
     nestingLevel,
   }
 
   const handlePointerEnter = useCallback<PointerEventHandler<SVGGElement>>(() => {
-    setIsHovered(true)
-  }, [])
+    selection.hover(pocketCluster)
+  }, [pocketCluster, selection])
   const handlePointerLeave = useCallback<PointerEventHandler<SVGGElement>>(() => {
-    setIsHovered(false)
-  }, [])
+    selection.clearHover()
+  }, [selection])
   const handleClick = useCallback<MouseEventHandler<SVGGElement>>(
     (event) => {
       event.stopPropagation()
-      selection.selectComponent(pocketCluster.id)
+      selection.select(pocketCluster)
     },
-    [pocketCluster.id, selection],
+    [pocketCluster, selection],
   )
 
   return (
@@ -67,9 +66,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
         {computedPocketCluster.tPockets.map((pocket, pocketIndex) => {
           return (
             <Fragment key={pocket.id}>
-              {isShowingCards && isDefined(pocket.card) && (
-                <Card isParentHovered={isHovered} owner={pocketCluster} path={pocket.card.path} />
-              )}
+              {isShowingCards && isDefined(pocket.card) && <Card owner={pocketCluster} path={pocket.card.path} />}
               <TPocket
                 fill={componentStyles.getBackgroundColor(clusterStyleParams)}
                 path={pocket.path}
@@ -82,7 +79,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
         })}
 
         {isShowingCards && isDefined(computedPocketCluster.frontPocket.card) && (
-          <Card isParentHovered={isHovered} owner={pocketCluster} path={computedPocketCluster.frontPocket.card.path} />
+          <Card owner={pocketCluster} path={computedPocketCluster.frontPocket.card.path} />
         )}
         <path
           d={frontPocketPathData}
@@ -93,6 +90,24 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       </g>
       <StitchLines componentId={pocketCluster.id} />
       <HoleHighlights componentId={pocketCluster.id} />
+      {computedPocketCluster.children.map((component) => {
+        switch (component.type) {
+          case 'computed-panel':
+            return (
+              <Panel componentId={component.componentId} key={component.componentId} nestingLevel={nestingLevel + 1} />
+            )
+          case 'computed-pocket-cluster':
+            return (
+              <PocketCluster
+                componentId={component.componentId}
+                key={component.componentId}
+                nestingLevel={nestingLevel + 1}
+              />
+            )
+          case 'computed-root-panel':
+            throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
+        }
+      })}
     </>
   )
 }

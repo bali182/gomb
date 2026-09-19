@@ -19,7 +19,6 @@ export const PdfFrontPocket: FC<PdfFrontPocketProps> = ({ element }) => {
   const pathData = usePath(element.pocket.path)
   const styleParams: DrawAreaComponentStyleParams = {
     component: element.ownerComponent,
-    isHovered: false,
     nestingLevel: 0,
   }
 

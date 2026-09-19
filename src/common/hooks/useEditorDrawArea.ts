@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { STITCH_LINE_LABEL_BACKGROUND_COLOR, STITCH_LINE_LABEL_COLOR, STROKE_THICKNESS } from '../constants/drawing'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
@@ -55,14 +55,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
   const { project } = useProject()
   const { subProject } = useSubProject()
   const drawAreaSelection = useSubProjectSelection(subProject)
-  const {
-    editorSelection: selection,
-    hoveredStitchLineId,
-    hoveredTreeSelection,
-    selectedHole,
-    selectedStitchLine,
-    isComponentSelected,
-  } = drawAreaSelection
+  const { hovered, isHovered, isSelected, selected } = drawAreaSelection
 
   const {
     colorSettings: {
@@ -78,40 +71,23 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
   } = project
 
   const selectionObstructingComponentIds = useMemo<ReadonlySet<string>>(
-    () => getSelectionObstructingComponentIds(hoveredTreeSelection ?? selection, subProject),
-    [hoveredTreeSelection, subProject, selection],
-  )
-
-  const isComponentTreeHovered = useCallback(
-    (componentId: string): boolean =>
-      hoveredTreeSelection?.type === 'component' && hoveredTreeSelection.componentId === componentId,
-    [hoveredTreeSelection],
-  )
-
-  const isHoleTreeHovered = useCallback(
-    (holeId: string): boolean => hoveredTreeSelection?.type === 'hole' && hoveredTreeSelection.holeId === holeId,
-    [hoveredTreeSelection],
-  )
-
-  const isStitchLineTreeHovered = useCallback(
-    (stitchLineId: string): boolean =>
-      hoveredTreeSelection?.type === 'stitch-line' && hoveredTreeSelection.stitchLineId === stitchLineId,
-    [hoveredTreeSelection],
+    () => getSelectionObstructingComponentIds(hovered ?? selected, subProject),
+    [hovered, selected, subProject],
   )
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(
     () => ({
-      getBackgroundColor: ({ component, isHovered, nestingLevel }) => {
+      getBackgroundColor: ({ component, nestingLevel }) => {
         const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
 
-        if (component.type === 'pocket-cluster' && (isComponentSelected(component.id) || isHovered)) {
+        if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
           return addAlpha(color)
         }
 
         return selectionObstructingComponentIds.has(component.id) ? addAlpha(color) : color
       },
-      getBorderColor: ({ component, isHovered }) => {
-        if (isComponentSelected(component.id) || isComponentTreeHovered(component.id) || isHovered) {
+      getBorderColor: ({ component }) => {
+        if (isSelected(component) || isHovered(component)) {
           return selectionColor
         }
         return selectionObstructingComponentIds.has(component.id) ? addAlpha(strokeColor) : strokeColor
@@ -119,26 +95,17 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       getBorderThickness: () => {
         return STROKE_THICKNESS
       },
-      getFilter: ({ component, isHovered }) => {
-        return isComponentSelected(component.id) || isComponentTreeHovered(component.id) || isHovered
-          ? `drop-shadow(0px 0px 2px ${selectionColor})`
-          : undefined
+      getFilter: ({ component }) => {
+        return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }),
-    [
-      isComponentSelected,
-      isComponentTreeHovered,
-      leatherColor,
-      selectionColor,
-      strokeColor,
-      selectionObstructingComponentIds,
-    ],
+    [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds],
   )
 
   const cardStyles = useMemo<DrawAreaCardStyles>(
     () => ({
-      getBackgroundColor: ({ owner, isParentHovered }) => {
-        if (isComponentSelected(owner.id) || isParentHovered) {
+      getBackgroundColor: ({ owner }) => {
+        if (isSelected(owner) || isHovered(owner)) {
           return addAlpha(cardColor)
         }
 
@@ -151,34 +118,28 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
         return STROKE_THICKNESS
       },
     }),
-    [isComponentSelected, cardColor, strokeColor, selectionObstructingComponentIds],
+    [isHovered, isSelected, cardColor, strokeColor, selectionObstructingComponentIds],
   )
 
   const holeStyles = useMemo<DrawAreaHoleStyles>(
     () => ({
-      getFillColor: ({ hole, isHovered }) => {
-        return selectedHole?.id === hole.id || isHoleTreeHovered(hole.id) || isHovered
-          ? addAlpha(selectionColor)
-          : 'transparent'
+      getFillColor: ({ hole }) => {
+        return isSelected(hole) || isHovered(hole) ? addAlpha(selectionColor) : 'transparent'
       },
-      getStrokeColor: ({ hole, isHovered }) => {
-        return selectedHole?.id === hole.id || isHoleTreeHovered(hole.id) || isHovered ? selectionColor : 'transparent'
+      getStrokeColor: ({ hole }) => {
+        return isSelected(hole) || isHovered(hole) ? selectionColor : 'transparent'
       },
       getStrokeThickness: () => {
         return STROKE_THICKNESS
       },
     }),
-    [isHoleTreeHovered, selectionColor, selectedHole?.id],
+    [isHovered, isSelected, selectionColor],
   )
 
   const stitchLineStyles = useMemo<DrawAreaStitchLineStyles>(
     () => ({
       getLineColor: (stitchLine) => {
-        if (
-          selectedStitchLine?.id === stitchLine.id ||
-          hoveredStitchLineId === stitchLine.id ||
-          isStitchLineTreeHovered(stitchLine.id)
-        ) {
+        if (isSelected(stitchLine) || isHovered(stitchLine)) {
           return selectionColor
         }
 
@@ -188,11 +149,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
         return stitchLine.stitchLineThickness ?? stitchLineThickness
       },
       getStitchHoleColor: (stitchLine) => {
-        if (
-          selectedStitchLine?.id === stitchLine.id ||
-          hoveredStitchLineId === stitchLine.id ||
-          isStitchLineTreeHovered(stitchLine.id)
-        ) {
+        if (isSelected(stitchLine) || isHovered(stitchLine)) {
           return selectionColor
         }
 
@@ -209,9 +166,8 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       },
     }),
     [
-      selectedStitchLine?.id,
-      hoveredStitchLineId,
-      isStitchLineTreeHovered,
+      isHovered,
+      isSelected,
       stitchLineColor,
       selectionColor,
       stitchLineThickness,

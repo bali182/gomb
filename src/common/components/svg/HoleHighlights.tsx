@@ -1,4 +1,4 @@
-import { useCallback, useState, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -38,24 +38,23 @@ export const HoleHighlights: FC<HoleHighlightsProps> = ({ componentId }) => {
 
 const HoleHighlight: FC<HoleHighlightProps> = ({ computedHole, hole }) => {
   const { holeStyles, isInteractive, selection } = useDrawAreaContext()
-  const [isHovered, setIsHovered] = useState(false)
   const pathData = usePath(computedHole.highlightPath)
-  const styleParams: DrawAreaHoleStyleParams = { hole, isHovered }
+  const styleParams: DrawAreaHoleStyleParams = { hole }
 
   const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    setIsHovered(true)
-  }, [])
+    selection.hover(hole)
+  }, [hole, selection])
 
   const handlePointerLeave = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    setIsHovered(false)
-  }, [])
+    selection.clearHover()
+  }, [selection])
 
   const handleClick = useCallback<MouseEventHandler<SVGPathElement>>(
     (event) => {
       event.stopPropagation()
-      selection.selectHole(hole.id)
+      selection.select(hole)
     },
-    [hole.id, selection],
+    [hole, selection],
   )
 
   if (computedHole.highlightPath.commands.length === 0) {
