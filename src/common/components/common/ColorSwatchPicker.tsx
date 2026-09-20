@@ -2,8 +2,8 @@ import { Button, ColorSwatch, IconButton, Popover, Portal, type PopoverRootProps
 import type { ReactElement } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 import type { ColorValue } from '../../hooks/useColors'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import { portalRef } from '../../portalRef'
-import { useTranslation } from '../../translations/translation'
 import { ButtonSwatchItem, SelectableColorSwatch } from './SelectableColorSwatch'
 
 type ColorSwatchPickerProps = {
@@ -23,7 +23,7 @@ export const ColorSwatchPicker = ({
   positioning,
   trigger,
 }: ColorSwatchPickerProps) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const value = v?.toLowerCase()
 
   return (
@@ -48,7 +48,7 @@ export const ColorSwatchPicker = ({
             {canReset && (
               <Button marginTop="3" onClick={() => onChange(undefined)} size="xs" width="full" variant="outline">
                 <PiArrowCounterClockwise />
-                {t.common.actions.reset}
+                {t.project.editors.controls.colorSwatchPicker.reset}
               </Button>
             )}
           </Popover.Content>

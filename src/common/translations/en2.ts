@@ -386,6 +386,19 @@ export const EN2 = {
           } satisfies EnumTranslationSchema<PageLayoutSchema>,
         },
       },
+      controls: {
+        cardPicker: {
+          noCard: 'None',
+          landscape: 'Landscape',
+          portrait: 'Portrait',
+        },
+        colorSwatchPicker: {
+          reset: 'Reset',
+        },
+        stitchHoleDistance: {
+          noMatchingValues: 'No matching values.',
+        },
+      },
     },
     errors: {
       notFound: {

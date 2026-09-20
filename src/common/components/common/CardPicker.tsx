@@ -11,9 +11,9 @@ import { useCallback, type FC } from 'react'
 import { PiArrowCounterClockwise, PiCreditCard } from 'react-icons/pi'
 
 import { cards, landscapeCards, portraitCards } from '../../data/cards'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import type { IssueSchema } from '../../schemas/validation'
 import type { CardSchema, CardSchemaId } from '../../schemas/valuables'
-import { useTranslation } from '../../translations/translation'
 import { isDefined } from '../../utils/isDefined'
 
 const cardCollection = createListCollection<CardSchema>({
@@ -31,7 +31,7 @@ type CardPickerProps = {
 }
 
 export const CardPicker: FC<CardPickerProps> = ({ isResetEnabled, issue, onChange, onReset, value }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const isInvalid = isDefined(issue) && issue.severity === 'error'
   const isValuePortrait = portraitCards.some((c) => c.id === value)
 
@@ -77,11 +77,11 @@ export const CardPicker: FC<CardPickerProps> = ({ isResetEnabled, issue, onChang
               <Select.ValueText asChild>
                 <HStack>
                   <PiCreditCard style={isValuePortrait ? { transform: `rotate(90deg)` } : undefined} />
-                  <span>{t.cards[value]}</span>
+                  <span>{t.data.cards[value]}</span>
                 </HStack>
               </Select.ValueText>
             ) : (
-              <Select.ValueText placeholder={t.component.editor.pocketCluster.noCard} />
+              <Select.ValueText placeholder={t.project.editors.controls.cardPicker.noCard} />
             )}
           </Select.Trigger>
           <Select.IndicatorGroup>
@@ -92,11 +92,11 @@ export const CardPicker: FC<CardPickerProps> = ({ isResetEnabled, issue, onChang
       <Select.Positioner>
         <Select.Content>
           <Select.ItemGroup key="landscape">
-            <Select.ItemGroupLabel>{t.component.editor.pocketCluster.landscape}</Select.ItemGroupLabel>
+            <Select.ItemGroupLabel>{t.project.editors.controls.cardPicker.landscape}</Select.ItemGroupLabel>
             <CardItems cards={landscapeCards} />
           </Select.ItemGroup>
           <Select.ItemGroup key="portrait">
-            <Select.ItemGroupLabel>{t.component.editor.pocketCluster.portrait}</Select.ItemGroupLabel>
+            <Select.ItemGroupLabel>{t.project.editors.controls.cardPicker.portrait}</Select.ItemGroupLabel>
             <CardItems cards={portraitCards} transform="rotate(90deg)" />
           </Select.ItemGroup>
         </Select.Content>
@@ -111,7 +111,7 @@ type CardItemsProps = {
 }
 
 const CardItems: FC<CardItemsProps> = ({ cards, transform }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   return (
     <>
@@ -120,8 +120,8 @@ const CardItems: FC<CardItemsProps> = ({ cards, transform }) => {
           <Select.Item item={card} key={card.id}>
             <HStack>
               <PiCreditCard style={{ transform }} />
-              <Text>{t.cardsSimple[card.id]}</Text>
-              <Text color="fg.muted">({t.common.dimensions(card.width.toString(), card.height.toString())})</Text>
+              <Text>{t.data.cardsSimple[card.id]}</Text>
+              <Text color="fg.muted">({t.formatters.dimensions(card.width.toString(), card.height.toString())})</Text>
             </HStack>
             <Select.ItemIndicator />
           </Select.Item>
