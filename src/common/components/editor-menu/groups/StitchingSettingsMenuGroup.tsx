@@ -5,6 +5,7 @@ import { LANGUAGE } from '../../../constants/language'
 import { useEditableModel } from '../../../hooks/useEditableModel'
 import { useProject } from '../../../hooks/useProject'
 import { useProjectOperations } from '../../../hooks/useProjectOperations'
+import { useTranslation2 } from '../../../hooks/useTranslation2'
 import type { BaseValidationContextSchema } from '../../../schemas/validation'
 import { useTranslation } from '../../../translations/translation'
 import { optionalComparators } from '../../../utils/comparators'
@@ -19,8 +20,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
   const { updateStitchingSettings } = useProjectOperations()
   const { project } = useProject()
 
-  const t = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t }), [t])
+  const { t } = useTranslation2()
+  const legacyT = useTranslation()
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
 
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit: updateStitchingSettings,
@@ -53,9 +55,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
 
   return (
     <Menu.ItemGroup>
-      <Menu.ItemGroupLabel>{t.editor.menus.project.stitching.name}</Menu.ItemGroupLabel>
+      <Menu.ItemGroupLabel>{t.project.menus.project.stitching.name}</Menu.ItemGroupLabel>
       <Box onKeyDown={stopPropagation}>
-        <StitchingSettingsMenuItem label={t.editor.menus.project.stitching.margin}>
+        <StitchingSettingsMenuItem label={t.project.menus.project.stitching.margin}>
           <NumberInput
             issue={validationIssues.stitchMargin}
             onChange={handleStitchMarginChange}
@@ -64,7 +66,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
             value={editableValue.stitchMargin}
           />
         </StitchingSettingsMenuItem>
-        <StitchingSettingsMenuItem label={t.editor.menus.project.stitching.holeLength}>
+        <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeLength}>
           <NumberInput
             issue={validationIssues.stitchHoleLength}
             onChange={handleStitchHoleLengthChange}
@@ -73,7 +75,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
             value={editableValue.stitchHoleLength}
           />
         </StitchingSettingsMenuItem>
-        <StitchingSettingsMenuItem label={t.editor.menus.project.stitching.holeDistance}>
+        <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeDistance}>
           <StitchHoleDistanceEditor
             isResetEnabled={false}
             issue={validationIssues.stitchHoleDistance}
@@ -82,7 +84,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
             size="2xs"
           />
         </StitchingSettingsMenuItem>
-        <StitchingSettingsMenuItem label={t.editor.menus.project.stitching.holeThickness}>
+        <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeThickness}>
           <NumberInput
             issue={validationIssues.stitchHoleThickness}
             onChange={handleStitchHoleThicknessChange}
@@ -91,7 +93,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
             value={editableValue.stitchHoleThickness}
           />
         </StitchingSettingsMenuItem>
-        <StitchingSettingsMenuItem label={t.editor.menus.project.stitching.lineThickness}>
+        <StitchingSettingsMenuItem label={t.project.menus.project.stitching.lineThickness}>
           <NumberInput
             issue={validationIssues.stitchLineThickness}
             onChange={handleStitchLineThicknessChange}

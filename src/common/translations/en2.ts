@@ -34,15 +34,13 @@ import type {
   NativeDialogTranslationSchema,
 } from '../schemas/translation'
 import type { CardSchemaId } from '../schemas/valuables'
-import type { TranslationLanguage } from './translation'
 
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
 
 register('en', en)
 
-export const EN = {
-  language: 'en' as TranslationLanguage,
+export const EN2 = {
   app: {
     title: 'Gomb',
     subtitle: 'A simple app for designing leathercraft projects.',
@@ -121,10 +119,10 @@ export const EN = {
           lineThickness: 'Line thickness',
         },
       },
-      help: {
-        name: 'Help',
-        help: {
-          name: 'Help',
+      about: {
+        name: 'About',
+        resources: {
+          name: 'Resources',
           viewSourceCode: 'View source code',
           reportIssue: 'Report issue',
           viewLicense: 'License',

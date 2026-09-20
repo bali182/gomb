@@ -1,5 +1,5 @@
 import { FC, ReactElement } from 'react'
-import { useTranslation } from '../../translations/translation'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import { BaseMenu } from './BaseMenu'
 
 type CommonMenuProps = {
@@ -7,30 +7,30 @@ type CommonMenuProps = {
 }
 
 export const FileMenu: FC<CommonMenuProps> = ({ children }) => {
-  const t = useTranslation()
-  return <BaseMenu title={t.editor.menus.file.name}>{children}</BaseMenu>
+  const { t } = useTranslation2()
+  return <BaseMenu title={t.project.menus.file.name}>{children}</BaseMenu>
 }
 
 export const EditMenu: FC<CommonMenuProps> = ({ children }) => {
-  const t = useTranslation()
-  return <BaseMenu title={t.editor.menus.edit.name}>{children}</BaseMenu>
+  const { t } = useTranslation2()
+  return <BaseMenu title={t.project.menus.edit.name}>{children}</BaseMenu>
 }
 
 export const ViewMenu: FC<CommonMenuProps> = ({ children }) => {
-  const t = useTranslation()
-  return <BaseMenu title={t.editor.menus.view.name}>{children}</BaseMenu>
+  const { t } = useTranslation2()
+  return <BaseMenu title={t.project.menus.view.name}>{children}</BaseMenu>
 }
 
 export const ProjectMenu: FC<CommonMenuProps> = ({ children }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   return (
-    <BaseMenu title={t.editor.menus.project.name} autoFocus={true}>
+    <BaseMenu title={t.project.menus.project.name} autoFocus={true}>
       {children}
     </BaseMenu>
   )
 }
 
-export const HelpMenu: FC<CommonMenuProps> = ({ children }) => {
-  const t = useTranslation()
-  return <BaseMenu title={t.editor.menus.help.name}>{children}</BaseMenu>
+export const AboutMenu: FC<CommonMenuProps> = ({ children }) => {
+  const { t } = useTranslation2()
+  return <BaseMenu title={t.project.menus.about.name}>{children}</BaseMenu>
 }
