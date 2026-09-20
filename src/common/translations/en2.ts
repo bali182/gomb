@@ -18,9 +18,12 @@ import type {
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
 import type {
+  ComponentColorSettingsSchema,
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
   ExportStitchLineModeSchema,
+  SelectionColorSettingsSchema,
+  StitchingColorSettingsSchema,
 } from '../schemas/settings'
 import type {
   HasDirectionalOffsetsSchema,
@@ -307,6 +310,24 @@ export const EN2 = {
             yAnchor: { label: 'Vertical alignment' },
             yOffset: { label: 'Y offset' },
           } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
+        },
+        project: {
+          components: {
+            title: 'Component colors',
+            leatherColor: { label: 'Leather color' },
+            strokeColor: { label: 'Outline color' },
+            cardColor: { label: 'Card color' },
+          } satisfies SectionTranslationSchema<ComponentColorSettingsSchema>,
+          stitching: {
+            title: 'Stitching colors',
+            stitchHoleColor: { label: 'Stitch hole color' },
+            stitchLineColor: { label: 'Stitch line color' },
+            threadColor: { label: 'Thread color' },
+          } satisfies SectionTranslationSchema<StitchingColorSettingsSchema>,
+          selection: {
+            title: 'Selection colors',
+            selectionColor: { label: 'Selection color' },
+          } satisfies SectionTranslationSchema<SelectionColorSettingsSchema>,
         },
         export: {
           layout: {

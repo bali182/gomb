@@ -10,10 +10,10 @@ import {
   threadColors,
 } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ProjectSchema } from '../../schemas/project'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { ColorInput } from '../common/ColorInput'
 import { SectionGroup } from '../common/SectionGroup'
 
@@ -24,7 +24,7 @@ type ProjectComponentSettingsSectionProps = {
 }
 
 export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = ({ editable, issues, onChange }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const leatherColorValues = useColors(leatherColors)
   const threadColorValues = useColors(threadColors)
   const stitchHoleColorValues = useColors(stitchHoleColors)
@@ -128,10 +128,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
     <>
       {/* Components */}
       <SectionGroup.Section>
-        <SectionGroup.SectionHeader>{t.projects.settingsDialog.colorSettings.leatherTitle}</SectionGroup.SectionHeader>
+        <SectionGroup.SectionHeader>{t.project.editors.sections.project.components.title}</SectionGroup.SectionHeader>
 
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.leatherColor}
+          {t.project.editors.sections.project.components.leatherColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.leatherColor}>
           <ColorInput
@@ -143,7 +143,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         </SectionGroup.SectionRowEditor>
 
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.strokeColor}
+          {t.project.editors.sections.project.components.strokeColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.strokeColor}>
           <ColorInput
@@ -154,7 +154,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
 
-        <SectionGroup.SectionRowTitle>{t.projects.settingsDialog.colorSettings.cardColor}</SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle>
+          {t.project.editors.sections.project.components.cardColor.label}
+        </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.cardColor}>
           <ColorInput
             colors={cardColorValues}
@@ -167,12 +169,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
 
       {/* Stitching */}
       <SectionGroup.Section>
-        <SectionGroup.SectionHeader>
-          {t.projects.settingsDialog.colorSettings.stitchingTitle}
-        </SectionGroup.SectionHeader>
+        <SectionGroup.SectionHeader>{t.project.editors.sections.project.stitching.title}</SectionGroup.SectionHeader>
 
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.stitchHoleColor}
+          {t.project.editors.sections.project.stitching.stitchHoleColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchHoleColor}>
           <ColorInput
@@ -183,7 +183,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.stitchLineColor}
+          {t.project.editors.sections.project.stitching.stitchLineColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchLineColor}>
           <ColorInput
@@ -194,7 +194,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.threadColor}
+          {t.project.editors.sections.project.stitching.threadColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.threadColor}>
           <ColorInput
@@ -208,12 +208,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
 
       {/* Selection */}
       <SectionGroup.Section>
-        <SectionGroup.SectionHeader>
-          {t.projects.settingsDialog.colorSettings.selectionTitle}
-        </SectionGroup.SectionHeader>
+        <SectionGroup.SectionHeader>{t.project.editors.sections.project.selection.title}</SectionGroup.SectionHeader>
 
         <SectionGroup.SectionRowTitle>
-          {t.projects.settingsDialog.colorSettings.selectionColor}
+          {t.project.editors.sections.project.selection.selectionColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.selectionColor}>
           <ColorInput
