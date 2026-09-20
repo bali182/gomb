@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router'
 import typia from 'typia'
 
 import { toaster } from '../../common/components/Toaster'
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -30,32 +31,33 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
   const requestIdRef = useRef(0)
   const navigate = useNavigate()
   const { subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
-  const t = useTranslation()
+  const legacyT = useTranslation()
+  const { t } = useTranslation2()
 
   const showOpenFailedToast = useCallback((): void => {
     toaster.create({
-      description: t.projects.openDialog.errors.openFailed,
+      description: legacyT.projects.openDialog.errors.openFailed,
       type: 'error',
       closable: true,
     })
-  }, [t.projects.openDialog.errors.openFailed])
+  }, [legacyT.projects.openDialog.errors.openFailed])
 
   const showSaveFailedToast = useCallback((): void => {
     toaster.create({
-      description: t.projects.saveDialog.errors.saveFailed,
+      description: legacyT.projects.saveDialog.errors.saveFailed,
       type: 'error',
       closable: true,
     })
-  }, [t.projects.saveDialog.errors.saveFailed])
+  }, [legacyT.projects.saveDialog.errors.saveFailed])
 
   const showSaveSucceededToast = useCallback((): void => {
     toaster.create({
-      description: t.projects.saveDialog.successes.saveSucceeded,
+      description: legacyT.projects.saveDialog.successes.saveSucceeded,
       type: 'info',
       duration: 2000,
       closable: true,
     })
-  }, [t.projects.saveDialog.successes.saveSucceeded])
+  }, [legacyT.projects.saveDialog.successes.saveSucceeded])
 
   console.log('h')
 
@@ -147,13 +149,13 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
 
   const openProject = useCallback(async (): Promise<void> => {
     const response = await electronApi.dialog({
-      buttonLabel: t.projects.actions.open,
+      buttonLabel: t.nativeDialogs.openProjectPath.positiveAction,
       fileFilter: {
         extension: FILE_EXTENSION,
-        name: t.projects.openDialog.fileFilterLabel,
+        name: t.nativeDialogs.openProjectPath.extensionName,
       },
       target: 'file',
-      title: t.projects.openDialog.title,
+      title: t.nativeDialogs.openProjectPath.title,
       type: 'read',
     })
 
@@ -170,9 +172,9 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
   }, [
     navigate,
     showOpenFailedToast,
-    t.projects.actions.open,
-    t.projects.openDialog.fileFilterLabel,
-    t.projects.openDialog.title,
+    t.nativeDialogs.openProjectPath.extensionName,
+    t.nativeDialogs.openProjectPath.positiveAction,
+    t.nativeDialogs.openProjectPath.title,
   ])
 
   const saveProject = useCallback(async (): Promise<void> => {
@@ -197,12 +199,12 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     }
 
     const response = await electronApi.dialog({
-      buttonLabel: t.editor.menus.file.file.save,
+      buttonLabel: t.nativeDialogs.saveProjectAsPath.positiveAction,
       fileFilter: {
         extension: FILE_EXTENSION,
-        name: t.projects.openDialog.fileFilterLabel,
+        name: t.nativeDialogs.saveProjectAsPath.extensionName,
       },
-      title: t.projects.saveDialog.title,
+      title: t.nativeDialogs.saveProjectAsPath.title,
       type: 'write',
     })
 
@@ -236,9 +238,9 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     navigateToProject,
     showSaveFailedToast,
     subProjectId,
-    t.editor.menus.file.file.save,
-    t.projects.openDialog.fileFilterLabel,
-    t.projects.saveDialog.title,
+    t.nativeDialogs.saveProjectAsPath.extensionName,
+    t.nativeDialogs.saveProjectAsPath.positiveAction,
+    t.nativeDialogs.saveProjectAsPath.title,
     writeProject,
   ])
 

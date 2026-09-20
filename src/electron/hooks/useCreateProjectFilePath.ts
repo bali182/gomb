@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { IssueSchema } from '../../common/schemas/validation'
@@ -26,7 +27,8 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
   const [isManuallyModified, setIsManuallyModified] = useState(false)
   const suggestPathRequestIdRef = useRef(0)
   const validatePathRequestIdRef = useRef(0)
-  const t = useTranslation()
+  const legacyT = useTranslation()
+  const { t } = useTranslation2()
 
   const updateFilePath = useCallback((requestId: number, update: SetStateAction<LoadableSchema<string>>): void => {
     if (requestId !== suggestPathRequestIdRef.current) {
@@ -84,12 +86,12 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     try {
       const response = await electronApi.validateCreatePath({ filePath: path, type: 'validate-create-path' })
 
-      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, t)))
+      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, legacyT)))
     } catch {
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: t.projects.createDialog.errors.filePathValidationFailed,
+          message: legacyT.projects.createDialog.errors.filePathValidationFailed,
           severity: 'error',
         }),
       )
@@ -142,12 +144,13 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
   const onFilePickerButtonPressed = useCallback(async (): Promise<void> => {
     const response = await electronApi.dialog({
+      buttonLabel: t.nativeDialogs.createProjectPath.positiveAction,
       defaultPath: Loadable.get(filePath),
       fileFilter: {
         extension: FILE_EXTENSION,
-        name: t.projects.openDialog.fileFilterLabel,
+        name: t.nativeDialogs.createProjectPath.extensionName,
       },
-      title: t.projects.createDialog.filePickerTitle,
+      title: t.nativeDialogs.createProjectPath.title,
       type: 'write',
     })
 
@@ -161,7 +164,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: t.projects.createDialog.errors.filePathValidationFailed,
+          message: legacyT.projects.createDialog.errors.filePathValidationFailed,
           severity: 'error',
         }),
       )
@@ -169,7 +172,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     }
 
     onFilePathChange(response.filePath)
-  }, [filePath, onFilePathChange, t, updateFilePathValidationIssue])
+  }, [filePath, legacyT, onFilePathChange, t.nativeDialogs.createProjectPath, updateFilePathValidationIssue])
 
   const filePathIssue = useMemo<LoadableSchema<IssueSchema | undefined>>(() => {
     return Loadable.merge([filePath, filePathValidationIssue], (_filePath, issue): IssueSchema | undefined => issue)
