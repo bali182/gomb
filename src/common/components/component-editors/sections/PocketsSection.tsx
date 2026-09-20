@@ -12,14 +12,14 @@ import { CardPicker } from '../../common/CardPicker'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type PocketClusterSettingsSectionProps = {
+type PocketsSectionProps = {
   component: PocketClusterSchema
   editable: EditableSchema<PocketClusterSchema>
   issues: ValidationIssuesSchema<PocketClusterSchema>
   onChange: (updated: EditableSchema<PocketClusterSchema>) => void
 }
 
-export const PocketClusterSettingsSection: FC<PocketClusterSettingsSectionProps> = ({ editable, issues, onChange }) => {
+export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onChange }) => {
   const t = useTranslation()
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
@@ -54,6 +54,27 @@ export const PocketClusterSettingsSection: FC<PocketClusterSettingsSectionProps>
     },
     [editable, onChange],
   )
+
+  const handleTPocketTabWidthChange = useCallback(
+    (tPocketTabWidth: string) => {
+      onChange({
+        ...editable,
+        tPocketTabWidth,
+      })
+    },
+    [editable, onChange],
+  )
+
+  const handleTPocketTaperChange = useCallback(
+    (tPocketTaper: string) => {
+      onChange({
+        ...editable,
+        tPocketTaper,
+      })
+    },
+    [editable, onChange],
+  )
+
   const handleCardIdChange = useCallback(
     (cardId: CardSchemaId): void => {
       onChange({
@@ -114,6 +135,26 @@ export const PocketClusterSettingsSection: FC<PocketClusterSettingsSectionProps>
           onChange={handlePocketStepChange}
           unit="mm"
           value={editable.pocketStep}
+        />
+      </SectionGroup.SectionRowEditor>
+
+      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.flapWidth}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
+        <NumberInput
+          issue={issues.tPocketTabWidth}
+          onChange={handleTPocketTabWidthChange}
+          unit="mm"
+          value={editable.tPocketTabWidth}
+        />
+      </SectionGroup.SectionRowEditor>
+
+      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.taper}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
+        <NumberInput
+          issue={issues.tPocketTaper}
+          onChange={handleTPocketTaperChange}
+          unit="mm"
+          value={editable.tPocketTaper}
         />
       </SectionGroup.SectionRowEditor>
 

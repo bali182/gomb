@@ -373,9 +373,6 @@ export const HU = {
         fromRight: 'Jobbról',
         landscape: 'Fekvő kártyák',
         portrait: 'Álló kártyák',
-      },
-      tPocket: {
-        title: 'T-zsebek',
         flapWidth: 'Fül szélesség',
         taper: 'Szűkülés',
       },

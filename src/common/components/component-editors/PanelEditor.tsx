@@ -5,7 +5,7 @@ import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
-import { FillableSizeSection } from './sections/FillableSizeSection'
+import { AutoSizeSection } from './sections/AutoSizeSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { SqueezeSection } from './sections/SqueezeSection'
 
@@ -20,7 +20,7 @@ type PanelEditorProps = {
 export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues, onChange, parent }) => {
   return (
     <SectionGroup.Root>
-      <FillableSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <AnchorSection<PanelSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
       <SqueezeSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <CornerRadiusSection<PanelSchema> value={component} editable={editable} issues={issues} onChange={onChange} />

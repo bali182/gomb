@@ -7,17 +7,13 @@ import { useTranslation } from '../../../translations/translation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type WidthAndHeightSizeSectionProps<T> = {
+type SizeSectionProps<T> = {
   editable: EditableSchema<T>
   issues: ValidationIssuesSchema<HasSizeSchema>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function WidthAndHeightSizeSection<T extends HasSizeSchema>({
-  editable,
-  issues,
-  onChange,
-}: WidthAndHeightSizeSectionProps<T>): ReactNode {
+export function SizeSection<T extends HasSizeSchema>({ editable, issues, onChange }: SizeSectionProps<T>): ReactNode {
   const t = useTranslation()
   const handleWidthChange = useCallback(
     (width: string) => {

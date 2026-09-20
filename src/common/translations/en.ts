@@ -371,9 +371,6 @@ export const EN: TranslationSchema = {
         fromRight: 'Right',
         landscape: 'Landscape cards',
         portrait: 'Portrait cards',
-      },
-      tPocket: {
-        title: 'T-pockets',
         flapWidth: 'Tab width',
         taper: 'Taper',
       },

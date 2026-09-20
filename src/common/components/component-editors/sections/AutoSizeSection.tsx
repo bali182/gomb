@@ -10,18 +10,18 @@ import { useTranslation } from '../../../translations/translation'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type FillableSizeSectionProps<T> = {
+type AutoSizeSectionProps<T> = {
   component: T
   editable: EditableSchema<T>
   issues: ValidationIssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function FillableSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSchema>({
+export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSchema>({
   editable,
   issues,
   onChange,
-}: FillableSizeSectionProps<T>) {
+}: AutoSizeSectionProps<T>) {
   const t = useTranslation()
   const hasActiveHorizontalSqueeze = editable.leftSqueeze !== '0' || editable.rightSqueeze !== '0'
   const hasActiveVerticalSqueeze = editable.topSqueeze !== '0' || editable.bottomSqueeze !== '0'

@@ -10,7 +10,7 @@ import { isDefined } from '../../common/utils/isDefined'
 import { electronAppRoutes } from '../electronAppRoutes'
 import { useElectronProject } from '../hooks/useElectronProject'
 
-export const ElectronUnsavedChangesGuard: FC = () => {
+export const ElectronUnsavedChangesGuardDialog: FC = () => {
   const [isWindowCloseRequested, setWindowCloseRequested] = useState(false)
   const isClosing = useRef(false)
   const { electronProject, saveProject } = useElectronProject()
