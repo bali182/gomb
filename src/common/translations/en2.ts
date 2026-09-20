@@ -160,6 +160,16 @@ export const EN2 = {
       },
     },
     editors: {
+      tabs: {
+        components: {
+          layout: 'Layout',
+          pockets: 'Pockets',
+        },
+        stitchLines: {
+          settings: 'Settings',
+          overrides: 'Overrides',
+        },
+      },
       actions: {
         components: {
           addPanel: 'Add panel',

@@ -1,10 +1,10 @@
 import { type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { SectionGroup } from '../common/SectionGroup'
 import { CornerRadiusSection } from '../component-editors/sections/CornerRadiusSection'
 import { StitchSidesAndCornersSection } from './sections/StitchSidesAndCornersSection'
@@ -27,12 +27,12 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
   onReset,
   resolvedEditable,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   return (
     <Tabs.Root defaultValue="settings">
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value="settings">{t.stitchLine.editor.tabs.settings}</Tabs.Trigger>
-        <Tabs.Trigger value="overrides">{t.stitchLine.editor.tabs.overrides}</Tabs.Trigger>
+        <Tabs.Trigger value="settings">{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
+        <Tabs.Trigger value="overrides">{t.project.editors.tabs.stitchLines.overrides}</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="settings" pt={0}>
         <SectionGroup.Root>
