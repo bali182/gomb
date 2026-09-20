@@ -415,22 +415,6 @@ export const EN: TranslationSchema = {
       seamLine: {
         title: 'Seam line',
       },
-      sidesAndCorners: {
-        topDirection: 'Top seam direction',
-        rightDirection: 'Right seam direction',
-        bottomDirection: 'Bottom seam direction',
-        leftDirection: 'Left seam direction',
-      },
-      offsets: {
-        bottomEnd: 'Bottom edge end offset',
-        bottomStart: 'Bottom edge start offset',
-        leftEnd: 'Left edge end offset',
-        leftStart: 'Left edge start offset',
-        rightEnd: 'Right edge end offset',
-        rightStart: 'Right edge start offset',
-        topEnd: 'Top edge end offset',
-        topStart: 'Top edge start offset',
-      },
       pocketStitch: {
         title: 'Pocket stitch',
         enabled: 'Enabled',

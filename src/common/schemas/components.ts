@@ -51,6 +51,21 @@ export type PanelSchema = HasTypeSchema<'panel'> &
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
+export type PocketsSchema = {
+  /** How many pockets do we have in this cluster (min 1) */
+  pocketCount: number
+  /** How far each pocket is offset from the previous one along the stack axis */
+  pocketStep: number
+  /** Direction where the pocket opening is. Example means you can put the card in from the top, and left means from the left side. */
+  orientation: PocketOrientationSchema
+  /** Size of the flaps/tabs on the T-Pockets */
+  tPocketTabWidth: number
+  /** How much the t pockets taper from the 2 * tPocketTabWidth reduced width to the bottom of the pocket */
+  tPocketTaper: number
+  /** Id of the card shown in every pocket */
+  cardId?: CardSchemaId
+}
+
 /**
  * A cluster of pockets.
  * Does not hold individual pockets, rather pocketCount-1 T-Pockets and 1 top pocket (computed internally).
@@ -62,19 +77,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasOffAxisAnchor &
   HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
-  HasSqueezeSchema & {
-    /** How many pockets do we have in this cluster (min 1) */
-    pocketCount: number
-    /** How far each pocket is offset from the previous one along the stack axis */
-    pocketStep: number
-    /** Direction where the pocket opening is. Example means you can put the card in from the top, and left means from the left side. */
-    orientation: PocketOrientationSchema
-    /** Size of the flaps/tabs on the T-Pockets */
-    tPocketTabWidth: number
-    /** How much the t pockets taper from the 2 * tPocketTabWidth reduced width to the bottom of the pocket */
-    tPocketTaper: number
-    /** Id of the card shown in every pocket */
-    cardId?: CardSchemaId
-  }
+  HasSqueezeSchema &
+  PocketsSchema
 
 export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema

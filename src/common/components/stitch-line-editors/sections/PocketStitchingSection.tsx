@@ -9,17 +9,13 @@ import { useTranslation } from '../../../translations/translation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type PocketClusterStitchLineSettingsSectionProps = {
+type PocketStitchingSectionProps = {
   editable: EditableSchema<PocketClusterStitchLineSchema>
   issues: ValidationIssuesSchema<PocketClusterStitchLineSchema>
   onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
 }
 
-export const PocketClusterStitchLineSettingsSection = ({
-  editable,
-  issues,
-  onChange,
-}: PocketClusterStitchLineSettingsSectionProps): ReactNode => {
+export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {
   const t = useTranslation()
   const handleStartOffsetChange = useCallback(
     (startOffset: string): void => {

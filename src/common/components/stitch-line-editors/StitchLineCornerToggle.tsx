@@ -18,18 +18,11 @@ type StitchLineSegmentLayout = {
 type StitchLineCornerToggleProps = {
   corner: StitchCornerSchema
   disabled: boolean
-  label: string
   onClick: () => void
   selected: boolean
 }
 
-export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
-  corner,
-  disabled,
-  label,
-  onClick,
-  selected,
-}) => {
+export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({ corner, disabled, onClick, selected }) => {
   const layout = useMemo<StitchLineSegmentLayout>(() => getCornerLayout(corner), [corner])
 
   const borderColor = useMemo<CssProperties['borderColor']>(
@@ -48,7 +41,6 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
   return (
     <Box {...layout.root}>
       <Button
-        aria-label={label}
         aria-pressed={selected}
         cursor={disabled === true ? 'not-allowed' : 'pointer'}
         disabled={disabled}

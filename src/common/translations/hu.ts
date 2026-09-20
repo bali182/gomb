@@ -417,22 +417,6 @@ export const HU = {
       seamLine: {
         title: 'Varratvonal',
       },
-      sidesAndCorners: {
-        topDirection: 'Felső varrat iránya',
-        rightDirection: 'Jobb varrat iránya',
-        bottomDirection: 'Alsó varrat iránya',
-        leftDirection: 'Bal varrat iránya',
-      },
-      offsets: {
-        bottomEnd: 'Alsó oldal végpontjának eltolása',
-        bottomStart: 'Alsó oldal kezdőpontjának eltolása',
-        leftEnd: 'Bal oldal végpontjának eltolása',
-        leftStart: 'Bal oldal kezdőpontjának eltolása',
-        rightEnd: 'Jobb oldal végpontjának eltolása',
-        rightStart: 'Jobb oldal kezdőpontjának eltolása',
-        topEnd: 'Felső oldal végpontjának eltolása',
-        topStart: 'Felső oldal kezdőpontjának eltolása',
-      },
       pocketStitch: {
         title: 'Zsebvarrás',
         enabled: 'Engedélyezve',
