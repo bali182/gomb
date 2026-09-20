@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { EditDialog } from '../../common/components/EditDialog'
 import { LANGUAGE } from '../../common/constants/language'
 import { useEditableModel } from '../../common/hooks/useEditableModel'
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { addSubProject } from '../../common/operations/project/addSubProject'
 import { getUnusedName } from '../../common/operations/subProject/utils/getUnusedName'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -24,13 +25,14 @@ type WebCreateProjectDialogProps = {
 export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const { addProject, projects } = useProjects()
   const navigate = useNavigate()
-  const t = useTranslation()
+  const legacyT = useTranslation()
+  const { t } = useTranslation2()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
     return createProject(
-      getUnusedName(t.defaults.projectName, new Set(projects.map((project): string => project.name))),
+      getUnusedName(t.defaultNames.project, new Set(projects.map((project): string => project.name))),
     )
-  }, [projects, t.defaults.projectName])
+  }, [projects, t.defaultNames.project])
 
   const [project, setProject] = useState<ProjectSchema>(() => createEmptyProject())
 
@@ -39,8 +41,8 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
   }, [createEmptyProject])
 
   const context = useMemo<ProjectBasedValidationContextSchema>(
-    () => ({ language: LANGUAGE, projects, t }),
-    [projects, t],
+    () => ({ language: LANGUAGE, projects, t: legacyT }),
+    [legacyT, projects],
   )
 
   const commit = useCallback((updatedProject: ProjectSchema): void => {
@@ -64,12 +66,12 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
-      baseRootComponentName: t.defaults.rootComponentName,
+      baseRootComponentName: t.defaultNames.rootPanel,
     })
     addProject(createdProject)
     onOpenChange(false)
     navigate(webAppRoutes.subProject(createdProject.id, initialSubProject.id))
-  }, [addProject, context, editableValue, navigate, onOpenChange, project, t])
+  }, [addProject, context, editableValue, navigate, onOpenChange, project, t.defaultNames.rootPanel])
 
   return (
     <EditDialog
@@ -78,8 +80,8 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
       onOpenChange={onOpenChange}
       onResetData={resetProject}
       onSubmit={handleSubmit}
-      submit={t.projects.createDialog.actions.create}
-      title={t.projects.createDialog.title}
+      submit={legacyT.projects.createDialog.actions.create}
+      title={legacyT.projects.createDialog.title}
     >
       <WebProjectSettingsEditor editable={editableValue} issues={validationIssues} onChange={setValue} />
     </EditDialog>

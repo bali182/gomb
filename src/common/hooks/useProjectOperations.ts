@@ -8,9 +8,9 @@ import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { useTranslation } from '../translations/translation'
 import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
+import { useTranslation2 } from './useTranslation2'
 
 export type UseProjectOperationsOutput = {
   cloneSubProject: (sourceSubProject: SubProjectSchema) => void
@@ -23,7 +23,7 @@ export type UseProjectOperationsOutput = {
 
 export const useProjectOperations = (): UseProjectOperationsOutput => {
   const { project, setProject } = useEditorContext()
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   const updateProject = useCallback(
     (updatedProject: ProjectSchema): void => {
@@ -58,12 +58,12 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
 
   const createSubProject = useCallback((): SubProjectSchema => {
     const currentProject = ensureProject(project)
-    const result = addSubProjectPure(currentProject, { baseRootComponentName: t.defaults.rootComponentName })
+    const result = addSubProjectPure(currentProject, { baseRootComponentName: t.defaultNames.rootPanel })
 
     setProject(result.project)
 
     return result.subProject
-  }, [project, setProject, t.defaults.rootComponentName])
+  }, [project, setProject, t.defaultNames.rootPanel])
 
   const cloneSubProject = useCallback(
     (sourceSubProject: SubProjectSchema): void => {

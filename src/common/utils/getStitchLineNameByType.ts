@@ -1,11 +1,14 @@
 import { StitchLineSchema } from '../schemas/stitching'
-import type { TranslationSchema } from '../translations/translationSchema'
+import type { TranslationSchema2 } from '../translations/translationSchema'
 
-export const getStitchLineNameByType = (type: StitchLineSchema['type'], t: TranslationSchema): string => {
+export const getStitchLineNameByType = (
+  type: StitchLineSchema['type'],
+  defaultNames: TranslationSchema2['defaultNames'],
+): string => {
   switch (type) {
     case 'component-bounds-stitch-line':
-      return t.stitchLine.types.componentBounds
+      return defaultNames.componentBoundsStitchLine
     case 'pocket-cluster-stitch-line':
-      return t.stitchLine.types.pocketCluster
+      return defaultNames.pocketClusterStitchLine
   }
 }

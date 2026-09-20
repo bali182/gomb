@@ -419,6 +419,15 @@ export const EN2 = {
       extensionName: 'Gomb JSON files',
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
+  defaultNames: {
+    project: 'Project',
+    rootPanel: 'Module',
+    panel: 'Panel',
+    pocketCluster: 'Pocket cluster',
+    componentBoundsStitchLine: 'Stitching',
+    pocketClusterStitchLine: 'Pocket stitching',
+    hole: 'Hole',
+  },
   data: {
     colors: {
       black: 'Black',

@@ -27,12 +27,12 @@ import type { HoleSchema } from '../schemas/hole'
 import type { ProjectSchema } from '../schemas/project'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { useTranslation } from '../translations/translation'
 import { getUnusedStitchLineName } from '../utils/getUnusedStitchLineName'
 import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useSubProjectHistory } from './useSubProjectHistory'
+import { useTranslation2 } from './useTranslation2'
 
 export type UseSubProjectOperationsOutput = {
   addComponent: (parentId: string, type: ComponentSchema['type']) => ComponentSchema
@@ -58,7 +58,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { project, subProject, setSubProject } = useEditorContext()
   const { settings } = useGlobalSettings()
   const { recordChange, recordThrottledChange: recordThrottledUpdate } = useSubProjectHistory()
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   const addComponent = useCallback(
     (parentId: string, type: ComponentSchema['type']): ComponentSchema => {
@@ -68,7 +68,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
         type,
         color: settings.edit.addBaseColor ? currentProject.colorSettings.leatherColor : undefined,
         id: id(),
-        name: getUnusedComponentName(type, currentSubProject, t),
+        name: getUnusedComponentName(type, currentSubProject, t.defaultNames),
         stitchingSettings: currentProject.stitchingSettings,
       })
 
@@ -87,7 +87,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
         type,
         { targetId: componentId, targetType: 'component' },
         id(),
-        getUnusedStitchLineName(type, currentSubProject, t),
+        getUnusedStitchLineName(type, currentSubProject, t.defaultNames),
       )
 
       recordChange(currentSubProject)
@@ -106,7 +106,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
         type,
         { targetId: holeId, targetType: 'hole' },
         id(),
-        getUnusedStitchLineName(type, currentSubProject, t),
+        getUnusedStitchLineName(type, currentSubProject, t.defaultNames),
       )
 
       recordChange(currentSubProject)
@@ -123,7 +123,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       const hole = createHole({
         componentId,
         id: id(),
-        name: getUnusedHoleName(currentSubProject, t),
+        name: getUnusedHoleName(currentSubProject, t.defaultNames),
       })
 
       recordChange(currentSubProject)
