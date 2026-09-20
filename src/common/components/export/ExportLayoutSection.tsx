@@ -1,9 +1,9 @@
 import { useCallback, type ReactNode } from 'react'
 
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import type { EditableSchema } from '../../schemas/editable'
 import type { BaseExportSettingsSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 
@@ -18,7 +18,7 @@ export function ExportLayoutSection<T extends BaseExportSettingsSchema>({
   issues,
   onChange,
 }: ExportLayoutSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const handleGapChange = useCallback(
     (gap: string): void => {
       onChange({ ...editable, gap })
@@ -34,12 +34,14 @@ export function ExportLayoutSection<T extends BaseExportSettingsSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.exportSettings.sections.layout}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.gap}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.export.layout.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.layout.gap.label}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.gap}>
         <NumberInput issue={issues.gap} onChange={handleGapChange} unit="mm" value={editable.gap} />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.padding}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.layout.padding.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.padding}>
         <NumberInput issue={issues.padding} onChange={handlePaddingChange} unit="mm" value={editable.padding} />
       </SectionGroup.SectionRowEditor>

@@ -2,11 +2,11 @@ import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PiCaretDown, PiCaretLeft, PiCaretRight, PiCaretUp } from 'react-icons/pi'
 
+import { useTranslation2 } from '../../../hooks/useTranslation2'
 import type { PocketClusterSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import type { CardSchemaId } from '../../../schemas/valuables'
-import { useTranslation } from '../../../translations/translation'
 import { isDefined } from '../../../utils/isDefined'
 import { CardPicker } from '../../common/CardPicker'
 import { NumberInput } from '../../common/NumberInput'
@@ -20,7 +20,7 @@ type PocketsSectionProps = {
 }
 
 export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onChange }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
       if (details.value !== 'up' && details.value !== 'down' && details.value !== 'left' && details.value !== 'right') {
@@ -93,8 +93,10 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.component.editor.pocketCluster.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.opening}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.components.pockets.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.orientation.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
           <SegmentGroup.Indicator />
@@ -117,7 +119,9 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.common.labels.amount}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.pocketCount.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.pocketCount}>
         <NumberInput
           issue={issues.pocketCount}
@@ -128,7 +132,9 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.common.labels.spacing}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.pocketStep.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.pocketStep}>
         <NumberInput
           issue={issues.pocketStep}
@@ -138,7 +144,9 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.flapWidth}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.tPocketTabWidth.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
         <NumberInput
           issue={issues.tPocketTabWidth}
@@ -148,7 +156,9 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.taper}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.tPocketTaper.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
         <NumberInput
           issue={issues.tPocketTaper}
@@ -158,7 +168,9 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.pocketCluster.card}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.pockets.cardId.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.cardId}>
         <CardPicker
           isResetEnabled={isDefined(editable.cardId)}

@@ -16,15 +16,20 @@ export type ColorSettingsSchema = {
 
 export type ExportStitchLineModeSchema = 'own-stitch-lines' | 'all-stitch-lines' | 'related-stitch-lines'
 
-export type BaseExportSettingsSchema = {
+export type ExportLayoutSettingsSchema = {
   gap: number
   padding: number
+}
+
+export type ExportContentSettingsSchema = {
   stitchLineMode: ExportStitchLineModeSchema
   showNames: boolean
   showDimensions: boolean
   childMarkers: boolean
   cutHelperDistance: number
 }
+
+export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportContentSettingsSchema
 
 export type AppSettingsSchema = {
   theme: ThemeSchema

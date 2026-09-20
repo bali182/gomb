@@ -2,11 +2,11 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { HStack } from '@chakra-ui/react'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink, PiLinkBreak } from 'react-icons/pi'
+import { useTranslation2 } from '../../../hooks/useTranslation2'
 import type { HasSqueezeSchema, HasSqueezeValuesSchema } from '../../../schemas/common'
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
@@ -24,7 +24,7 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
   issues,
   onChange,
 }: SqueezeSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   const horizontalIssues = useMemo(
     () => [issues.leftSqueeze, issues.rightSqueeze],
@@ -83,17 +83,19 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
           <SectionHeaderToggle
             onIcon={PiLink}
             offIcon={PiLinkBreak}
-            onLabel={t.component.editor.squeeze.uniform}
-            offLabel={t.component.editor.squeeze.individual}
+            onLabel={t.project.editors.enums.components.individualSqueeze.false}
+            offLabel={t.project.editors.enums.components.individualSqueeze.true}
             value={!editable.individualSqueeze}
             onChange={handleSqueezeTypeChange}
           />
         }
       >
-        {t.component.editor.squeeze.title}
+        {t.project.editors.sections.components.squeeze.title}
       </SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.squeeze.vertical}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.squeeze.vertical.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={verticalIssues}>
         <HStack gap="3">
           <NumberInput
@@ -113,7 +115,9 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
         </HStack>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.squeeze.horizontal}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.squeeze.horizontal.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={horizontalIssues}>
         <HStack gap="3">
           <NumberInput

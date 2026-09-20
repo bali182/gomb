@@ -17,7 +17,11 @@ import {
 } from '../schemas/components'
 import { HasAnchorsSchema } from '../schemas/hole'
 import { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
-import { BaseExportSettingsSchema, ExportStitchLineModeSchema } from '../schemas/settings'
+import {
+  ExportContentSettingsSchema,
+  ExportLayoutSettingsSchema,
+  ExportStitchLineModeSchema,
+} from '../schemas/settings'
 import {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
@@ -30,8 +34,9 @@ import {
 } from '../schemas/stitching'
 import type {
   DialogTranslationSchema,
-  EditorFieldTranslationSchema,
+  EnumTranslationSchema,
   NativeDialogTranslationSchema,
+  SectionTranslationSchema,
 } from '../schemas/translation'
 import type { CardSchemaId } from '../schemas/valuables'
 
@@ -137,63 +142,76 @@ export const EN2 = {
       sections: {
         common: {
           cornerRadius: {
-            autoCornerRadius: {},
-            individualRadii: {},
+            title: 'Corner radius',
+            autoCornerRadius: { placeholder: 'Auto' },
+            individualRadii: { label: 'Measurement' },
             topLeftRadius: {},
             topRightRadius: {},
             bottomLeftRadius: {},
             bottomRightRadius: {},
-          } satisfies Record<keyof (HasCornerRadiusSchema & HasAutoCornerRadiusSchema), EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
           size: {
+            title: 'Size',
             width: { label: 'Width' },
             height: { label: 'Height' },
-          } satisfies Record<keyof HasSizeSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasSizeSchema>,
         },
         components: {
           anchor: {
+            title: 'Alignment',
             offAxisAnchor: { label: 'Alignment' },
-          } satisfies Record<keyof HasOffAxisAnchor, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasOffAxisAnchor>,
           autoSize: {
+            title: 'Size',
+            squeezeActive: 'Squeeze is active!',
             width: { label: 'Width', placeholder: 'Fill' },
             height: { label: 'Height', placeholder: 'Fill' },
             autoWidth: {},
             autoHeight: {},
-          } satisfies Record<keyof HasAutoDimensionsSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasAutoDimensionsSchema>,
           layout: {
+            title: 'Layout',
             layoutOrientation: { label: 'Orientation' },
             layoutGap: { label: 'Gap', placeholder: 'Fill' },
             autoLayoutGap: {},
-          } satisfies Record<keyof HasLayoutSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasLayoutSchema>,
           squeeze: {
+            title: 'Squeeze',
+            horizontal: { label: 'Horizontal' },
+            vertical: { label: 'Vertical' },
             topSqueeze: {},
             rightSqueeze: {},
             bottomSqueeze: {},
             leftSqueeze: {},
             individualSqueeze: {},
-          } satisfies Record<keyof HasSqueezeSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasSqueezeSchema>,
           pockets: {
+            title: 'Pockets',
             orientation: { label: 'Opening' },
             pocketCount: { label: 'Amount' },
             pocketStep: { label: 'Spacing' },
             tPocketTabWidth: { label: 'Tab width' },
             tPocketTaper: { label: 'Taper' },
             cardId: { label: 'Card' },
-          } satisfies Record<keyof PocketsSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<PocketsSchema>,
         },
         stitchLines: {
           settings: {
+            title: 'Stitching',
             stitchMargin: { label: 'Margin' },
             stitchHoleLength: { label: 'Hole length' },
             stitchHoleDistance: { label: 'Hole spacing' },
             stitchHoleThickness: { label: 'Hole thickness' },
             stitchLineThickness: { label: 'Line thickness' },
-          } satisfies Record<keyof StitchLineCommonConfigSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<StitchLineCommonConfigSchema>,
           pocketStitching: {
+            title: 'Pocket stitch',
             startOffset: { label: 'Start offset' },
             endOffset: { label: 'End offset' },
             stitchDirection: { label: 'Direction' },
-          } satisfies Record<keyof PocketClusterStitchLineOwnSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<PocketClusterStitchLineOwnSchema>,
           sidesAndCorners: {
+            title: 'Seam line',
             top: {},
             right: {},
             bottom: {},
@@ -218,50 +236,68 @@ export const EN2 = {
             bottomEndOffset: {},
             leftStartOffset: {},
             leftEndOffset: {},
-          } satisfies Record<
-            keyof (HasDirectionalOffsetsSchema &
+          } satisfies SectionTranslationSchema<
+            HasDirectionalOffsetsSchema &
               HasStitchedSidesSchema &
               HasStitchedCornersSchema &
               HasStitchedUnconnectedCornersSchema &
               HasHorizontalDirectionsSchema &
-              HasVerticalDirectionsSchema),
-            EditorFieldTranslationSchema
+              HasVerticalDirectionsSchema
           >,
         },
         holes: {
-          anchors: {
+          position: {
+            title: 'Position',
             xAnchor: { label: 'Horizontal alignment' },
-            yAnchor: { label: 'Vertical alignment' },
-          } satisfies Record<keyof HasAnchorsSchema, EditorFieldTranslationSchema>,
-          xyOffset: {
             xOffset: { label: 'X offset' },
+            yAnchor: { label: 'Vertical alignment' },
             yOffset: { label: 'Y offset' },
-          } satisfies Record<keyof HasXYOffsetSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
         },
         export: {
-          common: {
+          layout: {
+            title: 'Layout',
             gap: { label: 'Gap' },
             padding: { label: 'Padding' },
+          } satisfies SectionTranslationSchema<ExportLayoutSettingsSchema>,
+          content: {
+            title: 'Content',
             stitchLineMode: { label: 'Stitch lines' },
             showNames: { label: 'Show names' },
             showDimensions: { label: 'Show dimensions' },
             childMarkers: { label: 'Show child markers' },
             cutHelperDistance: { label: 'Cut helper distance' },
-          } satisfies Record<keyof BaseExportSettingsSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<ExportContentSettingsSchema>,
           pdf: {
+            title: 'Page',
             page: { label: 'Paper size' },
             orientation: { label: 'Orientation' },
             layout: { label: 'Layout' },
-          } satisfies Record<keyof PdfExportOwnSettingsSchema, EditorFieldTranslationSchema>,
+          } satisfies SectionTranslationSchema<PdfExportOwnSettingsSchema>,
         },
       },
       enums: {
         common: {
           anchor: {
-            start: 'Start',
-            middle: 'Center',
-            end: 'End',
-          } satisfies Record<AnchorSchema, string>,
+            vertical: {
+              start: 'Top',
+              middle: 'Center',
+              end: 'Bottom',
+            } satisfies EnumTranslationSchema<AnchorSchema>,
+            horizontal: {
+              start: 'Left',
+              middle: 'Center',
+              end: 'Right',
+            } satisfies EnumTranslationSchema<AnchorSchema>,
+          },
+          individualRadii: {
+            false: 'Uniform radius',
+            true: 'Individual radii',
+          } satisfies EnumTranslationSchema<boolean>,
+          autoCornerRadius: {
+            false: 'Manual',
+            true: 'Auto',
+          } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
           pocketOrientation: {
@@ -269,27 +305,31 @@ export const EN2 = {
             down: 'Bottom',
             left: 'Left',
             right: 'Right',
-          } satisfies Record<PocketOrientationSchema, string>,
+          } satisfies EnumTranslationSchema<PocketOrientationSchema>,
           layoutOrientation: {
             horizontal: 'Horizontal',
             vertical: 'Vertical',
-          } satisfies Record<LayoutOrientationSchema, string>,
+          } satisfies EnumTranslationSchema<LayoutOrientationSchema>,
+          individualSqueeze: {
+            false: 'Uniform squeeze',
+            true: 'Individual squeeze',
+          } satisfies EnumTranslationSchema<boolean>,
         },
         export: {
           exportStitchLineModes: {
             'own-stitch-lines': 'Own stitch lines',
             'related-stitch-lines': 'Related stitch lines',
             'all-stitch-lines': 'All stitch lines',
-          } satisfies Record<ExportStitchLineModeSchema, string>,
+          } satisfies EnumTranslationSchema<ExportStitchLineModeSchema>,
           exportOrientation: {
             portrait: 'Portrait',
             landscape: 'Landscape',
-          } satisfies Record<PageOrientationSchema, string>,
+          } satisfies EnumTranslationSchema<PageOrientationSchema>,
           exportPageLayout: {
             vertical: 'Vertical',
             horizontal: 'Horizontal',
             compact: 'Compact',
-          } satisfies Record<PageLayoutSchema, string>,
+          } satisfies EnumTranslationSchema<PageLayoutSchema>,
         },
       },
     },
