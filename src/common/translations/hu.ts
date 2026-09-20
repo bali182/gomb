@@ -10,32 +10,25 @@ export const HU = {
   },
   common: {
     actions: {
-      add: 'Hozzáadás',
       reset: 'Visszaállítás',
       cancel: 'Mégse',
       back: 'Vissza',
-      next: 'Tovább',
       apply: 'Alkalmaz',
       remove: 'Törlés',
       clone: 'Duplikálás',
       flipHorizontal: 'Vízszintes tükrözés',
       flipVertical: 'Függőleges tükrözés',
-      settings: 'Beállítások',
       addByName: (name: string) => `${name} hozzáadása`,
     },
     labels: {
       general: 'Általános',
       name: 'Név',
-      component: 'Komponens',
-      color: 'Szín',
       size: 'Méret',
       width: 'Szélesség',
       height: 'Magasság',
       direction: 'Irány',
-      type: 'Típus',
       amount: 'Mennyiség',
       spacing: 'Köz',
-      measure: 'Mérték',
     },
     placeholders: {
       fill: 'Kitöltés',
@@ -45,16 +38,6 @@ export const HU = {
       noMatchingValues: 'Nincs egyező érték.',
     },
     dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    directions: {
-      top: 'Felső oldal',
-      right: 'Jobb oldal',
-      bottom: 'Alsó oldal',
-      left: 'Bal oldal',
-      topLeft: 'Bal felső sarok',
-      topRight: 'Jobb felső sarok',
-      bottomLeft: 'Bal alsó sarok',
-      bottomRight: 'Jobb alsó sarok',
-    },
     anchors: {
       left: 'Bal',
       center: 'Közép',
@@ -135,12 +118,7 @@ export const HU = {
       },
       help: {
         name: 'Segítség',
-        help: {
-          name: 'Segítség',
-          viewSourceCode: 'Forráskód megtekintése',
-          reportIssue: 'Probléma jelentése',
-          viewLicense: 'Licenc',
-        },
+        help: { viewSourceCode: 'Forráskód megtekintése', reportIssue: 'Probléma jelentése', viewLicense: 'Licenc' },
         downloadApp: {
           name: 'App letöltése',
           downloadApp: 'Letöltés',
@@ -222,7 +200,6 @@ export const HU = {
     },
   },
   projects: {
-    title: 'Projektek',
     actions: {
       open: 'Megnyitás',
       create: 'Új projekt',
@@ -281,7 +258,6 @@ export const HU = {
       },
     },
     settingsDialog: {
-      title: 'Projekt beállításai',
       colorSettings: {
         leatherTitle: 'Komponens színek',
         stitchingTitle: 'Varrás színek',
@@ -299,7 +275,6 @@ export const HU = {
       },
       tabs: {
         basics: 'Alapok',
-        colors: 'Színek',
         stitching: 'Varrás',
       },
     },
@@ -319,13 +294,6 @@ export const HU = {
       pocketCluster: 'Zsebek',
     },
     editor: {
-      missing: {
-        title: 'Hiba',
-        description: 'Ehhez a komponenshez még nincs szerkesztő!',
-      },
-      actions: {
-        addChild: 'Elem hozzáadása',
-      },
       tabs: {
         layout: 'Elrendezés',
         pockets: 'Zsebek',
@@ -335,24 +303,16 @@ export const HU = {
         orientation: 'Tájolás',
         horizontal: 'Vízszintes',
         vertical: 'Függőleges',
-        order: 'Irány',
-        defaultOrder: 'Alapértelmezett',
-        reverseOrder: 'Fordított',
         gap: 'Térköz',
-        offset: 'Eltolás',
-        xOffset: 'X',
-        yOffset: 'Y',
       },
       anchor: {
         title: 'Igazítás',
       },
       cornerRadius: {
         title: 'Lekerekítés',
-        type: 'Típus',
         individual: 'Egyedi lekerekítés',
         uniform: 'Egységes lekerekítés',
         individualMeasure: 'Mérték',
-        uniformMeasure: 'Mérték',
       },
       squeeze: {
         title: 'Összenyomás',
@@ -388,26 +348,12 @@ export const HU = {
         xAnchor: 'Vízszintes igazítás',
         yAnchor: 'Függőleges igazítás',
       },
-      size: {
-        radius: 'Sugár',
-      },
     },
   },
   stitchLine: {
     types: {
       componentBounds: 'Varrás',
       pocketCluster: 'Zseb varrás',
-    },
-    add: {
-      title: 'Varrás hozzáadása',
-      type: 'Varrás típusa',
-      typePlaceholder: 'Varrás típusának kiválasztása',
-    },
-    tree: {
-      empty: {
-        title: 'Nincs még varrás',
-        description: 'Adj hozzá varrást a fa menüjéből vagy a szerkesztőből!',
-      },
     },
     editor: {
       tabs: {
@@ -419,14 +365,11 @@ export const HU = {
       },
       pocketStitch: {
         title: 'Zsebvarrás',
-        enabled: 'Engedélyezve',
         startOffset: 'Kezdő eltolás',
         endOffset: 'Vég eltolás',
       },
       stitching: {
         title: 'Varrás',
-        holeColor: 'Lyuk színe',
-        lineColor: 'Vonal színe',
         margin: 'Margó',
         holeLength: 'Lyuk hossza',
         holeDistance: 'Lyuktávolság',

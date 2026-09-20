@@ -11,32 +11,25 @@ export const EN: TranslationSchema = {
   },
   common: {
     actions: {
-      add: 'Add',
       reset: 'Reset',
       cancel: 'Cancel',
       back: 'Back',
-      next: 'Next',
       remove: 'Delete',
       apply: 'Apply',
       clone: 'Clone',
       flipHorizontal: 'Flip horizontal',
       flipVertical: 'Flip vertical',
-      settings: 'Settings',
       addByName: (name: string) => `Add ${name.toLowerCase()}`,
     },
     labels: {
       general: 'General',
       name: 'Name',
-      component: 'Component',
-      color: 'Color',
       size: 'Size',
       width: 'Width',
       height: 'Height',
       direction: 'Direction',
-      type: 'Type',
       amount: 'Amount',
       spacing: 'Spacing',
-      measure: 'Measurement',
     },
     placeholders: {
       fill: 'Fill',
@@ -46,16 +39,6 @@ export const EN: TranslationSchema = {
       noMatchingValues: 'No matching values.',
     },
     dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    directions: {
-      top: 'Top edge',
-      right: 'Right edge',
-      bottom: 'Bottom edge',
-      left: 'Left edge',
-      topLeft: 'Top-left corner',
-      topRight: 'Top-right corner',
-      bottomLeft: 'Bottom-left corner',
-      bottomRight: 'Bottom-right corner',
-    },
     anchors: {
       left: 'Left',
       center: 'Center',
@@ -137,7 +120,6 @@ export const EN: TranslationSchema = {
       help: {
         name: 'Help',
         help: {
-          name: 'Help',
           viewSourceCode: 'View source code',
           reportIssue: 'Report issue',
           viewLicense: 'License',
@@ -223,7 +205,6 @@ export const EN: TranslationSchema = {
     },
   },
   projects: {
-    title: 'Projects',
     actions: {
       open: 'Open',
       create: 'New project',
@@ -282,7 +263,6 @@ export const EN: TranslationSchema = {
       },
     },
     settingsDialog: {
-      title: 'Project settings',
       colorSettings: {
         leatherTitle: 'Component colors',
         stitchingTitle: 'Stitching colors',
@@ -297,7 +277,6 @@ export const EN: TranslationSchema = {
       },
       tabs: {
         basics: 'Basics',
-        colors: 'Colors',
         stitching: 'Stitching',
       },
     },
@@ -317,13 +296,6 @@ export const EN: TranslationSchema = {
       pocketCluster: 'Pocket cluster',
     },
     editor: {
-      missing: {
-        title: 'Error',
-        description: 'There is no editor for this component yet.',
-      },
-      actions: {
-        addChild: 'Add item',
-      },
       tabs: {
         layout: 'Layout',
         pockets: 'Pockets',
@@ -333,24 +305,16 @@ export const EN: TranslationSchema = {
         orientation: 'Orientation',
         horizontal: 'Horizontal',
         vertical: 'Vertical',
-        order: 'Order',
-        defaultOrder: 'Default',
-        reverseOrder: 'Reverse',
         gap: 'Gap',
-        offset: 'Offset',
-        xOffset: 'X',
-        yOffset: 'Y',
       },
       anchor: {
         title: 'Alignment',
       },
       cornerRadius: {
         title: 'Corner radius',
-        type: 'Type',
         individual: 'Individual radii',
         uniform: 'Uniform radius',
         individualMeasure: 'Measurement',
-        uniformMeasure: 'Measurement',
       },
       squeeze: {
         title: 'Squeeze',
@@ -386,26 +350,12 @@ export const EN: TranslationSchema = {
         xAnchor: 'Horizontal alignment',
         yAnchor: 'Vertical alignment',
       },
-      size: {
-        radius: 'Radius',
-      },
     },
   },
   stitchLine: {
     types: {
       componentBounds: 'Stitching',
       pocketCluster: 'Pocket stitching',
-    },
-    add: {
-      title: 'Add stitch line',
-      type: 'Stitch line type',
-      typePlaceholder: 'Select a stitch line type',
-    },
-    tree: {
-      empty: {
-        title: 'No stitch lines yet',
-        description: 'Add a stitch line from the tree or the editors!',
-      },
     },
     editor: {
       tabs: {
@@ -417,14 +367,11 @@ export const EN: TranslationSchema = {
       },
       pocketStitch: {
         title: 'Pocket stitch',
-        enabled: 'Enabled',
         startOffset: 'Start offset',
         endOffset: 'End offset',
       },
       stitching: {
         title: 'Stitching',
-        holeColor: 'Hole color',
-        lineColor: 'Line color',
         margin: 'Margin',
         holeLength: 'Hole length',
         holeDistance: 'Hole spacing',
