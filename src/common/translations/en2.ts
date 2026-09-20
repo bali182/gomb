@@ -1,7 +1,36 @@
-import { ColorKey } from '../data/colors'
-import { DialogTranslationSchema, NativeDialogTranslationSchema } from '../schemas/translation'
-import { CardSchemaId } from '../schemas/valuables'
+import type { ColorKey } from '../data/colors'
+import type {
+  HasAutoCornerRadiusSchema,
+  HasCornerRadiusSchema,
+  HasOffAxisAnchor,
+  HasSizeSchema,
+  HasSqueezeSchema,
+  HasXYOffsetSchema,
+} from '../schemas/common'
+import { HasAutoDimensionsSchema, HasLayoutSchema, PocketsSchema } from '../schemas/components'
+import { HasAnchorsSchema } from '../schemas/hole'
+import {
+  HasDirectionalOffsetsSchema,
+  HasHorizontalDirectionsSchema,
+  HasStitchedCornersSchema,
+  HasStitchedSidesSchema,
+  HasStitchedUnconnectedCornersSchema,
+  HasVerticalDirectionsSchema,
+  PocketClusterStitchLineOwnSchema,
+  StitchLineCommonConfigSchema,
+} from '../schemas/stitching'
+import type {
+  DialogTranslationSchema,
+  EditorFieldTranslationSchema,
+  NativeDialogTranslationSchema,
+} from '../schemas/translation'
+import type { CardSchemaId } from '../schemas/valuables'
 import type { TranslationLanguage } from './translation'
+
+import { format, register } from 'timeago.js'
+import en from 'timeago.js/lib/lang/en_US'
+
+register('en', en)
 
 export const EN = {
   language: 'en' as TranslationLanguage,
@@ -9,7 +38,10 @@ export const EN = {
     title: 'Gomb',
     subtitle: 'A simple app for designing leathercraft projects.',
   },
-  projects: {},
+  projects: {
+    createProject: 'Create project',
+    openProject: 'Open project',
+  },
   project: {
     menus: {
       file: {
@@ -96,20 +128,107 @@ export const EN = {
     },
     editors: {
       common: {
-        cornerRadius: {},
-        size: {},
+        cornerRadius: {
+          autoCornerRadius: {},
+          individualRadii: {},
+          topLeftRadius: {},
+          topRightRadius: {},
+          bottomLeftRadius: {},
+          bottomRightRadius: {},
+        } satisfies Record<keyof (HasCornerRadiusSchema & HasAutoCornerRadiusSchema), EditorFieldTranslationSchema>,
+        size: {
+          width: { label: 'Width' },
+          height: { label: 'Height' },
+        } satisfies Record<keyof HasSizeSchema, EditorFieldTranslationSchema>,
       },
       components: {
-        anchor: {},
-        autoSize: {},
-        layout: {},
-        squeeze: {},
-        pockets: {},
+        anchor: {
+          offAxisAnchor: { label: 'Alignment' },
+        } satisfies Record<keyof HasOffAxisAnchor, EditorFieldTranslationSchema>,
+        autoSize: {
+          width: { label: 'Width', placeholder: 'Fill' },
+          height: { label: 'Height', placeholder: 'Fill' },
+          autoWidth: {},
+          autoHeight: {},
+        } satisfies Record<keyof HasAutoDimensionsSchema, EditorFieldTranslationSchema>,
+        layout: {
+          layoutOrientation: { label: 'Orientation' },
+          layoutGap: { label: 'Gap', placeholder: 'Fill' },
+          autoLayoutGap: {},
+        } satisfies Record<keyof HasLayoutSchema, EditorFieldTranslationSchema>,
+        squeeze: {
+          topSqueeze: {},
+          rightSqueeze: {},
+          bottomSqueeze: {},
+          leftSqueeze: {},
+          individualSqueeze: {},
+        } satisfies Record<keyof HasSqueezeSchema, EditorFieldTranslationSchema>,
+        pockets: {
+          orientation: { label: 'Opening' },
+          pocketCount: { label: 'Amount' },
+          pocketStep: { label: 'Spacing' },
+          tPocketTabWidth: { label: 'Tab width' },
+          tPocketTaper: { label: 'Taper' },
+          cardId: { label: 'Card' },
+        } satisfies Record<keyof PocketsSchema, EditorFieldTranslationSchema>,
       },
-      stitchLines: {},
+      stitchLines: {
+        settings: {
+          stitchMargin: { label: 'Margin' },
+          stitchHoleLength: { label: 'Hole length' },
+          stitchHoleDistance: { label: 'Hole spacing' },
+          stitchHoleThickness: { label: 'Hole thickness' },
+          stitchLineThickness: { label: 'Line thickness' },
+        } satisfies Record<keyof StitchLineCommonConfigSchema, EditorFieldTranslationSchema>,
+        pocketStitching: {
+          startOffset: { label: 'Start offset' },
+          endOffset: { label: 'End offset' },
+          stitchDirection: { label: 'Direction' },
+        } satisfies Record<keyof PocketClusterStitchLineOwnSchema, EditorFieldTranslationSchema>,
+        sidesAndCorners: {
+          top: {},
+          right: {},
+          bottom: {},
+          left: {},
+          topLeftCorner: {},
+          topRightCorner: {},
+          bottomRightCorner: {},
+          bottomLeftCorner: {},
+          stitchDisconnectedTopLeftCorner: {},
+          stitchDisconnectedTopRightCorner: {},
+          stitchDisconnectedBottomLeftCorner: {},
+          stitchDisconnectedBottomRightCorner: {},
+          topStitchDirection: {},
+          rightStitchDirection: {},
+          bottomStitchDirection: {},
+          leftStitchDirection: {},
+          topStartOffset: {},
+          topEndOffset: {},
+          rightStartOffset: {},
+          rightEndOffset: {},
+          bottomStartOffset: {},
+          bottomEndOffset: {},
+          leftStartOffset: {},
+          leftEndOffset: {},
+        } satisfies Record<
+          keyof (HasDirectionalOffsetsSchema &
+            HasStitchedSidesSchema &
+            HasStitchedCornersSchema &
+            HasStitchedUnconnectedCornersSchema &
+            HasHorizontalDirectionsSchema &
+            HasVerticalDirectionsSchema),
+          EditorFieldTranslationSchema
+        >,
+      },
       holes: {
-        anchors: {},
-        xyOffset: {},
+        anchors: {
+          xAnchor: { label: 'Horizontal alignment' },
+          yAnchor: { label: 'Vertical alignment' },
+        } satisfies Record<keyof HasAnchorsSchema, EditorFieldTranslationSchema>,
+        xyOffset: {
+          xOffset: { label: 'X offset' },
+          yOffset: { label: 'Y offset' },
+        } satisfies Record<keyof HasXYOffsetSchema, EditorFieldTranslationSchema>,
       },
     },
   },
@@ -215,5 +334,10 @@ export const EN = {
       'ID-2-portrait': 'ID-2',
       'ID-3-portrait': 'ID-3',
     } satisfies Record<CardSchemaId, string>,
+  },
+  formatters: {
+    size: (size: number) => `${size}mm`,
+    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'en'),
   },
 }
