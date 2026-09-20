@@ -99,6 +99,10 @@ export const EN2 = {
       saveFailed: 'The project could not be saved.',
       saveSucceeded: 'Saved.',
     },
+    export: {
+      frontPocketName: (ownerName: string): string => `${ownerName} - front pocket`,
+      tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. pocket`,
+    },
     menus: {
       file: {
         name: 'File',
