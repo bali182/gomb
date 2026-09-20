@@ -70,6 +70,13 @@ export const EN2 = {
     },
   },
   project: {
+    tree: {
+      title: 'Elemek',
+      noModuleSelected: {
+        title: 'No module selected',
+        description: 'Select or create a module.',
+      },
+    },
     menus: {
       file: {
         name: 'File',
@@ -156,7 +163,7 @@ export const EN2 = {
       actions: {
         components: {
           addPanel: 'Add panel',
-          addRootPanel: 'Add root panel',
+          addRootPanel: 'Add module',
           addPocketCluster: 'Add pocket cluster',
           addHole: 'Add hole',
           addStitching: 'Add stitching',
@@ -368,6 +375,20 @@ export const EN2 = {
             compact: 'Compact',
           } satisfies EnumTranslationSchema<PageLayoutSchema>,
         },
+      },
+    },
+    errors: {
+      notFound: {
+        title: 'A projekt nem található',
+        description: 'A megnyitni kívánt projekt nem létezik.',
+      },
+      moduleNotFound: {
+        title: 'A modul nem található',
+        description: 'A megnyitni kívánt modul nem létezik.',
+      },
+      noModules: {
+        title: 'No modules yet',
+        description: 'Create a new module to start editing.',
       },
     },
   },
