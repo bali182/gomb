@@ -10,11 +10,13 @@ export type PageOrientationSchema = 'portrait' | 'landscape'
 export type PageLayoutSchema = 'vertical' | 'horizontal' | 'compact'
 export type PdfExportPlacementRotation = 0 | 90
 
-export type PdfExportSettingsSchema = BaseExportSettingsSchema & {
+export type PdfExportOwnSettingsSchema = {
   page: PageSchemaId
   orientation: PageOrientationSchema
   layout: PageLayoutSchema
 }
+
+export type PdfExportSettingsSchema = BaseExportSettingsSchema & PdfExportOwnSettingsSchema
 
 export type PdfExportPlacementSchema = {
   boundingRect: RectSchema

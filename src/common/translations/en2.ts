@@ -1,5 +1,6 @@
 import type { ColorKey } from '../data/colors'
 import type {
+  AnchorSchema,
   HasAutoCornerRadiusSchema,
   HasCornerRadiusSchema,
   HasOffAxisAnchor,
@@ -7,8 +8,16 @@ import type {
   HasSqueezeSchema,
   HasXYOffsetSchema,
 } from '../schemas/common'
-import { HasAutoDimensionsSchema, HasLayoutSchema, PocketsSchema } from '../schemas/components'
+import {
+  HasAutoDimensionsSchema,
+  HasLayoutSchema,
+  LayoutOrientationSchema,
+  PocketOrientationSchema,
+  PocketsSchema,
+} from '../schemas/components'
 import { HasAnchorsSchema } from '../schemas/hole'
+import { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
+import { BaseExportSettingsSchema, ExportStitchLineModeSchema } from '../schemas/settings'
 import {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
@@ -127,108 +136,163 @@ export const EN = {
       },
     },
     editors: {
-      common: {
-        cornerRadius: {
-          autoCornerRadius: {},
-          individualRadii: {},
-          topLeftRadius: {},
-          topRightRadius: {},
-          bottomLeftRadius: {},
-          bottomRightRadius: {},
-        } satisfies Record<keyof (HasCornerRadiusSchema & HasAutoCornerRadiusSchema), EditorFieldTranslationSchema>,
-        size: {
-          width: { label: 'Width' },
-          height: { label: 'Height' },
-        } satisfies Record<keyof HasSizeSchema, EditorFieldTranslationSchema>,
+      sections: {
+        common: {
+          cornerRadius: {
+            autoCornerRadius: {},
+            individualRadii: {},
+            topLeftRadius: {},
+            topRightRadius: {},
+            bottomLeftRadius: {},
+            bottomRightRadius: {},
+          } satisfies Record<keyof (HasCornerRadiusSchema & HasAutoCornerRadiusSchema), EditorFieldTranslationSchema>,
+          size: {
+            width: { label: 'Width' },
+            height: { label: 'Height' },
+          } satisfies Record<keyof HasSizeSchema, EditorFieldTranslationSchema>,
+        },
+        components: {
+          anchor: {
+            offAxisAnchor: { label: 'Alignment' },
+          } satisfies Record<keyof HasOffAxisAnchor, EditorFieldTranslationSchema>,
+          autoSize: {
+            width: { label: 'Width', placeholder: 'Fill' },
+            height: { label: 'Height', placeholder: 'Fill' },
+            autoWidth: {},
+            autoHeight: {},
+          } satisfies Record<keyof HasAutoDimensionsSchema, EditorFieldTranslationSchema>,
+          layout: {
+            layoutOrientation: { label: 'Orientation' },
+            layoutGap: { label: 'Gap', placeholder: 'Fill' },
+            autoLayoutGap: {},
+          } satisfies Record<keyof HasLayoutSchema, EditorFieldTranslationSchema>,
+          squeeze: {
+            topSqueeze: {},
+            rightSqueeze: {},
+            bottomSqueeze: {},
+            leftSqueeze: {},
+            individualSqueeze: {},
+          } satisfies Record<keyof HasSqueezeSchema, EditorFieldTranslationSchema>,
+          pockets: {
+            orientation: { label: 'Opening' },
+            pocketCount: { label: 'Amount' },
+            pocketStep: { label: 'Spacing' },
+            tPocketTabWidth: { label: 'Tab width' },
+            tPocketTaper: { label: 'Taper' },
+            cardId: { label: 'Card' },
+          } satisfies Record<keyof PocketsSchema, EditorFieldTranslationSchema>,
+        },
+        stitchLines: {
+          settings: {
+            stitchMargin: { label: 'Margin' },
+            stitchHoleLength: { label: 'Hole length' },
+            stitchHoleDistance: { label: 'Hole spacing' },
+            stitchHoleThickness: { label: 'Hole thickness' },
+            stitchLineThickness: { label: 'Line thickness' },
+          } satisfies Record<keyof StitchLineCommonConfigSchema, EditorFieldTranslationSchema>,
+          pocketStitching: {
+            startOffset: { label: 'Start offset' },
+            endOffset: { label: 'End offset' },
+            stitchDirection: { label: 'Direction' },
+          } satisfies Record<keyof PocketClusterStitchLineOwnSchema, EditorFieldTranslationSchema>,
+          sidesAndCorners: {
+            top: {},
+            right: {},
+            bottom: {},
+            left: {},
+            topLeftCorner: {},
+            topRightCorner: {},
+            bottomRightCorner: {},
+            bottomLeftCorner: {},
+            stitchDisconnectedTopLeftCorner: {},
+            stitchDisconnectedTopRightCorner: {},
+            stitchDisconnectedBottomLeftCorner: {},
+            stitchDisconnectedBottomRightCorner: {},
+            topStitchDirection: {},
+            rightStitchDirection: {},
+            bottomStitchDirection: {},
+            leftStitchDirection: {},
+            topStartOffset: {},
+            topEndOffset: {},
+            rightStartOffset: {},
+            rightEndOffset: {},
+            bottomStartOffset: {},
+            bottomEndOffset: {},
+            leftStartOffset: {},
+            leftEndOffset: {},
+          } satisfies Record<
+            keyof (HasDirectionalOffsetsSchema &
+              HasStitchedSidesSchema &
+              HasStitchedCornersSchema &
+              HasStitchedUnconnectedCornersSchema &
+              HasHorizontalDirectionsSchema &
+              HasVerticalDirectionsSchema),
+            EditorFieldTranslationSchema
+          >,
+        },
+        holes: {
+          anchors: {
+            xAnchor: { label: 'Horizontal alignment' },
+            yAnchor: { label: 'Vertical alignment' },
+          } satisfies Record<keyof HasAnchorsSchema, EditorFieldTranslationSchema>,
+          xyOffset: {
+            xOffset: { label: 'X offset' },
+            yOffset: { label: 'Y offset' },
+          } satisfies Record<keyof HasXYOffsetSchema, EditorFieldTranslationSchema>,
+        },
+        export: {
+          common: {
+            gap: { label: 'Gap' },
+            padding: { label: 'Padding' },
+            stitchLineMode: { label: 'Stitch lines' },
+            showNames: { label: 'Show names' },
+            showDimensions: { label: 'Show dimensions' },
+            childMarkers: { label: 'Show child markers' },
+            cutHelperDistance: { label: 'Cut helper distance' },
+          } satisfies Record<keyof BaseExportSettingsSchema, EditorFieldTranslationSchema>,
+          pdf: {
+            page: { label: 'Paper size' },
+            orientation: { label: 'Orientation' },
+            layout: { label: 'Layout' },
+          } satisfies Record<keyof PdfExportOwnSettingsSchema, EditorFieldTranslationSchema>,
+        },
       },
-      components: {
-        anchor: {
-          offAxisAnchor: { label: 'Alignment' },
-        } satisfies Record<keyof HasOffAxisAnchor, EditorFieldTranslationSchema>,
-        autoSize: {
-          width: { label: 'Width', placeholder: 'Fill' },
-          height: { label: 'Height', placeholder: 'Fill' },
-          autoWidth: {},
-          autoHeight: {},
-        } satisfies Record<keyof HasAutoDimensionsSchema, EditorFieldTranslationSchema>,
-        layout: {
-          layoutOrientation: { label: 'Orientation' },
-          layoutGap: { label: 'Gap', placeholder: 'Fill' },
-          autoLayoutGap: {},
-        } satisfies Record<keyof HasLayoutSchema, EditorFieldTranslationSchema>,
-        squeeze: {
-          topSqueeze: {},
-          rightSqueeze: {},
-          bottomSqueeze: {},
-          leftSqueeze: {},
-          individualSqueeze: {},
-        } satisfies Record<keyof HasSqueezeSchema, EditorFieldTranslationSchema>,
-        pockets: {
-          orientation: { label: 'Opening' },
-          pocketCount: { label: 'Amount' },
-          pocketStep: { label: 'Spacing' },
-          tPocketTabWidth: { label: 'Tab width' },
-          tPocketTaper: { label: 'Taper' },
-          cardId: { label: 'Card' },
-        } satisfies Record<keyof PocketsSchema, EditorFieldTranslationSchema>,
-      },
-      stitchLines: {
-        settings: {
-          stitchMargin: { label: 'Margin' },
-          stitchHoleLength: { label: 'Hole length' },
-          stitchHoleDistance: { label: 'Hole spacing' },
-          stitchHoleThickness: { label: 'Hole thickness' },
-          stitchLineThickness: { label: 'Line thickness' },
-        } satisfies Record<keyof StitchLineCommonConfigSchema, EditorFieldTranslationSchema>,
-        pocketStitching: {
-          startOffset: { label: 'Start offset' },
-          endOffset: { label: 'End offset' },
-          stitchDirection: { label: 'Direction' },
-        } satisfies Record<keyof PocketClusterStitchLineOwnSchema, EditorFieldTranslationSchema>,
-        sidesAndCorners: {
-          top: {},
-          right: {},
-          bottom: {},
-          left: {},
-          topLeftCorner: {},
-          topRightCorner: {},
-          bottomRightCorner: {},
-          bottomLeftCorner: {},
-          stitchDisconnectedTopLeftCorner: {},
-          stitchDisconnectedTopRightCorner: {},
-          stitchDisconnectedBottomLeftCorner: {},
-          stitchDisconnectedBottomRightCorner: {},
-          topStitchDirection: {},
-          rightStitchDirection: {},
-          bottomStitchDirection: {},
-          leftStitchDirection: {},
-          topStartOffset: {},
-          topEndOffset: {},
-          rightStartOffset: {},
-          rightEndOffset: {},
-          bottomStartOffset: {},
-          bottomEndOffset: {},
-          leftStartOffset: {},
-          leftEndOffset: {},
-        } satisfies Record<
-          keyof (HasDirectionalOffsetsSchema &
-            HasStitchedSidesSchema &
-            HasStitchedCornersSchema &
-            HasStitchedUnconnectedCornersSchema &
-            HasHorizontalDirectionsSchema &
-            HasVerticalDirectionsSchema),
-          EditorFieldTranslationSchema
-        >,
-      },
-      holes: {
-        anchors: {
-          xAnchor: { label: 'Horizontal alignment' },
-          yAnchor: { label: 'Vertical alignment' },
-        } satisfies Record<keyof HasAnchorsSchema, EditorFieldTranslationSchema>,
-        xyOffset: {
-          xOffset: { label: 'X offset' },
-          yOffset: { label: 'Y offset' },
-        } satisfies Record<keyof HasXYOffsetSchema, EditorFieldTranslationSchema>,
+      enums: {
+        common: {
+          anchor: {
+            start: 'Start',
+            middle: 'Center',
+            end: 'End',
+          } satisfies Record<AnchorSchema, string>,
+        },
+        components: {
+          pocketOrientation: {
+            up: 'Top',
+            down: 'Bottom',
+            left: 'Left',
+            right: 'Right',
+          } satisfies Record<PocketOrientationSchema, string>,
+          layoutOrientation: {
+            horizontal: 'Horizontal',
+            vertical: 'Vertical',
+          } satisfies Record<LayoutOrientationSchema, string>,
+        },
+        export: {
+          exportStitchLineModes: {
+            'own-stitch-lines': 'Own stitch lines',
+            'related-stitch-lines': 'Related stitch lines',
+            'all-stitch-lines': 'All stitch lines',
+          } satisfies Record<ExportStitchLineModeSchema, string>,
+          exportOrientation: {
+            portrait: 'Portrait',
+            landscape: 'Landscape',
+          } satisfies Record<PageOrientationSchema, string>,
+          exportPageLayout: {
+            vertical: 'Vertical',
+            horizontal: 'Horizontal',
+            compact: 'Compact',
+          } satisfies Record<PageLayoutSchema, string>,
+        },
       },
     },
   },
