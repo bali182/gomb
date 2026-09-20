@@ -24,10 +24,10 @@ export const useEditableHole = (holeId: string): UseEditableHoleResult => {
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateHole } = useSubProjectOperations()
-  const t = useTranslation()
+  const validationT = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
-    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t }),
-    [computedSubProject, project, subProject, t],
+    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: validationT }),
+    [computedSubProject, project, subProject, validationT],
   )
   const commit = useCallback(
     (updatedHole: HoleSchema): void => {

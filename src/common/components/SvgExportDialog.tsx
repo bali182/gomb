@@ -25,9 +25,9 @@ type SvgExportDialogProps = {
 export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setSvgExportSettings, settings } = useGlobalSettings()
-  const legacyT = useTranslation()
+  const validationT = useTranslation()
   const { t } = useTranslation2()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validationT }), [validationT])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
 
   const [editableParams, setEditableParams] = useState<EditableSchema<BaseExportSettingsSchema>>(() =>

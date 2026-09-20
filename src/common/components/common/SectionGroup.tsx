@@ -92,7 +92,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
 }
 
 const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
-  const t = useTranslation()
+  const validationT = useTranslation()
   const issue = useMemo<IssueSchema | undefined>(() => {
     if ((!isDefined(issues) || isRecord(issues)) && !Array.isArray(issues)) {
       return issues
@@ -114,10 +114,10 @@ const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
     })
 
     return {
-      message: t.validation.multipleIssues(definedIssues.length),
+      message: validationT.validation.multipleIssues(definedIssues.length),
       severity: highestSeverityIssue.severity,
     }
-  }, [issues, t])
+  }, [issues, validationT])
 
   const color = useMemo<ComponentProps<typeof Text>['color']>(() => {
     if (!isDefined(issue)) {

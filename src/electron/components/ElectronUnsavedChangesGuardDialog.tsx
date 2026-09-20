@@ -3,9 +3,9 @@ import { useCallback, useEffect, useRef, useState, type FC } from 'react'
 import { PiX } from 'react-icons/pi'
 import { useBlocker, type BlockerFunction } from 'react-router'
 
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { Loadable } from '../../common/loadable'
 import { portalRef } from '../../common/portalRef'
-import { useTranslation } from '../../common/translations/translation'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronAppRoutes } from '../electronAppRoutes'
 import { useElectronProject } from '../hooks/useElectronProject'
@@ -14,7 +14,7 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
   const [isWindowCloseRequested, setWindowCloseRequested] = useState(false)
   const isClosing = useRef(false)
   const { electronProject, saveProject } = useElectronProject()
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const loadedElectronProject = Loadable.get(electronProject)
   const filePath = loadedElectronProject?.filePath
   const isDirty = loadedElectronProject?.isDirty === true
@@ -99,17 +99,17 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
               </IconButton>
             </Dialog.CloseTrigger>
             <Dialog.Header>
-              <Dialog.Title>{t.projects.unsavedChangesDialog.title}</Dialog.Title>
+              <Dialog.Title>{t.dialogs.unsavedChangesGuard.title}</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              <Dialog.Description>{t.projects.unsavedChangesDialog.description}</Dialog.Description>
+              <Dialog.Description>{t.dialogs.unsavedChangesGuard.description}</Dialog.Description>
             </Dialog.Body>
             <Dialog.Footer>
               <Button onClick={proceed} variant="outline">
-                {t.projects.unsavedChangesDialog.actions.discard}
+                {t.dialogs.unsavedChangesGuard.negativeAction}
               </Button>
               <Button onClick={saveAndProceed} variant="solid">
-                {t.projects.unsavedChangesDialog.actions.save}
+                {t.dialogs.unsavedChangesGuard.positiveAction}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>

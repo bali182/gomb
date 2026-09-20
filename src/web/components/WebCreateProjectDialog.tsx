@@ -25,7 +25,7 @@ type WebCreateProjectDialogProps = {
 export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const { addProject, projects } = useProjects()
   const navigate = useNavigate()
-  const legacyT = useTranslation()
+  const validationT = useTranslation()
   const { t } = useTranslation2()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
@@ -41,8 +41,8 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
   }, [createEmptyProject])
 
   const context = useMemo<ProjectBasedValidationContextSchema>(
-    () => ({ language: LANGUAGE, projects, t: legacyT }),
-    [legacyT, projects],
+    () => ({ language: LANGUAGE, projects, t: validationT }),
+    [validationT, projects],
   )
 
   const commit = useCallback((updatedProject: ProjectSchema): void => {
@@ -80,8 +80,8 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
       onOpenChange={onOpenChange}
       onResetData={resetProject}
       onSubmit={handleSubmit}
-      submit={legacyT.projects.createDialog.actions.create}
-      title={legacyT.projects.createDialog.title}
+      submit={t.dialogs.createProject.positiveAction}
+      title={t.dialogs.createProject.title}
     >
       <WebProjectSettingsEditor editable={editableValue} issues={validationIssues} onChange={setValue} />
     </EditDialog>

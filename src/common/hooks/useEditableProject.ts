@@ -21,10 +21,10 @@ export type UseEditableProjectResult = {
 export const useEditableProject = (projects: readonly ProjectSchema[]): UseEditableProjectResult => {
   const { project } = useProject()
   const { updateProject } = useProjectOperations()
-  const t = useTranslation()
+  const validationT = useTranslation()
   const context = useMemo<ProjectBasedValidationContextSchema>(
-    () => ({ language: LANGUAGE, projects, t }),
-    [projects, t],
+    () => ({ language: LANGUAGE, projects, t: validationT }),
+    [projects, validationT],
   )
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit: updateProject,

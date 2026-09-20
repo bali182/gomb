@@ -54,8 +54,10 @@ export const EN2 = {
     subtitle: 'A simple app for designing leathercraft projects.',
   },
   projects: {
-    createProject: 'Create project',
-    openProject: 'Open project',
+    buttons: {
+      createProject: 'Create project',
+      openProject: 'Open project',
+    },
     actions: {
       delete: 'Delete',
     },
@@ -416,6 +418,9 @@ export const EN2 = {
         colorSwatchPicker: {
           reset: 'Reset',
         },
+        filePicker: {
+          browse: 'Browse',
+        },
         stitchHoleDistance: {
           noMatchingValues: 'No matching values.',
         },
@@ -462,6 +467,9 @@ export const EN2 = {
     createProject: {
       title: 'Create new project',
       positiveAction: 'Create',
+      errors: {
+        saveFailed: 'Failed to save project.',
+      },
     },
     unsavedChangesGuard: {
       title: 'Unsaved changes',

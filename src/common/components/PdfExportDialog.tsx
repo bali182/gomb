@@ -44,9 +44,9 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
   )
   const [failure, setFailure] = useState<PdfExportFailure | undefined>(undefined)
   const [isExporting, setIsExporting] = useState<boolean>(false)
-  const legacyT = useTranslation()
+  const validatonT = useTranslation()
   const { t } = useTranslation2()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validatonT }), [validatonT])
 
   const validationResult = useMemo(
     () => validatePdfExportSettingsSchema(localPdfExportSettings, exportParams, context),

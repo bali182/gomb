@@ -21,8 +21,8 @@ export const StitchingSettingsMenuGroup: FC = () => {
   const { project } = useProject()
 
   const { t } = useTranslation2()
-  const legacyT = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
+  const validationT = useTranslation()
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validationT }), [validationT])
 
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit: updateStitchingSettings,

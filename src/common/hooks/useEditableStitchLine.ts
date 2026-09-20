@@ -27,10 +27,10 @@ export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLi
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateStitchLine } = useSubProjectOperations()
-  const t = useTranslation()
+  const validationT = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
-    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t }),
-    [computedSubProject, project, subProject, t],
+    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: validationT }),
+    [computedSubProject, project, subProject, validationT],
   )
 
   const commit = useCallback(
