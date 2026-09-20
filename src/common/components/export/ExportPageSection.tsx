@@ -104,11 +104,11 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.orientations.portrait} value="portrait">
+          <SegmentGroup.Item value="portrait">
             <SegmentGroup.ItemHiddenInput />
             <PiFile /> {t.pdfExport.dialog.orientations.portrait}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.orientations.landscape} value="landscape">
+          <SegmentGroup.Item value="landscape">
             <SegmentGroup.ItemHiddenInput />
             <PiFile style={{ transform: 'scaleY(-1) rotate(90deg)' }} /> {t.pdfExport.dialog.orientations.landscape}
           </SegmentGroup.Item>
@@ -119,15 +119,15 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
       <SectionGroup.SectionRowEditor issue={issues.layout}>
         <SegmentGroup.Root onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.vertical} value="vertical">
+          <SegmentGroup.Item value="vertical">
             <SegmentGroup.ItemHiddenInput />
             <PiRows /> {t.pdfExport.dialog.layouts.vertical}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.horizontal} value="horizontal">
+          <SegmentGroup.Item value="horizontal">
             <SegmentGroup.ItemHiddenInput />
             <PiColumns /> {t.pdfExport.dialog.layouts.horizontal}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.compact} value="compact">
+          <SegmentGroup.Item value="compact">
             <SegmentGroup.ItemHiddenInput />
             <PiGridFour /> {t.pdfExport.dialog.layouts.compact}
           </SegmentGroup.Item>

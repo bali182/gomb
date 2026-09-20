@@ -50,11 +50,11 @@ export function LayoutSection<T extends HasLayoutSchema>({
       <SectionGroup.SectionRowEditor issue={issues.layoutOrientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.layoutOrientation}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.component.editor.layout.horizontal} value="horizontal">
+          <SegmentGroup.Item value="horizontal">
             <SegmentGroup.ItemHiddenInput />
             <PiColumns /> {t.component.editor.layout.horizontal}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.component.editor.layout.vertical} value="vertical">
+          <SegmentGroup.Item value="vertical">
             <SegmentGroup.ItemHiddenInput />
             <PiRows /> {t.component.editor.layout.vertical}
           </SegmentGroup.Item>
@@ -64,7 +64,6 @@ export function LayoutSection<T extends HasLayoutSchema>({
       <SectionGroup.SectionRowTitle>{t.component.editor.layout.gap}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutGap}>
         <AutoDimensionEditor
-          ariaLabel={t.component.editor.layout.gap}
           auto={editable.autoLayoutGap}
           autoIcon={editable.layoutOrientation === 'horizontal' ? PiArrowsHorizontal : PiArrowsVertical}
           placeholder={t.common.placeholders.fill}

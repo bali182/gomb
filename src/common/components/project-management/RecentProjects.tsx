@@ -50,7 +50,7 @@ export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children,
         startElement={<PiMagnifyingGlass />}
         endElement={
           search.length > 0 ? (
-            <IconButton aria-label={t.common.actions.reset} onClick={clearSearch} size="2xs" variant="ghost">
+            <IconButton onClick={clearSearch} size="2xs" variant="ghost">
               <PiX />
             </IconButton>
           ) : undefined

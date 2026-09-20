@@ -98,19 +98,19 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.component.editor.pocketCluster.fromTop} value="up">
+          <SegmentGroup.Item value="up">
             <SegmentGroup.ItemHiddenInput />
             <PiCaretDown />
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.component.editor.pocketCluster.fromBottom} value="down">
+          <SegmentGroup.Item value="down">
             <SegmentGroup.ItemHiddenInput />
             <PiCaretUp />
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.component.editor.pocketCluster.fromLeft} value="left">
+          <SegmentGroup.Item value="left">
             <SegmentGroup.ItemHiddenInput />
             <PiCaretRight />
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.component.editor.pocketCluster.fromRight} value="right">
+          <SegmentGroup.Item value="right">
             <SegmentGroup.ItemHiddenInput />
             <PiCaretLeft />
           </SegmentGroup.Item>

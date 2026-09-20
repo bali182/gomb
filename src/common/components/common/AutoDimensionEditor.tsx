@@ -6,7 +6,6 @@ import type { IssueSchema } from '../../schemas/validation'
 import { NumberInput } from './NumberInput'
 
 type AutoDimensionEditorProps = {
-  ariaLabel: string
   auto: boolean
   autoIcon: IconType
   placeholder: string
@@ -20,7 +19,6 @@ type AutoDimensionEditorProps = {
 }
 
 export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
-  ariaLabel,
   auto,
   placeholder,
   issue,
@@ -41,7 +39,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   return (
     <HStack gap="2">
       <Switch.Root checked={!auto} onCheckedChange={handleCheckedChange} size="md">
-        <Switch.HiddenInput aria-label={ariaLabel} />
+        <Switch.HiddenInput />
         <Switch.Control>
           <Switch.Thumb>
             <Switch.ThumbIndicator fallback={<AutoIcon />}>

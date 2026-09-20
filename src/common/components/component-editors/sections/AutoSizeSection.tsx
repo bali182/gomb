@@ -87,7 +87,6 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
       <SectionGroup.SectionRowTitle>{t.common.labels.width}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.width}>
         <AutoDimensionEditor
-          ariaLabel={t.common.labels.width}
           auto={editable.autoWidth}
           autoIcon={PiArrowsHorizontal}
           placeholder={t.common.placeholders.fill}
@@ -104,7 +103,6 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
       <SectionGroup.SectionRowTitle>{t.common.labels.height}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.height}>
         <AutoDimensionEditor
-          ariaLabel={t.common.labels.height}
           auto={editable.autoHeight}
           autoIcon={PiArrowsVertical}
           placeholder={t.common.placeholders.fill}
