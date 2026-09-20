@@ -24,7 +24,7 @@ export const validateNumber = (
   if (!isDecimal(input, { locale: context.language })) {
     return createInvalidValidationResult<number>(
       {
-        message: context.t.validation.number.invalidFormat,
+        message: context.t.number.invalidFormat,
         severity: 'error',
       },
       currentValue,
@@ -41,7 +41,7 @@ export const validateNumber = (
   if (!Number.isFinite(value)) {
     return createInvalidValidationResult<number>(
       {
-        message: context.t.validation.number.invalidFormat,
+        message: context.t.number.invalidFormat,
         severity: 'error',
       },
       currentValue,
@@ -51,7 +51,7 @@ export const validateNumber = (
   if (config.allowFraction === false && !Number.isInteger(value)) {
     return createInvalidValidationResult<number>(
       {
-        message: context.t.validation.number.integerOnly,
+        message: context.t.number.integerOnly,
         severity: 'error',
       },
       currentValue,
@@ -66,8 +66,8 @@ export const validateNumber = (
         {
           message:
             config.minInclusive === false
-              ? context.t.validation.number.minimumExclusive(formatter.format(config.min))
-              : context.t.validation.number.minimumInclusive(formatter.format(config.min)),
+              ? context.t.number.minimumExclusive(formatter.format(config.min))
+              : context.t.number.minimumInclusive(formatter.format(config.min)),
           severity: 'error',
         },
         currentValue,
@@ -83,8 +83,8 @@ export const validateNumber = (
         {
           message:
             config.maxInclusive === false
-              ? context.t.validation.number.maximumExclusive(formatter.format(config.max))
-              : context.t.validation.number.maximumInclusive(formatter.format(config.max)),
+              ? context.t.number.maximumExclusive(formatter.format(config.max))
+              : context.t.number.maximumInclusive(formatter.format(config.max)),
           severity: 'error',
         },
         currentValue,
@@ -95,7 +95,7 @@ export const validateNumber = (
   if (isDefined(config.multipleOf) && !new BigNumber(value).mod(config.multipleOf).isZero()) {
     return createInvalidValidationResult<number>(
       {
-        message: context.t.validation.number.step(formatter.format(config.multipleOf)),
+        message: context.t.number.step(formatter.format(config.multipleOf)),
         severity: 'error',
       },
       currentValue,

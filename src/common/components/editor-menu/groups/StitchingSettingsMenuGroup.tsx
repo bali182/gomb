@@ -7,7 +7,6 @@ import { useProject } from '../../../hooks/useProject'
 import { useProjectOperations } from '../../../hooks/useProjectOperations'
 import { useTranslation2 } from '../../../hooks/useTranslation2'
 import type { BaseValidationContextSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { optionalComparators } from '../../../utils/comparators'
 import { validateStitchLineCommonConfigSchema } from '../../../validators/validateStitchLineCommonConfigSchema'
 import { NumberInput } from '../../common/NumberInput'
@@ -21,8 +20,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
   const { project } = useProject()
 
   const { t } = useTranslation2()
-  const validationT = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validationT }), [validationT])
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
 
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit: updateStitchingSettings,

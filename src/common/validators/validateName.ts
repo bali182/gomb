@@ -12,7 +12,7 @@ export const validateName = (
   if (input === '') {
     return createInvalidValidationResult<string>(
       {
-        message: context.t.validation.name.empty,
+        message: context.t.name.empty,
         severity: 'error',
       },
       currentValue,
@@ -24,7 +24,7 @@ export const validateName = (
   if (hasDuplicateName) {
     return createInvalidValidationResult<string>(
       {
-        message: context.t.validation.name.duplicate,
+        message: context.t.name.duplicate,
         severity: 'error',
       },
       currentValue,

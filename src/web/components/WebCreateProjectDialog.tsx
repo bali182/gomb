@@ -9,7 +9,6 @@ import { addSubProject } from '../../common/operations/project/addSubProject'
 import { getUnusedName } from '../../common/operations/subProject/utils/getUnusedName'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
-import { useTranslation } from '../../common/translations/translation'
 import { createProject } from '../../common/utils/createProject'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
 import { validateProjectSchema } from '../../common/validators/validateProjectSchema'
@@ -25,7 +24,6 @@ type WebCreateProjectDialogProps = {
 export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const { addProject, projects } = useProjects()
   const navigate = useNavigate()
-  const validationT = useTranslation()
   const { t } = useTranslation2()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
@@ -41,8 +39,8 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
   }, [createEmptyProject])
 
   const context = useMemo<ProjectBasedValidationContextSchema>(
-    () => ({ language: LANGUAGE, projects, t: validationT }),
-    [validationT, projects],
+    () => ({ language: LANGUAGE, projects, t: t.validation }),
+    [projects, t.validation],
   )
 
   const commit = useCallback((updatedProject: ProjectSchema): void => {

@@ -1,10 +1,9 @@
 import type { ColorKey } from '../data/colors'
 import type { CardSchemaId } from '../schemas/valuables'
-import type { TranslationLanguage } from './translation'
 import type { TranslationSchema } from './translationSchema'
 
 export const EN: TranslationSchema = {
-  language: 'en' as TranslationLanguage,
+  language: 'en',
   app: {
     title: 'Gomb',
     subtitle: 'A simple app for designing leathercraft projects.',

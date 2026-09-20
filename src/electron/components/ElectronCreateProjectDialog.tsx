@@ -10,7 +10,6 @@ import { Loadable } from '../../common/loadable'
 import { addSubProject } from '../../common/operations/project/addSubProject'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
-import { useTranslation } from '../../common/translations/translation'
 import { createProject } from '../../common/utils/createProject'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
 import { isDefined } from '../../common/utils/isDefined'
@@ -27,7 +26,6 @@ type ElectronCreateProjectDialogProps = {
 
 export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const navigate = useNavigate()
-  const validationT = useTranslation()
   const { t } = useTranslation2()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
@@ -41,8 +39,8 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
   }, [createEmptyProject])
 
   const context = useMemo<ProjectBasedValidationContextSchema>(
-    () => ({ language: LANGUAGE, projects: [], t: validationT }),
-    [validationT],
+    () => ({ language: LANGUAGE, projects: [], t: t.validation }),
+    [t.validation],
   )
 
   const commit = useCallback((updatedProject: ProjectSchema): void => {

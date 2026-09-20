@@ -9,7 +9,6 @@ import { getComputedProject } from '../logic/getComputedProject'
 import type { EditableSchema } from '../schemas/editable'
 import type { BaseExportSettingsSchema } from '../schemas/settings'
 import type { BaseValidationContextSchema } from '../schemas/validation'
-import { useTranslation } from '../translations/translation'
 import { downloadFile } from '../utils/downloadFile'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { hasValidationErrors } from '../utils/hasValidationErrors'
@@ -25,9 +24,8 @@ type SvgExportDialogProps = {
 export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setSvgExportSettings, settings } = useGlobalSettings()
-  const validationT = useTranslation()
   const { t } = useTranslation2()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validationT }), [validationT])
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
 
   const [editableParams, setEditableParams] = useState<EditableSchema<BaseExportSettingsSchema>>(() =>

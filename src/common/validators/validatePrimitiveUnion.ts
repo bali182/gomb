@@ -32,7 +32,7 @@ export function validatePrimitiveUnion<T extends string>(
 
     return createInvalidValidationResult<T | undefined>(
       {
-        message: context.t.validation.primitive.required,
+        message: context.t.primitive.required,
         severity: 'error',
       },
       currentValue,
@@ -42,7 +42,7 @@ export function validatePrimitiveUnion<T extends string>(
   if (!isAllowedPrimitiveUnionValue(value, allowedValues)) {
     return createInvalidValidationResult<T | undefined>(
       {
-        message: context.t.validation.primitive.invalid,
+        message: context.t.primitive.invalid,
         severity: 'error',
       },
       currentValue,

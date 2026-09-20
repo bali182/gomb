@@ -4,8 +4,7 @@ import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { IssueSchema } from '../../common/schemas/validation'
-import { useTranslation } from '../../common/translations/translation'
-import type { TranslationSchema } from '../../common/translations/translationSchema'
+import type { TranslationSchema2 } from '../../common/translations/translationSchema'
 import { electronApi } from '../electronApi'
 import { FILE_EXTENSION } from '../fileExtension'
 import type { FileValidateCreatePathResponseSchema } from '../schemas/electronApi'
@@ -27,7 +26,6 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
   const [isManuallyModified, setIsManuallyModified] = useState(false)
   const suggestPathRequestIdRef = useRef(0)
   const validatePathRequestIdRef = useRef(0)
-  const validationT = useTranslation()
   const { t } = useTranslation2()
 
   const updateFilePath = useCallback((requestId: number, update: SetStateAction<LoadableSchema<string>>): void => {
@@ -86,12 +84,12 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     try {
       const response = await electronApi.validateCreatePath({ filePath: path, type: 'validate-create-path' })
 
-      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, validationT)))
+      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, t.validation)))
     } catch {
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: validationT.validation.file.validationFailed,
+          message: t.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -164,7 +162,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: validationT.validation.file.validationFailed,
+          message: t.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -172,7 +170,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     }
 
     onFilePathChange(response.filePath)
-  }, [filePath, validationT, onFilePathChange, t.nativeDialogs.createProjectPath, updateFilePathValidationIssue])
+  }, [filePath, onFilePathChange, t, updateFilePathValidationIssue])
 
   const filePathIssue = useMemo<LoadableSchema<IssueSchema | undefined>>(() => {
     return Loadable.merge([filePath, filePathValidationIssue], (_filePath, issue): IssueSchema | undefined => issue)
@@ -190,16 +188,16 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
 const getFilePathIssue = (
   response: FileValidateCreatePathResponseSchema,
-  t: TranslationSchema,
+  t: TranslationSchema2['validation'],
 ): IssueSchema | undefined => {
   switch (response.type) {
     case 'create-path-available':
       return undefined
     case 'create-path-existing':
-      return { message: t.validation.file.existing, severity: 'warning' }
+      return { message: t.file.existing, severity: 'warning' }
     case 'create-path-invalid':
-      return { message: t.validation.file.invalid, severity: 'error' }
+      return { message: t.file.invalid, severity: 'error' }
     case 'error':
-      return { message: t.validation.file.validationFailed, severity: 'error' }
+      return { message: t.file.validationFailed, severity: 'error' }
   }
 }

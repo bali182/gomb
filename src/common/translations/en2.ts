@@ -594,4 +594,32 @@ export const EN2 = {
     dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
     timeago: (date: number): string => format(date, 'en'),
   },
+  validation: {
+    multipleIssues: (count: number) => `${count} issues`,
+    name: {
+      empty: 'Name cannot be empty.',
+      duplicate: 'This name is already in use.',
+    },
+    number: {
+      invalidFormat: 'Invalid number format.',
+      integerOnly: 'Only whole numbers are allowed.',
+      minimumExclusive: (value: string) => `Value must be greater than ${value}.`,
+      minimumInclusive: (value: string) => `Minimum value: ${value}.`,
+      maximumExclusive: (value: string) => `Value must be less than ${value}.`,
+      maximumInclusive: (value: string) => `Maximum value: ${value}.`,
+      step: (value: string) => `Step: ${value}.`,
+    },
+    primitive: {
+      required: 'This value is required.',
+      invalid: 'Invalid value.',
+    },
+    hexColor: {
+      invalid: 'Invalid hexadecimal color.',
+    },
+    file: {
+      existing: 'A file already exists at this path.',
+      invalid: 'The specified path is invalid or not writable.',
+      validationFailed: 'The file path could not be validated.',
+    },
+  },
 }

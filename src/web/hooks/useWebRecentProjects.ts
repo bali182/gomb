@@ -2,8 +2,8 @@ import { useAtomValue } from 'jotai'
 import { useMemo } from 'react'
 
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import type { RecentProjectVisualisationSchema } from '../../common/schemas/recentProject'
-import { useDateFormatter } from '../../common/translations/translation'
 import { isDefined } from '../../common/utils/isDefined'
 import { projectsAtom } from '../state/projectsAtom'
 import { webAppRoutes } from '../webAppRoutes'
@@ -11,7 +11,7 @@ import { webAppRoutes } from '../webAppRoutes'
 export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
   const projects = useAtomValue(projectsAtom)
   const { settings } = useGlobalSettings()
-  const formatDate = useDateFormatter()
+  const { t } = useTranslation2()
 
   return useMemo<RecentProjectVisualisationSchema[]>(() => {
     return projects
@@ -24,7 +24,7 @@ export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
         const subProject = isDefined(lastOpenedSubProject) ? lastOpenedSubProject : project.subProjects[0]
 
         return {
-          formattedLastOpenedAt: formatDate(recentProject.lastOpenedAt),
+          formattedLastOpenedAt: t.formatters.timeago(recentProject.lastOpenedAt),
           id: project.id,
           label: project.name,
           link: isDefined(subProject)
@@ -34,5 +34,5 @@ export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
         }
       })
       .sort((left, right): number => right.lastOpenedAt - left.lastOpenedAt)
-  }, [formatDate, projects, settings.recentProjects])
+  }, [projects, settings.recentProjects, t.formatters])
 }

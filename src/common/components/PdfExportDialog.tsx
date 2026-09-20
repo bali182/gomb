@@ -10,7 +10,6 @@ import { exportPdf } from '../logic/exports/exportPdf'
 import type { EditableSchema } from '../schemas/editable'
 import type { PdfExportSettingsSchema, PdfExportUnsuccessfulLayoutSchema } from '../schemas/pdfExport'
 import type { BaseValidationContextSchema } from '../schemas/validation'
-import { useTranslation } from '../translations/translation'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { hasValidationErrors } from '../utils/hasValidationErrors'
 import { isDefined } from '../utils/isDefined'
@@ -44,9 +43,8 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
   )
   const [failure, setFailure] = useState<PdfExportFailure | undefined>(undefined)
   const [isExporting, setIsExporting] = useState<boolean>(false)
-  const validatonT = useTranslation()
   const { t } = useTranslation2()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: validatonT }), [validatonT])
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
 
   const validationResult = useMemo(
     () => validatePdfExportSettingsSchema(localPdfExportSettings, exportParams, context),

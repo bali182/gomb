@@ -1,9 +1,8 @@
 import type { ColorKey } from '../data/colors'
 import type { CardSchemaId } from '../schemas/valuables'
-import type { TranslationLanguage } from './translation'
 
 export const HU = {
-  language: 'hu' as TranslationLanguage,
+  language: 'hu',
   app: {
     title: 'Gomb',
     subtitle: 'Egy egyszerű bőrdíszmű tervező program.',

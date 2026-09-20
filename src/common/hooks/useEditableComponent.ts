@@ -4,13 +4,13 @@ import { LANGUAGE } from '../constants/language'
 import type { ComponentSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
-import { useTranslation } from '../translations/translation'
 import { validateComponentSchema } from '../validators/validateComponentSchema'
 import { useComponent } from './useComponent'
 import { useEditableModel } from './useEditableModel'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
+import { useTranslation2 } from './useTranslation2'
 
 export type UseEditableComponentResult = {
   component: ComponentSchema
@@ -25,10 +25,10 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateComponent } = useSubProjectOperations()
-  const validationT = useTranslation()
+  const { t } = useTranslation2()
   const context = useMemo<ComponentBasedValidationContextSchema>(
-    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: validationT }),
-    [computedSubProject, project, subProject, validationT],
+    () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: t.validation }),
+    [computedSubProject, project, subProject, t.validation],
   )
 
   const commit = useCallback(
