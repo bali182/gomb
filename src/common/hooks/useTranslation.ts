@@ -1,4 +1,5 @@
 import { EN } from '../translations/en'
+import { HU } from '../translations/hu'
 import { TranslationSchema } from '../translations/translationSchema'
 
 export type TranslationLanguage = 'en' | 'hu'
@@ -14,8 +15,8 @@ const languages: Record<TranslationLanguage, UseTranslationResult> = {
     t: EN,
   },
   hu: {
-    language: 'en',
-    t: EN,
+    language: 'hu',
+    t: HU,
   },
 }
 

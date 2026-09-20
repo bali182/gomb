@@ -1,302 +1,547 @@
-import type { ColorKey } from '../data/colors'
-import type { CardSchemaId } from '../schemas/valuables'
+import { format, register } from 'timeago.js'
+import hu from 'timeago.js/lib/lang/hu'
+
+import type { TranslationSchema } from './translationSchema'
+
+register('hu', hu)
 
 export const HU = {
-  language: 'hu',
   app: {
     title: 'Gomb',
-    subtitle: 'Egy egyszerű bőrdíszmű tervező program.',
-  },
-  common: {
-    actions: {
-      reset: 'Visszaállítás',
-      cancel: 'Mégse',
-      back: 'Vissza',
-      apply: 'Alkalmaz',
-      remove: 'Törlés',
-      clone: 'Duplikálás',
-      flipHorizontal: 'Vízszintes tükrözés',
-      flipVertical: 'Függőleges tükrözés',
-      addByName: (name: string) => `${name} hozzáadása`,
-    },
-    labels: {
-      general: 'Általános',
-      name: 'Név',
-      size: 'Méret',
-      width: 'Szélesség',
-      height: 'Magasság',
-      direction: 'Irány',
-      amount: 'Mennyiség',
-      spacing: 'Köz',
-    },
-    placeholders: {
-      fill: 'Kitöltés',
-      selectComponent: 'Komponens kiválasztása',
-    },
-    emptyStates: {
-      noMatchingValues: 'Nincs egyező érték.',
-    },
-    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    anchors: {
-      left: 'Bal',
-      center: 'Közép',
-      right: 'Jobb',
-      top: 'Fent',
-      bottom: 'Lent',
-    },
-  },
-  editor: {
-    scalingDialog: {
-      title: 'Skálázás',
-      description:
-        'Tegyél egy vonalzót a képernyőhöz, és a csúszkával állítsd be, hogy a képen látható vonalzó 10cm hosszúságú legyen. Így a grafikák méretarányosan fognak megjelenni.',
-    },
-    panels: {
-      components: {
-        empty: {
-          title: 'Nincs kiválasztott modul',
-          description: 'Válassz vagy hozz létre egy modult.',
-        },
-        title: 'Elemek',
-      },
-    },
-  },
-  exportSettings: {
-    sections: {
-      layout: 'Elrendezés',
-      content: 'Tartalom',
-    },
-    labels: {
-      gap: 'Térköz',
-      padding: 'Belső margó',
-      stitchLineMode: 'Varróvonalak',
-      showNames: 'Nevek megjelenítése',
-      showDimensions: 'Méretek megjelenítése',
-      childMarkers: 'Gyermekjelölők megjelenítése',
-      cutHelperDistance: 'Vágási segédtávolság',
-    },
-    stitchLineModes: {
-      ownStitchLines: 'Saját varrások',
-      relatedStitchLines: 'Kapcsolódó varrások',
-      allStitchLines: 'Összes varrás',
-    },
-  },
-  svgExport: {
-    frontPocketName: (ownerName: string) => `${ownerName} - első zseb`,
-    tPocketName: (ownerName: string, index: number) => `${ownerName} - ${index}. zseb`,
-    dialog: {
-      title: 'SVG exportálása',
-      actions: {
-        export: 'Exportálás',
-      },
-    },
-  },
-  pdfExport: {
-    dialog: {
-      title: 'PDF exportálása',
-      actions: {
-        export: 'Exportálás',
-      },
-      sections: {
-        page: 'Oldal',
-      },
-      labels: {
-        page: 'Papírméret',
-        orientation: 'Tájolás',
-        layout: 'Elrendezés',
-      },
-      orientations: {
-        portrait: 'Álló',
-        landscape: 'Fekvő',
-      },
-      layouts: {
-        vertical: 'Függőleges',
-        horizontal: 'Vízszintes',
-        compact: 'Tömör',
-      },
-      errors: {
-        exportFailed: 'A PDF exportálása nem sikerült.',
-        unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalra.',
-      },
-    },
+    subtitle: 'Egyszerű alkalmazás bőrműves projektek tervezéséhez.',
   },
   projects: {
-    actions: {
-      open: 'Megnyitás',
-      create: 'Új projekt',
-      createModule: 'Új modul',
+    buttons: {
+      createProject: 'Projekt létrehozása',
+      openProject: 'Projekt megnyitása',
     },
-    empty: {
-      noProjects: {
-        title: 'Még nincs projekted',
-        description: 'Hozz létre egy új projektet a kezdéshez.',
+    actions: {
+      delete: 'Törlés',
+    },
+    recents: {
+      empty: {
+        noProjects: {
+          title: 'Még nincs projekted',
+          description: 'Hozz létre egy új projektet a kezdéshez.',
+        },
+        noSearchResults: {
+          title: 'Nincs találat',
+          description: 'Próbálj másik keresési kifejezést.',
+        },
       },
-      noSearchResults: {
-        title: 'Nincs találat',
-        description: 'Próbálj másik keresési kifejezést.',
+    },
+    errors: {
+      notFound: {
+        title: 'A projekt nem található',
+        description: 'A megnyitni kívánt projekt nem létezik.',
+      },
+      openFailed: {
+        title: 'A projekt nem található',
+        description: 'A projekt megnyitása nem sikerült.',
+        back: 'Vissza',
+      },
+    },
+  },
+  project: {
+    tree: {
+      title: 'Elemek',
+      noModuleSelected: {
+        title: 'Nincs kiválasztott modul',
+        description: 'Válassz vagy hozz létre egy modult.',
+      },
+    },
+    toast: {
+      openFailed: 'A projekt megnyitása nem sikerült.',
+      saveFailed: 'A projekt mentése nem sikerült.',
+      saveSucceeded: 'Mentve.',
+    },
+    export: {
+      frontPocketName: (ownerName: string): string => `${ownerName} - első zseb`,
+      tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. zseb`,
+    },
+    menus: {
+      file: {
+        name: 'Fájl',
+        file: {
+          name: 'Fájl',
+          open: 'Megnyitás',
+          save: 'Mentés',
+          saveAs: 'Mentés másként',
+        },
+        export: {
+          name: 'Projekt exportálása',
+          svg: 'SVG exportálása',
+          pdf: 'PDF exportálása',
+        },
+        download: {
+          name: 'Projekt letöltése',
+          download: 'Letöltés',
+        },
+      },
+      edit: {
+        name: 'Szerkesztés',
+        history: {
+          name: 'Előzmények',
+          undo: 'Visszavonás',
+          redo: 'Újra',
+        },
+        increment: {
+          name: 'Lépték',
+          small: 'Kicsi',
+          default: 'Alapértelmezett',
+          stitch: 'Öltésméret',
+        },
+      },
+      view: {
+        name: 'Nézet',
+        scaling: {
+          name: 'Méretarány',
+          scaling: 'Méretarány beállítása',
+        },
+        stitching: {
+          name: 'Varrás',
+          stitchLinesVisible: 'Vonalak láthatósága',
+          stitchHolesVisible: 'Lyukak láthatósága',
+          stitchesVisible: 'Cérna láthatósága',
+          stitchCountVisible: 'Lyukszám láthatósága',
+        },
+      },
+      project: {
+        name: 'Projekt',
+        colors: {
+          name: 'Színek',
+          leatherColor: 'Bőr színe',
+          stitchHoleColor: 'Öltéslyuk színe',
+          stitchLineColor: 'Varrásvonal színe',
+          strokeColor: 'Körvonal színe',
+          selectionColor: 'Kijelölés színe',
+          cardColor: 'Kártya színe',
+          threadColor: 'Cérna színe',
+        },
+        stitching: {
+          name: 'Varrás',
+          margin: 'Margó',
+          holeLength: 'Lyuk hossza',
+          holeDistance: 'Lyuktávolság',
+          holeThickness: 'Lyuk vastagsága',
+          lineThickness: 'Vonal vastagsága',
+        },
+      },
+      about: {
+        name: 'Névjegy',
+        resources: {
+          name: 'Források',
+          viewSourceCode: 'Forráskód megtekintése',
+          reportIssue: 'Hiba jelentése',
+          viewLicense: 'Licenc megtekintése',
+        },
+        downloadApp: {
+          name: 'Alkalmazás letöltése',
+          downloadApp: 'Letöltés',
+        },
+      },
+    },
+    editors: {
+      tabs: {
+        components: {
+          layout: 'Elrendezés',
+          pockets: 'Zsebek',
+        },
+        stitchLines: {
+          settings: 'Beállítások',
+          overrides: 'Felülírások',
+        },
+        project: {
+          basic: 'Alapok',
+          stitching: 'Varrás',
+        },
+      },
+      actions: {
+        components: {
+          addPanel: 'Panel hozzáadása',
+          addRootPanel: 'Modul hozzáadása',
+          addPocketCluster: 'Zsebcsoport hozzáadása',
+          addHole: 'Lyuk hozzáadása',
+          addStitching: 'Varrás hozzáadása',
+          addPocketStitching: 'Zsebvarrás hozzáadása',
+          clone: 'Duplikálás',
+          delete: 'Törlés',
+        },
+        stitchLines: {
+          flipHorizontal: 'Vízszintes tükrözés',
+          flipVertical: 'Függőleges tükrözés',
+          clone: 'Duplikálás',
+          delete: 'Törlés',
+        },
+        holes: {
+          addStitching: 'Varrás hozzáadása',
+          clone: 'Duplikálás',
+          delete: 'Törlés',
+        },
+      },
+      sections: {
+        common: {
+          cornerRadius: {
+            title: 'Sarokrádiusz',
+            autoCornerRadius: { placeholder: 'Auto' },
+            individualRadii: { label: 'Méretezés' },
+            topLeftRadius: {},
+            topRightRadius: {},
+            bottomLeftRadius: {},
+            bottomRightRadius: {},
+          },
+          size: {
+            title: 'Méret',
+            width: { label: 'Szélesség' },
+            height: { label: 'Magasság' },
+          },
+        },
+        components: {
+          anchor: {
+            title: 'Igazítás',
+            offAxisAnchor: { label: 'Igazítás' },
+          },
+          autoSize: {
+            title: 'Méret',
+            squeezeActive: 'A szorítás aktív!',
+            width: { label: 'Szélesség', placeholder: 'Kitöltés' },
+            height: { label: 'Magasság', placeholder: 'Kitöltés' },
+            autoWidth: {},
+            autoHeight: {},
+          },
+          layout: {
+            title: 'Elrendezés',
+            layoutOrientation: { label: 'Irány' },
+            layoutGap: { label: 'Köz', placeholder: 'Kitöltés' },
+            autoLayoutGap: {},
+          },
+          squeeze: {
+            title: 'Szorítás',
+            horizontal: { label: 'Vízszintes' },
+            vertical: { label: 'Függőleges' },
+            topSqueeze: {},
+            rightSqueeze: {},
+            bottomSqueeze: {},
+            leftSqueeze: {},
+            individualSqueeze: {},
+          },
+          pockets: {
+            title: 'Zsebek',
+            orientation: { label: 'Nyílás' },
+            pocketCount: { label: 'Darabszám' },
+            pocketStep: { label: 'Távolság' },
+            tPocketTabWidth: { label: 'Fül szélessége' },
+            tPocketTaper: { label: 'Keskenyedés' },
+            cardId: { label: 'Kártya' },
+          },
+        },
+        stitchLines: {
+          settings: {
+            title: 'Varrás',
+            stitchMargin: { label: 'Margó' },
+            stitchHoleLength: { label: 'Lyuk hossza' },
+            stitchHoleDistance: { label: 'Lyuktávolság' },
+            stitchHoleThickness: { label: 'Lyuk vastagsága' },
+            stitchLineThickness: { label: 'Vonal vastagsága' },
+          },
+          pocketStitching: {
+            title: 'Zsebvarrás',
+            startOffset: { label: 'Kezdő eltolás' },
+            endOffset: { label: 'Végeltolás' },
+            stitchDirection: { label: 'Irány' },
+          },
+          sidesAndCorners: {
+            title: 'Varrásvonal',
+            top: {},
+            right: {},
+            bottom: {},
+            left: {},
+            topLeftCorner: {},
+            topRightCorner: {},
+            bottomRightCorner: {},
+            bottomLeftCorner: {},
+            stitchDisconnectedTopLeftCorner: {},
+            stitchDisconnectedTopRightCorner: {},
+            stitchDisconnectedBottomLeftCorner: {},
+            stitchDisconnectedBottomRightCorner: {},
+            topStitchDirection: {},
+            rightStitchDirection: {},
+            bottomStitchDirection: {},
+            leftStitchDirection: {},
+            topStartOffset: {},
+            topEndOffset: {},
+            rightStartOffset: {},
+            rightEndOffset: {},
+            bottomStartOffset: {},
+            bottomEndOffset: {},
+            leftStartOffset: {},
+            leftEndOffset: {},
+          },
+        },
+        holes: {
+          position: {
+            title: 'Pozíció',
+            xAnchor: { label: 'Vízszintes igazítás' },
+            xOffset: { label: 'X eltolás' },
+            yAnchor: { label: 'Függőleges igazítás' },
+            yOffset: { label: 'Y eltolás' },
+          },
+        },
+        project: {
+          basic: {
+            title: 'Általános',
+            name: { label: 'Név' },
+            filePath: { label: 'Fájl útvonala' },
+          },
+          components: {
+            title: 'Komponensszínek',
+            leatherColor: { label: 'Bőr színe' },
+            strokeColor: { label: 'Körvonal színe' },
+            cardColor: { label: 'Kártya színe' },
+          },
+          stitching: {
+            title: 'Varrásszínek',
+            stitchHoleColor: { label: 'Öltéslyuk színe' },
+            stitchLineColor: { label: 'Varrásvonal színe' },
+            threadColor: { label: 'Cérna színe' },
+          },
+          selection: { title: 'Kijelölés színei', selectionColor: { label: 'Kijelölés színe' } },
+        },
+        export: {
+          layout: {
+            title: 'Elrendezés',
+            gap: { label: 'Köz' },
+            padding: { label: 'Belső margó' },
+          },
+          content: {
+            title: 'Tartalom',
+            stitchLineMode: { label: 'Varrásvonalak' },
+            showNames: { label: 'Nevek megjelenítése' },
+            showDimensions: { label: 'Méretek megjelenítése' },
+            childMarkers: { label: 'Gyermekjelölők megjelenítése' },
+            cutHelperDistance: { label: 'Vágási segédvonal távolsága' },
+          },
+          pdf: {
+            title: 'Oldal',
+            page: { label: 'Papírméret' },
+            orientation: { label: 'Tájolás' },
+            layout: { label: 'Elrendezés' },
+          },
+        },
+      },
+      enums: {
+        common: {
+          anchor: {
+            vertical: {
+              start: 'Fent',
+              middle: 'Középen',
+              end: 'Lent',
+            },
+            horizontal: {
+              start: 'Balra',
+              middle: 'Középen',
+              end: 'Jobbra',
+            },
+          },
+          individualRadii: {
+            false: 'Egységes rádiusz',
+            true: 'Egyedi rádiuszok',
+          },
+          autoCornerRadius: {
+            false: 'Manuális',
+            true: 'Automatikus',
+          },
+        },
+        components: {
+          pocketOrientation: {
+            up: 'Fent',
+            down: 'Lent',
+            left: 'Balra',
+            right: 'Jobbra',
+          },
+          layoutOrientation: {
+            horizontal: 'Vízszintes',
+            vertical: 'Függőleges',
+          },
+          individualSqueeze: {
+            false: 'Egységes szorítás',
+            true: 'Egyedi szorítások',
+          },
+        },
+        export: {
+          exportStitchLineModes: {
+            'own-stitch-lines': 'Saját varrásvonalak',
+            'related-stitch-lines': 'Kapcsolódó varrásvonalak',
+            'all-stitch-lines': 'Összes varrásvonal',
+          },
+          exportOrientation: {
+            portrait: 'Álló',
+            landscape: 'Fekvő',
+          },
+          exportPageLayout: {
+            vertical: 'Függőleges',
+            horizontal: 'Vízszintes',
+            compact: 'Tömör',
+          },
+        },
+      },
+      controls: {
+        cardPicker: {
+          noCard: 'Nincs',
+          landscape: 'Fekvő',
+          portrait: 'Álló',
+        },
+        colorSwatchPicker: {
+          reset: 'Visszaállítás',
+        },
+        filePicker: {
+          browse: 'Tallózás',
+        },
+        stitchHoleDistance: {
+          noMatchingValues: 'Nincs egyező érték.',
+        },
+      },
+    },
+    errors: {
+      moduleNotFound: {
+        title: 'A modul nem található',
+        description: 'A megnyitni kívánt modul nem létezik.',
       },
       noModules: {
         title: 'Még nincs modulod',
         description: 'Hozz létre egy új modult a szerkesztés megkezdéséhez.',
       },
     },
-    createDialog: {
-      title: 'Új projekt létrehozása',
-      filePath: 'Fájl útvonala',
-      filePickerTitle: 'Projektfájl helyének kiválasztása',
-      actions: {
-        create: 'Létrehozás',
-        browse: 'Tallózás',
-      },
+  },
+  dialogs: {
+    svgExport: {
+      title: 'SVG exportálása',
+      positiveAction: 'Exportálás',
     },
-    openDialog: {
-      title: 'Projekt megnyitása',
-      fileFilterLabel: 'Projektfájlok',
+    pdfExport: {
+      title: 'PDF exportálása',
+      positiveAction: 'Exportálás',
       errors: {
-        openFailed: 'A projekt megnyitása nem sikerült.',
+        exportFailed: 'A PDF exportálása nem sikerült.',
+        unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalon.',
       },
     },
-    saveDialog: {
-      title: 'Projekt mentése',
+    license: {
+      title: 'Licenc',
+      positiveAction: 'Rendben',
+    },
+    scaling: {
+      title: 'Méretarány',
+      description:
+        'Tarts egy vonalzót a képernyőhöz, és a csúszkával állítsd be, hogy a képernyőn látható vonalzó 10 cm hosszú legyen. Így a grafika megfelelő méretarányban jelenik meg.',
+      positiveAction: 'Alkalmaz',
+    },
+    createProject: {
+      title: 'Új projekt létrehozása',
+      positiveAction: 'Létrehozás',
       errors: {
         saveFailed: 'A projekt mentése nem sikerült.',
       },
-      successes: {
-        saveSucceeded: 'Mentve',
-      },
     },
-    unsavedChangesDialog: {
+    unsavedChangesGuard: {
       title: 'Nem mentett módosítások',
-      description: 'Szeretnéd menteni a módosításaid mielőtt elhagyod a projekt szerkesztőt?',
-      actions: {
-        discard: 'Folytatás mentés nélkül',
-        save: 'Mentés',
-      },
+      description: 'Szeretnéd menteni a módosításokat a kilépés előtt?',
+      positiveAction: 'Mentés',
+      negativeAction: 'Folytatás mentés nélkül',
     },
-    settingsDialog: {
-      colorSettings: {
-        leatherTitle: 'Komponens színek',
-        stitchingTitle: 'Varrás színek',
-        selectionTitle: 'Kijelölés színek',
-
-        leatherColor: 'Bőr színe',
-        strokeColor: 'Körvonal színe',
-        cardColor: 'Kártya színe',
-
-        stitchHoleColor: 'Öltéslyuk színe',
-        stitchLineColor: 'Öltésvonal színe',
-        threadColor: 'Cérna színe',
-
-        selectionColor: 'Kijelölés színe',
-      },
-      tabs: {
-        basics: 'Alapok',
-        stitching: 'Varrás',
-      },
-    },
-    notFound: {
-      title: 'A projekt nem található',
-      description: 'A megnyitni kívánt projekt nem létezik.',
-    },
-    moduleNotFound: {
-      title: 'A modul nem található',
-      description: 'A megnyitni kívánt modul nem létezik.',
+    editDialog: {
+      negativeAction: 'Mégse',
     },
   },
-  component: {
-    types: {
-      rootPanel: 'Fő panel',
-      panel: 'Panel',
-      pocketCluster: 'Zsebek',
+  nativeDialogs: {
+    openProjectPath: {
+      title: 'Projekt megnyitása',
+      positiveAction: 'Megnyitás',
+      extensionName: 'Gomb JSON fájlok',
     },
-    editor: {
-      tabs: {
-        layout: 'Elrendezés',
-        pockets: 'Zsebek',
-      },
-      layout: {
-        title: 'Elrendezés',
-        orientation: 'Tájolás',
-        horizontal: 'Vízszintes',
-        vertical: 'Függőleges',
-        gap: 'Térköz',
-      },
-      anchor: {
-        title: 'Igazítás',
-      },
-      cornerRadius: {
-        title: 'Lekerekítés',
-        individual: 'Egyedi lekerekítés',
-        uniform: 'Egységes lekerekítés',
-        individualMeasure: 'Mérték',
-      },
-      squeeze: {
-        title: 'Összenyomás',
-        horizontal: 'Vízszintes',
-        vertical: 'Függőleges',
-        individual: 'Egyedi összenyomás',
-        uniform: 'Egységes összenyomás',
-        active: 'Az összenyomás aktív!',
-      },
-      pocketCluster: {
-        title: 'Zsebek',
-        card: 'Kártya',
-        noCard: 'Nincs',
-        opening: 'Nyílás',
-        landscape: 'Fekvő kártyák',
-        portrait: 'Álló kártyák',
-        flapWidth: 'Fül szélesség',
-        taper: 'Szűkülés',
-      },
+    saveProjectPath: {
+      title: 'Projekt mentése',
+      positiveAction: 'Mentés',
+      extensionName: 'Gomb JSON fájlok',
+    },
+    saveProjectAsPath: {
+      title: 'Projekt mentése másként',
+      positiveAction: 'Mentés',
+      extensionName: 'Gomb JSON fájlok',
+    },
+    createProjectPath: {
+      title: 'Projektfájl helyének kiválasztása',
+      positiveAction: 'Kiválasztás',
+      extensionName: 'Gomb JSON fájlok',
     },
   },
-  hole: {
-    title: 'Lyuk',
-    editor: {
-      position: {
-        title: 'Pozíció',
-        xOffset: 'X eltolás',
-        yOffset: 'Y eltolás',
-        xAnchor: 'Vízszintes igazítás',
-        yAnchor: 'Függőleges igazítás',
-      },
+  defaultNames: {
+    project: 'Projekt',
+    rootPanel: 'Modul',
+    panel: 'Panel',
+    pocketCluster: 'Zsebcsoport',
+    componentBoundsStitchLine: 'Varrás',
+    pocketClusterStitchLine: 'Zsebvarrás',
+    hole: 'Lyuk',
+  },
+  data: {
+    colors: {
+      black: 'Fekete',
+      darkGray: 'Sötétszürke',
+      mediumGray: 'Középszürke',
+      lightGray: 'Világosszürke',
+      white: 'Fehér',
+      darkBrown: 'Sötétbarna',
+      mediumBrown: 'Középbarna',
+      lightBrown: 'Világosbarna',
+      natural: 'Natúr',
+      bone: 'Csont',
+      burgundy: 'Bordó',
+      red: 'Piros',
+      pink: 'Rózsaszín',
+      orange: 'Narancssárga',
+      yellow: 'Sárga',
+      navy: 'Tengerészkék',
+      indigo: 'Indigókék',
+      mediumBlue: 'Középkék',
+      lightBlue: 'Világoskék',
+      purple: 'Lila',
+      darkGreen: 'Sötétzöld',
+      olive: 'Olívazöld',
+      mediumGreen: 'Középzöld',
+      lightGreen: 'Világoszöld',
+      cyan: 'Cián',
+      selectionBlue: 'Kék',
+      selectionGreen: 'Zöld',
+      selectionOrange: 'Narancssárga',
+      selectionYellow: 'Sárga',
+      selectionWhite: 'Fehér',
+      transparent: 'Átlátszó',
+    },
+    cards: {
+      'ID-1-landscape': 'ID-1 (fekvő)',
+      'ID-2-landscape': 'ID-2 (fekvő)',
+      'ID-3-landscape': 'ID-3 (fekvő)',
+      'ID-1-portrait': 'ID-1 (álló)',
+      'ID-2-portrait': 'ID-2 (álló)',
+      'ID-3-portrait': 'ID-3 (álló)',
+    },
+    cardsSimple: {
+      'ID-1-landscape': 'ID-1',
+      'ID-2-landscape': 'ID-2',
+      'ID-3-landscape': 'ID-3',
+      'ID-1-portrait': 'ID-1',
+      'ID-2-portrait': 'ID-2',
+      'ID-3-portrait': 'ID-3',
     },
   },
-  stitchLine: {
-    types: {
-      componentBounds: 'Varrás',
-      pocketCluster: 'Zseb varrás',
-    },
-    editor: {
-      tabs: {
-        settings: 'Beállítások',
-        overrides: 'Felülírások',
-      },
-      seamLine: {
-        title: 'Varratvonal',
-      },
-      pocketStitch: {
-        title: 'Zsebvarrás',
-        startOffset: 'Kezdő eltolás',
-        endOffset: 'Vég eltolás',
-      },
-      stitching: {
-        title: 'Varrás',
-        margin: 'Margó',
-        holeLength: 'Lyuk hossza',
-        holeDistance: 'Lyuktávolság',
-        holeThickness: 'Lyuk vastagsága',
-        lineThickness: 'Vonal vastagsága',
-      },
-      autoCornerRadius: {
-        auto: 'Automatikus',
-        manual: 'Manuális',
-        autoPlaceholder: 'Auto',
-      },
-    },
+  formatters: {
+    size: (size: number): string => `${size}mm`,
+    dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'hu'),
   },
   validation: {
-    multipleIssues: (count: number) => `${count} hiba`,
+    multipleIssues: (count: number): string => `${count} hiba`,
     name: {
       empty: 'A név nem lehet üres.',
       duplicate: 'Ez a név már foglalt.',
@@ -304,80 +549,23 @@ export const HU = {
     number: {
       invalidFormat: 'Érvénytelen számformátum.',
       integerOnly: 'Csak egész érték adható meg.',
-      minimumExclusive: (value: string) => `Az értéknek a minimum felett kell lennie (${value}).`,
-      minimumInclusive: (value: string) => `Minimum érték: ${value}.`,
-      maximumExclusive: (value: string) => `Az értéknek a maximum alatt kell lennie (${value}).`,
-      maximumInclusive: (value: string) => `Maximum érték: ${value}.`,
-      step: (value: string) => `Lépték: ${value}.`,
+      minimumExclusive: (value: string): string => `Az értéknek nagyobbnak kell lennie, mint ${value}.`,
+      minimumInclusive: (value: string): string => `Minimum érték: ${value}.`,
+      maximumExclusive: (value: string): string => `Az értéknek kisebbnek kell lennie, mint ${value}.`,
+      maximumInclusive: (value: string): string => `Maximum érték: ${value}.`,
+      step: (value: string): string => `Lépték: ${value}.`,
     },
     primitive: {
       required: 'Kötelező érték.',
       invalid: 'Érvénytelen érték.',
     },
     hexColor: {
-      invalid: 'Érvénytelen hex szín.',
+      invalid: 'Érvénytelen hexadecimális szín.',
     },
     file: {
-      existing: 'A megadott útvonalon már létezik fájl.',
-      invalid: 'A megadott útvonal nem érvényes vagy nem írható.',
+      existing: 'A fájl már létezik ezen az útvonalon.',
+      invalid: 'A megadott útvonal érvénytelen vagy nem írható.',
       validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
   },
-  defaults: {
-    projectName: 'Projekt',
-    rootComponentName: 'Modul',
-  },
-  colors: {
-    black: 'Fekete',
-    darkGray: 'Sötétszürke',
-    mediumGray: 'Középszürke',
-    lightGray: 'Világosszürke',
-    white: 'Fehér',
-    darkBrown: 'Sötétbarna',
-    mediumBrown: 'Középbarna',
-    lightBrown: 'Világosbarna',
-    natural: 'Natúr',
-    bone: 'Csontszín',
-    burgundy: 'Bordó',
-    red: 'Piros',
-    pink: 'Rózsaszín',
-    orange: 'Narancssárga',
-    yellow: 'Sárga',
-    navy: 'Tengerészkék',
-    indigo: 'Indigókék',
-    mediumBlue: 'Középkék',
-    lightBlue: 'Világoskék',
-    purple: 'Lila',
-    darkGreen: 'Sötétzöld',
-    olive: 'Olívazöld',
-    mediumGreen: 'Középzöld',
-    lightGreen: 'Világoszöld',
-    cyan: 'Ciánkék',
-    selectionBlue: 'Kék',
-    selectionGreen: 'Zöld',
-    selectionOrange: 'Narancs',
-    selectionYellow: 'Sárga',
-    selectionWhite: 'Fehér',
-    transparent: 'Átlátszó',
-  } satisfies Record<ColorKey, string>,
-  cards: {
-    'ID-1-landscape': 'ID-1 (fekvő)',
-    'ID-2-landscape': 'ID-2 (fekvő)',
-    'ID-3-landscape': 'ID-3 (fekvő)',
-    'ID-1-portrait': 'ID-1 (álló)',
-    'ID-2-portrait': 'ID-2 (álló)',
-    'ID-3-portrait': 'ID-3 (álló)',
-  } satisfies Record<CardSchemaId, string>,
-  cardsSimple: {
-    'ID-1-landscape': 'ID-1',
-    'ID-2-landscape': 'ID-2',
-    'ID-3-landscape': 'ID-3',
-    'ID-1-portrait': 'ID-1',
-    'ID-2-portrait': 'ID-2',
-    'ID-3-portrait': 'ID-3',
-  } satisfies Record<CardSchemaId, string>,
-  licenseDialog: {
-    title: 'Licenc',
-    close: 'Rendben',
-  },
-}
+} satisfies TranslationSchema
