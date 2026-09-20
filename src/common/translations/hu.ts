@@ -145,11 +145,6 @@ export const HU = {
       title: 'Új projekt létrehozása',
       filePath: 'Fájl útvonala',
       filePickerTitle: 'Projektfájl helyének kiválasztása',
-      errors: {
-        filePathExisting: 'A megadott útvonalon már létezik fájl.',
-        filePathInvalid: 'A megadott útvonal nem érvényes vagy nem írható.',
-        filePathValidationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
-      },
       actions: {
         create: 'Létrehozás',
         browse: 'Tallózás',
@@ -322,6 +317,11 @@ export const HU = {
     },
     hexColor: {
       invalid: 'Érvénytelen hex szín.',
+    },
+    file: {
+      existing: 'A megadott útvonalon már létezik fájl.',
+      invalid: 'A megadott útvonal nem érvényes vagy nem írható.',
+      validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
   },
   defaults: {

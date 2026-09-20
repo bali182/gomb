@@ -146,11 +146,6 @@ export const EN: TranslationSchema = {
       title: 'Create new project',
       filePath: 'File path',
       filePickerTitle: 'Select project file location',
-      errors: {
-        filePathExisting: 'A file already exists at this path.',
-        filePathInvalid: 'The specified path is invalid or not writable.',
-        filePathValidationFailed: 'The file path could not be validated.',
-      },
       actions: {
         create: 'Create',
         browse: 'Browse',
@@ -320,6 +315,11 @@ export const EN: TranslationSchema = {
     },
     hexColor: {
       invalid: 'Invalid hexadecimal color.',
+    },
+    file: {
+      existing: 'A file already exists at this path.',
+      invalid: 'The specified path is invalid or not writable.',
+      validationFailed: 'The file path could not be validated.',
     },
   },
   defaults: {

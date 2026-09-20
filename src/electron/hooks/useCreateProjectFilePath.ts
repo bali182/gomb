@@ -27,7 +27,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
   const [isManuallyModified, setIsManuallyModified] = useState(false)
   const suggestPathRequestIdRef = useRef(0)
   const validatePathRequestIdRef = useRef(0)
-  const legacyT = useTranslation()
+  const validationT = useTranslation()
   const { t } = useTranslation2()
 
   const updateFilePath = useCallback((requestId: number, update: SetStateAction<LoadableSchema<string>>): void => {
@@ -86,12 +86,12 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     try {
       const response = await electronApi.validateCreatePath({ filePath: path, type: 'validate-create-path' })
 
-      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, legacyT)))
+      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, validationT)))
     } catch {
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: legacyT.projects.createDialog.errors.filePathValidationFailed,
+          message: validationT.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -164,7 +164,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: legacyT.projects.createDialog.errors.filePathValidationFailed,
+          message: validationT.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -172,7 +172,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     }
 
     onFilePathChange(response.filePath)
-  }, [filePath, legacyT, onFilePathChange, t.nativeDialogs.createProjectPath, updateFilePathValidationIssue])
+  }, [filePath, validationT, onFilePathChange, t.nativeDialogs.createProjectPath, updateFilePathValidationIssue])
 
   const filePathIssue = useMemo<LoadableSchema<IssueSchema | undefined>>(() => {
     return Loadable.merge([filePath, filePathValidationIssue], (_filePath, issue): IssueSchema | undefined => issue)
@@ -196,10 +196,10 @@ const getFilePathIssue = (
     case 'create-path-available':
       return undefined
     case 'create-path-existing':
-      return { message: t.projects.createDialog.errors.filePathExisting, severity: 'warning' }
+      return { message: t.validation.file.existing, severity: 'warning' }
     case 'create-path-invalid':
-      return { message: t.projects.createDialog.errors.filePathInvalid, severity: 'error' }
+      return { message: t.validation.file.invalid, severity: 'error' }
     case 'error':
-      return { message: t.projects.createDialog.errors.filePathValidationFailed, severity: 'error' }
+      return { message: t.validation.file.validationFailed, severity: 'error' }
   }
 }
