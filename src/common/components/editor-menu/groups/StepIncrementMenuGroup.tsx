@@ -19,7 +19,7 @@ export const StepIncrementMenuGroup: FC = () => {
       <Menu.ItemGroupLabel>{t.project.menus.edit.increment.name}</Menu.ItemGroupLabel>
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.project.menus.edit.increment.size(0.1)}
+        subTitle={t.formatters.size(0.1)}
         title={t.project.menus.edit.increment.small}
         icon={PiLineSegmentFill}
         iconScale={0.8}
@@ -28,7 +28,7 @@ export const StepIncrementMenuGroup: FC = () => {
       />
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.project.menus.edit.increment.size(1)}
+        subTitle={t.formatters.size(1)}
         title={t.project.menus.edit.increment.default}
         icon={PiLineSegmentFill}
         value={1}
@@ -36,7 +36,7 @@ export const StepIncrementMenuGroup: FC = () => {
       />
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.project.menus.edit.increment.size(project.stitchingSettings.stitchHoleDistance)}
+        subTitle={t.formatters.size(project.stitchingSettings.stitchHoleDistance)}
         title={t.project.menus.edit.increment.stitch}
         icon={PiNeedle}
         value="stitch-hole-distance"

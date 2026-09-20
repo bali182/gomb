@@ -8,21 +8,21 @@ import type {
   HasSqueezeSchema,
   HasXYOffsetSchema,
 } from '../schemas/common'
-import {
+import type {
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   LayoutOrientationSchema,
   PocketOrientationSchema,
   PocketsSchema,
 } from '../schemas/components'
-import { HasAnchorsSchema } from '../schemas/hole'
-import { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
-import {
+import type { HasAnchorsSchema } from '../schemas/hole'
+import type { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
+import type {
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
   ExportStitchLineModeSchema,
 } from '../schemas/settings'
-import {
+import type {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
   HasStitchedCornersSchema,
@@ -55,6 +55,18 @@ export const EN2 = {
     openProject: 'Open project',
     actions: {
       delete: 'Delete',
+    },
+    recents: {
+      empty: {
+        noProjects: {
+          title: 'Még nincs projekted',
+          description: 'Hozz létre egy új projektet a kezdéshez.',
+        },
+        noSearchResults: {
+          title: 'Nincs találat',
+          description: 'Próbálj másik keresési kifejezést.',
+        },
+      },
     },
   },
   project: {
@@ -89,7 +101,6 @@ export const EN2 = {
           small: 'Small',
           default: 'Default',
           stitch: 'Stitch-size',
-          size: (size: number) => `${size} mm`,
         },
       },
       view: {
