@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { EditableSchema } from '../../../schemas/editable'
 import { ComponentBoundsStitchLineSchema } from '../../../schemas/stitching'
 import { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -13,7 +13,7 @@ type StitchSidesAndCornersSectionProps = {
 }
 
 export const StitchSidesAndCornersSection = ({ editable, issues, onChange }: StitchSidesAndCornersSectionProps) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const stitchSidesAndCornersIssues = useMemo(() => Object.values(issues), [issues])
 
   return (

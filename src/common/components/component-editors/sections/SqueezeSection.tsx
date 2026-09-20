@@ -2,7 +2,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { HStack } from '@chakra-ui/react'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink, PiLinkBreak } from 'react-icons/pi'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSqueezeSchema, HasSqueezeValuesSchema } from '../../../schemas/common'
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
@@ -24,7 +24,7 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
   issues,
   onChange,
 }: SqueezeSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const horizontalIssues = useMemo(
     () => [issues.leftSqueeze, issues.rightSqueeze],

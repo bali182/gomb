@@ -12,11 +12,11 @@ import {
 import { useColors } from '../../../hooks/useColors'
 import { useProject } from '../../../hooks/useProject'
 import { useProjectOperations } from '../../../hooks/useProjectOperations'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { ColorPickerMenuItem } from '../items/ColorPickerMenuItem'
 
 export const ColorsMenuGroup: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { updateColorSettings } = useProjectOperations()
   const leatherColorValues = useColors(leatherColors)

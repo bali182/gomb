@@ -2,7 +2,7 @@ import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PiCaretDown, PiCaretLeft, PiCaretRight, PiCaretUp } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { PocketClusterSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -20,7 +20,7 @@ type PocketsSectionProps = {
 }
 
 export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onChange }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
       if (details.value !== 'up' && details.value !== 'down' && details.value !== 'left' && details.value !== 'right') {

@@ -2,7 +2,7 @@ import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { HoleSchema } from '../../schemas/hole'
 import { getModelIcon } from '../../utils/getModelIcon'
@@ -15,7 +15,7 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete = noop }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { addStitchLineToHole, cloneHole, deleteHole } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {

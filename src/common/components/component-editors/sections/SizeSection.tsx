@@ -1,6 +1,6 @@
 import { useCallback, type ReactNode } from 'react'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSizeSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -14,7 +14,7 @@ type SizeSectionProps<T> = {
 }
 
 export function SizeSection<T extends HasSizeSchema>({ editable, issues, onChange }: SizeSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleWidthChange = useCallback(
     (width: string) => {
       onChange({ ...editable, width })

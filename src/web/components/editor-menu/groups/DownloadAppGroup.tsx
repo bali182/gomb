@@ -3,11 +3,11 @@ import { type FC } from 'react'
 import { PiDownload } from 'react-icons/pi'
 
 import { CommandMenuItem } from '../../../../common/components/editor-menu/items/CommandMenuItem'
-import { useTranslation2 } from '../../../../common/hooks/useTranslation2'
+import { useTranslation } from '../../../../common/hooks/useTranslation'
 import type { WebCommandIdSchema } from '../../../schemas/webCommands'
 
 export const DownloadAppGroup: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <Menu.ItemGroup>

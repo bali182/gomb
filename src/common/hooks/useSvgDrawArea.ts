@@ -15,13 +15,13 @@ import type {
 import { BaseExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import { produce } from '../utils/produce'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export const useSvgDrawArea = (
   stitchingSettings: StitchLineCommonConfigSchema,
   settings: BaseExportSettingsSchema,
 ): DrawAreaContextValue => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(
     () => ({

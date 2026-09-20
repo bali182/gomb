@@ -10,7 +10,7 @@ import { useEditableModel } from './useEditableModel'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type UseEditableComponentResult = {
   component: ComponentSchema
@@ -25,7 +25,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateComponent } = useSubProjectOperations()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
     () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: t.validation }),
     [computedSubProject, project, subProject, t.validation],

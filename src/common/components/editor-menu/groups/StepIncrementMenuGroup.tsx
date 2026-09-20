@@ -4,12 +4,12 @@ import { PiLineSegmentFill, PiNeedle } from 'react-icons/pi'
 import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
 import { useProject } from '../../../hooks/useProject'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { CommonCommandIdSchema } from '../../../schemas/command'
 import { StepMenuItem } from '../items/StepMenuItem'
 
 export const StepIncrementMenuGroup: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const { getCommand } = useCommandsContext<CommonCommandIdSchema>()

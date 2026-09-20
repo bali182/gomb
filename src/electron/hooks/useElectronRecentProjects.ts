@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { RecentProjectSchema, RecentProjectVisualisationSchema } from '../../common/schemas/recentProject'
@@ -11,7 +11,7 @@ import { electronAppRoutes } from '../electronAppRoutes'
 
 export const useElectronRecentProjects = (): LoadableSchema<RecentProjectVisualisationSchema[]> => {
   const { settings } = useGlobalSettings()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const candidates = useMemo<RecentProjectVisualisationSchema[]>(() => {
     const recentProjectEntries: Array<[string, RecentProjectSchema]> = Object.entries(settings.recentProjects)

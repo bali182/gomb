@@ -1,9 +1,9 @@
 import { StitchLineSchema } from '../schemas/stitching'
-import type { TranslationSchema2 } from '../translations/translationSchema'
+import type { TranslationSchema } from '../translations/translationSchema'
 
 export const getStitchLineNameByType = (
   type: StitchLineSchema['type'],
-  defaultNames: TranslationSchema2['defaultNames'],
+  defaultNames: TranslationSchema['defaultNames'],
 ): string => {
   switch (type) {
     case 'component-bounds-stitch-line':

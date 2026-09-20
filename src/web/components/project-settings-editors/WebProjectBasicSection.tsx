@@ -2,7 +2,7 @@ import { Input } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type FC } from 'react'
 
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
-import { useTranslation2 } from '../../../common/hooks/useTranslation2'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import type { EditableSchema } from '../../../common/schemas/editable'
 import type { ProjectSchema } from '../../../common/schemas/project'
 import type { ValidationIssuesSchema } from '../../../common/schemas/validation'
@@ -15,7 +15,7 @@ type WebProjectBasicSectionProps = {
 }
 
 export const WebProjectBasicSection: FC<WebProjectBasicSectionProps> = ({ editable, issues, onChange }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleNameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       onChange({ ...editable, name: event.target.value })

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FC } from 'react'
 import { PiX } from 'react-icons/pi'
 import { useBlocker, type BlockerFunction } from 'react-router'
 
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import { portalRef } from '../../common/portalRef'
 import { isDefined } from '../../common/utils/isDefined'
@@ -14,7 +14,7 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
   const [isWindowCloseRequested, setWindowCloseRequested] = useState(false)
   const isClosing = useRef(false)
   const { electronProject, saveProject } = useElectronProject()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const loadedElectronProject = Loadable.get(electronProject)
   const filePath = loadedElectronProject?.filePath
   const isDirty = loadedElectronProject?.isDirty === true

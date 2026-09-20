@@ -2,7 +2,7 @@ import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { flipComponentBoundsStitchLine } from '../logic/flipComponentBoundsStitchLine'
 import { portalRef } from '../portalRef'
 import type { ComponentSchema } from '../schemas/components'
@@ -18,7 +18,7 @@ type StitchLineActionsMenuProps = {
 }
 
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { cloneStitchLine, deleteStitchLine, updateStitchLine } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {

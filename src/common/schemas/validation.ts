@@ -1,6 +1,6 @@
 import type { DecimalLocale } from 'validator/es/lib/isDecimal'
 
-import type { TranslationSchema2 } from '../translations/translationSchema'
+import type { TranslationSchema } from '../translations/translationSchema'
 import type { ProjectSchema } from './project'
 import type { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
 
@@ -35,7 +35,7 @@ export type ValidationResultSchema<T> = ValidationResultValidSchema<T> | Validat
 
 export type BaseValidationContextSchema = {
   language: DecimalLocale
-  t: TranslationSchema2['validation']
+  t: TranslationSchema['validation']
 }
 
 export type ComponentBasedValidationContextSchema = BaseValidationContextSchema & {

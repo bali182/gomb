@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -28,7 +28,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   onChange,
   parent,
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <Tabs.Root defaultValue="layout" display="flex" flexDirection="column" minH="0">

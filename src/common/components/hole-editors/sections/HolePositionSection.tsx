@@ -9,7 +9,7 @@ import {
   PiAlignTopSimple,
 } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { HasAnchorsSchema } from '../../../schemas/hole'
@@ -28,7 +28,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
   issues,
   onChange,
 }: HolePositionSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleXAnchorChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails): void => {
       onChange({ ...editable, xAnchor: details.value as AnchorSchema })

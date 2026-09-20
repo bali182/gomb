@@ -1,12 +1,12 @@
 import { Menu } from '@chakra-ui/react'
 import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { CommonCommandIdSchema } from '../../../schemas/command'
 import { StitchVisibilityMenuItem } from '../items/StitchVisibilityMenuItem'
 
 export const StitchingVisibilityMenuGroup = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { settings } = useGlobalSettings()
   const { getCommand } = useCommandsContext<CommonCommandIdSchema>()
 

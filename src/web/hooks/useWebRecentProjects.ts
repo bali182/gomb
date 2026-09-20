@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai'
 import { useMemo } from 'react'
 
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import type { RecentProjectVisualisationSchema } from '../../common/schemas/recentProject'
 import { isDefined } from '../../common/utils/isDefined'
 import { projectsAtom } from '../state/projectsAtom'
@@ -11,7 +11,7 @@ import { webAppRoutes } from '../webAppRoutes'
 export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
   const projects = useAtomValue(projectsAtom)
   const { settings } = useGlobalSettings()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return useMemo<RecentProjectVisualisationSchema[]>(() => {
     return projects

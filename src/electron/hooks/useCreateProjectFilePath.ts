@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { IssueSchema } from '../../common/schemas/validation'
-import type { TranslationSchema2 } from '../../common/translations/translationSchema'
+import type { TranslationSchema } from '../../common/translations/translationSchema'
 import { electronApi } from '../electronApi'
 import { FILE_EXTENSION } from '../fileExtension'
 import type { FileValidateCreatePathResponseSchema } from '../schemas/electronApi'
@@ -26,7 +26,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
   const [isManuallyModified, setIsManuallyModified] = useState(false)
   const suggestPathRequestIdRef = useRef(0)
   const validatePathRequestIdRef = useRef(0)
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const updateFilePath = useCallback((requestId: number, update: SetStateAction<LoadableSchema<string>>): void => {
     if (requestId !== suggestPathRequestIdRef.current) {
@@ -188,7 +188,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
 const getFilePathIssue = (
   response: FileValidateCreatePathResponseSchema,
-  t: TranslationSchema2['validation'],
+  t: TranslationSchema['validation'],
 ): IssueSchema | undefined => {
   switch (response.type) {
     case 'create-path-available':

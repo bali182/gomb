@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ColorKey } from '../data/colors'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type ColorValue = {
   key: string
@@ -11,7 +11,7 @@ export type ColorValue = {
 type ColorEntry = [ColorKey, string]
 
 export const useColors = (values: Partial<Record<ColorKey, string>>): ColorValue[] => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const colors = useMemo((): ColorValue[] => {
     const entries = Object.entries(values) as ColorEntry[]

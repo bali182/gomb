@@ -4,7 +4,7 @@ import type { FC } from 'react'
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { ColorSettingsSections } from '../../../common/components/project-settings-editors/ColorSettingsSections'
 import { ProjectStitchingSection } from '../../../common/components/project-settings-editors/ProjectStitchingSection'
-import { useTranslation2 } from '../../../common/hooks/useTranslation2'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import type { EditableSchema } from '../../../common/schemas/editable'
 import type { LoadableSchema } from '../../../common/schemas/loadable'
 import type { ProjectSchema } from '../../../common/schemas/project'
@@ -34,7 +34,7 @@ export const ElectronProjectSettingsEditor: FC<ElectronProjectSettingsEditorProp
   onFilePathReset,
   onFilePickerButtonPressed,
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <Tabs.Root defaultValue="basic">

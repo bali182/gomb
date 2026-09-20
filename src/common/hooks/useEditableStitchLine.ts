@@ -11,7 +11,7 @@ import { useProject } from './useProject'
 import { useStitchLine } from './useStitchLine'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type UseEditableStitchLineResult = {
   editableStitchLine: EditableSchema<StitchLineSchema>
@@ -27,7 +27,7 @@ export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLi
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateStitchLine } = useSubProjectOperations()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
     () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: t.validation }),
     [computedSubProject, project, subProject, t.validation],

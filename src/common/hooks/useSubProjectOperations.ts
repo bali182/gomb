@@ -32,7 +32,7 @@ import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useSubProjectHistory } from './useSubProjectHistory'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
   addComponent: (parentId: string, type: ComponentSchema['type']) => ComponentSchema
@@ -58,7 +58,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { project, subProject, setSubProject } = useEditorContext()
   const { settings } = useGlobalSettings()
   const { recordChange, recordThrottledChange: recordThrottledUpdate } = useSubProjectHistory()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const addComponent = useCallback(
     (parentId: string, type: ComponentSchema['type']): ComponentSchema => {

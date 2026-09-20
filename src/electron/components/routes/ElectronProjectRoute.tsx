@@ -4,7 +4,7 @@ import { PiWarningCircle } from 'react-icons/pi'
 import { useNavigate, useParams } from 'react-router'
 
 import { CommonEmptyState } from '../../../common/components/common/CommonEmptyState'
-import { useTranslation2 } from '../../../common/hooks/useTranslation2'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import { Loadable } from '../../../common/loadable'
 import { isDefined } from '../../../common/utils/isDefined'
 import { ElectronEditorContextProvider } from '../../contexts/ElectronEditorContextProvider'
@@ -82,7 +82,7 @@ type ElectronProjectLoadFailedProps = {
 }
 
 const ElectronProjectLoadFailed: FC<ElectronProjectLoadFailedProps> = ({ filePath }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleBack = (): void => {

@@ -5,7 +5,7 @@ import { LANGUAGE } from '../../../constants/language'
 import { useEditableModel } from '../../../hooks/useEditableModel'
 import { useProject } from '../../../hooks/useProject'
 import { useProjectOperations } from '../../../hooks/useProjectOperations'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { BaseValidationContextSchema } from '../../../schemas/validation'
 import { optionalComparators } from '../../../utils/comparators'
 import { validateStitchLineCommonConfigSchema } from '../../../validators/validateStitchLineCommonConfigSchema'
@@ -19,7 +19,7 @@ export const StitchingSettingsMenuGroup: FC = () => {
   const { updateStitchingSettings } = useProjectOperations()
   const { project } = useProject()
 
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
 
   const { editableValue, setValue, validationIssues } = useEditableModel({

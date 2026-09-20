@@ -1,6 +1,6 @@
 import { useCallback, type ReactNode } from 'react'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { StitchLineCommonConfigSchema } from '../../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -24,7 +24,7 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
   onReset,
   resolvedEditable,
 }: StitchingSettingsSectionProps<T>): ReactNode => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleStitchMarginChange = useCallback(
     (nextStitchMargin: string): void => {
       onChange({ ...editable, stitchMargin: nextStitchMargin })

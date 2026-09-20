@@ -2,7 +2,7 @@ import { Switch } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { PocketClusterStitchLineSchema } from '../../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -16,7 +16,7 @@ type PocketStitchingSectionProps = {
 }
 
 export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleStartOffsetChange = useCallback(
     (startOffset: string): void => {
       onChange({ ...editable, startOffset })

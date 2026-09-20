@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { renderSvgToString } from '../logic/exports/renderSvgToString'
 import { getComputedProject } from '../logic/getComputedProject'
 import type { EditableSchema } from '../schemas/editable'
@@ -24,7 +24,7 @@ type SvgExportDialogProps = {
 export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setSvgExportSettings, settings } = useGlobalSettings()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
 

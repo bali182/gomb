@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -27,7 +27,7 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
   onReset,
   resolvedEditable,
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   return (
     <Tabs.Root defaultValue="settings">
       <Tabs.List alignItems="center" pr="2">

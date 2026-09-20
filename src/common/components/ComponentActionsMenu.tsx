@@ -6,7 +6,7 @@ import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { portalRef } from '../portalRef'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
@@ -34,7 +34,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   onAddStitchLine = noop,
   onDelete = noop,
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
@@ -183,7 +183,7 @@ type AddChildComponentMenuProps = {
 const possibleChildTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster']
 
 const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
     () => ({
@@ -216,7 +216,7 @@ type AddComponentStitchLineMenuProps = {
 }
 
 export const AddComponentStitchLineMenu: FC<AddComponentStitchLineMenuProps> = ({ component, onAddStitchLine }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const possibleTypes = useMemo<StitchLineSchema['type'][]>(() => {
     switch (component.type) {

@@ -3,7 +3,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { PiColumns, PiFile, PiGridFour, PiRows } from 'react-icons/pi'
 
 import { pages } from '../../data/pages'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { PageSchema, PageSchemaId } from '../../schemas/page'
 import type { PageLayoutSchema, PageOrientationSchema, PdfExportSettingsSchema } from '../../schemas/pdfExport'
@@ -27,7 +27,7 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
   issues,
   onChange,
 }: ExportPageSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const pageOptions = useMemo<ExportPageOption[]>(() => pages.map((page) => createExportPageOption(page)), [])
   const pageCollection = useMemo<ListCollection<ExportPageOption>>(
     () =>

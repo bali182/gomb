@@ -10,7 +10,7 @@ import {
   threadColors,
 } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ProjectSchema } from '../../schemas/project'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -24,7 +24,7 @@ type ProjectComponentSettingsSectionProps = {
 }
 
 export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = ({ editable, issues, onChange }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const leatherColorValues = useColors(leatherColors)
   const threadColorValues = useColors(threadColors)
   const stitchHoleColorValues = useColors(stitchHoleColors)

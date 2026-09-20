@@ -7,7 +7,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { BaseExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -31,7 +31,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
   issues,
   onChange,
 }: ExportContentSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const stitchLineModeOptions = useMemo<ExportStitchLineModeOption[]>(
     () => [
       {

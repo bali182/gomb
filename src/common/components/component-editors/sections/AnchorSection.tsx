@@ -9,7 +9,7 @@ import {
   PiAlignTopSimple,
 } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
 import type { ComponentSchema, HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
@@ -29,7 +29,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   issues,
   onChange,
 }: AnchorSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const isOffAxisFill = parent.layoutOrientation === 'horizontal' ? editable.autoHeight : editable.autoWidth
 

@@ -13,7 +13,7 @@ import {
 import { useCallback, useMemo, type FC } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { IssueSchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
@@ -43,7 +43,7 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
   value,
   size = 'xs',
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const isCompact = size === '2xs'
   const isInvalid = isDefined(issue) && issue.severity === 'error'
 

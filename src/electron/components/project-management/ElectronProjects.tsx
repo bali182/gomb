@@ -4,7 +4,7 @@ import { PiFolder, PiPlus } from 'react-icons/pi'
 
 import { ProjectManagementHeader } from '../../../common/components/project-management/ProjectManagementHeader'
 import { RecentProjects } from '../../../common/components/project-management/RecentProjects'
-import { useTranslation2 } from '../../../common/hooks/useTranslation2'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import { Loadable } from '../../../common/loadable'
 import { useElectronProject } from '../../hooks/useElectronProject'
 import { useElectronRecentProjects } from '../../hooks/useElectronRecentProjects'
@@ -15,7 +15,7 @@ export const ElectronProjects: FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const recentProjects = useElectronRecentProjects()
   const { openProject } = useElectronProject()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const handleCreateProject = useCallback((): void => {
     setIsCreateDialogOpen(true)

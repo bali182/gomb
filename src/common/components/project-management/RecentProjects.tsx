@@ -1,7 +1,7 @@
 import { EmptyState, IconButton, Input, InputGroup, Listbox, useFilter, useListCollection } from '@chakra-ui/react'
 import { ChangeEvent, FC, PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { PiFolderDuotone, PiMagnifyingGlass, PiX } from 'react-icons/pi'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { RecentProjectVisualisationSchema } from '../../schemas/recentProject'
 
 export type RecentProjectItemProps = {
@@ -16,7 +16,7 @@ type RecentProjectsProps = PropsWithChildren & {
 export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children, projects }) => {
   const [search, setSearch] = useState('')
 
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const { contains } = useFilter({ sensitivity: 'base' })
   const { collection, filter, set } = useListCollection({

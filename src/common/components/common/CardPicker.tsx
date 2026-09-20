@@ -11,7 +11,7 @@ import { useCallback, type FC } from 'react'
 import { PiArrowCounterClockwise, PiCreditCard } from 'react-icons/pi'
 
 import { cards, landscapeCards, portraitCards } from '../../data/cards'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { IssueSchema } from '../../schemas/validation'
 import type { CardSchema, CardSchemaId } from '../../schemas/valuables'
 import { isDefined } from '../../utils/isDefined'
@@ -31,7 +31,7 @@ type CardPickerProps = {
 }
 
 export const CardPicker: FC<CardPickerProps> = ({ isResetEnabled, issue, onChange, onReset, value }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const isInvalid = isDefined(issue) && issue.severity === 'error'
   const isValuePortrait = portraitCards.some((c) => c.id === value)
 
@@ -111,7 +111,7 @@ type CardItemsProps = {
 }
 
 const CardItems: FC<CardItemsProps> = ({ cards, transform }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <>

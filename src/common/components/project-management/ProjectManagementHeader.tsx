@@ -4,10 +4,10 @@ import type { FC } from 'react'
 import { ReactComponent as Logo } from '../../../../logo.svg?react'
 
 import { version } from '../../../../package.json'
-import { useTranslation2 } from '../../hooks/useTranslation2'
+import { useTranslation } from '../../hooks/useTranslation'
 
 export const ProjectManagementHeader: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <HStack gap="2.5">

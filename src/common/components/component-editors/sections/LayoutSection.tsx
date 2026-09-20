@@ -2,7 +2,7 @@ import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiArrowsHorizontal, PiArrowsVertical, PiColumns, PiRows, PiRuler } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasLayoutSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -21,7 +21,7 @@ export function LayoutSection<T extends HasLayoutSchema>({
   issues,
   onChange,
 }: LayoutSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
       onChange({ ...editable, layoutOrientation: details.value })

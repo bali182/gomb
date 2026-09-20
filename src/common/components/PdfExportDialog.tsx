@@ -5,7 +5,7 @@ import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useSvgDrawArea } from '../hooks/useSvgDrawArea'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { exportPdf } from '../logic/exports/exportPdf'
 import type { EditableSchema } from '../schemas/editable'
 import type { PdfExportSettingsSchema, PdfExportUnsuccessfulLayoutSchema } from '../schemas/pdfExport'
@@ -43,7 +43,7 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
   )
   const [failure, setFailure] = useState<PdfExportFailure | undefined>(undefined)
   const [isExporting, setIsExporting] = useState<boolean>(false)
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
 
   const validationResult = useMemo(
@@ -130,7 +130,7 @@ type PdfExportFailureAlertProps = {
 }
 
 const PdfExportFailureAlert: FC<PdfExportFailureAlertProps> = ({ failure, onDismiss }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   if (!isDefined(failure)) {
     return null

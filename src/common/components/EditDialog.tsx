@@ -3,7 +3,7 @@ import { CSSProperties, PropsWithChildren, useCallback, useEffect, type FC, type
 
 import { PiX } from 'react-icons/pi'
 import { portalRef } from '../../common/portalRef'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { isDefined } from '../utils/isDefined'
 
 type EditDialogProps = PropsWithChildren & {
@@ -36,7 +36,7 @@ export const EditDialog: FC<EditDialogProps> = ({
   onOpenChange,
   onSubmit,
 }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!isOpen) {

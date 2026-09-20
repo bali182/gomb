@@ -10,7 +10,7 @@ import { useHole } from './useHole'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type UseEditableHoleResult = {
   editableHole: EditableSchema<HoleSchema>
@@ -24,7 +24,7 @@ export const useEditableHole = (holeId: string): UseEditableHoleResult => {
   const { project } = useProject()
   const { computedSubProject, subProject } = useSubProject()
   const { updateHole } = useSubProjectOperations()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
     () => ({ computedSubProject, language: LANGUAGE, project, subProject, t: t.validation }),
     [computedSubProject, project, subProject, t.validation],

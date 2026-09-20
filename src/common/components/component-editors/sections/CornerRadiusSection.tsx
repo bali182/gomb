@@ -3,7 +3,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { TbRadiusBottomLeft, TbRadiusBottomRight, TbRadiusTopLeft, TbRadiusTopRight } from 'react-icons/tb'
 
 import { PiCar, PiLink, PiLinkBreak, PiPencilLine } from 'react-icons/pi'
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema, HasCornerRadiusValuesSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
@@ -25,7 +25,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   value,
   onChange,
 }: CornerRadiusSectionProps<T>): ReactNode {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const hasAuto = has<Partial<HasAutoCornerRadiusSchema>>(editable, 'autoCornerRadius')
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)

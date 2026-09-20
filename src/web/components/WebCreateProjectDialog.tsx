@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router'
 import { EditDialog } from '../../common/components/EditDialog'
 import { LANGUAGE } from '../../common/constants/language'
 import { useEditableModel } from '../../common/hooks/useEditableModel'
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { addSubProject } from '../../common/operations/project/addSubProject'
 import { getUnusedName } from '../../common/operations/subProject/utils/getUnusedName'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -24,7 +24,7 @@ type WebCreateProjectDialogProps = {
 export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const { addProject, projects } = useProjects()
   const navigate = useNavigate()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
     return createProject(

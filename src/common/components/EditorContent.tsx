@@ -14,7 +14,7 @@ import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import type { ProjectSchema } from '../schemas/project'
 import { isDefined } from '../utils/isDefined'
 import { CommonEmptyState } from './common/CommonEmptyState'
@@ -35,7 +35,7 @@ type EditorContentProps = {
 }
 
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { setAppSettings, settings } = useGlobalSettings()
   const subProject = useMemo(
@@ -112,7 +112,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 }
 
 const EmptyProjectState: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const { createSubProject } = useProjectOperations()
   const { navigateToSubProject } = useEditorContext()
 
@@ -137,7 +137,7 @@ const EmptyProjectState: FC = () => {
 }
 
 const MissingSubProjectState: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <CommonEmptyState
@@ -149,7 +149,7 @@ const MissingSubProjectState: FC = () => {
 }
 
 const EmptyComponentTreeState: FC = () => {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   return (
     <CommonEmptyState

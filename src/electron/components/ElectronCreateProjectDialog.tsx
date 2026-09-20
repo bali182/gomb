@@ -5,7 +5,7 @@ import { EditDialog } from '../../common/components/EditDialog'
 import { toaster } from '../../common/components/Toaster'
 import { LANGUAGE } from '../../common/constants/language'
 import { useEditableModel } from '../../common/hooks/useEditableModel'
-import { useTranslation2 } from '../../common/hooks/useTranslation2'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import { addSubProject } from '../../common/operations/project/addSubProject'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -26,7 +26,7 @@ type ElectronCreateProjectDialogProps = {
 
 export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const navigate = useNavigate()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
     return createProject(t.defaultNames.project)

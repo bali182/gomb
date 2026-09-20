@@ -3,11 +3,11 @@ import { compiler, RuleType } from 'markdown-to-jsx/react'
 import { FC, useCallback } from 'react'
 import hungarianLicense from '../../../license-hu.md?raw'
 import englishLicense from '../../../license.md?raw'
-import { TranslationLanguage2, useTranslation2 } from '../hooks/useTranslation2'
+import { TranslationLanguage, useTranslation } from '../hooks/useTranslation'
 import { noop } from '../utils/noop'
 import { EditDialog } from './EditDialog'
 
-const licenses: Record<TranslationLanguage2, string> = {
+const licenses: Record<TranslationLanguage, string> = {
   en: englishLicense,
   hu: hungarianLicense,
 }
@@ -66,7 +66,7 @@ const renderLicenseMarkdown = (markdown: string) => {
 }
 
 export const LicenseDialog: FC<LicenseDialogProps> = ({ isOpen, onOpenChange }) => {
-  const { language, t } = useTranslation2()
+  const { language, t } = useTranslation()
   const onClose = useCallback(() => {
     onOpenChange(false)
   }, [onOpenChange])

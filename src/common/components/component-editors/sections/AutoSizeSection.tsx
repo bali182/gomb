@@ -2,7 +2,7 @@ import { HStack, Text } from '@chakra-ui/react'
 import { useCallback } from 'react'
 import { PiArrowsHorizontal, PiArrowsVertical, PiRuler, PiWarningBold } from 'react-icons/pi'
 
-import { useTranslation2 } from '../../../hooks/useTranslation2'
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSqueezeSchema } from '../../../schemas/common'
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
@@ -22,7 +22,7 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
   issues,
   onChange,
 }: AutoSizeSectionProps<T>) {
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const hasActiveHorizontalSqueeze = editable.leftSqueeze !== '0' || editable.rightSqueeze !== '0'
   const hasActiveVerticalSqueeze = editable.topSqueeze !== '0' || editable.bottomSqueeze !== '0'
   const hasTransformedManualSize =

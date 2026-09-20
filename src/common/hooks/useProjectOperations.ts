@@ -10,7 +10,7 @@ import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
-import { useTranslation2 } from './useTranslation2'
+import { useTranslation } from './useTranslation'
 
 export type UseProjectOperationsOutput = {
   cloneSubProject: (sourceSubProject: SubProjectSchema) => void
@@ -23,7 +23,7 @@ export type UseProjectOperationsOutput = {
 
 export const useProjectOperations = (): UseProjectOperationsOutput => {
   const { project, setProject } = useEditorContext()
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
 
   const updateProject = useCallback(
     (updatedProject: ProjectSchema): void => {

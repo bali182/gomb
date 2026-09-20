@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { useCallback, useState, type FC } from 'react'
 
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
-import { useTranslation2 } from '../hooks/useTranslation2'
+import { useTranslation } from '../hooks/useTranslation'
 import { EditDialog } from './EditDialog'
 import { RulerSvg } from './svg/RulerSvg'
 
@@ -15,7 +15,7 @@ type ScalingDialogProps = {
 export const ScalingDialog: FC<ScalingDialogProps> = ({ isOpen, onOpenChange }) => {
   const { setViewSettings, settings } = useGlobalSettings()
   const [draftScaling, setDraftScaling] = useState<number>(settings.view.scale)
-  const { t } = useTranslation2()
+  const { t } = useTranslation()
   const scalingPercent = new BigNumber(draftScaling).times(100).toNumber()
 
   const resetDraft = useCallback((): void => {
