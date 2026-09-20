@@ -40,8 +40,8 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
     <HStack gap="2">
       <Switch.Root checked={!auto} onCheckedChange={handleCheckedChange} size="md">
         <Switch.HiddenInput />
-        <Switch.Control>
-          <Switch.Thumb>
+        <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
+          <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
             <Switch.ThumbIndicator fallback={<AutoIcon />}>
               <ManualIcon />
             </Switch.ThumbIndicator>
