@@ -2,12 +2,12 @@ import { Input } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type FC } from 'react'
 
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
+import { useTranslation2 } from '../../../common/hooks/useTranslation2'
 import { Loadable } from '../../../common/loadable'
 import type { EditableSchema } from '../../../common/schemas/editable'
 import type { LoadableSchema } from '../../../common/schemas/loadable'
 import type { ProjectSchema } from '../../../common/schemas/project'
 import type { IssueSchema, ValidationIssuesSchema } from '../../../common/schemas/validation'
-import { useTranslation } from '../../../common/translations/translation'
 import { isDefined } from '../../../common/utils/isDefined'
 import { ElectronFilePicker } from './ElectronFilePicker'
 
@@ -34,7 +34,7 @@ export const ElectronProjectBasicSection: FC<ElectronProjectBasicSectionProps> =
   onFilePathReset,
   onFilePickerButtonPressed,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const handleNameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       onChange({ ...editable, name: event.target.value })
@@ -46,12 +46,14 @@ export const ElectronProjectBasicSection: FC<ElectronProjectBasicSectionProps> =
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.common.labels.general}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.common.labels.name}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.project.basic.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>{t.project.editors.sections.project.basic.name.label}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.name}>
         <Input aria-invalid={hasNameError} autoFocus onChange={handleNameChange} size="xs" value={editable.name} />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>{t.projects.createDialog.filePath}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.project.basic.filePath.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={Loadable.get(filePathIssue)}>
         <ElectronFilePicker
           isManuallyModified={isFilePathManuallyModified}

@@ -3,6 +3,7 @@ import type {
   AnchorSchema,
   HasAutoCornerRadiusSchema,
   HasCornerRadiusSchema,
+  HasName,
   HasOffAxisAnchor,
   HasSizeSchema,
   HasSqueezeSchema,
@@ -314,6 +315,11 @@ export const EN2 = {
           } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
         },
         project: {
+          basic: {
+            title: 'General',
+            name: { label: 'Name' },
+            filePath: { label: 'File path' },
+          } satisfies SectionTranslationSchema<HasName>,
           components: {
             title: 'Component colors',
             leatherColor: { label: 'Leather color' },
