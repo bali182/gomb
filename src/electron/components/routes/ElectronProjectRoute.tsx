@@ -4,8 +4,8 @@ import { PiWarningCircle } from 'react-icons/pi'
 import { useNavigate, useParams } from 'react-router'
 
 import { CommonEmptyState } from '../../../common/components/common/CommonEmptyState'
+import { useTranslation2 } from '../../../common/hooks/useTranslation2'
 import { Loadable } from '../../../common/loadable'
-import { useTranslation } from '../../../common/translations/translation'
 import { isDefined } from '../../../common/utils/isDefined'
 import { ElectronEditorContextProvider } from '../../contexts/ElectronEditorContextProvider'
 import { electronAppRoutes } from '../../electronAppRoutes'
@@ -82,7 +82,7 @@ type ElectronProjectLoadFailedProps = {
 }
 
 const ElectronProjectLoadFailed: FC<ElectronProjectLoadFailedProps> = ({ filePath }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const navigate = useNavigate()
 
   const handleBack = (): void => {
@@ -93,17 +93,17 @@ const ElectronProjectLoadFailed: FC<ElectronProjectLoadFailedProps> = ({ filePat
     <CommonEmptyState
       content={
         <Button onClick={handleBack} variant="solid">
-          {t.common.actions.back}
+          {t.projects.errors.openFailed.back}
         </Button>
       }
       description={
         <Stack align="center" gap="2">
-          <Box>{t.projects.openDialog.errors.openFailed}</Box>
+          <Box>{t.projects.errors.openFailed.description}</Box>
           <Code>{filePath}</Code>
         </Stack>
       }
       icon={<PiWarningCircle />}
-      title={t.projects.notFound.title}
+      title={t.projects.errors.openFailed.title}
     />
   )
 }

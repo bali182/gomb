@@ -74,6 +74,17 @@ export const EN2 = {
         },
       },
     },
+    errors: {
+      notFound: {
+        title: 'Project not found',
+        description: 'The project you want to open does not exist.',
+      },
+      openFailed: {
+        title: 'Project not found',
+        description: 'Failed to open project.',
+        back: 'Back',
+      },
+    },
   },
   project: {
     tree: {
@@ -174,6 +185,10 @@ export const EN2 = {
         stitchLines: {
           settings: 'Settings',
           overrides: 'Overrides',
+        },
+        project: {
+          basic: 'Basics',
+          stitching: 'Stitching',
         },
       },
       actions: {
@@ -433,10 +448,6 @@ export const EN2 = {
       },
     },
     errors: {
-      notFound: {
-        title: 'A projekt nem található',
-        description: 'A megnyitni kívánt projekt nem létezik.',
-      },
       moduleNotFound: {
         title: 'A modul nem található',
         description: 'A megnyitni kívánt modul nem létezik.',

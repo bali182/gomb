@@ -4,11 +4,11 @@ import type { FC } from 'react'
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { ColorSettingsSections } from '../../../common/components/project-settings-editors/ColorSettingsSections'
 import { ProjectStitchingSection } from '../../../common/components/project-settings-editors/ProjectStitchingSection'
+import { useTranslation2 } from '../../../common/hooks/useTranslation2'
 import type { EditableSchema } from '../../../common/schemas/editable'
 import type { LoadableSchema } from '../../../common/schemas/loadable'
 import type { ProjectSchema } from '../../../common/schemas/project'
 import type { IssueSchema, ValidationIssuesSchema } from '../../../common/schemas/validation'
-import { useTranslation } from '../../../common/translations/translation'
 import { ElectronProjectBasicSection } from './ElectronProjectBasicSection'
 
 type ElectronProjectSettingsEditorProps = {
@@ -34,13 +34,13 @@ export const ElectronProjectSettingsEditor: FC<ElectronProjectSettingsEditorProp
   onFilePathReset,
   onFilePickerButtonPressed,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   return (
     <Tabs.Root defaultValue="basic">
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value="basic">{t.projects.settingsDialog.tabs.basics}</Tabs.Trigger>
-        <Tabs.Trigger value="stitching">{t.projects.settingsDialog.tabs.stitching}</Tabs.Trigger>
+        <Tabs.Trigger value="basic">{t.project.editors.tabs.project.basic}</Tabs.Trigger>
+        <Tabs.Trigger value="stitching">{t.project.editors.tabs.project.stitching}</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="basic" pt={0}>
         <SectionGroup.Root>
