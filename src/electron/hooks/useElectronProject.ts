@@ -8,7 +8,6 @@ import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
-import { useTranslation } from '../../common/translations/translation'
 import { id } from '../../common/utils/id'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronApi } from '../electronApi'
@@ -31,33 +30,32 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
   const requestIdRef = useRef(0)
   const navigate = useNavigate()
   const { subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
-  const legacyT = useTranslation()
   const { t } = useTranslation2()
 
   const showOpenFailedToast = useCallback((): void => {
     toaster.create({
-      description: legacyT.projects.openDialog.errors.openFailed,
+      description: t.project.toast.openFailed,
       type: 'error',
       closable: true,
     })
-  }, [legacyT.projects.openDialog.errors.openFailed])
+  }, [t.project.toast.openFailed])
 
   const showSaveFailedToast = useCallback((): void => {
     toaster.create({
-      description: legacyT.projects.saveDialog.errors.saveFailed,
+      description: t.project.toast.saveFailed,
       type: 'error',
       closable: true,
     })
-  }, [legacyT.projects.saveDialog.errors.saveFailed])
+  }, [t.project.toast.saveFailed])
 
   const showSaveSucceededToast = useCallback((): void => {
     toaster.create({
-      description: legacyT.projects.saveDialog.successes.saveSucceeded,
+      description: t.project.toast.saveSucceeded,
       type: 'info',
       duration: 2000,
       closable: true,
     })
-  }, [legacyT.projects.saveDialog.successes.saveSucceeded])
+  }, [t.project.toast.saveSucceeded])
 
   console.log('h')
 

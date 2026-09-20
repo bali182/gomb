@@ -94,6 +94,11 @@ export const EN2 = {
         description: 'Select or create a module.',
       },
     },
+    toast: {
+      openFailed: 'The project could not be opened.',
+      saveFailed: 'The project could not be saved.',
+      saveSucceeded: 'Saved.',
+    },
     menus: {
       file: {
         name: 'File',
