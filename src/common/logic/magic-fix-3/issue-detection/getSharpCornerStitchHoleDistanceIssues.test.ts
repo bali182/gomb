@@ -186,7 +186,7 @@ describe('getSharpCornerStitchHoleDistanceIssues', () => {
     const magicFixSettings = defaultMagicFix3Settings
     const computed = getComputedSubProject(subProject, project.stitchingSettings)
 
-    expect(computed.stitchLines[0]?.routes).toHaveLength(2)
+    expect(Object.values(computed.stitchLines).flat()[0]?.routes).toHaveLength(2)
     expect(
       getSharpCornerStitchHoleDistanceIssues({
         subProject,

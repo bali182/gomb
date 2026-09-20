@@ -8,14 +8,19 @@ export const calculateStitchLine = (
   stitchLine: ResolvedStitchLineSchema,
   component: ComponentSchema,
   computedComponent: ComputedComponentSchema,
+  computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedStitchLineSchema => {
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line': {
-      return calculateComponentBoundsStitchLine(stitchLine, {
-        componentId: computedComponent.componentId,
-        boundingRect: computedComponent.boundingRect,
-        cornerRadius: computedComponent.cornerRadius,
-      })
+      return calculateComponentBoundsStitchLine(
+        stitchLine,
+        {
+          componentId: computedComponent.componentId,
+          boundingRect: computedComponent.boundingRect,
+          cornerRadius: computedComponent.cornerRadius,
+        },
+        computedComponents,
+      )
     }
     case 'pocket-cluster-stitch-line': {
       if (component.type !== 'pocket-cluster') {

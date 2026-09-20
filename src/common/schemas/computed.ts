@@ -2,7 +2,7 @@ import type BigNumber from 'bignumber.js'
 
 import { HasComponentReferenceSchema, HasId, HasTargetSchema, HasTypeSchema } from './common'
 import { CornerRadiusSchema, LineSchema, PathSchema, PointSchema, RectSchema } from './geometry'
-import { StitchCornerSchema, StitchSideSchema } from './stitching'
+import { StitchCornerSchema, StitchLineSchema, StitchSideSchema } from './stitching'
 import { CardSchema } from './valuables'
 
 export type ComputedStitchHoleSchema = {
@@ -121,7 +121,9 @@ export type ComputedStitchRouteSchema = HasBoundingRectSchema & {
 export type ComputedStitchLineSchema = HasTargetSchema &
   HasBoundingRectSchema & {
     stitchLineId: string
+    type: StitchLineSchema['type']
     componentId: string
+    onTop: string
     autoComputedCornerRadius: CornerRadiusSchema
     routes: ComputedStitchRouteSchema[]
     connectingStitches: ComputedStitchSchema[]

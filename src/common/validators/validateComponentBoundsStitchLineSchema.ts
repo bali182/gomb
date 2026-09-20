@@ -110,6 +110,7 @@ export const validateComponentBoundsStitchLineSchema = (
     topRightRadius: topRightRadiusResult.issues,
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
+    onTop: undefined,
     stitchDisconnectedBottomLeftCorner: undefined,
     stitchDisconnectedBottomRightCorner: undefined,
     stitchDisconnectedTopLeftCorner: undefined,
@@ -153,6 +154,7 @@ export const validateComponentBoundsStitchLineSchema = (
     stitchDisconnectedBottomRightCorner: input.stitchDisconnectedBottomRightCorner,
     stitchDisconnectedTopLeftCorner: input.stitchDisconnectedTopLeftCorner,
     stitchDisconnectedTopRightCorner: input.stitchDisconnectedTopRightCorner,
+    onTop: input.onTop,
   }
 
   if (

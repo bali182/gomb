@@ -224,6 +224,14 @@ const cloneStitchLines = (
 
     const name = names.stitchLine(sourceStitchLine.name, usedNames)
     usedNames.add(name)
+    if (sourceStitchLine.type === 'component-bounds-stitch-line') {
+      const onTop = isDefined(sourceStitchLine.onTop)
+        ? clonedComponentIdBySourceComponentId[sourceStitchLine.onTop]
+        : undefined
+      clonedStitchLines.push({ ...sourceStitchLine, id: ids.stitchLine(), name, targetId, onTop })
+      continue
+    }
+
     clonedStitchLines.push({ ...sourceStitchLine, id: ids.stitchLine(), name, targetId })
   }
 

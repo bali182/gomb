@@ -92,11 +92,15 @@ const computedSubProject = (computedSubProject: ComputedSubProjectSchema) => {
   }
 
   const stitchLine = (id: string) => {
-    const anyStitchLine = computedSubProject.stitchLines.find((s) => s.stitchLineId === id)
-    if (!isDefined(anyStitchLine)) {
-      throw new Error(createMissingErrorMessage('stitch line', 'computed sub-project', computedSubProject.id))
+    for (const stitchLines of Object.values(computedSubProject.stitchLines)) {
+      for (const stitchLine of stitchLines) {
+        if (stitchLine.stitchLineId === id) {
+          return stitchLine
+        }
+      }
     }
-    return anyStitchLine
+
+    throw new Error(createMissingErrorMessage('stitch line', 'computed sub-project', computedSubProject.id))
   }
 
   const hole = (id: string) => {

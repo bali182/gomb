@@ -4,6 +4,7 @@ import { HoleSchema } from '../schemas/hole'
 import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 
@@ -46,17 +47,17 @@ const getStitchLineObstructingComponentIds = (
   stitchLine: StitchLineSchema,
   subProject: SubProjectSchema,
 ): ReadonlySet<string> => {
-  const ownerComponent = getStitchLineOwnerComponent(stitchLine, subProject)
+  const underlyingComponent = getStitchLineUnderlyingComponent(stitchLine, subProject)
 
-  if (!isDefined(ownerComponent)) {
+  if (!isDefined(underlyingComponent)) {
     return EmptySet
   }
 
-  const coveredComponentIds = new Set(getComponentDescendants(ownerComponent, subProject))
-  coveredComponentIds.delete(ownerComponent.id)
+  const coveredComponentIds = new Set(getComponentDescendants(underlyingComponent, subProject))
+  coveredComponentIds.delete(underlyingComponent.id)
 
-  if (ownerComponent.type === 'pocket-cluster' && stitchLine.type === 'pocket-cluster-stitch-line') {
-    coveredComponentIds.add(ownerComponent.id)
+  if (underlyingComponent.type === 'pocket-cluster' && stitchLine.type === 'pocket-cluster-stitch-line') {
+    coveredComponentIds.add(underlyingComponent.id)
   }
 
   return coveredComponentIds
@@ -75,13 +76,22 @@ const getHoleObstructingComponentIds = (hole: HoleSchema, subProject: SubProject
   return obstructingComponentIds
 }
 
-const getStitchLineOwnerComponent = (
+const getStitchLineUnderlyingComponent = (
   stitchLine: StitchLineSchema,
   subProject: SubProjectSchema,
 ): ComponentSchema | undefined => {
-  if (stitchLine.targetType === 'component') {
-    return subProject.components[stitchLine.targetId]
+  const accessor = accessors.subProject(subProject)
+
+  if (stitchLine.type === 'component-bounds-stitch-line' && isDefined(stitchLine.onTop)) {
+    const renderTarget = accessor.optional.component(stitchLine.onTop)
+    if (isDefined(renderTarget)) {
+      return renderTarget
+    }
   }
-  const targetHole = subProject.holes.find((hole) => hole.id === stitchLine.targetId)
-  return isDefined(targetHole) ? subProject.components[targetHole.componentId] : undefined
+
+  if (stitchLine.targetType === 'component') {
+    return accessor.optional.component(stitchLine.targetId)
+  }
+  const targetHole = accessor.optional.hole(stitchLine.targetId)
+  return isDefined(targetHole) ? accessor.optional.component(targetHole.componentId) : undefined
 }

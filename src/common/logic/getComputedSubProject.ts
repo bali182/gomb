@@ -66,7 +66,7 @@ export const getComputedSubProject = (
     components: computedComponents,
     holes,
     stitchLines,
-    viewBox: getSubProjectViewBox(Object.values(computedComponents), stitchLines),
+    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines).flat()),
   }
 }
 
