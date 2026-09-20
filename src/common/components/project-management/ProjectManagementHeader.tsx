@@ -2,12 +2,12 @@ import { HStack, Icon, Span, Text, VStack } from '@chakra-ui/react'
 import type { FC } from 'react'
 
 import { ReactComponent as Logo } from '../../../../logo.svg?react'
-import { useTranslation } from '../../translations/translation'
 
 import { version } from '../../../../package.json'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 
 export const ProjectManagementHeader: FC = () => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   return (
     <HStack gap="2.5">

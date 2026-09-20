@@ -2,9 +2,9 @@ import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import { useTranslation2 } from '../../hooks/useTranslation2'
 import { portalRef } from '../../portalRef'
 import type { HoleSchema } from '../../schemas/hole'
-import { useTranslation } from '../../translations/translation'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { noop } from '../../utils/noop'
 
@@ -15,7 +15,7 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete = noop }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const { addStitchLineToHole, cloneHole, deleteHole } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -50,12 +50,12 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete
             <Menu.Content>
               <Menu.Item onSelect={handleAddStitchLine} value="stitch-line">
                 <StitchLineIcon />
-                <Menu.ItemText>{t.common.actions.addByName(t.stitchLine.types.componentBounds)}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.holes.addStitching}</Menu.ItemText>
               </Menu.Item>
               <Menu.Separator />
               <Menu.Item onSelect={handleClone} value="clone">
                 <PiCopy />
-                <Menu.ItemText>{t.common.actions.clone}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.holes.clone}</Menu.ItemText>
               </Menu.Item>
               <Menu.Item
                 onSelect={handleDelete}
@@ -64,7 +64,7 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete
                 _hover={{ bg: 'bg.error', color: 'fg.error' }}
               >
                 <PiTrash />
-                <Menu.ItemText>{t.common.actions.remove}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.holes.delete}</Menu.ItemText>
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>

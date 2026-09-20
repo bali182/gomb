@@ -3,8 +3,8 @@ import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
 import { useNavigate } from 'react-router'
 
+import { useTranslation2 } from '../../common/hooks/useTranslation2'
 import { portalRef } from '../../common/portalRef'
-import { useTranslation } from '../../common/translations/translation'
 import { useProjects } from '../hooks/useProjects'
 import { webAppRoutes } from '../webAppRoutes'
 
@@ -14,7 +14,7 @@ type ProjectActionsMenuProps = {
 }
 
 export const ProjectActionsMenu: FC<ProjectActionsMenuProps> = ({ size, projectId }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const { deleteProject } = useProjects()
   const navigate = useNavigate()
 
@@ -45,7 +45,7 @@ export const ProjectActionsMenu: FC<ProjectActionsMenuProps> = ({ size, projectI
                 _hover={{ bg: 'bg.error', color: 'fg.error' }}
               >
                 <PiTrash />
-                <Menu.ItemText>{t.common.actions.remove}</Menu.ItemText>
+                <Menu.ItemText>{t.projects.actions.delete}</Menu.ItemText>
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>

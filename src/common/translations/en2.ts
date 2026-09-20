@@ -53,6 +53,9 @@ export const EN2 = {
   projects: {
     createProject: 'Create project',
     openProject: 'Open project',
+    actions: {
+      delete: 'Delete',
+    },
   },
   project: {
     menus: {
@@ -139,6 +142,29 @@ export const EN2 = {
       },
     },
     editors: {
+      actions: {
+        components: {
+          addPanel: 'Add panel',
+          addRootPanel: 'Add root panel',
+          addPocketCluster: 'Add pocket cluster',
+          addHole: 'Add hole',
+          addStitching: 'Add stitching',
+          addPocketStitching: 'Add pocket stitching',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
+        stitchLines: {
+          flipHorizontal: 'Flip horizontal',
+          flipVertical: 'Flip vertical',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
+        holes: {
+          addStitching: 'Add stitching',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
+      },
       sections: {
         common: {
           cornerRadius: {

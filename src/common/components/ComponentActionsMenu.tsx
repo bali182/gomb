@@ -6,11 +6,11 @@ import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
+import { useTranslation2 } from '../hooks/useTranslation2'
 import { portalRef } from '../portalRef'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
 import { SubProjectSchema } from '../schemas/subProject'
-import { useTranslation } from '../translations/translation'
 import { getModelIcon } from '../utils/getModelIcon'
 import { isDefined } from '../utils/isDefined'
 import { noop } from '../utils/noop'
@@ -34,7 +34,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   onAddStitchLine = noop,
   onDelete = noop,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const { project } = useProject()
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
@@ -148,7 +148,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                   <AddChildComponentMenuSection component={component} onAddChild={handleAddChild} />
                   <Menu.Item value="hole" onSelect={handleAddHole}>
                     <HoleIcon />
-                    <Menu.ItemText>{t.common.actions.addByName(t.hole.title)}</Menu.ItemText>
+                    <Menu.ItemText>{t.project.editors.actions.components.addHole}</Menu.ItemText>
                   </Menu.Item>
                   <Menu.Separator />
                   <AddComponentStitchLineMenu component={component} onAddStitchLine={handleAddStitchLine} />
@@ -156,7 +156,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               )}
               <Menu.Item value="clone" onSelect={handleClone}>
                 <PiCopy />
-                <Menu.ItemText>{t.common.actions.clone}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
               </Menu.Item>
               <Menu.Item
                 onSelect={handleDelete}
@@ -165,7 +165,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 _hover={{ bg: 'bg.error', color: 'fg.error' }}
               >
                 <PiTrash />
-                <Menu.ItemText>{t.common.actions.remove}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.components.delete}</Menu.ItemText>
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>
@@ -183,13 +183,13 @@ type AddChildComponentMenuProps = {
 const possibleChildTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster']
 
 const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
     () => ({
-      panel: t.common.actions.addByName(t.component.types.panel),
-      'root-panel': t.common.actions.addByName(t.component.types.rootPanel),
-      'pocket-cluster': t.common.actions.addByName(t.component.types.pocketCluster),
+      panel: t.project.editors.actions.components.addPanel,
+      'root-panel': t.project.editors.actions.components.addRootPanel,
+      'pocket-cluster': t.project.editors.actions.components.addPocketCluster,
     }),
     [t],
   )
@@ -216,13 +216,12 @@ type AddComponentStitchLineMenuProps = {
 }
 
 export const AddComponentStitchLineMenu: FC<AddComponentStitchLineMenuProps> = ({ component, onAddStitchLine }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   const possibleTypes = useMemo<StitchLineSchema['type'][]>(() => {
     switch (component.type) {
-      case 'panel':
-        return ['component-bounds-stitch-line']
       case 'root-panel':
+      case 'panel':
         return ['component-bounds-stitch-line']
       case 'pocket-cluster':
         return ['component-bounds-stitch-line', 'pocket-cluster-stitch-line']
@@ -233,8 +232,8 @@ export const AddComponentStitchLineMenu: FC<AddComponentStitchLineMenuProps> = (
 
   const labels = useMemo<Record<StitchLineSchema['type'], string>>(
     () => ({
-      'component-bounds-stitch-line': t.common.actions.addByName(t.stitchLine.types.componentBounds),
-      'pocket-cluster-stitch-line': t.common.actions.addByName(t.stitchLine.types.pocketCluster),
+      'component-bounds-stitch-line': t.project.editors.actions.components.addStitching,
+      'pocket-cluster-stitch-line': t.project.editors.actions.components.addPocketStitching,
     }),
     [t],
   )
