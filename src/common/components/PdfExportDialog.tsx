@@ -5,6 +5,7 @@ import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useSvgDrawArea } from '../hooks/useSvgDrawArea'
+import { useTranslation2 } from '../hooks/useTranslation2'
 import { exportPdf } from '../logic/exports/exportPdf'
 import type { EditableSchema } from '../schemas/editable'
 import type { PdfExportSettingsSchema, PdfExportUnsuccessfulLayoutSchema } from '../schemas/pdfExport'
@@ -43,8 +44,9 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
   )
   const [failure, setFailure] = useState<PdfExportFailure | undefined>(undefined)
   const [isExporting, setIsExporting] = useState<boolean>(false)
-  const t = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t }), [t])
+  const legacyT = useTranslation()
+  const { t } = useTranslation2()
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
 
   const validationResult = useMemo(
     () => validatePdfExportSettingsSchema(localPdfExportSettings, exportParams, context),
@@ -111,8 +113,8 @@ export const PdfExportDialog: FC<PdfExportDialogProps> = ({ isOpen, onOpenChange
       onOpenChange={onOpenChange}
       onResetData={resetDraft}
       onSubmit={handleSubmit}
-      submit={t.pdfExport.dialog.actions.export}
-      title={t.pdfExport.dialog.title}
+      submit={t.dialogs.pdfExport.positiveAction}
+      title={t.dialogs.pdfExport.title}
     >
       <PdfExportFailureAlert failure={failure} onDismiss={handleFailureDismiss} />
       <PdfExportEditor
@@ -130,7 +132,7 @@ type PdfExportFailureAlertProps = {
 }
 
 const PdfExportFailureAlert: FC<PdfExportFailureAlertProps> = ({ failure, onDismiss }) => {
-  const t = useTranslation()
+  const { t } = useTranslation2()
 
   if (!isDefined(failure)) {
     return null
@@ -143,8 +145,8 @@ const PdfExportFailureAlert: FC<PdfExportFailureAlertProps> = ({ failure, onDism
         <Alert.Content pe="8">
           <Alert.Title>
             {failure.type === 'unplaceable'
-              ? t.pdfExport.dialog.errors.unplaceablePanels
-              : t.pdfExport.dialog.errors.exportFailed}
+              ? t.dialogs.pdfExport.errors.unplaceablePanels
+              : t.dialogs.pdfExport.errors.exportFailed}
           </Alert.Title>
           {failure.type === 'unplaceable' && (
             <Alert.Description as="ul" mt="2" ps="4">

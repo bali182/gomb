@@ -1,8 +1,9 @@
 export type DialogTranslationSchema = {
-  title: string
+  title?: string
   description?: string
-  positiveAction: string
+  positiveAction?: string
   negativeAction?: string
+  errors?: Record<string, string>
 }
 
 export type NativeDialogTranslationSchema = {

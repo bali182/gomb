@@ -342,6 +342,10 @@ export const EN2 = {
     pdfExport: {
       title: 'Export PDF',
       positiveAction: 'Export',
+      errors: {
+        exportFailed: 'The PDF export failed.',
+        unplaceablePanels: 'One or more panels do not fit on the selected page.',
+      },
     },
     license: {
       title: 'License',
@@ -362,6 +366,9 @@ export const EN2 = {
       description: 'Do you want to save your changes before leaving?',
       positiveAction: 'Save',
       negativeAction: 'Continue without saving',
+    },
+    editDialog: {
+      negativeAction: 'Cancel',
     },
   } satisfies Record<string, DialogTranslationSchema>,
   nativeDialogs: {

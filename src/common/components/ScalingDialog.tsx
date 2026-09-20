@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { useCallback, useState, type FC } from 'react'
 
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
-import { useTranslation } from '../translations/translation'
+import { useTranslation2 } from '../hooks/useTranslation2'
 import { EditDialog } from './EditDialog'
 import { RulerSvg } from './svg/RulerSvg'
 
@@ -15,7 +15,7 @@ type ScalingDialogProps = {
 export const ScalingDialog: FC<ScalingDialogProps> = ({ isOpen, onOpenChange }) => {
   const { setViewSettings, settings } = useGlobalSettings()
   const [draftScaling, setDraftScaling] = useState<number>(settings.view.scale)
-  const t = useTranslation()
+  const { t } = useTranslation2()
   const scalingPercent = new BigNumber(draftScaling).times(100).toNumber()
 
   const resetDraft = useCallback((): void => {
@@ -38,19 +38,19 @@ export const ScalingDialog: FC<ScalingDialogProps> = ({ isOpen, onOpenChange }) 
   return (
     <EditDialog
       canSubmit={true}
-      description={t.editor.scalingDialog.description}
+      description={t.dialogs.scaling.description}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       onResetData={resetDraft}
       onSubmit={handleSubmit}
       size="xl"
-      submit={t.common.actions.apply}
-      title={t.editor.scalingDialog.title}
+      submit={t.dialogs.scaling.positiveAction}
+      title={t.dialogs.scaling.title}
     >
       <VStack align="stretch" gap="12" px="6">
         <Slider.Root min={0.5} max={2} step={0.001} value={[draftScaling]} onValueChange={handleScaleChange}>
           <Text fontWeight="medium">
-            {t.editor.scalingDialog.title}: {scalingPercent}%
+            {t.dialogs.scaling.title}: {scalingPercent}%
           </Text>
           <Slider.Control>
             <Slider.Track>

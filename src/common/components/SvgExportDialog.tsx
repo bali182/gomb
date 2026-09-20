@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
+import { useTranslation2 } from '../hooks/useTranslation2'
 import { renderSvgToString } from '../logic/exports/renderSvgToString'
 import { getComputedProject } from '../logic/getComputedProject'
 import type { EditableSchema } from '../schemas/editable'
@@ -24,8 +25,9 @@ type SvgExportDialogProps = {
 export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setSvgExportSettings, settings } = useGlobalSettings()
-  const t = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t }), [t])
+  const legacyT = useTranslation()
+  const { t } = useTranslation2()
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: legacyT }), [legacyT])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
 
   const [editableParams, setEditableParams] = useState<EditableSchema<BaseExportSettingsSchema>>(() =>
@@ -82,8 +84,8 @@ export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange
       onOpenChange={onOpenChange}
       onResetData={resetDraft}
       onSubmit={handleSubmit}
-      submit={t.svgExport.dialog.actions.export}
-      title={t.svgExport.dialog.title}
+      submit={t.dialogs.svgExport.positiveAction}
+      title={t.dialogs.svgExport.title}
     >
       <SvgExportEditor editable={editableParams} issues={validationResult.issues} onChange={handleParamsChange} />
     </EditDialog>
