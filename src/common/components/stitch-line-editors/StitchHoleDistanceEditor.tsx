@@ -13,9 +13,9 @@ import {
 import { useCallback, useMemo, type FC } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
+import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { IssueSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { isDefined } from '../../utils/isDefined'
 
 const stitchHoleDistanceValues = ['2.7', '3.0', '3.38', '3.85', '4.0', '4.5', '5.0', '5.5', '6.0']
@@ -43,7 +43,7 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
   value,
   size = 'xs',
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const isCompact = size === '2xs'
   const isInvalid = isDefined(issue) && issue.severity === 'error'
 
@@ -139,7 +139,7 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
                 </Combobox.Item>
               ))}
             </Combobox.List>
-            <Combobox.Empty>{t.common.emptyStates.noMatchingValues}</Combobox.Empty>
+            <Combobox.Empty>{t.project.editors.controls.stitchHoleDistance.noMatchingValues}</Combobox.Empty>
           </Combobox.Content>
         </Combobox.Positioner>
       </Portal>

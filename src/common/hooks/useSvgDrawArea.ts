@@ -14,14 +14,14 @@ import type {
 } from '../schemas/drawArea'
 import { BaseExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
-import { useTranslation } from '../translations/translation'
 import { produce } from '../utils/produce'
+import { useTranslation } from './useTranslation'
 
 export const useSvgDrawArea = (
   stitchingSettings: StitchLineCommonConfigSchema,
   settings: BaseExportSettingsSchema,
 ): DrawAreaContextValue => {
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(
     () => ({
@@ -75,13 +75,13 @@ export const useSvgDrawArea = (
           case 'svg-export-panel':
             return element.component.name
           case 'svg-export-front-pocket':
-            return t.svgExport.frontPocketName(element.ownerComponent.name)
+            return t.project.export.frontPocketName(element.ownerComponent.name)
           case 'svg-export-t-pocket':
-            return t.svgExport.tPocketName(element.ownerComponent.name, element.pocketIndex + 1)
+            return t.project.export.tPocketName(element.ownerComponent.name, element.pocketIndex + 1)
         }
       },
     }),
-    [settings.showNames, t.svgExport],
+    [settings.showNames, t.project.export],
   )
 
   const exportTextStyles = useMemo<DrawAreaExportTextStyles>(
@@ -95,7 +95,7 @@ export const useSvgDrawArea = (
         }
 
         const boundingRect = getSvgExportElementBoundingRect(element)
-        return t.common.dimensions(boundingRect.width.toFixed(1), boundingRect.height.toFixed(1))
+        return t.formatters.dimensions(boundingRect.width.toFixed(1), boundingRect.height.toFixed(1))
       },
       getDimensionsTextColor: produce(COMPONENT_DIMENSIONS_COLOR),
       getDimensionsTextFontFamily: produce('sans-serif'),

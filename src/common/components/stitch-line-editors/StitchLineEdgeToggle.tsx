@@ -16,13 +16,12 @@ type StitchLineSegmentLayout = {
 }
 
 type StitchLineEdgeToggleProps = {
-  label: string
   onClick: () => void
   selected: boolean
   side: StitchSideSchema
 }
 
-export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ label, onClick, selected, side }) => {
+export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side }) => {
   const layout = useMemo<StitchLineSegmentLayout>(() => getSideLayout(side), [side])
 
   const borderColor = useMemo<CssProperties['borderColor']>(
@@ -40,15 +39,7 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ label, onC
 
   return (
     <Box {...layout.root}>
-      <Button
-        aria-label={label}
-        aria-pressed={selected}
-        cursor="pointer"
-        onClick={onClick}
-        _hover={hover}
-        unstyled
-        {...layout.button}
-      >
+      <Button aria-pressed={selected} cursor="pointer" onClick={onClick} _hover={hover} unstyled {...layout.button}>
         <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
       </Button>
     </Box>

@@ -2,25 +2,21 @@ import { Switch } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
 
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { PocketClusterStitchLineSchema } from '../../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type PocketClusterStitchLineSettingsSectionProps = {
+type PocketStitchingSectionProps = {
   editable: EditableSchema<PocketClusterStitchLineSchema>
   issues: ValidationIssuesSchema<PocketClusterStitchLineSchema>
   onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
 }
 
-export const PocketClusterStitchLineSettingsSection = ({
-  editable,
-  issues,
-  onChange,
-}: PocketClusterStitchLineSettingsSectionProps): ReactNode => {
-  const t = useTranslation()
+export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {
+  const { t } = useTranslation()
   const handleStartOffsetChange = useCallback(
     (startOffset: string): void => {
       onChange({ ...editable, startOffset })
@@ -42,8 +38,12 @@ export const PocketClusterStitchLineSettingsSection = ({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.stitchLine.editor.pocketStitch.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.pocketStitch.startOffset}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>
+        {t.project.editors.sections.stitchLines.pocketStitching.title}
+      </SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.pocketStitching.startOffset.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.startOffset}>
         <NumberInput
           issue={issues.startOffset}
@@ -53,12 +53,16 @@ export const PocketClusterStitchLineSettingsSection = ({
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.pocketStitch.endOffset}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.pocketStitching.endOffset.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.endOffset}>
         <NumberInput issue={issues.endOffset} onChange={handleEndOffsetChange} unit="mm" value={editable.endOffset} />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.common.labels.direction}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchDirection}>
         <Switch.Root
           checked={editable.stitchDirection === 'start-to-end'}

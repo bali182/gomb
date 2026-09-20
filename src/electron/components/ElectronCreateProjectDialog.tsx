@@ -5,11 +5,11 @@ import { EditDialog } from '../../common/components/EditDialog'
 import { toaster } from '../../common/components/Toaster'
 import { LANGUAGE } from '../../common/constants/language'
 import { useEditableModel } from '../../common/hooks/useEditableModel'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import { addSubProject } from '../../common/operations/project/addSubProject'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
-import { useTranslation } from '../../common/translations/translation'
 import { createProject } from '../../common/utils/createProject'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
 import { isDefined } from '../../common/utils/isDefined'
@@ -26,11 +26,11 @@ type ElectronCreateProjectDialogProps = {
 
 export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> = ({ isOpen, onOpenChange }) => {
   const navigate = useNavigate()
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const createEmptyProject = useCallback((): ProjectSchema => {
-    return createProject(t.defaults.projectName)
-  }, [t.defaults.projectName])
+    return createProject(t.defaultNames.project)
+  }, [t.defaultNames.project])
 
   const [project, setProject] = useState<ProjectSchema>(() => createEmptyProject())
 
@@ -38,7 +38,10 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     setProject(createEmptyProject())
   }, [createEmptyProject])
 
-  const context = useMemo<ProjectBasedValidationContextSchema>(() => ({ language: LANGUAGE, projects: [], t }), [t])
+  const context = useMemo<ProjectBasedValidationContextSchema>(
+    () => ({ language: LANGUAGE, projects: [], t: t.validation }),
+    [t.validation],
+  )
 
   const commit = useCallback((updatedProject: ProjectSchema): void => {
     setProject(updatedProject)
@@ -61,10 +64,10 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
 
   const showSaveFailedToast = useCallback((): void => {
     toaster.create({
-      description: t.projects.saveDialog.errors.saveFailed,
+      description: t.dialogs.createProject.errors?.saveFailed,
       type: 'error',
     })
-  }, [t.projects.saveDialog.errors.saveFailed])
+  }, [t.dialogs.createProject.errors?.saveFailed])
 
   const handleSubmit = useCallback(async (): Promise<void> => {
     const validationResult = validateProjectSchema(editableValue, project, context)
@@ -75,7 +78,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
-      baseRootComponentName: t.defaults.rootComponentName,
+      baseRootComponentName: t.defaultNames.rootPanel,
     })
 
     const response = await electronApi.write({
@@ -99,7 +102,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     onOpenChange,
     project,
     showSaveFailedToast,
-    t.defaults.rootComponentName,
+    t.defaultNames.rootPanel,
   ])
 
   return (
@@ -109,8 +112,8 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
       onOpenChange={onOpenChange}
       onResetData={resetProject}
       onSubmit={handleSubmit}
-      submit={t.projects.createDialog.actions.create}
-      title={t.projects.createDialog.title}
+      submit={t.dialogs.createProject.positiveAction}
+      title={t.dialogs.createProject.title}
     >
       <ElectronProjectSettingsEditor
         editable={editableValue}

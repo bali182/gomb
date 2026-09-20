@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { IssueSchema } from '../../common/schemas/validation'
-import { useTranslation } from '../../common/translations/translation'
 import type { TranslationSchema } from '../../common/translations/translationSchema'
 import { electronApi } from '../electronApi'
 import { FILE_EXTENSION } from '../fileExtension'
@@ -26,7 +26,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
   const [isManuallyModified, setIsManuallyModified] = useState(false)
   const suggestPathRequestIdRef = useRef(0)
   const validatePathRequestIdRef = useRef(0)
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const updateFilePath = useCallback((requestId: number, update: SetStateAction<LoadableSchema<string>>): void => {
     if (requestId !== suggestPathRequestIdRef.current) {
@@ -84,12 +84,12 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
     try {
       const response = await electronApi.validateCreatePath({ filePath: path, type: 'validate-create-path' })
 
-      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, t)))
+      updateFilePathValidationIssue(requestId, Loadable.loaded(getFilePathIssue(response, t.validation)))
     } catch {
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: t.projects.createDialog.errors.filePathValidationFailed,
+          message: t.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -142,12 +142,13 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
   const onFilePickerButtonPressed = useCallback(async (): Promise<void> => {
     const response = await electronApi.dialog({
+      buttonLabel: t.nativeDialogs.createProjectPath.positiveAction,
       defaultPath: Loadable.get(filePath),
       fileFilter: {
         extension: FILE_EXTENSION,
-        name: t.projects.openDialog.fileFilterLabel,
+        name: t.nativeDialogs.createProjectPath.extensionName,
       },
-      title: t.projects.createDialog.filePickerTitle,
+      title: t.nativeDialogs.createProjectPath.title,
       type: 'write',
     })
 
@@ -161,7 +162,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
       updateFilePathValidationIssue(
         requestId,
         Loadable.loaded({
-          message: t.projects.createDialog.errors.filePathValidationFailed,
+          message: t.validation.file.validationFailed,
           severity: 'error',
         }),
       )
@@ -187,16 +188,16 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
 const getFilePathIssue = (
   response: FileValidateCreatePathResponseSchema,
-  t: TranslationSchema,
+  t: TranslationSchema['validation'],
 ): IssueSchema | undefined => {
   switch (response.type) {
     case 'create-path-available':
       return undefined
     case 'create-path-existing':
-      return { message: t.projects.createDialog.errors.filePathExisting, severity: 'warning' }
+      return { message: t.file.existing, severity: 'warning' }
     case 'create-path-invalid':
-      return { message: t.projects.createDialog.errors.filePathInvalid, severity: 'error' }
+      return { message: t.file.invalid, severity: 'error' }
     case 'error':
-      return { message: t.projects.createDialog.errors.filePathValidationFailed, severity: 'error' }
+      return { message: t.file.validationFailed, severity: 'error' }
   }
 }

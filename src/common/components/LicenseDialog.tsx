@@ -3,9 +3,14 @@ import { compiler, RuleType } from 'markdown-to-jsx/react'
 import { FC, useCallback } from 'react'
 import hungarianLicense from '../../../license-hu.md?raw'
 import englishLicense from '../../../license.md?raw'
-import { useTranslation } from '../translations/translation'
+import { TranslationLanguage, useTranslation } from '../hooks/useTranslation'
 import { noop } from '../utils/noop'
 import { EditDialog } from './EditDialog'
+
+const licenses: Record<TranslationLanguage, string> = {
+  en: englishLicense,
+  hu: hungarianLicense,
+}
 
 type LicenseDialogProps = {
   isOpen: boolean
@@ -61,7 +66,7 @@ const renderLicenseMarkdown = (markdown: string) => {
 }
 
 export const LicenseDialog: FC<LicenseDialogProps> = ({ isOpen, onOpenChange }) => {
-  const t = useTranslation()
+  const { language, t } = useTranslation()
   const onClose = useCallback(() => {
     onOpenChange(false)
   }, [onOpenChange])
@@ -74,11 +79,11 @@ export const LicenseDialog: FC<LicenseDialogProps> = ({ isOpen, onOpenChange }) 
       canSubmit={true}
       loading={false}
       hasCancel={false}
-      submit={t.licenseDialog.close}
-      title={t.licenseDialog.title}
+      submit={t.dialogs.license.positiveAction}
+      title={t.dialogs.license.title}
     >
       <Box gap="6" px="6">
-        {renderLicenseMarkdown(t.language === 'hu' ? hungarianLicense : englishLicense)}
+        {renderLicenseMarkdown(licenses[language] ?? englishLicense)}
       </Box>
     </EditDialog>
   )

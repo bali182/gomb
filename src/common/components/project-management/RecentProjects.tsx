@@ -1,8 +1,8 @@
 import { EmptyState, IconButton, Input, InputGroup, Listbox, useFilter, useListCollection } from '@chakra-ui/react'
 import { ChangeEvent, FC, PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { PiFolderDuotone, PiMagnifyingGlass, PiX } from 'react-icons/pi'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { RecentProjectVisualisationSchema } from '../../schemas/recentProject'
-import { useTranslation } from '../../translations/translation'
 
 export type RecentProjectItemProps = {
   project: RecentProjectVisualisationSchema
@@ -16,7 +16,7 @@ type RecentProjectsProps = PropsWithChildren & {
 export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children, projects }) => {
   const [search, setSearch] = useState('')
 
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const { contains } = useFilter({ sensitivity: 'base' })
   const { collection, filter, set } = useListCollection({
@@ -50,7 +50,7 @@ export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children,
         startElement={<PiMagnifyingGlass />}
         endElement={
           search.length > 0 ? (
-            <IconButton aria-label={t.common.actions.reset} onClick={clearSearch} size="2xs" variant="ghost">
+            <IconButton onClick={clearSearch} size="2xs" variant="ghost">
               <PiX />
             </IconButton>
           ) : undefined
@@ -70,8 +70,8 @@ export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children,
                 <EmptyState.Indicator>
                   <PiFolderDuotone />
                 </EmptyState.Indicator>
-                <EmptyState.Title>{t.projects.empty.noProjects.title}</EmptyState.Title>
-                <EmptyState.Description>{t.projects.empty.noProjects.description}</EmptyState.Description>
+                <EmptyState.Title>{t.projects.recents.empty.noProjects.title}</EmptyState.Title>
+                <EmptyState.Description>{t.projects.recents.empty.noProjects.description}</EmptyState.Description>
               </EmptyState.Content>
             </EmptyState.Root>
           )}
@@ -81,8 +81,8 @@ export const RecentProjects: FC<RecentProjectsProps> = ({ ProjectItem, children,
                 <EmptyState.Indicator>
                   <PiMagnifyingGlass />
                 </EmptyState.Indicator>
-                <EmptyState.Title>{t.projects.empty.noSearchResults.title}</EmptyState.Title>
-                <EmptyState.Description>{t.projects.empty.noSearchResults.description}</EmptyState.Description>
+                <EmptyState.Title>{t.projects.recents.empty.noSearchResults.title}</EmptyState.Title>
+                <EmptyState.Description>{t.projects.recents.empty.noSearchResults.description}</EmptyState.Description>
               </EmptyState.Content>
             </EmptyState.Root>
           )}

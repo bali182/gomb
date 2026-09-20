@@ -4,8 +4,6 @@ import type { IconType } from 'react-icons'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiProhibit } from 'react-icons/pi'
 
 import type { IssueSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
-import { TranslationSchema } from '../../translations/translationSchema'
 import { NumberInput } from '../common/NumberInput'
 import { HIDDEN_INPUT_OPACITY } from './colors'
 
@@ -82,18 +80,11 @@ const OFFSET_INPUT_CONFIGURATIONS: Record<StitchLineOffsetField, StitchLineOffse
 }
 
 export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({ disabled, field, issue, onChange, value }) => {
-  const t = useTranslation()
   const configuration = OFFSET_INPUT_CONFIGURATIONS[field]
   const Icon = disabled ? PiProhibit : configuration.icon
 
   return (
-    <Box
-      alignSelf={configuration.alignSelf}
-      aria-label={getOffsetInputLabel(field, t)}
-      gridArea={configuration.gridArea}
-      role="group"
-      width="20"
-    >
+    <Box alignSelf={configuration.alignSelf} gridArea={configuration.gridArea} role="group" width="20">
       <NumberInput
         disabled={disabled}
         issue={issue}
@@ -105,25 +96,4 @@ export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({ disabled
       />
     </Box>
   )
-}
-
-const getOffsetInputLabel = (field: StitchLineOffsetField, t: TranslationSchema): string => {
-  switch (field) {
-    case 'bottomEndOffset':
-      return t.stitchLine.editor.offsets.bottomEnd
-    case 'bottomStartOffset':
-      return t.stitchLine.editor.offsets.bottomStart
-    case 'leftEndOffset':
-      return t.stitchLine.editor.offsets.leftEnd
-    case 'leftStartOffset':
-      return t.stitchLine.editor.offsets.leftStart
-    case 'rightEndOffset':
-      return t.stitchLine.editor.offsets.rightEnd
-    case 'rightStartOffset':
-      return t.stitchLine.editor.offsets.rightStart
-    case 'topEndOffset':
-      return t.stitchLine.editor.offsets.topEnd
-    case 'topStartOffset':
-      return t.stitchLine.editor.offsets.topStart
-  }
 }

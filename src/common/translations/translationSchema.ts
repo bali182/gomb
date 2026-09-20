@@ -1,3 +1,3 @@
-import type { HU } from './hu'
+import { EN } from './en'
 
-export type TranslationSchema = typeof HU
+export type TranslationSchema = typeof EN

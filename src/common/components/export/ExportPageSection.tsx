@@ -3,11 +3,11 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { PiColumns, PiFile, PiGridFour, PiRows } from 'react-icons/pi'
 
 import { pages } from '../../data/pages'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { PageSchema, PageSchemaId } from '../../schemas/page'
 import type { PageLayoutSchema, PageOrientationSchema, PdfExportSettingsSchema } from '../../schemas/pdfExport'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
 
@@ -27,7 +27,7 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
   issues,
   onChange,
 }: ExportPageSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const pageOptions = useMemo<ExportPageOption[]>(() => pages.map((page) => createExportPageOption(page)), [])
   const pageCollection = useMemo<ListCollection<ExportPageOption>>(
     () =>
@@ -67,9 +67,9 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.pdfExport.dialog.sections.page}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.export.pdf.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>{t.pdfExport.dialog.labels.page}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.pdf.page.label}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.page}>
         <Select.Root
           aria-invalid={hasPageError}
@@ -100,36 +100,39 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
         </Select.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.pdfExport.dialog.labels.orientation}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.pdf.orientation.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.orientations.portrait} value="portrait">
+          <SegmentGroup.Item value="portrait">
             <SegmentGroup.ItemHiddenInput />
-            <PiFile /> {t.pdfExport.dialog.orientations.portrait}
+            <PiFile /> {t.project.editors.enums.export.exportOrientation.portrait}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.orientations.landscape} value="landscape">
+          <SegmentGroup.Item value="landscape">
             <SegmentGroup.ItemHiddenInput />
-            <PiFile style={{ transform: 'scaleY(-1) rotate(90deg)' }} /> {t.pdfExport.dialog.orientations.landscape}
+            <PiFile style={{ transform: 'scaleY(-1) rotate(90deg)' }} />{' '}
+            {t.project.editors.enums.export.exportOrientation.landscape}
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.pdfExport.dialog.labels.layout}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.pdf.layout.label}</SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layout}>
         <SegmentGroup.Root onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.vertical} value="vertical">
+          <SegmentGroup.Item value="vertical">
             <SegmentGroup.ItemHiddenInput />
-            <PiRows /> {t.pdfExport.dialog.layouts.vertical}
+            <PiRows /> {t.project.editors.enums.export.exportPageLayout.vertical}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.horizontal} value="horizontal">
+          <SegmentGroup.Item value="horizontal">
             <SegmentGroup.ItemHiddenInput />
-            <PiColumns /> {t.pdfExport.dialog.layouts.horizontal}
+            <PiColumns /> {t.project.editors.enums.export.exportPageLayout.horizontal}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.pdfExport.dialog.layouts.compact} value="compact">
+          <SegmentGroup.Item value="compact">
             <SegmentGroup.ItemHiddenInput />
-            <PiGridFour /> {t.pdfExport.dialog.layouts.compact}
+            <PiGridFour /> {t.project.editors.enums.export.exportPageLayout.compact}
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>

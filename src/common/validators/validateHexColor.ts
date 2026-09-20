@@ -11,7 +11,7 @@ export const validateHexColor = (
   if (!hexColorPattern.test(input)) {
     return createInvalidValidationResult<string>(
       {
-        message: context.t.validation.hexColor.invalid,
+        message: context.t.hexColor.invalid,
         severity: 'error',
       },
       currentValue,

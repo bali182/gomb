@@ -1,70 +1,108 @@
 import type { ColorKey } from '../data/colors'
+import type {
+  AnchorSchema,
+  HasAutoCornerRadiusSchema,
+  HasCornerRadiusSchema,
+  HasName,
+  HasOffAxisAnchor,
+  HasSizeSchema,
+  HasSqueezeSchema,
+  HasXYOffsetSchema,
+} from '../schemas/common'
+import type {
+  HasAutoDimensionsSchema,
+  HasLayoutSchema,
+  LayoutOrientationSchema,
+  PocketOrientationSchema,
+  PocketsSchema,
+} from '../schemas/components'
+import type { HasAnchorsSchema } from '../schemas/hole'
+import type { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
+import type {
+  ComponentColorSettingsSchema,
+  ExportContentSettingsSchema,
+  ExportLayoutSettingsSchema,
+  ExportStitchLineModeSchema,
+  SelectionColorSettingsSchema,
+  StitchingColorSettingsSchema,
+} from '../schemas/settings'
+import type {
+  HasDirectionalOffsetsSchema,
+  HasHorizontalDirectionsSchema,
+  HasStitchedCornersSchema,
+  HasStitchedSidesSchema,
+  HasStitchedUnconnectedCornersSchema,
+  HasVerticalDirectionsSchema,
+  PocketClusterStitchLineOwnSchema,
+  StitchLineCommonConfigSchema,
+} from '../schemas/stitching'
+import type {
+  DialogTranslationSchema,
+  EnumTranslationSchema,
+  NativeDialogTranslationSchema,
+  SectionTranslationSchema,
+} from '../schemas/translation'
 import type { CardSchemaId } from '../schemas/valuables'
-import type { TranslationLanguage } from './translation'
-import type { TranslationSchema } from './translationSchema'
 
-export const EN: TranslationSchema = {
-  language: 'en' as TranslationLanguage,
+import { format, register } from 'timeago.js'
+import en from 'timeago.js/lib/lang/en_US'
+
+register('en', en)
+
+export const EN = {
   app: {
     title: 'Gomb',
     subtitle: 'A simple app for designing leathercraft projects.',
   },
-  common: {
+  projects: {
+    buttons: {
+      createProject: 'Create project',
+      openProject: 'Open project',
+    },
     actions: {
-      add: 'Add',
-      reset: 'Reset',
-      cancel: 'Cancel',
-      back: 'Back',
-      next: 'Next',
-      remove: 'Delete',
-      apply: 'Apply',
-      clone: 'Clone',
-      flipHorizontal: 'Flip horizontal',
-      flipVertical: 'Flip vertical',
-      settings: 'Settings',
-      addByName: (name: string) => `Add ${name.toLowerCase()}`,
+      delete: 'Delete',
     },
-    labels: {
-      general: 'General',
-      name: 'Name',
-      component: 'Component',
-      color: 'Color',
-      size: 'Size',
-      width: 'Width',
-      height: 'Height',
-      direction: 'Direction',
-      type: 'Type',
-      amount: 'Amount',
-      spacing: 'Spacing',
-      measure: 'Measurement',
+    recents: {
+      empty: {
+        noProjects: {
+          title: 'Még nincs projekted',
+          description: 'Hozz létre egy új projektet a kezdéshez.',
+        },
+        noSearchResults: {
+          title: 'Nincs találat',
+          description: 'Próbálj másik keresési kifejezést.',
+        },
+      },
     },
-    placeholders: {
-      fill: 'Fill',
-      selectComponent: 'Select a component',
-    },
-    emptyStates: {
-      noMatchingValues: 'No matching values.',
-    },
-    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    directions: {
-      top: 'Top edge',
-      right: 'Right edge',
-      bottom: 'Bottom edge',
-      left: 'Left edge',
-      topLeft: 'Top-left corner',
-      topRight: 'Top-right corner',
-      bottomLeft: 'Bottom-left corner',
-      bottomRight: 'Bottom-right corner',
-    },
-    anchors: {
-      left: 'Left',
-      center: 'Center',
-      right: 'Right',
-      top: 'Top',
-      bottom: 'Bottom',
+    errors: {
+      notFound: {
+        title: 'Project not found',
+        description: 'The project you want to open does not exist.',
+      },
+      openFailed: {
+        title: 'Project not found',
+        description: 'Failed to open project.',
+        back: 'Back',
+      },
     },
   },
-  editor: {
+  project: {
+    tree: {
+      title: 'Elemek',
+      noModuleSelected: {
+        title: 'No module selected',
+        description: 'Select or create a module.',
+      },
+    },
+    toast: {
+      openFailed: 'The project could not be opened.',
+      saveFailed: 'The project could not be saved.',
+      saveSucceeded: 'Saved.',
+    },
+    export: {
+      frontPocketName: (ownerName: string): string => `${ownerName} - front pocket`,
+      tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. pocket`,
+    },
     menus: {
       file: {
         name: 'File',
@@ -96,7 +134,6 @@ export const EN: TranslationSchema = {
           small: 'Small',
           default: 'Default',
           stitch: 'Stitch-size',
-          size: (size: number) => `${size} mm`,
         },
       },
       view: {
@@ -134,10 +171,10 @@ export const EN: TranslationSchema = {
           lineThickness: 'Line thickness',
         },
       },
-      help: {
-        name: 'Help',
-        help: {
-          name: 'Help',
+      about: {
+        name: 'About',
+        resources: {
+          name: 'Resources',
           viewSourceCode: 'View source code',
           reportIssue: 'Report issue',
           viewLicense: 'License',
@@ -148,314 +185,414 @@ export const EN: TranslationSchema = {
         },
       },
     },
-    scalingDialog: {
-      title: 'Scaling',
-      description:
-        'Hold a ruler up to your screen and use the slider to make the ruler shown on screen 10 cm long. This will make the graphics appear at the correct scale.',
-    },
-    panels: {
-      components: {
-        empty: {
-          title: 'No module selected',
-          description: 'Select or create a module.',
+    editors: {
+      tabs: {
+        components: {
+          layout: 'Layout',
+          pockets: 'Pockets',
         },
-        title: 'Components',
+        stitchLines: {
+          settings: 'Settings',
+          overrides: 'Overrides',
+        },
+        project: {
+          basic: 'Basics',
+          stitching: 'Stitching',
+        },
       },
-    },
-  },
-  exportSettings: {
-    sections: {
-      layout: 'Layout',
-      content: 'Content',
-    },
-    labels: {
-      gap: 'Gap',
-      padding: 'Padding',
-      stitchLineMode: 'Stitch lines',
-      showNames: 'Show names',
-      showDimensions: 'Show dimensions',
-      childMarkers: 'Show child markers',
-      cutHelperDistance: 'Cut helper distance',
-    },
-    stitchLineModes: {
-      ownStitchLines: 'Own stitch lines',
-      relatedStitchLines: 'Related stitch lines',
-      allStitchLines: 'All stitch lines',
-    },
-  },
-  svgExport: {
-    frontPocketName: (ownerName: string) => `${ownerName} - front pocket`,
-    tPocketName: (ownerName: string, index: number) => `${ownerName} - ${index}. pocket`,
-    dialog: {
-      title: 'Export SVG',
       actions: {
-        export: 'Export',
-      },
-    },
-  },
-  pdfExport: {
-    dialog: {
-      title: 'Export PDF',
-      actions: {
-        export: 'Export',
+        components: {
+          addPanel: 'Add panel',
+          addRootPanel: 'Add module',
+          addPocketCluster: 'Add pocket cluster',
+          addHole: 'Add hole',
+          addStitching: 'Add stitching',
+          addPocketStitching: 'Add pocket stitching',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
+        stitchLines: {
+          flipHorizontal: 'Flip horizontal',
+          flipVertical: 'Flip vertical',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
+        holes: {
+          addStitching: 'Add stitching',
+          clone: 'Clone',
+          delete: 'Delete',
+        },
       },
       sections: {
-        page: 'Page',
+        common: {
+          cornerRadius: {
+            title: 'Corner radius',
+            autoCornerRadius: { placeholder: 'Auto' },
+            individualRadii: { label: 'Measurement' },
+            topLeftRadius: {},
+            topRightRadius: {},
+            bottomLeftRadius: {},
+            bottomRightRadius: {},
+          } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
+          size: {
+            title: 'Size',
+            width: { label: 'Width' },
+            height: { label: 'Height' },
+          } satisfies SectionTranslationSchema<HasSizeSchema>,
+        },
+        components: {
+          anchor: {
+            title: 'Alignment',
+            offAxisAnchor: { label: 'Alignment' },
+          } satisfies SectionTranslationSchema<HasOffAxisAnchor>,
+          autoSize: {
+            title: 'Size',
+            squeezeActive: 'Squeeze is active!',
+            width: { label: 'Width', placeholder: 'Fill' },
+            height: { label: 'Height', placeholder: 'Fill' },
+            autoWidth: {},
+            autoHeight: {},
+          } satisfies SectionTranslationSchema<HasAutoDimensionsSchema>,
+          layout: {
+            title: 'Layout',
+            layoutOrientation: { label: 'Orientation' },
+            layoutGap: { label: 'Gap', placeholder: 'Fill' },
+            autoLayoutGap: {},
+          } satisfies SectionTranslationSchema<HasLayoutSchema>,
+          squeeze: {
+            title: 'Squeeze',
+            horizontal: { label: 'Horizontal' },
+            vertical: { label: 'Vertical' },
+            topSqueeze: {},
+            rightSqueeze: {},
+            bottomSqueeze: {},
+            leftSqueeze: {},
+            individualSqueeze: {},
+          } satisfies SectionTranslationSchema<HasSqueezeSchema>,
+          pockets: {
+            title: 'Pockets',
+            orientation: { label: 'Opening' },
+            pocketCount: { label: 'Amount' },
+            pocketStep: { label: 'Spacing' },
+            tPocketTabWidth: { label: 'Tab width' },
+            tPocketTaper: { label: 'Taper' },
+            cardId: { label: 'Card' },
+          } satisfies SectionTranslationSchema<PocketsSchema>,
+        },
+        stitchLines: {
+          settings: {
+            title: 'Stitching',
+            stitchMargin: { label: 'Margin' },
+            stitchHoleLength: { label: 'Hole length' },
+            stitchHoleDistance: { label: 'Hole spacing' },
+            stitchHoleThickness: { label: 'Hole thickness' },
+            stitchLineThickness: { label: 'Line thickness' },
+          } satisfies SectionTranslationSchema<StitchLineCommonConfigSchema>,
+          pocketStitching: {
+            title: 'Pocket stitch',
+            startOffset: { label: 'Start offset' },
+            endOffset: { label: 'End offset' },
+            stitchDirection: { label: 'Direction' },
+          } satisfies SectionTranslationSchema<PocketClusterStitchLineOwnSchema>,
+          sidesAndCorners: {
+            title: 'Seam line',
+            top: {},
+            right: {},
+            bottom: {},
+            left: {},
+            topLeftCorner: {},
+            topRightCorner: {},
+            bottomRightCorner: {},
+            bottomLeftCorner: {},
+            stitchDisconnectedTopLeftCorner: {},
+            stitchDisconnectedTopRightCorner: {},
+            stitchDisconnectedBottomLeftCorner: {},
+            stitchDisconnectedBottomRightCorner: {},
+            topStitchDirection: {},
+            rightStitchDirection: {},
+            bottomStitchDirection: {},
+            leftStitchDirection: {},
+            topStartOffset: {},
+            topEndOffset: {},
+            rightStartOffset: {},
+            rightEndOffset: {},
+            bottomStartOffset: {},
+            bottomEndOffset: {},
+            leftStartOffset: {},
+            leftEndOffset: {},
+          } satisfies SectionTranslationSchema<
+            HasDirectionalOffsetsSchema &
+              HasStitchedSidesSchema &
+              HasStitchedCornersSchema &
+              HasStitchedUnconnectedCornersSchema &
+              HasHorizontalDirectionsSchema &
+              HasVerticalDirectionsSchema
+          >,
+        },
+        holes: {
+          position: {
+            title: 'Position',
+            xAnchor: { label: 'Horizontal alignment' },
+            xOffset: { label: 'X offset' },
+            yAnchor: { label: 'Vertical alignment' },
+            yOffset: { label: 'Y offset' },
+          } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
+        },
+        project: {
+          basic: {
+            title: 'General',
+            name: { label: 'Name' },
+            filePath: { label: 'File path' },
+          } satisfies SectionTranslationSchema<HasName>,
+          components: {
+            title: 'Component colors',
+            leatherColor: { label: 'Leather color' },
+            strokeColor: { label: 'Outline color' },
+            cardColor: { label: 'Card color' },
+          } satisfies SectionTranslationSchema<ComponentColorSettingsSchema>,
+          stitching: {
+            title: 'Stitching colors',
+            stitchHoleColor: { label: 'Stitch hole color' },
+            stitchLineColor: { label: 'Stitch line color' },
+            threadColor: { label: 'Thread color' },
+          } satisfies SectionTranslationSchema<StitchingColorSettingsSchema>,
+          selection: {
+            title: 'Selection colors',
+            selectionColor: { label: 'Selection color' },
+          } satisfies SectionTranslationSchema<SelectionColorSettingsSchema>,
+        },
+        export: {
+          layout: {
+            title: 'Layout',
+            gap: { label: 'Gap' },
+            padding: { label: 'Padding' },
+          } satisfies SectionTranslationSchema<ExportLayoutSettingsSchema>,
+          content: {
+            title: 'Content',
+            stitchLineMode: { label: 'Stitch lines' },
+            showNames: { label: 'Show names' },
+            showDimensions: { label: 'Show dimensions' },
+            childMarkers: { label: 'Show child markers' },
+            cutHelperDistance: { label: 'Cut helper distance' },
+          } satisfies SectionTranslationSchema<ExportContentSettingsSchema>,
+          pdf: {
+            title: 'Page',
+            page: { label: 'Paper size' },
+            orientation: { label: 'Orientation' },
+            layout: { label: 'Layout' },
+          } satisfies SectionTranslationSchema<PdfExportOwnSettingsSchema>,
+        },
       },
-      labels: {
-        page: 'Paper size',
-        orientation: 'Orientation',
-        layout: 'Layout',
+      enums: {
+        common: {
+          anchor: {
+            vertical: {
+              start: 'Top',
+              middle: 'Center',
+              end: 'Bottom',
+            } satisfies EnumTranslationSchema<AnchorSchema>,
+            horizontal: {
+              start: 'Left',
+              middle: 'Center',
+              end: 'Right',
+            } satisfies EnumTranslationSchema<AnchorSchema>,
+          },
+          individualRadii: {
+            false: 'Uniform radius',
+            true: 'Individual radii',
+          } satisfies EnumTranslationSchema<boolean>,
+          autoCornerRadius: {
+            false: 'Manual',
+            true: 'Auto',
+          } satisfies EnumTranslationSchema<boolean>,
+        },
+        components: {
+          pocketOrientation: {
+            up: 'Top',
+            down: 'Bottom',
+            left: 'Left',
+            right: 'Right',
+          } satisfies EnumTranslationSchema<PocketOrientationSchema>,
+          layoutOrientation: {
+            horizontal: 'Horizontal',
+            vertical: 'Vertical',
+          } satisfies EnumTranslationSchema<LayoutOrientationSchema>,
+          individualSqueeze: {
+            false: 'Uniform squeeze',
+            true: 'Individual squeeze',
+          } satisfies EnumTranslationSchema<boolean>,
+        },
+        export: {
+          exportStitchLineModes: {
+            'own-stitch-lines': 'Own stitch lines',
+            'related-stitch-lines': 'Related stitch lines',
+            'all-stitch-lines': 'All stitch lines',
+          } satisfies EnumTranslationSchema<ExportStitchLineModeSchema>,
+          exportOrientation: {
+            portrait: 'Portrait',
+            landscape: 'Landscape',
+          } satisfies EnumTranslationSchema<PageOrientationSchema>,
+          exportPageLayout: {
+            vertical: 'Vertical',
+            horizontal: 'Horizontal',
+            compact: 'Compact',
+          } satisfies EnumTranslationSchema<PageLayoutSchema>,
+        },
       },
-      orientations: {
-        portrait: 'Portrait',
-        landscape: 'Landscape',
-      },
-      layouts: {
-        vertical: 'Vertical',
-        horizontal: 'Horizontal',
-        compact: 'Compact',
-      },
-      errors: {
-        exportFailed: 'The PDF export failed.',
-        unplaceablePanels: 'One or more panels do not fit on the selected page.',
+      controls: {
+        cardPicker: {
+          noCard: 'None',
+          landscape: 'Landscape',
+          portrait: 'Portrait',
+        },
+        colorSwatchPicker: {
+          reset: 'Reset',
+        },
+        filePicker: {
+          browse: 'Browse',
+        },
+        stitchHoleDistance: {
+          noMatchingValues: 'No matching values.',
+        },
       },
     },
-  },
-  projects: {
-    title: 'Projects',
-    actions: {
-      open: 'Open',
-      create: 'New project',
-      createModule: 'New module',
-    },
-    empty: {
-      noProjects: {
-        title: 'No projects yet',
-        description: 'Create a new project to get started.',
-      },
-      noSearchResults: {
-        title: 'No matches found',
-        description: 'Try a different search term.',
+    errors: {
+      moduleNotFound: {
+        title: 'A modul nem található',
+        description: 'A megnyitni kívánt modul nem létezik.',
       },
       noModules: {
         title: 'No modules yet',
         description: 'Create a new module to start editing.',
       },
     },
-    createDialog: {
+  },
+  dialogs: {
+    svgExport: {
+      title: 'Export SVG',
+      positiveAction: 'Export',
+    },
+    pdfExport: {
+      title: 'Export PDF',
+      positiveAction: 'Export',
+      errors: {
+        exportFailed: 'The PDF export failed.',
+        unplaceablePanels: 'One or more panels do not fit on the selected page.',
+      },
+    },
+    license: {
+      title: 'License',
+      positiveAction: 'OK',
+    },
+    scaling: {
+      title: 'Scaling',
+      description:
+        'Hold a ruler up to your screen and use the slider to make the ruler shown on screen 10 cm long. This will make the graphics appear at the correct scale.',
+      positiveAction: 'Apply',
+    },
+    createProject: {
       title: 'Create new project',
-      filePath: 'File path',
-      filePickerTitle: 'Select project file location',
+      positiveAction: 'Create',
       errors: {
-        filePathExisting: 'A file already exists at this path.',
-        filePathInvalid: 'The specified path is invalid or not writable.',
-        filePathValidationFailed: 'The file path could not be validated.',
-      },
-      actions: {
-        create: 'Create',
-        browse: 'Browse',
+        saveFailed: 'Failed to save project.',
       },
     },
-    openDialog: {
-      title: 'Open project',
-      fileFilterLabel: 'Project files',
-      errors: {
-        openFailed: 'The project could not be opened.',
-      },
-    },
-    saveDialog: {
-      title: 'Save project',
-      errors: {
-        saveFailed: 'The project could not be saved.',
-      },
-      successes: {
-        saveSucceeded: 'Saved',
-      },
-    },
-    unsavedChangesDialog: {
+    unsavedChangesGuard: {
       title: 'Unsaved changes',
       description: 'Do you want to save your changes before leaving?',
-      actions: {
-        discard: 'Continue without saving',
-        save: 'Save',
-      },
+      positiveAction: 'Save',
+      negativeAction: 'Continue without saving',
     },
-    settingsDialog: {
-      title: 'Project settings',
-      colorSettings: {
-        leatherTitle: 'Component colors',
-        stitchingTitle: 'Stitching colors',
-        selectionTitle: 'Selection colors',
-        leatherColor: 'Leather color',
-        stitchHoleColor: 'Stitch hole color',
-        stitchLineColor: 'Stitch line color',
-        strokeColor: 'Stroke color',
-        selectionColor: 'Selection color',
-        cardColor: 'Card color',
-        threadColor: 'Thread color',
-      },
-      tabs: {
-        basics: 'Basics',
-        colors: 'Colors',
-        stitching: 'Stitching',
-      },
+    editDialog: {
+      negativeAction: 'Cancel',
     },
-    notFound: {
-      title: 'Project not found',
-      description: 'The project you want to open does not exist.',
+  } satisfies Record<string, DialogTranslationSchema>,
+  nativeDialogs: {
+    openProjectPath: {
+      title: 'Open project',
+      positiveAction: 'Open',
+      extensionName: 'Gomb JSON files',
     },
-    moduleNotFound: {
-      title: 'Module not found',
-      description: 'The module you want to open does not exist.',
+    saveProjectPath: {
+      title: 'Save project',
+      positiveAction: 'Save',
+      extensionName: 'Gomb JSON files',
     },
+    saveProjectAsPath: {
+      title: 'Save project',
+      positiveAction: 'Save',
+      extensionName: 'Gomb JSON files',
+    },
+    createProjectPath: {
+      title: 'Select project file location',
+      positiveAction: 'Select',
+      extensionName: 'Gomb JSON files',
+    },
+  } satisfies Record<string, NativeDialogTranslationSchema>,
+  defaultNames: {
+    project: 'Project',
+    rootPanel: 'Module',
+    panel: 'Panel',
+    pocketCluster: 'Pocket cluster',
+    componentBoundsStitchLine: 'Stitching',
+    pocketClusterStitchLine: 'Pocket stitching',
+    hole: 'Hole',
   },
-  component: {
-    types: {
-      rootPanel: 'Root panel',
-      panel: 'Panel',
-      pocketCluster: 'Pocket cluster',
-    },
-    editor: {
-      missing: {
-        title: 'Error',
-        description: 'There is no editor for this component yet.',
-      },
-      actions: {
-        addChild: 'Add item',
-      },
-      tabs: {
-        layout: 'Layout',
-        pockets: 'Pockets',
-      },
-      layout: {
-        title: 'Layout',
-        orientation: 'Orientation',
-        horizontal: 'Horizontal',
-        vertical: 'Vertical',
-        order: 'Order',
-        defaultOrder: 'Default',
-        reverseOrder: 'Reverse',
-        gap: 'Gap',
-        offset: 'Offset',
-        xOffset: 'X',
-        yOffset: 'Y',
-      },
-      anchor: {
-        title: 'Alignment',
-      },
-      cornerRadius: {
-        title: 'Corner radius',
-        type: 'Type',
-        individual: 'Individual radii',
-        uniform: 'Uniform radius',
-        individualMeasure: 'Measurement',
-        uniformMeasure: 'Measurement',
-      },
-      squeeze: {
-        title: 'Squeeze',
-        horizontal: 'Horizontal',
-        vertical: 'Vertical',
-        individual: 'Individual squeeze',
-        uniform: 'Uniform squeeze',
-        active: 'Squeeze is active!',
-      },
-      pocketCluster: {
-        title: 'Pockets',
-        card: 'Card',
-        noCard: 'None',
-        opening: 'Opening',
-        fromTop: 'Top',
-        fromBottom: 'Bottom',
-        fromLeft: 'Left',
-        fromRight: 'Right',
-        landscape: 'Landscape cards',
-        portrait: 'Portrait cards',
-      },
-      tPocket: {
-        title: 'T-pockets',
-        flapWidth: 'Tab width',
-        taper: 'Taper',
-      },
-    },
+  data: {
+    colors: {
+      black: 'Black',
+      darkGray: 'Dark gray',
+      mediumGray: 'Medium gray',
+      lightGray: 'Light gray',
+      white: 'White',
+      darkBrown: 'Dark brown',
+      mediumBrown: 'Medium brown',
+      lightBrown: 'Light brown',
+      natural: 'Natural',
+      bone: 'Bone',
+      burgundy: 'Burgundy',
+      red: 'Red',
+      pink: 'Pink',
+      orange: 'Orange',
+      yellow: 'Yellow',
+      navy: 'Navy',
+      indigo: 'Indigo',
+      mediumBlue: 'Medium blue',
+      lightBlue: 'Light blue',
+      purple: 'Purple',
+      darkGreen: 'Dark green',
+      olive: 'Olive',
+      mediumGreen: 'Medium green',
+      lightGreen: 'Light green',
+      cyan: 'Cyan',
+      selectionBlue: 'Blue',
+      selectionGreen: 'Green',
+      selectionOrange: 'Orange',
+      selectionYellow: 'Yellow',
+      selectionWhite: 'White',
+      transparent: 'Transparent',
+    } satisfies Record<ColorKey, string>,
+    cards: {
+      'ID-1-landscape': 'ID-1 (landscape)',
+      'ID-2-landscape': 'ID-2 (landscape)',
+      'ID-3-landscape': 'ID-3 (landscape)',
+      'ID-1-portrait': 'ID-1 (portrait)',
+      'ID-2-portrait': 'ID-2 (portrait)',
+      'ID-3-portrait': 'ID-3 (portrait)',
+    } satisfies Record<CardSchemaId, string>,
+    cardsSimple: {
+      'ID-1-landscape': 'ID-1',
+      'ID-2-landscape': 'ID-2',
+      'ID-3-landscape': 'ID-3',
+      'ID-1-portrait': 'ID-1',
+      'ID-2-portrait': 'ID-2',
+      'ID-3-portrait': 'ID-3',
+    } satisfies Record<CardSchemaId, string>,
   },
-  hole: {
-    title: 'Hole',
-    editor: {
-      position: {
-        title: 'Position',
-        xOffset: 'X offset',
-        yOffset: 'Y offset',
-        xAnchor: 'Horizontal alignment',
-        yAnchor: 'Vertical alignment',
-      },
-      size: {
-        radius: 'Radius',
-      },
-    },
-  },
-  stitchLine: {
-    types: {
-      componentBounds: 'Stitching',
-      pocketCluster: 'Pocket stitching',
-    },
-    add: {
-      title: 'Add stitch line',
-      type: 'Stitch line type',
-      typePlaceholder: 'Select a stitch line type',
-    },
-    tree: {
-      empty: {
-        title: 'No stitch lines yet',
-        description: 'Add a stitch line from the tree or the editors!',
-      },
-    },
-    editor: {
-      tabs: {
-        settings: 'Settings',
-        overrides: 'Overrides',
-      },
-      seamLine: {
-        title: 'Seam line',
-      },
-      sidesAndCorners: {
-        topDirection: 'Top seam direction',
-        rightDirection: 'Right seam direction',
-        bottomDirection: 'Bottom seam direction',
-        leftDirection: 'Left seam direction',
-      },
-      offsets: {
-        bottomEnd: 'Bottom edge end offset',
-        bottomStart: 'Bottom edge start offset',
-        leftEnd: 'Left edge end offset',
-        leftStart: 'Left edge start offset',
-        rightEnd: 'Right edge end offset',
-        rightStart: 'Right edge start offset',
-        topEnd: 'Top edge end offset',
-        topStart: 'Top edge start offset',
-      },
-      pocketStitch: {
-        title: 'Pocket stitch',
-        enabled: 'Enabled',
-        startOffset: 'Start offset',
-        endOffset: 'End offset',
-      },
-      stitching: {
-        title: 'Stitching',
-        holeColor: 'Hole color',
-        lineColor: 'Line color',
-        margin: 'Margin',
-        holeLength: 'Hole length',
-        holeDistance: 'Hole spacing',
-        holeThickness: 'Hole thickness',
-        lineThickness: 'Line thickness',
-      },
-      autoCornerRadius: {
-        auto: 'Automatic',
-        manual: 'Manual',
-        autoPlaceholder: 'Auto',
-      },
-    },
+  formatters: {
+    size: (size: number) => `${size}mm`,
+    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'en'),
   },
   validation: {
     multipleIssues: (count: number) => `${count} issues`,
@@ -479,62 +616,10 @@ export const EN: TranslationSchema = {
     hexColor: {
       invalid: 'Invalid hexadecimal color.',
     },
-  },
-  defaults: {
-    projectName: 'Project',
-    rootComponentName: 'Module',
-  },
-  colors: {
-    black: 'Black',
-    darkGray: 'Dark gray',
-    mediumGray: 'Medium gray',
-    lightGray: 'Light gray',
-    white: 'White',
-    darkBrown: 'Dark brown',
-    mediumBrown: 'Medium brown',
-    lightBrown: 'Light brown',
-    natural: 'Natural',
-    bone: 'Bone',
-    burgundy: 'Burgundy',
-    red: 'Red',
-    pink: 'Pink',
-    orange: 'Orange',
-    yellow: 'Yellow',
-    navy: 'Navy',
-    indigo: 'Indigo',
-    mediumBlue: 'Medium blue',
-    lightBlue: 'Light blue',
-    purple: 'Purple',
-    darkGreen: 'Dark green',
-    olive: 'Olive',
-    mediumGreen: 'Medium green',
-    lightGreen: 'Light green',
-    cyan: 'Cyan',
-    selectionBlue: 'Blue',
-    selectionGreen: 'Green',
-    selectionOrange: 'Orange',
-    selectionYellow: 'Yellow',
-    selectionWhite: 'White',
-    transparent: 'Transparent',
-  } satisfies Record<ColorKey, string>,
-  cards: {
-    'ID-1-landscape': 'ID-1 (landscape)',
-    'ID-2-landscape': 'ID-2 (landscape)',
-    'ID-3-landscape': 'ID-3 (landscape)',
-    'ID-1-portrait': 'ID-1 (portrait)',
-    'ID-2-portrait': 'ID-2 (portrait)',
-    'ID-3-portrait': 'ID-3 (portrait)',
-  } satisfies Record<CardSchemaId, string>,
-  cardsSimple: {
-    'ID-1-landscape': 'ID-1',
-    'ID-2-landscape': 'ID-2',
-    'ID-3-landscape': 'ID-3',
-    'ID-1-portrait': 'ID-1',
-    'ID-2-portrait': 'ID-2',
-    'ID-3-portrait': 'ID-3',
-  } satisfies Record<CardSchemaId, string>,
-  licenseDialog: {
-    title: 'License',
-    close: 'OK',
+    file: {
+      existing: 'A file already exists at this path.',
+      invalid: 'The specified path is invalid or not writable.',
+      validationFailed: 'The file path could not be validated.',
+    },
   },
 }

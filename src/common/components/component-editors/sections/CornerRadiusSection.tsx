@@ -3,10 +3,10 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { TbRadiusBottomLeft, TbRadiusBottomRight, TbRadiusTopLeft, TbRadiusTopRight } from 'react-icons/tb'
 
 import { PiCar, PiLink, PiLinkBreak, PiPencilLine } from 'react-icons/pi'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema, HasCornerRadiusValuesSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { has } from '../../../utils/has'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -25,7 +25,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   value,
   onChange,
 }: CornerRadiusSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const hasAuto = has<Partial<HasAutoCornerRadiusSchema>>(editable, 'autoCornerRadius')
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
@@ -96,8 +96,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             <SectionHeaderToggle
               onIcon={PiPencilLine}
               offIcon={PiCar}
-              onLabel={t.stitchLine.editor.autoCornerRadius.manual}
-              offLabel={t.stitchLine.editor.autoCornerRadius.auto}
+              onLabel={t.project.editors.enums.common.autoCornerRadius.false}
+              offLabel={t.project.editors.enums.common.autoCornerRadius.true}
               value={!Boolean(editable.autoCornerRadius)}
               onChange={handleAutoChange}
             />
@@ -108,17 +108,19 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             <SectionHeaderToggle
               onIcon={PiLink}
               offIcon={PiLinkBreak}
-              onLabel={t.component.editor.cornerRadius.uniform}
-              offLabel={t.component.editor.cornerRadius.individual}
+              onLabel={t.project.editors.enums.common.individualRadii.false}
+              offLabel={t.project.editors.enums.common.individualRadii.true}
               value={!editable.individualRadii}
               onChange={handleRadiusTypeChange}
             />
           ) : undefined
         }
       >
-        {t.component.editor.cornerRadius.title}
+        {t.project.editors.sections.common.cornerRadius.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.component.editor.cornerRadius.individualMeasure}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.common.cornerRadius.individualRadii.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={individualRadiusIssues}>
         <Grid gridTemplateColumns="repeat(2, minmax(0, 1fr))" minWidth="0" columnGap="3" rowGap="3">
           <NumberInput
@@ -128,7 +130,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             unit="mm"
             disabled={disabled}
             value={disabled ? '' : editable.topLeftRadius}
-            placeholder={disabled ? t.stitchLine.editor.autoCornerRadius.autoPlaceholder : undefined}
+            placeholder={
+              disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
+            }
           />
           <NumberInput
             issue={disabled ? undefined : issues.topRightRadius}
@@ -137,7 +141,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             unit="mm"
             disabled={disabled}
             value={disabled ? '' : editable.topRightRadius}
-            placeholder={disabled ? t.stitchLine.editor.autoCornerRadius.autoPlaceholder : undefined}
+            placeholder={
+              disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
+            }
           />
           <NumberInput
             issue={disabled ? undefined : issues.bottomLeftRadius}
@@ -146,7 +152,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             unit="mm"
             disabled={disabled}
             value={disabled ? '' : editable.bottomLeftRadius}
-            placeholder={disabled ? t.stitchLine.editor.autoCornerRadius.autoPlaceholder : undefined}
+            placeholder={
+              disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
+            }
           />
           <NumberInput
             issue={disabled ? undefined : issues.bottomRightRadius}
@@ -155,7 +163,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             unit="mm"
             disabled={disabled}
             value={disabled ? '' : editable.bottomRightRadius}
-            placeholder={disabled ? t.stitchLine.editor.autoCornerRadius.autoPlaceholder : undefined}
+            placeholder={
+              disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
+            }
           />
         </Grid>
       </SectionGroup.SectionRowEditor>

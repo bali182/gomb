@@ -2,11 +2,11 @@ import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
+import { useTranslation } from '../hooks/useTranslation'
 import { flipComponentBoundsStitchLine } from '../logic/flipComponentBoundsStitchLine'
 import { portalRef } from '../portalRef'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
-import { useTranslation } from '../translations/translation'
 import { noop } from '../utils/noop'
 
 type StitchLineActionsMenuProps = {
@@ -18,7 +18,7 @@ type StitchLineActionsMenuProps = {
 }
 
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const { cloneStitchLine, deleteStitchLine, updateStitchLine } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -65,18 +65,18 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
                 <>
                   <Menu.Item onSelect={handleFlipHorizontal} value="flip-horizontal">
                     <PiSquareSplitHorizontal />
-                    <Menu.ItemText>{t.common.actions.flipHorizontal}</Menu.ItemText>
+                    <Menu.ItemText>{t.project.editors.actions.stitchLines.flipHorizontal}</Menu.ItemText>
                   </Menu.Item>
                   <Menu.Item onSelect={handleFlipVertical} value="flip-vertical">
                     <PiSquareSplitVertical />
-                    <Menu.ItemText>{t.common.actions.flipVertical}</Menu.ItemText>
+                    <Menu.ItemText>{t.project.editors.actions.stitchLines.flipVertical}</Menu.ItemText>
                   </Menu.Item>
                   <Menu.Separator />
                 </>
               )}
               <Menu.Item onSelect={handleClone} value="clone">
                 <PiCopy />
-                <Menu.ItemText>{t.common.actions.clone}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.stitchLines.clone}</Menu.ItemText>
               </Menu.Item>
               <Menu.Item
                 onSelect={handleDelete}
@@ -85,7 +85,7 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
                 _hover={{ bg: 'bg.error', color: 'fg.error' }}
               >
                 <PiTrash />
-                <Menu.ItemText>{t.common.actions.remove}</Menu.ItemText>
+                <Menu.ItemText>{t.project.editors.actions.stitchLines.delete}</Menu.ItemText>
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>

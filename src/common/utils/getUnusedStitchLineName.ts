@@ -7,9 +7,9 @@ import { getStitchLineNameByType } from './getStitchLineNameByType'
 export const getUnusedStitchLineName = (
   type: StitchLineSchema['type'],
   subProject: SubProjectSchema,
-  t: TranslationSchema,
+  defaultNames: TranslationSchema['defaultNames'],
 ): string => {
-  const baseName = getStitchLineNameByType(type, t)
+  const baseName = getStitchLineNameByType(type, defaultNames)
   const usedNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
   return getUnusedName(baseName, usedNames)
 }

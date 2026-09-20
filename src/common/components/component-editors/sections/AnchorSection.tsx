@@ -9,11 +9,11 @@ import {
   PiAlignTopSimple,
 } from 'react-icons/pi'
 
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
 import type { ComponentSchema, HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type AnchorSectionProps<T> = {
@@ -29,7 +29,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   issues,
   onChange,
 }: AnchorSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const isOffAxisFill = parent.layoutOrientation === 'horizontal' ? editable.autoHeight : editable.autoWidth
 
@@ -42,8 +42,10 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.component.editor.anchor.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.component.editor.anchor.title}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.components.anchor.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.anchor.offAxisAnchor.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.offAxisAnchor}>
         <SegmentGroup.Root
           disabled={isOffAxisFill}
@@ -55,7 +57,9 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
           <SegmentGroup.Item value="start">
             <SegmentGroup.ItemHiddenInput />
             {parent.layoutOrientation === 'horizontal' ? <PiAlignTopSimple /> : <PiAlignLeftSimple />}
-            {parent.layoutOrientation === 'horizontal' ? t.common.anchors.top : t.common.anchors.left}
+            {parent.layoutOrientation === 'horizontal'
+              ? t.project.editors.enums.common.anchor.vertical.start
+              : t.project.editors.enums.common.anchor.horizontal.start}
           </SegmentGroup.Item>
           <SegmentGroup.Item value="middle">
             <SegmentGroup.ItemHiddenInput />
@@ -64,12 +68,16 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
             ) : (
               <PiAlignCenterHorizontalSimple />
             )}
-            {t.common.anchors.center}
+            {parent.layoutOrientation === 'horizontal'
+              ? t.project.editors.enums.common.anchor.vertical.middle
+              : t.project.editors.enums.common.anchor.horizontal.middle}
           </SegmentGroup.Item>
           <SegmentGroup.Item value="end">
             <SegmentGroup.ItemHiddenInput />
             {parent.layoutOrientation === 'horizontal' ? <PiAlignBottomSimple /> : <PiAlignRightSimple />}
-            {parent.layoutOrientation === 'horizontal' ? t.common.anchors.bottom : t.common.anchors.right}
+            {parent.layoutOrientation === 'horizontal'
+              ? t.project.editors.enums.common.anchor.vertical.end
+              : t.project.editors.enums.common.anchor.horizontal.end}
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>

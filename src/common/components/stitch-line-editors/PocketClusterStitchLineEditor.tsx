@@ -1,12 +1,12 @@
 import { type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { PocketClusterStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { SectionGroup } from '../common/SectionGroup'
-import { PocketClusterStitchLineSettingsSection } from './sections/PocketClusterStitchLineSettingsSection'
+import { PocketStitchingSection } from './sections/PocketStitchingSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 
 type PocketClusterStitchLineEditorProps = {
@@ -24,16 +24,16 @@ export const PocketClusterStitchLineEditor: FC<PocketClusterStitchLineEditorProp
   onReset,
   resolvedEditable,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   return (
     <Tabs.Root defaultValue="settings">
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value="settings">{t.stitchLine.editor.tabs.settings}</Tabs.Trigger>
-        <Tabs.Trigger value="overrides">{t.stitchLine.editor.tabs.overrides}</Tabs.Trigger>
+        <Tabs.Trigger value="settings">{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
+        <Tabs.Trigger value="overrides">{t.project.editors.tabs.stitchLines.overrides}</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="settings" pt={0}>
         <SectionGroup.Root>
-          <PocketClusterStitchLineSettingsSection editable={editable} issues={issues} onChange={onChange} />
+          <PocketStitchingSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value="overrides" pt={0}>

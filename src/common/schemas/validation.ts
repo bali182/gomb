@@ -35,7 +35,7 @@ export type ValidationResultSchema<T> = ValidationResultValidSchema<T> | Validat
 
 export type BaseValidationContextSchema = {
   language: DecimalLocale
-  t: TranslationSchema
+  t: TranslationSchema['validation']
 }
 
 export type ComponentBasedValidationContextSchema = BaseValidationContextSchema & {

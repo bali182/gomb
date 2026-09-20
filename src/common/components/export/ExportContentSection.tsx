@@ -7,10 +7,10 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 
+import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { BaseExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { isDefined } from '../../utils/isDefined'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
@@ -31,12 +31,21 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
   issues,
   onChange,
 }: ExportContentSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const stitchLineModeOptions = useMemo<ExportStitchLineModeOption[]>(
     () => [
-      { label: t.exportSettings.stitchLineModes.ownStitchLines, value: 'own-stitch-lines' },
-      { label: t.exportSettings.stitchLineModes.relatedStitchLines, value: 'related-stitch-lines' },
-      { label: t.exportSettings.stitchLineModes.allStitchLines, value: 'all-stitch-lines' },
+      {
+        label: t.project.editors.enums.export.exportStitchLineModes['own-stitch-lines'],
+        value: 'own-stitch-lines',
+      },
+      {
+        label: t.project.editors.enums.export.exportStitchLineModes['related-stitch-lines'],
+        value: 'related-stitch-lines',
+      },
+      {
+        label: t.project.editors.enums.export.exportStitchLineModes['all-stitch-lines'],
+        value: 'all-stitch-lines',
+      },
     ],
     [t],
   )
@@ -90,9 +99,11 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.exportSettings.sections.content}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.export.content.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.stitchLineMode}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.content.stitchLineMode.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchLineMode}>
         <Select.Root
           aria-invalid={hasStitchLineModeError}
@@ -123,7 +134,9 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Select.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.showNames}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.content.showNames.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showNames}>
         <Switch.Root checked={editable.showNames} onCheckedChange={handleShowNamesChange} size="sm">
           <Switch.HiddenInput />
@@ -133,7 +146,9 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.showDimensions}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.content.showDimensions.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showDimensions}>
         <Switch.Root checked={editable.showDimensions} onCheckedChange={handleShowDimensionsChange} size="sm">
           <Switch.HiddenInput />
@@ -143,7 +158,9 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.childMarkers}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.content.childMarkers.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.childMarkers}>
         <Switch.Root checked={editable.childMarkers} onCheckedChange={handleChildMarkersChange} size="sm">
           <Switch.HiddenInput />
@@ -153,7 +170,9 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.exportSettings.labels.cutHelperDistance}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.export.content.cutHelperDistance.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.cutHelperDistance}>
         <NumberInput
           issue={issues.cutHelperDistance}

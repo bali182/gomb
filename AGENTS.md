@@ -13,6 +13,7 @@
 - If the user answers your questions, but didn't give an explicit "go", it's still forbidden to write code.
 - Never type `useCallback` with a type extracted from another type, such as `useCallback<EditorContextType['setProject']>(...)`. Write the callback parameter and return types directly in the callback declaration instead.
 - Type `useMemo` directly with its result type, such as `useMemo<ProjectSchema | undefined>(...)`.
+- It is forbidden to add aria-label-s unless explicitly asked to.
 
 ## Planning
 

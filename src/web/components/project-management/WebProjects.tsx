@@ -4,7 +4,7 @@ import { PiPlus } from 'react-icons/pi'
 
 import { ProjectManagementHeader } from '../../../common/components/project-management/ProjectManagementHeader'
 import { RecentProjects } from '../../../common/components/project-management/RecentProjects'
-import { useTranslation } from '../../../common/translations/translation'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import { useWebRecentProjects } from '../../hooks/useWebRecentProjects'
 import { WebCreateProjectDialog } from '../WebCreateProjectDialog'
 import { WebProjectItem } from './WebProjectItem'
@@ -12,7 +12,7 @@ import { WebProjectItem } from './WebProjectItem'
 export const WebProjects: FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const recentProjects = useWebRecentProjects()
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const openCreateDialog = useCallback((): void => {
     setIsCreateDialogOpen(true)
@@ -26,7 +26,7 @@ export const WebProjects: FC = () => {
           <RecentProjects ProjectItem={WebProjectItem} projects={recentProjects}>
             <Button onClick={openCreateDialog} width="100%" mt="2" variant="solid">
               <PiPlus />
-              {t.projects.actions.create}
+              {t.projects.buttons.createProject}
             </Button>
           </RecentProjects>
         </Stack>

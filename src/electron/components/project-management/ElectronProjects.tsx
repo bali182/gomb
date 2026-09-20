@@ -4,8 +4,8 @@ import { PiFolder, PiPlus } from 'react-icons/pi'
 
 import { ProjectManagementHeader } from '../../../common/components/project-management/ProjectManagementHeader'
 import { RecentProjects } from '../../../common/components/project-management/RecentProjects'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 import { Loadable } from '../../../common/loadable'
-import { useTranslation } from '../../../common/translations/translation'
 import { useElectronProject } from '../../hooks/useElectronProject'
 import { useElectronRecentProjects } from '../../hooks/useElectronRecentProjects'
 import { ElectronCreateProjectDialog } from '../ElectronCreateProjectDialog'
@@ -15,7 +15,7 @@ export const ElectronProjects: FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const recentProjects = useElectronRecentProjects()
   const { openProject } = useElectronProject()
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   const handleCreateProject = useCallback((): void => {
     setIsCreateDialogOpen(true)
@@ -31,11 +31,11 @@ export const ElectronProjects: FC = () => {
               <HStack gap="2" mt="2">
                 <Button onClick={handleCreateProject} width="100%" variant="solid" display="flex" flex="1">
                   <PiPlus />
-                  {t.projects.actions.create}
+                  {t.projects.buttons.createProject}
                 </Button>
                 <Button onClick={openProject} width="100%" variant="subtle" display="flex" flex="1">
                   <PiFolder />
-                  {t.projects.actions.open}
+                  {t.projects.buttons.openProject}
                 </Button>
               </HStack>
             </RecentProjects>

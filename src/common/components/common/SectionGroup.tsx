@@ -1,8 +1,8 @@
 import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
 import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
 
+import { useTranslation } from '../../hooks/useTranslation'
 import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
-import { useTranslation } from '../../translations/translation'
 import { isDefined } from '../../utils/isDefined'
 import { isRecord } from '../../utils/isRecord'
 
@@ -92,7 +92,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
 }
 
 const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const issue = useMemo<IssueSchema | undefined>(() => {
     if ((!isDefined(issues) || isRecord(issues)) && !Array.isArray(issues)) {
       return issues
@@ -117,7 +117,7 @@ const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
       message: t.validation.multipleIssues(definedIssues.length),
       severity: highestSeverityIssue.severity,
     }
-  }, [issues, t])
+  }, [issues, t.validation])
 
   const color = useMemo<ComponentProps<typeof Text>['color']>(() => {
     if (!isDefined(issue)) {

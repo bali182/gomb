@@ -14,8 +14,8 @@ import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
+import { useTranslation } from '../hooks/useTranslation'
 import type { ProjectSchema } from '../schemas/project'
-import { useTranslation } from '../translations/translation'
 import { isDefined } from '../utils/isDefined'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import { EditorComponentTree } from './component-tree/EditorComponentTree'
@@ -35,7 +35,7 @@ type EditorContentProps = {
 }
 
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { setAppSettings, settings } = useGlobalSettings()
   const subProject = useMemo(
@@ -84,7 +84,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
           <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
             <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0">
               <Card.Header>
-                <Heading size="sm">{t.editor.panels.components.title}</Heading>
+                <Heading size="sm">{t.project.tree.title}</Heading>
               </Card.Header>
               <Card.Body flex="1" minHeight="0" overflow="auto" padding="4">
                 {isDefined(subProject) ? <EditorComponentTree /> : <EmptyComponentTreeState />}
@@ -112,7 +112,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 }
 
 const EmptyProjectState: FC = () => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const { createSubProject } = useProjectOperations()
   const { navigateToSubProject } = useEditorContext()
 
@@ -126,36 +126,36 @@ const EmptyProjectState: FC = () => {
       content={
         <Button onClick={handleCreateSubProject} variant="solid">
           <PiPlus />
-          {t.projects.actions.createModule}
+          {t.project.editors.actions.components.addRootPanel}
         </Button>
       }
-      description={t.projects.empty.noModules.description}
+      description={t.project.errors.noModules.description}
       icon={<PiWarningCircle />}
-      title={t.projects.empty.noModules.title}
+      title={t.project.errors.noModules.title}
     />
   )
 }
 
 const MissingSubProjectState: FC = () => {
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <CommonEmptyState
-      description={t.projects.moduleNotFound.description}
+      description={t.project.errors.moduleNotFound.description}
       icon={<PiWarningCircle />}
-      title={t.projects.moduleNotFound.title}
+      title={t.project.errors.moduleNotFound.title}
     />
   )
 }
 
 const EmptyComponentTreeState: FC = () => {
-  const t = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <CommonEmptyState
-      description={t.editor.panels.components.empty.description}
+      title={t.project.tree.noModuleSelected.title}
+      description={t.project.tree.noModuleSelected.description}
       icon={<PiWarningCircle />}
-      title={t.editor.panels.components.empty.title}
     />
   )
 }

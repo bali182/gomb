@@ -1,9 +1,9 @@
 import { useCallback, type ReactNode } from 'react'
 
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { StitchLineCommonConfigSchema } from '../../../schemas/stitching'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { isDefined } from '../../../utils/isDefined'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -24,7 +24,7 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
   onReset,
   resolvedEditable,
 }: StitchingSettingsSectionProps<T>): ReactNode => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const handleStitchMarginChange = useCallback(
     (nextStitchMargin: string): void => {
       onChange({ ...editable, stitchMargin: nextStitchMargin })
@@ -73,9 +73,11 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.stitchLine.editor.stitching.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.stitchLines.settings.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.stitching.margin}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.settings.stitchMargin.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchMargin}>
         <NumberInput
           issue={issues.stitchMargin}
@@ -87,7 +89,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.stitching.holeLength}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.settings.stitchHoleLength.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleLength}>
         <NumberInput
           issue={issues.stitchHoleLength}
@@ -99,7 +103,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.stitching.holeDistance}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.settings.stitchHoleDistance.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleDistance}>
         <StitchHoleDistanceEditor
           issue={issues.stitchHoleDistance}
@@ -110,7 +116,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.stitching.holeThickness}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.settings.stitchHoleThickness.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleThickness}>
         <NumberInput
           issue={issues.stitchHoleThickness}
@@ -122,7 +130,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.stitchLine.editor.stitching.lineThickness}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.stitchLines.settings.stitchLineThickness.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchLineThickness}>
         <NumberInput
           issue={issues.stitchLineThickness}

@@ -4,27 +4,42 @@ import type { ThemeSchema } from './theme'
 
 export type NumberEditorStepSchema = number | 'stitch-hole-distance'
 
-export type ColorSettingsSchema = {
+export type ComponentColorSettingsSchema = {
   leatherColor: string
+  strokeColor: string
+  cardColor: string
+}
+
+export type StitchingColorSettingsSchema = {
   stitchHoleColor: string
   stitchLineColor: string
-  strokeColor: string
-  selectionColor: string
-  cardColor: string
   threadColor: string
 }
 
+export type SelectionColorSettingsSchema = {
+  selectionColor: string
+}
+
+export type ColorSettingsSchema = ComponentColorSettingsSchema &
+  StitchingColorSettingsSchema &
+  SelectionColorSettingsSchema
+
 export type ExportStitchLineModeSchema = 'own-stitch-lines' | 'all-stitch-lines' | 'related-stitch-lines'
 
-export type BaseExportSettingsSchema = {
+export type ExportLayoutSettingsSchema = {
   gap: number
   padding: number
+}
+
+export type ExportContentSettingsSchema = {
   stitchLineMode: ExportStitchLineModeSchema
   showNames: boolean
   showDimensions: boolean
   childMarkers: boolean
   cutHelperDistance: number
 }
+
+export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportContentSettingsSchema
 
 export type AppSettingsSchema = {
   theme: ThemeSchema

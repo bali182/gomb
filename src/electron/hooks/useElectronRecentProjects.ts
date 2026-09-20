@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
+import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { RecentProjectSchema, RecentProjectVisualisationSchema } from '../../common/schemas/recentProject'
-import { useDateFormatter } from '../../common/translations/translation'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
 
 export const useElectronRecentProjects = (): LoadableSchema<RecentProjectVisualisationSchema[]> => {
   const { settings } = useGlobalSettings()
-  const formatDate = useDateFormatter()
+  const { t } = useTranslation()
 
   const candidates = useMemo<RecentProjectVisualisationSchema[]>(() => {
     const recentProjectEntries: Array<[string, RecentProjectSchema]> = Object.entries(settings.recentProjects)
     return recentProjectEntries
       .map(([filePath, recentProject]: [string, RecentProjectSchema]): RecentProjectVisualisationSchema => {
         return {
-          formattedLastOpenedAt: formatDate(recentProject.lastOpenedAt),
+          formattedLastOpenedAt: t.formatters.timeago(recentProject.lastOpenedAt),
           id: filePath,
           label: filePath,
           link: isDefined(recentProject.lastSubProjectId)
@@ -28,7 +28,7 @@ export const useElectronRecentProjects = (): LoadableSchema<RecentProjectVisuali
         }
       })
       .sort((left, right): number => right.lastOpenedAt - left.lastOpenedAt)
-  }, [formatDate, settings.recentProjects])
+  }, [settings.recentProjects, t.formatters])
 
   return useExistingElectronRecentProjects(candidates)
 }

@@ -2,7 +2,7 @@ import { Button, HStack, IconButton, Input, InputGroup, Separator } from '@chakr
 import { useCallback, type ChangeEvent, type FC } from 'react'
 import { PiArrowCounterClockwise, PiFolder } from 'react-icons/pi'
 
-import { useTranslation } from '../../../common/translations/translation'
+import { useTranslation } from '../../../common/hooks/useTranslation'
 
 type ElectronFilePickerProps = {
   value: string
@@ -21,7 +21,7 @@ export const ElectronFilePicker: FC<ElectronFilePickerProps> = ({
   isManuallyModified,
   onReset,
 }) => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       onChange(event.currentTarget.value)
@@ -43,7 +43,7 @@ export const ElectronFilePicker: FC<ElectronFilePickerProps> = ({
             variant="plain"
           >
             <PiFolder />
-            {t.projects.createDialog.actions.browse}
+            {t.project.editors.controls.filePicker.browse}
           </Button>
           <Separator alignSelf="stretch" orientation="vertical" size="sm" />
           <IconButton

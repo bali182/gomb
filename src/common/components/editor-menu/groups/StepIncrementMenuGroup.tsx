@@ -4,23 +4,23 @@ import { PiLineSegmentFill, PiNeedle } from 'react-icons/pi'
 import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
 import { useProject } from '../../../hooks/useProject'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { CommonCommandIdSchema } from '../../../schemas/command'
-import { useTranslation } from '../../../translations/translation'
 import { StepMenuItem } from '../items/StepMenuItem'
 
 export const StepIncrementMenuGroup: FC = () => {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const { getCommand } = useCommandsContext<CommonCommandIdSchema>()
 
   return (
     <Menu.ItemGroup>
-      <Menu.ItemGroupLabel>{t.editor.menus.edit.increment.name}</Menu.ItemGroupLabel>
+      <Menu.ItemGroupLabel>{t.project.menus.edit.increment.name}</Menu.ItemGroupLabel>
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.editor.menus.edit.increment.size(0.1)}
-        title={t.editor.menus.edit.increment.small}
+        subTitle={t.formatters.size(0.1)}
+        title={t.project.menus.edit.increment.small}
         icon={PiLineSegmentFill}
         iconScale={0.8}
         value={0.1}
@@ -28,16 +28,16 @@ export const StepIncrementMenuGroup: FC = () => {
       />
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.editor.menus.edit.increment.size(1)}
-        title={t.editor.menus.edit.increment.default}
+        subTitle={t.formatters.size(1)}
+        title={t.project.menus.edit.increment.default}
         icon={PiLineSegmentFill}
         value={1}
         command={getCommand('increment-medium')}
       />
       <StepMenuItem
         selectedValue={settings.edit.step}
-        subTitle={t.editor.menus.edit.increment.size(project.stitchingSettings.stitchHoleDistance)}
-        title={t.editor.menus.edit.increment.stitch}
+        subTitle={t.formatters.size(project.stitchingSettings.stitchHoleDistance)}
+        title={t.project.menus.edit.increment.stitch}
         icon={PiNeedle}
         value="stitch-hole-distance"
         command={getCommand('increment-stitch-hole-distance')}

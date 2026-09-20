@@ -3,12 +3,12 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
+import { useTranslation } from '../hooks/useTranslation'
 import { renderSvgToString } from '../logic/exports/renderSvgToString'
 import { getComputedProject } from '../logic/getComputedProject'
 import type { EditableSchema } from '../schemas/editable'
 import type { BaseExportSettingsSchema } from '../schemas/settings'
 import type { BaseValidationContextSchema } from '../schemas/validation'
-import { useTranslation } from '../translations/translation'
 import { downloadFile } from '../utils/downloadFile'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { hasValidationErrors } from '../utils/hasValidationErrors'
@@ -24,8 +24,8 @@ type SvgExportDialogProps = {
 export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setSvgExportSettings, settings } = useGlobalSettings()
-  const t = useTranslation()
-  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t }), [t])
+  const { t } = useTranslation()
+  const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
 
   const [editableParams, setEditableParams] = useState<EditableSchema<BaseExportSettingsSchema>>(() =>
@@ -82,8 +82,8 @@ export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange
       onOpenChange={onOpenChange}
       onResetData={resetDraft}
       onSubmit={handleSubmit}
-      submit={t.svgExport.dialog.actions.export}
-      title={t.svgExport.dialog.title}
+      submit={t.dialogs.svgExport.positiveAction}
+      title={t.dialogs.svgExport.title}
     >
       <SvgExportEditor editable={editableParams} issues={validationResult.issues} onChange={handleParamsChange} />
     </EditDialog>

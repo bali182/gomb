@@ -2,10 +2,10 @@ import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiArrowsHorizontal, PiArrowsVertical, PiColumns, PiRows, PiRuler } from 'react-icons/pi'
 
+import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasLayoutSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import { useTranslation } from '../../../translations/translation'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
 
@@ -21,7 +21,7 @@ export function LayoutSection<T extends HasLayoutSchema>({
   issues,
   onChange,
 }: LayoutSectionProps<T>): ReactNode {
-  const t = useTranslation()
+  const { t } = useTranslation()
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
       onChange({ ...editable, layoutOrientation: details.value })
@@ -45,29 +45,32 @@ export function LayoutSection<T extends HasLayoutSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.component.editor.layout.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.component.editor.layout.orientation}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.components.layout.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.layout.layoutOrientation.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutOrientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.layoutOrientation}>
           <SegmentGroup.Indicator />
-          <SegmentGroup.Item aria-label={t.component.editor.layout.horizontal} value="horizontal">
+          <SegmentGroup.Item value="horizontal">
             <SegmentGroup.ItemHiddenInput />
-            <PiColumns /> {t.component.editor.layout.horizontal}
+            <PiColumns /> {t.project.editors.enums.components.layoutOrientation.horizontal}
           </SegmentGroup.Item>
-          <SegmentGroup.Item aria-label={t.component.editor.layout.vertical} value="vertical">
+          <SegmentGroup.Item value="vertical">
             <SegmentGroup.ItemHiddenInput />
-            <PiRows /> {t.component.editor.layout.vertical}
+            <PiRows /> {t.project.editors.enums.components.layoutOrientation.vertical}
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.component.editor.layout.gap}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle>
+        {t.project.editors.sections.components.layout.layoutGap.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutGap}>
         <AutoDimensionEditor
-          ariaLabel={t.component.editor.layout.gap}
           auto={editable.autoLayoutGap}
           autoIcon={editable.layoutOrientation === 'horizontal' ? PiArrowsHorizontal : PiArrowsVertical}
-          placeholder={t.common.placeholders.fill}
+          placeholder={t.project.editors.sections.components.layout.layoutGap.placeholder}
           issue={issues.layoutGap}
           manualIcon={PiRuler}
           onAutoChange={handleAutoLayoutGapChange}
