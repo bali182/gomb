@@ -1,10 +1,12 @@
-import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
+import { Box, Grid, Icon, Spacer, Text, chakra } from '@chakra-ui/react'
 import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
 
+import { PiInfo } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { isRecord } from '../../utils/isRecord'
+import { Tooltip } from './Tooltip'
 
 type SectionGroupRootProps = {
   children: ReactNode
@@ -22,6 +24,7 @@ type SectionGroupSectionHeaderProps = {
 
 type SectionGroupSectionRowTitleProps = {
   children?: ReactNode
+  tooltip?: string
 }
 
 type SectionGroupSectionRowEditorProps = {
@@ -83,10 +86,15 @@ const SectionGroupSectionHeader: FC<SectionGroupSectionHeaderProps> = ({ childre
   )
 }
 
-const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ children }) => {
+const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ children, tooltip }) => {
   return (
-    <Text alignSelf="center" color="fg.muted" pl="4" textStyle="sm">
-      {children}
+    <Text alignItems="center" alignSelf="center" color="fg.muted" display="flex" gap="1" pl="4" textStyle="sm">
+      <span>{children}</span>
+      {isDefined(tooltip) && (
+        <Tooltip content={tooltip}>
+          <Icon cursor="pointer" as={PiInfo} color="colorPalette.border" colorPalette="blue" size="sm" />
+        </Tooltip>
+      )}
     </Text>
   )
 }

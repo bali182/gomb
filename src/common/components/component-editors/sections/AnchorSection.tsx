@@ -43,7 +43,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.components.anchor.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.anchor.offAxisAnchor.tooltip}>
         {t.project.editors.sections.components.anchor.offAxisAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.offAxisAnchor}>
