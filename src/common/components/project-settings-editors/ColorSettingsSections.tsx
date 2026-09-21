@@ -130,7 +130,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
       <SectionGroup.Section>
         <SectionGroup.SectionHeader>{t.project.editors.sections.project.components.title}</SectionGroup.SectionHeader>
 
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.leatherColor.tooltip}>
           {t.project.editors.sections.project.components.leatherColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.leatherColor}>
@@ -142,7 +142,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
 
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.strokeColor.tooltip}>
           {t.project.editors.sections.project.components.strokeColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.strokeColor}>
@@ -154,7 +154,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
 
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.cardColor.tooltip}>
           {t.project.editors.sections.project.components.cardColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.cardColor}>
@@ -171,7 +171,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
       <SectionGroup.Section>
         <SectionGroup.SectionHeader>{t.project.editors.sections.project.stitching.title}</SectionGroup.SectionHeader>
 
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.stitchHoleColor.tooltip}>
           {t.project.editors.sections.project.stitching.stitchHoleColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchHoleColor}>
@@ -182,7 +182,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
             value={editable.colorSettings.stitchHoleColor}
           />
         </SectionGroup.SectionRowEditor>
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.stitchLineColor.tooltip}>
           {t.project.editors.sections.project.stitching.stitchLineColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchLineColor}>
@@ -193,7 +193,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
             value={editable.colorSettings.stitchLineColor}
           />
         </SectionGroup.SectionRowEditor>
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.threadColor.tooltip}>
           {t.project.editors.sections.project.stitching.threadColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.threadColor}>
@@ -210,7 +210,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
       <SectionGroup.Section>
         <SectionGroup.SectionHeader>{t.project.editors.sections.project.selection.title}</SectionGroup.SectionHeader>
 
-        <SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.selection.selectionColor.tooltip}>
           {t.project.editors.sections.project.selection.selectionColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings.selectionColor}>

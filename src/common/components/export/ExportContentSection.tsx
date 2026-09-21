@@ -101,7 +101,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.export.content.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.stitchLineMode.tooltip}>
         {t.project.editors.sections.export.content.stitchLineMode.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchLineMode}>
@@ -134,7 +134,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Select.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.showNames.tooltip}>
         {t.project.editors.sections.export.content.showNames.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showNames}>
@@ -146,7 +146,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.showDimensions.tooltip}>
         {t.project.editors.sections.export.content.showDimensions.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showDimensions}>
@@ -158,7 +158,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.childMarkers.tooltip}>
         {t.project.editors.sections.export.content.childMarkers.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.childMarkers}>
@@ -170,7 +170,7 @@ export function ExportContentSection<T extends BaseExportSettingsSchema>({
         </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.cutHelperDistance.tooltip}>
         {t.project.editors.sections.export.content.cutHelperDistance.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.cutHelperDistance}>

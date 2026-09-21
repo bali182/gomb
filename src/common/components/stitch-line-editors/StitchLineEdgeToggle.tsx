@@ -2,6 +2,7 @@ import { Box, Button, type CssProperties, type SystemStyleObject, type Tokens } 
 import { useMemo, type FC } from 'react'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
+import { Tooltip } from '../common/Tooltip'
 import {
   SELECTED_BORDER_COLOR,
   SELECTED_HOVER_BORDER_COLOR,
@@ -19,9 +20,10 @@ type StitchLineEdgeToggleProps = {
   onClick: () => void
   selected: boolean
   side: StitchSideSchema
+  tooltip: string
 }
 
-export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side }) => {
+export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side, tooltip }) => {
   const layout = useMemo<StitchLineSegmentLayout>(() => getSideLayout(side), [side])
 
   const borderColor = useMemo<CssProperties['borderColor']>(
@@ -38,11 +40,13 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
   )
 
   return (
-    <Box {...layout.root}>
-      <Button aria-pressed={selected} cursor="pointer" onClick={onClick} _hover={hover} unstyled {...layout.button}>
-        <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
-      </Button>
-    </Box>
+    <Tooltip content={tooltip}>
+      <Box {...layout.root}>
+        <Button aria-pressed={selected} cursor="pointer" onClick={onClick} _hover={hover} unstyled {...layout.button}>
+          <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
+        </Button>
+      </Box>
+    </Tooltip>
   )
 }
 

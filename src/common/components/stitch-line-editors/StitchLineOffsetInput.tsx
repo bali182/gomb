@@ -5,6 +5,7 @@ import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiPr
 
 import type { IssueSchema } from '../../schemas/validation'
 import { NumberInput } from '../common/NumberInput'
+import { Tooltip } from '../common/Tooltip'
 import { HIDDEN_INPUT_OPACITY } from './colors'
 
 export type StitchLineOffsetField =
@@ -22,6 +23,7 @@ type StitchLineOffsetInputProps = {
   field: StitchLineOffsetField
   issue: IssueSchema | undefined
   onChange: (value: string) => void
+  tooltip: string
   value: string
 }
 
@@ -79,21 +81,30 @@ const OFFSET_INPUT_CONFIGURATIONS: Record<StitchLineOffsetField, StitchLineOffse
   },
 }
 
-export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({ disabled, field, issue, onChange, value }) => {
+export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({
+  disabled,
+  field,
+  issue,
+  onChange,
+  tooltip,
+  value,
+}) => {
   const configuration = OFFSET_INPUT_CONFIGURATIONS[field]
   const Icon = disabled ? PiProhibit : configuration.icon
 
   return (
-    <Box alignSelf={configuration.alignSelf} gridArea={configuration.gridArea} role="group" width="20">
-      <NumberInput
-        disabled={disabled}
-        issue={issue}
-        opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
-        size="2xs"
-        startAddon={<Icon />}
-        value={value}
-        onChange={onChange}
-      />
-    </Box>
+    <Tooltip content={tooltip}>
+      <Box alignSelf={configuration.alignSelf} gridArea={configuration.gridArea} role="group" width="20">
+        <NumberInput
+          disabled={disabled}
+          issue={issue}
+          opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
+          size="2xs"
+          startAddon={<Icon />}
+          value={value}
+          onChange={onChange}
+        />
+      </Box>
+    </Tooltip>
   )
 }

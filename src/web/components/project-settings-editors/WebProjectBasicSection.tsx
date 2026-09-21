@@ -28,7 +28,9 @@ export const WebProjectBasicSection: FC<WebProjectBasicSectionProps> = ({ editab
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.project.basic.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.project.basic.name.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.basic.name.tooltip}>
+        {t.project.editors.sections.project.basic.name.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.name}>
         <Input aria-invalid={hasNameError} autoFocus onChange={handleNameChange} size="xs" value={editable.name} />
       </SectionGroup.SectionRowEditor>

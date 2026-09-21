@@ -94,7 +94,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.components.pockets.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.orientation.tooltip}>
         {t.project.editors.sections.components.pockets.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
@@ -119,7 +119,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketCount.tooltip}>
         {t.project.editors.sections.components.pockets.pocketCount.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.pocketCount}>
@@ -132,7 +132,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketStep.tooltip}>
         {t.project.editors.sections.components.pockets.pocketStep.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.pocketStep}>
@@ -144,7 +144,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.tPocketTabWidth.tooltip}>
         {t.project.editors.sections.components.pockets.tPocketTabWidth.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
@@ -156,7 +156,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.tPocketTaper.tooltip}>
         {t.project.editors.sections.components.pockets.tPocketTaper.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
@@ -168,7 +168,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.cardId.tooltip}>
         {t.project.editors.sections.components.pockets.cardId.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.cardId}>

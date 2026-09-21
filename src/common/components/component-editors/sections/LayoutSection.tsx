@@ -46,7 +46,7 @@ export function LayoutSection<T extends HasLayoutSchema>({
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.components.layout.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.layoutOrientation.tooltip}>
         {t.project.editors.sections.components.layout.layoutOrientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutOrientation}>
@@ -63,7 +63,7 @@ export function LayoutSection<T extends HasLayoutSchema>({
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.layoutGap.tooltip}>
         {t.project.editors.sections.components.layout.layoutGap.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutGap}>

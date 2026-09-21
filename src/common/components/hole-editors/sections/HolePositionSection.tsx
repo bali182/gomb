@@ -57,7 +57,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.holes.position.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xAnchor.tooltip}>
         {t.project.editors.sections.holes.position.xAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xAnchor}>
@@ -77,13 +77,13 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xOffset.tooltip}>
         {t.project.editors.sections.holes.position.xOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xOffset}>
         <NumberInput issue={issues.xOffset} onChange={handleXOffsetChange} unit="mm" value={editable.xOffset} />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yAnchor.tooltip}>
         {t.project.editors.sections.holes.position.yAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yAnchor}>
@@ -103,7 +103,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yOffset.tooltip}>
         {t.project.editors.sections.holes.position.yOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yOffset}>

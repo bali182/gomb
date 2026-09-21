@@ -75,7 +75,7 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.stitchLines.settings.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.stitchLines.settings.stitchMargin.tooltip}>
         {t.project.editors.sections.stitchLines.settings.stitchMargin.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchMargin}>
@@ -89,7 +89,7 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.stitchLines.settings.stitchHoleLength.tooltip}>
         {t.project.editors.sections.stitchLines.settings.stitchHoleLength.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleLength}>
@@ -103,7 +103,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.stitchLines.settings.stitchHoleDistance.tooltip}
+      >
         {t.project.editors.sections.stitchLines.settings.stitchHoleDistance.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleDistance}>
@@ -116,7 +118,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.stitchLines.settings.stitchHoleThickness.tooltip}
+      >
         {t.project.editors.sections.stitchLines.settings.stitchHoleThickness.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleThickness}>
@@ -130,7 +134,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.stitchLines.settings.stitchLineThickness.tooltip}
+      >
         {t.project.editors.sections.stitchLines.settings.stitchLineThickness.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchLineThickness}>

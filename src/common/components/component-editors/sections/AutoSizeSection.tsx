@@ -84,7 +84,7 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
       >
         {t.project.editors.sections.components.autoSize.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.autoSize.width.tooltip}>
         {t.project.editors.sections.components.autoSize.width.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.width}>
@@ -102,7 +102,7 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.autoSize.height.tooltip}>
         {t.project.editors.sections.components.autoSize.height.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.height}>

@@ -2,6 +2,7 @@ import { Box, Button, type CssProperties, type SystemStyleObject, type Tokens } 
 import { useMemo, type FC } from 'react'
 
 import type { StitchCornerSchema } from '../../schemas/stitching'
+import { Tooltip } from '../common/Tooltip'
 import {
   SELECTED_BORDER_COLOR,
   SELECTED_HOVER_BORDER_COLOR,
@@ -20,9 +21,16 @@ type StitchLineCornerToggleProps = {
   disabled: boolean
   onClick: () => void
   selected: boolean
+  tooltip: string
 }
 
-export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({ corner, disabled, onClick, selected }) => {
+export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
+  corner,
+  disabled,
+  onClick,
+  selected,
+  tooltip,
+}) => {
   const layout = useMemo<StitchLineSegmentLayout>(() => getCornerLayout(corner), [corner])
 
   const borderColor = useMemo<CssProperties['borderColor']>(
@@ -39,20 +47,22 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({ corner
   )
 
   return (
-    <Box {...layout.root}>
-      <Button
-        aria-pressed={selected}
-        cursor={disabled === true ? 'not-allowed' : 'pointer'}
-        disabled={disabled}
-        onClick={onClick}
-        opacity={disabled === true ? 0.4 : 1}
-        _hover={hover}
-        unstyled
-        {...layout.button}
-      >
-        <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
-      </Button>
-    </Box>
+    <Tooltip content={tooltip}>
+      <Box {...layout.root}>
+        <Button
+          aria-pressed={selected}
+          cursor={disabled === true ? 'not-allowed' : 'pointer'}
+          disabled={disabled}
+          onClick={onClick}
+          opacity={disabled === true ? 0.4 : 1}
+          _hover={hover}
+          unstyled
+          {...layout.button}
+        >
+          <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
+        </Button>
+      </Box>
+    </Tooltip>
   )
 }
 

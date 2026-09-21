@@ -69,7 +69,9 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.export.pdf.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.pdf.page.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.page.tooltip}>
+        {t.project.editors.sections.export.pdf.page.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.page}>
         <Select.Root
           aria-invalid={hasPageError}
@@ -100,7 +102,7 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
         </Select.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.orientation.tooltip}>
         {t.project.editors.sections.export.pdf.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
@@ -118,7 +120,9 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.pdf.layout.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.layout.tooltip}>
+        {t.project.editors.sections.export.pdf.layout.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layout}>
         <SegmentGroup.Root onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
           <SegmentGroup.Indicator />
