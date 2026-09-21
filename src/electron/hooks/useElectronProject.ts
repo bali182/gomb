@@ -6,7 +6,9 @@ import typia from 'typia'
 import { toaster } from '../../common/components/Toaster'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
+import { migrateProject } from '../../common/migrations/migrateProject'
 import type { LoadableSchema } from '../../common/schemas/loadable'
+import type { DeepPartial } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
 import { id } from '../../common/utils/id'
 import { isDefined } from '../../common/utils/isDefined'
@@ -113,7 +115,16 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       return
     }
 
-    if (!typia.is<ProjectSchema>(input)) {
+    let migratedProject: DeepPartial<ProjectSchema>
+
+    try {
+      migratedProject = migrateProject(input)
+    } catch {
+      setElectronProject(Loadable.failed())
+      return
+    }
+
+    if (!typia.is<ProjectSchema>(migratedProject)) {
       setElectronProject(Loadable.failed())
       return
     }
@@ -122,7 +133,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       Loadable.loaded({
         filePath,
         isDirty: false,
-        project: input,
+        project: migratedProject,
       }),
     )
   }, [filePath, setElectronProject])

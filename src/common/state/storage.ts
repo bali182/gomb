@@ -1,5 +1,6 @@
 import typia from 'typia'
 
+import { migrateProject } from '../migrations/migrateProject'
 import type { ProjectSchema } from '../schemas/project'
 import type { GlobalSettingsSchema } from '../schemas/settings'
 
@@ -16,14 +17,19 @@ export const saveGlobalSettingsToStorage = (settings: GlobalSettingsSchema): voi
 }
 
 export const readProjectsFromStorage = (): ProjectSchema[] => {
-  return safeReadStorage<ProjectSchema[]>('projects', [], (raw) => typia.assert<ProjectSchema[]>(raw))
+  return safeReadStorage<ProjectSchema[]>('projects', [], (raw) => {
+    if (!Array.isArray(raw)) {
+      throw new Error('Expected projects array')
+    }
+    return typia.assert<ProjectSchema[]>(raw.map(migrateProject))
+  })
 }
 
 export const saveProjectsToStorage = (projects: ProjectSchema[]): void => {
   safeWriteStorage('projects', projects)
 }
 
-const safeReadStorage = <T>(key: StorageKey, defaultValue: T, assert: (raw: unknown) => void): T => {
+const safeReadStorage = <T>(key: StorageKey, defaultValue: T, parse: (raw: unknown) => T): T => {
   try {
     const storedValue = localStorage.getItem(key)
 
@@ -32,8 +38,7 @@ const safeReadStorage = <T>(key: StorageKey, defaultValue: T, assert: (raw: unkn
     }
 
     const parsedValue: unknown = JSON.parse(storedValue)
-    assert(parsedValue)
-    return parsedValue as T
+    return parse(parsedValue)
   } catch (error) {
     try {
       localStorage.removeItem(key)
