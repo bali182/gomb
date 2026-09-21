@@ -15,11 +15,11 @@ export const Tooltip: FC<TooltipProps> = ({ children, disabled, content, content
   }
 
   return (
-    <ChakraTooltip.Root {...tooltipRootProps}>
+    <ChakraTooltip.Root closeDelay={0} openDelay={600} {...tooltipRootProps}>
       <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
       <Portal container={portalRef}>
         <ChakraTooltip.Positioner>
-          <ChakraTooltip.Content ref={ref} {...contentProps}>
+          <ChakraTooltip.Content animationDuration="50ms" ref={ref} {...contentProps}>
             <ChakraTooltip.Arrow>
               <ChakraTooltip.ArrowTip />
             </ChakraTooltip.Arrow>
