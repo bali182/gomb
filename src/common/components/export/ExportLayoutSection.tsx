@@ -35,11 +35,13 @@ export function ExportLayoutSection<T extends BaseExportSettingsSchema>({
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.export.layout.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.export.layout.gap.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.layout.gap.tooltip}>
+        {t.project.editors.sections.export.layout.gap.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.gap}>
         <NumberInput issue={issues.gap} onChange={handleGapChange} unit="mm" value={editable.gap} />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.layout.padding.tooltip}>
         {t.project.editors.sections.export.layout.padding.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.padding}>

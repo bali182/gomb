@@ -93,7 +93,7 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
         {t.project.editors.sections.components.squeeze.title}
       </SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.squeeze.vertical.tooltip}>
         {t.project.editors.sections.components.squeeze.vertical.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={verticalIssues}>
@@ -115,7 +115,7 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
         </HStack>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.squeeze.horizontal.tooltip}>
         {t.project.editors.sections.components.squeeze.horizontal.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={horizontalIssues}>

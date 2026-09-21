@@ -32,12 +32,16 @@ export function SizeSection<T extends HasSizeSchema>({ editable, issues, onChang
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.common.size.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.common.size.width.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.common.size.width.tooltip}>
+        {t.project.editors.sections.common.size.width.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.width}>
         <NumberInput issue={issues.width} onChange={handleWidthChange} unit="mm" value={editable.width} />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>{t.project.editors.sections.common.size.height.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.common.size.height.tooltip}>
+        {t.project.editors.sections.common.size.height.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.height}>
         <NumberInput issue={issues.height} onChange={handleHeightChange} unit="mm" value={editable.height} />
       </SectionGroup.SectionRowEditor>

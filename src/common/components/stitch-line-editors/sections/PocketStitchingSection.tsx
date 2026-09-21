@@ -41,7 +41,9 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.stitchLines.pocketStitching.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.stitchLines.pocketStitching.startOffset.tooltip}
+      >
         {t.project.editors.sections.stitchLines.pocketStitching.startOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.startOffset}>
@@ -53,14 +55,16 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.stitchLines.pocketStitching.endOffset.tooltip}>
         {t.project.editors.sections.stitchLines.pocketStitching.endOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.endOffset}>
         <NumberInput issue={issues.endOffset} onChange={handleEndOffsetChange} unit="mm" value={editable.endOffset} />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.tooltip}
+      >
         {t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchDirection}>

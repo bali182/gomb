@@ -118,7 +118,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
       >
         {t.project.editors.sections.common.cornerRadius.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.common.cornerRadius.individualRadii.tooltip}>
         {t.project.editors.sections.common.cornerRadius.individualRadii.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={individualRadiusIssues}>
