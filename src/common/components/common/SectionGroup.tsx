@@ -92,7 +92,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
       <span>{children}</span>
       {isDefined(tooltip) && (
         <Tooltip content={tooltip}>
-          <Icon cursor="pointer" as={PiInfo} color="colorPalette.border" colorPalette="blue" size="sm" />
+          <Icon cursor="pointer" as={PiInfo} size="sm" />
         </Tooltip>
       )}
     </Text>

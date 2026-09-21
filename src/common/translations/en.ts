@@ -227,99 +227,259 @@ export const EN = {
         common: {
           cornerRadius: {
             title: 'Corner radius',
-            autoCornerRadius: { placeholder: 'Auto', tooltip: undefined },
-            individualRadii: { label: 'Measurement', tooltip: undefined },
-            topLeftRadius: { tooltip: undefined },
-            topRightRadius: { tooltip: undefined },
-            bottomLeftRadius: { tooltip: undefined },
-            bottomRightRadius: { tooltip: undefined },
+            autoCornerRadius: {
+              placeholder: 'Auto',
+              tooltip: 'Matches the corner radius of the component this stitch line follows.',
+            },
+            individualRadii: {
+              label: 'Measurement',
+              tooltip: 'Use the same corner rounding everywhere, or set each corner separately.',
+            },
+            topLeftRadius: {
+              tooltip: 'Sets the radius of the top-left corner.',
+            },
+            topRightRadius: {
+              tooltip: 'Sets the radius of the top-right corner.',
+            },
+            bottomLeftRadius: {
+              tooltip: 'Sets the radius of the bottom-left corner.',
+            },
+            bottomRightRadius: {
+              tooltip: 'Sets the radius of the bottom-right corner.',
+            },
           } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
           size: {
             title: 'Size',
-            width: { label: 'Width', tooltip: undefined },
-            height: { label: 'Height', tooltip: undefined },
+            width: {
+              label: 'Width',
+              tooltip: 'Sets the overall width of this component.',
+            },
+            height: {
+              label: 'Height',
+              tooltip: 'Sets the overall height of this component.',
+            },
           } satisfies SectionTranslationSchema<HasSizeSchema>,
         },
         components: {
           anchor: {
             title: 'Alignment',
-            offAxisAnchor: { label: 'Alignment', tooltip: undefined },
+            offAxisAnchor: {
+              label: 'Alignment',
+              tooltip: 'Sets whether the component sits at the start, centre, or end of its parent.',
+            },
           } satisfies SectionTranslationSchema<HasOffAxisAnchor>,
           autoSize: {
             title: 'Size',
             squeezeActive: 'Squeeze is active!',
-            width: { label: 'Width', placeholder: 'Fill', tooltip: undefined },
-            height: { label: 'Height', placeholder: 'Fill', tooltip: undefined },
-            autoWidth: { tooltip: undefined },
-            autoHeight: { tooltip: undefined },
+            width: {
+              label: 'Width',
+              placeholder: 'Fill',
+              tooltip: 'Sets a fixed width. Choose Fill to make the component stretch to fill its parent.',
+            },
+            height: {
+              label: 'Height',
+              placeholder: 'Fill',
+              tooltip: 'Sets a fixed height. Choose Fill to make the component stretch to fill its parent.',
+            },
+            autoWidth: {
+              tooltip: 'Makes the component stretch to fill its parent horizontally.',
+            },
+            autoHeight: {
+              tooltip: 'Makes the component stretch to fill its parent vertically.',
+            },
           } satisfies SectionTranslationSchema<HasAutoDimensionsSchema>,
           layout: {
             title: 'Layout',
-            layoutOrientation: { label: 'Orientation', tooltip: undefined },
-            layoutGap: { label: 'Gap', placeholder: 'Fill', tooltip: undefined },
-            autoLayoutGap: { tooltip: undefined },
+            layoutOrientation: {
+              label: 'Orientation',
+              tooltip: 'Arranges this component’s children in a horizontal row or vertical column.',
+            },
+            layoutGap: {
+              label: 'Gap',
+              placeholder: 'Fill',
+              tooltip:
+                'Sets a fixed gap between child components. Choose Fill to make the gaps adjust so the panel is filled.',
+            },
+            autoLayoutGap: { tooltip: 'Adjusts the gaps between child components so the panel is filled.' },
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
           squeeze: {
             title: 'Squeeze',
-            horizontal: { label: 'Horizontal', tooltip: undefined },
-            vertical: { label: 'Vertical', tooltip: undefined },
-            topSqueeze: { tooltip: undefined },
-            rightSqueeze: { tooltip: undefined },
-            bottomSqueeze: { tooltip: undefined },
-            leftSqueeze: { tooltip: undefined },
-            individualSqueeze: { tooltip: undefined },
+            horizontal: {
+              label: 'Horizontal',
+              tooltip:
+                'Moves the left and right edges. Positive values move them inward; negative values extend them outward.',
+            },
+            vertical: {
+              label: 'Vertical',
+              tooltip:
+                'Moves the top and bottom edges. Positive values move them inward; negative values extend them outward.',
+            },
+            topSqueeze: {
+              tooltip: 'Moves the top edge. Positive values move it inward; negative values extend it outward.',
+            },
+            rightSqueeze: {
+              tooltip: 'Moves the right edge. Positive values move it inward; negative values extend it outward.',
+            },
+            bottomSqueeze: {
+              tooltip: 'Moves the bottom edge. Positive values move it inward; negative values extend it outward.',
+            },
+            leftSqueeze: {
+              tooltip: 'Moves the left edge. Positive values move it inward; negative values extend it outward.',
+            },
+            individualSqueeze: { tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.' },
           } satisfies SectionTranslationSchema<HasSqueezeSchema>,
           pockets: {
             title: 'Pockets',
-            orientation: { label: 'Opening', tooltip: undefined },
-            pocketCount: { label: 'Amount', tooltip: undefined },
-            pocketStep: { label: 'Spacing', tooltip: undefined },
-            tPocketTabWidth: { label: 'Tab width', tooltip: undefined },
-            tPocketTaper: { label: 'Taper', tooltip: undefined },
-            cardId: { label: 'Card', tooltip: undefined },
+            orientation: {
+              label: 'Opening',
+              tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
+            },
+            pocketCount: {
+              label: 'Amount',
+              tooltip: 'Sets how many pockets are created in this pocket cluster.',
+            },
+            pocketStep: {
+              label: 'Spacing',
+              tooltip: 'Sets the distance between adjacent pockets.',
+            },
+            tPocketTabWidth: {
+              label: 'Tab width',
+              tooltip: 'Sets the width of the retaining tabs on T-shaped pockets.',
+            },
+            tPocketTaper: {
+              label: 'Taper',
+              tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
+            },
+            cardId: {
+              label: 'Card',
+              tooltip: 'Selects the card shown inside each pocket.',
+            },
           } satisfies SectionTranslationSchema<PocketsSchema>,
         },
         stitchLines: {
           settings: {
             title: 'Stitching',
-            stitchMargin: { label: 'Margin', tooltip: undefined },
-            stitchHoleLength: { label: 'Hole length', tooltip: undefined },
-            stitchHoleDistance: { label: 'Hole spacing', tooltip: undefined },
-            stitchHoleThickness: { label: 'Hole thickness', tooltip: undefined },
-            stitchLineThickness: { label: 'Line thickness', tooltip: undefined },
+            stitchMargin: {
+              label: 'Margin',
+              tooltip: 'Sets the distance between the stitch line and the edge of the material.',
+            },
+            stitchHoleLength: { label: 'Hole length', tooltip: 'Sets the length of each stitch hole.' },
+            stitchHoleDistance: {
+              label: 'Hole spacing',
+              tooltip: 'Sets the spacing between consecutive stitch holes.',
+            },
+            stitchHoleThickness: {
+              label: 'Hole thickness',
+              tooltip: 'Sets the width of each stitch hole.',
+            },
+            stitchLineThickness: {
+              label: 'Line thickness',
+              tooltip: 'Sets how thick the visible stitch line is.',
+            },
           } satisfies SectionTranslationSchema<StitchLineCommonConfigSchema>,
           pocketStitching: {
             title: 'Pocket stitch',
-            startOffset: { label: 'Start offset', tooltip: undefined },
-            endOffset: { label: 'End offset', tooltip: undefined },
-            stitchDirection: { label: 'Direction', tooltip: undefined },
+            startOffset: {
+              label: 'Start offset',
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            endOffset: {
+              label: 'End offset',
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            stitchDirection: {
+              label: 'Direction',
+              tooltip: 'Changes which way the stitch line runs along the pocket.',
+            },
           } satisfies SectionTranslationSchema<PocketClusterStitchLineOwnSchema>,
           sidesAndCorners: {
             title: 'Seam line',
-            top: { tooltip: undefined },
-            right: { tooltip: undefined },
-            bottom: { tooltip: undefined },
-            left: { tooltip: undefined },
-            topLeftCorner: { tooltip: undefined },
-            topRightCorner: { tooltip: undefined },
-            bottomRightCorner: { tooltip: undefined },
-            bottomLeftCorner: { tooltip: undefined },
-            stitchDisconnectedTopLeftCorner: { tooltip: undefined },
-            stitchDisconnectedTopRightCorner: { tooltip: undefined },
-            stitchDisconnectedBottomLeftCorner: { tooltip: undefined },
-            stitchDisconnectedBottomRightCorner: { tooltip: undefined },
-            topStitchDirection: { tooltip: undefined },
-            rightStitchDirection: { tooltip: undefined },
-            bottomStitchDirection: { tooltip: undefined },
-            leftStitchDirection: { tooltip: undefined },
-            topStartOffset: { tooltip: undefined },
-            topEndOffset: { tooltip: undefined },
-            rightStartOffset: { tooltip: undefined },
-            rightEndOffset: { tooltip: undefined },
-            bottomStartOffset: { tooltip: undefined },
-            bottomEndOffset: { tooltip: undefined },
-            leftStartOffset: { tooltip: undefined },
-            leftEndOffset: { tooltip: undefined },
+            top: {
+              tooltip: 'Turns stitching on or off along the top edge.',
+            },
+            right: {
+              tooltip: 'Turns stitching on or off along the right edge.',
+            },
+            bottom: {
+              tooltip: 'Turns stitching on or off along the bottom edge.',
+            },
+            left: {
+              tooltip: 'Turns stitching on or off along the left edge.',
+            },
+            topLeftCorner: {
+              tooltip: 'Turns stitching on or off at the top-left corner.',
+            },
+            topRightCorner: {
+              tooltip: 'Turns stitching on or off at the top-right corner.',
+            },
+            bottomRightCorner: {
+              tooltip: 'Turns stitching on or off at the bottom-right corner.',
+            },
+            bottomLeftCorner: {
+              tooltip: 'Turns stitching on or off at the bottom-left corner.',
+            },
+            stitchDisconnectedTopLeftCorner: {
+              tooltip:
+                'Adds a stitch across this corner when the top and left edges are stitched but the corner is not.',
+            },
+            stitchDisconnectedTopRightCorner: {
+              tooltip:
+                'Adds a stitch across this corner when the top and right edges are stitched but the corner is not.',
+            },
+            stitchDisconnectedBottomLeftCorner: {
+              tooltip:
+                'Adds a stitch across this corner when the bottom and left edges are stitched but the corner is not.',
+            },
+            stitchDisconnectedBottomRightCorner: {
+              tooltip:
+                'Adds a stitch across this corner when the bottom and right edges are stitched but the corner is not.',
+            },
+            topStitchDirection: {
+              tooltip: 'Changes which way the stitch line runs along the top edge.',
+            },
+            rightStitchDirection: {
+              tooltip: 'Changes which way the stitch line runs along the right edge.',
+            },
+            bottomStitchDirection: {
+              tooltip: 'Changes which way the stitch line runs along the bottom edge.',
+            },
+            leftStitchDirection: {
+              tooltip: 'Changes which way the stitch line runs along the left edge.',
+            },
+            topStartOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            topEndOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            rightStartOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            rightEndOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            bottomStartOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            bottomEndOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            leftStartOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
+            leftEndOffset: {
+              tooltip:
+                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+            },
           } satisfies SectionTranslationSchema<
             HasDirectionalOffsetsSchema &
               HasStitchedSidesSchema &
@@ -332,54 +492,124 @@ export const EN = {
         holes: {
           position: {
             title: 'Position',
-            xAnchor: { label: 'Horizontal alignment', tooltip: undefined },
-            xOffset: { label: 'X offset', tooltip: undefined },
-            yAnchor: { label: 'Vertical alignment', tooltip: undefined },
-            yOffset: { label: 'Y offset', tooltip: undefined },
+            xAnchor: {
+              label: 'Horizontal alignment',
+              tooltip: 'Sets whether the hole is aligned to the left, centre, or right side of its parent.',
+            },
+            xOffset: {
+              label: 'X offset',
+              tooltip: 'Moves the hole horizontally from its selected alignment.',
+            },
+            yAnchor: {
+              label: 'Vertical alignment',
+              tooltip: 'Sets whether the hole is aligned to the top, centre, or bottom side of its parent.',
+            },
+            yOffset: {
+              label: 'Y offset',
+              tooltip: 'Moves the hole vertically from its selected alignment.',
+            },
           } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
         },
         project: {
           basic: {
             title: 'General',
-            name: { label: 'Name', tooltip: undefined },
-            filePath: { label: 'File path', tooltip: undefined },
+            name: {
+              label: 'Name',
+              tooltip: 'Sets the name shown for this project.',
+            },
+            filePath: {
+              label: 'File path',
+              tooltip: 'Shows where this project is saved on your computer.',
+            },
           } satisfies SectionTranslationSchema<HasName>,
           components: {
             title: 'Component colors',
-            leatherColor: { label: 'Leather color', tooltip: undefined },
-            strokeColor: { label: 'Outline color', tooltip: undefined },
-            cardColor: { label: 'Card color', tooltip: undefined },
+            leatherColor: {
+              label: 'Leather color',
+              tooltip: 'Sets the fill colour used to represent leather components.',
+            },
+            strokeColor: {
+              label: 'Outline color',
+              tooltip: 'Sets the outline colour used around leather components.',
+            },
+            cardColor: {
+              label: 'Card color',
+              tooltip: 'Sets the colour used for cards shown inside pockets.',
+            },
           } satisfies SectionTranslationSchema<ComponentColorSettingsSchema>,
           stitching: {
             title: 'Stitching colors',
-            stitchHoleColor: { label: 'Stitch hole color', tooltip: undefined },
-            stitchLineColor: { label: 'Stitch line color', tooltip: undefined },
-            threadColor: { label: 'Thread color', tooltip: undefined },
+            stitchHoleColor: {
+              label: 'Stitch hole color',
+              tooltip: 'Sets the colour used to display stitch holes.',
+            },
+            stitchLineColor: {
+              label: 'Stitch line color',
+              tooltip: 'Sets the colour used to display stitch lines.',
+            },
+            threadColor: {
+              label: 'Thread color',
+              tooltip: 'Sets the colour used to display thread.',
+            },
           } satisfies SectionTranslationSchema<StitchingColorSettingsSchema>,
           selection: {
             title: 'Selection colors',
-            selectionColor: { label: 'Selection color', tooltip: undefined },
+            selectionColor: {
+              label: 'Selection color',
+              tooltip: 'Sets the highlight colour for selected components.',
+            },
           } satisfies SectionTranslationSchema<SelectionColorSettingsSchema>,
         },
         export: {
           layout: {
             title: 'Layout',
-            gap: { label: 'Gap', tooltip: undefined },
-            padding: { label: 'Padding', tooltip: undefined },
+            gap: {
+              label: 'Gap',
+              tooltip: 'Sets the space left between exported components on the page.',
+            },
+            padding: {
+              label: 'Padding',
+              tooltip: 'Sets the empty space left between exported components and the page edges.',
+            },
           } satisfies SectionTranslationSchema<ExportLayoutSettingsSchema>,
           content: {
             title: 'Content',
-            stitchLineMode: { label: 'Stitch lines', tooltip: undefined },
-            showNames: { label: 'Show names', tooltip: undefined },
-            showDimensions: { label: 'Show dimensions', tooltip: undefined },
-            childMarkers: { label: 'Show child markers', tooltip: undefined },
-            cutHelperDistance: { label: 'Cut helper distance', tooltip: undefined },
+            stitchLineMode: {
+              label: 'Stitch lines',
+              tooltip: 'Chooses which stitch lines are included in the export.',
+            },
+            showNames: {
+              label: 'Show names',
+              tooltip: 'Includes component names in the exported file.',
+            },
+            showDimensions: {
+              label: 'Show dimensions',
+              tooltip: 'Includes component dimensions in the exported file.',
+            },
+            childMarkers: {
+              label: 'Show child markers',
+              tooltip: 'Adds markers for components placed inside other components.',
+            },
+            cutHelperDistance: {
+              label: 'Cut helper distance',
+              tooltip:
+                'Sets how far outside each component the cut helper outline is drawn. Set it to 0 to hide the outline.',
+            },
           } satisfies SectionTranslationSchema<ExportContentSettingsSchema>,
           pdf: {
             title: 'Page',
-            page: { label: 'Paper size', tooltip: undefined },
-            orientation: { label: 'Orientation', tooltip: undefined },
-            layout: { label: 'Layout', tooltip: undefined },
+            page: {
+              label: 'Paper size',
+              tooltip: 'Chooses the paper size used for the PDF.',
+            },
+            orientation: {
+              label: 'Orientation',
+              tooltip: 'Chooses whether the PDF page is portrait or landscape.',
+            },
+            layout: {
+              label: 'Layout',
+              tooltip: 'Chooses how exported components are arranged on each PDF page.',
+            },
           } satisfies SectionTranslationSchema<PdfExportOwnSettingsSchema>,
         },
       },
