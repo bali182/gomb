@@ -15,6 +15,16 @@ export const calculateRouteConnectingStitches = (
   stitchLine: ResolvedComponentBoundsStitchLineSchema,
   routes: ComputedStitchRouteSchema[],
 ): ComputedStitchSchema[] => {
+  return [
+    ...calculatePairedRouteConnectingStitches(stitchLine, routes),
+    ...calculateSingleRouteConnectingStitches(stitchLine, routes),
+  ]
+}
+
+const calculatePairedRouteConnectingStitches = (
+  stitchLine: ResolvedComponentBoundsStitchLineSchema,
+  routes: ComputedStitchRouteSchema[],
+): ComputedStitchSchema[] => {
   return STITCH_CORNERS.flatMap((corner): ComputedStitchSchema[] => {
     if (!isStitchDisconnectedCornerEnabled(stitchLine, corner)) {
       return []
@@ -38,6 +48,53 @@ export const calculateRouteConnectingStitches = (
     const stitch: ComputedStitchSchema = { line: { start: firstPoint, end: secondPoint } }
     return [stitch]
   })
+}
+
+const calculateSingleRouteConnectingStitches = (
+  stitchLine: ResolvedComponentBoundsStitchLineSchema,
+  routes: ComputedStitchRouteSchema[],
+): ComputedStitchSchema[] => {
+  const route = routes[0]
+  if (
+    routes.length !== 1 ||
+    !isDefined(route) ||
+    route.isClosed ||
+    !stitchLine.top ||
+    !stitchLine.right ||
+    !stitchLine.bottom ||
+    !stitchLine.left ||
+    route.holes.length < 2
+  ) {
+    return []
+  }
+
+  const hasEnabledDisconnectedCorner = STITCH_CORNERS.some(
+    (corner) => isStitchDisconnectedCornerEnabled(stitchLine, corner) && isDefined(route.disconnectedCorners[corner]),
+  )
+  if (!hasEnabledDisconnectedCorner) {
+    return []
+  }
+
+  const firstHole = route.holes[0]
+  const lastHole = route.holes[route.holes.length - 1]
+  if (!isDefined(firstHole) || !isDefined(lastHole)) {
+    return []
+  }
+
+  const firstStitch = getRouteEndpointStitch(route, firstHole)
+  const lastStitch = getRouteEndpointStitch(route, lastHole)
+  if (!isDefined(firstStitch) || !isDefined(lastStitch)) {
+    return []
+  }
+
+  const stitch: ComputedStitchSchema = {
+    line: {
+      start: getUnusedStitchHolePoint(firstHole, firstStitch),
+      end: getUnusedStitchHolePoint(lastHole, lastStitch),
+    },
+  }
+
+  return [stitch]
 }
 
 const isStitchDisconnectedCornerEnabled = (
