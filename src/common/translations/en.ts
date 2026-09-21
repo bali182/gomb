@@ -307,24 +307,24 @@ export const EN = {
             horizontal: {
               label: 'Horizontal',
               tooltip:
-                'Moves the left and right edges. Positive values move them inward; negative values extend them outward.',
+                'Moves the left and right edges. Positive values move them inward. Negative values extend them outward.',
             },
             vertical: {
               label: 'Vertical',
               tooltip:
-                'Moves the top and bottom edges. Positive values move them inward; negative values extend them outward.',
+                'Moves the top and bottom edges. Positive values move them inward. Negative values extend them outward.',
             },
             topSqueeze: {
-              tooltip: 'Moves the top edge. Positive values move it inward; negative values extend it outward.',
+              tooltip: 'Moves the top edge. Positive values move it inward. Negative values extend it outward.',
             },
             rightSqueeze: {
-              tooltip: 'Moves the right edge. Positive values move it inward; negative values extend it outward.',
+              tooltip: 'Moves the right edge. Positive values move it inward. Negative values extend it outward.',
             },
             bottomSqueeze: {
-              tooltip: 'Moves the bottom edge. Positive values move it inward; negative values extend it outward.',
+              tooltip: 'Moves the bottom edge. Positive values move it inward. Negative values extend it outward.',
             },
             leftSqueeze: {
-              tooltip: 'Moves the left edge. Positive values move it inward; negative values extend it outward.',
+              tooltip: 'Moves the left edge. Positive values move it inward. Negative values extend it outward.',
             },
             individualSqueeze: { tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.' },
           } satisfies SectionTranslationSchema<HasSqueezeSchema>,
@@ -382,12 +382,12 @@ export const EN = {
             startOffset: {
               label: 'Start offset',
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             endOffset: {
               label: 'End offset',
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             stitchDirection: {
               label: 'Direction',
@@ -450,35 +450,35 @@ export const EN = {
             },
             topStartOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             topEndOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightStartOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightEndOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomStartOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomEndOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftStartOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftEndOffset: {
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer; negative values make it shorter.',
+                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
           } satisfies SectionTranslationSchema<
             HasDirectionalOffsetsSchema &

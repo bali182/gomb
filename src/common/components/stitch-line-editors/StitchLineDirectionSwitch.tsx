@@ -4,6 +4,7 @@ import type { IconType } from 'react-icons'
 import { PiArrowDown, PiArrowLeft, PiArrowRight, PiArrowUp, PiProhibit } from 'react-icons/pi'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
+import { Tooltip } from '../common/Tooltip'
 import { HIDDEN_INPUT_OPACITY } from './colors'
 
 type StitchLineDirectionSwitchProps = {
@@ -11,6 +12,7 @@ type StitchLineDirectionSwitchProps = {
   disabled: boolean
   onCheckedChange: (checked: boolean) => void
   side: StitchSideSchema
+  tooltip: string
 }
 
 type StitchLineDirectionGridArea = 'top-direction' | 'right-direction' | 'bottom-direction' | 'left-direction'
@@ -49,6 +51,7 @@ export const StitchLineDirectionSwitch: FC<StitchLineDirectionSwitchProps> = ({
   disabled,
   onCheckedChange,
   side,
+  tooltip,
 }) => {
   const configuration = DIRECTION_SWITCH_CONFIGURATIONS[side]
   const CheckedIcon = disabled ? PiProhibit : configuration.checkedIcon
@@ -62,22 +65,24 @@ export const StitchLineDirectionSwitch: FC<StitchLineDirectionSwitchProps> = ({
   )
 
   return (
-    <Box
-      alignSelf="center"
-      gridArea={configuration.gridArea}
-      justifySelf="center"
-      opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
-    >
-      <Switch.Root checked={checked} disabled={disabled} onCheckedChange={handleCheckedChange} size="md">
-        <Switch.HiddenInput />
-        <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
-          <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
-            <Switch.ThumbIndicator fallback={<UncheckedIcon />}>
-              <CheckedIcon />
-            </Switch.ThumbIndicator>
-          </Switch.Thumb>
-        </Switch.Control>
-      </Switch.Root>
-    </Box>
+    <Tooltip content={tooltip}>
+      <Box
+        alignSelf="center"
+        gridArea={configuration.gridArea}
+        justifySelf="center"
+        opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
+      >
+        <Switch.Root checked={checked} disabled={disabled} onCheckedChange={handleCheckedChange} size="md">
+          <Switch.HiddenInput />
+          <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
+            <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
+              <Switch.ThumbIndicator fallback={<UncheckedIcon />}>
+                <CheckedIcon />
+              </Switch.ThumbIndicator>
+            </Switch.Thumb>
+          </Switch.Control>
+        </Switch.Root>
+      </Box>
+    </Tooltip>
   )
 }
