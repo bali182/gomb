@@ -300,7 +300,9 @@ export const EN = {
               tooltip:
                 'Sets a fixed gap between child components. Choose Fill to make the gaps adjust so the panel is filled.',
             },
-            autoLayoutGap: { tooltip: 'Adjusts the gaps between child components so the panel is filled.' },
+            autoLayoutGap: {
+              tooltip: 'Adjusts the gaps between child components so the panel is filled.',
+            },
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
           squeeze: {
             title: 'Squeeze',
@@ -326,7 +328,9 @@ export const EN = {
             leftSqueeze: {
               tooltip: 'Moves the left edge. Positive values move it inward. Negative values extend it outward.',
             },
-            individualSqueeze: { tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.' },
+            individualSqueeze: {
+              tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.',
+            },
           } satisfies SectionTranslationSchema<HasSqueezeSchema>,
           pockets: {
             title: 'Pockets',
@@ -363,7 +367,10 @@ export const EN = {
               label: 'Margin',
               tooltip: 'Sets the distance between the stitch line and the edge of the material.',
             },
-            stitchHoleLength: { label: 'Hole length', tooltip: 'Sets the length of each stitch hole.' },
+            stitchHoleLength: {
+              label: 'Hole length',
+              tooltip: 'Sets the length of each stitch hole.',
+            },
             stitchHoleDistance: {
               label: 'Hole spacing',
               tooltip: 'Sets the spacing between consecutive stitch holes.',

@@ -183,149 +183,382 @@ export const HU = {
         common: {
           cornerRadius: {
             title: 'Sarokrádiusz',
-            autoCornerRadius: { placeholder: 'Auto', tooltip: undefined },
-            individualRadii: { label: 'Méretezés', tooltip: undefined },
-            topLeftRadius: { tooltip: undefined },
-            topRightRadius: { tooltip: undefined },
-            bottomLeftRadius: { tooltip: undefined },
-            bottomRightRadius: { tooltip: undefined },
+            autoCornerRadius: {
+              placeholder: 'Auto',
+              tooltip: 'A varrásvonal rádiusza az általa követett komponens sarkaihoz igazodik.',
+            },
+            individualRadii: {
+              label: 'Méretezés',
+              tooltip: 'Azonos saroklekerekítést használ minden saroknál, vagy külön is beállíthatja őket.',
+            },
+            topLeftRadius: {
+              tooltip: 'A bal felső sarok rádiuszát állítja be.',
+            },
+            topRightRadius: {
+              tooltip: 'A jobb felső sarok rádiuszát állítja be.',
+            },
+            bottomLeftRadius: {
+              tooltip: 'A bal alsó sarok rádiuszát állítja be.',
+            },
+            bottomRightRadius: {
+              tooltip: 'A jobb alsó sarok rádiuszát állítja be.',
+            },
           },
           size: {
             title: 'Méret',
-            width: { label: 'Szélesség', tooltip: undefined },
-            height: { label: 'Magasság', tooltip: undefined },
+            width: {
+              label: 'Szélesség',
+              tooltip: 'Ennek a komponensnek a teljes szélességét állítja be.',
+            },
+            height: {
+              label: 'Magasság',
+              tooltip: 'Ennek a komponensnek a teljes magasságát állítja be.',
+            },
           },
         },
         components: {
           anchor: {
             title: 'Igazítás',
-            offAxisAnchor: { label: 'Igazítás', tooltip: undefined },
+            offAxisAnchor: {
+              label: 'Igazítás',
+              tooltip: 'A komponens helyét állítja be a szülőkomponens elején, közepén vagy végén.',
+            },
           },
           autoSize: {
             title: 'Méret',
             squeezeActive: 'A szorítás aktív!',
-            width: { label: 'Szélesség', placeholder: 'Kitöltés', tooltip: undefined },
-            height: { label: 'Magasság', placeholder: 'Kitöltés', tooltip: undefined },
-            autoWidth: { tooltip: undefined },
-            autoHeight: { tooltip: undefined },
+            width: {
+              label: 'Szélesség',
+              placeholder: 'Kitöltés',
+              tooltip: 'Rögzített szélességet állít be. A Kitöltés a komponenst a szülőjéhez igazítja.',
+            },
+            height: {
+              label: 'Magasság',
+              placeholder: 'Kitöltés',
+              tooltip: 'Rögzített magasságot állít be. A Kitöltés a komponenst a szülőjéhez igazítja.',
+            },
+            autoWidth: {
+              tooltip: 'A komponens szélességét a szülőjéhez igazítja.',
+            },
+            autoHeight: {
+              tooltip: 'A komponens magasságát a szülőjéhez igazítja.',
+            },
           },
           layout: {
             title: 'Elrendezés',
-            layoutOrientation: { label: 'Irány', tooltip: undefined },
-            layoutGap: { label: 'Köz', placeholder: 'Kitöltés', tooltip: undefined },
-            autoLayoutGap: { tooltip: undefined },
+            layoutOrientation: {
+              label: 'Irány',
+              tooltip: 'A gyermekkomponenseket vízszintes sorba vagy függőleges oszlopba rendezi.',
+            },
+            layoutGap: {
+              label: 'Köz',
+              placeholder: 'Kitöltés',
+              tooltip:
+                'Rögzített távolságot állít be a gyermekkomponensek között. A Kitöltés a panel kitöltéséhez igazítja a távolságokat.',
+            },
+            autoLayoutGap: {
+              tooltip: 'A gyermekkomponensek közötti távolságokat a panel kitöltéséhez igazítja.',
+            },
           },
           squeeze: {
             title: 'Szorítás',
-            horizontal: { label: 'Vízszintes', tooltip: undefined },
-            vertical: { label: 'Függőleges', tooltip: undefined },
-            topSqueeze: { tooltip: undefined },
-            rightSqueeze: { tooltip: undefined },
-            bottomSqueeze: { tooltip: undefined },
-            leftSqueeze: { tooltip: undefined },
-            individualSqueeze: { tooltip: undefined },
+            horizontal: {
+              label: 'Vízszintes',
+              tooltip: 'A bal és jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+            },
+            vertical: {
+              label: 'Függőleges',
+              tooltip: 'A felső és alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+            },
+            topSqueeze: {
+              tooltip: 'A felső élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            },
+            rightSqueeze: {
+              tooltip: 'A jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            },
+            bottomSqueeze: {
+              tooltip: 'Az alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            },
+            leftSqueeze: {
+              tooltip: 'A bal élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            },
+            individualSqueeze: {
+              tooltip: 'Minden élen azonos beállítást használ, vagy külön is beállíthatja őket.',
+            },
           },
           pockets: {
             title: 'Zsebek',
-            orientation: { label: 'Nyílás', tooltip: undefined },
-            pocketCount: { label: 'Darabszám', tooltip: undefined },
-            pocketStep: { label: 'Távolság', tooltip: undefined },
-            tPocketTabWidth: { label: 'Fül szélessége', tooltip: undefined },
-            tPocketTaper: { label: 'Keskenyedés', tooltip: undefined },
-            cardId: { label: 'Kártya', tooltip: undefined },
+            orientation: {
+              label: 'Nyílás',
+              tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártya behelyezéséhez.',
+            },
+            pocketCount: {
+              label: 'Darabszám',
+              tooltip: 'A zsebcsoportban létrehozott zsebek számát állítja be.',
+            },
+            pocketStep: {
+              label: 'Távolság',
+              tooltip: 'A szomszédos zsebek közötti távolságot állítja be.',
+            },
+            tPocketTabWidth: {
+              label: 'Fül szélessége',
+              tooltip: 'A T alakú zsebek kártyatartó füleinek szélességét állítja be.',
+            },
+            tPocketTaper: {
+              label: 'Keskenyedés',
+              tooltip: 'A T alakú zseb oldalfalainak dőlését állítja be.',
+            },
+            cardId: {
+              label: 'Kártya',
+              tooltip: 'Kiválasztja az egyes zsebekben megjelenő kártyát.',
+            },
           },
         },
         stitchLines: {
           settings: {
             title: 'Varrás',
-            stitchMargin: { label: 'Margó', tooltip: undefined },
-            stitchHoleLength: { label: 'Lyuk hossza', tooltip: undefined },
-            stitchHoleDistance: { label: 'Lyuktávolság', tooltip: undefined },
-            stitchHoleThickness: { label: 'Lyuk vastagsága', tooltip: undefined },
-            stitchLineThickness: { label: 'Vonal vastagsága', tooltip: undefined },
+            stitchMargin: {
+              label: 'Margó',
+              tooltip: 'A varrásvonal és az anyag széle közötti távolságot állítja be.',
+            },
+            stitchHoleLength: {
+              label: 'Lyuk hossza',
+              tooltip: 'Az egyes öltéslyukak hosszát állítja be.',
+            },
+            stitchHoleDistance: {
+              label: 'Lyuktávolság',
+              tooltip: 'Az egymást követő öltéslyukak közötti távolságot állítja be.',
+            },
+            stitchHoleThickness: {
+              label: 'Lyuk vastagsága',
+              tooltip: 'Az egyes öltéslyukak szélességét állítja be.',
+            },
+            stitchLineThickness: {
+              label: 'Vonal vastagsága',
+              tooltip: 'A látható varrásvonal vastagságát állítja be.',
+            },
           },
           pocketStitching: {
             title: 'Zsebvarrás',
-            startOffset: { label: 'Kezdő eltolás', tooltip: undefined },
-            endOffset: { label: 'Végeltolás', tooltip: undefined },
-            stitchDirection: { label: 'Irány', tooltip: undefined },
+            startOffset: {
+              label: 'Kezdő eltolás',
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            endOffset: {
+              label: 'Végeltolás',
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            stitchDirection: {
+              label: 'Irány',
+              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a zseb mentén.',
+            },
           },
           sidesAndCorners: {
             title: 'Varrásvonal',
-            top: { tooltip: undefined },
-            right: { tooltip: undefined },
-            bottom: { tooltip: undefined },
-            left: { tooltip: undefined },
-            topLeftCorner: { tooltip: undefined },
-            topRightCorner: { tooltip: undefined },
-            bottomRightCorner: { tooltip: undefined },
-            bottomLeftCorner: { tooltip: undefined },
-            stitchDisconnectedTopLeftCorner: { tooltip: undefined },
-            stitchDisconnectedTopRightCorner: { tooltip: undefined },
-            stitchDisconnectedBottomLeftCorner: { tooltip: undefined },
-            stitchDisconnectedBottomRightCorner: { tooltip: undefined },
-            topStitchDirection: { tooltip: undefined },
-            rightStitchDirection: { tooltip: undefined },
-            bottomStitchDirection: { tooltip: undefined },
-            leftStitchDirection: { tooltip: undefined },
-            topStartOffset: { tooltip: undefined },
-            topEndOffset: { tooltip: undefined },
-            rightStartOffset: { tooltip: undefined },
-            rightEndOffset: { tooltip: undefined },
-            bottomStartOffset: { tooltip: undefined },
-            bottomEndOffset: { tooltip: undefined },
-            leftStartOffset: { tooltip: undefined },
-            leftEndOffset: { tooltip: undefined },
+            top: {
+              tooltip: 'Be vagy kikapcsolja a varrást a felső élen.',
+            },
+            right: {
+              tooltip: 'Be vagy kikapcsolja a varrást a jobb élen.',
+            },
+            bottom: {
+              tooltip: 'Be vagy kikapcsolja a varrást az alsó élen.',
+            },
+            left: {
+              tooltip: 'Be vagy kikapcsolja a varrást a bal élen.',
+            },
+            topLeftCorner: {
+              tooltip: 'Be vagy kikapcsolja a varrást a bal felső sarokban.',
+            },
+            topRightCorner: {
+              tooltip: 'Be vagy kikapcsolja a varrást a jobb felső sarokban.',
+            },
+            bottomRightCorner: {
+              tooltip: 'Be vagy kikapcsolja a varrást a jobb alsó sarokban.',
+            },
+            bottomLeftCorner: {
+              tooltip: 'Be vagy kikapcsolja a varrást a bal alsó sarokban.',
+            },
+            stitchDisconnectedTopLeftCorner: {
+              tooltip: 'Öltést ad a sarokhoz, ha a felső és bal él varrott, de maga a sarok nem.',
+            },
+            stitchDisconnectedTopRightCorner: {
+              tooltip: 'Öltést ad a sarokhoz, ha a felső és jobb él varrott, de maga a sarok nem.',
+            },
+            stitchDisconnectedBottomLeftCorner: {
+              tooltip: 'Öltést ad a sarokhoz, ha az alsó és bal él varrott, de maga a sarok nem.',
+            },
+            stitchDisconnectedBottomRightCorner: {
+              tooltip: 'Öltést ad a sarokhoz, ha az alsó és jobb él varrott, de maga a sarok nem.',
+            },
+            topStitchDirection: {
+              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a felső élen.',
+            },
+            rightStitchDirection: {
+              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a jobb élen.',
+            },
+            bottomStitchDirection: {
+              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal az alsó élen.',
+            },
+            leftStitchDirection: {
+              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a bal élen.',
+            },
+            topStartOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            topEndOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            rightStartOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            rightEndOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            bottomStartOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            bottomEndOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            leftStartOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
+            leftEndOffset: {
+              tooltip:
+                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+            },
           },
         },
         holes: {
           position: {
             title: 'Pozíció',
-            xAnchor: { label: 'Vízszintes igazítás', tooltip: undefined },
-            xOffset: { label: 'X eltolás', tooltip: undefined },
-            yAnchor: { label: 'Függőleges igazítás', tooltip: undefined },
-            yOffset: { label: 'Y eltolás', tooltip: undefined },
+            xAnchor: {
+              label: 'Vízszintes igazítás',
+              tooltip: 'Beállítja, hogy a lyuk a szülőkomponens bal, középső vagy jobb oldalához igazodjon.',
+            },
+            xOffset: {
+              label: 'X eltolás',
+              tooltip: 'A kiválasztott igazítástól vízszintesen mozdítja el a lyukat.',
+            },
+            yAnchor: {
+              label: 'Függőleges igazítás',
+              tooltip: 'Beállítja, hogy a lyuk a szülőkomponens felső, középső vagy alsó oldalához igazodjon.',
+            },
+            yOffset: {
+              label: 'Y eltolás',
+              tooltip: 'A kiválasztott igazítástól függőlegesen mozdítja el a lyukat.',
+            },
           },
         },
         project: {
           basic: {
             title: 'Általános',
-            name: { label: 'Név', tooltip: undefined },
-            filePath: { label: 'Fájl útvonala', tooltip: undefined },
+            name: {
+              label: 'Név',
+              tooltip: 'A projektnél megjelenő nevet állítja be.',
+            },
+            filePath: {
+              label: 'Fájl útvonala',
+              tooltip: 'Megmutatja, hová van mentve a projekt a számítógépen.',
+            },
           },
           components: {
             title: 'Komponensszínek',
-            leatherColor: { label: 'Bőr színe', tooltip: undefined },
-            strokeColor: { label: 'Körvonal színe', tooltip: undefined },
-            cardColor: { label: 'Kártya színe', tooltip: undefined },
+            leatherColor: {
+              label: 'Bőr színe',
+              tooltip: 'A bőrkomponensek kitöltőszínét állítja be.',
+            },
+            strokeColor: {
+              label: 'Körvonal színe',
+              tooltip: 'A bőrkomponensek körvonalának színét állítja be.',
+            },
+            cardColor: {
+              label: 'Kártya színe',
+              tooltip: 'A zsebekben megjelenő kártyák színét állítja be.',
+            },
           },
           stitching: {
             title: 'Varrásszínek',
-            stitchHoleColor: { label: 'Öltéslyuk színe', tooltip: undefined },
-            stitchLineColor: { label: 'Varrásvonal színe', tooltip: undefined },
-            threadColor: { label: 'Cérna színe', tooltip: undefined },
+            stitchHoleColor: {
+              label: 'Öltéslyuk színe',
+              tooltip: 'Az öltéslyukak megjelenítési színét állítja be.',
+            },
+            stitchLineColor: {
+              label: 'Varrásvonal színe',
+              tooltip: 'A varrásvonalak megjelenítési színét állítja be.',
+            },
+            threadColor: {
+              label: 'Cérna színe',
+              tooltip: 'A cérna megjelenítési színét állítja be.',
+            },
           },
-          selection: { title: 'Kijelölés színei', selectionColor: { label: 'Kijelölés színe', tooltip: undefined } },
+          selection: {
+            title: 'Kijelölés színei',
+            selectionColor: {
+              label: 'Kijelölés színe',
+              tooltip: 'A kijelölt komponensek kiemelőszínét állítja be.',
+            },
+          },
         },
         export: {
           layout: {
             title: 'Elrendezés',
-            gap: { label: 'Köz', tooltip: undefined },
-            padding: { label: 'Belső margó', tooltip: undefined },
+            gap: {
+              label: 'Köz',
+              tooltip: 'Az exportált komponensek közötti távolságot állítja be az oldalon.',
+            },
+            padding: {
+              label: 'Belső margó',
+              tooltip: 'Az exportált komponensek és az oldal szélei közötti üres területet állítja be.',
+            },
           },
           content: {
             title: 'Tartalom',
-            stitchLineMode: { label: 'Varrásvonalak', tooltip: undefined },
-            showNames: { label: 'Nevek megjelenítése', tooltip: undefined },
-            showDimensions: { label: 'Méretek megjelenítése', tooltip: undefined },
-            childMarkers: { label: 'Gyermekjelölők megjelenítése', tooltip: undefined },
-            cutHelperDistance: { label: 'Vágási segédvonal távolsága', tooltip: undefined },
+            stitchLineMode: {
+              label: 'Varrásvonalak',
+              tooltip: 'Kiválasztja, mely varrásvonalak kerüljenek az exportba.',
+            },
+            showNames: {
+              label: 'Nevek megjelenítése',
+              tooltip: 'A komponensek nevét is belefoglalja az exportált fájlba.',
+            },
+            showDimensions: {
+              label: 'Méretek megjelenítése',
+              tooltip: 'A komponensek méreteit is belefoglalja az exportált fájlba.',
+            },
+            childMarkers: {
+              label: 'Gyermekjelölők megjelenítése',
+              tooltip: 'Jelölőket ad az egymásba helyezett komponensekhez.',
+            },
+            cutHelperDistance: {
+              label: 'Vágási segédvonal távolsága',
+              tooltip: 'A komponens körül rajzolt vágási segédvonal távolságát állítja be. A 0 elrejti a segédvonalat.',
+            },
           },
           pdf: {
             title: 'Oldal',
-            page: { label: 'Papírméret', tooltip: undefined },
-            orientation: { label: 'Tájolás', tooltip: undefined },
-            layout: { label: 'Elrendezés', tooltip: undefined },
+            page: {
+              label: 'Papírméret',
+              tooltip: 'A PDF-hez használt papírméretet választja ki.',
+            },
+            orientation: {
+              label: 'Tájolás',
+              tooltip: 'Kiválasztja, hogy a PDF oldal álló vagy fekvő legyen.',
+            },
+            layout: {
+              label: 'Elrendezés',
+              tooltip: 'Kiválasztja, hogyan rendezze el az exportált komponenseket a PDF-oldalakon.',
+            },
           },
         },
       },
