@@ -1,4 +1,4 @@
-import { ElectronApi } from '../schemas/electronApi'
+import { IpcElectronApi } from '../schemas/electronApi'
 import { dialog } from './methods/dialog'
 import { findExistingFilePaths } from './methods/findExistingFilePaths'
 import { getSettings } from './methods/getSettings'
@@ -9,7 +9,7 @@ import { suggestPath } from './methods/suggestPath'
 import { validateCreatePath } from './methods/validateCreatePath'
 import { write } from './methods/write'
 
-export const _electronApi: ElectronApi = {
+export const _electronApi: IpcElectronApi = {
   dialog,
   findExistingFilePaths,
   getSettings,

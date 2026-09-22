@@ -55,6 +55,11 @@ export const EN = {
     subtitle: 'A simple app for designing leathercraft projects.',
   },
   projects: {
+    dnd: {
+      dropProjectFile: 'Drop project file (.json) to open',
+      dropProjectFileInvalidExtension: 'Only .json project files can be opened.',
+      dropProjectFileMultipleFiles: 'Drop one project file at a time.',
+    },
     buttons: {
       createProject: 'Create project',
       openProject: 'Open project',

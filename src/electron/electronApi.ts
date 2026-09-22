@@ -17,6 +17,7 @@ const api = (): ElectronApi => {
 export const electronApi: ElectronApi = {
   dialog: (request) => api().dialog(request),
   findExistingFilePaths: (request) => api().findExistingFilePaths(request),
+  getPathForFile: (file) => api().getPathForFile(file),
   getSettings: () => api().getSettings(),
   openExternal: (url) => api().openExternal(url),
   read: (request) => api().read(request),
