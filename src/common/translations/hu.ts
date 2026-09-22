@@ -11,6 +11,11 @@ export const HU = {
     subtitle: 'Egyszerű alkalmazás bőrműves projektek tervezéséhez.',
   },
   projects: {
+    dnd: {
+      dropProjectFile: 'Projektfájl (.json) megnyitásához húzd ide.',
+      dropProjectFileInvalidExtension: 'Csak .json projektfájlt lehet megnyitni.',
+      dropProjectFileMultipleFiles: 'Egyszerre csak egy projektfájlt dobj be.',
+    },
     buttons: {
       createProject: 'Projekt létrehozása',
       openProject: 'Projekt megnyitása',
