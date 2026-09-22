@@ -1,8 +1,8 @@
 import typia from 'typia'
 
-import { migrateProject } from '../migrations/migrateProject'
-import type { ProjectSchema } from '../schemas/project'
-import type { GlobalSettingsSchema } from '../schemas/settings'
+import { migrateProject } from '../../common/migrations/migrateProject'
+import type { ProjectSchema } from '../../common/schemas/project'
+import type { GlobalSettingsSchema } from '../../common/schemas/settings'
 
 type StorageKey = 'global-settings' | 'projects'
 
