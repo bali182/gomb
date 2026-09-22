@@ -125,7 +125,7 @@ export type SettingsSetSucceededResponseSchema = HasTypeSchema<'settings-set-suc
 
 export type SettingsSetResponseSchema = SettingsSetSucceededResponseSchema | FileErrorResponseSchema
 
-export type ElectronApi = {
+export type IpcElectronApi = {
   dialog: (request: FileDialogRequestSchema) => Promise<FileDialogResponseSchema>
   findExistingFilePaths: (
     request: FileFindExistingFilePathsRequestSchema,
@@ -138,3 +138,9 @@ export type ElectronApi = {
   validateCreatePath: (request: FileValidateCreatePathRequestSchema) => Promise<FileValidateCreatePathResponseSchema>
   write: (request: FileWriteRequestSchema) => Promise<FileWriteResponseSchema>
 }
+
+export type PreloadElectronApi = {
+  getPathForFile: (file: File) => string
+}
+
+export type ElectronApi = IpcElectronApi & PreloadElectronApi

@@ -14,10 +14,10 @@ export type ProjectFileDropResultSchema = ResultSchema<File, ProjectFileDropErro
 
 type FileDropzoneProps = {
   children: ReactNode
-  onProjectFileDrop: (result: ProjectFileDropResultSchema) => void
+  onDrop: (result: ProjectFileDropResultSchema) => void
 }
 
-export const FileDropzone: FC<FileDropzoneProps> = ({ children, onProjectFileDrop }) => {
+export const FileDropzone: FC<FileDropzoneProps> = ({ children, onDrop }) => {
   const [isDraggingFile, setIsDraggingFile] = useState(false)
   const dragEnterCountRef = useRef(0)
   const { t } = useTranslation()
@@ -69,7 +69,7 @@ export const FileDropzone: FC<FileDropzoneProps> = ({ children, onProjectFileDro
     const files = Array.from(event.dataTransfer.files)
 
     if (files.length > 1) {
-      onProjectFileDrop({ error: 'multiple-files', type: 'error' })
+      onDrop({ error: 'multiple-files', type: 'error' })
       return
     }
 
@@ -80,11 +80,11 @@ export const FileDropzone: FC<FileDropzoneProps> = ({ children, onProjectFileDro
     }
 
     if (!isProjectFile(file)) {
-      onProjectFileDrop({ error: 'invalid-file-extension', type: 'error' })
+      onDrop({ error: 'invalid-file-extension', type: 'error' })
       return
     }
 
-    onProjectFileDrop({ type: 'success', value: file })
+    onDrop({ type: 'success', value: file })
   }
 
   return (

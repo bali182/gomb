@@ -1,18 +1,16 @@
 import { useAtom } from 'jotai'
 import { useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import typia from 'typia'
 
 import { toaster } from '../../common/components/Toaster'
 import { FILE_EXTENSION } from '../../common/constants/fileExtension'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
-import { migrateProject } from '../../common/migrations/migrateProject'
 import type { LoadableSchema } from '../../common/schemas/loadable'
-import type { DeepPartial } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
 import { id } from '../../common/utils/id'
 import { isDefined } from '../../common/utils/isDefined'
+import { parseProjectFileContents } from '../../common/utils/parseProjectFileContents'
 import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
@@ -106,25 +104,11 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       return
     }
 
-    let input: unknown
+    let project: ProjectSchema
 
     try {
-      input = JSON.parse(response.contents)
+      project = parseProjectFileContents(response.contents)
     } catch {
-      setElectronProject(Loadable.failed())
-      return
-    }
-
-    let migratedProject: DeepPartial<ProjectSchema>
-
-    try {
-      migratedProject = migrateProject(input)
-    } catch {
-      setElectronProject(Loadable.failed())
-      return
-    }
-
-    if (!typia.is<ProjectSchema>(migratedProject)) {
       setElectronProject(Loadable.failed())
       return
     }
@@ -133,7 +117,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       Loadable.loaded({
         filePath,
         isDirty: false,
-        project: migratedProject,
+        project,
       }),
     )
   }, [filePath, setElectronProject])
