@@ -3,7 +3,7 @@ import type { FC } from 'react'
 
 import { ReactComponent as Logo } from '../../../../logo.svg?react'
 
-import { version } from '../../../../package.json'
+import { VERSION } from '../../../version'
 import { useTranslation } from '../../hooks/useTranslation'
 
 export const ProjectManagementHeader: FC = () => {
@@ -18,7 +18,7 @@ export const ProjectManagementHeader: FC = () => {
             {t.app.title}
           </Span>
           <Span fontSize="xx-small" color="fg.muted" marginLeft="1" fontWeight="normal" lineHeight="shorter">
-            v{version}
+            v{VERSION}
           </Span>
         </Text>
         <Text fontSize="xs" color="fg.muted">

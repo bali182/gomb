@@ -25,6 +25,7 @@ export const validateProjectSchema = (
   const issues: ValidationIssuesSchema<ProjectSchema> = {
     id: undefined,
     name: nameResult.issues,
+    version: undefined,
     subProjects: [],
     colorSettings: colorSettingsResult.issues,
     stitchingSettings: stitchingSettingsResult.issues,
@@ -32,6 +33,7 @@ export const validateProjectSchema = (
   const committedValue: ProjectSchema = {
     id: currentValue.id,
     name: nameResult.committedValue,
+    version: currentValue.version,
     subProjects: currentValue.subProjects,
     stitchingSettings: stitchingSettingsResult.committedValue,
     colorSettings: colorSettingsResult.committedValue,

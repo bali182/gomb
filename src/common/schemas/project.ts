@@ -4,6 +4,7 @@ import { StitchLineCommonConfigSchema } from './stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
 
 export type ProjectSchema = HasIdentitySchema & {
+  version: string
   subProjects: SubProjectSchema[]
   stitchingSettings: StitchLineCommonConfigSchema
   colorSettings: ColorSettingsSchema

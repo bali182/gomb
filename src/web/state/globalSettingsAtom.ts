@@ -2,9 +2,9 @@ import { atom } from 'jotai'
 import type { SetStateAction } from 'react'
 
 import type { GlobalSettingsSchema } from '../../common/schemas/settings'
-import { readGlobalSettingsFromStorage, saveGlobalSettingsToStorage } from '../../common/state/storage'
 import { createDefaultGlobalSettings } from '../../common/utils/createDefaultGlobalSettings'
 import { getSystemTheme } from '../../common/utils/getSystemTheme'
+import { readGlobalSettingsFromStorage, saveGlobalSettingsToStorage } from './storage'
 
 const globalSettingsStorageAtom = atom<GlobalSettingsSchema>(
   readGlobalSettingsFromStorage(createDefaultGlobalSettings(getSystemTheme())),
