@@ -5,7 +5,7 @@ import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
-import { StitchHole } from './StitchHole'
+import { StitchLineRouteHoles } from './StitchLineRouteHoles'
 import { StitchRouteLabel } from './StitchRouteLabel'
 import { Stitches } from './Stitches'
 
@@ -61,8 +61,9 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
           strokeWidth={stitchLineThickness}
         />
       )}
-      {(!isInteractive || settings.view.stitchHolesVisible) &&
-        route.holes.map((hole, index) => <StitchHole key={index} hole={hole} stitchLine={stitchLine} />)}
+      {(!isInteractive || settings.view.stitchHolesVisible) && (
+        <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} />
+      )}
       {isInteractive && settings.view.stitchesVisible && <Stitches stitches={route.stitches} stitchLine={stitchLine} />}
       {isInteractive && isStitchLineActive && settings.view.stitchCountVisible && <StitchRouteLabel route={route} />}
       {isInteractive && (
