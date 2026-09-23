@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { LANGUAGE } from '../constants/language'
+import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { ComponentSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
@@ -43,6 +44,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
     context,
     validate: validateComponentSchema,
     value: component,
+    throttle: HOT_EDITOR_THROTTLE,
   })
 
   return {

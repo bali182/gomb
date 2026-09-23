@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { LANGUAGE } from '../constants/language'
+import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { EditableSchema } from '../schemas/editable'
 import type { StitchLineCommonConfigSchema, StitchLineSchema } from '../schemas/stitching'
 import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
@@ -45,6 +46,7 @@ export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLi
     context,
     validate: validateStitchLineSchema,
     value: stitchLine,
+    throttle: HOT_EDITOR_THROTTLE,
   })
   const resolvedEditableStitchLine = useMemo(
     () => ({

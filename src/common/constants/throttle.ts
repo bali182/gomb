@@ -1,0 +1,1 @@
+export const HOT_EDITOR_THROTTLE = 300
