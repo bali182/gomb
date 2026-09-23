@@ -26,8 +26,8 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
           closable: true,
           description:
             result.error === 'invalid-file-extension'
-              ? t.projects.dnd.dropProjectFileInvalidExtension
-              : t.projects.dnd.dropProjectFileMultipleFiles,
+              ? t.project.toast.dropProjectFileInvalidExtension
+              : t.project.toast.dropProjectFileMultipleFiles,
           type: 'error',
         })
         return
@@ -59,8 +59,8 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
       addProject,
       navigate,
       t.project.toast.openFailed,
-      t.projects.dnd.dropProjectFileInvalidExtension,
-      t.projects.dnd.dropProjectFileMultipleFiles,
+      t.project.toast.dropProjectFileInvalidExtension,
+      t.project.toast.dropProjectFileMultipleFiles,
     ],
   )
 

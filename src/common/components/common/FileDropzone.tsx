@@ -114,7 +114,7 @@ export const FileDropzone: FC<FileDropzoneProps> = ({ children, onDrop }) => {
             rounded="lg"
           >
             <Icon as={PiFolderOpen} boxSize="10" />
-            <Text>{t.projects.dnd.dropProjectFile}</Text>
+            <Text>{t.projects.dropzone.dropProjectFile}</Text>
           </Box>
         </Box>
       ) : undefined}

@@ -30,8 +30,8 @@ export const useElectronFileDropHandler = (): UseElectronFileDropHandlerOutput =
           closable: true,
           description:
             result.error === 'invalid-file-extension'
-              ? t.projects.dnd.dropProjectFileInvalidExtension
-              : t.projects.dnd.dropProjectFileMultipleFiles,
+              ? t.project.toast.dropProjectFileInvalidExtension
+              : t.project.toast.dropProjectFileMultipleFiles,
           type: 'error',
         })
         return
@@ -56,8 +56,8 @@ export const useElectronFileDropHandler = (): UseElectronFileDropHandlerOutput =
     [
       navigate,
       showOpenFailedToast,
-      t.projects.dnd.dropProjectFileInvalidExtension,
-      t.projects.dnd.dropProjectFileMultipleFiles,
+      t.project.toast.dropProjectFileInvalidExtension,
+      t.project.toast.dropProjectFileMultipleFiles,
     ],
   )
 

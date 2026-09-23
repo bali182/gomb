@@ -11,10 +11,8 @@ export const HU = {
     subtitle: 'Egyszerű alkalmazás bőrműves projektek tervezéséhez.',
   },
   projects: {
-    dnd: {
+    dropzone: {
       dropProjectFile: 'Projektfájl (.json) megnyitásához húzd ide.',
-      dropProjectFileInvalidExtension: 'Csak .json projektfájlt lehet megnyitni.',
-      dropProjectFileMultipleFiles: 'Egyszerre csak egy projektfájlt dobj be.',
     },
     buttons: {
       createProject: 'Projekt létrehozása',
@@ -56,6 +54,8 @@ export const HU = {
       },
     },
     toast: {
+      dropProjectFileInvalidExtension: 'Csak .json projektfájlt lehet megnyitni.',
+      dropProjectFileMultipleFiles: 'Egyszerre csak egy projektfájlt dobj be.',
       openFailed: 'A projekt megnyitása nem sikerült.',
       saveFailed: 'A projekt mentése nem sikerült.',
       saveSucceeded: 'Mentve.',
