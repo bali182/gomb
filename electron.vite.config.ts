@@ -1,8 +1,25 @@
 import typia from '@typia/unplugin/vite'
 import { defineConfig } from 'electron-vite'
 import { resolve } from 'node:path'
+import type { Plugin } from 'vite'
+import { version } from './package.json'
 import { electronBuildTargets } from './src/electron/electron-api/buildPaths'
 import { createViteConfig } from './vite.common'
+
+const appTitle = (version: string): Plugin => {
+  return {
+    name: 'app-title',
+    transformIndexHtml() {
+      return [
+        {
+          tag: 'title',
+          children: `Gomb v${version}`,
+          injectTo: 'head',
+        },
+      ]
+    },
+  }
+}
 
 const developmentContentSecurityPolicy = `
   base-uri 'self';
@@ -28,6 +45,13 @@ const productionContentSecurityPolicy = `
 
 export default defineConfig(({ command }) => {
   const contentSecurityPolicy = command === 'serve' ? developmentContentSecurityPolicy : productionContentSecurityPolicy
+  const rendererConfig = createViteConfig({
+    appEntry: '/index.tsx',
+    base: './',
+    contentSecurityPolicy,
+    isElectron: true,
+    port: 4000,
+  })
 
   return {
     main: {
@@ -58,13 +82,8 @@ export default defineConfig(({ command }) => {
       },
     },
     renderer: {
-      ...createViteConfig({
-        appEntry: '/index.tsx',
-        base: './',
-        contentSecurityPolicy,
-        isElectron: true,
-        port: 4000,
-      }),
+      ...rendererConfig,
+      plugins: [...(rendererConfig.plugins ?? []), appTitle(version)],
       root: resolve('src/electron'),
       build: {
         outDir: resolve(electronBuildTargets.renderer.outputDirectory),
