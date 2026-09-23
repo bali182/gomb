@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { LANGUAGE } from '../constants/language'
+import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { EditableSchema } from '../schemas/editable'
 import type { HoleSchema } from '../schemas/hole'
 import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
@@ -40,6 +41,7 @@ export const useEditableHole = (holeId: string): UseEditableHoleResult => {
     context,
     validate: validateHoleSchema,
     value: hole,
+    throttle: HOT_EDITOR_THROTTLE,
   })
 
   return {
