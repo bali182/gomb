@@ -55,10 +55,8 @@ export const EN = {
     subtitle: 'A simple app for designing leathercraft projects.',
   },
   projects: {
-    dnd: {
+    dropzone: {
       dropProjectFile: 'Drop project file (.json) to open',
-      dropProjectFileInvalidExtension: 'Only .json project files can be opened.',
-      dropProjectFileMultipleFiles: 'Drop one project file at a time.',
     },
     buttons: {
       createProject: 'Create project',
@@ -70,12 +68,12 @@ export const EN = {
     recents: {
       empty: {
         noProjects: {
-          title: 'Még nincs projekted',
-          description: 'Hozz létre egy új projektet a kezdéshez.',
+          title: 'No projects yet',
+          description: 'Create a new project to get started.',
         },
         noSearchResults: {
-          title: 'Nincs találat',
-          description: 'Próbálj másik keresési kifejezést.',
+          title: 'No results found',
+          description: 'Try a different search term.',
         },
       },
     },
@@ -93,13 +91,15 @@ export const EN = {
   },
   project: {
     tree: {
-      title: 'Elemek',
+      title: 'Components',
       noModuleSelected: {
         title: 'No module selected',
         description: 'Select or create a module.',
       },
     },
     toast: {
+      dropProjectFileInvalidExtension: 'Only .json project files can be opened.',
+      dropProjectFileMultipleFiles: 'Drop one project file at a time.',
       openFailed: 'The project could not be opened.',
       saveFailed: 'The project could not be saved.',
       saveSucceeded: 'Saved.',
@@ -700,8 +700,8 @@ export const EN = {
     },
     errors: {
       moduleNotFound: {
-        title: 'A modul nem található',
-        description: 'A megnyitni kívánt modul nem létezik.',
+        title: 'Module not found',
+        description: 'The module you want to open does not exist.',
       },
       noModules: {
         title: 'No modules yet',
