@@ -57,8 +57,6 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     })
   }, [t.project.toast.saveSucceeded])
 
-  console.log('h')
-
   const writeProject = useCallback(
     async (target: ElectronProjectSchema): Promise<boolean> => {
       const response = await electronApi.write({
