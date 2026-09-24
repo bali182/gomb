@@ -4,6 +4,7 @@ import { PiCopy, PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
+import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { noop } from '../../utils/noop'
@@ -11,10 +12,11 @@ import { noop } from '../../utils/noop'
 type HoleActionsMenuProps = {
   hole: HoleSchema
   size: IconButtonProps['size']
+  onAddStitchLine?: (target: HasTargetSchema) => void
   onDelete?: (holeId: string) => void
 }
 
-export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete = noop }) => {
+export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
   const { t } = useTranslation()
   const { addStitchLineToHole, cloneHole, deleteHole } = useSubProjectOperations()
 
@@ -24,7 +26,8 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onDelete
 
   const handleAddStitchLine = useCallback((): void => {
     addStitchLineToHole(hole.id)
-  }, [addStitchLineToHole, hole.id])
+    onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
+  }, [addStitchLineToHole, hole.id, onAddStitchLine])
 
   const handleClone = useCallback((): void => {
     cloneHole(hole.id)
