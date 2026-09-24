@@ -8,6 +8,7 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import { portalRef } from '../portalRef'
+import type { HasComponentTargetSchema, HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
 import { SubProjectSchema } from '../schemas/subProject'
@@ -20,8 +21,9 @@ type ComponentActionsProps = {
   subProject: SubProjectSchema
   subProjectOnly?: boolean
   size: IconButtonProps['size']
-  onAddChild?: (parentId: string, type: ComponentSchema['type']) => void
-  onAddStitchLine?: (componentId: string, type: StitchLineSchema['type']) => void
+  onAddChild?: (target: HasComponentTargetSchema, type: ComponentSchema['type']) => void
+  onAddHole?: (target: HasComponentTargetSchema) => void
+  onAddStitchLine?: (target: HasTargetSchema, type: StitchLineSchema['type']) => void
   onDelete?: (componentId: string) => void
 }
 
@@ -31,6 +33,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   subProject,
   subProjectOnly,
   onAddChild = noop,
+  onAddHole = noop,
   onAddStitchLine = noop,
   onDelete = noop,
 }) => {
@@ -84,7 +87,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const handleAddChild = useCallback(
     (type: ComponentSchema['type']): void => {
       addComponent(component.id, type)
-      onAddChild(component.id, type)
+      onAddChild({ targetId: component.id, targetType: 'component' }, type)
     },
     [addComponent, component.id, onAddChild],
   )
@@ -121,14 +124,15 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const handleAddStitchLine = useCallback(
     (type: StitchLineSchema['type']): void => {
       addStitchLineToComponent(component.id, type)
-      onAddStitchLine(component.id, type)
+      onAddStitchLine({ targetId: component.id, targetType: 'component' }, type)
     },
-    [addStitchLineToComponent, component, onAddStitchLine],
+    [addStitchLineToComponent, component.id, onAddStitchLine],
   )
 
   const handleAddHole = useCallback((): void => {
     addHole(component.id)
-  }, [addHole, component.id])
+    onAddHole({ targetId: component.id, targetType: 'component' })
+  }, [addHole, component.id, onAddHole])
 
   const HoleIcon = getModelIcon('hole')
 

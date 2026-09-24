@@ -3,6 +3,7 @@ import { useCallback, useEffect, useImperativeHandle, useState, type FC, type Re
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import type { HasTargetSchema } from '../../schemas/common'
 import { isDefined } from '../../utils/isDefined'
 import { ComponentActionsMenu } from '../ComponentActionsMenu'
 import { StitchLineActionsMenu } from '../StitchLineActionsMenu'
@@ -10,7 +11,7 @@ import { ComponentTree } from './ComponentTree'
 import { HoleActionsMenu } from './HoleActionsMenu'
 import type { ProjectTreeNode } from './types/nodeTypes'
 import { getNextExpandedNodeIds } from './utils/getNextExpandedNodeIds'
-import { getComponentNodeId } from './utils/treeNodeIds'
+import { getComponentNodeId, getHoleNodeId } from './utils/treeNodeIds'
 import { useComponentTreeCollection } from './utils/useComponentTreeCollection'
 
 export type EditorComponentTreeHandle = {
@@ -62,11 +63,18 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
     }
   }, [selected, subProject])
 
-  const handleAddChild = useCallback((parentId: string): void => {
-    setExpandedNodeIds((currentExpandedNodeIds) =>
-      Array.from(new Set([...currentExpandedNodeIds, getComponentNodeId(parentId)])),
-    )
-  }, [])
+  const handleAdd = useCallback(
+    (target: HasTargetSchema): void => {
+      const targetNodeId =
+        target.targetType === 'component' ? getComponentNodeId(target.targetId) : getHoleNodeId(target.targetId)
+      const parentNodeIds = collection.getParentNodes(targetNodeId).map((node) => node.id)
+
+      setExpandedNodeIds((currentExpandedNodeIds) =>
+        Array.from(new Set([...currentExpandedNodeIds, ...parentNodeIds, targetNodeId])),
+      )
+    },
+    [collection],
+  )
 
   const handleHoleDelete = useCallback(
     (holeId: string): void => {
@@ -93,18 +101,20 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
           return (
             <ComponentActionsMenu
               component={node.component}
-              onAddChild={handleAddChild}
+              onAddChild={handleAdd}
+              onAddHole={handleAdd}
+              onAddStitchLine={handleAdd}
               size="2xs"
               subProject={subProject}
             />
           )
         case 'hole':
-          return <HoleActionsMenu hole={node.hole} onDelete={handleHoleDelete} size="2xs" />
+          return <HoleActionsMenu hole={node.hole} onAddStitchLine={handleAdd} onDelete={handleHoleDelete} size="2xs" />
         case 'stitch-line':
           return <StitchLineActionsMenu onDelete={handleStitchLineDelete} size="2xs" stitchLine={node.stitchLine} />
       }
     },
-    [handleAddChild, handleHoleDelete, handleStitchLineDelete, subProject],
+    [handleAdd, handleHoleDelete, handleStitchLineDelete, subProject],
   )
 
   return (
