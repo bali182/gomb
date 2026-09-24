@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FC, type ReactNode } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useState, type FC, type ReactNode, type Ref } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -13,7 +13,16 @@ import { getNextExpandedNodeIds } from './utils/getNextExpandedNodeIds'
 import { getComponentNodeId } from './utils/treeNodeIds'
 import { useComponentTreeCollection } from './utils/useComponentTreeCollection'
 
-export const EditorComponentTree: FC = () => {
+export type EditorComponentTreeHandle = {
+  collapseAll: () => void
+  expandAll: () => void
+}
+
+type EditorComponentTreeProps = {
+  ref?: Ref<EditorComponentTreeHandle>
+}
+
+export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
   const { selection } = useDrawAreaContext()
   const { subProject } = useSubProject()
   const operations = useSubProjectOperations()
@@ -25,6 +34,16 @@ export const EditorComponentTree: FC = () => {
   })
 
   const { selected } = selection
+
+  const collapseAll = useCallback((): void => {
+    setExpandedNodeIds([])
+  }, [])
+
+  const expandAll = useCallback((): void => {
+    setExpandedNodeIds(collection.getBranchValues())
+  }, [collection])
+
+  useImperativeHandle(ref, () => ({ collapseAll, expandAll }), [collapseAll, expandAll])
 
   useEffect(() => {
     setExpandedNodeIds((currentExpandedNodeIds) => {
