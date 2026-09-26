@@ -125,6 +125,7 @@ export const useSvgDrawArea = (
       exportTextStyles,
       markerStyles,
       exportIdentifiers,
+      labelStyles: defaultDrawAreaContext.labelStyles,
       stitchRouteLabelStyles: defaultDrawAreaContext.stitchRouteLabelStyles,
     }),
     [componentStyles, exportIdentifiers, exportTextStyles, holeStyles, markerStyles, stitchLineStyles],

@@ -15,9 +15,9 @@ import type {
   DrawAreaExportIdentifiers,
   DrawAreaExportTextStyles,
   DrawAreaHoleStyles,
+  DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
   DrawAreaStitchLineStyles,
-  DrawAreaStitchRouteLabelStyles,
 } from '../schemas/drawArea'
 import { useSubProjectSelection } from './useSubProjectSelection'
 
@@ -177,7 +177,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
     ],
   )
 
-  const stitchRouteLabelStyles = useMemo<DrawAreaStitchRouteLabelStyles>(
+  const labelStyles = useMemo<DrawAreaLabelStyles>(
     () => ({
       getLabelBackgroundColor: produce(STITCH_LINE_LABEL_BACKGROUND_COLOR),
       getLabelColor: produce(STITCH_LINE_LABEL_COLOR),
@@ -199,9 +199,10 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       exportTextStyles,
       markerStyles,
       exportIdentifiers,
-      stitchRouteLabelStyles,
+      labelStyles,
+      stitchRouteLabelStyles: labelStyles,
     }),
-    [cardStyles, componentStyles, drawAreaSelection, holeStyles, stitchLineStyles, stitchRouteLabelStyles],
+    [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles],
   )
 
   return drawAreaContextValue
