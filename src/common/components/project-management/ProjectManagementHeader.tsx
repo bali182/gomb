@@ -5,14 +5,15 @@ import { ReactComponent as Logo } from '../../../../logo.svg?react'
 
 import { VERSION } from '../../../version'
 import { useTranslation } from '../../hooks/useTranslation'
+import { GlobalSettingsButton } from '../GlobalSettingsButton'
 
 export const ProjectManagementHeader: FC = () => {
   const { t } = useTranslation()
 
   return (
-    <HStack gap="2.5">
+    <HStack gap="2.5" width="100%">
       <Icon as={Logo} boxSize="40px" fill="fg" />
-      <VStack gap="0" align="start">
+      <VStack gap="0" align="start" marginRight="auto">
         <Text lineHeight="shorter">
           <Span fontSize="large" fontWeight="semibold" lineHeight="shorter">
             {t.app.title}
@@ -25,6 +26,7 @@ export const ProjectManagementHeader: FC = () => {
           {t.app.subtitle}
         </Text>
       </VStack>
+      <GlobalSettingsButton />
     </HStack>
   )
 }
