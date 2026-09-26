@@ -1,11 +1,13 @@
 import BigNumber from 'bignumber.js'
 import { type CSSProperties, type FC, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { IconType } from 'react-icons'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import type { PointSchema, RectSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
+import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
 const DEFAULT_LABEL_MARGIN = 3
 const DEFAULT_LABEL_PADDING_X = 1.5
@@ -41,6 +43,7 @@ export const Label: FC<LabelProps> = ({
   const fontFamily = labelStyles.getLabelFontFamily()
   const fontSize = labelStyles.getLabelFontSize()
   const textStyle: CSSProperties = { color, fontFamily, fontSize }
+  const portalTarget = svgLabelsPortalRef.current
 
   useLayoutEffect(() => {
     const textElement = textRef.current
@@ -54,7 +57,7 @@ export const Label: FC<LabelProps> = ({
       width: new BigNumber(width),
       height: new BigNumber(height),
     })
-  }, [fontFamily, fontSize, label])
+  }, [fontFamily, fontSize, label, portalTarget])
 
   const backgroundBounds = useMemo<RectSchema | undefined>(() => {
     if (!isDefined(textBounds)) {
@@ -84,7 +87,11 @@ export const Label: FC<LabelProps> = ({
     return BigNumber.minimum(backgroundBounds.width, backgroundBounds.height).dividedBy(2)
   }, [backgroundBounds])
 
-  return (
+  if (!isDefined(portalTarget)) {
+    return null
+  }
+
+  return createPortal(
     <g
       opacity={isDefined(position) ? 1 : 0}
       pointerEvents="none"
@@ -121,7 +128,8 @@ export const Label: FC<LabelProps> = ({
       >
         {label}
       </text>
-    </g>
+    </g>,
+    portalTarget,
   )
 }
 
