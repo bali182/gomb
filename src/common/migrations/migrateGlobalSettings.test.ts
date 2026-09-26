@@ -13,7 +13,8 @@ describe('migrateGlobalSettings', () => {
   it('adds nested defaults to versionless settings while preserving existing values and arrays', () => {
     const splitterSizes: [string, string] = ['250px', '450px']
     const legacySettings: DeepPartial<GlobalSettingsSchema> = {
-      app: { splitterSizes, theme: 'dark' },
+      app: { theme: 'dark' },
+      ui: { splitterSizes },
       edit: { step: 5 },
     }
 
@@ -21,10 +22,11 @@ describe('migrateGlobalSettings', () => {
 
     expect(migratedSettings).toEqual({
       ...defaults,
-      app: { ...defaults.app, splitterSizes, theme: 'dark' },
+      app: { ...defaults.app, theme: 'dark' },
+      ui: { ...defaults.ui, splitterSizes },
       edit: { ...defaults.edit, step: 5 },
     })
-    expect(migratedSettings.app?.splitterSizes).toBe(splitterSizes)
+    expect(migratedSettings.ui?.splitterSizes).toBe(splitterSizes)
     expect(typia.is<GlobalSettingsSchema>(migratedSettings)).toBe(true)
   })
 
@@ -34,9 +36,9 @@ describe('migrateGlobalSettings', () => {
 
   it('does not repair an existing incomplete array', () => {
     const splitterSizes = ['250px']
-    const migratedSettings = migrateGlobalSettings({ app: { splitterSizes } }, defaults)
+    const migratedSettings = migrateGlobalSettings({ ui: { splitterSizes } }, defaults)
 
-    expect(migratedSettings.app?.splitterSizes).toBe(splitterSizes)
+    expect(migratedSettings.ui?.splitterSizes).toBe(splitterSizes)
     expect(typia.is<GlobalSettingsSchema>(migratedSettings)).toBe(false)
   })
 

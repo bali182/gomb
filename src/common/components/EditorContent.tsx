@@ -10,8 +10,8 @@ import {
   SplitterPanelData,
   SplitterResizeEndDetails,
 } from '@chakra-ui/react'
-import { FC, ReactElement, useCallback, useMemo, useRef } from 'react'
-import { PiCopySimple, PiMinus, PiPlus, PiWarningCircle } from 'react-icons/pi'
+import { FC, ReactElement, useCallback, useMemo, useRef, useState } from 'react'
+import { PiCopySimple, PiGearSix, PiMinus, PiPlus, PiWarningCircle } from 'react-icons/pi'
 import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
@@ -25,6 +25,7 @@ import { DrawArea } from './DrawArea'
 import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
 import { FloatingEditors } from './FloatingEditors'
+import { GlobalSettingsDialog } from './GlobalSettingsDialog'
 
 const panels: SplitterPanelData[] = [
   { id: 'draw-area', collapsible: false },
@@ -39,7 +40,8 @@ type EditorContentProps = {
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
   const { t } = useTranslation()
   const { project } = useProject()
-  const { setAppSettings, settings } = useGlobalSettings()
+  const { setUISettings, settings } = useGlobalSettings()
+  const [isGlobalSettingsOpen, setGlobalSettingsOpen] = useState<boolean>(false)
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
   const subProject = useMemo(
     () => project.subProjects.find((candidate) => candidate.id === subProjectId),
@@ -47,9 +49,9 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   )
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
-      setAppSettings({ splitterSizes: [size[0], size[1]] })
+      setUISettings({ splitterSizes: [size[0], size[1]] })
     },
-    [setAppSettings],
+    [setUISettings],
   )
   const handleCollapseAll = useCallback((): void => {
     componentTreeRef.current?.collapseAll()
@@ -58,11 +60,14 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const handleExpandAll = useCallback((): void => {
     componentTreeRef.current?.expandAll()
   }, [])
+  const handleOpenGlobalSettings = useCallback((): void => {
+    setGlobalSettingsOpen(true)
+  }, [])
 
   return (
     <Flex direction="column" height="100%" minHeight="0" minWidth="0">
       <Splitter.Root
-        defaultSize={settings.app.splitterSizes}
+        defaultSize={settings.ui.splitterSizes}
         flex="1"
         minHeight="0"
         minWidth="0"
@@ -77,9 +82,30 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
             {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
 
             <Box left="3" position="absolute" right="3" top="3" zIndex="1">
-              <Box maxWidth="100%" width="fit-content">
-                <EditorMenu menu={menu} projects={projects} />
-              </Box>
+              <Flex alignItems="stretch" gap="3" justifyContent="space-between" minWidth="0">
+                <Box maxWidth="100%" minWidth="0" width="fit-content">
+                  <EditorMenu menu={menu} projects={projects} />
+                </Box>
+                <IconButton
+                  position="absolute"
+                  right="0"
+                  top="0"
+                  bottom="0"
+                  width="auto"
+                  height="auto"
+                  aspectRatio={1}
+                  minWidth="0"
+                  padding="0"
+                  rounded="full"
+                  variant="outline"
+                  bg="bg.panel"
+                  borderColor="border"
+                  _hover={{ bg: 'colorPalette.subtle' }}
+                  onClick={handleOpenGlobalSettings}
+                >
+                  <PiGearSix />
+                </IconButton>
+              </Flex>
             </Box>
 
             {isDefined(subProject) && <FloatingEditors />}
@@ -143,6 +169,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
           <EditorSubProjectTabs />
         </Box>
       </Box>
+      <GlobalSettingsDialog isOpen={isGlobalSettingsOpen} onOpenChange={setGlobalSettingsOpen} />
     </Flex>
   )
 }

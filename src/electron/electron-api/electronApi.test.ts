@@ -66,7 +66,7 @@ describe('electronApi', () => {
 
     expect(settings.version).toBe(VERSION)
     expect(settings.app.theme).toBe('dark')
-    expect(settings.app.splitterSizes).toEqual(['auto', '350px'])
+    expect(settings.ui.splitterSizes).toEqual(['auto', '350px'])
     expect(writeFile).not.toHaveBeenCalled()
   })
 

@@ -10,6 +10,7 @@ import type {
   AppSettingsSchema,
   BaseExportSettingsSchema,
   EditSettingSchema,
+  UISettingsSchema,
   ViewSettingsSchema,
 } from '../../common/schemas/settings'
 import { isDefined } from '../../common/utils/isDefined'
@@ -21,6 +22,13 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
   const setAppSettings = useCallback(
     (updates: Partial<AppSettingsSchema>): void => {
       setSettings((current) => ({ ...current, app: { ...current.app, ...updates } }))
+    },
+    [setSettings],
+  )
+
+  const setUISettings = useCallback(
+    (updates: Partial<UISettingsSchema>): void => {
+      setSettings((current) => ({ ...current, ui: { ...current.ui, ...updates } }))
     },
     [setSettings],
   )
@@ -79,6 +87,7 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
       setSettings,
       setSvgExportSettings,
       setViewSettings,
+      setUISettings,
       settings,
     }),
     [
@@ -88,6 +97,7 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
       setRecentProjects,
       setSettings,
       setSvgExportSettings,
+      setUISettings,
       setViewSettings,
       settings,
     ],

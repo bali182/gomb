@@ -19,6 +19,7 @@ import type {
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
 import type {
+  AppSettingsSchema,
   ComponentColorSettingsSchema,
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
@@ -36,6 +37,7 @@ import type {
   PocketClusterStitchLineOwnSchema,
   StitchLineCommonConfigSchema,
 } from '../schemas/stitching'
+import type { ThemeSchema } from '../schemas/theme'
 import type {
   DialogTranslationSchema,
   EnumTranslationSchema,
@@ -229,6 +231,13 @@ export const EN = {
         },
       },
       sections: {
+        globalSettings: {
+          app: {
+            title: 'General',
+            theme: { label: 'Theme' },
+            language: { label: 'Language' },
+          } satisfies SectionTranslationSchema<AppSettingsSchema>,
+        },
         common: {
           cornerRadius: {
             title: 'Corner radius',
@@ -626,6 +635,12 @@ export const EN = {
         },
       },
       enums: {
+        globalSettings: {
+          theme: {
+            light: 'Light',
+            dark: 'Dark',
+          } satisfies EnumTranslationSchema<ThemeSchema>,
+        },
         common: {
           anchor: {
             vertical: {
@@ -710,6 +725,10 @@ export const EN = {
     },
   },
   dialogs: {
+    globalSettings: {
+      title: 'Settings',
+      positiveAction: 'OK',
+    },
     svgExport: {
       title: 'Export SVG',
       positiveAction: 'Export',

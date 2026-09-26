@@ -1,9 +1,8 @@
-import { Card, HStack, IconButton, Input, Separator, Switch } from '@chakra-ui/react'
+import { Card, HStack, IconButton, Input, Separator } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type FC, type ReactElement } from 'react'
-import { PiCaretLeft, PiMoon, PiSun, PiWalletDuotone } from 'react-icons/pi'
+import { PiCaretLeft, PiWalletDuotone } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditableProject } from '../../hooks/useEditableProject'
-import { useTheme } from '../../hooks/useTheme'
 import type { ProjectSchema } from '../../schemas/project'
 import { isDefined } from '../../utils/isDefined'
 
@@ -14,20 +13,16 @@ type EditorMenuProps = {
 
 export const EditorMenu: FC<EditorMenuProps> = ({ menu, projects }) => {
   const { editableProject, setProject, validationIssues } = useEditableProject(projects)
-  const { theme, setTheme } = useTheme()
   const { navigateToProjects } = useEditorContext()
   const hasNameError = isDefined(validationIssues.name) && validationIssues.name.severity === 'error'
 
-  const handleThemeChange = useCallback(
-    (details: Switch.CheckedChangeDetails): void => setTheme(details.checked ? 'dark' : 'light'),
-    [setTheme],
-  )
   const handleNameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       setProject({ ...editableProject, name: event.currentTarget.value })
     },
     [editableProject, setProject],
   )
+
   const handleNavigateToProjects = useCallback((): void => {
     navigateToProjects()
   }, [navigateToProjects])
@@ -58,16 +53,6 @@ export const EditorMenu: FC<EditorMenuProps> = ({ menu, projects }) => {
           </HStack>
           <Separator orientation="vertical" height="5" ml="3" mr="3" />
           <HStack gap="1">{menu}</HStack>
-          <Separator orientation="vertical" height="5" ml="3" mr="7" />
-          <Switch.Root checked={theme === 'dark'} onCheckedChange={handleThemeChange} size="lg">
-            <Switch.HiddenInput />
-            <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
-              <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }} />
-              <Switch.Indicator fallback={<PiSun />}>
-                <PiMoon />
-              </Switch.Indicator>
-            </Switch.Control>
-          </Switch.Root>
         </Card.Body>
       </Card.Root>
     </>

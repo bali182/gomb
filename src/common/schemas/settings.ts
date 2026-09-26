@@ -47,6 +47,9 @@ export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportConten
 export type AppSettingsSchema = {
   theme: ThemeSchema
   language: LanguageSchema
+}
+
+export type UISettingsSchema = {
   splitterSizes: [number | string, number | string]
 }
 
@@ -65,6 +68,7 @@ export type ViewSettingsSchema = {
 
 export type GlobalSettingsSchema = HasVersionSchema & {
   app: AppSettingsSchema
+  ui: UISettingsSchema
   edit: EditSettingSchema
   view: ViewSettingsSchema
   svgExport: BaseExportSettingsSchema

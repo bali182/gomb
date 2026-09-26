@@ -185,6 +185,13 @@ export const HU = {
         },
       },
       sections: {
+        globalSettings: {
+          app: {
+            title: 'Általános',
+            theme: { label: 'Téma' },
+            language: { label: 'Nyelv' },
+          },
+        },
         common: {
           cornerRadius: {
             title: 'Sarokrádiusz',
@@ -568,6 +575,12 @@ export const HU = {
         },
       },
       enums: {
+        globalSettings: {
+          theme: {
+            light: 'Világos',
+            dark: 'Sötét',
+          },
+        },
         common: {
           anchor: {
             vertical: {
@@ -652,6 +665,10 @@ export const HU = {
     },
   },
   dialogs: {
+    globalSettings: {
+      title: 'Beállítások',
+      positiveAction: 'OK',
+    },
     svgExport: {
       title: 'SVG exportálása',
       positiveAction: 'Exportálás',

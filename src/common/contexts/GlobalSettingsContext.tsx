@@ -7,11 +7,13 @@ import type {
   BaseExportSettingsSchema,
   EditSettingSchema,
   GlobalSettingsSchema,
+  UISettingsSchema,
   ViewSettingsSchema,
 } from '../schemas/settings'
 
 export type GlobalSettingsContextValue = {
   setAppSettings: (settings: Partial<AppSettingsSchema>) => void
+  setUISettings: (settings: Partial<UISettingsSchema>) => void
   setEditSettings: (settings: Partial<EditSettingSchema>) => void
   setPdfExportSettings: (settings: Partial<PdfExportSettingsSchema>) => void
   setRecentProjects: (settings: Partial<RecentProjectsSchema>) => void

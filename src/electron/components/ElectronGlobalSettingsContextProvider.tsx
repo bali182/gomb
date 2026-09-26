@@ -10,6 +10,7 @@ import type {
   BaseExportSettingsSchema,
   EditSettingSchema,
   GlobalSettingsSchema,
+  UISettingsSchema,
   ViewSettingsSchema,
 } from '../../common/schemas/settings'
 import { isDefined } from '../../common/utils/isDefined'
@@ -44,6 +45,10 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
 
   const setAppSettings = useCallback((updates: Partial<AppSettingsSchema>): void => {
     setSettings((current) => ({ ...current, app: { ...current.app, ...updates } }))
+  }, [])
+
+  const setUISettings = useCallback((updates: Partial<UISettingsSchema>): void => {
+    setSettings((current) => ({ ...current, ui: { ...current.ui, ...updates } }))
   }, [])
 
   const setEditSettings = useCallback((updates: Partial<EditSettingSchema>): void => {
@@ -85,6 +90,7 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
       setSettings,
       setSvgExportSettings,
       setViewSettings,
+      setUISettings,
       settings,
     }),
     [
@@ -95,6 +101,7 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
       setSettings,
       setSvgExportSettings,
       setViewSettings,
+      setUISettings,
       settings,
     ],
   )
