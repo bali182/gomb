@@ -62,6 +62,7 @@ export type ViewSettingsSchema = {
 }
 
 export type GlobalSettingsSchema = {
+  version: string
   app: AppSettingsSchema
   edit: EditSettingSchema
   view: ViewSettingsSchema

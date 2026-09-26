@@ -6,7 +6,7 @@ import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { m } from './migrationUtils'
 
-export const migrate = (migrator: ProjectMigratorSchema): ProjectMigration => {
+export const createProjectMigration = (migrator: ProjectMigratorSchema): ProjectMigration => {
   return (project: DeepPartial<ProjectSchema>): DeepPartial<ProjectSchema> => {
     const migratedProject = migrator.project(project)
     const migratedColorSettings = migrator.colorSettings(m.requireObject(migratedProject.colorSettings))

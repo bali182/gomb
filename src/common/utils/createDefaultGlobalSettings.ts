@@ -1,9 +1,11 @@
+import { VERSION } from '../../version'
 import { defaultPdfExportParams, defaultSvgExportParams } from '../defaultStates'
 import type { GlobalSettingsSchema } from '../schemas/settings'
 import type { ThemeSchema } from '../schemas/theme'
 
 export const createDefaultGlobalSettings = (theme: ThemeSchema): GlobalSettingsSchema => {
   return {
+    version: VERSION,
     app: {
       splitterSizes: ['auto', '350px'],
       theme,

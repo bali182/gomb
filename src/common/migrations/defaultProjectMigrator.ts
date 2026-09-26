@@ -19,7 +19,7 @@ import type {
   StitchLineCommonConfigSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { migrate } from './migrate'
+import { createProjectMigration } from './createProjectMigration'
 import { m } from './migrationUtils'
 
 const defaultProjectMigratorSchema: ProjectMigratorSchema = {
@@ -106,7 +106,7 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   },
 }
 
-export const defaultProjectMigrator = migrate(defaultProjectMigratorSchema)
+export const defaultProjectMigrator = createProjectMigration(defaultProjectMigratorSchema)
 
 const applyDefaults = <T extends object>(input: DeepPartial<T>, defaults: DeepPartial<T>): DeepPartial<T> => {
   const output = { ...input } as DeepPartial<T>
