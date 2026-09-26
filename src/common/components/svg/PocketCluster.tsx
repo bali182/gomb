@@ -1,16 +1,20 @@
-import { Fragment, useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { Fragment, useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { PiRectangleDashed, PiShield } from 'react-icons/pi'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
+import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import { StitchSideSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import { Card } from './Card'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
+import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { TPocket } from './TPocket'
 import { TPocketStitchLines } from './TPocketStitchLines'
@@ -22,6 +26,7 @@ type PocketClusterProps = {
 
 export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
+  const { settings } = useGlobalSettings()
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
   const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
   const pathData = usePath(computedPocketCluster.path)
@@ -45,6 +50,19 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
     },
     [pocketCluster, selection],
   )
+
+  const topPocketLabelLocation = useMemo<StitchSideSchema>(() => {
+    switch (pocketCluster.orientation) {
+      case 'up':
+        return 'top'
+      case 'down':
+        return 'bottom'
+      case 'left':
+        return 'left'
+      case 'right':
+        return 'right'
+    }
+  }, [pocketCluster.orientation])
 
   return (
     <>
@@ -88,6 +106,21 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
           strokeWidth={componentStyles.getBorderThickness(clusterStyleParams)}
         />
       </g>
+      {isInteractive && settings.view.componentDimensionsVisible && isSelected && (
+        <>
+          <SizeLabel
+            icon={PiRectangleDashed}
+            reference="bottom-right"
+            boundingRect={computedPocketCluster.boundingRect}
+          />
+          <SizeLabel
+            icon={PiShield}
+            reference={topPocketLabelLocation}
+            boundingRect={computedPocketCluster.frontPocket.boundingRect}
+            ignoreStitchMargin
+          />
+        </>
+      )}
       <StitchLines componentId={pocketCluster.id} />
       <HoleHighlights componentId={pocketCluster.id} />
       {computedPocketCluster.children.map((component) => {

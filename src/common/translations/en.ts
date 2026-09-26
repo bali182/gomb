@@ -24,6 +24,7 @@ import type {
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
   ExportStitchLineModeSchema,
+  LanguageSchema,
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
@@ -49,7 +50,16 @@ import type { CardSchemaId } from '../schemas/valuables'
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
 
-register('en', en)
+const language: LanguageSchema = 'en-GB'
+
+register(language, en)
+
+const numberFormats = {
+  max: {
+    1: new Intl.NumberFormat(language, { maximumFractionDigits: 1 }),
+    2: new Intl.NumberFormat(language, { maximumFractionDigits: 2 }),
+  },
+}
 
 export const EN = {
   app: {
@@ -879,8 +889,13 @@ export const EN = {
     },
   },
   formatters: {
-    size: (size: number) => `${size}mm`,
+    size: (size: string) => `${size}mm`,
     dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    timeago: (date: number): string => format(date, 'en'),
+    dimensionsShort: (width: string, height: string) => `${width}×${height}`,
+    timeago: (date: number): string => format(date, language),
+    number: {
+      max2: (value: number) => numberFormats.max[2].format(value),
+      max1: (value: number) => numberFormats.max[1].format(value),
+    },
   },
 }

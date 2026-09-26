@@ -1,9 +1,19 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 
+import type { LanguageSchema } from '../schemas/settings'
 import type { TranslationSchema } from './translationSchema'
 
-register('hu', hu)
+const language: LanguageSchema = 'hu-HU'
+
+register(language, hu)
+
+const numberFormats = {
+  max: {
+    1: new Intl.NumberFormat(language, { maximumFractionDigits: 1 }),
+    2: new Intl.NumberFormat(language, { maximumFractionDigits: 2 }),
+  },
+}
 
 export const HU = {
   app: {
@@ -819,8 +829,13 @@ export const HU = {
     },
   },
   formatters: {
-    size: (size: number): string => `${size}mm`,
+    size: (size: string): string => `${size}mm`,
     dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
-    timeago: (date: number): string => format(date, 'hu'),
+    dimensionsShort: (width: string, height: string) => `${width}×${height}`,
+    timeago: (date: number): string => format(date, language),
+    number: {
+      max1: (value: number): string => numberFormats.max[1].format(value),
+      max2: (value: number): string => numberFormats.max[2].format(value),
+    },
   },
 } satisfies TranslationSchema

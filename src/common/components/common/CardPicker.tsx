@@ -121,7 +121,9 @@ const CardItems: FC<CardItemsProps> = ({ cards, transform }) => {
             <HStack>
               <PiCreditCard style={{ transform }} />
               <Text>{t.data.cardsSimple[card.id]}</Text>
-              <Text color="fg.muted">({t.formatters.dimensions(card.width.toString(), card.height.toString())})</Text>
+              <Text color="fg.muted">
+                ({t.formatters.dimensions(t.formatters.number.max2(card.width), t.formatters.number.max2(card.height))})
+              </Text>
             </HStack>
             <Select.ItemIndicator />
           </Select.Item>
