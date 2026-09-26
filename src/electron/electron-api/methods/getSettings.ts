@@ -5,10 +5,14 @@ import typia from 'typia'
 import { migrateGlobalSettings } from '../../../common/migrations/migrateGlobalSettings'
 import type { GlobalSettingsSchema } from '../../../common/schemas/settings'
 import { createDefaultGlobalSettings } from '../../../common/utils/createDefaultGlobalSettings'
+import { getElectronDefaultLanguage } from './getElectronDefaultLanguage'
 import { getSettingsFilePath } from './utils'
 
 export const getSettings = async (): Promise<GlobalSettingsSchema> => {
-  const defaults = createDefaultGlobalSettings(nativeTheme.shouldUseDarkColors ? 'dark' : 'light')
+  const defaults = createDefaultGlobalSettings({
+    language: getElectronDefaultLanguage(),
+    theme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light',
+  })
 
   try {
     const contents = await readFile(getSettingsFilePath(), 'utf8')

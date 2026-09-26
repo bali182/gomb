@@ -2,6 +2,7 @@ import { LanguageSchema } from '../schemas/settings'
 import { EN } from '../translations/en'
 import { HU } from '../translations/hu'
 import { TranslationSchema } from '../translations/translationSchema'
+import { useGlobalSettings } from './useGlobalSettings'
 
 export type UseTranslationResult = {
   language: LanguageSchema
@@ -19,17 +20,7 @@ const languages: Record<LanguageSchema, UseTranslationResult> = {
   },
 }
 
-const getTranslationLanguage = (): LanguageSchema => {
-  const language = new Intl.Locale(navigator.language).language
-
-  switch (language) {
-    case 'hu':
-      return 'hu-HU'
-    default:
-      return 'en-GB'
-  }
-}
-
 export const useTranslation = (): UseTranslationResult => {
-  return languages[getTranslationLanguage()]
+  const { settings } = useGlobalSettings()
+  return languages[settings.app.language]
 }

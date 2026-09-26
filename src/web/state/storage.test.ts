@@ -15,7 +15,7 @@ describe('readGlobalSettingsFromStorage', () => {
     const setItem = vi.fn()
     vi.stubGlobal('localStorage', { getItem, removeItem, setItem })
 
-    const defaults = createDefaultGlobalSettings('light')
+    const defaults = createDefaultGlobalSettings({ language: 'en-GB', theme: 'light' })
     const settings = readGlobalSettingsFromStorage(defaults)
 
     expect(settings.version).toBe(VERSION)

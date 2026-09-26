@@ -46,6 +46,7 @@ export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportConten
 
 export type AppSettingsSchema = {
   theme: ThemeSchema
+  language: LanguageSchema
   splitterSizes: [number | string, number | string]
 }
 

@@ -1,17 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { access, getPath, readFile, showOpenDialog, showSaveDialog, stat, writeFile } = vi.hoisted(() => ({
-  access: vi.fn(),
-  getPath: vi.fn(),
-  readFile: vi.fn(),
-  showOpenDialog: vi.fn(),
-  showSaveDialog: vi.fn(),
-  stat: vi.fn(),
-  writeFile: vi.fn(),
-}))
+const { access, getPath, getPreferredSystemLanguages, readFile, showOpenDialog, showSaveDialog, stat, writeFile } =
+  vi.hoisted(() => ({
+    access: vi.fn(),
+    getPath: vi.fn(),
+    getPreferredSystemLanguages: vi.fn(),
+    readFile: vi.fn(),
+    showOpenDialog: vi.fn(),
+    showSaveDialog: vi.fn(),
+    stat: vi.fn(),
+    writeFile: vi.fn(),
+  }))
 
 vi.mock('electron', () => ({
-  app: { getPath },
+  app: { getPath, getPreferredSystemLanguages },
   dialog: {
     showOpenDialog,
     showSaveDialog,
@@ -36,6 +38,7 @@ import { _electronApi } from './electronApi'
 describe('electronApi', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    getPreferredSystemLanguages.mockReturnValue(['en-GB'])
   })
 
   it('reads a known file path', async () => {

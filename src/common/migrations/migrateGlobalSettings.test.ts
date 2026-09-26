@@ -7,7 +7,7 @@ import type { GlobalSettingsSchema } from '../schemas/settings'
 import { createDefaultGlobalSettings } from '../utils/createDefaultGlobalSettings'
 import { migrateGlobalSettings } from './migrateGlobalSettings'
 
-const defaults = createDefaultGlobalSettings('light')
+const defaults = createDefaultGlobalSettings({ language: 'en-GB', theme: 'light' })
 
 describe('migrateGlobalSettings', () => {
   it('adds nested defaults to versionless settings while preserving existing values and arrays', () => {

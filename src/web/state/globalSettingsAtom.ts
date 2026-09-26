@@ -4,10 +4,13 @@ import type { SetStateAction } from 'react'
 import type { GlobalSettingsSchema } from '../../common/schemas/settings'
 import { createDefaultGlobalSettings } from '../../common/utils/createDefaultGlobalSettings'
 import { getSystemTheme } from '../../common/utils/getSystemTheme'
+import { getWebDefaultLanguage } from '../../common/utils/getWebDefaultLanguage'
 import { readGlobalSettingsFromStorage, saveGlobalSettingsToStorage } from './storage'
 
 const globalSettingsStorageAtom = atom<GlobalSettingsSchema>(
-  readGlobalSettingsFromStorage(createDefaultGlobalSettings(getSystemTheme())),
+  readGlobalSettingsFromStorage(
+    createDefaultGlobalSettings({ language: getWebDefaultLanguage(), theme: getSystemTheme() }),
+  ),
 )
 
 export const globalSettingsAtom = atom(
