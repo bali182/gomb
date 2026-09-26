@@ -80,5 +80,4 @@ export const defaultDrawAreaContext: DrawAreaContextValue = {
   markerStyles: drawAreaDefaultMarkerStyles,
   exportIdentifiers: drawAreaExportIdentifiers,
   labelStyles,
-  stitchRouteLabelStyles: labelStyles,
 }

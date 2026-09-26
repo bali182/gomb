@@ -200,7 +200,6 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       markerStyles,
       exportIdentifiers,
       labelStyles,
-      stitchRouteLabelStyles: labelStyles,
     }),
     [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles],
   )

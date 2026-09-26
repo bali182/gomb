@@ -7,15 +7,20 @@ import type { PointSchema, RectSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 
+const DEFAULT_LABEL_MARGIN = 3
+const DEFAULT_LABEL_PADDING_X = 1.5
+const DEFAULT_LABEL_PADDING_Y = 0.3
+const DEFAULT_LABEL_GAP = 0.3
+
 type LabelProps = {
   icon: IconType
   label: string
   reference: StitchSideSchema | StitchCornerSchema
   boundingRect: RectSchema
-  margin: number
-  paddingX: number
-  paddingY: number
-  gap: number
+  margin?: number
+  paddingX?: number
+  paddingY?: number
+  gap?: number
 }
 
 export const Label: FC<LabelProps> = ({
@@ -23,10 +28,10 @@ export const Label: FC<LabelProps> = ({
   label,
   reference,
   boundingRect,
-  margin,
-  paddingX,
-  paddingY,
-  gap,
+  margin = DEFAULT_LABEL_MARGIN,
+  paddingX = DEFAULT_LABEL_PADDING_X,
+  paddingY = DEFAULT_LABEL_PADDING_Y,
+  gap = DEFAULT_LABEL_GAP,
 }) => {
   const { labelStyles } = useDrawAreaContext()
   const textRef = useRef<SVGTextElement>(null)

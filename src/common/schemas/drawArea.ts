@@ -68,8 +68,6 @@ export type DrawAreaLabelStyles = {
   getLabelFontSize: () => number | string | undefined
 }
 
-export type DrawAreaStitchRouteLabelStyles = DrawAreaLabelStyles
-
 export type DrawAreaMarkerStyles = {
   getColor: () => string | undefined
   getThickness: () => number | undefined
@@ -87,5 +85,4 @@ export type DrawAreaContextValue = {
   exportIdentifiers: DrawAreaExportIdentifiers
   markerStyles: DrawAreaMarkerStyles
   labelStyles: DrawAreaLabelStyles
-  stitchRouteLabelStyles: DrawAreaStitchRouteLabelStyles
 }
