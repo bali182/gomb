@@ -39,7 +39,7 @@ export const HU = {
         description: 'A megnyitni kívánt projekt nem létezik.',
       },
       openFailed: {
-        title: 'A projekt nem található',
+        title: 'Hiba!',
         description: 'A projekt megnyitása nem sikerült.',
         back: 'Vissza',
       },
