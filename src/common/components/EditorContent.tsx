@@ -97,10 +97,9 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                   minWidth="0"
                   padding="0"
                   rounded="full"
-                  variant="outline"
-                  bg="bg.panel"
+                  variant="ghost"
                   borderColor="border"
-                  _hover={{ bg: 'colorPalette.subtle' }}
+                  _hover={{ bg: 'bg.panel' }}
                   onClick={handleOpenGlobalSettings}
                 >
                   <PiGearSix />
