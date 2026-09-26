@@ -103,13 +103,14 @@ describe('migrateProject', () => {
     expect(migrateProject(project)).toBe(project)
   })
 
-  it('rejects projects created by a newer app version', () => {
+  it('migrates projects with a different version', () => {
     const project = createProjectWithSubProject()
+    const [major] = VERSION.split('.')
     const newerProject: DeepPartial<ProjectSchema> = {
       ...project,
-      version: '0.0.8',
+      version: `${Number(major) + 1}.0.0`,
     }
 
-    expect(() => migrateProject(newerProject)).toThrow()
+    expect(migrateProject(newerProject).version).toBe(VERSION)
   })
 })

@@ -1,7 +1,7 @@
 import type { PanelSchema, PocketClusterSchema, RootPanelSchema } from './components'
 import type { HoleSchema } from './hole'
 import type { ProjectSchema } from './project'
-import type { ColorSettingsSchema } from './settings'
+import type { ColorSettingsSchema, GlobalSettingsSchema } from './settings'
 import type {
   ComponentBoundsStitchLineSchema,
   PocketClusterStitchLineSchema,
@@ -16,6 +16,11 @@ export type DeepPartial<T> = T extends readonly (infer Item)[]
     : T
 
 export type ProjectMigration = (project: DeepPartial<ProjectSchema>) => DeepPartial<ProjectSchema>
+
+export type GlobalSettingsMigration = (
+  settings: DeepPartial<GlobalSettingsSchema>,
+  defaults: GlobalSettingsSchema,
+) => DeepPartial<GlobalSettingsSchema>
 
 export type ProjectMigratorSchema = {
   project: (input: DeepPartial<ProjectSchema>) => DeepPartial<ProjectSchema>

@@ -1,3 +1,4 @@
+import { HasVersionSchema } from './common'
 import type { PdfExportSettingsSchema } from './pdfExport'
 import type { RecentProjectsSchema } from './recentProject'
 import type { ThemeSchema } from './theme'
@@ -61,8 +62,7 @@ export type ViewSettingsSchema = {
   scale: number
 }
 
-export type GlobalSettingsSchema = {
-  version: string
+export type GlobalSettingsSchema = HasVersionSchema & {
   app: AppSettingsSchema
   edit: EditSettingSchema
   view: ViewSettingsSchema

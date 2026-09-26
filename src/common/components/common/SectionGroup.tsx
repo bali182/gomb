@@ -102,7 +102,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
 const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
   const { t } = useTranslation()
   const issue = useMemo<IssueSchema | undefined>(() => {
-    if ((!isDefined(issues) || isRecord(issues)) && !Array.isArray(issues)) {
+    if (!isDefined(issues) || isRecord(issues)) {
       return issues
     }
     const definedIssues = issues.filter((candidateIssue): candidateIssue is IssueSchema => isDefined(candidateIssue))
