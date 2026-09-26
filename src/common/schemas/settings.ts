@@ -1,6 +1,9 @@
+import { HasVersionSchema } from './common'
 import type { PdfExportSettingsSchema } from './pdfExport'
 import type { RecentProjectsSchema } from './recentProject'
 import type { ThemeSchema } from './theme'
+
+export type LanguageSchema = 'hu-HU' | 'en-GB'
 
 export type NumberEditorStepSchema = number | 'stitch-hole-distance'
 
@@ -43,6 +46,10 @@ export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportConten
 
 export type AppSettingsSchema = {
   theme: ThemeSchema
+  language: LanguageSchema
+}
+
+export type UISettingsSchema = {
   splitterSizes: [number | string, number | string]
 }
 
@@ -59,8 +66,9 @@ export type ViewSettingsSchema = {
   scale: number
 }
 
-export type GlobalSettingsSchema = {
+export type GlobalSettingsSchema = HasVersionSchema & {
   app: AppSettingsSchema
+  ui: UISettingsSchema
   edit: EditSettingSchema
   view: ViewSettingsSchema
   svgExport: BaseExportSettingsSchema

@@ -1,12 +1,16 @@
+import { VERSION } from '../../version'
 import { defaultPdfExportParams, defaultSvgExportParams } from '../defaultStates'
-import type { GlobalSettingsSchema } from '../schemas/settings'
-import type { ThemeSchema } from '../schemas/theme'
+import type { AppSettingsSchema, GlobalSettingsSchema } from '../schemas/settings'
 
-export const createDefaultGlobalSettings = (theme: ThemeSchema): GlobalSettingsSchema => {
+export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSchema): GlobalSettingsSchema => {
   return {
+    version: VERSION,
     app: {
-      splitterSizes: ['auto', '350px'],
       theme,
+      language,
+    },
+    ui: {
+      splitterSizes: ['auto', '350px'],
     },
     edit: {
       addBaseColor: false,

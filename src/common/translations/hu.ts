@@ -39,7 +39,7 @@ export const HU = {
         description: 'A megnyitni kívánt projekt nem létezik.',
       },
       openFailed: {
-        title: 'A projekt nem található',
+        title: 'Hiba!',
         description: 'A projekt megnyitása nem sikerült.',
         back: 'Vissza',
       },
@@ -185,6 +185,13 @@ export const HU = {
         },
       },
       sections: {
+        globalSettings: {
+          app: {
+            title: 'Általános',
+            theme: { label: 'Téma' },
+            language: { label: 'Nyelv' },
+          },
+        },
         common: {
           cornerRadius: {
             title: 'Sarokrádiusz',
@@ -568,6 +575,12 @@ export const HU = {
         },
       },
       enums: {
+        globalSettings: {
+          theme: {
+            light: 'Világos',
+            dark: 'Sötét',
+          },
+        },
         common: {
           anchor: {
             vertical: {
@@ -652,6 +665,10 @@ export const HU = {
     },
   },
   dialogs: {
+    globalSettings: {
+      title: 'Beállítások',
+      positiveAction: 'OK',
+    },
     svgExport: {
       title: 'SVG exportálása',
       positiveAction: 'Exportálás',
@@ -773,11 +790,6 @@ export const HU = {
       'ID-3-portrait': 'ID-3',
     },
   },
-  formatters: {
-    size: (size: number): string => `${size}mm`,
-    dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
-    timeago: (date: number): string => format(date, 'hu'),
-  },
   validation: {
     multipleIssues: (count: number): string => `${count} hiba`,
     name: {
@@ -805,5 +817,10 @@ export const HU = {
       invalid: 'A megadott útvonal érvénytelen vagy nem írható.',
       validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
+  },
+  formatters: {
+    size: (size: number): string => `${size}mm`,
+    dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'hu'),
   },
 } satisfies TranslationSchema

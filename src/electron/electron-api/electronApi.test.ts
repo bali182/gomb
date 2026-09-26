@@ -1,21 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { access, getPath, readFile, showOpenDialog, showSaveDialog, stat, writeFile } = vi.hoisted(() => ({
-  access: vi.fn(),
-  getPath: vi.fn(),
-  readFile: vi.fn(),
-  showOpenDialog: vi.fn(),
-  showSaveDialog: vi.fn(),
-  stat: vi.fn(),
-  writeFile: vi.fn(),
-}))
+const { access, getPath, getPreferredSystemLanguages, readFile, showOpenDialog, showSaveDialog, stat, writeFile } =
+  vi.hoisted(() => ({
+    access: vi.fn(),
+    getPath: vi.fn(),
+    getPreferredSystemLanguages: vi.fn(),
+    readFile: vi.fn(),
+    showOpenDialog: vi.fn(),
+    showSaveDialog: vi.fn(),
+    stat: vi.fn(),
+    writeFile: vi.fn(),
+  }))
 
 vi.mock('electron', () => ({
-  app: { getPath },
+  app: { getPath, getPreferredSystemLanguages },
   dialog: {
     showOpenDialog,
     showSaveDialog,
   },
+  nativeTheme: { shouldUseDarkColors: false },
 }))
 
 vi.mock('node:fs', () => ({
@@ -29,11 +32,13 @@ vi.mock('node:fs/promises', () => ({
   writeFile,
 }))
 
+import { VERSION } from '../../version'
 import { _electronApi } from './electronApi'
 
 describe('electronApi', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    getPreferredSystemLanguages.mockReturnValue(['en-GB'])
   })
 
   it('reads a known file path', async () => {
@@ -51,6 +56,18 @@ describe('electronApi', () => {
     await expect(_electronApi.read({ type: 'read', filePath: '/projects/example.json' })).resolves.toEqual({
       type: 'error',
     })
+  })
+
+  it('loads migrated settings without writing them during read', async () => {
+    getPath.mockReturnValue('/user-data')
+    readFile.mockResolvedValue(JSON.stringify({ app: { theme: 'dark' } }))
+
+    const settings = await _electronApi.getSettings()
+
+    expect(settings.version).toBe(VERSION)
+    expect(settings.app.theme).toBe('dark')
+    expect(settings.ui.splitterSizes).toEqual(['auto', '350px'])
+    expect(writeFile).not.toHaveBeenCalled()
   })
 
   it('writes to a known file path', async () => {

@@ -27,6 +27,7 @@
     "bignumber.js": "11.1.5",
     "bowser": "2.14.1",
     "comlink": "4.4.2",
+    "country-flag-icons": "^1.6.20",
     "culori": "4.0.2",
     "jotai": "2.20.1",
     "jotai-family": "1.1.0",

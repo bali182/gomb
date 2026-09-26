@@ -12,6 +12,10 @@ export type HasName = {
   name: string
 }
 
+export type HasVersionSchema = {
+  version: string
+}
+
 export type HasIdentitySchema = HasId & HasName
 
 export type HasCornerRadiusValuesSchema = {

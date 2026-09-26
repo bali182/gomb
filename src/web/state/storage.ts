@@ -1,5 +1,6 @@
 import typia from 'typia'
 
+import { migrateGlobalSettings } from '../../common/migrations/migrateGlobalSettings'
 import { migrateProject } from '../../common/migrations/migrateProject'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { GlobalSettingsSchema } from '../../common/schemas/settings'
@@ -8,7 +9,7 @@ type StorageKey = 'global-settings' | 'projects'
 
 export const readGlobalSettingsFromStorage = (defaultValue: GlobalSettingsSchema): GlobalSettingsSchema => {
   return safeReadStorage<GlobalSettingsSchema>('global-settings', defaultValue, (raw) =>
-    typia.assert<GlobalSettingsSchema>(raw),
+    typia.assert<GlobalSettingsSchema>(migrateGlobalSettings(raw, defaultValue)),
   )
 }
 

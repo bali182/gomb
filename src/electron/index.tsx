@@ -7,6 +7,7 @@ import '../common/scrollbars.css'
 import { appStore } from '../common/state/store'
 import { createDefaultGlobalSettings } from '../common/utils/createDefaultGlobalSettings'
 import { getSystemTheme } from '../common/utils/getSystemTheme'
+import { getWebDefaultLanguage } from '../common/utils/getWebDefaultLanguage'
 import { ElectronApp } from './ElectronApp'
 import { ElectronGlobalSettingsContextProvider } from './components/ElectronGlobalSettingsContextProvider'
 import { electronApi } from './electronApi'
@@ -31,7 +32,7 @@ const renderElectronApp = async (): Promise<void> => {
     initialSettings = await electronApi.getSettings()
   } catch (error) {
     console.error('Unable to initialize Electron global settings:', error)
-    initialSettings = createDefaultGlobalSettings(getSystemTheme())
+    initialSettings = createDefaultGlobalSettings({ language: getWebDefaultLanguage(), theme: getSystemTheme() })
   }
 
   createRoot(rootElement).render(
