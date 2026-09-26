@@ -3,13 +3,14 @@ import { compiler, RuleType } from 'markdown-to-jsx/react'
 import { FC, useCallback } from 'react'
 import hungarianLicense from '../../../license-hu.md?raw'
 import englishLicense from '../../../license.md?raw'
-import { TranslationLanguage, useTranslation } from '../hooks/useTranslation'
+import { useTranslation } from '../hooks/useTranslation'
+import { LanguageSchema } from '../schemas/settings'
 import { noop } from '../utils/noop'
 import { EditDialog } from './EditDialog'
 
-const licenses: Record<TranslationLanguage, string> = {
-  en: englishLicense,
-  hu: hungarianLicense,
+const licenses: Record<LanguageSchema, string> = {
+  'en-GB': englishLicense,
+  'hu-HU': hungarianLicense,
 }
 
 type LicenseDialogProps = {

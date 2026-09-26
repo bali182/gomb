@@ -773,11 +773,6 @@ export const HU = {
       'ID-3-portrait': 'ID-3',
     },
   },
-  formatters: {
-    size: (size: number): string => `${size}mm`,
-    dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
-    timeago: (date: number): string => format(date, 'hu'),
-  },
   validation: {
     multipleIssues: (count: number): string => `${count} hiba`,
     name: {
@@ -805,5 +800,10 @@ export const HU = {
       invalid: 'A megadott útvonal érvénytelen vagy nem írható.',
       validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
+  },
+  formatters: {
+    size: (size: number): string => `${size}mm`,
+    dimensions: (width: string, height: string): string => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'hu'),
   },
 } satisfies TranslationSchema

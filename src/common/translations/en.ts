@@ -56,7 +56,7 @@ export const EN = {
   },
   projects: {
     dropzone: {
-      dropProjectFile: 'Drop project file (.json) to open',
+      dropProjectFile: 'Drop a project file (.json) to open it',
     },
     buttons: {
       createProject: 'Create project',
@@ -106,7 +106,7 @@ export const EN = {
     },
     export: {
       frontPocketName: (ownerName: string): string => `${ownerName} - front pocket`,
-      tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. pocket`,
+      tPocketName: (ownerName: string, index: number): string => `${ownerName} - Pocket ${index}`,
     },
     menus: {
       file: {
@@ -158,14 +158,14 @@ export const EN = {
       project: {
         name: 'Project',
         colors: {
-          name: 'Colors',
-          leatherColor: 'Leather color',
-          stitchHoleColor: 'Stitch hole color',
-          stitchLineColor: 'Stitch line color',
-          strokeColor: 'Stroke color',
-          selectionColor: 'Selection color',
-          cardColor: 'Card color',
-          threadColor: 'Thread color',
+          name: 'Colours',
+          leatherColor: 'Leather colour',
+          stitchHoleColor: 'Stitch hole colour',
+          stitchLineColor: 'Stitch line colour',
+          strokeColor: 'Stroke colour',
+          selectionColor: 'Selection colour',
+          cardColor: 'Card colour',
+          threadColor: 'Thread colour',
         },
         stitching: {
           name: 'Stitching',
@@ -182,7 +182,7 @@ export const EN = {
           name: 'Resources',
           viewSourceCode: 'View source code',
           reportIssue: 'Report issue',
-          viewLicense: 'License',
+          viewLicense: 'Licence',
         },
         downloadApp: {
           name: 'Download app',
@@ -344,7 +344,7 @@ export const EN = {
               tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
             },
             pocketCount: {
-              label: 'Amount',
+              label: 'Number of pockets',
               tooltip: 'Sets how many pockets are created in this pocket cluster.',
             },
             pocketStep: {
@@ -535,39 +535,39 @@ export const EN = {
             },
           } satisfies SectionTranslationSchema<HasName>,
           components: {
-            title: 'Component colors',
+            title: 'Component colours',
             leatherColor: {
-              label: 'Leather color',
+              label: 'Leather colour',
               tooltip: 'Sets the fill colour used to represent leather components.',
             },
             strokeColor: {
-              label: 'Outline color',
+              label: 'Outline colour',
               tooltip: 'Sets the outline colour used around leather components.',
             },
             cardColor: {
-              label: 'Card color',
+              label: 'Card colour',
               tooltip: 'Sets the colour used for cards shown inside pockets.',
             },
           } satisfies SectionTranslationSchema<ComponentColorSettingsSchema>,
           stitching: {
-            title: 'Stitching colors',
+            title: 'Stitching colours',
             stitchHoleColor: {
-              label: 'Stitch hole color',
+              label: 'Stitch hole colour',
               tooltip: 'Sets the colour used to display stitch holes.',
             },
             stitchLineColor: {
-              label: 'Stitch line color',
+              label: 'Stitch line colour',
               tooltip: 'Sets the colour used to display stitch lines.',
             },
             threadColor: {
-              label: 'Thread color',
+              label: 'Thread colour',
               tooltip: 'Sets the colour used to display thread.',
             },
           } satisfies SectionTranslationSchema<StitchingColorSettingsSchema>,
           selection: {
-            title: 'Selection colors',
+            title: 'Selection colours',
             selectionColor: {
-              label: 'Selection color',
+              label: 'Selection colour',
               tooltip: 'Sets the highlight colour for selected components.',
             },
           } satisfies SectionTranslationSchema<SelectionColorSettingsSchema>,
@@ -630,12 +630,12 @@ export const EN = {
           anchor: {
             vertical: {
               start: 'Top',
-              middle: 'Center',
+              middle: 'Centre',
               end: 'Bottom',
             } satisfies EnumTranslationSchema<AnchorSchema>,
             horizontal: {
               start: 'Left',
-              middle: 'Center',
+              middle: 'Centre',
               end: 'Right',
             } satisfies EnumTranslationSchema<AnchorSchema>,
           },
@@ -723,7 +723,7 @@ export const EN = {
       },
     },
     license: {
-      title: 'License',
+      title: 'Licence',
       positiveAction: 'OK',
     },
     scaling: {
@@ -783,9 +783,9 @@ export const EN = {
   data: {
     colors: {
       black: 'Black',
-      darkGray: 'Dark gray',
-      mediumGray: 'Medium gray',
-      lightGray: 'Light gray',
+      darkGray: 'Dark grey',
+      mediumGray: 'Medium grey',
+      lightGray: 'Light grey',
       white: 'White',
       darkBrown: 'Dark brown',
       mediumBrown: 'Medium brown',
@@ -831,11 +831,6 @@ export const EN = {
       'ID-3-portrait': 'ID-3',
     } satisfies Record<CardSchemaId, string>,
   },
-  formatters: {
-    size: (size: number) => `${size}mm`,
-    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
-    timeago: (date: number): string => format(date, 'en'),
-  },
   validation: {
     multipleIssues: (count: number) => `${count} issues`,
     name: {
@@ -856,12 +851,17 @@ export const EN = {
       invalid: 'Invalid value.',
     },
     hexColor: {
-      invalid: 'Invalid hexadecimal color.',
+      invalid: 'Invalid hexadecimal colour.',
     },
     file: {
       existing: 'A file already exists at this path.',
       invalid: 'The specified path is invalid or not writable.',
       validationFailed: 'The file path could not be validated.',
     },
+  },
+  formatters: {
+    size: (size: number) => `${size}mm`,
+    dimensions: (width: string, height: string) => `${width}mm × ${height}mm`,
+    timeago: (date: number): string => format(date, 'en'),
   },
 }
