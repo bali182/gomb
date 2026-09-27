@@ -80,6 +80,8 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return setViewSettings({ stitchHolesVisible: !settings.view.stitchHolesVisible })
         case 'stitches-visibility':
           return setViewSettings({ stitchesVisible: !settings.view.stitchesVisible })
+        case 'stitch-count-visibility':
+          return setViewSettings({ stitchCountVisible: !settings.view.stitchCountVisible })
         case 'report-issue':
           return electronApi.openExternal(ISSUES_URL)
         case 'view-license':

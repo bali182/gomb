@@ -19,7 +19,9 @@ export const VisibilityMenuItem: FC<VisibilityMenuItemProps> = ({ command: comma
   return (
     <Menu.Item disabled={command.disabled} onSelect={toggle} value={command.id} closeOnSelect={false}>
       {value ? <PiEye /> : <Icon as={PiEyeSlash} color="fg.muted" />}
-      <Menu.ItemText mr="2">{label}</Menu.ItemText>
+      <Menu.ItemText color={value ? undefined : 'fg.muted'} mr="2">
+        {label}
+      </Menu.ItemText>
       <MenuShortcut command={command} noPadding />
     </Menu.Item>
   )

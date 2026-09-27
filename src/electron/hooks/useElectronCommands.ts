@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { useCommonCommands } from '../../common/hooks/useCommonCommands'
+import { CommonCommandShortcutMap, useCommonCommands } from '../../common/hooks/useCommonCommands'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
 import { Loadable } from '../../common/loadable'
 import type { ElectronCommandMap } from '../schemas/electronCommands'
@@ -23,6 +23,7 @@ export const useElectronCommands = (): ElectronCommandMap => {
     canRedo,
     canUndo,
     hasOpenProject,
+    shortcuts: COMMAND_OVERRIDES,
   })
 
   const commands = useMemo<ElectronCommandMap>(() => {
@@ -45,24 +46,37 @@ export const useElectronCommands = (): ElectronCommandMap => {
         disabled: false,
         shortcut: { default: ['CommandOrControl', 'O'] },
       },
-      // Edit - Change increments
-      'increment-small': {
-        id: 'increment-small',
-        disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Digit1'] },
-      },
-      'increment-medium': {
-        id: 'increment-medium',
-        disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Digit2'] },
-      },
-      'increment-stitch-hole-distance': {
-        id: 'increment-stitch-hole-distance',
-        disabled: !hasOpenProject,
-        shortcut: { default: ['CommandOrControl', 'Digit3'] },
-      },
     } satisfies ElectronCommandMap
   }, [commonCommands, hasOpenProject, hasProjectAndIsDirty])
 
   return commands
+}
+
+const COMMAND_OVERRIDES: Partial<CommonCommandShortcutMap> = {
+  // Edit incremenets
+  'increment-small': {
+    default: ['CommandOrControl', 'Digit1'],
+  },
+  'increment-medium': {
+    default: ['CommandOrControl', 'Digit2'],
+  },
+  'increment-stitch-hole-distance': {
+    default: ['CommandOrControl', 'Digit3'],
+  },
+  // View
+  'stitch-line-visibility': {
+    default: ['CommandOrControl', 'Shift', 'L'],
+  },
+  'stitch-hole-visibility': {
+    default: ['CommandOrControl', 'Shift', 'X'],
+  },
+  'stitches-visibility': {
+    default: ['CommandOrControl', 'Shift', 'T'],
+  },
+  'stitch-count-visibility': {
+    default: ['CommandOrControl', 'Shift', 'Y'],
+  },
+  'component-dimensions-visibility': {
+    default: ['CommandOrControl', 'Shift', 'D'],
+  },
 }
