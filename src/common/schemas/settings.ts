@@ -63,6 +63,7 @@ export type ViewSettingsSchema = {
   stitchHolesVisible: boolean
   stitchesVisible: boolean
   stitchCountVisible: boolean
+  componentDimensionsVisible: boolean
   scale: number
 }
 

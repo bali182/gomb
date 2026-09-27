@@ -61,7 +61,7 @@ export type DrawAreaExportTextStyles = {
   getNameDimensionsGap: (element: SvgExportElementSchema) => number | undefined
 }
 
-export type DrawAreaStitchRouteLabelStyles = {
+export type DrawAreaLabelStyles = {
   getLabelBackgroundColor: () => string | undefined
   getLabelColor: () => string | undefined
   getLabelFontFamily: () => string | undefined
@@ -84,5 +84,5 @@ export type DrawAreaContextValue = {
   exportTextStyles: DrawAreaExportTextStyles
   exportIdentifiers: DrawAreaExportIdentifiers
   markerStyles: DrawAreaMarkerStyles
-  stitchRouteLabelStyles: DrawAreaStitchRouteLabelStyles
+  labelStyles: DrawAreaLabelStyles
 }

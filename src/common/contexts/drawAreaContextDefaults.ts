@@ -5,9 +5,9 @@ import type {
   DrawAreaExportIdentifiers,
   DrawAreaExportTextStyles,
   DrawAreaHoleStyles,
+  DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
   DrawAreaStitchLineStyles,
-  DrawAreaStitchRouteLabelStyles,
 } from '../schemas/drawArea'
 import { produce } from '../utils/produce'
 import { defaultSubProjectSelection } from './SubProjectSelectionContext'
@@ -61,7 +61,7 @@ const drawAreaDefaultMarkerStyles: DrawAreaMarkerStyles = {
   getThickness: produce(undefined),
 }
 
-const stitchRouteLabelStyles: DrawAreaStitchRouteLabelStyles = {
+const labelStyles: DrawAreaLabelStyles = {
   getLabelBackgroundColor: produce(undefined),
   getLabelColor: produce(undefined),
   getLabelFontFamily: produce(undefined),
@@ -79,5 +79,5 @@ export const defaultDrawAreaContext: DrawAreaContextValue = {
   exportTextStyles: drawAreaDefaultExportTextStyles,
   markerStyles: drawAreaDefaultMarkerStyles,
   exportIdentifiers: drawAreaExportIdentifiers,
-  stitchRouteLabelStyles: stitchRouteLabelStyles,
+  labelStyles,
 }

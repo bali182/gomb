@@ -1,8 +1,10 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { PiRectangleDashed } from 'react-icons/pi'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
+import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import type { RootPanelSchema } from '../../schemas/components'
 import type { ComputedRootPanelSchema } from '../../schemas/computed'
@@ -10,6 +12,7 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
+import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 
 type RootPanelProps = {
@@ -19,9 +22,11 @@ type RootPanelProps = {
 
 export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
+  const { settings } = useGlobalSettings()
   const rootPanel = useComponent<RootPanelSchema>(componentId)
   const computedRootPanel = useComputedComponent<ComputedRootPanelSchema>(componentId)
   const pathData = usePath(computedRootPanel.path)
+  const isActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
   const styleParams: DrawAreaComponentStyleParams = {
     component: rootPanel,
     nestingLevel,
@@ -54,6 +59,10 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
         onPointerLeave={isInteractive ? handlePointerLeave : undefined}
         onClick={isInteractive ? handleClick : undefined}
       />
+
+      {isInteractive && settings.view.componentDimensionsVisible && isActive && (
+        <SizeLabel icon={PiRectangleDashed} reference="bottom-right" boundingRect={computedRootPanel.boundingRect} />
+      )}
 
       <StitchLines componentId={rootPanel.id} />
 

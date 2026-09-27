@@ -2,6 +2,7 @@ import { VIEWBOX_PADDING } from '../../constants/drawing'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getViewBox } from '../../utils/getViewBox'
 import { RootPanel } from './RootPanel'
+import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
 export const SvgRoot = () => {
   const { computedSubProject: computedProject } = useSubProject()
@@ -18,6 +19,7 @@ export const SvgRoot = () => {
       viewBox={viewBox}
     >
       <RootPanel componentId={computedProject.root} nestingLevel={0} />
+      <g ref={svgLabelsPortalRef} pointerEvents="none" />
     </svg>
   )
 }
