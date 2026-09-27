@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
+import { useSvgDrawArea } from '../hooks/useSvgDrawArea'
 import { useTranslation } from '../hooks/useTranslation'
 import { renderSvgToString } from '../logic/exports/renderSvgToString'
 import { getComputedProject } from '../logic/getComputedProject'
@@ -27,6 +28,7 @@ export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange
   const { t } = useTranslation()
   const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
   const [localSvgExportSettings, setLocalSvgExportParams] = useState<BaseExportSettingsSchema>(settings.svgExport)
+  const drawAreaContextValue = useSvgDrawArea(project.stitchingSettings, localSvgExportSettings)
 
   const [editableParams, setEditableParams] = useState<EditableSchema<BaseExportSettingsSchema>>(() =>
     getEditableSchema(settings.svgExport, context),
@@ -69,11 +71,24 @@ export const SvgExportDialog: FC<SvgExportDialogProps> = ({ isOpen, onOpenChange
     }
 
     const computedProject = getComputedProject(project)
-    const svg = renderSvgToString(project, computedProject, submitValidationResult.value)
+    const svg = renderSvgToString({
+      project,
+      computedProject,
+      settings: submitValidationResult.value,
+      context: drawAreaContextValue,
+    })
     downloadFile({ contentType: 'image/svg+xml', content: svg, fileName: `${project.name}.svg` })
     setSvgExportSettings(submitValidationResult.value)
     onOpenChange(false)
-  }, [context, editableParams, localSvgExportSettings, onOpenChange, project, setSvgExportSettings])
+  }, [
+    context,
+    drawAreaContextValue,
+    editableParams,
+    localSvgExportSettings,
+    onOpenChange,
+    project,
+    setSvgExportSettings,
+  ])
 
   return (
     <EditDialog
