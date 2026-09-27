@@ -1,5 +1,4 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
-import { PiRectangleDashed } from 'react-icons/pi'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
@@ -61,7 +60,7 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
       />
 
       {isInteractive && settings.view.componentDimensionsVisible && isActive && (
-        <SizeLabel icon={PiRectangleDashed} reference="bottom-right" boundingRect={computedRootPanel.boundingRect} />
+        <SizeLabel reference="bottom-right" boundingRect={computedRootPanel.boundingRect} />
       )}
 
       <StitchLines componentId={rootPanel.id} />

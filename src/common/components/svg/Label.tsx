@@ -28,7 +28,7 @@ const DEFAULT_MARGIN_X = 3
 const DEFAULT_MARGIN_Y = 3
 const DEFAULT_PADDING_X = 1.5
 const DEFAULT_PADDING_Y = 0.3
-const DEFAULT_GAP = 0.3
+const DEFAULT_GAP = 0.6
 
 export const Label: FC<LabelProps> = ({
   icon: Icon,
