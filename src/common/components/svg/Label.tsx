@@ -14,21 +14,32 @@ type LabelProps = {
   label: string
   reference: StitchSideSchema | StitchCornerSchema
   boundingRect: RectSchema
-  margin: number
-  paddingX: number
-  paddingY: number
-  gap: number
+  // Space from the sides of it's bounding rect
+  marginX?: number
+  marginY?: number
+  // Padding inside the container pill
+  paddingX?: number
+  paddingY?: number
+  // Gap between icon and label
+  gap?: number
 }
+
+const DEFAULT_MARGIN_X = 3
+const DEFAULT_MARGIN_Y = 3
+const DEFAULT_PADDING_X = 1.5
+const DEFAULT_PADDING_Y = 0.3
+const DEFAULT_GAP = 0.3
 
 export const Label: FC<LabelProps> = ({
   icon: Icon,
   label,
   reference,
   boundingRect,
-  margin,
-  paddingX,
-  paddingY,
-  gap,
+  marginX = DEFAULT_MARGIN_X,
+  marginY = DEFAULT_MARGIN_Y,
+  paddingX = DEFAULT_PADDING_X,
+  paddingY = DEFAULT_PADDING_Y,
+  gap = DEFAULT_GAP,
 }) => {
   const { labelStyles } = useDrawAreaContext()
   const textRef = useRef<SVGTextElement>(null)
@@ -65,8 +76,8 @@ export const Label: FC<LabelProps> = ({
     if (!isDefined(backgroundBounds)) {
       return undefined
     }
-    return getLabelPosition(boundingRect, backgroundBounds, reference, margin)
-  }, [boundingRect, backgroundBounds, reference, margin])
+    return getLabelPosition(boundingRect, backgroundBounds, reference, marginX, marginY)
+  }, [backgroundBounds, boundingRect, reference, marginX, marginY])
 
   const iconPosition = useMemo<PointSchema | undefined>(() => {
     if (!isDefined(textBounds)) {
@@ -151,24 +162,25 @@ const getLabelPosition = (
   boundingRect: RectSchema,
   backgroundBounds: RectSchema,
   reference: StitchSideSchema | StitchCornerSchema,
-  margin: number,
+  marginX: number,
+  marginY: number,
 ): PointSchema => {
-  const left = boundingRect.x.plus(margin).minus(backgroundBounds.x)
+  const left = boundingRect.x.plus(marginX).minus(backgroundBounds.x)
   const centerX = boundingRect.x
     .plus(boundingRect.width.dividedBy(2))
     .minus(backgroundBounds.x.plus(backgroundBounds.width.dividedBy(2)))
   const right = boundingRect.x
     .plus(boundingRect.width)
-    .minus(margin)
+    .minus(marginX)
     .minus(backgroundBounds.x)
     .minus(backgroundBounds.width)
-  const top = boundingRect.y.plus(margin).minus(backgroundBounds.y)
+  const top = boundingRect.y.plus(marginY).minus(backgroundBounds.y)
   const centerY = boundingRect.y
     .plus(boundingRect.height.dividedBy(2))
     .minus(backgroundBounds.y.plus(backgroundBounds.height.dividedBy(2)))
   const bottom = boundingRect.y
     .plus(boundingRect.height)
-    .minus(margin)
+    .minus(marginY)
     .minus(backgroundBounds.y)
     .minus(backgroundBounds.height)
 

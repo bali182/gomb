@@ -71,7 +71,7 @@ export const HU = {
       saveSucceeded: 'Mentve.',
     },
     export: {
-      frontPocketName: (ownerName: string): string => `${ownerName} - első zseb`,
+      frontPocketName: (ownerName: string): string => `${ownerName} - elülső zseb`,
       tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. zseb`,
     },
     menus: {
@@ -101,7 +101,7 @@ export const HU = {
           redo: 'Újra',
         },
         increment: {
-          name: 'Lépték',
+          name: 'Lépésköz',
           small: 'Kicsi',
           default: 'Alapértelmezett',
           stitch: 'Öltésméret',
@@ -204,26 +204,26 @@ export const HU = {
         },
         common: {
           cornerRadius: {
-            title: 'Sarokrádiusz',
+            title: 'Saroklekerekítés',
             autoCornerRadius: {
               placeholder: 'Auto',
-              tooltip: 'A varrásvonal rádiusza az általa követett komponens sarkaihoz igazodik.',
+              tooltip: 'A varrásvonal lekerekítése az általa követett komponens sarkaihoz igazodik.',
             },
             individualRadii: {
               label: 'Méretezés',
               tooltip: 'Azonos saroklekerekítést használ minden saroknál, vagy külön is beállíthatja őket.',
             },
             topLeftRadius: {
-              tooltip: 'A bal felső sarok rádiuszát állítja be.',
+              tooltip: 'A bal felső sarok lekerekítését állítja be.',
             },
             topRightRadius: {
-              tooltip: 'A jobb felső sarok rádiuszát állítja be.',
+              tooltip: 'A jobb felső sarok lekerekítését állítja be.',
             },
             bottomLeftRadius: {
-              tooltip: 'A bal alsó sarok rádiuszát állítja be.',
+              tooltip: 'A bal alsó sarok lekerekítését állítja be.',
             },
             bottomRightRadius: {
-              tooltip: 'A jobb alsó sarok rádiuszát állítja be.',
+              tooltip: 'A jobb alsó sarok lekerekítését állítja be.',
             },
           },
           size: {
@@ -248,7 +248,7 @@ export const HU = {
           },
           autoSize: {
             title: 'Méret',
-            squeezeActive: 'A szorítás aktív!',
+            squeezeActive: 'A méretkorrekció aktív!',
             width: {
               label: 'Szélesség',
               placeholder: 'Kitöltés',
@@ -283,7 +283,7 @@ export const HU = {
             },
           },
           squeeze: {
-            title: 'Szorítás',
+            title: 'Méretkorrekció',
             horizontal: {
               label: 'Vízszintes',
               tooltip: 'A bal és jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
@@ -319,8 +319,8 @@ export const HU = {
               tooltip: 'A zsebcsoportban létrehozott zsebek számát állítja be.',
             },
             pocketStep: {
-              label: 'Távolság',
-              tooltip: 'A szomszédos zsebek közötti távolságot állítja be.',
+              label: 'Zsebek eltolása',
+              tooltip: 'Az egymást követő zsebek egymáshoz képesti eltolását állítja be.',
             },
             tPocketTabWidth: {
               label: 'Fül szélessége',
@@ -559,7 +559,7 @@ export const HU = {
               tooltip: 'A komponensek méreteit is belefoglalja az exportált fájlba.',
             },
             childMarkers: {
-              label: 'Gyermekjelölők megjelenítése',
+              label: 'Belső elemek jelölése',
               tooltip: 'Jelölőket ad az egymásba helyezett komponensekhez.',
             },
             cutHelperDistance: {
@@ -605,8 +605,8 @@ export const HU = {
             },
           },
           individualRadii: {
-            false: 'Egységes rádiusz',
-            true: 'Egyedi rádiuszok',
+            false: 'Egységes lekerekítés',
+            true: 'Egyedi lekerekítések',
           },
           autoCornerRadius: {
             false: 'Manuális',
@@ -625,8 +625,8 @@ export const HU = {
             vertical: 'Függőleges',
           },
           individualSqueeze: {
-            false: 'Egységes szorítás',
-            true: 'Egyedi szorítások',
+            false: 'Egységes méretkorrekció',
+            true: 'Oldalankénti méretkorrekció',
           },
         },
         export: {
@@ -642,7 +642,7 @@ export const HU = {
           exportPageLayout: {
             vertical: 'Függőleges',
             horizontal: 'Vízszintes',
-            compact: 'Tömör',
+            compact: 'Helytakarékos',
           },
         },
       },
@@ -813,7 +813,7 @@ export const HU = {
       minimumInclusive: (value: string): string => `Minimum érték: ${value}.`,
       maximumExclusive: (value: string): string => `Az értéknek kisebbnek kell lennie, mint ${value}.`,
       maximumInclusive: (value: string): string => `Maximum érték: ${value}.`,
-      step: (value: string): string => `Lépték: ${value}.`,
+      step: (value: string): string => `Lépésköz: ${value}.`,
     },
     primitive: {
       required: 'Kötelező érték.',

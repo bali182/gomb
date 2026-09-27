@@ -117,7 +117,6 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
             icon={PiShield}
             reference={topPocketLabelLocation}
             boundingRect={computedPocketCluster.frontPocket.boundingRect}
-            ignoreStitchMargin
           />
         </>
       )}
