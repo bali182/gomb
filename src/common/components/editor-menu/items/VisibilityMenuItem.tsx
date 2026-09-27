@@ -5,13 +5,13 @@ import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { CommandSchema, CommonCommandIdSchema } from '../../../schemas/command'
 import { MenuShortcut } from '../MenuShortcut'
 
-type StitchVisibilityMenuItemProps = {
+type VisibilityMenuItemProps = {
   value: boolean
   label: string
   command: CommandSchema<CommonCommandIdSchema>
 }
 
-export const StitchVisibilityMenuItem: FC<StitchVisibilityMenuItemProps> = ({ command, value, label }) => {
+export const VisibilityMenuItem: FC<VisibilityMenuItemProps> = ({ command, value, label }) => {
   const { emitCommand } = useCommandsContext<CommonCommandIdSchema>()
   const toggle = useCallback(() => emitCommand(command.id), [command.id, emitCommand])
 
