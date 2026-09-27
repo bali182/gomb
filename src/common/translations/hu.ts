@@ -109,6 +109,10 @@ export const HU = {
       },
       view: {
         name: 'Nézet',
+        components: {
+          name: 'Komponensek',
+          componentDimensionsVisible: 'Méretek láthatósága',
+        },
         scaling: {
           name: 'Méretarány',
           scaling: 'Méretarány beállítása',

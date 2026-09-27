@@ -155,6 +155,10 @@ export const EN = {
       },
       view: {
         name: 'View',
+        components: {
+          name: 'Components',
+          componentDimensionsVisible: 'Dimension visibility',
+        },
         scaling: {
           name: 'Scaling',
           scaling: 'Set scaling',

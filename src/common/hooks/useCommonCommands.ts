@@ -63,6 +63,11 @@ export const useCommonCommands = ({ canRedo, canUndo, hasOpenProject }: UseCommo
           mac: ['Command', 'Alt', 'Digit3'],
         },
       },
+      // View - component visibility
+      'component-dimensions-visibility': {
+        id: 'component-dimensions-visibility',
+        disabled: !hasOpenProject,
+      },
       // View - stitch part visibility
       'stitch-line-visibility': {
         id: 'stitch-line-visibility',
