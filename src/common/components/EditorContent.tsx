@@ -17,6 +17,7 @@ import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
+import type { HasTargetSchema } from '../schemas/common'
 import type { ProjectSchema } from '../schemas/project'
 import { isDefined } from '../utils/isDefined'
 import { CommonEmptyState } from './common/CommonEmptyState'
@@ -59,6 +60,11 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const handleExpandAll = useCallback((): void => {
     componentTreeRef.current?.expandAll()
   }, [])
+
+  const handleAdd = useCallback((target: HasTargetSchema): void => {
+    componentTreeRef.current?.expand(target)
+  }, [])
+
   return (
     <Flex direction="column" height="100%" minHeight="0" minWidth="0">
       <Splitter.Root
@@ -85,7 +91,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
               </Flex>
             </Box>
 
-            {isDefined(subProject) && <FloatingEditors />}
+            {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
           </Box>
         </Splitter.Panel>
 

@@ -1,6 +1,7 @@
 import { type FC } from 'react'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useSubProject } from '../hooks/useSubProject'
+import type { HasTargetSchema } from '../schemas/common'
 import { getComponentAnchor, getHoleAnchor, getStitchLineAnchor } from '../utils/floatingEditorAnchorUtils'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -8,7 +9,11 @@ import { ComponentFloatingEditor } from './component-editors/ComponentFloatingEd
 import { HoleFloatingEditor } from './hole-editors/HoleFloatingEditor'
 import { StitchLineFloatingEditor } from './stitch-line-editors/StitchLineFloatingEditor'
 
-export const FloatingEditors: FC = () => {
+type FloatingEditorsProps = {
+  onAdd: (target: HasTargetSchema) => void
+}
+
+export const FloatingEditors: FC<FloatingEditorsProps> = ({ onAdd }) => {
   const { selection } = useDrawAreaContext()
   const { subProject } = useSubProject()
 
@@ -23,6 +28,7 @@ export const FloatingEditors: FC = () => {
       <ComponentFloatingEditor
         component={selection.selected}
         anchorElement={anchorElement}
+        onAdd={onAdd}
         onClose={selection.clearSelection}
       />
     ) : null
@@ -44,7 +50,12 @@ export const FloatingEditors: FC = () => {
     const anchorElement = getHoleAnchor(selection.selected, subProject)
 
     return isDefined(anchorElement) ? (
-      <HoleFloatingEditor hole={selection.selected} anchorElement={anchorElement} onClose={selection.clearSelection} />
+      <HoleFloatingEditor
+        hole={selection.selected}
+        anchorElement={anchorElement}
+        onAdd={onAdd}
+        onClose={selection.clearSelection}
+      />
     ) : null
   }
 

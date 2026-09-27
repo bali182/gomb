@@ -21,11 +21,11 @@ export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSche
     svgExport: defaultSvgExportParams,
     view: {
       scale: 1,
+      componentDimensionsVisible: false,
       stitchCountVisible: false,
       stitchHolesVisible: true,
       stitchLinesVisible: true,
       stitchesVisible: true,
-      componentDimensionsVisible: true,
     },
   }
 }

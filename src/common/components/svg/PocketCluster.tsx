@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
-import { PiRectangleDashed, PiShield } from 'react-icons/pi'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
@@ -108,16 +107,8 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       </g>
       {isInteractive && settings.view.componentDimensionsVisible && isSelected && (
         <>
-          <SizeLabel
-            icon={PiRectangleDashed}
-            reference="bottom-right"
-            boundingRect={computedPocketCluster.boundingRect}
-          />
-          <SizeLabel
-            icon={PiShield}
-            reference={topPocketLabelLocation}
-            boundingRect={computedPocketCluster.frontPocket.boundingRect}
-          />
+          <SizeLabel reference="bottom-right" boundingRect={computedPocketCluster.boundingRect} />
+          <SizeLabel reference={topPocketLabelLocation} boundingRect={computedPocketCluster.frontPocket.boundingRect} />
         </>
       )}
       <StitchLines componentId={pocketCluster.id} />

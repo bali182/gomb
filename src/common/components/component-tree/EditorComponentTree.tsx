@@ -17,6 +17,7 @@ import { useComponentTreeCollection } from './utils/useComponentTreeCollection'
 export type EditorComponentTreeHandle = {
   collapseAll: () => void
   expandAll: () => void
+  expand: (target: HasTargetSchema) => void
 }
 
 type EditorComponentTreeProps = {
@@ -44,8 +45,6 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
     setExpandedNodeIds(collection.getBranchValues())
   }, [collection])
 
-  useImperativeHandle(ref, () => ({ collapseAll, expandAll }), [collapseAll, expandAll])
-
   useEffect(() => {
     setExpandedNodeIds((currentExpandedNodeIds) => {
       const nextExpandedNodeIds = currentExpandedNodeIds.filter(
@@ -63,7 +62,7 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
     }
   }, [selected, subProject])
 
-  const handleAdd = useCallback(
+  const expand = useCallback(
     (target: HasTargetSchema): void => {
       const targetNodeId =
         target.targetType === 'component' ? getComponentNodeId(target.targetId) : getHoleNodeId(target.targetId)
@@ -75,6 +74,8 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
     },
     [collection],
   )
+
+  useImperativeHandle(ref, () => ({ collapseAll, expandAll, expand }), [collapseAll, expandAll, expand])
 
   const handleHoleDelete = useCallback(
     (holeId: string): void => {
@@ -101,20 +102,20 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
           return (
             <ComponentActionsMenu
               component={node.component}
-              onAddChild={handleAdd}
-              onAddHole={handleAdd}
-              onAddStitchLine={handleAdd}
+              onAddChild={expand}
+              onAddHole={expand}
+              onAddStitchLine={expand}
               size="2xs"
               subProject={subProject}
             />
           )
         case 'hole':
-          return <HoleActionsMenu hole={node.hole} onAddStitchLine={handleAdd} onDelete={handleHoleDelete} size="2xs" />
+          return <HoleActionsMenu hole={node.hole} onAddStitchLine={expand} onDelete={handleHoleDelete} size="2xs" />
         case 'stitch-line':
           return <StitchLineActionsMenu onDelete={handleStitchLineDelete} size="2xs" stitchLine={node.stitchLine} />
       }
     },
-    [handleAdd, handleHoleDelete, handleStitchLineDelete, subProject],
+    [expand, handleHoleDelete, handleStitchLineDelete, subProject],
   )
 
   return (
