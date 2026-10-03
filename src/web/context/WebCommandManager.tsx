@@ -8,6 +8,7 @@ import {
   EDITOR_SMALL_STEP,
   EDITOR_STITCH_HOLE_DISTANCE_STEP,
 } from '../../common/constants/commands'
+import { FILE_EXTENSION } from '../../common/constants/fileExtension'
 import { APP_DOWNLOAD_URL, ISSUES_URL, REPO_URL } from '../../common/constants/links'
 import { CommandsContext, CommandsContextValue } from '../../common/contexts/CommandsContext'
 import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmitter'
@@ -94,7 +95,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return downloadFile({
             content: JSON.stringify(project, null, 2),
             contentType: 'application/json',
-            fileName: `${project.name}.json`,
+            fileName: `${project.name}.${FILE_EXTENSION}`,
           })
         }
         default: {
