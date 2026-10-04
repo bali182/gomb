@@ -17,8 +17,7 @@ export const MeasurementMenuGroup: FC = () => {
         command="measurement"
         label={t.project.menus.edit.measurement.measurement}
         value={isMeasuring}
-        enabledIcon={PiRuler}
-        disabledIcon={PiRuler}
+        icon={PiRuler}
       />
     </Menu.ItemGroup>
   )

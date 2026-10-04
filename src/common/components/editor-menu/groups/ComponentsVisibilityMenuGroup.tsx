@@ -1,5 +1,5 @@
 import { Menu } from '@chakra-ui/react'
-import { PiEye, PiEyeSlash } from 'react-icons/pi'
+import { PiEye } from 'react-icons/pi'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { ToggleMenuItem } from '../items/ToggleMenuItem'
@@ -12,8 +12,7 @@ export const ComponentsVisibilityMenuGroup = () => {
     <Menu.ItemGroup>
       <Menu.ItemGroupLabel>{t.project.menus.view.components.name}</Menu.ItemGroupLabel>
       <ToggleMenuItem
-        enabledIcon={PiEye}
-        disabledIcon={PiEyeSlash}
+        icon={PiEye}
         label={t.project.menus.view.components.componentDimensionsVisible}
         value={settings.view.componentDimensionsVisible}
         command="component-dimensions-visibility"
