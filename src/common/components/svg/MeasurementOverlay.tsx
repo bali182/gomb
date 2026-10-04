@@ -44,16 +44,24 @@ export const MeasurementOverlay: FC = () => {
     }
   }, [])
 
-  const handleClick = useCallback((event: MouseEvent<SVGRectElement>): void => {
-    const point = getSvgPoint(event)
-    if (!isDefined(point)) {
-      return
-    }
-    event.stopPropagation()
-    setStart(point)
-    setPointer(point)
-    setShiftPressed(event.shiftKey)
-  }, [])
+  const handleClick = useCallback(
+    (event: MouseEvent<SVGRectElement>): void => {
+      event.stopPropagation()
+      if (isDefined(start)) {
+        setStart(undefined)
+        setPointer(undefined)
+        return
+      }
+      const point = getSvgPoint(event)
+      if (!isDefined(point)) {
+        return
+      }
+      setStart(point)
+      setPointer(point)
+      setShiftPressed(event.shiftKey)
+    },
+    [start],
+  )
 
   const handlePointerMove = useCallback((event: PointerEvent<SVGRectElement>): void => {
     const point = getSvgPoint(event)

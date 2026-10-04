@@ -63,7 +63,13 @@ export const Label: FC<LabelProps> = ({
   const color = labelStyles.getLabelColor()
   const fontFamily = labelStyles.getLabelFontFamily()
   const fontSize = labelStyles.getLabelFontSize()
-  const textStyle: CSSProperties = { color, fontFamily, fontSize, fontVariantNumeric: 'tabular-nums' }
+  const textStyle: CSSProperties = {
+    color,
+    fontFamily,
+    fontSize,
+    fontVariantNumeric: 'tabular-nums',
+    userSelect: 'none',
+  }
 
   useLayoutEffect(() => {
     const textElement = textRef.current
