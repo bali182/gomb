@@ -1,4 +1,5 @@
 import type { Configuration } from 'electron-builder'
+import { FILE_EXTENSION } from './src/common/constants/fileExtension'
 
 const config: Configuration = {
   appId: 'com.gomb.app',
@@ -8,6 +9,11 @@ const config: Configuration = {
     output: 'release',
   },
   files: ['out/**/*'],
+  fileAssociations: {
+    ext: FILE_EXTENSION,
+    name: 'Gomb',
+    role: 'Editor',
+  },
   mac: {
     target: [
       {
