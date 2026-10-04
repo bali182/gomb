@@ -1,10 +1,13 @@
 import { VIEWBOX_PADDING } from '../../constants/drawing'
+import { useMeasurement } from '../../hooks/useMeasurement'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getViewBox } from '../../utils/getViewBox'
+import { MeasurementOverlay } from './MeasurementOverlay'
 import { RootPanel } from './RootPanel'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
 export const SvgRoot = () => {
+  const { isMeasuring } = useMeasurement()
   const { computedSubProject: computedProject } = useSubProject()
 
   const viewBox = getViewBox(computedProject.viewBox, VIEWBOX_PADDING)
@@ -20,6 +23,7 @@ export const SvgRoot = () => {
     >
       <RootPanel componentId={computedProject.root} nestingLevel={0} />
       <g ref={svgLabelsPortalRef} pointerEvents="none" />
+      {isMeasuring && <MeasurementOverlay />}
     </svg>
   )
 }

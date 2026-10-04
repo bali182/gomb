@@ -3,6 +3,7 @@ import { useParams } from 'react-router'
 
 import { DrawAreaContext } from '../../../common/contexts/DrawAreaContext'
 import { useEditorDrawArea } from '../../../common/hooks/useEditorDrawArea'
+import { useMeasurement } from '../../../common/hooks/useMeasurement'
 import { useOptionalProject } from '../../../common/hooks/useOptionalProject'
 import { useOptionalSubProject } from '../../../common/hooks/useOptionalSubProject'
 import { useRecentProjectOperations } from '../../../common/hooks/useRecentProjectOperations'
@@ -37,7 +38,8 @@ type ExistingElectronSubProjectRouteProps = {
 }
 
 const ExistingElectronSubProjectRoute: FC<ExistingElectronSubProjectRouteProps> = ({ subProjectId }) => {
-  const drawAreaContext = useEditorDrawArea()
+  const { isMeasuring } = useMeasurement()
+  const drawAreaContext = useEditorDrawArea(!isMeasuring)
 
   return (
     <DrawAreaContext.Provider value={drawAreaContext}>

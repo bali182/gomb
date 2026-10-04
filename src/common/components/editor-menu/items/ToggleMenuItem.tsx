@@ -1,24 +1,32 @@
 import { Icon, Menu } from '@chakra-ui/react'
 import { FC, useCallback, useMemo } from 'react'
-import { PiEye, PiEyeSlash } from 'react-icons/pi'
+import type { IconType } from 'react-icons'
 import { useCommandsContext } from '../../../contexts/CommandsContext'
 import { CommonCommandIdSchema } from '../../../schemas/command'
 import { MenuShortcut } from '../MenuShortcut'
 
-type VisibilityMenuItemProps = {
+type ToggleMenuItemProps = {
   value: boolean
   label: string
   command: CommonCommandIdSchema
+  enabledIcon: IconType
+  disabledIcon: IconType
 }
 
-export const VisibilityMenuItem: FC<VisibilityMenuItemProps> = ({ command: commandId, value, label }) => {
+export const ToggleMenuItem: FC<ToggleMenuItemProps> = ({
+  command: commandId,
+  value,
+  label,
+  enabledIcon: EnabledIcon,
+  disabledIcon: DisabledIcon,
+}) => {
   const { emitCommand, getCommand } = useCommandsContext<CommonCommandIdSchema>()
   const command = useMemo(() => getCommand(commandId), [commandId, getCommand])
   const toggle = useCallback(() => emitCommand(commandId), [commandId, emitCommand])
 
   return (
     <Menu.Item disabled={command.disabled} onSelect={toggle} value={command.id} closeOnSelect={false}>
-      {value ? <PiEye /> : <Icon as={PiEyeSlash} color="fg.muted" />}
+      {value ? <EnabledIcon /> : <Icon as={DisabledIcon} color="fg.muted" />}
       <Menu.ItemText color={value ? undefined : 'fg.muted'} mr="2">
         {label}
       </Menu.ItemText>

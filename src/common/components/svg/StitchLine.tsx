@@ -1,6 +1,5 @@
 import type { FC } from 'react'
 
-import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import type { ComputedStitchLineSchema } from '../../schemas/computed'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
@@ -13,7 +12,6 @@ type StitchLineProps = {
 }
 
 export const StitchLine: FC<StitchLineProps> = ({ computedStitchLine, stitchLine }) => {
-  const { isInteractive } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
 
   return (
@@ -21,7 +19,7 @@ export const StitchLine: FC<StitchLineProps> = ({ computedStitchLine, stitchLine
       {computedStitchLine.routes.map((route, index) => (
         <StitchLineRoute key={index} route={route} stitchLine={stitchLine} />
       ))}
-      {isInteractive && settings.view.stitchesVisible && (
+      {settings.view.stitchesVisible && (
         <Stitches stitches={computedStitchLine.connectingStitches} stitchLine={stitchLine} />
       )}
     </g>

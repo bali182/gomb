@@ -12,6 +12,7 @@ import { ISSUES_URL, REPO_URL } from '../../common/constants/links'
 import { CommandsContext, CommandsContextValue } from '../../common/contexts/CommandsContext'
 import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmitter'
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
+import { useMeasurement } from '../../common/hooks/useMeasurement'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronApi } from '../electronApi'
@@ -20,6 +21,7 @@ import { useElectronProject } from '../hooks/useElectronProject'
 import { ElectronCommand, ElectronCommandIdSchema } from '../schemas/electronCommands'
 
 export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
+  const { toggleMeasuring } = useMeasurement()
   const [isScalingDialogOpen, setScalingDialogOpen] = useState<boolean>(false)
   const [isSvgExportDialogOpen, setSvgExportDialogOpen] = useState<boolean>(false)
   const [isPdfExportDialogOpen, setPdfExportDialogOpen] = useState<boolean>(false)
@@ -50,6 +52,8 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
       }
 
       switch (id) {
+        case 'measurement':
+          return toggleMeasuring()
         case 'open':
           return openProject()
         case 'save':
@@ -94,7 +98,18 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
           console.log(`Command "${id}" not yet handled!`)
       }
     },
-    [getCommand, openProject, redo, saveProject, saveProjectAs, undo, setEditSettings, setViewSettings, settings.view],
+    [
+      getCommand,
+      openProject,
+      redo,
+      saveProject,
+      saveProjectAs,
+      undo,
+      setEditSettings,
+      setViewSettings,
+      settings.view,
+      toggleMeasuring,
+    ],
   )
 
   useCommonCommandEmitter({ commands, execute: emitCommand })

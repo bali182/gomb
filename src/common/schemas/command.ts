@@ -115,6 +115,7 @@ export type CommonCommandIdSchema =
   | 'increment-small'
   | 'increment-medium'
   | 'increment-stitch-hole-distance'
+  | 'measurement'
   // View menu - component visibility
   | 'component-dimensions-visibility'
   // View menu - stitching visibility

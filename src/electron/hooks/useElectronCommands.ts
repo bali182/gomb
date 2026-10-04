@@ -1,14 +1,18 @@
 import { useMemo } from 'react'
 
 import { CommonCommandShortcutMap, useCommonCommands } from '../../common/hooks/useCommonCommands'
+import { useOptionalSubProject } from '../../common/hooks/useOptionalSubProject'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
 import { Loadable } from '../../common/loadable'
+import { isDefined } from '../../common/utils/isDefined'
 import type { ElectronCommandMap } from '../schemas/electronCommands'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
 import { useElectronProject } from './useElectronProject'
 
 export const useElectronCommands = (): ElectronCommandMap => {
   const { electronProject } = useElectronProject()
+  const { subProject } = useOptionalSubProject()
+  const hasOpenSubProject = isDefined(subProject)
   const { canRedo, canUndo } = useSubProjectHistory()
   const hasProjectAndIsDirty = Loadable.get(
     Loadable.map(electronProject, (project: ElectronProjectSchema): boolean => project.isDirty),
@@ -23,6 +27,7 @@ export const useElectronCommands = (): ElectronCommandMap => {
     canRedo,
     canUndo,
     hasOpenProject,
+    hasOpenSubProject,
     shortcuts: COMMAND_OVERRIDES,
   })
 
@@ -53,6 +58,9 @@ export const useElectronCommands = (): ElectronCommandMap => {
 }
 
 const COMMAND_OVERRIDES: Partial<CommonCommandShortcutMap> = {
+  measurement: {
+    default: ['CommandOrControl', 'Shift', 'M'],
+  },
   // Edit incremenets
   'increment-small': {
     default: ['CommandOrControl', 'Digit1'],

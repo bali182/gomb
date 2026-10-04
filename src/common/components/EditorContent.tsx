@@ -10,10 +10,12 @@ import {
   SplitterPanelData,
   SplitterResizeEndDetails,
 } from '@chakra-ui/react'
-import { FC, ReactElement, useCallback, useMemo, useRef } from 'react'
+import { FC, ReactElement, useCallback, useEffect, useMemo, useRef } from 'react'
 import { PiCopySimple, PiMinus, PiPlus, PiWarningCircle } from 'react-icons/pi'
+import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
+import { useMeasurement } from '../hooks/useMeasurement'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
@@ -42,6 +44,15 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const { t } = useTranslation()
   const { project } = useProject()
   const { setUISettings, settings } = useGlobalSettings()
+  const { selected } = useDrawAreaContext().selection
+  const { stopMeasuring } = useMeasurement()
+
+  useEffect(() => {
+    if (isDefined(selected)) {
+      stopMeasuring()
+    }
+  }, [selected, stopMeasuring])
+
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
   const subProject = useMemo(
     () => project.subProjects.find((candidate) => candidate.id === subProjectId),

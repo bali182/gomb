@@ -58,7 +58,7 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
         onClick={isInteractive ? handleClick : undefined}
       />
 
-      {isInteractive && settings.view.componentDimensionsVisible && isActive && (
+      {settings.view.componentDimensionsVisible && isActive && (
         <SizeLabel reference="bottom-right" boundingRect={computedPanel.boundingRect} />
       )}
 

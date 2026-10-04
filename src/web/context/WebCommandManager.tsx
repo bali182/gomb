@@ -13,6 +13,7 @@ import { APP_DOWNLOAD_URL, ISSUES_URL, REPO_URL } from '../../common/constants/l
 import { CommandsContext, CommandsContextValue } from '../../common/contexts/CommandsContext'
 import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmitter'
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
+import { useMeasurement } from '../../common/hooks/useMeasurement'
 import { useOptionalProject } from '../../common/hooks/useOptionalProject'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
 import { downloadFile } from '../../common/utils/downloadFile'
@@ -28,6 +29,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const { setEditSettings, setViewSettings, settings } = useGlobalSettings()
   const { project } = useOptionalProject()
   const { redo, undo } = useSubProjectHistory()
+  const { toggleMeasuring } = useMeasurement()
 
   const commands = useWebCommands()
 
@@ -51,6 +53,8 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
       }
 
       switch (id) {
+        case 'measurement':
+          return toggleMeasuring()
         case 'export-svg':
           return setSvgExportDialogOpen(true)
         case 'export-pdf':
@@ -105,7 +109,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
         }
       }
     },
-    [getCommand, project, redo, setEditSettings, setViewSettings, settings.view, undo],
+    [getCommand, project, redo, setEditSettings, setViewSettings, settings.view, undo, toggleMeasuring],
   )
 
   useCommonCommandEmitter({ commands, execute: emitCommand })
