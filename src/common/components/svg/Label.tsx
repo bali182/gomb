@@ -4,16 +4,15 @@ import { createPortal } from 'react-dom'
 import type { IconType } from 'react-icons'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
-import type { PointSchema, RectSchema } from '../../schemas/geometry'
+import type { PointSchema, RectSchema, SizeSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
-type LabelProps = {
+type LabelCommonProps = {
   icon: IconType
   label: string
-  reference: StitchSideSchema | StitchCornerSchema
-  boundingRect: RectSchema
+  portal?: boolean
   // Space from the sides of it's bounding rect
   marginX?: number
   marginY?: number
@@ -23,6 +22,20 @@ type LabelProps = {
   // Gap between icon and label
   gap?: number
 }
+
+type LabelRectPositionProps = {
+  reference: StitchSideSchema | StitchCornerSchema
+  boundingRect: RectSchema
+  getPosition?: never
+}
+
+type LabelPointPositionProps = {
+  getPosition: (size: SizeSchema) => PointSchema
+  reference?: never
+  boundingRect?: never
+}
+
+type LabelProps = LabelCommonProps & (LabelRectPositionProps | LabelPointPositionProps)
 
 const DEFAULT_MARGIN_X = 3
 const DEFAULT_MARGIN_Y = 3
@@ -35,6 +48,8 @@ export const Label: FC<LabelProps> = ({
   label,
   reference,
   boundingRect,
+  getPosition,
+  portal = true,
   marginX = DEFAULT_MARGIN_X,
   marginY = DEFAULT_MARGIN_Y,
   paddingX = DEFAULT_PADDING_X,
@@ -48,8 +63,13 @@ export const Label: FC<LabelProps> = ({
   const color = labelStyles.getLabelColor()
   const fontFamily = labelStyles.getLabelFontFamily()
   const fontSize = labelStyles.getLabelFontSize()
-  const textStyle: CSSProperties = { color, fontFamily, fontSize }
-  const portalTarget = svgLabelsPortalRef.current
+  const textStyle: CSSProperties = {
+    color,
+    fontFamily,
+    fontSize,
+    fontVariantNumeric: 'tabular-nums',
+    userSelect: 'none',
+  }
 
   useLayoutEffect(() => {
     const textElement = textRef.current
@@ -63,7 +83,7 @@ export const Label: FC<LabelProps> = ({
       width: new BigNumber(width),
       height: new BigNumber(height),
     })
-  }, [fontFamily, fontSize, label, portalTarget])
+  }, [fontFamily, fontSize, label, portal])
 
   const backgroundBounds = useMemo<RectSchema | undefined>(() => {
     if (!isDefined(textBounds)) {
@@ -76,8 +96,18 @@ export const Label: FC<LabelProps> = ({
     if (!isDefined(backgroundBounds)) {
       return undefined
     }
-    return getLabelPosition(boundingRect, backgroundBounds, reference, marginX, marginY)
-  }, [backgroundBounds, boundingRect, reference, marginX, marginY])
+    if (isDefined(getPosition)) {
+      const center = getPosition({ width: backgroundBounds.width, height: backgroundBounds.height })
+      return {
+        x: center.x.minus(backgroundBounds.x.plus(backgroundBounds.width.dividedBy(2))),
+        y: center.y.minus(backgroundBounds.y.plus(backgroundBounds.height.dividedBy(2))),
+      }
+    }
+    if (isDefined(boundingRect) && isDefined(reference)) {
+      return getLabelPosition(boundingRect, backgroundBounds, reference, marginX, marginY)
+    }
+    return undefined
+  }, [backgroundBounds, boundingRect, reference, marginX, marginY, getPosition])
 
   const iconPosition = useMemo<PointSchema | undefined>(() => {
     if (!isDefined(textBounds)) {
@@ -93,11 +123,7 @@ export const Label: FC<LabelProps> = ({
     return BigNumber.minimum(backgroundBounds.width, backgroundBounds.height).dividedBy(2)
   }, [backgroundBounds])
 
-  if (!isDefined(portalTarget)) {
-    return null
-  }
-
-  return createPortal(
+  const content = (
     <g
       opacity={isDefined(position) ? 1 : 0}
       pointerEvents="none"
@@ -134,9 +160,16 @@ export const Label: FC<LabelProps> = ({
       >
         {label}
       </text>
-    </g>,
-    portalTarget,
+    </g>
   )
+
+  if (!portal) {
+    return content
+  }
+  if (!isDefined(svgLabelsPortalRef.current)) {
+    return null
+  }
+  return createPortal(content, svgLabelsPortalRef.current)
 }
 
 const getBackgroundBounds = (textBounds: RectSchema, paddingX: number, paddingY: number, gap: number): RectSchema => {

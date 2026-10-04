@@ -9,6 +9,7 @@ export type UseCommonCommandsParams = {
   canRedo: boolean
   canUndo: boolean
   hasOpenProject: boolean
+  hasOpenSubProject: boolean
   shortcuts?: Partial<CommonCommandShortcutMap>
 }
 
@@ -18,6 +19,7 @@ export const useCommonCommands = ({
   canRedo,
   canUndo,
   hasOpenProject,
+  hasOpenSubProject,
   shortcuts,
 }: UseCommonCommandsParams): CommonCommandsMap => {
   const commands = useMemo<CommonCommandsMap>(() => {
@@ -60,6 +62,12 @@ export const useCommonCommands = ({
         id: 'increment-stitch-hole-distance',
         disabled: !hasOpenProject,
         shortcut: getShortcut('increment-stitch-hole-distance'),
+      },
+      // Edit - Measurement
+      measurement: {
+        id: 'measurement',
+        disabled: !hasOpenSubProject,
+        shortcut: getShortcut('measurement'),
       },
       // View - component visibility
       'component-dimensions-visibility': {
@@ -116,7 +124,7 @@ export const useCommonCommands = ({
         shortcut: getShortcut('view-license'),
       },
     } satisfies CommonCommandsMap
-  }, [canRedo, canUndo, hasOpenProject, shortcuts])
+  }, [canRedo, canUndo, hasOpenProject, hasOpenSubProject, shortcuts])
 
   return commands
 }
@@ -128,6 +136,7 @@ const createShortcutGetter =
   }
 
 const DEFAULT_SHORTCUTS: CommonCommandShortcutMap = {
+  measurement: undefined,
   'export-pdf': {
     default: ['CommandOrControl', 'Shift', 'P'],
   },

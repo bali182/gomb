@@ -53,7 +53,7 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
       onPointerEnter={isInteractive ? handlePointerEnter : undefined}
       onPointerLeave={isInteractive ? handlePointerLeave : undefined}
     >
-      {isInteractive && settings.view.stitchHoleFootprintVisible && (
+      {settings.view.stitchHoleFootprintVisible && (
         <path
           d={pathData}
           fill="none"
@@ -63,7 +63,7 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
           strokeWidth={stitchLineStyles.getStitchHoleFootprintThickness(stitchLine)}
         />
       )}
-      {(!isInteractive || settings.view.stitchLinesVisible) && (
+      {settings.view.stitchLinesVisible && (
         <path
           d={pathData}
           fill="none"
@@ -71,11 +71,9 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
           strokeWidth={stitchLineThickness}
         />
       )}
-      {(!isInteractive || settings.view.stitchHolesVisible) && (
-        <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} />
-      )}
-      {isInteractive && settings.view.stitchesVisible && <Stitches stitches={route.stitches} stitchLine={stitchLine} />}
-      {isInteractive && isStitchLineActive && settings.view.stitchCountVisible && <StitchRouteLabel route={route} />}
+      {settings.view.stitchHolesVisible && <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} />}
+      {settings.view.stitchesVisible && <Stitches stitches={route.stitches} stitchLine={stitchLine} />}
+      {isStitchLineActive && settings.view.stitchCountVisible && <StitchRouteLabel route={route} />}
       {isInteractive && (
         <path d={pathData} fill="none" pointerEvents="stroke" stroke="transparent" strokeWidth={hitAreaThickness} />
       )}

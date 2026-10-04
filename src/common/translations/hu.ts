@@ -14,6 +14,9 @@ const numberFormats = {
     1: new Intl.NumberFormat(language, { maximumFractionDigits: 1 }),
     2: new Intl.NumberFormat(language, { maximumFractionDigits: 2 }),
   },
+  fixed: {
+    2: new Intl.NumberFormat(language, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  },
 }
 
 export const HU = {
@@ -96,6 +99,10 @@ export const HU = {
       },
       edit: {
         name: 'Szerkesztés',
+        measurement: {
+          name: 'Mérés',
+          measurement: 'Mérés',
+        },
         history: {
           name: 'Előzmények',
           undo: 'Visszavonás',
@@ -842,6 +849,7 @@ export const HU = {
     number: {
       max1: (value: number): string => numberFormats.max[1].format(value),
       max2: (value: number): string => numberFormats.max[2].format(value),
+      fixed2: (value: number): string => numberFormats.fixed[2].format(value),
     },
   },
 } satisfies TranslationSchema

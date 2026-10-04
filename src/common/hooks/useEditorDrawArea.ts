@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useLayoutEffect, useMemo } from 'react'
 import { STITCH_LINE_LABEL_BACKGROUND_COLOR, STITCH_LINE_LABEL_COLOR, STROKE_THICKNESS } from '../constants/drawing'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
@@ -52,11 +52,19 @@ const markerStyles: DrawAreaMarkerStyles = {
   getThickness: produce(undefined),
 }
 
-export const useEditorDrawArea = (): DrawAreaContextValue => {
+export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue => {
   const { project } = useProject()
   const { subProject } = useSubProject()
   const drawAreaSelection = useSubProjectSelection(subProject)
   const { hovered, isHovered, isSelected, selected } = drawAreaSelection
+  const { clearSelection, clearHover } = drawAreaSelection
+
+  useLayoutEffect(() => {
+    if (!isInteractive) {
+      clearSelection()
+      clearHover()
+    }
+  }, [isInteractive, clearSelection, clearHover])
 
   const {
     colorSettings: {
@@ -202,7 +210,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
 
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
-      isInteractive: true,
+      isInteractive,
       isShowingCards: true,
       selection: drawAreaSelection,
       holeStyles,
@@ -214,7 +222,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       exportIdentifiers,
       labelStyles,
     }),
-    [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles],
+    [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles, isInteractive],
   )
 
   return drawAreaContextValue

@@ -60,6 +60,9 @@ const numberFormats = {
     1: new Intl.NumberFormat(language, { maximumFractionDigits: 1 }),
     2: new Intl.NumberFormat(language, { maximumFractionDigits: 2 }),
   },
+  fixed: {
+    2: new Intl.NumberFormat(language, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  },
 }
 
 export const EN = {
@@ -142,6 +145,10 @@ export const EN = {
       },
       edit: {
         name: 'Edit',
+        measurement: {
+          name: 'Measure',
+          measurement: 'Measure',
+        },
         history: {
           name: 'History',
           undo: 'Undo',
@@ -902,6 +909,7 @@ export const EN = {
     number: {
       max2: (value: number) => numberFormats.max[2].format(value),
       max1: (value: number) => numberFormats.max[1].format(value),
+      fixed2: (value: number): string => numberFormats.fixed[2].format(value),
     },
   },
 }

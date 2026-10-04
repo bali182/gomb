@@ -59,7 +59,7 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
         onClick={isInteractive ? handleClick : undefined}
       />
 
-      {isInteractive && settings.view.componentDimensionsVisible && isActive && (
+      {settings.view.componentDimensionsVisible && isActive && (
         <SizeLabel reference="bottom-right" boundingRect={computedRootPanel.boundingRect} />
       )}
 

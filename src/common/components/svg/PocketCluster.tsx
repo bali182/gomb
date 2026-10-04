@@ -105,7 +105,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
           strokeWidth={componentStyles.getBorderThickness(clusterStyleParams)}
         />
       </g>
-      {isInteractive && settings.view.componentDimensionsVisible && isSelected && (
+      {settings.view.componentDimensionsVisible && isSelected && (
         <>
           <SizeLabel reference="bottom-right" boundingRect={computedPocketCluster.boundingRect} />
           <SizeLabel reference={topPocketLabelLocation} boundingRect={computedPocketCluster.frontPocket.boundingRect} />
