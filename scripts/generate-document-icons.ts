@@ -83,7 +83,7 @@ async function generateMacIcon(images: readonly IconImage[]): Promise<void> {
 async function generateWindowsIcon(images: readonly IconImage[]): Promise<void> {
   const sourcePath = resolve(OUTPUT_DIRECTORY, 'logo.ico')
   await writeFile(sourcePath, createIco(images))
-  await executeFile('pwsh', [
+  await executeFile('powershell.exe', [
     '-NoProfile',
     '-NonInteractive',
     '-File',

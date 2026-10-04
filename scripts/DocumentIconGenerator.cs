@@ -5,6 +5,9 @@ using System.Runtime.InteropServices;
 public static class DocumentIconGenerator
 {
     private const uint GIL_SIMULATEDOC = 1;
+    // FileIconInit is exported by ordinal 660, as documented by Microsoft:
+    // https://learn.microsoft.com/en-us/windows/win32/shell/fileiconinit
+    private const string FILE_ICON_INIT_ENTRY_POINT = "#660";
 
     [StructLayout(LayoutKind.Sequential)]
     private struct IconInfo
@@ -27,6 +30,11 @@ public static class DocumentIconGenerator
         public ushort BitsPixel;
         public IntPtr Bits;
     }
+
+    [DllImport("shell32.dll", EntryPoint = FILE_ICON_INIT_ENTRY_POINT)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FileIconInit(
+        [MarshalAs(UnmanagedType.Bool)] bool restoreCache);
 
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHDefExtractIconW(string file, int index, uint flags,
@@ -59,6 +67,9 @@ public static class DocumentIconGenerator
 
     public static void GenerateDocumentIcon(string sourcePath, string destinationPath)
     {
+        if (!FileIconInit(true))
+            throw new InvalidOperationException("Cannot initialize the system image list.");
+
         int[] sizes = { 16, 32, 48, 64, 128, 256 };
         byte[][] frames = new byte[sizes.Length][];
         for (int i = 0; i < sizes.Length; i++)
