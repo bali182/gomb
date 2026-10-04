@@ -17,6 +17,8 @@ const drawAreaDefaultStitchLineStyles: DrawAreaStitchLineStyles = {
   getLineThickness: produce(undefined),
   getStitchHoleColor: produce(undefined),
   getStitchHoleThickness: produce(undefined),
+  getStitchHoleFootprintColor: produce(undefined),
+  getStitchHoleFootprintThickness: produce(undefined),
   getThreadColor: produce(undefined),
   getThreadThickness: produce(undefined),
 }

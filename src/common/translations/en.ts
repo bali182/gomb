@@ -168,6 +168,7 @@ export const EN = {
           name: 'Stitching',
           stitchLinesVisible: 'Line visibility',
           stitchHolesVisible: 'Hole visibility',
+          stitchHoleFootprintVisible: 'Footprint visibility',
           stitchesVisible: 'Thread visibility',
           stitchCountVisible: 'Hole count visibility',
         },

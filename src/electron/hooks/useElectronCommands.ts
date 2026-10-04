@@ -70,6 +70,9 @@ const COMMAND_OVERRIDES: Partial<CommonCommandShortcutMap> = {
   'stitch-hole-visibility': {
     default: ['CommandOrControl', 'Shift', 'X'],
   },
+  'stitch-hole-footprint-visibility': {
+    default: ['CommandOrControl', 'Shift', 'J'],
+  },
   'stitches-visibility': {
     default: ['CommandOrControl', 'Shift', 'T'],
   },

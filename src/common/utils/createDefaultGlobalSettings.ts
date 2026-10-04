@@ -24,6 +24,7 @@ export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSche
       componentDimensionsVisible: false,
       stitchCountVisible: false,
       stitchHolesVisible: true,
+      stitchHoleFootprintVisible: false,
       stitchLinesVisible: true,
       stitchesVisible: true,
     },

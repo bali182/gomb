@@ -40,6 +40,8 @@ export const useSvgDrawArea = (
         return stitchLine.stitchLineThickness ?? stitchingSettings.stitchLineThickness
       },
       getStitchHoleColor: produce(STROKE_COLOR),
+      getStitchHoleFootprintColor: produce(undefined),
+      getStitchHoleFootprintThickness: produce(undefined),
       getStitchHoleThickness: (stitchLine) => {
         return stitchLine.stitchHoleThickness ?? stitchingSettings.stitchHoleThickness
       },

@@ -21,6 +21,11 @@ export const StitchingVisibilityMenuGroup = () => {
         command="stitch-hole-visibility"
       />
       <VisibilityMenuItem
+        label={t.project.menus.view.stitching.stitchHoleFootprintVisible}
+        value={settings.view.stitchHoleFootprintVisible}
+        command="stitch-hole-footprint-visibility"
+      />
+      <VisibilityMenuItem
         label={t.project.menus.view.stitching.stitchesVisible}
         value={settings.view.stitchesVisible}
         command="stitches-visibility"
