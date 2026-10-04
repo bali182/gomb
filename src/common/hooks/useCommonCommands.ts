@@ -78,6 +78,11 @@ export const useCommonCommands = ({
         disabled: !hasOpenProject,
         shortcut: getShortcut('stitch-hole-visibility'),
       },
+      'stitch-hole-footprint-visibility': {
+        id: 'stitch-hole-footprint-visibility',
+        disabled: !hasOpenProject,
+        shortcut: getShortcut('stitch-hole-footprint-visibility'),
+      },
       'stitches-visibility': {
         id: 'stitches-visibility',
         disabled: !hasOpenProject,
@@ -151,6 +156,7 @@ const DEFAULT_SHORTCUTS: CommonCommandShortcutMap = {
   'component-dimensions-visibility': undefined,
   'stitch-line-visibility': undefined,
   'stitch-hole-visibility': undefined,
+  'stitch-hole-footprint-visibility': undefined,
   'stitches-visibility': undefined,
   'stitch-count-visibility': undefined,
   scaling: {

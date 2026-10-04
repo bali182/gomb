@@ -19,6 +19,7 @@ import type {
   DrawAreaMarkerStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
+import { StitchLineSchema } from '../schemas/stitching'
 import { useSubProjectSelection } from './useSubProjectSelection'
 
 const addAlpha = (color: string): string => {
@@ -67,7 +68,7 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       strokeColor,
       threadColor,
     },
-    stitchingSettings: { stitchHoleThickness, stitchLineThickness },
+    stitchingSettings: { stitchHoleLength, stitchHoleThickness, stitchLineThickness },
   } = project
 
   const selectionObstructingComponentIds = useMemo<ReadonlySet<string>>(
@@ -136,14 +137,27 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
     [isHovered, isSelected, selectionColor],
   )
 
-  const stitchLineStyles = useMemo<DrawAreaStitchLineStyles>(
-    () => ({
-      getLineColor: (stitchLine) => {
-        if (isSelected(stitchLine) || isHovered(stitchLine)) {
-          return selectionColor
+  const stitchLineStyles = useMemo<DrawAreaStitchLineStyles>(() => {
+    const getLineColor = (stitchLine: StitchLineSchema): string => {
+      if (isSelected(stitchLine) || isHovered(stitchLine)) {
+        return selectionColor
+      }
+      return stitchLineColor
+    }
+    return {
+      getLineColor,
+      getStitchHoleFootprintColor: (stitchLine) => {
+        const color = getLineColor(stitchLine)
+        const parsed = parse(color)
+        if (!isDefined(parsed)) {
+          return undefined
         }
-
-        return stitchLineColor
+        return formatHex8({ ...parsed, alpha: 0.2 })
+      },
+      getStitchHoleFootprintThickness: (stitchLine) => {
+        const length = stitchLine.stitchHoleLength ?? stitchHoleLength
+        const thickness = stitchLine.stitchHoleThickness ?? stitchHoleThickness
+        return length / Math.SQRT2 + thickness + 0.3 // + 0.3 just for visual clarity
       },
       getLineThickness: (stitchLine) => {
         return stitchLine.stitchLineThickness ?? stitchLineThickness
@@ -152,7 +166,6 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
         if (isSelected(stitchLine) || isHovered(stitchLine)) {
           return selectionColor
         }
-
         return stitchHoleColor
       },
       getStitchHoleThickness: (stitchLine) => {
@@ -164,18 +177,18 @@ export const useEditorDrawArea = (): DrawAreaContextValue => {
       getThreadThickness: () => {
         return 0.5
       },
-    }),
-    [
-      isHovered,
-      isSelected,
-      stitchLineColor,
-      selectionColor,
-      stitchLineThickness,
-      stitchHoleColor,
-      stitchHoleThickness,
-      threadColor,
-    ],
-  )
+    }
+  }, [
+    isHovered,
+    isSelected,
+    stitchLineColor,
+    selectionColor,
+    stitchLineThickness,
+    stitchHoleColor,
+    stitchHoleThickness,
+    stitchHoleLength,
+    threadColor,
+  ])
 
   const labelStyles = useMemo<DrawAreaLabelStyles>(
     () => ({

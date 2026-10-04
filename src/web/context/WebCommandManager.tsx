@@ -73,6 +73,8 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return setViewSettings({ stitchLinesVisible: !settings.view.stitchLinesVisible })
         case 'stitch-hole-visibility':
           return setViewSettings({ stitchHolesVisible: !settings.view.stitchHolesVisible })
+        case 'stitch-hole-footprint-visibility':
+          return setViewSettings({ stitchHoleFootprintVisible: !settings.view.stitchHoleFootprintVisible })
         case 'stitches-visibility':
           return setViewSettings({ stitchesVisible: !settings.view.stitchesVisible })
         case 'stitch-count-visibility':

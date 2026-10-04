@@ -120,6 +120,7 @@ export type CommonCommandIdSchema =
   // View menu - stitching visibility
   | 'stitch-line-visibility'
   | 'stitch-hole-visibility'
+  | 'stitch-hole-footprint-visibility'
   | 'stitches-visibility'
   | 'stitch-count-visibility'
   | 'scaling'

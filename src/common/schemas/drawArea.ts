@@ -35,6 +35,8 @@ export type DrawAreaStitchLineStyles = {
   getLineThickness: (stitchLine: StitchLineSchema) => number | undefined
   getStitchHoleColor: (stitchLine: StitchLineSchema) => string | undefined
   getStitchHoleThickness: (stitchLine: StitchLineSchema) => number | undefined
+  getStitchHoleFootprintColor: (stitchLine: StitchLineSchema) => string | undefined
+  getStitchHoleFootprintThickness: (stitchLine: StitchLineSchema) => number | undefined
   getThreadColor: (stitchLine: StitchLineSchema) => string | undefined
   getThreadThickness: (stitchLine: StitchLineSchema) => number | undefined
 }

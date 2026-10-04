@@ -53,6 +53,16 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
       onPointerEnter={isInteractive ? handlePointerEnter : undefined}
       onPointerLeave={isInteractive ? handlePointerLeave : undefined}
     >
+      {isInteractive && settings.view.stitchHoleFootprintVisible && (
+        <path
+          d={pathData}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          stroke={stitchLineStyles.getStitchHoleFootprintColor(stitchLine)}
+          strokeWidth={stitchLineStyles.getStitchHoleFootprintThickness(stitchLine)}
+        />
+      )}
       {(!isInteractive || settings.view.stitchLinesVisible) && (
         <path
           d={pathData}

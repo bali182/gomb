@@ -122,6 +122,7 @@ export const HU = {
           name: 'Varrás',
           stitchLinesVisible: 'Vonalak láthatósága',
           stitchHolesVisible: 'Lyukak láthatósága',
+          stitchHoleFootprintVisible: 'Helyigény láthatósága',
           stitchesVisible: 'Cérna láthatósága',
           stitchCountVisible: 'Lyukszám láthatósága',
         },
