@@ -11,10 +11,12 @@ import { ElectronProjectRoute } from './components/routes/ElectronProjectRoute'
 import { ElectronProjectsRoute } from './components/routes/ElectronProjectsRoute'
 import { ElectronSubProjectRoute } from './components/routes/ElectronSubProjectRoute'
 import { useElectronFileDropHandler } from './hooks/useElectronFileDropHandler'
+import { useElectronOpenProjectHandler } from './hooks/useElectronOpenProjectHandler'
 
 export const ElectronApp: FC = () => {
   const { theme } = useTheme()
   const { onDrop } = useElectronFileDropHandler()
+  useElectronOpenProjectHandler()
 
   return (
     <Theme appearance={theme}>

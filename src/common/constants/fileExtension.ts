@@ -1,1 +1,1 @@
-export const FILE_EXTENSION = 'json'
+export const FILE_EXTENSION = 'gomb'

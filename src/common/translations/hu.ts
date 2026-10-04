@@ -1,6 +1,7 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 
+import { FILE_EXTENSION } from '../constants/fileExtension'
 import type { LanguageSchema } from '../schemas/settings'
 import type { TranslationSchema } from './translationSchema'
 
@@ -22,7 +23,7 @@ export const HU = {
   },
   projects: {
     dropzone: {
-      dropProjectFile: 'Projektfájl (.json) megnyitásához húzd ide.',
+      dropProjectFile: `Projektfájl (.${FILE_EXTENSION}) megnyitásához húzd ide.`,
     },
     buttons: {
       createProject: 'Projekt létrehozása',
@@ -64,7 +65,7 @@ export const HU = {
       },
     },
     toast: {
-      dropProjectFileInvalidExtension: 'Csak .json projektfájlt lehet megnyitni.',
+      dropProjectFileInvalidExtension: `Csak .${FILE_EXTENSION} projektfájlt lehet megnyitni.`,
       dropProjectFileMultipleFiles: 'Egyszerre csak egy projektfájlt dobj be.',
       openFailed: 'A projekt megnyitása nem sikerült.',
       saveFailed: 'A projekt mentése nem sikerült.',

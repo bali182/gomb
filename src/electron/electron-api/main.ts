@@ -12,15 +12,17 @@ import type {
   FileWriteRequestSchema,
   SettingsSetRequestSchema,
 } from '../schemas/electronApi'
+import type { BaseProjectOpenHandler } from './BaseProjectOpenHandler'
 import { getPreloadPath, getRendererPath } from './buildPaths'
 import { createNativeCommandHandler } from './createNativeCommandHandler'
+import { createProjectFileOpenHandler } from './createProjectFileOpenHandler'
 import { _electronApi } from './electronApi'
 import { electronIpcChannels } from './electronIpcChannels'
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url))
 let mainWindow: BrowserWindow
 
-const createMainWindow = async (): Promise<BrowserWindow> => {
+const createMainWindow = async (projectOpenHandler: BaseProjectOpenHandler): Promise<BrowserWindow> => {
   const settings = await _electronApi.getSettings()
   const browserWindow = new BrowserWindow({
     backgroundColor: BACKGROUND_COLORS[settings.app.theme],
@@ -32,6 +34,8 @@ const createMainWindow = async (): Promise<BrowserWindow> => {
       sandbox: true,
     },
   })
+
+  projectOpenHandler.attachWindow(browserWindow)
 
   browserWindow.webContents.on(
     'before-input-event',
@@ -128,9 +132,16 @@ ipcMain.handle(electronIpcChannels.write, (_event, request: unknown) => {
 
 Menu.setApplicationMenu(null)
 
-app.whenReady().then(async (): Promise<void> => {
-  mainWindow = await createMainWindow()
-})
+const projectOpenHandler = createProjectFileOpenHandler({ app, ipcMain })
+projectOpenHandler.initialize()
+
+if (projectOpenHandler.shouldQuit) {
+  app.quit()
+} else {
+  app.whenReady().then(async (): Promise<void> => {
+    mainWindow = await createMainWindow(projectOpenHandler)
+  })
+}
 
 app.on('window-all-closed', () => {
   app.quit()

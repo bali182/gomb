@@ -1,3 +1,4 @@
+import { FILE_EXTENSION } from '../constants/fileExtension'
 import type { ColorKey } from '../data/colors'
 import type {
   AnchorSchema,
@@ -68,7 +69,7 @@ export const EN = {
   },
   projects: {
     dropzone: {
-      dropProjectFile: 'Drop a project file (.json) to open it',
+      dropProjectFile: `Drop a project file (.${FILE_EXTENSION}) to open it`,
     },
     buttons: {
       createProject: 'Create project',
@@ -110,7 +111,7 @@ export const EN = {
       },
     },
     toast: {
-      dropProjectFileInvalidExtension: 'Only .json project files can be opened.',
+      dropProjectFileInvalidExtension: `Only .${FILE_EXTENSION} project files can be opened.`,
       dropProjectFileMultipleFiles: 'Drop one project file at a time.',
       openFailed: 'The project could not be opened.',
       saveFailed: 'The project could not be saved.',

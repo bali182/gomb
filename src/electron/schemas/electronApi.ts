@@ -141,6 +141,8 @@ export type IpcElectronApi = {
 
 export type PreloadElectronApi = {
   getPathForFile: (file: File) => string
+  onOpenProject: (listener: (filePath: string) => void) => () => void
+  reactAppReady: () => void
 }
 
 export type ElectronApi = IpcElectronApi & PreloadElectronApi
