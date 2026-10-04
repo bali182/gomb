@@ -16,6 +16,7 @@
     "vite.common.ts",
     "electron.vite.config.ts",
     "electron-builder.config.ts",
-    "src/electron/electron-api/**/*.ts"
+    "src/electron/electron-api/**/*.ts",
+    "scripts/**/*.ts"
   ]
 }
