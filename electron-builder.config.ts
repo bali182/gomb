@@ -17,7 +17,7 @@ const config: Configuration = {
         {
           UTTypeIdentifier: 'com.gomb.project',
           UTTypeDescription: 'Gomb',
-          UTTypeConformsTo: ['public.json'],
+          UTTypeConformsTo: ['public.data'],
           UTTypeTagSpecification: { 'public.filename-extension': [GOMB_EXTENSION] },
           UTTypeIcons: { UTTypeIconBadgeName: 'GombDocumentLogo' },
         },
