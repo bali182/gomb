@@ -1,4 +1,4 @@
-import { FILE_EXTENSION } from '../constants/fileExtension'
+import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
 import type {
   AnchorSchema,
@@ -74,7 +74,7 @@ export const EN = {
   },
   projects: {
     dropzone: {
-      dropProjectFile: `Drop a project file (.${FILE_EXTENSION}) to open it`,
+      dropProjectFile: `Drop a project file (.${GOMB_EXTENSION}) to open it`,
     },
     buttons: {
       createProject: 'Create project',
@@ -116,7 +116,7 @@ export const EN = {
       },
     },
     toast: {
-      dropProjectFileInvalidExtension: `Only .${FILE_EXTENSION} project files can be opened.`,
+      dropProjectFileInvalidExtension: `Only .${GOMB_EXTENSION} project files can be opened.`,
       dropProjectFileMultipleFiles: 'Drop one project file at a time.',
       openFailed: 'The project could not be opened.',
       saveFailed: 'The project could not be saved.',
