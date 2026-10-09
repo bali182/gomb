@@ -75,6 +75,7 @@ export const HU = {
       saveSucceeded: 'Mentve.',
     },
     export: {
+      pageName: (name: string, pageNumber: number): string => `${name}-${String(pageNumber).padStart(3, '0')}`,
       frontPocketName: (ownerName: string): string => `${ownerName} - elülső zseb`,
       tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. zseb`,
     },
@@ -649,6 +650,7 @@ export const HU = {
           exportFormats: {
             svg: 'SVG',
             pdf: 'PDF',
+            png: 'PNG',
           },
           exportStitchLineModes: {
             'own-stitch-lines': 'Saját varrásvonalak',

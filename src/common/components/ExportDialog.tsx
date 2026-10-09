@@ -87,7 +87,12 @@ export const ExportDialog: FC<ExportDialogProps> = ({ isOpen, onOpenChange }) =>
     setIsExporting(true)
 
     try {
-      const layout = await exportProject(project, submitValidationResult.value, drawAreaContextValue)
+      const layout = await exportProject({
+        project,
+        settings: submitValidationResult.value,
+        context: drawAreaContextValue,
+        translation: t,
+      })
 
       if (layout.type === 'unsuccessful-export') {
         setFailure({ layout, type: 'unplaceable' })
@@ -102,7 +107,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ isOpen, onOpenChange }) =>
     } finally {
       setIsExporting(false)
     }
-  }, [context, drawAreaContextValue, localExportSettings, exportParams, onOpenChange, project, setExportSettings])
+  }, [context, drawAreaContextValue, localExportSettings, exportParams, onOpenChange, project, setExportSettings, t])
 
   return (
     <EditDialog

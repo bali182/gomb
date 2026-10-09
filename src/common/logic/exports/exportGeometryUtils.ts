@@ -15,6 +15,7 @@ import { translateRect } from '../translateRect'
 export const hasPerPageCoordinateSystem = (format: ExportFormatSchema): boolean => {
   switch (format) {
     case 'pdf':
+    case 'png':
       return true
     case 'svg':
       return false

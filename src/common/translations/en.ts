@@ -123,6 +123,7 @@ export const EN = {
       saveSucceeded: 'Saved.',
     },
     export: {
+      pageName: (name: string, pageNumber: number): string => `${name}-${String(pageNumber).padStart(3, '0')}`,
       frontPocketName: (ownerName: string): string => `${ownerName} - front pocket`,
       tPocketName: (ownerName: string, index: number): string => `${ownerName} - Pocket ${index}`,
     },
@@ -711,6 +712,7 @@ export const EN = {
           exportFormats: {
             svg: 'SVG',
             pdf: 'PDF',
+            png: 'PNG',
           } satisfies EnumTranslationSchema<ExportFormatSchema>,
           exportStitchLineModes: {
             'own-stitch-lines': 'Own stitch lines',

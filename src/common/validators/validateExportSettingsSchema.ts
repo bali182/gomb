@@ -13,7 +13,7 @@ export const exportStitchLineModes: Record<ExportStitchLineModeSchema, boolean> 
   'related-stitch-lines': true,
 }
 
-const exportFormats: Record<ExportFormatSchema, boolean> = { svg: true, pdf: true }
+const exportFormats: Record<ExportFormatSchema, boolean> = { svg: true, pdf: true, png: true }
 
 const pageSchemaIds: Record<PageSchemaId, boolean> = {
   A3: true,

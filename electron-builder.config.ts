@@ -1,6 +1,6 @@
 import type { Configuration } from 'electron-builder'
 import { resolve } from 'node:path'
-import { FILE_EXTENSION } from './src/common/constants/fileExtension'
+import { GOMB_EXTENSION } from './src/common/constants/fileExtensions'
 
 const config: Configuration = {
   appId: 'com.gomb.app',
@@ -18,7 +18,7 @@ const config: Configuration = {
           UTTypeIdentifier: 'com.gomb.project',
           UTTypeDescription: 'Gomb',
           UTTypeConformsTo: ['public.json'],
-          UTTypeTagSpecification: { 'public.filename-extension': [FILE_EXTENSION] },
+          UTTypeTagSpecification: { 'public.filename-extension': [GOMB_EXTENSION] },
           UTTypeIcons: { UTTypeIconBadgeName: 'GombDocumentLogo' },
         },
       ],
@@ -42,7 +42,7 @@ const config: Configuration = {
   },
   win: {
     fileAssociations: {
-      ext: FILE_EXTENSION,
+      ext: GOMB_EXTENSION,
       name: 'Gomb',
       role: 'Editor',
       icon: resolve('out/document-icons/gomb.ico'),

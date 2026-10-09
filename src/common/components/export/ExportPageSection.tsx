@@ -38,6 +38,7 @@ export function ExportPageSection({ editable, issues, onChange }: ExportPageSect
         items: [
           { label: t.project.editors.enums.export.exportFormats.pdf, value: 'pdf' },
           { label: t.project.editors.enums.export.exportFormats.svg, value: 'svg' },
+          { label: t.project.editors.enums.export.exportFormats.png, value: 'png' },
         ],
       }),
     [t],

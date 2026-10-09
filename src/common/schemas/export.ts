@@ -1,9 +1,11 @@
 import type BigNumber from 'bignumber.js'
 
+import type { TranslationSchema } from '../translations/translationSchema'
 import type { HasTypeSchema } from './common'
 import type { ComponentSchema, PocketClusterSchema } from './components'
 import type { ComputedStitchHoleSchema, ComputedTPocketSchema, ComputedTopPocketSchema } from './computed'
-import type { PathSchema, RectSchema } from './geometry'
+import type { DrawAreaContextValue } from './drawArea'
+import type { PathSchema, RectSchema, SizeSchema } from './geometry'
 import type { ResolvedStitchLineSchema } from './stitching'
 import type { SubProjectSchema } from './subProject'
 
@@ -48,7 +50,15 @@ export type ExportTPocketSchema = HasTypeSchema<'export-t-pocket'> & {
 
 export type ExportElementSchema = ExportPanelSchema | ExportFrontPocketSchema | ExportTPocketSchema
 
-export type ExportFormatSchema = 'svg' | 'pdf'
+export type ExportFormatSchema = 'svg' | 'pdf' | 'png'
+
+export type ExportParamsSchema = {
+  layout: ExportSuccessfulLayoutSchema
+  pageSize: SizeSchema
+  context: DrawAreaContextValue
+  projectName: string
+  translation: TranslationSchema
+}
 
 export type PageOrientationSchema = 'portrait' | 'landscape'
 export type PageLayoutSchema = 'vertical' | 'horizontal' | 'compact'
