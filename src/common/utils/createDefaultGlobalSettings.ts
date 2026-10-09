@@ -1,5 +1,5 @@
 import { VERSION } from '../../version'
-import { defaultPdfExportParams, defaultSvgExportParams } from '../defaultStates'
+import { defaultExportParams } from '../defaultStates'
 import type { AppSettingsSchema, GlobalSettingsSchema } from '../schemas/settings'
 
 export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSchema): GlobalSettingsSchema => {
@@ -16,9 +16,8 @@ export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSche
       addBaseColor: false,
       step: 1,
     },
-    pdfExport: defaultPdfExportParams,
+    export: defaultExportParams,
     recentProjects: {},
-    svgExport: defaultSvgExportParams,
     view: {
       scale: 1,
       componentDimensionsVisible: false,

@@ -1,18 +1,19 @@
 import type { FC, PropsWithChildren } from 'react'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
-
-import type { GlobalSettingsContextValue } from '../../common/contexts/GlobalSettingsContext'
-import { GlobalSettingsContext } from '../../common/contexts/GlobalSettingsContext'
-import type { PdfExportSettingsSchema } from '../../common/schemas/pdfExport'
-import type { RecentProjectsSchema } from '../../common/schemas/recentProject'
 import type {
   AppSettingsSchema,
-  BaseExportSettingsSchema,
   EditSettingSchema,
+  ExportSettingsSchema,
   GlobalSettingsSchema,
   UISettingsSchema,
   ViewSettingsSchema,
 } from '../../common/schemas/settings'
+
+import type { GlobalSettingsContextValue } from '../../common/contexts/GlobalSettingsContext'
+import { GlobalSettingsContext } from '../../common/contexts/GlobalSettingsContext'
+
+import type { RecentProjectsSchema } from '../../common/schemas/recentProject'
+
 import { isDefined } from '../../common/utils/isDefined'
 import { electronApi } from '../electronApi'
 
@@ -59,12 +60,8 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
     setSettings((current) => ({ ...current, view: { ...current.view, ...updates } }))
   }, [])
 
-  const setSvgExportSettings = useCallback((updates: Partial<BaseExportSettingsSchema>): void => {
-    setSettings((current) => ({ ...current, svgExport: { ...current.svgExport, ...updates } }))
-  }, [])
-
-  const setPdfExportSettings = useCallback((updates: Partial<PdfExportSettingsSchema>): void => {
-    setSettings((current) => ({ ...current, pdfExport: { ...current.pdfExport, ...updates } }))
+  const setExportSettings = useCallback((updates: Partial<ExportSettingsSchema>): void => {
+    setSettings((current) => ({ ...current, export: { ...current.export, ...updates } }))
   }, [])
 
   const setRecentProjects = useCallback((updates: Partial<RecentProjectsSchema>): void => {
@@ -85,10 +82,9 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
     () => ({
       setAppSettings,
       setEditSettings,
-      setPdfExportSettings,
+      setExportSettings,
       setRecentProjects,
       setSettings,
-      setSvgExportSettings,
       setViewSettings,
       setUISettings,
       settings,
@@ -96,10 +92,9 @@ export const ElectronGlobalSettingsContextProvider: FC<ElectronGlobalSettingsCon
     [
       setAppSettings,
       setEditSettings,
-      setPdfExportSettings,
+      setExportSettings,
       setRecentProjects,
       setSettings,
-      setSvgExportSettings,
       setViewSettings,
       setUISettings,
       settings,

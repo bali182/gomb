@@ -9,7 +9,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
-import type { BaseExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
+import type { ExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { NumberInput } from '../common/NumberInput'
@@ -20,17 +20,13 @@ type ExportStitchLineModeOption = {
   value: ExportStitchLineModeSchema
 }
 
-type ExportContentSectionProps<T extends BaseExportSettingsSchema> = {
-  editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<BaseExportSettingsSchema>
-  onChange: (updated: EditableSchema<T>) => void
+type ExportContentSectionProps = {
+  editable: EditableSchema<ExportSettingsSchema>
+  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportContentSection<T extends BaseExportSettingsSchema>({
-  editable,
-  issues,
-  onChange,
-}: ExportContentSectionProps<T>): ReactNode {
+export function ExportContentSection({ editable, issues, onChange }: ExportContentSectionProps): ReactNode {
   const { t } = useTranslation()
   const stitchLineModeOptions = useMemo<ExportStitchLineModeOption[]>(
     () => [

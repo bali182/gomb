@@ -3,17 +3,17 @@ import type { FC } from 'react'
 
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import { usePath } from '../../hooks/usePath'
+import type { ExportStitchLineSchema } from '../../schemas/export'
 import type { PathSchema } from '../../schemas/geometry'
-import type { SvgExportStitchLineSchema } from '../../schemas/svgExport'
 import { PdfStitchHole } from './PdfStitchHole'
 
 type PdfStitchLineProps = {
-  stitchLine: SvgExportStitchLineSchema
+  stitchLine: ExportStitchLineSchema
 }
 
 type PdfStitchPathProps = {
   path: PathSchema
-  stitchLine: SvgExportStitchLineSchema
+  stitchLine: ExportStitchLineSchema
 }
 
 export const PdfStitchLine: FC<PdfStitchLineProps> = ({ stitchLine }) => {

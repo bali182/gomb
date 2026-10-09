@@ -1,18 +1,19 @@
 import { useAtom } from 'jotai'
 import type { FC, PropsWithChildren } from 'react'
 import { useCallback, useMemo } from 'react'
-
-import type { GlobalSettingsContextValue } from '../../common/contexts/GlobalSettingsContext'
-import { GlobalSettingsContext } from '../../common/contexts/GlobalSettingsContext'
-import type { PdfExportSettingsSchema } from '../../common/schemas/pdfExport'
-import type { RecentProjectsSchema } from '../../common/schemas/recentProject'
 import type {
   AppSettingsSchema,
-  BaseExportSettingsSchema,
   EditSettingSchema,
+  ExportSettingsSchema,
   UISettingsSchema,
   ViewSettingsSchema,
 } from '../../common/schemas/settings'
+
+import type { GlobalSettingsContextValue } from '../../common/contexts/GlobalSettingsContext'
+import { GlobalSettingsContext } from '../../common/contexts/GlobalSettingsContext'
+
+import type { RecentProjectsSchema } from '../../common/schemas/recentProject'
+
 import { isDefined } from '../../common/utils/isDefined'
 import { globalSettingsAtom } from '../state/globalSettingsAtom'
 
@@ -47,16 +48,9 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
     [setSettings],
   )
 
-  const setSvgExportSettings = useCallback(
-    (updates: Partial<BaseExportSettingsSchema>): void => {
-      setSettings((current) => ({ ...current, svgExport: { ...current.svgExport, ...updates } }))
-    },
-    [setSettings],
-  )
-
-  const setPdfExportSettings = useCallback(
-    (updates: Partial<PdfExportSettingsSchema>): void => {
-      setSettings((current) => ({ ...current, pdfExport: { ...current.pdfExport, ...updates } }))
+  const setExportSettings = useCallback(
+    (updates: Partial<ExportSettingsSchema>): void => {
+      setSettings((current) => ({ ...current, export: { ...current.export, ...updates } }))
     },
     [setSettings],
   )
@@ -82,10 +76,9 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
     () => ({
       setAppSettings,
       setEditSettings,
-      setPdfExportSettings,
+      setExportSettings,
       setRecentProjects,
       setSettings,
-      setSvgExportSettings,
       setViewSettings,
       setUISettings,
       settings,
@@ -93,10 +86,9 @@ export const WebGlobalSettingsContextProvider: FC<PropsWithChildren> = ({ childr
     [
       setAppSettings,
       setEditSettings,
-      setPdfExportSettings,
+      setExportSettings,
       setRecentProjects,
       setSettings,
-      setSvgExportSettings,
       setUISettings,
       setViewSettings,
       settings,

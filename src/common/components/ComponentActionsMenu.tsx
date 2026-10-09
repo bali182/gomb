@@ -1,12 +1,15 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
-import { PiCopy, PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
+import { PiCopy, PiDotsThreeVertical, PiImage, PiTrash } from 'react-icons/pi'
 import { useEditorContext } from '../contexts/EditorContext'
+import { useEditorDrawArea } from '../hooks/useEditorDrawArea'
+import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
+import { exportComponentPng } from '../logic/exports/exportComponentPng'
 import { portalRef } from '../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
@@ -15,6 +18,7 @@ import { SubProjectSchema } from '../schemas/subProject'
 import { getModelIcon } from '../utils/getModelIcon'
 import { isDefined } from '../utils/isDefined'
 import { noop } from '../utils/noop'
+import { toaster } from './Toaster'
 
 type ComponentActionsProps = {
   component: ComponentSchema
@@ -39,6 +43,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 }) => {
   const { t } = useTranslation()
   const { project } = useProject()
+  const { settings } = useGlobalSettings()
+  const exportDrawAreaContext = useEditorDrawArea(false)
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
   const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent } = useSubProjectOperations()
@@ -134,6 +140,22 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     onAddHole({ targetId: component.id, targetType: 'component' })
   }, [addHole, component.id, onAddHole])
 
+  const handleExportPng = useCallback(async (): Promise<void> => {
+    try {
+      await exportComponentPng({
+        project,
+        subProject,
+        componentId: component.id,
+        settings,
+        context: exportDrawAreaContext,
+        translation: t,
+      })
+    } catch (error) {
+      console.error('Unable to export component:', error)
+      toaster.create({ type: 'error', title: t.dialogs.export.errors.exportFailed })
+    }
+  }, [project, subProject, component.id, settings, exportDrawAreaContext, t])
+
   const HoleIcon = getModelIcon('hole')
 
   return (
@@ -158,6 +180,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                   <AddComponentStitchLineMenu component={component} onAddStitchLine={handleAddStitchLine} />
                 </>
               )}
+              <Menu.Item value="export-png" onSelect={handleExportPng}>
+                <PiImage />
+                <Menu.ItemText>{t.project.editors.actions.components.exportToPng}</Menu.ItemText>
+              </Menu.Item>
+              <Menu.Separator />
               <Menu.Item value="clone" onSelect={handleClone}>
                 <PiCopy />
                 <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>

@@ -1,5 +1,6 @@
 import { HasVersionSchema } from './common'
-import type { PdfExportSettingsSchema } from './pdfExport'
+import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from './export'
+import type { PageSchemaId } from './page'
 import type { RecentProjectsSchema } from './recentProject'
 import type { ThemeSchema } from './theme'
 
@@ -42,7 +43,14 @@ export type ExportContentSettingsSchema = {
   cutHelperDistance: number
 }
 
-export type BaseExportSettingsSchema = ExportLayoutSettingsSchema & ExportContentSettingsSchema
+export type ExportPageSettingsSchema = {
+  format: ExportFormatSchema
+  page: PageSchemaId
+  orientation: PageOrientationSchema
+  layout: PageLayoutSchema
+}
+
+export type ExportSettingsSchema = ExportLayoutSettingsSchema & ExportContentSettingsSchema & ExportPageSettingsSchema
 
 export type AppSettingsSchema = {
   theme: ThemeSchema
@@ -73,7 +81,6 @@ export type GlobalSettingsSchema = HasVersionSchema & {
   ui: UISettingsSchema
   edit: EditSettingSchema
   view: ViewSettingsSchema
-  svgExport: BaseExportSettingsSchema
-  pdfExport: PdfExportSettingsSchema
+  export: ExportSettingsSchema
   recentProjects: RecentProjectsSchema
 }

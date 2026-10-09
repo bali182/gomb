@@ -106,8 +106,7 @@ export type CommandShortcutSchema = {
 
 export type CommonCommandIdSchema =
   // File menu - Exports
-  | 'export-pdf'
-  | 'export-svg'
+  | 'export'
   // Edit menu - History
   | 'undo'
   | 'redo'

@@ -3,7 +3,7 @@ import type { DragEvent, FC, ReactNode } from 'react'
 import { useRef, useState } from 'react'
 import { PiFolderOpen } from 'react-icons/pi'
 
-import { FILE_EXTENSION } from '../../constants/fileExtension'
+import { GOMB_EXTENSION } from '../../constants/fileExtensions'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ResultSchema } from '../../schemas/result'
 import { isDefined } from '../../utils/isDefined'
@@ -127,5 +127,5 @@ const containsFiles = (dataTransfer: DataTransfer): boolean => {
 }
 
 const isProjectFile = (file: File): boolean => {
-  return file.name.toLowerCase().endsWith(`.${FILE_EXTENSION}`)
+  return file.name.toLowerCase().endsWith(`.${GOMB_EXTENSION}`)
 }

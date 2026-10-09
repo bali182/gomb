@@ -26,15 +26,10 @@ export const useCommonCommands = ({
     const getShortcut = createShortcutGetter(DEFAULT_SHORTCUTS, shortcuts)
     return {
       // File - Exports
-      'export-pdf': {
-        id: 'export-pdf',
+      export: {
+        id: 'export',
         disabled: !hasOpenProject,
-        shortcut: getShortcut('export-pdf'),
-      },
-      'export-svg': {
-        id: 'export-svg',
-        disabled: !hasOpenProject,
-        shortcut: getShortcut('export-svg'),
+        shortcut: getShortcut('export'),
       },
       // Edit - Undo/Redo
       undo: {
@@ -137,10 +132,7 @@ const createShortcutGetter =
 
 const DEFAULT_SHORTCUTS: CommonCommandShortcutMap = {
   measurement: undefined,
-  'export-pdf': {
-    default: ['CommandOrControl', 'Shift', 'P'],
-  },
-  'export-svg': {
+  export: {
     default: ['CommandOrControl', 'Shift', 'E'],
   },
   undo: {

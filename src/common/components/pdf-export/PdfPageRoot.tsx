@@ -1,14 +1,13 @@
 import { Svg } from '@react-pdf/renderer'
 import type { FC, ReactNode } from 'react'
 
-import type { PdfExportElement, PdfExportPageSchema } from '../../schemas/pdfExport'
-import type { SvgExportElementSchema } from '../../schemas/svgExport'
+import type { ExportElementSchema, ExportPageElementSchema, ExportPageSchema } from '../../schemas/export'
 import { PdfFrontPocket } from './PdfFrontPocket'
 import { PdfPanel } from './PdfPanel'
 import { PdfTPocket } from './PdfTPocket'
 
 type PdfPageRootProps = {
-  page: PdfExportPageSchema
+  page: ExportPageSchema
 }
 
 export const PdfPageRoot: FC<PdfPageRootProps> = ({ page }) => {
@@ -22,7 +21,7 @@ export const PdfPageRoot: FC<PdfPageRootProps> = ({ page }) => {
 }
 
 type PdfElementProps = {
-  element: PdfExportElement
+  element: ExportPageElementSchema
 }
 
 const PdfElement: FC<PdfElementProps> = ({ element: { element, placement } }) => {
@@ -48,13 +47,13 @@ const PdfElement: FC<PdfElementProps> = ({ element: { element, placement } }) =>
   )
 }
 
-const renderPdfElement = (element: SvgExportElementSchema): ReactNode => {
+const renderPdfElement = (element: ExportElementSchema): ReactNode => {
   switch (element.type) {
-    case 'svg-export-panel':
+    case 'export-panel':
       return <PdfPanel element={element} />
-    case 'svg-export-front-pocket':
+    case 'export-front-pocket':
       return <PdfFrontPocket element={element} />
-    case 'svg-export-t-pocket':
+    case 'export-t-pocket':
       return <PdfTPocket element={element} />
   }
 }

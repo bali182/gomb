@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 import { ProjectFileDropResultSchema } from '../../common/components/common/FileDropzone'
 import { toaster } from '../../common/components/Toaster'
-import { FILE_EXTENSION } from '../../common/constants/fileExtension'
+import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { ProjectSchema } from '../../common/schemas/project'
 import { id } from '../../common/utils/id'
@@ -68,6 +68,6 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
 }
 
 const createImportedProjectId = (fileName: string): string => {
-  const nameWithoutExtension = fileName.replace(new RegExp(`\\.${FILE_EXTENSION}$`, 'i'), '')
+  const nameWithoutExtension = fileName.replace(new RegExp(`\\.${GOMB_EXTENSION}$`, 'i'), '')
   return `${nameWithoutExtension.replace(/[^a-zA-Z0-9]/g, '')}${id()}`
 }

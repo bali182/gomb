@@ -1,43 +1,21 @@
-import BigNumber from 'bignumber.js'
 import type { FC } from 'react'
 
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
-import { getSvgExportElementBoundingRect } from '../../logic/exports/getSvgExportElementBoundingRect'
-import type { SvgExportElementSchema } from '../../schemas/svgExport'
-import { isDefined } from '../../utils/isDefined'
+import { getExportElementText } from '../../logic/exports/getExportElementText'
+import type { ExportElementSchema } from '../../schemas/export'
 
 type ExportElementTextProps = {
-  element: SvgExportElementSchema
+  element: ExportElementSchema
 }
 
 export const ExportElementText: FC<ExportElementTextProps> = ({ element }) => {
-  const { exportTextStyles, exportIdentifiers } = useExportDrawAreaContext()
-  const lines = [
-    getExportTextLine(
-      exportIdentifiers.getNameText(element),
-      exportTextStyles.getNameTextColor(element),
-      exportTextStyles.getNameTextFontFamily(element),
-      exportTextStyles.getNameTextFontSize(element),
-    ),
-    getExportTextLine(
-      exportTextStyles.getDimensionsText(element),
-      exportTextStyles.getDimensionsTextColor(element),
-      exportTextStyles.getDimensionsTextFontFamily(element),
-      exportTextStyles.getDimensionsTextFontSize(element),
-    ),
-  ].filter(isDefined)
+  const context = useExportDrawAreaContext()
+  const { exportIdentifiers } = context
+  const positionedLines = getExportElementText(element, context)
 
-  if (lines.length === 0) {
+  if (positionedLines.length === 0) {
     return null
   }
-
-  const boundingRect = getSvgExportElementBoundingRect(element)
-  const positionedLines = getExportTextLinePositions(
-    lines,
-    boundingRect.x.plus(boundingRect.width.dividedBy(2)),
-    boundingRect.y.plus(boundingRect.height.dividedBy(2)),
-    new BigNumber(exportTextStyles.getNameDimensionsGap(element) ?? 0),
-  )
 
   return (
     <g data-text-for-component={exportIdentifiers.getElementId(element)}>
@@ -58,61 +36,4 @@ export const ExportElementText: FC<ExportElementTextProps> = ({ element }) => {
       ))}
     </g>
   )
-}
-
-type ExportTextLine = {
-  text: string
-  color: string | undefined
-  fontFamily: string | undefined
-  fontSize: number
-}
-
-type ExportTextLinePosition = {
-  line: ExportTextLine
-  x: BigNumber
-  y: BigNumber
-}
-
-const getExportTextLine = (
-  text: string | undefined,
-  color: string | undefined,
-  fontFamily: string | undefined,
-  fontSize: number | undefined,
-): ExportTextLine | undefined => {
-  if (isDefined(text) && isDefined(fontSize)) {
-    return {
-      text,
-      color,
-      fontFamily,
-      fontSize,
-    }
-  }
-
-  return undefined
-}
-
-const getExportTextLinePositions = (
-  lines: ExportTextLine[],
-  centerX: BigNumber,
-  centerY: BigNumber,
-  gap: BigNumber,
-): ExportTextLinePosition[] => {
-  const linesHeight = lines.reduce((height, line) => height.plus(line.fontSize), new BigNumber(0))
-  const contentHeight = linesHeight.plus(gap.times(lines.length - 1))
-  const contentTop = centerY.minus(contentHeight.dividedBy(2))
-
-  return lines.map((line, lineIndex) => {
-    const previousLinesHeight = lines
-      .slice(0, lineIndex)
-      .reduce((height, previousLine) => height.plus(previousLine.fontSize), new BigNumber(0))
-
-    return {
-      line,
-      x: centerX,
-      y: contentTop
-        .plus(previousLinesHeight)
-        .plus(gap.times(lineIndex))
-        .plus(new BigNumber(line.fontSize).dividedBy(2)),
-    }
-  })
 }

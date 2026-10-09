@@ -1,19 +1,26 @@
 import BigNumber from 'bignumber.js'
 
-import { ZERO } from '../../constants/layout'
+import { EXPORT_PAGE_GAP, ZERO } from '../../constants/layout'
 import { pages } from '../../data/pages'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { RectSchema, SizeSchema } from '../../schemas/geometry'
-import {
-  PdfExportLayoutSchema,
-  PdfExportPageSchema,
-  PdfExportPlacementRotation,
-  PdfExportPlacementSchema,
-  PdfExportSettingsSchema,
-} from '../../schemas/pdfExport'
-import type { SvgExportElementSchema, SvgExportPanelSchema } from '../../schemas/svgExport'
+import type {
+  ExportElementSchema,
+  ExportLayoutSchema,
+  ExportPageElementSchema,
+  ExportPageSchema,
+  ExportPanelSchema,
+  ExportPlacementRotation,
+  ExportPlacementSchema,
+} from '../../schemas/export'
+import type { PointSchema, RectSchema, SizeSchema } from '../../schemas/geometry'
+import type { ExportSettingsSchema } from '../../schemas/settings'
 import { isDefined } from '../../utils/isDefined'
-import { getSvgExportElementLayoutBoundingRect } from './getSvgExportElementLayoutBoundingRect'
+import { translateRect } from '../translateRect'
+import {
+  getExportElementLayoutBoundingRect,
+  hasPerPageCoordinateSystem,
+  translateExportElement,
+} from './exportGeometryUtils'
 
 type CompactPlacementCandidate = {
   pageIndex: number
@@ -26,10 +33,10 @@ type CompactPlacementCandidate = {
 
 type CompactPage = {
   freeRects: RectSchema[]
-  page: PdfExportPageSchema
+  page: ExportPageElementSchema[]
 }
 
-export const getPdfExportPageSize = (settings: PdfExportSettingsSchema): SizeSchema => {
+export const getExportPageSize = (settings: ExportSettingsSchema): SizeSchema => {
   const page = pages.find((candidate) => candidate.id === settings.page)
 
   if (!isDefined(page)) {
@@ -41,30 +48,58 @@ export const getPdfExportPageSize = (settings: PdfExportSettingsSchema): SizeSch
     : { width: new BigNumber(page.height), height: new BigNumber(page.width) }
 }
 
-export const getPdfExportLayout = (
-  elements: SvgExportElementSchema[],
-  settings: PdfExportSettingsSchema,
+export const getExportLayout = (
+  elements: ExportElementSchema[],
+  settings: ExportSettingsSchema,
   context: DrawAreaContextValue,
-): PdfExportLayoutSchema => {
-  const pageSize = getPdfExportPageSize(settings)
+): ExportLayoutSchema => {
+  const pageSize = getExportPageSize(settings)
   const usableRect = getUsableRect(pageSize, settings.padding)
   const unplaceableElements = getUnplaceableElements(elements, usableRect, settings.layout, context)
 
   if (unplaceableElements.length > 0) {
     const unplaceables = unplaceableElements.filter(
-      (element): element is SvgExportPanelSchema => element.type === 'svg-export-panel',
+      (element): element is ExportPanelSchema => element.type === 'export-panel',
     )
 
     if (unplaceables.length === 0) {
       throw new Error('Expected an unplaceable panel')
     }
 
-    return { type: 'unsuccessful-pdf-export', unplaceables }
+    return { type: 'unsuccessful-export', unplaceables }
   }
 
-  const pages = layoutElements(elements, usableRect, settings.gap, settings.layout, context)
+  const pageElements = layoutElements(elements, usableRect, settings.gap, settings.layout, context)
+  const perPageCoordinateSystem = hasPerPageCoordinateSystem(settings.format)
+  const pages = pageElements.map((elements, pageIndex): ExportPageSchema => {
+    const pageTranslation: PointSchema = {
+      x: ZERO,
+      y: perPageCoordinateSystem ? ZERO : pageSize.height.plus(EXPORT_PAGE_GAP).times(pageIndex),
+    }
 
-  return { type: 'successful-pdf-export', pages }
+    return {
+      boundingRect: createRect(pageTranslation.x, pageTranslation.y, pageSize.width, pageSize.height),
+      elements: elements.map(({ element, placement }): ExportPageElementSchema => {
+        const translation: PointSchema = {
+          x: placement.x.minus(placement.boundingRect.x).plus(pageTranslation.x),
+          y: placement.y.minus(placement.boundingRect.y).plus(pageTranslation.y),
+        }
+
+        return {
+          element: translateExportElement(element, translation),
+          placement: {
+            ...placement,
+            boundingRect: translateRect(placement.boundingRect, translation),
+            placementBoundingRect: translateRect(placement.placementBoundingRect, pageTranslation),
+            x: placement.x.plus(pageTranslation.x),
+            y: placement.y.plus(pageTranslation.y),
+          },
+        }
+      }),
+    }
+  })
+
+  return { type: 'successful-export', pages }
 }
 
 const getUsableRect = (pageSize: SizeSchema, padding: number): RectSchema => {
@@ -79,13 +114,13 @@ const getUsableRect = (pageSize: SizeSchema, padding: number): RectSchema => {
 }
 
 const getUnplaceableElements = (
-  elements: SvgExportElementSchema[],
+  elements: ExportElementSchema[],
   usableRect: RectSchema,
-  layout: PdfExportSettingsSchema['layout'],
+  layout: ExportSettingsSchema['layout'],
   context: DrawAreaContextValue,
-): SvgExportElementSchema[] => {
+): ExportElementSchema[] => {
   return elements.filter((element) => {
-    const boundingRect = getPdfExportElementLayoutBoundingRect(element, context)
+    const boundingRect = getExportElementStrokeBoundingRect(element, context)
 
     if (layout === 'compact') {
       return (
@@ -102,14 +137,14 @@ const canFit = (width: BigNumber, height: BigNumber, usableRect: RectSchema): bo
   return width.isLessThanOrEqualTo(usableRect.width) && height.isLessThanOrEqualTo(usableRect.height)
 }
 
-const getPdfExportElementLayoutBoundingRect = (
-  element: SvgExportElementSchema,
+const getExportElementStrokeBoundingRect = (
+  element: ExportElementSchema,
   context: DrawAreaContextValue,
 ): RectSchema => {
-  const component = element.type === 'svg-export-panel' ? element.component : element.ownerComponent
+  const component = element.type === 'export-panel' ? element.component : element.ownerComponent
   const borderThickness = context.componentStyles.getBorderThickness({ component, nestingLevel: 0 }) ?? 0
   const padding = new BigNumber(borderThickness).dividedBy(2)
-  const boundingRect = getSvgExportElementLayoutBoundingRect(element)
+  const boundingRect = getExportElementLayoutBoundingRect(element)
 
   return createRect(
     boundingRect.x.minus(padding),
@@ -120,12 +155,12 @@ const getPdfExportElementLayoutBoundingRect = (
 }
 
 const layoutElements = (
-  elements: SvgExportElementSchema[],
+  elements: ExportElementSchema[],
   usableRect: RectSchema,
   gap: number,
-  layout: PdfExportSettingsSchema['layout'],
+  layout: ExportSettingsSchema['layout'],
   context: DrawAreaContextValue,
-): PdfExportPageSchema[] => {
+): ExportPageElementSchema[][] => {
   switch (layout) {
     case 'vertical':
       return layoutVertically(elements, usableRect, gap, context)
@@ -137,28 +172,28 @@ const layoutElements = (
 }
 
 const layoutVertically = (
-  elements: SvgExportElementSchema[],
+  elements: ExportElementSchema[],
   usableRect: RectSchema,
   gap: number,
   context: DrawAreaContextValue,
-): PdfExportPageSchema[] => {
-  const pages: PdfExportPageSchema[] = []
+): ExportPageElementSchema[][] => {
+  const pages: ExportPageElementSchema[][] = []
   const gapValue = new BigNumber(gap)
-  let page = createPage()
+  let page: ExportPageElementSchema[] = []
   let nextY = usableRect.y
 
   elements.forEach((element) => {
-    const sourceRect = getPdfExportElementLayoutBoundingRect(element, context)
+    const sourceRect = getExportElementStrokeBoundingRect(element, context)
 
     if (nextY.plus(sourceRect.height).isGreaterThan(usableRect.y.plus(usableRect.height))) {
       pages.push(page)
-      page = createPage()
+      page = []
       nextY = usableRect.y
     }
 
-    page.elements.push({
+    page.push({
       element,
-      placement: createPdfExportPlacement(
+      placement: createExportPlacement(
         sourceRect,
         createRect(usableRect.x, nextY, sourceRect.width, sourceRect.height),
         0,
@@ -173,28 +208,28 @@ const layoutVertically = (
 }
 
 const layoutHorizontally = (
-  elements: SvgExportElementSchema[],
+  elements: ExportElementSchema[],
   usableRect: RectSchema,
   gap: number,
   context: DrawAreaContextValue,
-): PdfExportPageSchema[] => {
-  const pages: PdfExportPageSchema[] = []
+): ExportPageElementSchema[][] => {
+  const pages: ExportPageElementSchema[][] = []
   const gapValue = new BigNumber(gap)
-  let page = createPage()
+  let page: ExportPageElementSchema[] = []
   let nextX = usableRect.x
 
   elements.forEach((element) => {
-    const sourceRect = getPdfExportElementLayoutBoundingRect(element, context)
+    const sourceRect = getExportElementStrokeBoundingRect(element, context)
 
     if (nextX.plus(sourceRect.width).isGreaterThan(usableRect.x.plus(usableRect.width))) {
       pages.push(page)
-      page = createPage()
+      page = []
       nextX = usableRect.x
     }
 
-    page.elements.push({
+    page.push({
       element,
-      placement: createPdfExportPlacement(
+      placement: createExportPlacement(
         sourceRect,
         createRect(nextX, usableRect.y, sourceRect.width, sourceRect.height),
         0,
@@ -209,22 +244,22 @@ const layoutHorizontally = (
 }
 
 const layoutCompactly = (
-  elements: SvgExportElementSchema[],
+  elements: ExportElementSchema[],
   usableRect: RectSchema,
   gap: number,
   context: DrawAreaContextValue,
-): PdfExportPageSchema[] => {
+): ExportPageElementSchema[][] => {
   const gapValue = new BigNumber(gap)
   const compactPages: CompactPage[] = []
   const elementsByArea = [...elements].sort((left, right) => {
-    const leftRect = getPdfExportElementLayoutBoundingRect(left, context)
-    const rightRect = getPdfExportElementLayoutBoundingRect(right, context)
+    const leftRect = getExportElementStrokeBoundingRect(left, context)
+    const rightRect = getExportElementStrokeBoundingRect(right, context)
 
     return compareBigNumbers(rightRect.width.times(rightRect.height), leftRect.width.times(leftRect.height))
   })
 
   elementsByArea.forEach((element) => {
-    const sourceRect = getPdfExportElementLayoutBoundingRect(element, context)
+    const sourceRect = getExportElementStrokeBoundingRect(element, context)
     let placement = findCompactPlacement(compactPages, sourceRect, usableRect, gapValue)
 
     if (!isDefined(placement)) {
@@ -242,9 +277,9 @@ const layoutCompactly = (
       throw new Error(`Page not found: ${placement.pageIndex}`)
     }
 
-    compactPage.page.elements.push({
+    compactPage.page.push({
       element,
-      placement: createPdfExportPlacement(sourceRect, placement.boundingRect, placement.rotation),
+      placement: createExportPlacement(sourceRect, placement.boundingRect, placement.rotation),
     })
     compactPage.freeRects = splitFreeRects(compactPage.freeRects, getFootprint(placement.boundingRect, gapValue))
   })
@@ -252,13 +287,11 @@ const layoutCompactly = (
   return compactPages.map((compactPage) => compactPage.page)
 }
 
-const createPage = (): PdfExportPageSchema => ({ elements: [] })
-
-const createPdfExportPlacement = (
+const createExportPlacement = (
   boundingRect: RectSchema,
   placementBoundingRect: RectSchema,
-  rotation: PdfExportPlacementRotation,
-): PdfExportPlacementSchema => {
+  rotation: ExportPlacementRotation,
+): ExportPlacementSchema => {
   if (rotation === 0) {
     return {
       boundingRect,
@@ -280,7 +313,7 @@ const createPdfExportPlacement = (
 
 const createCompactPage = (usableRect: RectSchema, gap: BigNumber): CompactPage => ({
   freeRects: [createRect(usableRect.x, usableRect.y, usableRect.width.plus(gap), usableRect.height.plus(gap))],
-  page: createPage(),
+  page: [],
 })
 
 const findCompactPlacement = (
@@ -303,7 +336,7 @@ const findCompactPlacementForRotation = (
   sourceRect: RectSchema,
   usableRect: RectSchema,
   gap: BigNumber,
-  rotation: PdfExportPlacementSchema['rotation'],
+  rotation: ExportPlacementSchema['rotation'],
 ): CompactPlacementCandidate | undefined => {
   let bestCandidate: CompactPlacementCandidate | undefined
 
