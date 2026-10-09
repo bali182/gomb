@@ -1,8 +1,7 @@
 import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react'
+import { ExportDialog } from '../../common/components/ExportDialog'
 import { LicenseDialog } from '../../common/components/LicenseDialog'
-import { PdfExportDialog } from '../../common/components/PdfExportDialog'
 import { ScalingDialog } from '../../common/components/ScalingDialog'
-import { SvgExportDialog } from '../../common/components/SvgExportDialog'
 import {
   EDITOR_MEDIUM_STEP,
   EDITOR_SMALL_STEP,
@@ -24,8 +23,7 @@ import type { WebCommandIdSchema, WebCommandSchema } from '../schemas/webCommand
 export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const [isLicenseDialogOpen, setLicenseDialogOpen] = useState<boolean>(false)
   const [isScalingDialogOpen, setScalingDialogOpen] = useState<boolean>(false)
-  const [isSvgExportDialogOpen, setSvgExportDialogOpen] = useState<boolean>(false)
-  const [isPdfExportDialogOpen, setPdfExportDialogOpen] = useState<boolean>(false)
+  const [isExportDialogOpen, setExportDialogOpen] = useState<boolean>(false)
   const { setEditSettings, setViewSettings, settings } = useGlobalSettings()
   const { project } = useOptionalProject()
   const { redo, undo } = useSubProjectHistory()
@@ -55,10 +53,8 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
       switch (id) {
         case 'measurement':
           return toggleMeasuring()
-        case 'export-svg':
-          return setSvgExportDialogOpen(true)
-        case 'export-pdf':
-          return setPdfExportDialogOpen(true)
+        case 'export':
+          return setExportDialogOpen(true)
         case 'undo':
           return undo()
         case 'redo':
@@ -122,12 +118,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
   return (
     <CommandsContext.Provider value={value as CommandsContextValue<string>}>
       {children}
-      {!commands['export-svg'].disabled && (
-        <SvgExportDialog isOpen={isSvgExportDialogOpen} onOpenChange={setSvgExportDialogOpen} />
-      )}
-      {!commands['export-pdf'].disabled && (
-        <PdfExportDialog isOpen={isPdfExportDialogOpen} onOpenChange={setPdfExportDialogOpen} />
-      )}
+      {!commands['export'].disabled && <ExportDialog isOpen={isExportDialogOpen} onOpenChange={setExportDialogOpen} />}
       {!commands['scaling'].disabled && (
         <ScalingDialog isOpen={isScalingDialogOpen} onOpenChange={setScalingDialogOpen} />
       )}

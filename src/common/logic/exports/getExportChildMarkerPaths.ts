@@ -1,10 +1,11 @@
 import type { ComputedComponentSchema } from '../../schemas/computed'
-import type { PathSchema, RectSchema } from '../../schemas/geometry'
+
+import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
 import { createPathFromConnectedSegments } from '../pathSegments'
 import type { LinePathSegment } from '../pathSegmentTypes'
 import { doLinePathSegmentsOverlap } from '../pathSegmentUtils'
 
-export const getSvgExportChildMarkerPaths = (
+export const getExportChildMarkerPaths = (
   children: ComputedComponentSchema[],
   parentBoundingRect: RectSchema,
 ): PathSchema[] => {
@@ -31,10 +32,10 @@ export const getSvgExportChildMarkerPaths = (
 const getBoundingRectMarkerLines = (boundingRect: RectSchema): LinePathSegment[] => {
   const right = boundingRect.x.plus(boundingRect.width)
   const bottom = boundingRect.y.plus(boundingRect.height)
-  const topLeft = { x: boundingRect.x, y: boundingRect.y }
-  const topRight = { x: right, y: boundingRect.y }
-  const bottomRight = { x: right, y: bottom }
-  const bottomLeft = { x: boundingRect.x, y: bottom }
+  const topLeft: PointSchema = { x: boundingRect.x, y: boundingRect.y }
+  const topRight: PointSchema = { x: right, y: boundingRect.y }
+  const bottomRight: PointSchema = { x: right, y: bottom }
+  const bottomLeft: PointSchema = { x: boundingRect.x, y: bottom }
 
   return [
     { type: 'line', start: topLeft, end: topRight },

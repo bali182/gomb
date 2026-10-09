@@ -17,18 +17,20 @@ import type {
   PocketOrientationSchema,
   PocketsSchema,
 } from '../schemas/components'
+import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
-import type { PageLayoutSchema, PageOrientationSchema, PdfExportOwnSettingsSchema } from '../schemas/pdfExport'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
+  ExportPageSettingsSchema,
   ExportStitchLineModeSchema,
   LanguageSchema,
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
+
 import type {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
@@ -135,8 +137,7 @@ export const EN = {
         },
         export: {
           name: 'Export project',
-          svg: 'Export SVG',
-          pdf: 'Export PDF',
+          export: 'Export',
         },
         download: {
           name: 'Download project',
@@ -640,21 +641,25 @@ export const EN = {
                 'Sets how far outside each component the cut helper outline is drawn. Set it to 0 to hide the outline.',
             },
           } satisfies SectionTranslationSchema<ExportContentSettingsSchema>,
-          pdf: {
+          page: {
             title: 'Page',
+            format: {
+              label: 'Format',
+              tooltip: 'Chooses the exported file format.',
+            },
             page: {
               label: 'Paper size',
-              tooltip: 'Chooses the paper size used for the PDF.',
+              tooltip: 'Chooses the paper size used for the export.',
             },
             orientation: {
               label: 'Orientation',
-              tooltip: 'Chooses whether the PDF page is portrait or landscape.',
+              tooltip: 'Chooses whether the page is portrait or landscape.',
             },
             layout: {
               label: 'Layout',
-              tooltip: 'Chooses how exported components are arranged on each PDF page.',
+              tooltip: 'Chooses how exported components are arranged on each page.',
             },
-          } satisfies SectionTranslationSchema<PdfExportOwnSettingsSchema>,
+          } satisfies SectionTranslationSchema<ExportPageSettingsSchema>,
         },
       },
       enums: {
@@ -703,6 +708,10 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         export: {
+          exportFormats: {
+            svg: 'SVG',
+            pdf: 'PDF',
+          } satisfies EnumTranslationSchema<ExportFormatSchema>,
           exportStitchLineModes: {
             'own-stitch-lines': 'Own stitch lines',
             'related-stitch-lines': 'Related stitch lines',
@@ -752,15 +761,11 @@ export const EN = {
       title: 'Settings',
       positiveAction: 'OK',
     },
-    svgExport: {
-      title: 'Export SVG',
-      positiveAction: 'Export',
-    },
-    pdfExport: {
-      title: 'Export PDF',
+    export: {
+      title: 'Export',
       positiveAction: 'Export',
       errors: {
-        exportFailed: 'The PDF export failed.',
+        exportFailed: 'The export failed.',
         unplaceablePanels: 'One or more panels do not fit on the selected page.',
       },
     },

@@ -8,36 +8,36 @@ import type {
   ComputedTopPocketSchema,
   ComputedTPocketSchema,
 } from '../../schemas/computed'
+import type { ExportStitchLineSchema } from '../../schemas/export'
 import type { PathSchema } from '../../schemas/geometry'
 import type { ExportStitchLineModeSchema } from '../../schemas/settings'
 import type { StitchLineCommonConfigSchema, StitchLineSchema } from '../../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/subProject'
-import type { SvgExportStitchLineSchema } from '../../schemas/svgExport'
 import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { clipPathToClosedPath } from '../clipPathToClosedPath'
 import { isPointInClosedPath } from '../isPointInClosedPath'
 
-type ComputedSvgExportStitchLineTarget =
+type ComputedExportStitchLineTarget =
   | ComputedRootPanelSchema
   | ComputedPanelSchema
   | ComputedTopPocketSchema
   | ComputedTPocketSchema
 
-export const getSvgExportStitchLines = (
+export const getExportStitchLines = (
   subProject: SubProjectSchema,
   computedSubProject: ComputedSubProjectSchema,
-  target: ComputedSvgExportStitchLineTarget,
+  target: ComputedExportStitchLineTarget,
   stitchLineMode: ExportStitchLineModeSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
-): SvgExportStitchLineSchema[] => {
+): ExportStitchLineSchema[] => {
   const candidateStitchLines = getCandidateStitchLines(computedSubProject, subProject, target, stitchLineMode)
   const accessor = accessors.subProject(subProject)
 
   return candidateStitchLines.flatMap((computedStitchLine) => {
     const stitchLine = accessor.stitchLine(computedStitchLine.stitchLineId)
-    const svgExportStitchLine = getSvgExportStitchLine(
+    const exportStitchLine = getExportStitchLine(
       stitchLine,
       computedStitchLine,
       stitchingSettings,
@@ -45,11 +45,11 @@ export const getSvgExportStitchLines = (
       getExportRoutes(computedSubProject, stitchLine, computedStitchLine, target, stitchLineMode),
     )
 
-    return isDefined(svgExportStitchLine) ? [svgExportStitchLine] : []
+    return isDefined(exportStitchLine) ? [exportStitchLine] : []
   })
 }
 
-const getTargetComponentId = (target: ComputedSvgExportStitchLineTarget): string => {
+const getTargetComponentId = (target: ComputedExportStitchLineTarget): string => {
   switch (target.type) {
     case 'computed-root-panel':
     case 'computed-panel':
@@ -62,7 +62,7 @@ const getTargetComponentId = (target: ComputedSvgExportStitchLineTarget): string
 const getCandidateStitchLines = (
   computedSubProject: ComputedSubProjectSchema,
   subProject: SubProjectSchema,
-  target: ComputedSvgExportStitchLineTarget,
+  target: ComputedExportStitchLineTarget,
   stitchLineMode: ExportStitchLineModeSchema,
 ): ComputedStitchLineSchema[] => {
   switch (stitchLineMode) {
@@ -78,7 +78,7 @@ const getCandidateStitchLines = (
 const getContainedStitchLines = (
   computedSubProject: ComputedSubProjectSchema,
   subProject: SubProjectSchema,
-  target: ComputedSvgExportStitchLineTarget,
+  target: ComputedExportStitchLineTarget,
 ): ComputedStitchLineSchema[] => {
   switch (target.type) {
     case 'computed-root-panel':
@@ -150,7 +150,7 @@ const getPocketClusterTPocketStitchLines = (
   componentId: string,
 ): ComputedStitchLineSchema[] => {
   const pocketCluster = accessors.subProject(subProject).component(componentId)
-  const descendantIds = [
+  const descendantIds: string[] = [
     ...getComponentDescendants(pocketCluster, subProject),
     ...getSiblingsRenderingOnTop(componentId, subProject),
   ]
@@ -181,13 +181,13 @@ const getComputedStitchLinesForComponents = (
   return stitchLines
 }
 
-const getSvgExportStitchLine = (
+const getExportStitchLine = (
   stitchLine: StitchLineSchema,
   computedStitchLine: ComputedStitchLineSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
   clippingPath: PathSchema,
   routes: ComputedStitchRouteSchema[],
-): SvgExportStitchLineSchema | undefined => {
+): ExportStitchLineSchema | undefined => {
   const paths = routes.flatMap((route) => clipPathToClosedPath(route.path, clippingPath))
   const holes = routes.flatMap((route) => {
     return route.holes.filter((hole) => isPointInClosedPath(hole.center, clippingPath))
@@ -208,7 +208,7 @@ const getExportRoutes = (
   computedProject: ComputedSubProjectSchema,
   stitchLine: StitchLineSchema,
   computedStitchLine: ComputedStitchLineSchema,
-  target: ComputedSvgExportStitchLineTarget,
+  target: ComputedExportStitchLineTarget,
   stitchLineMode: ExportStitchLineModeSchema,
 ): ComputedStitchRouteSchema[] => {
   if (stitchLineMode === 'all-stitch-lines' || stitchLine.type !== 'pocket-cluster-stitch-line') {

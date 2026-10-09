@@ -12,13 +12,8 @@ export const ExportMenuGroup: FC = () => {
     <Menu.ItemGroup>
       <Menu.ItemGroupLabel>{t.project.menus.file.export.name}</Menu.ItemGroupLabel>
       <CommandMenuItem<CommonCommandIdSchema>
-        command="export-svg"
-        title={t.project.menus.file.export.svg}
-        icon={PiExport}
-      />
-      <CommandMenuItem<CommonCommandIdSchema>
-        command="export-pdf"
-        title={t.project.menus.file.export.pdf}
+        command="export"
+        title={t.project.menus.file.export.export}
         icon={PiExport}
       />
     </Menu.ItemGroup>

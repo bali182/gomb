@@ -1,23 +1,34 @@
 import BigNumber from 'bignumber.js'
 import type { FC } from 'react'
 
+import { STROKE_THICKNESS } from '../../constants/drawing'
+import { ZERO } from '../../constants/layout'
 import { ExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { SvgExportElementSchema, SvgExportSchema } from '../../schemas/svgExport'
-import { ExportFrontPocket } from './ExportFrontPocket'
-import { ExportPanel } from './ExportPanel'
-import { ExportTPocket } from './ExportTPocket'
+import type { ExportSuccessfulLayoutSchema } from '../../schemas/export'
+import type { RectSchema, SizeSchema } from '../../schemas/geometry'
+import { getViewBox } from '../../utils/getViewBox'
+import { SvgExportPage } from './SvgExportPage'
 
 type SvgExportRootProps = {
   context: DrawAreaContextValue
-  svgExport: SvgExportSchema
+  layout: ExportSuccessfulLayoutSchema
+  pageSize: SizeSchema
 }
 
-export const SvgExportRoot: FC<SvgExportRootProps> = ({ context, svgExport }) => {
-  const padding = new BigNumber(svgExport.settings.padding)
-  const width = svgExport.contentWidth.plus(padding.times(2))
-  const height = svgExport.contentHeight.plus(padding.times(2))
-  const viewBox = `${padding.negated().toString()} ${padding.negated().toString()} ${width.toString()} ${height.toString()}`
+export const SvgExportRoot: FC<SvgExportRootProps> = ({ context, layout, pageSize }) => {
+  const boundingRect: RectSchema = {
+    x: ZERO,
+    y: ZERO,
+    width: pageSize.width,
+    height: layout.pages.reduce(
+      (height, page) => BigNumber.maximum(height, page.boundingRect.y.plus(page.boundingRect.height)),
+      ZERO,
+    ),
+  }
+  const width = boundingRect.width.plus(STROKE_THICKNESS)
+  const height = boundingRect.height.plus(STROKE_THICKNESS)
+  const viewBox = getViewBox(boundingRect, STROKE_THICKNESS / 2)
 
   return (
     <ExportDrawAreaContext.Provider value={context}>
@@ -28,29 +39,10 @@ export const SvgExportRoot: FC<SvgExportRootProps> = ({ context, svgExport }) =>
         style={{ display: 'block' }}
         viewBox={viewBox}
       >
-        {svgExport.elements.map((element) => (
-          <SvgExportElement element={element} key={`${element.subProject.id}:${element.id}`} />
+        {layout.pages.map((page, pageIndex) => (
+          <SvgExportPage key={pageIndex} page={page} />
         ))}
       </svg>
     </ExportDrawAreaContext.Provider>
   )
-}
-
-type SvgExportElementProps = {
-  element: SvgExportElementSchema
-}
-
-const SvgExportElement: FC<SvgExportElementProps> = ({ element }) => {
-  return renderSvgExportElement(element)
-}
-
-const renderSvgExportElement = (element: SvgExportElementSchema) => {
-  switch (element.type) {
-    case 'svg-export-panel':
-      return <ExportPanel element={element} />
-    case 'svg-export-front-pocket':
-      return <ExportFrontPocket element={element} />
-    case 'svg-export-t-pocket':
-      return <ExportTPocket element={element} />
-  }
 }

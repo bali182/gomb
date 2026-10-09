@@ -1,8 +1,8 @@
 import { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
 import { ComponentSchema, PocketClusterSchema } from './components'
+import type { ExportElementSchema } from './export'
 import { HoleSchema } from './hole'
 import { ResolvedStitchLineSchema, StitchLineSchema } from './stitching'
-import { SvgExportElementSchema } from './svgExport'
 
 export type DrawAreaComponentStyleParams = {
   component: ComponentSchema
@@ -47,20 +47,20 @@ export type DrawAreaHoleStyles = {
   getStrokeThickness: (params: DrawAreaHoleStyleParams) => number | undefined
 }
 export type DrawAreaExportIdentifiers = {
-  getElementId: (element: SvgExportElementSchema) => string | undefined
+  getElementId: (element: ExportElementSchema) => string | undefined
   getStitchLineId: (element: ResolvedStitchLineSchema) => string | undefined
-  getNameText: (element: SvgExportElementSchema) => string | undefined
+  getNameText: (element: ExportElementSchema) => string | undefined
 }
 
 export type DrawAreaExportTextStyles = {
-  getNameTextColor: (element: SvgExportElementSchema) => string | undefined
-  getNameTextFontFamily: (element: SvgExportElementSchema) => string | undefined
-  getNameTextFontSize: (element: SvgExportElementSchema) => number | undefined
-  getDimensionsText: (element: SvgExportElementSchema) => string | undefined
-  getDimensionsTextColor: (element: SvgExportElementSchema) => string | undefined
-  getDimensionsTextFontFamily: (element: SvgExportElementSchema) => string | undefined
-  getDimensionsTextFontSize: (element: SvgExportElementSchema) => number | undefined
-  getNameDimensionsGap: (element: SvgExportElementSchema) => number | undefined
+  getNameTextColor: (element: ExportElementSchema) => string | undefined
+  getNameTextFontFamily: (element: ExportElementSchema) => string | undefined
+  getNameTextFontSize: (element: ExportElementSchema) => number | undefined
+  getDimensionsText: (element: ExportElementSchema) => string | undefined
+  getDimensionsTextColor: (element: ExportElementSchema) => string | undefined
+  getDimensionsTextFontFamily: (element: ExportElementSchema) => string | undefined
+  getDimensionsTextFontSize: (element: ExportElementSchema) => number | undefined
+  getNameDimensionsGap: (element: ExportElementSchema) => number | undefined
 }
 
 export type DrawAreaLabelStyles = {

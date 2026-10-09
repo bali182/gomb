@@ -2,22 +2,18 @@ import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
-import type { BaseExportSettingsSchema } from '../../schemas/settings'
+import type { ExportSettingsSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 
-type ExportLayoutSectionProps<T extends BaseExportSettingsSchema> = {
-  editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<BaseExportSettingsSchema>
-  onChange: (updated: EditableSchema<T>) => void
+type ExportLayoutSectionProps = {
+  editable: EditableSchema<ExportSettingsSchema>
+  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportLayoutSection<T extends BaseExportSettingsSchema>({
-  editable,
-  issues,
-  onChange,
-}: ExportLayoutSectionProps<T>): ReactNode {
+export function ExportLayoutSection({ editable, issues, onChange }: ExportLayoutSectionProps): ReactNode {
   const { t } = useTranslation()
   const handleGapChange = useCallback(
     (gap: string): void => {

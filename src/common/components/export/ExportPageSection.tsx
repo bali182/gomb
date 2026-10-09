@@ -5,29 +5,53 @@ import { PiColumns, PiFile, PiGridFour, PiRows } from 'react-icons/pi'
 import { pages } from '../../data/pages'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../../schemas/export'
 import type { PageSchema, PageSchemaId } from '../../schemas/page'
-import type { PageLayoutSchema, PageOrientationSchema, PdfExportSettingsSchema } from '../../schemas/pdfExport'
+import type { ExportSettingsSchema } from '../../schemas/settings'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
+
+type ExportFormatOption = {
+  label: string
+  value: ExportFormatSchema
+}
 
 type ExportPageOption = {
   label: string
   value: PageSchemaId
 }
 
-type ExportPageSectionProps<T extends PdfExportSettingsSchema> = {
-  editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<PdfExportSettingsSchema>
-  onChange: (updated: EditableSchema<T>) => void
+type ExportPageSectionProps = {
+  editable: EditableSchema<ExportSettingsSchema>
+  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportPageSection<T extends PdfExportSettingsSchema>({
-  editable,
-  issues,
-  onChange,
-}: ExportPageSectionProps<T>): ReactNode {
+export function ExportPageSection({ editable, issues, onChange }: ExportPageSectionProps): ReactNode {
   const { t } = useTranslation()
+  const formatCollection = useMemo<ListCollection<ExportFormatOption>>(
+    () =>
+      createListCollection<ExportFormatOption>({
+        itemToString: (item) => item.label,
+        itemToValue: (item) => item.value,
+        items: [
+          { label: t.project.editors.enums.export.exportFormats.pdf, value: 'pdf' },
+          { label: t.project.editors.enums.export.exportFormats.svg, value: 'svg' },
+        ],
+      }),
+    [t],
+  )
+  const handleFormatChange = useCallback(
+    (details: Select.ValueChangeDetails<ExportFormatOption>): void => {
+      const format = details.value[0]
+      if (!isDefined(format)) {
+        return
+      }
+      onChange({ ...editable, format: format as ExportFormatSchema })
+    },
+    [editable, onChange],
+  )
   const pageOptions = useMemo<ExportPageOption[]>(() => pages.map((page) => createExportPageOption(page)), [])
   const pageCollection = useMemo<ListCollection<ExportPageOption>>(
     () =>
@@ -67,10 +91,42 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.project.editors.sections.export.pdf.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader>{t.project.editors.sections.export.page.title}</SectionGroup.SectionHeader>
 
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.page.tooltip}>
-        {t.project.editors.sections.export.pdf.page.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.format.tooltip}>
+        {t.project.editors.sections.export.page.format.label}
+      </SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowEditor issue={issues.format}>
+        <Select.Root
+          collection={formatCollection}
+          onValueChange={handleFormatChange}
+          size="xs"
+          value={[editable.format]}
+        >
+          <Select.HiddenSelect />
+          <Select.Control>
+            <Select.Trigger>
+              <Select.ValueText />
+            </Select.Trigger>
+            <Select.IndicatorGroup>
+              <Select.Indicator />
+            </Select.IndicatorGroup>
+          </Select.Control>
+          <Select.Positioner>
+            <Select.Content>
+              {formatCollection.items.map((item) => (
+                <Select.Item item={item} key={item.value}>
+                  <Select.ItemText>{item.label}</Select.ItemText>
+                  <Select.ItemIndicator />
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Positioner>
+        </Select.Root>
+      </SectionGroup.SectionRowEditor>
+
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.page.tooltip}>
+        {t.project.editors.sections.export.page.page.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.page}>
         <Select.Root
@@ -102,8 +158,8 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
         </Select.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.orientation.tooltip}>
-        {t.project.editors.sections.export.pdf.orientation.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.orientation.tooltip}>
+        {t.project.editors.sections.export.page.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
         <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
@@ -120,8 +176,8 @@ export function ExportPageSection<T extends PdfExportSettingsSchema>({
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.pdf.layout.tooltip}>
-        {t.project.editors.sections.export.pdf.layout.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.layout.tooltip}>
+        {t.project.editors.sections.export.page.layout.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layout}>
         <SegmentGroup.Root onValueChange={handleLayoutChange} size="sm" value={editable.layout}>

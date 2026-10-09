@@ -4,14 +4,14 @@ import type { FC } from 'react'
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import { usePath } from '../../hooks/usePath'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import type { SvgExportTPocketSchema } from '../../schemas/svgExport'
+import type { ExportTPocketSchema } from '../../schemas/export'
 import { isDefined } from '../../utils/isDefined'
 import { PdfElementText } from './PdfElementText'
 import { PdfMarkerPath } from './PdfMarkerPath'
 import { PdfStitchLine } from './PdfStitchLine'
 
 type PdfTPocketProps = {
-  element: SvgExportTPocketSchema
+  element: ExportTPocketSchema
 }
 
 export const PdfTPocket: FC<PdfTPocketProps> = ({ element }) => {

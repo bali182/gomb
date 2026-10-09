@@ -89,8 +89,7 @@ export const HU = {
         },
         export: {
           name: 'Projekt exportálása',
-          svg: 'SVG exportálása',
-          pdf: 'PDF exportálása',
+          export: 'Exportálás',
         },
         download: {
           name: 'Projekt letöltése',
@@ -580,19 +579,23 @@ export const HU = {
               tooltip: 'A komponens körül rajzolt vágási segédvonal távolságát állítja be. A 0 elrejti a segédvonalat.',
             },
           },
-          pdf: {
+          page: {
             title: 'Oldal',
+            format: {
+              label: 'Formátum',
+              tooltip: 'Az exportált fájl formátumát választja ki.',
+            },
             page: {
               label: 'Papírméret',
-              tooltip: 'A PDF-hez használt papírméretet választja ki.',
+              tooltip: 'Az exporthoz használt papírméretet választja ki.',
             },
             orientation: {
               label: 'Tájolás',
-              tooltip: 'Kiválasztja, hogy a PDF oldal álló vagy fekvő legyen.',
+              tooltip: 'Kiválasztja, hogy az oldal álló vagy fekvő legyen.',
             },
             layout: {
               label: 'Elrendezés',
-              tooltip: 'Kiválasztja, hogyan rendezze el az exportált komponenseket a PDF-oldalakon.',
+              tooltip: 'Kiválasztja, hogyan rendezze el az exportált komponenseket az oldalakon.',
             },
           },
         },
@@ -643,6 +646,10 @@ export const HU = {
           },
         },
         export: {
+          exportFormats: {
+            svg: 'SVG',
+            pdf: 'PDF',
+          },
           exportStitchLineModes: {
             'own-stitch-lines': 'Saját varrásvonalak',
             'related-stitch-lines': 'Kapcsolódó varrásvonalak',
@@ -692,15 +699,11 @@ export const HU = {
       title: 'Beállítások',
       positiveAction: 'OK',
     },
-    svgExport: {
-      title: 'SVG exportálása',
-      positiveAction: 'Exportálás',
-    },
-    pdfExport: {
-      title: 'PDF exportálása',
+    export: {
+      title: 'Exportálás',
       positiveAction: 'Exportálás',
       errors: {
-        exportFailed: 'A PDF exportálása nem sikerült.',
+        exportFailed: 'Az exportálás nem sikerült.',
         unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalon.',
       },
     },
