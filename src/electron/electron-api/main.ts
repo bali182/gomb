@@ -30,6 +30,8 @@ const createMainWindow = async (projectOpenHandler: BaseProjectOpenHandler): Pro
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      // Keep Chromium storage in memory to avoid disk-backed localStorage/sessionStorage startup delays.
+      partition: 'gomb',
       preload: getPreloadPath(currentDirectory),
       sandbox: true,
     },
