@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type SetStateAction } from 'react'
 
-import { FILE_EXTENSION } from '../../common/constants/fileExtension'
+import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
@@ -56,7 +56,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
 
     try {
       const response = await electronApi.suggestPath({
-        extension: FILE_EXTENSION,
+        extension: GOMB_EXTENSION,
         fileName,
         type: 'suggest-path',
       })
@@ -145,7 +145,7 @@ export const useCreateProjectFilePath = (projectName: string): UseCreateProjectF
       buttonLabel: t.nativeDialogs.createProjectPath.positiveAction,
       defaultPath: Loadable.get(filePath),
       fileFilter: {
-        extension: FILE_EXTENSION,
+        extension: GOMB_EXTENSION,
         name: t.nativeDialogs.createProjectPath.extensionName,
       },
       title: t.nativeDialogs.createProjectPath.title,

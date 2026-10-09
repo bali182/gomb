@@ -1,7 +1,7 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 
-import { FILE_EXTENSION } from '../constants/fileExtension'
+import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { LanguageSchema } from '../schemas/settings'
 import type { TranslationSchema } from './translationSchema'
 
@@ -26,7 +26,7 @@ export const HU = {
   },
   projects: {
     dropzone: {
-      dropProjectFile: `Projektfájl (.${FILE_EXTENSION}) megnyitásához húzd ide.`,
+      dropProjectFile: `Projektfájl (.${GOMB_EXTENSION}) megnyitásához húzd ide.`,
     },
     buttons: {
       createProject: 'Projekt létrehozása',
@@ -68,13 +68,14 @@ export const HU = {
       },
     },
     toast: {
-      dropProjectFileInvalidExtension: `Csak .${FILE_EXTENSION} projektfájlt lehet megnyitni.`,
+      dropProjectFileInvalidExtension: `Csak .${GOMB_EXTENSION} projektfájlt lehet megnyitni.`,
       dropProjectFileMultipleFiles: 'Egyszerre csak egy projektfájlt dobj be.',
       openFailed: 'A projekt megnyitása nem sikerült.',
       saveFailed: 'A projekt mentése nem sikerült.',
       saveSucceeded: 'Mentve.',
     },
     export: {
+      pageName: (name: string, pageNumber: number): string => `${name}-${String(pageNumber).padStart(3, '0')}`,
       frontPocketName: (ownerName: string): string => `${ownerName} - elülső zseb`,
       tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. zseb`,
     },
@@ -89,8 +90,7 @@ export const HU = {
         },
         export: {
           name: 'Projekt exportálása',
-          svg: 'SVG exportálása',
-          pdf: 'PDF exportálása',
+          export: 'Exportálás',
         },
         download: {
           name: 'Projekt letöltése',
@@ -192,6 +192,7 @@ export const HU = {
           addHole: 'Lyuk hozzáadása',
           addStitching: 'Varrás hozzáadása',
           addPocketStitching: 'Zsebvarrás hozzáadása',
+          exportToPng: 'Exportálás PNG-be',
           clone: 'Duplikálás',
           delete: 'Törlés',
         },
@@ -580,19 +581,23 @@ export const HU = {
               tooltip: 'A komponens körül rajzolt vágási segédvonal távolságát állítja be. A 0 elrejti a segédvonalat.',
             },
           },
-          pdf: {
+          page: {
             title: 'Oldal',
+            format: {
+              label: 'Formátum',
+              tooltip: 'Az exportált fájl formátumát választja ki.',
+            },
             page: {
               label: 'Papírméret',
-              tooltip: 'A PDF-hez használt papírméretet választja ki.',
+              tooltip: 'Az exporthoz használt papírméretet választja ki.',
             },
             orientation: {
               label: 'Tájolás',
-              tooltip: 'Kiválasztja, hogy a PDF oldal álló vagy fekvő legyen.',
+              tooltip: 'Kiválasztja, hogy az oldal álló vagy fekvő legyen.',
             },
             layout: {
               label: 'Elrendezés',
-              tooltip: 'Kiválasztja, hogyan rendezze el az exportált komponenseket a PDF-oldalakon.',
+              tooltip: 'Kiválasztja, hogyan rendezze el az exportált komponenseket az oldalakon.',
             },
           },
         },
@@ -643,6 +648,11 @@ export const HU = {
           },
         },
         export: {
+          exportFormats: {
+            svg: 'SVG',
+            pdf: 'PDF',
+            png: 'PNG',
+          },
           exportStitchLineModes: {
             'own-stitch-lines': 'Saját varrásvonalak',
             'related-stitch-lines': 'Kapcsolódó varrásvonalak',
@@ -692,15 +702,11 @@ export const HU = {
       title: 'Beállítások',
       positiveAction: 'OK',
     },
-    svgExport: {
-      title: 'SVG exportálása',
-      positiveAction: 'Exportálás',
-    },
-    pdfExport: {
-      title: 'PDF exportálása',
+    export: {
+      title: 'Exportálás',
       positiveAction: 'Exportálás',
       errors: {
-        exportFailed: 'A PDF exportálása nem sikerült.',
+        exportFailed: 'Az exportálás nem sikerült.',
         unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalon.',
       },
     },

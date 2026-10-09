@@ -1,54 +1,21 @@
 import { G, Text } from '@react-pdf/renderer'
-import BigNumber from 'bignumber.js'
 import type { FC } from 'react'
 
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
-import { getSvgExportElementBoundingRect } from '../../logic/exports/getSvgExportElementBoundingRect'
-import type { SvgExportElementSchema } from '../../schemas/svgExport'
-import { isDefined } from '../../utils/isDefined'
+import { getExportElementText } from '../../logic/exports/getExportElementText'
+import type { ExportElementSchema } from '../../schemas/export'
 
 type PdfElementTextProps = {
-  element: SvgExportElementSchema
-}
-
-type PdfTextLine = {
-  text: string
-  color: string | undefined
-  fontSize: number
-}
-
-type PdfTextLinePosition = {
-  line: PdfTextLine
-  x: BigNumber
-  y: BigNumber
+  element: ExportElementSchema
 }
 
 export const PdfElementText: FC<PdfElementTextProps> = ({ element }) => {
-  const { exportTextStyles, exportIdentifiers } = useExportDrawAreaContext()
-  const lines = [
-    getPdfTextLine(
-      exportIdentifiers.getNameText(element),
-      exportTextStyles.getNameTextColor(element),
-      exportTextStyles.getNameTextFontSize(element),
-    ),
-    getPdfTextLine(
-      exportTextStyles.getDimensionsText(element),
-      exportTextStyles.getDimensionsTextColor(element),
-      exportTextStyles.getDimensionsTextFontSize(element),
-    ),
-  ].filter(isDefined)
+  const context = useExportDrawAreaContext()
+  const positionedLines = getExportElementText(element, context)
 
-  if (lines.length === 0) {
+  if (positionedLines.length === 0) {
     return null
   }
-
-  const boundingRect = getSvgExportElementBoundingRect(element)
-  const positionedLines = getPdfTextLinePositions(
-    lines,
-    boundingRect.x.plus(boundingRect.width.dividedBy(2)),
-    boundingRect.y.plus(boundingRect.height.dividedBy(2)),
-    new BigNumber(exportTextStyles.getNameDimensionsGap(element) ?? 0),
-  )
 
   return (
     <G>
@@ -68,42 +35,4 @@ export const PdfElementText: FC<PdfElementTextProps> = ({ element }) => {
       ))}
     </G>
   )
-}
-
-const getPdfTextLine = (
-  text: string | undefined,
-  color: string | undefined,
-  fontSize: number | undefined,
-): PdfTextLine | undefined => {
-  if (isDefined(text) && isDefined(fontSize)) {
-    return { text, color, fontSize }
-  }
-
-  return undefined
-}
-
-const getPdfTextLinePositions = (
-  lines: PdfTextLine[],
-  centerX: BigNumber,
-  centerY: BigNumber,
-  gap: BigNumber,
-): PdfTextLinePosition[] => {
-  const linesHeight = lines.reduce((height, line) => height.plus(line.fontSize), new BigNumber(0))
-  const contentHeight = linesHeight.plus(gap.times(lines.length - 1))
-  const contentTop = centerY.minus(contentHeight.dividedBy(2))
-
-  return lines.map((line, lineIndex) => {
-    const previousLinesHeight = lines
-      .slice(0, lineIndex)
-      .reduce((height, previousLine) => height.plus(previousLine.fontSize), new BigNumber(0))
-
-    return {
-      line,
-      x: centerX,
-      y: contentTop
-        .plus(previousLinesHeight)
-        .plus(gap.times(lineIndex))
-        .plus(new BigNumber(line.fontSize).dividedBy(2)),
-    }
-  })
 }

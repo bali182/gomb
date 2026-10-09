@@ -1,0 +1,5 @@
+export const GOMB_EXTENSION = 'gomb'
+export const PDF_EXTENSION = 'pdf'
+export const SVG_EXTENSION = 'svg'
+export const PNG_EXTENSION = 'png'
+export const ZIP_EXTENSION = 'zip'

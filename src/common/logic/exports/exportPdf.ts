@@ -1,27 +1,11 @@
 import { Font, pdf } from '@react-pdf/renderer'
 
-import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { PdfExportLayoutSchema, PdfExportSettingsSchema } from '../../schemas/pdfExport'
-import type { ProjectSchema } from '../../schemas/project'
+import { PDF_EXTENSION } from '../../constants/fileExtensions'
+import type { ExportParamsSchema } from '../../schemas/export'
 import { has } from '../../utils/has'
-import { getComputedProject } from '../getComputedProject'
-import { getComputedPdfExport } from './getComputedPdfExport'
-import { getPdfExportPageSize } from './getPdfExportLayout'
 import { renderPdfDocument } from './renderPdfDocument'
 
-export const exportPdf = async (
-  project: ProjectSchema,
-  settings: PdfExportSettingsSchema,
-  drawAreaContextValue: DrawAreaContextValue,
-): Promise<PdfExportLayoutSchema> => {
-  const computedProject = getComputedProject(project)
-  const layout = getComputedPdfExport(project, computedProject, settings, drawAreaContextValue)
-
-  if (layout.type === 'unsuccessful-pdf-export') {
-    return layout
-  }
-
-  const pageSize = getPdfExportPageSize(settings)
+export const exportPdf = async ({ layout, pageSize, context, projectName }: ExportParamsSchema): Promise<void> => {
   const openSans = await import('open-sans-fonts/open-sans/Regular/OpenSans-Regular.ttf?inline')
 
   const registeredFonts = Font.getRegisteredFonts()
@@ -33,11 +17,9 @@ export const exportPdf = async (
     })
   }
 
-  const blob = await pdf(renderPdfDocument(layout, pageSize, drawAreaContextValue)).toBlob()
+  const blob = await pdf(renderPdfDocument(layout, pageSize, context)).toBlob()
 
-  downloadPdf(blob, `${project.name}.pdf`)
-
-  return layout
+  downloadPdf(blob, `${projectName}.${PDF_EXTENSION}`)
 }
 
 const downloadPdf = (blob: Blob, filename: string): void => {

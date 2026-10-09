@@ -3,14 +3,14 @@ import type { FC } from 'react'
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import { usePath } from '../../hooks/usePath'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import type { SvgExportPanelSchema } from '../../schemas/svgExport'
+import type { ExportPanelSchema } from '../../schemas/export'
 import { isDefined } from '../../utils/isDefined'
 import { ExportElementText } from './ExportElementText'
 import { ExportMarkerPath } from './ExportMarkerPath'
 import { ExportStitchLine } from './ExportStitchLine'
 
 type ExportPanelProps = {
-  element: SvgExportPanelSchema
+  element: ExportPanelSchema
 }
 
 export const ExportPanel: FC<ExportPanelProps> = ({ element }) => {

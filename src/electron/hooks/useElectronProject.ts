@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { toaster } from '../../common/components/Toaster'
-import { FILE_EXTENSION } from '../../common/constants/fileExtension'
+import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
@@ -142,7 +142,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     const response = await electronApi.dialog({
       buttonLabel: t.nativeDialogs.openProjectPath.positiveAction,
       fileFilter: {
-        extension: FILE_EXTENSION,
+        extension: GOMB_EXTENSION,
         name: t.nativeDialogs.openProjectPath.extensionName,
       },
       target: 'file',
@@ -192,7 +192,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     const response = await electronApi.dialog({
       buttonLabel: t.nativeDialogs.saveProjectAsPath.positiveAction,
       fileFilter: {
-        extension: FILE_EXTENSION,
+        extension: GOMB_EXTENSION,
         name: t.nativeDialogs.saveProjectAsPath.extensionName,
       },
       title: t.nativeDialogs.saveProjectAsPath.title,

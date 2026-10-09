@@ -1,12 +1,9 @@
 import { createContext, SetStateAction, useContext } from 'react'
 import { ProjectSchema } from '../schemas/project'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { notImplemented } from '../utils/notImplemented'
 
-export type EditorContextType = {
-  project?: ProjectSchema
-  subProject?: SubProjectSchema
-  computedSubProject?: ComputedSubProjectSchema
-
+export type EditorContextOperations = {
   /** Overwrites the data model of the selected project. */
   setProject: (project: SetStateAction<ProjectSchema>) => void
   /** Overwrites the data model of the selected sub-project. */
@@ -20,20 +17,31 @@ export type EditorContextType = {
   navigateToSubProject: (subProjectId: string) => void
 }
 
-const notImplemented = () => {
-  throw new Error('Should not be used outside of EditorContext.Provider')
+export type EditorContextValues = {
+  project?: ProjectSchema
+  subProject?: SubProjectSchema
+  computedSubProject?: ComputedSubProjectSchema
 }
 
-export const EditorContext = createContext<EditorContextType>({
+export type EditorContextType = EditorContextOperations & EditorContextValues
+
+export const EditorContextDefaultOperations: EditorContextOperations = {
+  setProject: notImplemented(),
+  setSubProject: notImplemented(),
+  navigateToProjects: notImplemented(),
+  navigateToProject: notImplemented(),
+  navigateToSubProject: notImplemented(),
+}
+
+export const EditorContextDefaultValues: EditorContextValues = {
   project: undefined,
   subProject: undefined,
   computedSubProject: undefined,
+}
 
-  setProject: notImplemented,
-  setSubProject: notImplemented,
-  navigateToProjects: notImplemented,
-  navigateToProject: notImplemented,
-  navigateToSubProject: notImplemented,
+export const EditorContext = createContext<EditorContextType>({
+  ...EditorContextDefaultValues,
+  ...EditorContextDefaultOperations,
 })
 
 export const useEditorContext = () => {

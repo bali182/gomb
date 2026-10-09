@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { COMPONENT_DIMENSIONS_COLOR, COMPONENT_NAME_COLOR, STROKE_COLOR, STROKE_THICKNESS } from '../constants/drawing'
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { defaultSubProjectSelection } from '../contexts/SubProjectSelectionContext'
-import { getSvgExportElementBoundingRect } from '../logic/exports/getSvgExportElementBoundingRect'
+import { getExportElementBoundingRect } from '../logic/exports/exportGeometryUtils'
 import type {
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -12,14 +12,14 @@ import type {
   DrawAreaMarkerStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
-import { BaseExportSettingsSchema } from '../schemas/settings'
+import { ExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import { produce } from '../utils/produce'
 import { useTranslation } from './useTranslation'
 
-export const useSvgDrawArea = (
+export const useExportDrawArea = (
   stitchingSettings: StitchLineCommonConfigSchema,
-  settings: BaseExportSettingsSchema,
+  settings: ExportSettingsSchema,
 ): DrawAreaContextValue => {
   const { t } = useTranslation()
 
@@ -74,11 +74,11 @@ export const useSvgDrawArea = (
         }
 
         switch (element.type) {
-          case 'svg-export-panel':
+          case 'export-panel':
             return element.component.name
-          case 'svg-export-front-pocket':
+          case 'export-front-pocket':
             return t.project.export.frontPocketName(element.ownerComponent.name)
-          case 'svg-export-t-pocket':
+          case 'export-t-pocket':
             return t.project.export.tPocketName(element.ownerComponent.name, element.pocketIndex + 1)
         }
       },
@@ -96,7 +96,7 @@ export const useSvgDrawArea = (
           return undefined
         }
 
-        const boundingRect = getSvgExportElementBoundingRect(element)
+        const boundingRect = getExportElementBoundingRect(element)
         return t.formatters.dimensions(
           t.formatters.number.max1(boundingRect.width.toNumber()),
           t.formatters.number.max1(boundingRect.height.toNumber()),

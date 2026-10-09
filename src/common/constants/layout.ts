@@ -11,3 +11,5 @@ export const ZERO_CORNER_RADIUS: CornerRadiusSchema = {
   topLeft: ZERO,
   topRight: ZERO,
 }
+
+export const EXPORT_PAGE_GAP = 10

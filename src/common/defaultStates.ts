@@ -26,8 +26,8 @@ import type {
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
 import type { MagicFixSettingsSchema } from './schemas/magic-fix-3/magicFixSettings3'
-import type { PdfExportSettingsSchema } from './schemas/pdfExport'
-import type { BaseExportSettingsSchema, ColorSettingsSchema } from './schemas/settings'
+import type { ColorSettingsSchema, ExportSettingsSchema } from './schemas/settings'
+
 import type {
   ComponentBoundsStitchLineOwnSchema,
   PocketClusterStitchLineOwnSchema,
@@ -42,7 +42,7 @@ export const defaultStitchingSettings: StitchLineCommonConfigSchema = {
   stitchLineThickness: STROKE_THICKNESS,
 }
 
-export const defaultSvgExportParams: BaseExportSettingsSchema = {
+export const defaultExportParams: ExportSettingsSchema = {
   gap: 10,
   padding: 10,
   stitchLineMode: 'related-stitch-lines',
@@ -50,10 +50,7 @@ export const defaultSvgExportParams: BaseExportSettingsSchema = {
   showDimensions: true,
   childMarkers: true,
   cutHelperDistance: 0,
-}
-
-export const defaultPdfExportParams: PdfExportSettingsSchema = {
-  ...defaultSvgExportParams,
+  format: 'pdf',
   page: 'A4',
   orientation: 'portrait',
   layout: 'compact',
