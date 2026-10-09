@@ -192,6 +192,7 @@ export const HU = {
           addHole: 'Lyuk hozzáadása',
           addStitching: 'Varrás hozzáadása',
           addPocketStitching: 'Zsebvarrás hozzáadása',
+          exportToPng: 'Exportálás PNG-be',
           clone: 'Duplikálás',
           delete: 'Törlés',
         },

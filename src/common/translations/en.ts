@@ -240,6 +240,7 @@ export const EN = {
           addHole: 'Add hole',
           addStitching: 'Add stitching',
           addPocketStitching: 'Add pocket stitching',
+          exportToPng: 'Export to PNG',
           clone: 'Clone',
           delete: 'Delete',
         },
