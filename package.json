@@ -24,7 +24,7 @@
     "@emotion/react": "11.14.0",
     "@flatten-js/core": "1.6.12",
     "@internationalized/number": "3.6.7",
-    "@react-pdf/renderer": "4.5.1",
+    "@react-pdf/renderer": "4.9.0",
     "@resvg/resvg-wasm": "2.6.2",
     "bignumber.js": "11.1.5",
     "bowser": "2.14.1",

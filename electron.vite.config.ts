@@ -86,6 +86,8 @@ export default defineConfig(({ command }) => {
       plugins: [...(rendererConfig.plugins ?? []), appTitle(version)],
       root: resolve('src/electron'),
       build: {
+        minify: 'esbuild',
+        sourcemap: true,
         outDir: resolve(electronBuildTargets.renderer.outputDirectory),
         rollupOptions: {
           input: resolve(electronBuildTargets.renderer.sourcePath),
