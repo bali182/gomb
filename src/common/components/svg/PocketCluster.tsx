@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { Fragment, useCallback, useId, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
@@ -13,6 +13,7 @@ import { isDefined } from '../../utils/isDefined'
 import { Card } from './Card'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
+import { PocketStitchMask } from './PocketStitchMask'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { TPocket } from './TPocket'
@@ -24,6 +25,7 @@ type PocketClusterProps = {
 }
 
 export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLevel }) => {
+  const maskId = useId()
   const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
@@ -65,6 +67,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
 
   return (
     <>
+      {isShowingCards && <PocketStitchMask id={maskId} componentId={componentId} nestingLevel={nestingLevel} />}
       <g
         data-component-id={pocketCluster.id}
         onClick={isInteractive ? handleClick : undefined}
@@ -111,7 +114,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
           <SizeLabel reference={topPocketLabelLocation} boundingRect={computedPocketCluster.frontPocket.boundingRect} />
         </>
       )}
-      <StitchLines componentId={pocketCluster.id} />
+      <StitchLines componentId={pocketCluster.id} maskId={isShowingCards ? maskId : undefined} />
       <HoleHighlights componentId={pocketCluster.id} />
       {computedPocketCluster.children.map((component) => {
         switch (component.type) {

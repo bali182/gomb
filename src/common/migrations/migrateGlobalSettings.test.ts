@@ -52,7 +52,28 @@ describe('migrateGlobalSettings', () => {
   })
 
   it('returns settings with the current version unchanged', () => {
-    expect(migrateGlobalSettings(defaults, defaults)).toBe(defaults)
+    expect(migrateGlobalSettings(defaults, defaults)).toEqual(defaults)
+  })
+
+  it('adds nested defaults with the current version while preserving existing values', () => {
+    const splitterSizes: [string, string] = ['250px', '450px']
+    const input: DeepPartial<GlobalSettingsSchema> = {
+      version: VERSION,
+      app: { theme: 'dark' },
+      ui: { splitterSizes },
+      edit: { step: 5 },
+    }
+
+    const migratedSettings = migrateGlobalSettings(input, defaults)
+
+    expect(migratedSettings).toEqual({
+      ...defaults,
+      app: { ...defaults.app, theme: 'dark' },
+      ui: { ...defaults.ui, splitterSizes },
+      edit: { ...defaults.edit, step: 5 },
+    })
+    expect(migratedSettings.ui?.splitterSizes).toBe(splitterSizes)
+    expect(typia.is<GlobalSettingsSchema>(migratedSettings)).toBe(true)
   })
 
   it('migrates settings with a different version', () => {

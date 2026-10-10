@@ -9,7 +9,9 @@ import { useSubProject } from './useSubProject'
 import { formatHex8, parse } from 'culori'
 import { getSelectionObstructingComponentIds } from '../logic/getSelectionObstructingComponentIds'
 import type {
+  DrawAreaCardStyleParams,
   DrawAreaCardStyles,
+  DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
   DrawAreaExportIdentifiers,
@@ -28,6 +30,20 @@ const addAlpha = (color: string): string => {
     return color
   }
   return formatHex8({ ...parsed, alpha: Math.min(parsed.alpha ?? 1, 0.3) })
+}
+
+const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): string | undefined => {
+  if (!isDefined(color)) {
+    return undefined
+  }
+
+  const parsed = parse(color)
+  if (!isDefined(parsed)) {
+    return undefined
+  }
+
+  const channel = maskColor === 'black' ? 0 : 1
+  return formatHex8({ mode: 'rgb', r: channel, g: channel, b: channel, alpha: parsed.alpha ?? 1 })
 }
 
 const exportIdentifiers: DrawAreaExportIdentifiers = {
@@ -84,22 +100,30 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
     [hovered, selected, subProject],
   )
 
-  const componentStyles = useMemo<DrawAreaComponentStyles>(
-    () => ({
-      getBackgroundColor: ({ component, nestingLevel }) => {
-        const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
+  const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
+    const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
+      const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
+      if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
+        return addAlpha(color)
+      }
+      return selectionObstructingComponentIds.has(component.id) ? addAlpha(color) : color
+    }
 
-        if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
-          return addAlpha(color)
-        }
+    const getBorderColor = ({ component }: DrawAreaComponentStyleParams): string => {
+      if (isSelected(component) || isHovered(component)) {
+        return selectionColor
+      }
+      return selectionObstructingComponentIds.has(component.id) ? addAlpha(strokeColor) : strokeColor
+    }
 
-        return selectionObstructingComponentIds.has(component.id) ? addAlpha(color) : color
+    return {
+      getBackgroundColor,
+      getBorderColor,
+      getMaskFillColor: (params) => {
+        return getMaskColor(getBackgroundColor(params), 'white')
       },
-      getBorderColor: ({ component }) => {
-        if (isSelected(component) || isHovered(component)) {
-          return selectionColor
-        }
-        return selectionObstructingComponentIds.has(component.id) ? addAlpha(strokeColor) : strokeColor
+      getMaskStrokeColor: (params) => {
+        return getMaskColor(getBorderColor(params), 'white')
       },
       getBorderThickness: () => {
         return STROKE_THICKNESS
@@ -107,28 +131,34 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
       getFilter: ({ component }) => {
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
-    }),
-    [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds],
-  )
+    }
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds])
 
-  const cardStyles = useMemo<DrawAreaCardStyles>(
-    () => ({
-      getBackgroundColor: ({ owner }) => {
-        if (isSelected(owner) || isHovered(owner)) {
-          return addAlpha(cardColor)
-        }
+  const cardStyles = useMemo<DrawAreaCardStyles>(() => {
+    const getBackgroundColor = ({ owner }: DrawAreaCardStyleParams): string => {
+      if (isSelected(owner) || isHovered(owner)) {
+        return addAlpha(cardColor)
+      }
+      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(cardColor) : cardColor
+    }
+    const getStrokeColor = ({ owner }: DrawAreaCardStyleParams): string => {
+      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(strokeColor) : strokeColor
+    }
 
-        return selectionObstructingComponentIds.has(owner.id) ? addAlpha(cardColor) : cardColor
+    return {
+      getBackgroundColor,
+      getStrokeColor,
+      getMaskFillColor: (params) => {
+        return getMaskColor(getBackgroundColor(params), 'black')
       },
-      getStrokeColor: ({ owner }) => {
-        return selectionObstructingComponentIds.has(owner.id) ? addAlpha(strokeColor) : strokeColor
+      getMaskStrokeColor: (params) => {
+        return getMaskColor(getStrokeColor(params), 'black')
       },
       getStrokeThickness: () => {
         return STROKE_THICKNESS
       },
-    }),
-    [isHovered, isSelected, cardColor, strokeColor, selectionObstructingComponentIds],
-  )
+    }
+  }, [isHovered, isSelected, cardColor, strokeColor, selectionObstructingComponentIds])
 
   const holeStyles = useMemo<DrawAreaHoleStyles>(
     () => ({

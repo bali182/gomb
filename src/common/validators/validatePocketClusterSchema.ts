@@ -79,6 +79,10 @@ export const validatePocketClusterSchema = (
     pocketOrientationValues,
     context,
   )
+  const cardCrossAxisOffsetResult = validateNumber(input.cardCrossAxisOffset, currentValue.cardCrossAxisOffset, context)
+  const cardOpeningOffsetResult = validateNumber(input.cardOpeningOffset, currentValue.cardOpeningOffset, context, {
+    min: 0,
+  })
   const cardIdResult = validatePrimitiveUnion(input.cardId, currentValue.cardId, cardIdValues, context, true)
   const pocketCountResult = validateNumber(input.pocketCount, currentValue.pocketCount, context, {
     allowFraction: false,
@@ -109,6 +113,8 @@ export const validatePocketClusterSchema = (
     bottomRightRadius: bottomRightRadiusResult.issues,
     children: input.children.map(() => undefined),
     cardId: cardIdResult.issues,
+    cardCrossAxisOffset: cardCrossAxisOffsetResult.issues,
+    cardOpeningOffset: cardOpeningOffsetResult.issues,
     color: colorResult.issues,
     height: heightResult.issues,
     id: undefined,
@@ -140,6 +146,8 @@ export const validatePocketClusterSchema = (
     bottomRightRadius: bottomRightRadiusResult.committedValue,
     children: currentValue.children,
     cardId: cardIdResult.committedValue,
+    cardCrossAxisOffset: cardCrossAxisOffsetResult.committedValue,
+    cardOpeningOffset: cardOpeningOffsetResult.committedValue,
     height: heightResult.committedValue,
     id: currentValue.id,
     individualRadii: input.individualRadii,
@@ -179,6 +187,8 @@ export const validatePocketClusterSchema = (
     !bottomLeftRadiusResult.isValid ||
     !bottomRightRadiusResult.isValid ||
     !cardIdResult.isValid ||
+    !cardCrossAxisOffsetResult.isValid ||
+    !cardOpeningOffsetResult.isValid ||
     !widthResult.isValid ||
     !heightResult.isValid ||
     !orientationResult.isValid ||
@@ -201,6 +211,8 @@ export const validatePocketClusterSchema = (
     bottomRightRadius: bottomRightRadiusResult.value,
     children: currentValue.children,
     cardId: cardIdResult.value,
+    cardCrossAxisOffset: cardCrossAxisOffsetResult.value,
+    cardOpeningOffset: cardOpeningOffsetResult.value,
     height: heightResult.value,
     id: currentValue.id,
     individualRadii: input.individualRadii,

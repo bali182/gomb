@@ -6,9 +6,6 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { PocketClusterSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
-import type { CardSchemaId } from '../../../schemas/valuables'
-import { isDefined } from '../../../utils/isDefined'
-import { CardPicker } from '../../common/CardPicker'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
@@ -74,22 +71,6 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
     },
     [editable, onChange],
   )
-
-  const handleCardIdChange = useCallback(
-    (cardId: CardSchemaId): void => {
-      onChange({
-        ...editable,
-        cardId,
-      })
-    },
-    [editable, onChange],
-  )
-  const handleCardIdReset = useCallback((): void => {
-    onChange({
-      ...editable,
-      cardId: undefined,
-    })
-  }, [editable, onChange])
 
   return (
     <SectionGroup.Section>
@@ -165,19 +146,6 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
           onChange={handleTPocketTaperChange}
           unit="mm"
           value={editable.tPocketTaper}
-        />
-      </SectionGroup.SectionRowEditor>
-
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.cardId.tooltip}>
-        {t.project.editors.sections.components.pockets.cardId.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.cardId}>
-        <CardPicker
-          isResetEnabled={isDefined(editable.cardId)}
-          issue={issues.cardId}
-          onChange={handleCardIdChange}
-          onReset={handleCardIdReset}
-          value={editable.cardId}
         />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>

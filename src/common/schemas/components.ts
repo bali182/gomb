@@ -62,8 +62,15 @@ export type PocketsSchema = {
   tPocketTabWidth: number
   /** How much the t pockets taper from the 2 * tPocketTabWidth reduced width to the bottom of the pocket */
   tPocketTaper: number
+}
+
+export type HasCardsSchema = {
   /** Id of the card shown in every pocket */
   cardId?: CardSchemaId
+  /** Signed offset from the pocket center across the opening direction, in mm. */
+  cardCrossAxisOffset: number
+  /** Offset from the closed pocket edge toward the opening, in mm (min 0). */
+  cardOpeningOffset: number
 }
 
 /**
@@ -78,6 +85,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
   HasSqueezeSchema &
-  PocketsSchema
+  PocketsSchema &
+  HasCardsSchema
 
 export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema
