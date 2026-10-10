@@ -27,6 +27,8 @@ export const useExportDrawArea = (
     () => ({
       getBackgroundColor: produce('none'),
       getBorderColor: produce(STROKE_COLOR),
+      getMaskFillColor: produce(undefined),
+      getMaskStrokeColor: produce(undefined),
       getBorderThickness: produce(STROKE_THICKNESS),
       getFilter: produce(undefined),
     }),

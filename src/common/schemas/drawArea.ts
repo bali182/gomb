@@ -20,6 +20,8 @@ export type DrawAreaHoleStyleParams = {
 export type DrawAreaComponentStyles = {
   getBackgroundColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getBorderColor: (params: DrawAreaComponentStyleParams) => string | undefined
+  getMaskFillColor: (params: DrawAreaComponentStyleParams) => string | undefined
+  getMaskStrokeColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getBorderThickness: (params: DrawAreaComponentStyleParams) => number | undefined
   getFilter: (params: DrawAreaComponentStyleParams) => string | undefined
 }
@@ -27,6 +29,8 @@ export type DrawAreaComponentStyles = {
 export type DrawAreaCardStyles = {
   getBackgroundColor: (params: DrawAreaCardStyleParams) => string | undefined
   getStrokeColor: (params: DrawAreaCardStyleParams) => string | undefined
+  getMaskFillColor: (params: DrawAreaCardStyleParams) => string | undefined
+  getMaskStrokeColor: (params: DrawAreaCardStyleParams) => string | undefined
   getStrokeThickness: (params: DrawAreaCardStyleParams) => number | undefined
 }
 

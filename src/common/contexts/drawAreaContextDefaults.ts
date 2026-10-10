@@ -32,6 +32,8 @@ const drawAreaDefaultHoleStyles: DrawAreaHoleStyles = {
 const drawAreaDefaultComponentStyles: DrawAreaComponentStyles = {
   getBackgroundColor: produce(undefined),
   getBorderColor: produce(undefined),
+  getMaskFillColor: produce(undefined),
+  getMaskStrokeColor: produce(undefined),
   getBorderThickness: produce(undefined),
   getFilter: produce(undefined),
 }
@@ -39,6 +41,8 @@ const drawAreaDefaultComponentStyles: DrawAreaComponentStyles = {
 const drawAreaDefaultCardStyles: DrawAreaCardStyles = {
   getBackgroundColor: produce(undefined),
   getStrokeColor: produce(undefined),
+  getMaskFillColor: produce(undefined),
+  getMaskStrokeColor: produce(undefined),
   getStrokeThickness: produce(undefined),
 }
 

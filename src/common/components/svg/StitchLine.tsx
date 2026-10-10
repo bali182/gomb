@@ -9,13 +9,14 @@ import { Stitches } from './Stitches'
 type StitchLineProps = {
   computedStitchLine: ComputedStitchLineSchema
   stitchLine: ResolvedStitchLineSchema
+  maskId?: string
 }
 
-export const StitchLine: FC<StitchLineProps> = ({ computedStitchLine, stitchLine }) => {
+export const StitchLine: FC<StitchLineProps> = ({ computedStitchLine, stitchLine, maskId }) => {
   const { settings } = useGlobalSettings()
 
   return (
-    <g>
+    <g mask={maskId === undefined ? undefined : `url(#${maskId})`}>
       {computedStitchLine.routes.map((route, index) => (
         <StitchLineRoute key={index} route={route} stitchLine={stitchLine} />
       ))}
