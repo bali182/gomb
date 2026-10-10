@@ -352,12 +352,12 @@ export const HU = {
               tooltip: 'Kiválasztja az egyes zsebekben megjelenő kártyát.',
             },
             cardCrossAxisOffset: {
-              label: 'Keresztirányú eltolás',
+              label: 'Oldaleltolás',
               tooltip:
                 'A zseb középvonalától tolja el a kártyát. Pozitív érték felső/alsó nyílásnál jobbra, bal/jobb oldali nyílásnál lefelé tol; negatív érték az ellenkező irányba.',
             },
             cardOpeningOffset: {
-              label: 'Eltolás a nyílás felé',
+              label: 'Kiemelés',
               tooltip:
                 'A zseb zárt szélétől a nyílás felé tolja a kártyát. Nulla értéknél a kártya a zseb zárt széléhez igazodik.',
             },

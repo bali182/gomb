@@ -403,12 +403,12 @@ export const EN = {
               tooltip: 'Selects the card shown inside each pocket.',
             },
             cardCrossAxisOffset: {
-              label: 'Cross-axis offset',
+              label: 'Lateral offset',
               tooltip:
                 'Offsets the card from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
             },
             cardOpeningOffset: {
-              label: 'Offset toward opening',
+              label: 'Lift',
               tooltip:
                 'Moves the card from the closed pocket edge toward the opening. Zero rests against the closed edge.',
             },
