@@ -380,7 +380,7 @@ export const EN = {
               tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
             },
             pocketCount: {
-              label: 'Number of pockets',
+              label: 'Count',
               tooltip: 'Sets how many pockets are created in this pocket cluster.',
             },
             pocketStep: {
@@ -403,7 +403,7 @@ export const EN = {
               tooltip: 'Selects the card shown inside each pocket.',
             },
             cardCrossAxisOffset: {
-              label: 'Lateral offset',
+              label: 'Offset',
               tooltip:
                 'Offsets the card from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
             },
