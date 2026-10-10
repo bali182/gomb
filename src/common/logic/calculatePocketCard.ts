@@ -48,36 +48,38 @@ const getCardBoundingRect = (
   const isOpeningVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const cardWidth = new BigNumber(isOpeningVertical ? card.width : card.height)
   const cardHeight = new BigNumber(isOpeningVertical ? card.height : card.width)
-  const cardThickness = new BigNumber(card.thickness)
   const horizontallyCenteredX = pocketBoundingRect.x.plus(pocketBoundingRect.width.minus(cardWidth).dividedBy(2))
   const verticallyCenteredY = pocketBoundingRect.y.plus(pocketBoundingRect.height.minus(cardHeight).dividedBy(2))
 
   switch (pocketCluster.orientation) {
     case 'up':
       return {
-        x: horizontallyCenteredX,
-        y: pocketBoundingRect.y.plus(pocketBoundingRect.height).minus(cardHeight).minus(cardThickness),
+        x: horizontallyCenteredX.plus(pocketCluster.cardCrossAxisOffset),
+        y: pocketBoundingRect.y
+          .plus(pocketBoundingRect.height)
+          .minus(cardHeight)
+          .minus(pocketCluster.cardOpeningOffset),
         width: cardWidth,
         height: cardHeight,
       }
     case 'down':
       return {
-        x: horizontallyCenteredX,
-        y: pocketBoundingRect.y.plus(cardThickness),
+        x: horizontallyCenteredX.plus(pocketCluster.cardCrossAxisOffset),
+        y: pocketBoundingRect.y.plus(pocketCluster.cardOpeningOffset),
         width: cardWidth,
         height: cardHeight,
       }
     case 'left':
       return {
-        x: pocketBoundingRect.x.plus(pocketBoundingRect.width).minus(cardWidth).minus(cardThickness),
-        y: verticallyCenteredY,
+        x: pocketBoundingRect.x.plus(pocketBoundingRect.width).minus(cardWidth).minus(pocketCluster.cardOpeningOffset),
+        y: verticallyCenteredY.plus(pocketCluster.cardCrossAxisOffset),
         width: cardWidth,
         height: cardHeight,
       }
     case 'right':
       return {
-        x: pocketBoundingRect.x.plus(cardThickness),
-        y: verticallyCenteredY,
+        x: pocketBoundingRect.x.plus(pocketCluster.cardOpeningOffset),
+        y: verticallyCenteredY.plus(pocketCluster.cardCrossAxisOffset),
         width: cardWidth,
         height: cardHeight,
       }

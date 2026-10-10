@@ -212,12 +212,7 @@ const computePocketCluster = (
     radiusCap: getPocketClusterRadiusCap(pocketCluster),
   })
   const normalizedPocketCluster = normalizePocketCluster(pocketCluster, boundingRect)
-  const geometry = calculatePocketClusterGeometry(
-    normalizedPocketCluster,
-    boundingRect,
-    cornerRadius,
-    resolvedStitchLines,
-  )
+  const geometry = calculatePocketClusterGeometry(normalizedPocketCluster, boundingRect, cornerRadius)
   const layoutChildren = assertLayoutChildren(getComponentChildren(pocketCluster, subProject))
   const computedLayoutGap = calculateGap(layoutChildren, geometry.frontPocket.boundingRect, pocketCluster)
   const children = computeLayoutChildren(

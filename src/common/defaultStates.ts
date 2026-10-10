@@ -135,6 +135,8 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   type: 'pocket-cluster',
   children: [],
   orientation: 'up',
+  cardCrossAxisOffset: 0,
+  cardOpeningOffset: 0,
   pocketCount: 3,
   pocketStep: 10,
   tPocketTabWidth: 8,

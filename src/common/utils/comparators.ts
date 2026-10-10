@@ -143,7 +143,9 @@ export const comparators = {
       a.orientation === b.orientation &&
       a.tPocketTabWidth === b.tPocketTabWidth &&
       a.tPocketTaper === b.tPocketTaper &&
-      a.cardId === b.cardId
+      a.cardId === b.cardId &&
+      a.cardCrossAxisOffset === b.cardCrossAxisOffset &&
+      a.cardOpeningOffset === b.cardOpeningOffset
     )
   },
 

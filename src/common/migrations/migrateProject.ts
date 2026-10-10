@@ -4,15 +4,15 @@ import type { ProjectSchema } from '../schemas/project'
 import { defaultProjectMigrator } from './defaultProjectMigrator'
 import { migrateVersionedObject } from './migrationUtils'
 
-const MIGRATIONS: ProjectMigration[] = [defaultProjectMigrator]
+const MIGRATIONS: ProjectMigration[] = []
 
 export const migrateProject = (input: unknown): DeepPartial<ProjectSchema> => {
-  return migrateVersionedObject<ProjectSchema>(input, migrateProjectToCurrentShape)
-}
+  const migratedProject: DeepPartial<ProjectSchema> = migrateVersionedObject<ProjectSchema>(input, (project) =>
+    MIGRATIONS.reduce((current, migrate): DeepPartial<ProjectSchema> => migrate(current), project),
+  )
 
-const migrateProjectToCurrentShape = (input: DeepPartial<ProjectSchema>): DeepPartial<ProjectSchema> => {
   return {
-    ...MIGRATIONS.reduce((project, migrate): DeepPartial<ProjectSchema> => migrate(project), input),
+    ...defaultProjectMigrator(migratedProject),
     version: VERSION,
   }
 }

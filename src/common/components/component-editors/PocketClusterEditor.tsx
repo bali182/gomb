@@ -8,6 +8,7 @@ import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
+import { CardsSection } from './sections/CardsSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { PocketsSection } from './sections/PocketsSection'
@@ -53,6 +54,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
       <Tabs.Content value="pockets" display="flex" flex="1" minH="0" pt={0}>
         <SectionGroup.Root>
           <PocketsSection component={component} editable={editable} issues={issues} onChange={onChange} />
+          <CardsSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
     </Tabs.Root>

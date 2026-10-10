@@ -12,6 +12,7 @@ import type {
 } from '../schemas/common'
 import type {
   HasAutoDimensionsSchema,
+  HasCardsSchema,
   HasLayoutSchema,
   LayoutOrientationSchema,
   PocketOrientationSchema,
@@ -394,11 +395,24 @@ export const EN = {
               label: 'Taper',
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
+          } satisfies SectionTranslationSchema<PocketsSchema>,
+          cards: {
+            title: 'Cards',
             cardId: {
               label: 'Card',
               tooltip: 'Selects the card shown inside each pocket.',
             },
-          } satisfies SectionTranslationSchema<PocketsSchema>,
+            cardCrossAxisOffset: {
+              label: 'Cross-axis offset',
+              tooltip:
+                'Offsets the card from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
+            },
+            cardOpeningOffset: {
+              label: 'Offset toward opening',
+              tooltip:
+                'Moves the card from the closed pocket edge toward the opening. Zero rests against the closed edge.',
+            },
+          } satisfies SectionTranslationSchema<HasCardsSchema>,
         },
         stitchLines: {
           settings: {
