@@ -5,10 +5,17 @@ import {
   defaultPanel,
   defaultPocketCluster,
   defaultPocketClusterStitchLine,
+  defaultRecessedPocketTop,
   defaultRootPanel,
   defaultStitchingSettings,
 } from '../defaultStates'
-import type { PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  PanelSchema,
+  PocketClusterSchema,
+  PocketTopSchema,
+  RecessedPocketTopSchema,
+  RootPanelSchema,
+} from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectMigratorSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
@@ -73,7 +80,20 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireString(pocketCluster, 'name')
     m.requireValue(pocketCluster, 'type', 'pocket-cluster')
 
-    return m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
+    const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
+    const pocketTop = m.requireObjectField<PocketClusterSchema, PocketTopSchema>(migrated, 'pocketTop')
+    m.requirePrimitiveUnion(pocketTop, 'type', ['straight', 'recessed'])
+
+    switch (pocketTop.type) {
+      case 'straight':
+        migrated.pocketTop = { type: 'straight' }
+        break
+      case 'recessed':
+        migrated.pocketTop = m.applyDefaults<RecessedPocketTopSchema>(pocketTop, defaultRecessedPocketTop)
+        break
+    }
+
+    return migrated
   },
   hole: (input) => {
     const hole = m.requireObject<HoleSchema>(input)

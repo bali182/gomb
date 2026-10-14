@@ -12,6 +12,7 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
+import { validatePocketTopSchema } from './validatePocketTopSchema'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 const pocketOrientationValues: Record<PocketOrientationSchema, boolean> = {
@@ -42,6 +43,7 @@ export const validatePocketClusterSchema = (
   currentValue: PocketClusterSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<PocketClusterSchema> => {
+  const pocketTopResult = validatePocketTopSchema(input.pocketTop, currentValue.pocketTop, context)
   const nameResult = validateName(
     input.name,
     currentValue.name,
@@ -106,6 +108,7 @@ export const validatePocketClusterSchema = (
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
   const issues: ValidationIssuesSchema<PocketClusterSchema> = {
+    pocketTop: pocketTopResult.issues,
     autoHeight: undefined,
     autoWidth: undefined,
     offAxisAnchor: offAxisAnchorResult.issues,
@@ -140,6 +143,7 @@ export const validatePocketClusterSchema = (
   }
 
   const committedValue: PocketClusterSchema = {
+    pocketTop: pocketTopResult.committedValue,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
@@ -177,6 +181,7 @@ export const validatePocketClusterSchema = (
   }
 
   if (
+    !pocketTopResult.isValid ||
     !nameResult.isValid ||
     !colorResult.isValid ||
     !layoutOrientationResult.isValid ||
@@ -205,6 +210,7 @@ export const validatePocketClusterSchema = (
   }
 
   const value: PocketClusterSchema = {
+    pocketTop: pocketTopResult.value,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.value,

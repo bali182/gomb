@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zsebnyílás — görbe-összehasonlítás</title>
+    <style>
+      body {
+        margin: 24px auto;
+        padding: 0 20px;
+        max-width: 1100px;
+        font:
+          15px system-ui,
+          sans-serif;
+        color: #222;
+        background: #fff;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      h2 {
+        margin-top: 32px;
+        font-size: 20px;
+      }
+      h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      fieldset {
+        margin: 12px 0;
+        border: 1px solid #ccc;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 24px;
+        align-items: center;
+      }
+      label {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+      input[type='number'] {
+        width: 75px;
+      }
+      input,
+      select {
+        font: inherit;
+        padding: 4px;
+      }
+      .part-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .comparison {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 26px;
+      }
+      .figure {
+        min-width: 0;
+      }
+      svg {
+        display: block;
+        width: 100%;
+        overflow: visible;
+      }
+      .curve {
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .guide {
+        fill: none;
+        stroke: #aaa;
+        stroke-width: 1;
+        stroke-dasharray: 4 4;
+      }
+      .control {
+        fill: #fff;
+        stroke: #666;
+        stroke-width: 1;
+      }
+      .anchor {
+        fill: #222;
+      }
+      .description {
+        color: #555;
+        font-size: 13px;
+      }
+      .preset {
+        border-top: 1px solid #ccc;
+        margin-top: 26px;
+        padding-top: 4px;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 750px) {
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+        body {
+          margin-top: 16px;
+          padding: 0 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Zsebnyílás — négy görbe összehasonlítása</h1>
+    <p>Csak a nyílás kontúrja. Azonos alapforma és azonos átmenet-kezdőpontok minden változatnál.</p>
+    <p class="description">
+      A szélességek a lekerekítés előtti alapformát jelölik. Egy lekerekítés 100%-nál az oldal felét használja; 50%-nál
+      a negyedét. Nincs validáció vagy automatikus korrekció.
+    </p>
+
+    <fieldset>
+      <legend>Megjelenítés — minden rajzra</legend>
+      <div class="controls">
+        <label><input id="pieces" type="checkbox" /> Darabok: színezés és külön elrejtés</label>
+        <label><input id="control-points" type="checkbox" /> Kontrollpontok és segédvonalak</label>
+      </div>
+      <div id="part-toggles" class="part-toggles" hidden>
+        <label><input type="checkbox" data-part="horizontal" checked /> Vízszintes részek</label>
+        <label><input type="checkbox" data-part="outer" checked /> Felső átmenetek</label>
+        <label><input type="checkbox" data-part="side" checked /> Egyenes oldalak</label>
+        <label><input type="checkbox" data-part="inner" checked /> Alsó átmenetek</label>
+      </div>
+    </fieldset>
+
+    <h2>Konfigurálható görbe</h2>
+    <fieldset>
+      <legend>Paraméterek</legend>
+      <div class="controls">
+        <label
+          >Típus
+          <select id="curve-type"></select
+        ></label>
+        <label>Zsebszélesség <input id="pocket-width" type="number" value="100" step="1" /> mm</label>
+        <label>Felső szélesség <input id="top-width" type="number" value="70" step="1" /> mm</label>
+        <label>Alsó szélesség <input id="bottom-width" type="number" value="30" step="1" /> mm</label>
+        <label>Mélység <input id="depth" type="number" value="20" step="1" /> mm</label>
+        <label>Felső lekerekítés <input id="outer" type="number" value="50" step="5" /> %</label>
+        <label>Alsó lekerekítés <input id="inner" type="number" value="50" step="5" /> %</label>
+      </div>
+    </fieldset>
+    <div id="configurable" class="figure"></div>
+
+    <h2>Statikus összehasonlítások</h2>
+    <div id="examples"></div>
+
+    <script>
+      const types = [
+        { id: 'arc', name: 'Körív — A' },
+        { id: 'quadratic', name: 'Kvadratikus Bézier — Q' },
+        { id: 'cubic', name: 'Köbös Bézier — C' },
+        { id: 'double-cubic', name: 'Két köbös Bézier — C + C, görbületfolytonos' },
+      ]
+      const presets = [
+        {
+          name: 'Gyakori: 50–50%, megmaradó egyenes',
+          width: 100,
+          top: 70,
+          bottom: 30,
+          depth: 20,
+          outer: 50,
+          inner: 50,
+        },
+        { name: 'Gyakori: 70–70%, rövidebb egyenes', width: 100, top: 70, bottom: 30, depth: 20, outer: 70, inner: 70 },
+        { name: 'Eltérő átmenetek: 30–80%', width: 100, top: 70, bottom: 30, depth: 20, outer: 30, inner: 80 },
+        { name: 'Fordított arány: 80–30%', width: 100, top: 70, bottom: 30, depth: 20, outer: 80, inner: 30 },
+        { name: 'Szélső: 0–0%, szögletes alapforma', width: 100, top: 70, bottom: 30, depth: 20, outer: 0, inner: 0 },
+        {
+          name: 'Szélső: 100–100%, az oldalegyenes eltűnik',
+          width: 100,
+          top: 70,
+          bottom: 30,
+          depth: 20,
+          outer: 100,
+          inner: 100,
+        },
+        { name: 'Széles, sekély kivágás', width: 100, top: 70, bottom: 30, depth: 8, outer: 70, inner: 100 },
+        { name: 'U: függőleges oldal és kerek alj', width: 100, top: 30, bottom: 30, depth: 30, outer: 25, inner: 100 },
+        { name: 'U: határozott váll és kerek alj', width: 100, top: 30, bottom: 30, depth: 30, outer: 0, inner: 100 },
+        {
+          name: 'U: 100–100%, nincs oldalegyenes és alsó egyenes',
+          width: 100,
+          top: 30,
+          bottom: 30,
+          depth: 30,
+          outer: 100,
+          inner: 100,
+        },
+        {
+          name: 'Szélső: V alak, alsó lekerekítés nélkül',
+          width: 100,
+          top: 70,
+          bottom: 0,
+          depth: 20,
+          outer: 60,
+          inner: 0,
+        },
+      ]
+      const colors = { horizontal: '#333', outer: '#1976d2', side: '#b17b00', inner: '#b43180' }
+      const piecesInput = document.getElementById('pieces')
+      const controlsInput = document.getElementById('control-points')
+      const partInputs = [...document.querySelectorAll('[data-part]')]
+      const drawings = []
+      const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]
+      const subtract = (a, b) => [a[0] - b[0], a[1] - b[1]]
+      const cross = (a, b) => a[0] * b[1] - a[1] * b[0]
+
+      // Each corner trims the same distance from its two adjacent straight lines.
+      // The percentages independently consume up to half the original side.
+      function geometry(p) {
+        const a = (p.width - p.top) / 2
+        const b = (p.width - p.bottom) / 2
+        const A = [a, 0]
+        const B = [b, p.depth]
+        const sideLength = Math.hypot(b - a, p.depth)
+        const outerTrim = (sideLength * p.outer) / 200
+        const innerTrim = (sideLength * p.inner) / 200
+        const start = [a - outerTrim, 0]
+        const upper = lerp(A, B, p.outer / 200)
+        const lower = lerp(B, A, p.inner / 200)
+        const end = [b + innerTrim, p.depth]
+        const mirror = (point) => [p.width - point[0], point[1]]
+        return { A, B, start, upper, lower, end, mirror }
+      }
+
+      function line(from, to, part) {
+        return { from, commands: [{ type: 'L', points: [to] }], part, guides: [], controls: [] }
+      }
+
+      function corner(from, vertex, to, type, part) {
+        const incoming = subtract(vertex, from)
+        const outgoing = subtract(to, vertex)
+        const trim = Math.hypot(...incoming)
+        if (trim === 0) return line(from, to, part)
+        const segment = { from, commands: [], part, guides: [], controls: [] }
+
+        if (type === 'arc') {
+          const incomingLength = trim
+          const outgoingLength = Math.hypot(...outgoing)
+          const cosine = (incoming[0] * outgoing[0] + incoming[1] * outgoing[1]) / (incomingLength * outgoingLength)
+          const angle = Math.acos(Math.max(-1, Math.min(1, cosine)))
+          const radius = trim / Math.tan(angle / 2)
+          const sign = cross(incoming, outgoing) >= 0 ? 1 : -1
+          const center = [
+            from[0] - ((sign * incoming[1]) / incomingLength) * radius,
+            from[1] + ((sign * incoming[0]) / incomingLength) * radius,
+          ]
+          segment.commands = [{ type: 'A', points: [to], radius, sweep: sign > 0 ? 1 : 0 }]
+          segment.controls = [center]
+          segment.guides = [[from, center, to]]
+        } else if (type === 'quadratic') {
+          segment.commands = [{ type: 'Q', points: [vertex, to] }]
+          segment.controls = [vertex]
+          segment.guides = [[from, vertex, to]]
+        } else if (type === 'cubic') {
+          const k = 0.5522847498307936
+          const c1 = lerp(from, vertex, k)
+          const c2 = lerp(to, vertex, k)
+          segment.commands = [{ type: 'C', points: [c1, c2, to] }]
+          segment.controls = [c1, c2]
+          segment.guides = [[from, c1, c2, to]]
+        } else {
+          // First/last three points are collinear: zero endpoint curvature.
+          // Matching fractions on both legs give matching first derivatives
+          // and matching signed curvature at the midpoint of the two cubics.
+          const c1 = lerp(from, vertex, 0.25)
+          const c2 = lerp(from, vertex, 0.5)
+          const c3 = lerp(to, vertex, 0.5)
+          const c4 = lerp(to, vertex, 0.25)
+          const middle = lerp(c2, c3, 0.5)
+          segment.commands = [
+            { type: 'C', points: [c1, c2, middle] },
+            { type: 'C', points: [c3, c4, to] },
+          ]
+          segment.controls = [c1, c2, c3, c4]
+          segment.guides = [
+            [from, c1, c2, middle],
+            [middle, c3, c4, to],
+          ]
+        }
+        return segment
+      }
+
+      function segments(p, type) {
+        const g = geometry(p)
+        const m = g.mirror
+        return [
+          line([0, 0], g.start, 'horizontal'),
+          corner(g.start, g.A, g.upper, type, 'outer'),
+          line(g.upper, g.lower, 'side'),
+          corner(g.lower, g.B, g.end, type, 'inner'),
+          line(g.end, m(g.end), 'horizontal'),
+          corner(m(g.end), m(g.B), m(g.lower), type, 'inner'),
+          line(m(g.lower), m(g.upper), 'side'),
+          corner(m(g.upper), m(g.A), m(g.start), type, 'outer'),
+          line(m(g.start), [p.width, 0], 'horizontal'),
+        ]
+      }
+
+      function readParameters() {
+        return {
+          width: Number(document.getElementById('pocket-width').value),
+          top: Number(document.getElementById('top-width').value),
+          bottom: Number(document.getElementById('bottom-width').value),
+          depth: Number(document.getElementById('depth').value),
+          outer: Number(document.getElementById('outer').value),
+          inner: Number(document.getElementById('inner').value),
+        }
+      }
+
+      function render(drawing) {
+        const p = drawing.getParameters()
+        const type = drawing.getType()
+        const all = segments(p, type)
+        const hiddenParts = new Set(partInputs.filter((input) => !input.checked).map((input) => input.dataset.part))
+        const visible = piecesInput.checked ? all.filter((segment) => !hiddenParts.has(segment.part)) : all
+        const points = all.flatMap((segment) => [
+          segment.from,
+          ...segment.commands.flatMap((command) => command.points),
+        ])
+        if (controlsInput.checked) points.push(...visible.flatMap((segment) => segment.controls))
+        const minX = Math.min(0, ...points.map((point) => point[0]))
+        const maxX = Math.max(p.width, ...points.map((point) => point[0]))
+        const minY = Math.min(0, ...points.map((point) => point[1]))
+        const maxY = Math.max(p.depth, ...points.map((point) => point[1]))
+        const width = drawing.element.clientWidth
+        const scale = (width - 24) / (maxX - minX)
+        const height = Math.max(60, 28 + (maxY - minY) * scale)
+        const pair = (point) => `${12 + (point[0] - minX) * scale} ${14 + (point[1] - minY) * scale}`
+        const commandData = (command) =>
+          command.type === 'A'
+            ? `A ${command.radius * scale} ${command.radius * scale} 0 0 ${command.sweep} ${pair(command.points[0])}`
+            : `${command.type} ${command.points.map(pair).join(' ')}`
+        const commands = (segment) => segment.commands.map(commandData).join(' ')
+        let content = `<title>${types.find((item) => item.id === type).name}</title>`
+        if (piecesInput.checked) {
+          content += visible
+            .map(
+              (segment) =>
+                `<path class="curve" stroke="${colors[segment.part]}" d="M ${pair(segment.from)} ${commands(segment)}"/>`,
+            )
+            .join('')
+        } else {
+          content += `<path class="curve" stroke="#222" d="M ${pair(all[0].from)} ${all.map(commands).join(' ')}"/>`
+        }
+        if (controlsInput.checked) {
+          content += visible
+            .flatMap((segment) => segment.guides)
+            .map((guide) => `<path class="guide" d="M ${guide.map(pair).join(' L ')}"/>`)
+            .join('')
+          content += visible
+            .flatMap((segment) => segment.controls)
+            .map(
+              (point) =>
+                `<circle class="control" cx="${12 + (point[0] - minX) * scale}" cy="${14 + (point[1] - minY) * scale}" r="3.5"/>`,
+            )
+            .join('')
+          content += visible
+            .flatMap((segment) => [segment.from, ...segment.commands.map((command) => command.points.at(-1))])
+            .map(
+              (point) =>
+                `<circle class="anchor" cx="${12 + (point[0] - minX) * scale}" cy="${14 + (point[1] - minY) * scale}" r="2.5"/>`,
+            )
+            .join('')
+        }
+        drawing.svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+        drawing.svg.style.height = `${height}px`
+        drawing.svg.innerHTML = content
+      }
+
+      function addDrawing(element, getParameters, getType) {
+        element.innerHTML = '<svg role="img"></svg>'
+        const drawing = { element, svg: element.querySelector('svg'), getParameters, getType }
+        drawings.push(drawing)
+        new ResizeObserver(() => render(drawing)).observe(element)
+        render(drawing)
+      }
+
+      const typeSelect = document.getElementById('curve-type')
+      typeSelect.innerHTML = types.map((type) => `<option value="${type.id}">${type.name}</option>`).join('')
+      typeSelect.value = 'cubic'
+      addDrawing(document.getElementById('configurable'), readParameters, () => typeSelect.value)
+      for (const p of presets) {
+        const section = document.createElement('section')
+        section.className = 'preset'
+        section.innerHTML = `<h3>${p.name}</h3><div class="description">Felső / alsó szélesség: ${p.top} / ${p.bottom} mm · Mélység: ${p.depth} mm · Felső / alsó lekerekítés: ${p.outer} / ${p.inner}%</div><div class="comparison"></div>`
+        document.getElementById('examples').appendChild(section)
+        for (const type of types) {
+          const column = document.createElement('div')
+          column.className = 'figure'
+          column.innerHTML = `<h3>${type.name}</h3><div class="drawing"></div>`
+          section.querySelector('.comparison').appendChild(column)
+          addDrawing(
+            column.querySelector('.drawing'),
+            () => p,
+            () => type.id,
+          )
+        }
+      }
+
+      function renderAll() {
+        document.getElementById('part-toggles').hidden = !piecesInput.checked
+        drawings.forEach(render)
+      }
+      document.querySelectorAll('input, select').forEach((input) => input.addEventListener('input', renderAll))
+    </script>
+  </body>
+</html>

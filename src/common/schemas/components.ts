@@ -51,7 +51,25 @@ export type PanelSchema = HasTypeSchema<'panel'> &
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
+export type StraightPocketTopSchema = {
+  type: 'straight'
+}
+
+export type RecessedPocketTopSchema = {
+  type: 'recessed'
+  /** Distance from either opening edge to the outer corner, in mm. */
+  outerInset: number
+  /** Distance from either opening edge to the inner corner, in mm. */
+  innerInset: number
+  outerRadius: number
+  innerRadius: number
+  depth: number
+}
+
+export type PocketTopSchema = StraightPocketTopSchema | RecessedPocketTopSchema
+
 export type PocketsSchema = {
+  pocketTop: PocketTopSchema
   /** How many pockets do we have in this cluster (min 1) */
   pocketCount: number
   /** How far each pocket is offset from the previous one along the stack axis */

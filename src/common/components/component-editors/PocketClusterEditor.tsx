@@ -1,8 +1,8 @@
-import { type FC } from 'react'
+import { useCallback, type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
+import type { ComponentSchema, PocketClusterSchema, PocketTopSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
@@ -12,6 +12,7 @@ import { CardsSection } from './sections/CardsSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { PocketsSection } from './sections/PocketsSection'
+import { PocketTopSection } from './sections/PocketTopSection'
 import { SqueezeSection } from './sections/SqueezeSection'
 
 type PocketClusterEditorProps = {
@@ -30,6 +31,12 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   parent,
 }) => {
   const { t } = useTranslation()
+  const handlePocketTopChange = useCallback(
+    (pocketTop: EditableSchema<PocketTopSchema>): void => {
+      onChange({ ...editable, pocketTop })
+    },
+    [editable, onChange],
+  )
 
   return (
     <Tabs.Root defaultValue="layout" display="flex" flexDirection="column" minH="0">
@@ -54,6 +61,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
       <Tabs.Content value="pockets" display="flex" flex="1" minH="0" pt={0}>
         <SectionGroup.Root>
           <PocketsSection component={component} editable={editable} issues={issues} onChange={onChange} />
+          <PocketTopSection editable={editable.pocketTop} issues={issues.pocketTop} onChange={handlePocketTopChange} />
           <CardsSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>

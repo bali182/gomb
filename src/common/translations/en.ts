@@ -17,6 +17,8 @@ import type {
   LayoutOrientationSchema,
   PocketOrientationSchema,
   PocketsSchema,
+  PocketTopSchema,
+  RecessedPocketTopSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -375,6 +377,7 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasSqueezeSchema>,
           pockets: {
             title: 'Pockets',
+            pocketTop: { label: 'Opening shape' },
             orientation: {
               label: 'Opening',
               tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
@@ -396,6 +399,27 @@ export const EN = {
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
           } satisfies SectionTranslationSchema<PocketsSchema>,
+          pocketTop: {
+            title: 'Pocket opening shape',
+            type: { label: 'Shape', tooltip: 'Sets the shape of every pocket opening in this cluster.' },
+            outerInset: {
+              label: 'Outer inset',
+              tooltip: 'Distance from either opening edge to the outer corner, in mm.',
+            },
+            innerInset: {
+              label: 'Inner inset',
+              tooltip: 'Distance from either opening edge to the inner corner, in mm.',
+            },
+            depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
+            outerRadius: {
+              label: 'Outer radius',
+              tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
+            },
+            innerRadius: {
+              label: 'Inner radius',
+              tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
+            },
+          } satisfies SectionTranslationSchema<RecessedPocketTopSchema>,
           cards: {
             title: 'Cards',
             cardId: {
@@ -708,6 +732,10 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
+          pocketTop: {
+            straight: 'Straight',
+            recessed: 'Recessed',
+          } satisfies EnumTranslationSchema<PocketTopSchema['type']>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',

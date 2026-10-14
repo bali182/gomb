@@ -324,6 +324,7 @@ export const HU = {
           },
           pockets: {
             title: 'Zsebek',
+            pocketTop: { label: 'Nyílás formája' },
             orientation: {
               label: 'Nyílás',
               tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártya behelyezéséhez.',
@@ -344,6 +345,24 @@ export const HU = {
               label: 'Keskenyedés',
               tooltip: 'A T alakú zseb oldalfalainak dőlését állítja be.',
             },
+          },
+          pocketTop: {
+            title: 'Zsebnyílás formája',
+            type: { label: 'Forma', tooltip: 'A zsebcsoport minden zsebének nyílásformáját állítja.' },
+            outerInset: {
+              label: 'Külső betolás',
+              tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            },
+            innerInset: {
+              label: 'Belső betolás',
+              tooltip: 'A belső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            },
+            depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
+            outerRadius: {
+              label: 'Külső sugár',
+              tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
+            },
+            innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
           },
           cards: {
             title: 'Kártyák',
@@ -645,6 +664,10 @@ export const HU = {
           },
         },
         components: {
+          pocketTop: {
+            straight: 'Egyenes',
+            recessed: 'Bemélyített',
+          },
           pocketOrientation: {
             up: 'Fent',
             down: 'Lent',
