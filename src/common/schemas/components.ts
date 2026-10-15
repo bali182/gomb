@@ -51,11 +51,11 @@ export type PanelSchema = HasTypeSchema<'panel'> &
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
-export type StraightPocketTopSchema = {
+export type StraightPocketOpeningSchema = {
   type: 'straight'
 }
 
-export type RecessedPocketTopSchema = {
+export type RecessedPocketOpeningSchema = {
   type: 'recessed'
   /** Distance from either opening edge to the outer corner, in mm. */
   outerInset: number
@@ -66,15 +66,18 @@ export type RecessedPocketTopSchema = {
   depth: number
 }
 
-export type PocketTopOwnSchema = StraightPocketTopSchema | RecessedPocketTopSchema
+export type PocketOpeningOwnSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema
 
-export type PocketTopSchema = HasIdentitySchema & PocketTopOwnSchema
+export type PocketOpeningSchema = HasIdentitySchema & PocketOpeningOwnSchema
+
+export type HasPocketOpenings = {
+  defaultOpening: PocketOpeningSchema
+  openings: PocketOpeningSchema[]
+  /** One-based pocket numbers. Missing entries use defaultOpening. */
+  openingMapping: Partial<Record<number, string>>
+}
 
 export type PocketsSchema = {
-  defaultPocketTop: PocketTopSchema
-  pocketTops: PocketTopSchema[]
-  /** One-based pocket numbers. Missing entries use defaultPocketTop. */
-  pocketTopMapping: Partial<Record<number, string>>
   /** How many pockets do we have in this cluster (min 1) */
   pocketCount: number
   /** How far each pocket is offset from the previous one along the stack axis */
@@ -109,6 +112,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasAutoDimensionsSchema &
   HasSqueezeSchema &
   PocketsSchema &
-  HasCardsSchema
+  HasCardsSchema &
+  HasPocketOpenings
 
 export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema

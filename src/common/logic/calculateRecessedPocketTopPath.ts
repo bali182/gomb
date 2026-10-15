@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import type { PocketOrientationSchema, RecessedPocketTopSchema } from '../schemas/components'
+import type { PocketOrientationSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathCommand, PathSchema, PointSchema, RectSchema } from '../schemas/geometry'
 
 type RecessedPocketTopVertex = {
@@ -9,7 +9,7 @@ type RecessedPocketTopVertex = {
 }
 
 export const calculateRecessedPocketTopPath = (
-  adjustedPocketTop: RecessedPocketTopSchema,
+  adjustedPocketTop: RecessedPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
 ): PathSchema => {
@@ -22,7 +22,7 @@ export const calculateRecessedPocketTopPath = (
   return transformPocketTopPath(path, pocketRect, orientation)
 }
 
-const createRecessedVertices = (pocketTop: RecessedPocketTopSchema, width: BigNumber): RecessedPocketTopVertex[] => {
+const createRecessedVertices = (pocketTop: RecessedPocketOpeningSchema, width: BigNumber): RecessedPocketTopVertex[] => {
   const zero = new BigNumber(0)
   const vertices: RecessedPocketTopVertex[] = [{ point: { x: zero, y: zero }, radius: zero }]
 

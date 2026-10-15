@@ -12,9 +12,9 @@ import {
 import type {
   PanelSchema,
   PocketClusterSchema,
-  PocketTopOwnSchema,
-  PocketTopSchema,
-  RecessedPocketTopSchema,
+  PocketOpeningOwnSchema,
+  PocketOpeningSchema,
+  RecessedPocketOpeningSchema,
   RootPanelSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
@@ -82,18 +82,18 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireValue(pocketCluster, 'type', 'pocket-cluster')
 
     const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
-    const defaultPocketTop = m.applyDefaults<PocketTopSchema>(
-      m.requireObjectField<PocketClusterSchema, PocketTopSchema>(migrated, 'defaultPocketTop'),
-      defaultPocketCluster.defaultPocketTop,
+    const defaultPocketTop = m.applyDefaults<PocketOpeningSchema>(
+      m.requireObjectField<PocketClusterSchema, PocketOpeningSchema>(migrated, 'defaultOpening'),
+      defaultPocketCluster.defaultOpening,
     )
     m.requireValue(defaultPocketTop, 'id', 'own:default')
-    migrated.defaultPocketTop = migratePocketTop(defaultPocketTop)
-    migrated.pocketTops = m
-      .requireArray<PocketClusterSchema, PocketTopSchema>(migrated, 'pocketTops')
+    migrated.defaultOpening = migratePocketTop(defaultPocketTop)
+    migrated.openings = m
+      .requireArray<PocketClusterSchema, PocketOpeningSchema>(migrated, 'openings')
       .map(migratePocketTop)
-    const mapping = m.requireObjectField<PocketClusterSchema, PocketClusterSchema['pocketTopMapping']>(
+    const mapping = m.requireObjectField<PocketClusterSchema, PocketClusterSchema['openingMapping']>(
       migrated,
-      'pocketTopMapping',
+      'openingMapping',
     )
     for (const key of Object.keys(mapping)) {
       m.requireString(mapping, Number(key))
@@ -132,8 +132,8 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   },
 }
 
-const migratePocketTop = (input: DeepPartial<PocketTopSchema>): DeepPartial<PocketTopSchema> => {
-  const pocketTop = m.requireObject<PocketTopSchema>(input)
+const migratePocketTop = (input: DeepPartial<PocketOpeningSchema>): DeepPartial<PocketOpeningSchema> => {
+  const pocketTop = m.requireObject<PocketOpeningSchema>(input)
   const id = m.requireString(pocketTop, 'id')
   const name = m.requireString(pocketTop, 'name')
   m.requirePrimitiveUnion(pocketTop, 'type', ['straight', 'recessed'])
@@ -142,12 +142,12 @@ const migratePocketTop = (input: DeepPartial<PocketTopSchema>): DeepPartial<Pock
   return { ...own, id, name }
 }
 
-const migratePocketTopOwn = (pocketTop: DeepPartial<PocketTopOwnSchema>): DeepPartial<PocketTopOwnSchema> => {
+const migratePocketTopOwn = (pocketTop: DeepPartial<PocketOpeningOwnSchema>): DeepPartial<PocketOpeningOwnSchema> => {
   switch (pocketTop.type) {
     case 'straight':
       return { type: 'straight' }
     case 'recessed':
-      return m.applyDefaults<RecessedPocketTopSchema>(pocketTop, defaultRecessedPocketTop)
+      return m.applyDefaults<RecessedPocketOpeningSchema>(pocketTop, defaultRecessedPocketTop)
     default:
       throw new Error('Missing pocket top type')
   }

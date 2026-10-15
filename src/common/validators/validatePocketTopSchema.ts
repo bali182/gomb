@@ -1,6 +1,6 @@
 import { defaultRecessedPocketTop } from '../defaultStates'
 import type { HasIdentitySchema } from '../schemas/common'
-import type { PocketTopOwnSchema, PocketTopSchema, RecessedPocketTopSchema } from '../schemas/components'
+import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
@@ -9,29 +9,29 @@ import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 export const validatePocketTopSchema = (
-  input: EditableSchema<PocketTopSchema>,
-  currentValue: PocketTopSchema,
+  input: EditableSchema<PocketOpeningSchema>,
+  currentValue: PocketOpeningSchema,
   pocketTops: readonly HasIdentitySchema[],
   context: BaseValidationContextSchema,
-): ValidationResultSchema<PocketTopSchema> => {
+): ValidationResultSchema<PocketOpeningSchema> => {
   const ownResult = validatePocketTopOwnSchema(input, currentValue, context)
   const nameResult = validateName(input.name, currentValue.name, currentValue.id, pocketTops, context)
-  const issues: ValidationIssuesSchema<PocketTopSchema> = {
+  const issues: ValidationIssuesSchema<PocketOpeningSchema> = {
     ...ownResult.issues,
     id: undefined,
     name: nameResult.issues,
   }
-  const committedValue: PocketTopSchema = {
+  const committedValue: PocketOpeningSchema = {
     ...ownResult.committedValue,
     id: currentValue.id,
     name: nameResult.committedValue,
   }
 
   if (!ownResult.isValid || !nameResult.isValid) {
-    return createInvalidValidationResult<PocketTopSchema>(issues, committedValue)
+    return createInvalidValidationResult<PocketOpeningSchema>(issues, committedValue)
   }
 
-  return createValidValidationResult<PocketTopSchema>(
+  return createValidValidationResult<PocketOpeningSchema>(
     issues,
     { ...ownResult.value, id: currentValue.id, name: nameResult.value },
     committedValue,
@@ -39,19 +39,19 @@ export const validatePocketTopSchema = (
 }
 
 const validatePocketTopOwnSchema = (
-  input: EditableSchema<PocketTopOwnSchema>,
-  currentValue: PocketTopOwnSchema,
+  input: EditableSchema<PocketOpeningOwnSchema>,
+  currentValue: PocketOpeningOwnSchema,
   context: BaseValidationContextSchema,
-): ValidationResultSchema<PocketTopOwnSchema> => {
+): ValidationResultSchema<PocketOpeningOwnSchema> => {
   const typeResult = validatePrimitiveUnion(input.type, currentValue.type, { straight: true, recessed: true }, context)
 
   if (!typeResult.isValid) {
-    return createInvalidValidationResult<PocketTopOwnSchema>({ type: typeResult.issues }, currentValue)
+    return createInvalidValidationResult<PocketOpeningOwnSchema>({ type: typeResult.issues }, currentValue)
   }
 
   switch (input.type) {
     case 'straight':
-      return createValidValidationResult<PocketTopOwnSchema>({ type: undefined }, { type: 'straight' })
+      return createValidValidationResult<PocketOpeningOwnSchema>({ type: undefined }, { type: 'straight' })
     case 'recessed':
       return validateRecessedPocketTopSchema(
         input,
@@ -62,16 +62,16 @@ const validatePocketTopOwnSchema = (
 }
 
 const validateRecessedPocketTopSchema = (
-  input: EditableSchema<RecessedPocketTopSchema>,
-  currentValue: RecessedPocketTopSchema,
+  input: EditableSchema<RecessedPocketOpeningSchema>,
+  currentValue: RecessedPocketOpeningSchema,
   context: BaseValidationContextSchema,
-): ValidationResultSchema<RecessedPocketTopSchema> => {
+): ValidationResultSchema<RecessedPocketOpeningSchema> => {
   const outerInset = validateNumber(input.outerInset, currentValue.outerInset, context, { min: 0 })
   const innerInset = validateNumber(input.innerInset, currentValue.innerInset, context, { min: 0 })
   const depth = validateNumber(input.depth, currentValue.depth, context, { min: 0 })
   const outerRadius = validateNumber(input.outerRadius, currentValue.outerRadius, context, { min: 0 })
   const innerRadius = validateNumber(input.innerRadius, currentValue.innerRadius, context, { min: 0 })
-  const issues: ValidationIssuesSchema<RecessedPocketTopSchema> = {
+  const issues: ValidationIssuesSchema<RecessedPocketOpeningSchema> = {
     type: undefined,
     outerInset: outerInset.issues,
     innerInset: innerInset.issues,
@@ -79,7 +79,7 @@ const validateRecessedPocketTopSchema = (
     outerRadius: outerRadius.issues,
     innerRadius: innerRadius.issues,
   }
-  const committedValue: RecessedPocketTopSchema = {
+  const committedValue: RecessedPocketOpeningSchema = {
     type: 'recessed',
     outerInset: outerInset.committedValue,
     innerInset: innerInset.committedValue,
@@ -89,10 +89,10 @@ const validateRecessedPocketTopSchema = (
   }
 
   if (!outerInset.isValid || !innerInset.isValid || !depth.isValid || !outerRadius.isValid || !innerRadius.isValid) {
-    return createInvalidValidationResult<RecessedPocketTopSchema>(issues, committedValue)
+    return createInvalidValidationResult<RecessedPocketOpeningSchema>(issues, committedValue)
   }
 
-  return createValidValidationResult<RecessedPocketTopSchema>(
+  return createValidValidationResult<RecessedPocketOpeningSchema>(
     issues,
     {
       type: 'recessed',

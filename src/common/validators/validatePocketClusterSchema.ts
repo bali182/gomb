@@ -5,7 +5,7 @@ import type {
   LayoutOrientationSchema,
   PocketClusterSchema,
   PocketOrientationSchema,
-  PocketTopSchema,
+  PocketOpeningSchema,
 } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type {
@@ -51,20 +51,20 @@ export const validatePocketClusterSchema = (
   currentValue: PocketClusterSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<PocketClusterSchema> => {
-  const pocketTops = [input.defaultPocketTop, ...input.pocketTops]
+  const pocketTops = [input.defaultOpening, ...input.openings]
   const currentTopAccessor = accessors.pocketCluster(currentValue)
   const defaultPocketTopResult = validatePocketTopSchema(
-    input.defaultPocketTop,
-    currentValue.defaultPocketTop,
+    input.defaultOpening,
+    currentValue.defaultOpening,
     pocketTops,
     context,
   )
-  const pocketTopResults = input.pocketTops.map((pocketTop) => {
+  const pocketTopResults = input.openings.map((pocketTop) => {
     const previous = currentTopAccessor.optional.pocketTop(pocketTop.id)
-    const fallback: PocketTopSchema = {
-      ...defaultPocketCluster.defaultPocketTop,
+    const fallback: PocketOpeningSchema = {
+      ...defaultPocketCluster.defaultOpening,
       id: pocketTop.id,
-      name: getUnusedName(currentValue.defaultPocketTop.name, new Set(pocketTops.map((top) => top.name))),
+      name: getUnusedName(currentValue.defaultOpening.name, new Set(pocketTops.map((top) => top.name))),
     }
     return validatePocketTopSchema(pocketTop, previous ?? fallback, pocketTops, context)
   })
@@ -132,9 +132,9 @@ export const validatePocketClusterSchema = (
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
   const issues: ValidationIssuesSchema<PocketClusterSchema> = {
-    defaultPocketTop: defaultPocketTopResult.issues,
-    pocketTops: pocketTopResults.map((result) => result.issues),
-    pocketTopMapping: Object.fromEntries(Object.keys(input.pocketTopMapping).map((key) => [key, undefined])),
+    defaultOpening: defaultPocketTopResult.issues,
+    openings: pocketTopResults.map((result) => result.issues),
+    openingMapping: Object.fromEntries(Object.keys(input.openingMapping).map((key) => [key, undefined])),
     autoHeight: undefined,
     autoWidth: undefined,
     offAxisAnchor: offAxisAnchorResult.issues,
@@ -169,9 +169,9 @@ export const validatePocketClusterSchema = (
   }
 
   const committedValue: PocketClusterSchema = {
-    defaultPocketTop: defaultPocketTopResult.committedValue,
-    pocketTops: pocketTopResults.map((result) => result.committedValue),
-    pocketTopMapping: input.pocketTopMapping,
+    defaultOpening: defaultPocketTopResult.committedValue,
+    openings: pocketTopResults.map((result) => result.committedValue),
+    openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
@@ -239,9 +239,9 @@ export const validatePocketClusterSchema = (
   }
 
   const value: PocketClusterSchema = {
-    defaultPocketTop: defaultPocketTopResult.value,
-    pocketTops: pocketTopResults.map((result) => result.committedValue),
-    pocketTopMapping: input.pocketTopMapping,
+    defaultOpening: defaultPocketTopResult.value,
+    openings: pocketTopResults.map((result) => result.committedValue),
+    openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.value,

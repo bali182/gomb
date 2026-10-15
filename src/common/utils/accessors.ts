@@ -2,7 +2,7 @@ import type {
   ComponentSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketTopSchema,
+  PocketOpeningSchema,
   RootPanelSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
@@ -140,16 +140,16 @@ const computedSubProject = (computedSubProject: ComputedSubProjectSchema) => {
 }
 
 const pocketCluster = (cluster: PocketClusterSchema) => {
-  const optionalPocketTop = (id: string | undefined): PocketTopSchema | undefined => {
+  const optionalPocketTop = (id: string | undefined): PocketOpeningSchema | undefined => {
     if (!isDefined(id)) {
       return undefined
     }
-    return id === cluster.defaultPocketTop.id
-      ? cluster.defaultPocketTop
-      : cluster.pocketTops.find((pocketTop) => pocketTop.id === id)
+    return id === cluster.defaultOpening.id
+      ? cluster.defaultOpening
+      : cluster.openings.find((pocketTop) => pocketTop.id === id)
   }
-  const pocketTop = (pocketNumber: number): PocketTopSchema =>
-    optionalPocketTop(cluster.pocketTopMapping[pocketNumber]) ?? cluster.defaultPocketTop
+  const pocketTop = (pocketNumber: number): PocketOpeningSchema =>
+    optionalPocketTop(cluster.openingMapping[pocketNumber]) ?? cluster.defaultOpening
 
   return {
     optional: { pocketTop: optionalPocketTop },

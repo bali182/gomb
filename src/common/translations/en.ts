@@ -14,11 +14,12 @@ import type {
   HasAutoDimensionsSchema,
   HasCardsSchema,
   HasLayoutSchema,
+  HasPocketOpenings,
   LayoutOrientationSchema,
+  PocketOpeningOwnSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  PocketTopOwnSchema,
-  RecessedPocketTopSchema,
+  RecessedPocketOpeningSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -402,9 +403,7 @@ export const EN = {
               label: 'Taper',
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
-          } satisfies SectionTranslationSchema<
-            Omit<PocketsSchema, 'defaultPocketTop' | 'pocketTops' | 'pocketTopMapping'>
-          >,
+          } satisfies SectionTranslationSchema<PocketsSchema>,
           pocketTop: {
             title: 'Pocket opening shape',
             name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket top.' },
@@ -426,11 +425,11 @@ export const EN = {
               label: 'Inner radius',
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketTopSchema & HasName>,
+          } satisfies SectionTranslationSchema<RecessedPocketOpeningSchema & HasName>,
           pocketAssignments: {
             title: 'Pocket assignments',
-            pocketTopMapping: { label: 'Pocket top' },
-          } satisfies SectionTranslationSchema<Pick<PocketsSchema, 'pocketTopMapping'>>,
+            openingMapping: { label: 'Pocket opening' },
+          } satisfies SectionTranslationSchema<Pick<HasPocketOpenings, 'openingMapping'>>,
           cards: {
             title: 'Cards',
             cardId: {
@@ -746,7 +745,7 @@ export const EN = {
           pocketTop: {
             straight: 'Straight',
             recessed: 'Recessed',
-          } satisfies EnumTranslationSchema<PocketTopOwnSchema['type']>,
+          } satisfies EnumTranslationSchema<PocketOpeningOwnSchema['type']>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',

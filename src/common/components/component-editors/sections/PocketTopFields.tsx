@@ -10,7 +10,7 @@ import { useCallback, useMemo, type FC } from 'react'
 import { defaultRecessedPocketTop } from '../../../defaultStates'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasIdentitySchema } from '../../../schemas/common'
-import type { PocketTopOwnSchema, PocketTopSchema, RecessedPocketTopSchema } from '../../../schemas/components'
+import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { getEditableSchema } from '../../../utils/getEditableSchema'
@@ -18,17 +18,17 @@ import { SectionGroup } from '../../common/SectionGroup'
 import { RecessedPocketTopFields } from './RecessedPocketTopFields'
 
 type PocketTopFieldsProps = {
-  editable: EditableSchema<PocketTopSchema>
-  issues: ValidationIssuesSchema<PocketTopSchema>
-  onChange: (updated: EditableSchema<PocketTopSchema>) => void
+  editable: EditableSchema<PocketOpeningSchema>
+  issues: ValidationIssuesSchema<PocketOpeningSchema>
+  onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 
 export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, onChange }) => {
   const { t, language } = useTranslation()
 
-  const collection = useMemo<ListCollection<PocketTopOwnSchema['type']>>(
+  const collection = useMemo<ListCollection<PocketOpeningOwnSchema['type']>>(
     () =>
-      createListCollection<PocketTopOwnSchema['type']>({
+      createListCollection<PocketOpeningOwnSchema['type']>({
         items: ['straight', 'recessed'],
         itemToString: (type) => t.project.editors.enums.components.pocketTop[type],
         itemToValue: (type) => type,
@@ -39,7 +39,7 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
   const selectedType = useMemo<string[]>(() => [editable.type], [editable.type])
 
   const handleTypeChange = useCallback(
-    (details: SelectValueChangeDetails<PocketTopOwnSchema['type']>): void => {
+    (details: SelectValueChangeDetails<PocketOpeningOwnSchema['type']>): void => {
       const identity: HasIdentitySchema = { id: editable.id, name: editable.name }
       switch (details.items[0]) {
         case 'straight':
@@ -111,8 +111,8 @@ const PocketTopShapeFields: FC<PocketTopFieldsProps> = ({ editable, issues, onCh
       return (
         <RecessedPocketTopFields
           editable={editable}
-          issues={issues as ValidationIssuesSchema<RecessedPocketTopSchema>}
-          onChange={(updated: EditableSchema<RecessedPocketTopSchema>): void =>
+          issues={issues as ValidationIssuesSchema<RecessedPocketOpeningSchema>}
+          onChange={(updated: EditableSchema<RecessedPocketOpeningSchema>): void =>
             onChange({ ...updated, id: editable.id, name: editable.name })
           }
         />

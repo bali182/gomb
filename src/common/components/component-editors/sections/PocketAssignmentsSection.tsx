@@ -11,7 +11,7 @@ import { useCallback, useMemo, type FC } from 'react'
 import { PiArrowRight } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { PocketClusterSchema, PocketTopSchema } from '../../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
@@ -28,33 +28,33 @@ type PocketAssignmentRow = {
   pocketNumber: number
   pocketType: PocketType
   selectedValue: string[]
-  onChange: (details: SelectValueChangeDetails<PocketTopSchema>) => void
+  onChange: (details: SelectValueChangeDetails<PocketOpeningSchema>) => void
 }
 
 export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ component, editable, onChange }) => {
   const { t } = useTranslation()
 
-  const collection = useMemo<ListCollection<PocketTopSchema>>(
+  const collection = useMemo<ListCollection<PocketOpeningSchema>>(
     () =>
-      createListCollection<PocketTopSchema>({
-        items: [component.defaultPocketTop, ...component.pocketTops],
+      createListCollection<PocketOpeningSchema>({
+        items: [component.defaultOpening, ...component.openings],
         itemToString: (top) => top.name,
         itemToValue: (top) => top.id,
       }),
-    [component.defaultPocketTop, component.pocketTops],
+    [component.defaultOpening, component.openings],
   )
 
   const handleMappingChange = useCallback(
-    (pocketNumber: number, pocketTop: PocketTopSchema): void => {
-      const pocketTopMapping: Partial<Record<number, string>> = { ...editable.pocketTopMapping }
-      if (pocketTop.id === component.defaultPocketTop.id) {
+    (pocketNumber: number, pocketTop: PocketOpeningSchema): void => {
+      const pocketTopMapping: Partial<Record<number, string>> = { ...editable.openingMapping }
+      if (pocketTop.id === component.defaultOpening.id) {
         delete pocketTopMapping[pocketNumber]
       } else {
         pocketTopMapping[pocketNumber] = pocketTop.id
       }
-      onChange({ ...editable, pocketTopMapping })
+      onChange({ ...editable, openingMapping: pocketTopMapping })
     },
-    [component.defaultPocketTop.id, editable, onChange],
+    [component.defaultOpening.id, editable, onChange],
   )
 
   const rows = useMemo<PocketAssignmentRow[]>(() => {
@@ -66,7 +66,7 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
         pocketNumber,
         pocketType: pocketNumber === component.pocketCount ? 'front-pocket' : 't-pocket',
         selectedValue: [pocketTopAccessor.pocketTop(pocketNumber).id],
-        onChange: (details: SelectValueChangeDetails<PocketTopSchema>): void => {
+        onChange: (details: SelectValueChangeDetails<PocketOpeningSchema>): void => {
           const top = details.items[0]
           if (isDefined(top)) {
             handleMappingChange(pocketNumber, top)
@@ -115,7 +115,7 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
                     <Select.Control>
                       <Select.Trigger>
                         <Select.ValueText
-                          placeholder={t.project.editors.sections.components.pocketAssignments.pocketTopMapping.label}
+                          placeholder={t.project.editors.sections.components.pocketAssignments.openingMapping.label}
                         />
                       </Select.Trigger>
                       <Select.IndicatorGroup>

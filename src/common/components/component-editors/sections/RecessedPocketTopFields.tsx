@@ -1,16 +1,16 @@
 import { useCallback, type FC } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { RecessedPocketTopSchema } from '../../../schemas/components'
+import type { RecessedPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type RecessedPocketTopFieldsProps = {
-  editable: EditableSchema<RecessedPocketTopSchema>
-  issues: ValidationIssuesSchema<RecessedPocketTopSchema>
-  onChange: (updated: EditableSchema<RecessedPocketTopSchema>) => void
+  editable: EditableSchema<RecessedPocketOpeningSchema>
+  issues: ValidationIssuesSchema<RecessedPocketOpeningSchema>
+  onChange: (updated: EditableSchema<RecessedPocketOpeningSchema>) => void
 }
 
 export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ editable, issues, onChange }) => {

@@ -8,7 +8,7 @@ import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useTranslation } from '../../hooks/useTranslation'
 import { getAdjustedPocketTop } from '../../logic/getAdjustedPocketTop'
 import { getMaximumOpeningCornerRadius } from '../../logic/pocketUtils'
-import type { PocketClusterSchema, PocketTopOwnSchema, PocketTopSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -19,10 +19,10 @@ import { PocketTopFields } from './sections/PocketTopFields'
 
 type PocketTopAccordionItemProps = {
   pocketCluster: PocketClusterSchema
-  pocketTop: PocketTopSchema
-  editable: EditableSchema<PocketTopSchema>
-  issues: ValidationIssuesSchema<PocketTopSchema>
-  onChange: (updated: EditableSchema<PocketTopSchema>) => void
+  pocketTop: PocketOpeningSchema
+  editable: EditableSchema<PocketOpeningSchema>
+  issues: ValidationIssuesSchema<PocketOpeningSchema>
+  onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
   onDelete?: () => void
 }
 
@@ -38,7 +38,7 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
   const computed = useComputedComponent<ComputedPocketClusterSchema>(pocketCluster.id)
   const pocketRect = computed.frontPocket.boundingRect
   const orientation = pocketCluster.orientation
-  const isDefault = pocketTop.id === pocketCluster.defaultPocketTop.id
+  const isDefault = pocketTop.id === pocketCluster.defaultOpening.id
 
   const openingCornerRadius = useMemo<BigNumber>(
     () => (computed.tPockets.length > 0 ? getMaximumOpeningCornerRadius(computed.cornerRadius, orientation) : ZERO),
@@ -52,7 +52,7 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
     )
   }, [pocketCluster, pocketTop.id])
 
-  const adjustedPocketTop = useMemo<PocketTopOwnSchema>(
+  const adjustedPocketTop = useMemo<PocketOpeningOwnSchema>(
     () => getAdjustedPocketTop(pocketTop, pocketRect, orientation, openingCornerRadius),
     [openingCornerRadius, orientation, pocketRect, pocketTop],
   )

@@ -1,15 +1,15 @@
 import BigNumber from 'bignumber.js'
 
-import type { PocketOrientationSchema, PocketTopOwnSchema, RecessedPocketTopSchema } from '../schemas/components'
+import type { PocketOrientationSchema, PocketOpeningOwnSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
 
 export const getAdjustedPocketTop = (
-  pocketTop: PocketTopOwnSchema,
+  pocketTop: PocketOpeningOwnSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
   openingCornerRadius: BigNumber,
-): PocketTopOwnSchema => {
+): PocketOpeningOwnSchema => {
   switch (pocketTop.type) {
     case 'straight':
       return pocketTop
@@ -19,11 +19,11 @@ export const getAdjustedPocketTop = (
 }
 
 const getAdjustedRecessedPocketTop = (
-  pocketTop: RecessedPocketTopSchema,
+  pocketTop: RecessedPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
   openingCornerRadius: BigNumber,
-): RecessedPocketTopSchema => {
+): RecessedPocketOpeningSchema => {
   const isVertical = orientation === 'up' || orientation === 'down'
   const halfWidth = (isVertical ? pocketRect.width : pocketRect.height).dividedBy(2)
   const pocketDepth = isVertical ? pocketRect.height : pocketRect.width

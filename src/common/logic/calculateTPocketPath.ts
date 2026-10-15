@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 import { ZERO } from '../constants/layout'
-import type { PocketClusterSchema, PocketTopOwnSchema } from '../schemas/components'
+import type { PocketClusterSchema, PocketOpeningOwnSchema } from '../schemas/components'
 import type { CornerRadiusSchema, PathCommand, PathSchema, RectSchema } from '../schemas/geometry'
 import { calculatePocketTopPath } from './calculatePocketTopPath'
 import { getTPocketTabDepth } from './pocketUtils'
@@ -10,7 +10,7 @@ export const calculateTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
-  adjustedPocketTop: PocketTopOwnSchema,
+  adjustedPocketTop: PocketOpeningOwnSchema,
 ): PathSchema => {
   switch (pocketCluster.orientation) {
     case 'up':
@@ -28,7 +28,7 @@ const calculateUpTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
-  adjustedPocketTop: PocketTopOwnSchema,
+  adjustedPocketTop: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -85,7 +85,7 @@ const calculateDownTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
-  adjustedPocketTop: PocketTopOwnSchema,
+  adjustedPocketTop: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -142,7 +142,7 @@ const calculateLeftTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
-  adjustedPocketTop: PocketTopOwnSchema,
+  adjustedPocketTop: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -199,7 +199,7 @@ const calculateRightTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
-  adjustedPocketTop: PocketTopOwnSchema,
+  adjustedPocketTop: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y

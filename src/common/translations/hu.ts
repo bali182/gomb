@@ -371,7 +371,7 @@ export const HU = {
           },
           pocketAssignments: {
             title: 'Zsebek hozzárendelése',
-            pocketTopMapping: { label: 'Zsebnyílás' },
+            openingMapping: { label: 'Zsebnyílás' },
           },
           cards: {
             title: 'Kártyák',

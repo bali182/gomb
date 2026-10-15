@@ -13,14 +13,14 @@ export const deleteOrphanedPocketTopMappings = (
       return component
     }
     const pocketTopAccessor = accessors.pocketCluster(component)
-    const entries = Object.entries(component.pocketTopMapping)
+    const entries = Object.entries(component.openingMapping)
     const remainingEntries = entries.filter(([key, topId]) => {
       const pocketNumber = Number(key)
       return (
         Number.isInteger(pocketNumber) &&
         pocketNumber >= 1 &&
         pocketNumber <= component.pocketCount &&
-        topId !== component.defaultPocketTop.id &&
+        topId !== component.defaultOpening.id &&
         isDefined(pocketTopAccessor.optional.pocketTop(topId))
       )
     })
@@ -29,7 +29,7 @@ export const deleteOrphanedPocketTopMappings = (
     }
 
     const pocketTopMapping: Partial<Record<number, string>> = Object.fromEntries(remainingEntries)
-    const updatedComponent: PocketClusterSchema = { ...component, pocketTopMapping }
+    const updatedComponent: PocketClusterSchema = { ...component, openingMapping: pocketTopMapping }
     return updatedComponent
   })
 }
