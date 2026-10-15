@@ -36,6 +36,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
     component: editedComponent,
     editableComponent,
     setComponent,
+    setComponentImmediately,
     validationIssues,
   } = useEditableComponent(component.id)
 
@@ -71,6 +72,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
         editable={editableComponent}
         issues={validationIssues}
         onChange={setComponent}
+        onChangeImmediately={setComponentImmediately}
         parent={parent}
       />
     </FloatingEditor>

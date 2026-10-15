@@ -1,4 +1,10 @@
-import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  ComponentSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketTopSchema,
+  RootPanelSchema,
+} from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type {
   ComponentBoundsStitchLineSchema,
@@ -133,9 +139,28 @@ const computedSubProject = (computedSubProject: ComputedSubProjectSchema) => {
   }
 }
 
+const pocketCluster = (cluster: PocketClusterSchema) => {
+  const optionalPocketTop = (id: string | undefined): PocketTopSchema | undefined => {
+    if (!isDefined(id)) {
+      return undefined
+    }
+    return id === cluster.defaultPocketTop.id
+      ? cluster.defaultPocketTop
+      : cluster.pocketTops.find((pocketTop) => pocketTop.id === id)
+  }
+  const pocketTop = (pocketNumber: number): PocketTopSchema =>
+    optionalPocketTop(cluster.pocketTopMapping[pocketNumber]) ?? cluster.defaultPocketTop
+
+  return {
+    optional: { pocketTop: optionalPocketTop },
+    pocketTop,
+  }
+}
+
 export const accessors = {
   subProject,
   computedSubProject,
+  pocketCluster,
 }
 
 const createMissingErrorMessage = (componentType: string, ownerType: string, ownerId: string, ownerName?: string) => {

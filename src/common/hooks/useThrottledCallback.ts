@@ -2,10 +2,15 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { isDefined } from '../utils/isDefined'
 
+export type UseThrottledCallbackResult<T extends unknown[]> = {
+  call: (...args: T) => void
+  flush: () => void
+}
+
 export const useThrottledCallback = <T extends unknown[]>(
   callback: (...args: T) => void,
   throttle: number,
-): ((...args: T) => void) => {
+): UseThrottledCallbackResult<T> => {
   const callbackRef = useRef(callback)
   const lastCallTimeRef = useRef<number | undefined>(undefined)
   const pendingArgsRef = useRef<T | undefined>(undefined)
@@ -16,6 +21,7 @@ export const useThrottledCallback = <T extends unknown[]>(
   }, [callback])
 
   const flush = useCallback((): void => {
+    clearTimeout(timeoutRef.current)
     timeoutRef.current = undefined
     const pendingArgs = pendingArgsRef.current
 
@@ -60,5 +66,5 @@ export const useThrottledCallback = <T extends unknown[]>(
     }
   }, [throttle])
 
-  return throttle === 0 ? callback : throttledCallback
+  return { call: throttle === 0 ? callback : throttledCallback, flush }
 }

@@ -17,7 +17,7 @@ import type {
   LayoutOrientationSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  PocketTopSchema,
+  PocketTopOwnSchema,
   RecessedPocketTopSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
@@ -225,6 +225,7 @@ export const EN = {
         components: {
           layout: 'Layout',
           pockets: 'Pockets',
+          pocketOpenings: 'Pocket openings',
         },
         stitchLines: {
           settings: 'Settings',
@@ -245,6 +246,10 @@ export const EN = {
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
           clone: 'Clone',
+          delete: 'Delete',
+        },
+        pocketTops: {
+          add: 'Add pocket top',
           delete: 'Delete',
         },
         stitchLines: {
@@ -377,7 +382,6 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasSqueezeSchema>,
           pockets: {
             title: 'Pockets',
-            pocketTop: { label: 'Opening shape' },
             orientation: {
               label: 'Opening',
               tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
@@ -398,10 +402,13 @@ export const EN = {
               label: 'Taper',
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
-          } satisfies SectionTranslationSchema<PocketsSchema>,
+          } satisfies SectionTranslationSchema<
+            Omit<PocketsSchema, 'defaultPocketTop' | 'pocketTops' | 'pocketTopMapping'>
+          >,
           pocketTop: {
             title: 'Pocket opening shape',
-            type: { label: 'Shape', tooltip: 'Sets the shape of every pocket opening in this cluster.' },
+            name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket top.' },
+            type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this top.' },
             outerInset: {
               label: 'Outer inset',
               tooltip: 'Distance from either opening edge to the outer corner, in mm.',
@@ -419,7 +426,11 @@ export const EN = {
               label: 'Inner radius',
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketTopSchema>,
+          } satisfies SectionTranslationSchema<RecessedPocketTopSchema & HasName>,
+          pocketAssignments: {
+            title: 'Pocket assignments',
+            pocketTopMapping: { label: 'Pocket top' },
+          } satisfies SectionTranslationSchema<Pick<PocketsSchema, 'pocketTopMapping'>>,
           cards: {
             title: 'Cards',
             cardId: {
@@ -735,7 +746,7 @@ export const EN = {
           pocketTop: {
             straight: 'Straight',
             recessed: 'Recessed',
-          } satisfies EnumTranslationSchema<PocketTopSchema['type']>,
+          } satisfies EnumTranslationSchema<PocketTopOwnSchema['type']>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',
@@ -774,6 +785,16 @@ export const EN = {
         },
       },
       controls: {
+        pocketTops: {
+          default: 'Default',
+          assignedPockets: (numbers: readonly number[]): string => `Pockets: ${numbers.join(', ')}`,
+          unassigned: 'No pockets assigned',
+        },
+        pocketAssignments: {
+          pocket: (number: number): string => `Pocket ${number}`,
+          tPocket: 'T pocket',
+          frontPocket: 'Front pocket',
+        },
         cardPicker: {
           noCard: 'None',
           landscape: 'Landscape',
@@ -868,6 +889,7 @@ export const EN = {
     rootPanel: 'Module',
     panel: 'Panel',
     pocketCluster: 'Pocket cluster',
+    pocketTop: 'Pocket top',
     componentBoundsStitchLine: 'Stitching',
     pocketClusterStitchLine: 'Pocket stitching',
     hole: 'Hole',

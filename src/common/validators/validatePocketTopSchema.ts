@@ -1,25 +1,57 @@
 import { defaultRecessedPocketTop } from '../defaultStates'
-import type { PocketTopSchema, RecessedPocketTopSchema } from '../schemas/components'
+import type { HasIdentitySchema } from '../schemas/common'
+import type { PocketTopOwnSchema, PocketTopSchema, RecessedPocketTopSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
+import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 export const validatePocketTopSchema = (
   input: EditableSchema<PocketTopSchema>,
   currentValue: PocketTopSchema,
+  pocketTops: readonly HasIdentitySchema[],
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<PocketTopSchema> => {
+  const ownResult = validatePocketTopOwnSchema(input, currentValue, context)
+  const nameResult = validateName(input.name, currentValue.name, currentValue.id, pocketTops, context)
+  const issues: ValidationIssuesSchema<PocketTopSchema> = {
+    ...ownResult.issues,
+    id: undefined,
+    name: nameResult.issues,
+  }
+  const committedValue: PocketTopSchema = {
+    ...ownResult.committedValue,
+    id: currentValue.id,
+    name: nameResult.committedValue,
+  }
+
+  if (!ownResult.isValid || !nameResult.isValid) {
+    return createInvalidValidationResult<PocketTopSchema>(issues, committedValue)
+  }
+
+  return createValidValidationResult<PocketTopSchema>(
+    issues,
+    { ...ownResult.value, id: currentValue.id, name: nameResult.value },
+    committedValue,
+  )
+}
+
+const validatePocketTopOwnSchema = (
+  input: EditableSchema<PocketTopOwnSchema>,
+  currentValue: PocketTopOwnSchema,
+  context: BaseValidationContextSchema,
+): ValidationResultSchema<PocketTopOwnSchema> => {
   const typeResult = validatePrimitiveUnion(input.type, currentValue.type, { straight: true, recessed: true }, context)
 
   if (!typeResult.isValid) {
-    return createInvalidValidationResult<PocketTopSchema>({ type: typeResult.issues }, currentValue)
+    return createInvalidValidationResult<PocketTopOwnSchema>({ type: typeResult.issues }, currentValue)
   }
 
   switch (input.type) {
     case 'straight':
-      return createValidValidationResult<PocketTopSchema>({ type: undefined }, { type: 'straight' })
+      return createValidValidationResult<PocketTopOwnSchema>({ type: undefined }, { type: 'straight' })
     case 'recessed':
       return validateRecessedPocketTopSchema(
         input,

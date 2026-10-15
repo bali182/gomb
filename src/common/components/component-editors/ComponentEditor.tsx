@@ -1,5 +1,6 @@
-import { FC } from 'react'
+import type { FC } from 'react'
 
+import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
@@ -13,6 +14,7 @@ type ComponentEditorProps = {
   editable: EditableSchema<ComponentSchema>
   issues: ValidationIssuesSchema<ComponentSchema>
   onChange: (updated: EditableSchema<ComponentSchema>) => void
+  onChangeImmediately: (update: ImmediateUpdater<ComponentSchema>) => void
   parent: ComponentSchema | undefined
 }
 
@@ -50,6 +52,7 @@ export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
           editable={props.editable}
           issues={props.issues as ValidationIssuesSchema<PocketClusterSchema>}
           onChange={props.onChange}
+          onChangeImmediately={props.onChangeImmediately as (update: ImmediateUpdater<PocketClusterSchema>) => void}
           parent={props.parent}
         />
       )

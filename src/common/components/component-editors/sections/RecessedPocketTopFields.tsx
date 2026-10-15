@@ -15,7 +15,6 @@ type RecessedPocketTopFieldsProps = {
 
 export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ editable, issues, onChange }) => {
   const { t } = useTranslation()
-  const text = t.project.editors.sections.components.pocketTop
   const handleOuterInsetChange = useCallback(
     (outerInset: string): void => {
       onChange({ ...editable, outerInset })
@@ -49,8 +48,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
 
   return (
     <>
-      <SectionGroup.SectionRowTitle tooltip={text.outerInset.tooltip}>
-        {text.outerInset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.outerInset.tooltip}>
+        {t.project.editors.sections.components.pocketTop.outerInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerInset}>
         <NumberInput
@@ -60,8 +59,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={text.innerInset.tooltip}>
-        {text.innerInset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.innerInset.tooltip}>
+        {t.project.editors.sections.components.pocketTop.innerInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerInset}>
         <NumberInput
@@ -71,12 +70,14 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={text.depth.tooltip}>{text.depth.label}</SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.depth.tooltip}>
+        {t.project.editors.sections.components.pocketTop.depth.label}
+      </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.depth}>
         <NumberInput value={editable.depth} issue={issues.depth} onChange={handleDepthChange} unit="mm" />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={text.outerRadius.tooltip}>
-        {text.outerRadius.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.outerRadius.tooltip}>
+        {t.project.editors.sections.components.pocketTop.outerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerRadius}>
         <NumberInput
@@ -86,8 +87,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={text.innerRadius.tooltip}>
-        {text.innerRadius.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.innerRadius.tooltip}>
+        {t.project.editors.sections.components.pocketTop.innerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerRadius}>
         <NumberInput

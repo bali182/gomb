@@ -66,10 +66,15 @@ export type RecessedPocketTopSchema = {
   depth: number
 }
 
-export type PocketTopSchema = StraightPocketTopSchema | RecessedPocketTopSchema
+export type PocketTopOwnSchema = StraightPocketTopSchema | RecessedPocketTopSchema
+
+export type PocketTopSchema = HasIdentitySchema & PocketTopOwnSchema
 
 export type PocketsSchema = {
-  pocketTop: PocketTopSchema
+  defaultPocketTop: PocketTopSchema
+  pocketTops: PocketTopSchema[]
+  /** One-based pocket numbers. Missing entries use defaultPocketTop. */
+  pocketTopMapping: Partial<Record<number, string>>
   /** How many pockets do we have in this cluster (min 1) */
   pocketCount: number
   /** How far each pocket is offset from the previous one along the stack axis */

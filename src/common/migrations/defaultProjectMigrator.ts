@@ -12,12 +12,13 @@ import {
 import type {
   PanelSchema,
   PocketClusterSchema,
+  PocketTopOwnSchema,
   PocketTopSchema,
   RecessedPocketTopSchema,
   RootPanelSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
-import type { ProjectMigratorSchema } from '../schemas/migration'
+import type { DeepPartial, ProjectMigratorSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
@@ -81,16 +82,21 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireValue(pocketCluster, 'type', 'pocket-cluster')
 
     const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
-    const pocketTop = m.requireObjectField<PocketClusterSchema, PocketTopSchema>(migrated, 'pocketTop')
-    m.requirePrimitiveUnion(pocketTop, 'type', ['straight', 'recessed'])
-
-    switch (pocketTop.type) {
-      case 'straight':
-        migrated.pocketTop = { type: 'straight' }
-        break
-      case 'recessed':
-        migrated.pocketTop = m.applyDefaults<RecessedPocketTopSchema>(pocketTop, defaultRecessedPocketTop)
-        break
+    const defaultPocketTop = m.applyDefaults<PocketTopSchema>(
+      m.requireObjectField<PocketClusterSchema, PocketTopSchema>(migrated, 'defaultPocketTop'),
+      defaultPocketCluster.defaultPocketTop,
+    )
+    m.requireValue(defaultPocketTop, 'id', 'own:default')
+    migrated.defaultPocketTop = migratePocketTop(defaultPocketTop)
+    migrated.pocketTops = m
+      .requireArray<PocketClusterSchema, PocketTopSchema>(migrated, 'pocketTops')
+      .map(migratePocketTop)
+    const mapping = m.requireObjectField<PocketClusterSchema, PocketClusterSchema['pocketTopMapping']>(
+      migrated,
+      'pocketTopMapping',
+    )
+    for (const key of Object.keys(mapping)) {
+      m.requireString(mapping, Number(key))
     }
 
     return migrated
@@ -124,6 +130,27 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
 
     return m.applyDefaults<PocketClusterStitchLineSchema>(stitchLine, defaultPocketClusterStitchLine)
   },
+}
+
+const migratePocketTop = (input: DeepPartial<PocketTopSchema>): DeepPartial<PocketTopSchema> => {
+  const pocketTop = m.requireObject<PocketTopSchema>(input)
+  const id = m.requireString(pocketTop, 'id')
+  const name = m.requireString(pocketTop, 'name')
+  m.requirePrimitiveUnion(pocketTop, 'type', ['straight', 'recessed'])
+
+  const own = migratePocketTopOwn(pocketTop)
+  return { ...own, id, name }
+}
+
+const migratePocketTopOwn = (pocketTop: DeepPartial<PocketTopOwnSchema>): DeepPartial<PocketTopOwnSchema> => {
+  switch (pocketTop.type) {
+    case 'straight':
+      return { type: 'straight' }
+    case 'recessed':
+      return m.applyDefaults<RecessedPocketTopSchema>(pocketTop, defaultRecessedPocketTop)
+    default:
+      throw new Error('Missing pocket top type')
+  }
 }
 
 export const defaultProjectMigrator = createProjectMigration(defaultProjectMigratorSchema)

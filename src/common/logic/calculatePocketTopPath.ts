@@ -1,10 +1,10 @@
-import type { PocketOrientationSchema, PocketTopSchema } from '../schemas/components'
+import type { PocketOrientationSchema, PocketTopOwnSchema } from '../schemas/components'
 import type { PathSchema, RectSchema } from '../schemas/geometry'
 import { calculateRecessedPocketTopPath } from './calculateRecessedPocketTopPath'
 import { calculateStraightPocketTopPath } from './calculateStraightPocketTopPath'
 
 export const calculatePocketTopPath = (
-  adjustedPocketTop: PocketTopSchema,
+  adjustedPocketTop: PocketTopOwnSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
 ): PathSchema => {
