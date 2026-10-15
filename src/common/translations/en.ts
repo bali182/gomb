@@ -250,7 +250,7 @@ export const EN = {
           delete: 'Delete',
         },
         pocketOpenings: {
-          add: 'Add pocket opening',
+          add: 'Add design',
           delete: 'Delete',
         },
         stitchLines: {
@@ -785,7 +785,6 @@ export const EN = {
       },
       controls: {
         pocketOpenings: {
-          default: 'Default',
           assignedPockets: (numbers: readonly number[]): string => `Pockets: ${numbers.join(', ')}`,
           unassigned: 'No pockets assigned',
         },

@@ -198,7 +198,7 @@ export const HU = {
           delete: 'Törlés',
         },
         pocketOpenings: {
-          add: 'Zsebnyílás hozzáadása',
+          add: 'Dizájn hozzáadása',
           delete: 'Törlés',
         },
         stitchLines: {
@@ -716,7 +716,6 @@ export const HU = {
       },
       controls: {
         pocketOpenings: {
-          default: 'Alapértelmezett',
           assignedPockets: (numbers: readonly number[]): string => `Zsebek: ${numbers.join(', ')}`,
           unassigned: 'Nincs hozzárendelt zseb',
         },

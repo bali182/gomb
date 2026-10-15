@@ -1,6 +1,7 @@
 import { Accordion, Button, Stack, type AccordionValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useState, type FC } from 'react'
 
+import { PiPlusCircle } from 'react-icons/pi'
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import { useTranslation } from '../../hooks/useTranslation'
 import { createPocketOpening } from '../../operations/subProject/utils/createPocketOpening'
@@ -30,10 +31,9 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   onChangeImmediately,
 }) => {
   const { t, language } = useTranslation()
-  const [openIds, setOpenIds] = useState<string[]>([component.defaultOpening.id])
+  const [openIds, setOpenIds] = useState<string[]>([])
 
   const handleAdd = useCallback((): void => {
-    let addedOpeningId: string | undefined
     onChangeImmediately(
       (
         current: EditableSchema<PocketClusterSchema>,
@@ -41,13 +41,9 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
       ): EditableSchema<PocketClusterSchema> => {
         const openings: readonly HasIdentitySchema[] = [currentValue.defaultOpening, ...currentValue.openings]
         const opening = createPocketOpening(openings, t.defaultNames.pocketOpening)
-        addedOpeningId = opening.id
         return { ...current, openings: [...current.openings, getEditableSchema(opening, { language })] }
       },
     )
-    if (isDefined(addedOpeningId)) {
-      setOpenIds([addedOpeningId])
-    }
   }, [language, onChangeImmediately, t.defaultNames.pocketOpening])
 
   const handleDelete = useCallback(
@@ -86,7 +82,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
 
   return (
     <>
-      <SectionGroup.SectionFullWidthContent>
+      <SectionGroup.SectionFullWidthContent padded={false}>
         <Stack gap="3">
           <Accordion.Root multiple={false} collapsible value={openIds} onValueChange={handleAccordionChange} size="sm">
             <PocketOpeningAccordionItem
@@ -115,8 +111,8 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
               )
             })}
           </Accordion.Root>
-          <Button size="xs" variant="outline" onClick={handleAdd}>
-            {t.project.editors.actions.pocketOpenings.add}
+          <Button size="xs" variant="outline" onClick={handleAdd} mx="3.5">
+            <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
           </Button>
         </Stack>
       </SectionGroup.SectionFullWidthContent>

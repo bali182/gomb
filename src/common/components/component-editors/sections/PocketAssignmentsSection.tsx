@@ -1,7 +1,8 @@
 import {
+  Flex,
+  Grid,
   HStack,
   Select,
-  Table,
   Text,
   createListCollection,
   type ListCollection,
@@ -77,67 +78,70 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
   }, [component, handleMappingChange])
 
   return (
-    <SectionGroup.Section>
+    <SectionGroup.Section spaced={false}>
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.components.pocketAssignments.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionFullWidthContent>
-        <Table.Root size="sm" tableLayout="fixed" width="full">
-          <Table.Body>
-            {rows.map(({ pocketNumber, pocketType, selectedValue, onChange: handleChange }) => (
-              <Table.Row key={pocketNumber}>
-                <Table.Cell width="35%" px="0">
-                  <HStack gap="2">
-                    <PocketTypeIcon type={pocketType} />
-                    <Text textStyle="sm">
-                      {t.project.editors.controls.pocketAssignments.pocket(pocketNumber)}
-                      <Text as="span" display="block" color="fg.muted" textStyle="xs">
-                        {pocketType === 'front-pocket'
-                          ? t.project.editors.controls.pocketAssignments.frontPocket
-                          : t.project.editors.controls.pocketAssignments.tPocket}
-                      </Text>
-                    </Text>
-                  </HStack>
-                </Table.Cell>
-                <Table.Cell width="8%" px="0" color="fg.muted">
-                  <PiArrowRight />
-                </Table.Cell>
-                <Table.Cell px="0">
-                  <Select.Root
-                    collection={collection}
-                    value={selectedValue}
-                    onValueChange={handleChange}
-                    positioning={{ strategy: 'fixed' }}
-                    size="xs"
-                    width="full"
-                  >
-                    <Select.HiddenSelect />
-                    <Select.Control>
-                      <Select.Trigger>
-                        <Select.ValueText
-                          placeholder={t.project.editors.sections.components.pocketAssignments.openingMapping.label}
-                        />
-                      </Select.Trigger>
-                      <Select.IndicatorGroup>
-                        <Select.Indicator />
-                      </Select.IndicatorGroup>
-                    </Select.Control>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {collection.items.map((opening) => (
-                          <Select.Item key={opening.id} item={opening}>
-                            {opening.name}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Select.Root>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
+      <SectionGroup.SectionFullWidthContent padded={false}>
+        <Grid templateColumns="max-content auto minmax(0, 1fr)" columnGap="4">
+          {rows.map(({ pocketNumber, pocketType, selectedValue, onChange: handleChange }) => (
+            <Grid
+              key={pocketNumber}
+              gridColumn="1 / -1"
+              templateColumns="subgrid"
+              alignItems="center"
+              px="4"
+              py="3"
+              _notLast={{ borderBottomWidth: '1px' }}
+            >
+              <HStack gap="2">
+                <PocketTypeIcon type={pocketType} />
+                <Text textStyle="sm">
+                  {t.project.editors.controls.pocketAssignments.pocket(pocketNumber)}
+                  <Text as="span" display="block" color="fg.muted" textStyle="xs">
+                    {pocketType === 'front-pocket'
+                      ? t.project.editors.controls.pocketAssignments.frontPocket
+                      : t.project.editors.controls.pocketAssignments.tPocket}
+                  </Text>
+                </Text>
+              </HStack>
+              <Flex align="center" justify="center" color="fg.muted">
+                <PiArrowRight />
+              </Flex>
+              <Select.Root
+                collection={collection}
+                value={selectedValue}
+                onValueChange={handleChange}
+                positioning={{ strategy: 'fixed' }}
+                size="xs"
+                width="full"
+                minW="0"
+              >
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText
+                      placeholder={t.project.editors.sections.components.pocketAssignments.openingMapping.label}
+                    />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Select.Positioner>
+                  <Select.Content>
+                    {collection.items.map((opening) => (
+                      <Select.Item key={opening.id} item={opening}>
+                        {opening.name}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Select.Root>
+            </Grid>
+          ))}
+        </Grid>
       </SectionGroup.SectionFullWidthContent>
     </SectionGroup.Section>
   )

@@ -59,50 +59,52 @@ export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, is
 
   return (
     <SectionGroup.Root>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.name.tooltip}>
-        {t.project.editors.sections.components.pocketOpening.name.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.name}>
-        <Input
-          size="xs"
-          value={editable.name}
-          aria-invalid={issues.name?.severity === 'error'}
-          onChange={(event) => onChange({ ...editable, name: event.currentTarget.value })}
-        />
-      </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.type.tooltip}>
-        {t.project.editors.sections.components.pocketOpening.type.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.type}>
-        <Select.Root
-          collection={collection}
-          value={selectedType}
-          onValueChange={handleTypeChange}
-          positioning={{ strategy: 'fixed' }}
-          size="xs"
-        >
-          <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Select.Positioner>
-            <Select.Content>
-              {collection.items.map((type) => (
-                <Select.Item key={type} item={type}>
-                  {t.project.editors.enums.components.pocketOpening[type]}
-                  <Select.ItemIndicator />
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Positioner>
-        </Select.Root>
-      </SectionGroup.SectionRowEditor>
-      <PocketOpeningShapeFields editable={editable} issues={issues} onChange={onChange} />
+      <SectionGroup.Section>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.name.tooltip}>
+          {t.project.editors.sections.components.pocketOpening.name.label}
+        </SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowEditor issue={issues.name}>
+          <Input
+            size="xs"
+            value={editable.name}
+            aria-invalid={issues.name?.severity === 'error'}
+            onChange={(event) => onChange({ ...editable, name: event.currentTarget.value })}
+          />
+        </SectionGroup.SectionRowEditor>
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.type.tooltip}>
+          {t.project.editors.sections.components.pocketOpening.type.label}
+        </SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowEditor issue={issues.type}>
+          <Select.Root
+            collection={collection}
+            value={selectedType}
+            onValueChange={handleTypeChange}
+            positioning={{ strategy: 'fixed' }}
+            size="xs"
+          >
+            <Select.HiddenSelect />
+            <Select.Control>
+              <Select.Trigger>
+                <Select.ValueText />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+            <Select.Positioner>
+              <Select.Content>
+                {collection.items.map((type) => (
+                  <Select.Item key={type} item={type}>
+                    {t.project.editors.enums.components.pocketOpening[type]}
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Positioner>
+          </Select.Root>
+        </SectionGroup.SectionRowEditor>
+        <PocketOpeningShapeFields editable={editable} issues={issues} onChange={onChange} />
+      </SectionGroup.Section>
     </SectionGroup.Root>
   )
 }

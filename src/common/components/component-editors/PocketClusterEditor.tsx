@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import { Badge, Tabs } from '@chakra-ui/react'
+import { Tabs } from '@chakra-ui/react'
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
@@ -40,10 +40,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
       <Tabs.List alignItems="center" pr="2">
         <Tabs.Trigger value="layout">{t.project.editors.tabs.components.layout}</Tabs.Trigger>
         <Tabs.Trigger value="pockets">{t.project.editors.tabs.components.pockets}</Tabs.Trigger>
-        <Tabs.Trigger value="pocket-openings">
-          {t.project.editors.tabs.components.pocketOpenings}
-          <Badge>{component.pocketCount}</Badge>
-        </Tabs.Trigger>
+        <Tabs.Trigger value="pocket-openings">{t.project.editors.tabs.components.pocketOpenings}</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="layout" display="flex" flex="1" minH="0" pt={0}>
         <SectionGroup.Root>
@@ -65,8 +62,8 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
           <CardsSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value="pocket-openings" display="flex" flex="1" minH="0" pt="3">
-        <SectionGroup.Root>
+      <Tabs.Content value="pocket-openings" display="flex" flex="1" minH="0" pt="0">
+        <SectionGroup.Root padded={false}>
           <PocketOpeningsEditor
             component={component}
             editable={editable}

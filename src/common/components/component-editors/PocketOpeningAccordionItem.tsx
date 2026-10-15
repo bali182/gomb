@@ -1,7 +1,7 @@
-import { Accordion, Badge, Box, Button, HStack, Text } from '@chakra-ui/react'
+import { Accordion, Box, Button, Text } from '@chakra-ui/react'
 import type BigNumber from 'bignumber.js'
 import { useMemo, type FC } from 'react'
-import { PiCaretDown } from 'react-icons/pi'
+import { PiCaretDown, PiTrash } from 'react-icons/pi'
 
 import { ZERO } from '../../constants/layout'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
@@ -13,7 +13,6 @@ import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { accessors } from '../../utils/accessors'
-import { isDefined } from '../../utils/isDefined'
 import { PocketOpeningPreview } from '../common/PocketOpeningPreview'
 import { PocketOpeningFields } from './sections/PocketOpeningFields'
 
@@ -60,7 +59,7 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
   return (
     <Accordion.Item value={editable.id}>
       <Box position="relative" bg="bg.muted">
-        <Accordion.ItemTrigger px="3" pr={isDefined(onDelete) ? '20' : '3'} py="3" borderRadius="0">
+        <Accordion.ItemTrigger px="3" pr="20" py="3" borderRadius="0">
           <Accordion.ItemIndicator>
             <PiCaretDown />
           </Accordion.ItemIndicator>
@@ -72,12 +71,9 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
             height={30}
           />
           <Box as="span" flex="1" minW="0">
-            <HStack as="span" gap="2" flexWrap="wrap">
-              <Text as="span" overflowWrap="anywhere">
-                {opening.name}
-              </Text>
-              {isDefault && <Badge>{t.project.editors.controls.pocketOpenings.default}</Badge>}
-            </HStack>
+            <Text as="span" overflowWrap="anywhere">
+              {opening.name}
+            </Text>
             <Text as="span" display="block" color="fg.muted" textStyle="xs" fontWeight="normal">
               {assignedPockets.length > 0
                 ? t.project.editors.controls.pocketOpenings.assignedPockets(assignedPockets)
@@ -85,19 +81,21 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
             </Text>
           </Box>
         </Accordion.ItemTrigger>
-        {isDefined(onDelete) && (
-          <Button
-            position="absolute"
-            right="2"
-            top="50%"
-            transform="translateY(-50%)"
-            zIndex="1"
-            size="xs"
-            onClick={onDelete}
-          >
-            {t.project.editors.actions.pocketOpenings.delete}
-          </Button>
-        )}
+        <Button
+          position="absolute"
+          right="2"
+          top="50%"
+          transform="translateY(-50%)"
+          zIndex="1"
+          size="xs"
+          colorPalette="red"
+          // variant={isDefault ? 'subtle' : 'surface'}
+          variant="ghost"
+          disabled={isDefault}
+          onClick={onDelete}
+        >
+          <PiTrash /> {t.project.editors.actions.pocketOpenings.delete}
+        </Button>
       </Box>
       <Accordion.ItemContent>
         <Accordion.ItemBody px="0" pt="3" pb="0">
