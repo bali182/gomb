@@ -127,7 +127,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   children: [],
 }
 
-export const defaultRecessedPocketTop: RecessedPocketOpeningSchema = {
+export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   type: 'recessed',
   outerInset: 15,
   innerInset: 30,

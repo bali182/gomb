@@ -7,13 +7,13 @@ import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type RecessedPocketTopFieldsProps = {
+type RecessedPocketOpeningFieldsProps = {
   editable: EditableSchema<RecessedPocketOpeningSchema>
   issues: ValidationIssuesSchema<RecessedPocketOpeningSchema>
   onChange: (updated: EditableSchema<RecessedPocketOpeningSchema>) => void
 }
 
-export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ editable, issues, onChange }) => {
+export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> = ({ editable, issues, onChange }) => {
   const { t } = useTranslation()
   const handleOuterInsetChange = useCallback(
     (outerInset: string): void => {
@@ -48,8 +48,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
 
   return (
     <>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.outerInset.tooltip}>
-        {t.project.editors.sections.components.pocketTop.outerInset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.outerInset.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.outerInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerInset}>
         <NumberInput
@@ -59,8 +59,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.innerInset.tooltip}>
-        {t.project.editors.sections.components.pocketTop.innerInset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.innerInset.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.innerInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerInset}>
         <NumberInput
@@ -70,14 +70,14 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.depth.tooltip}>
-        {t.project.editors.sections.components.pocketTop.depth.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.depth.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.depth.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.depth}>
         <NumberInput value={editable.depth} issue={issues.depth} onChange={handleDepthChange} unit="mm" />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.outerRadius.tooltip}>
-        {t.project.editors.sections.components.pocketTop.outerRadius.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.outerRadius.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.outerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerRadius}>
         <NumberInput
@@ -87,8 +87,8 @@ export const RecessedPocketTopFields: FC<RecessedPocketTopFieldsProps> = ({ edit
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.innerRadius.tooltip}>
-        {t.project.editors.sections.components.pocketTop.innerRadius.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.innerRadius.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.innerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerRadius}>
         <NumberInput

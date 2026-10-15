@@ -10,7 +10,7 @@ import { calculateFrontPocketPath } from './calculateFrontPocketPath'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
 import { calculatePocketCard } from './calculatePocketCard'
 import { calculateTPocketPath } from './calculateTPocketPath'
-import { getAdjustedPocketTop } from './getAdjustedPocketTop'
+import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 import { getMaximumOpeningCornerRadius } from './pocketUtils'
 
 export type PocketClusterGeometry = {
@@ -34,9 +34,9 @@ export const calculatePocketClusterGeometry = (
   const tPocketRects = initial(pocketRects)
   const openingCornerRadius =
     tPocketRects.length > 0 ? getMaximumOpeningCornerRadius(radius, pocketCluster.orientation) : ZERO
-  const pocketTopAccessor = accessors.pocketCluster(pocketCluster)
-  const adjustedFrontPocketTop = getAdjustedPocketTop(
-    pocketTopAccessor.pocketTop(pocketCluster.pocketCount),
+  const openingAccessor = accessors.pocketCluster(pocketCluster)
+  const adjustedFrontOpening = getAdjustedPocketOpening(
+    openingAccessor.opening(pocketCluster.pocketCount),
     topPocketRect,
     pocketCluster.orientation,
     openingCornerRadius,
@@ -45,7 +45,7 @@ export const calculatePocketClusterGeometry = (
     topPocketRect,
     topPocketRadius,
     pocketCluster.orientation,
-    adjustedFrontPocketTop,
+    adjustedFrontOpening,
   )
 
   return {
@@ -61,13 +61,13 @@ export const calculatePocketClusterGeometry = (
     },
     tPockets: tPocketRects.map((pocketRect, index): ComputedTPocketSchema => {
       const cornerRadius = index === 0 ? radius : ZERO_CORNER_RADIUS
-      const adjustedPocketTop = getAdjustedPocketTop(
-        pocketTopAccessor.pocketTop(index + 1),
+      const adjustedOpening = getAdjustedPocketOpening(
+        openingAccessor.opening(index + 1),
         topPocketRect,
         pocketCluster.orientation,
         openingCornerRadius,
       )
-      const path = calculateTPocketPath(pocketRect, pocketCluster, cornerRadius, adjustedPocketTop)
+      const path = calculateTPocketPath(pocketRect, pocketCluster, cornerRadius, adjustedOpening)
 
       return {
         type: 'computed-t-pocket',

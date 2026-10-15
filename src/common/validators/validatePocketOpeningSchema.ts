@@ -1,4 +1,4 @@
-import { defaultRecessedPocketTop } from '../defaultStates'
+import { defaultRecessedPocketOpening } from '../defaultStates'
 import type { HasIdentitySchema } from '../schemas/common'
 import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
@@ -8,14 +8,14 @@ import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
-export const validatePocketTopSchema = (
+export const validatePocketOpeningSchema = (
   input: EditableSchema<PocketOpeningSchema>,
   currentValue: PocketOpeningSchema,
-  pocketTops: readonly HasIdentitySchema[],
+  openings: readonly HasIdentitySchema[],
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<PocketOpeningSchema> => {
-  const ownResult = validatePocketTopOwnSchema(input, currentValue, context)
-  const nameResult = validateName(input.name, currentValue.name, currentValue.id, pocketTops, context)
+  const ownResult = validatePocketOpeningOwnSchema(input, currentValue, context)
+  const nameResult = validateName(input.name, currentValue.name, currentValue.id, openings, context)
   const issues: ValidationIssuesSchema<PocketOpeningSchema> = {
     ...ownResult.issues,
     id: undefined,
@@ -38,7 +38,7 @@ export const validatePocketTopSchema = (
   )
 }
 
-const validatePocketTopOwnSchema = (
+const validatePocketOpeningOwnSchema = (
   input: EditableSchema<PocketOpeningOwnSchema>,
   currentValue: PocketOpeningOwnSchema,
   context: BaseValidationContextSchema,
@@ -53,15 +53,15 @@ const validatePocketTopOwnSchema = (
     case 'straight':
       return createValidValidationResult<PocketOpeningOwnSchema>({ type: undefined }, { type: 'straight' })
     case 'recessed':
-      return validateRecessedPocketTopSchema(
+      return validateRecessedPocketOpeningSchema(
         input,
-        currentValue.type === 'recessed' ? currentValue : defaultRecessedPocketTop,
+        currentValue.type === 'recessed' ? currentValue : defaultRecessedPocketOpening,
         context,
       )
   }
 }
 
-const validateRecessedPocketTopSchema = (
+const validateRecessedPocketOpeningSchema = (
   input: EditableSchema<RecessedPocketOpeningSchema>,
   currentValue: RecessedPocketOpeningSchema,
   context: BaseValidationContextSchema,

@@ -7,7 +7,7 @@ import type { ComponentSchema, PocketClusterSchema } from '../../schemas/compone
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
-import { PocketTopsEditor } from './PocketTopsEditor'
+import { PocketOpeningsEditor } from './PocketOpeningsEditor'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
 import { CardsSection } from './sections/CardsSection'
@@ -67,7 +67,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
       </Tabs.Content>
       <Tabs.Content value="pocket-openings" display="flex" flex="1" minH="0" pt="3">
         <SectionGroup.Root>
-          <PocketTopsEditor
+          <PocketOpeningsEditor
             component={component}
             editable={editable}
             issues={issues}

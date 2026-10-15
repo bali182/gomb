@@ -1,8 +1,8 @@
 import type { PocketOrientationSchema, StraightPocketOpeningSchema } from '../schemas/components'
 import type { PathCommand, PathSchema, PointSchema, RectSchema } from '../schemas/geometry'
 
-export const calculateStraightPocketTopPath = (
-  _pocketTop: StraightPocketOpeningSchema,
+export const calculateStraightPocketOpeningPath = (
+  _opening: StraightPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
 ): PathSchema => {

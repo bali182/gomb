@@ -197,7 +197,7 @@ export const HU = {
           clone: 'Duplikálás',
           delete: 'Törlés',
         },
-        pocketTops: {
+        pocketOpenings: {
           add: 'Zsebnyílás hozzáadása',
           delete: 'Törlés',
         },
@@ -350,7 +350,7 @@ export const HU = {
               tooltip: 'A T alakú zseb oldalfalainak dőlését állítja be.',
             },
           },
-          pocketTop: {
+          pocketOpening: {
             title: 'Zsebnyílás formája',
             name: { label: 'Név', tooltip: 'A zsebnyílás azonosítására használt nevet állítja.' },
             type: { label: 'Forma', tooltip: 'Az ehhez a beállításhoz rendelt zsebek nyílásformáját állítja.' },
@@ -673,7 +673,7 @@ export const HU = {
           },
         },
         components: {
-          pocketTop: {
+          pocketOpening: {
             straight: 'Egyenes',
             recessed: 'Ívelt',
           },
@@ -715,7 +715,7 @@ export const HU = {
         },
       },
       controls: {
-        pocketTops: {
+        pocketOpenings: {
           default: 'Alapértelmezett',
           assignedPockets: (numbers: readonly number[]): string => `Zsebek: ${numbers.join(', ')}`,
           unassigned: 'Nincs hozzárendelt zseb',
@@ -819,7 +819,7 @@ export const HU = {
     rootPanel: 'Modul',
     panel: 'Panel',
     pocketCluster: 'Zsebcsoport',
-    pocketTop: 'Zsebnyílás',
+    pocketOpening: 'Zsebnyílás',
     componentBoundsStitchLine: 'Varrás',
     pocketClusterStitchLine: 'Zsebvarrás',
     hole: 'Lyuk',

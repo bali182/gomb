@@ -1,20 +1,20 @@
-import type { PocketOrientationSchema, PocketOpeningOwnSchema } from '../schemas/components'
+import type { PocketOpeningOwnSchema, PocketOrientationSchema } from '../schemas/components'
 import type { CornerRadiusSchema, PathSchema, RectSchema } from '../schemas/geometry'
-import { calculatePocketTopPath } from './calculatePocketTopPath'
+import { calculatePocketOpeningPath } from './calculatePocketOpeningPath'
 import { calculateRectPath } from './calculateRectPath'
 
 export const calculateFrontPocketPath = (
   rect: RectSchema,
   cornerRadius: CornerRadiusSchema,
   orientation: PocketOrientationSchema,
-  adjustedPocketTop: PocketOpeningOwnSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   const path = calculateRectPath(rect, cornerRadius)
-  if (adjustedPocketTop.type === 'straight') {
+  if (adjustedOpening.type === 'straight') {
     return path
   }
 
-  const opening = calculatePocketTopPath(adjustedPocketTop, rect, orientation).commands.filter(
+  const opening = calculatePocketOpeningPath(adjustedOpening, rect, orientation).commands.filter(
     (command, index, commands) => index > 0 && (index < commands.length - 1 || command.type !== 'lineTo'),
   )
   const endpoint = {

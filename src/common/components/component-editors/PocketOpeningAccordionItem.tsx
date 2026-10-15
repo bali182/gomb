@@ -6,7 +6,7 @@ import { PiCaretDown } from 'react-icons/pi'
 import { ZERO } from '../../constants/layout'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useTranslation } from '../../hooks/useTranslation'
-import { getAdjustedPocketTop } from '../../logic/getAdjustedPocketTop'
+import { getAdjustedPocketOpening } from '../../logic/getAdjustedPocketOpening'
 import { getMaximumOpeningCornerRadius } from '../../logic/pocketUtils'
 import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
@@ -14,21 +14,21 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
-import { PocketTopPreview } from '../common/PocketTopPreview'
-import { PocketTopFields } from './sections/PocketTopFields'
+import { PocketOpeningPreview } from '../common/PocketOpeningPreview'
+import { PocketOpeningFields } from './sections/PocketOpeningFields'
 
-type PocketTopAccordionItemProps = {
+type PocketOpeningAccordionItemProps = {
   pocketCluster: PocketClusterSchema
-  pocketTop: PocketOpeningSchema
+  opening: PocketOpeningSchema
   editable: EditableSchema<PocketOpeningSchema>
   issues: ValidationIssuesSchema<PocketOpeningSchema>
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
   onDelete?: () => void
 }
 
-export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
+export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = ({
   pocketCluster,
-  pocketTop,
+  opening,
   editable,
   issues,
   onChange,
@@ -38,7 +38,7 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
   const computed = useComputedComponent<ComputedPocketClusterSchema>(pocketCluster.id)
   const pocketRect = computed.frontPocket.boundingRect
   const orientation = pocketCluster.orientation
-  const isDefault = pocketTop.id === pocketCluster.defaultOpening.id
+  const isDefault = opening.id === pocketCluster.defaultOpening.id
 
   const openingCornerRadius = useMemo<BigNumber>(
     () => (computed.tPockets.length > 0 ? getMaximumOpeningCornerRadius(computed.cornerRadius, orientation) : ZERO),
@@ -46,15 +46,15 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
   )
 
   const assignedPockets = useMemo<number[]>(() => {
-    const pocketTopAccessor = accessors.pocketCluster(pocketCluster)
+    const openingAccessor = accessors.pocketCluster(pocketCluster)
     return Array.from({ length: pocketCluster.pocketCount }, (_, index) => index + 1).filter(
-      (number) => pocketTopAccessor.pocketTop(number).id === pocketTop.id,
+      (number) => openingAccessor.opening(number).id === opening.id,
     )
-  }, [pocketCluster, pocketTop.id])
+  }, [pocketCluster, opening.id])
 
-  const adjustedPocketTop = useMemo<PocketOpeningOwnSchema>(
-    () => getAdjustedPocketTop(pocketTop, pocketRect, orientation, openingCornerRadius),
-    [openingCornerRadius, orientation, pocketRect, pocketTop],
+  const adjustedOpening = useMemo<PocketOpeningOwnSchema>(
+    () => getAdjustedPocketOpening(opening, pocketRect, orientation, openingCornerRadius),
+    [openingCornerRadius, orientation, pocketRect, opening],
   )
 
   return (
@@ -64,8 +64,8 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
           <Accordion.ItemIndicator>
             <PiCaretDown />
           </Accordion.ItemIndicator>
-          <PocketTopPreview
-            adjustedPocketTop={adjustedPocketTop}
+          <PocketOpeningPreview
+            adjustedOpening={adjustedOpening}
             pocketRect={pocketRect}
             orientation={orientation}
             width={60}
@@ -74,14 +74,14 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
           <Box as="span" flex="1" minW="0">
             <HStack as="span" gap="2" flexWrap="wrap">
               <Text as="span" overflowWrap="anywhere">
-                {pocketTop.name}
+                {opening.name}
               </Text>
-              {isDefault && <Badge>{t.project.editors.controls.pocketTops.default}</Badge>}
+              {isDefault && <Badge>{t.project.editors.controls.pocketOpenings.default}</Badge>}
             </HStack>
             <Text as="span" display="block" color="fg.muted" textStyle="xs" fontWeight="normal">
               {assignedPockets.length > 0
-                ? t.project.editors.controls.pocketTops.assignedPockets(assignedPockets)
-                : t.project.editors.controls.pocketTops.unassigned}
+                ? t.project.editors.controls.pocketOpenings.assignedPockets(assignedPockets)
+                : t.project.editors.controls.pocketOpenings.unassigned}
             </Text>
           </Box>
         </Accordion.ItemTrigger>
@@ -95,13 +95,13 @@ export const PocketTopAccordionItem: FC<PocketTopAccordionItemProps> = ({
             size="xs"
             onClick={onDelete}
           >
-            {t.project.editors.actions.pocketTops.delete}
+            {t.project.editors.actions.pocketOpenings.delete}
           </Button>
         )}
       </Box>
       <Accordion.ItemContent>
         <Accordion.ItemBody px="0" pt="3" pb="0">
-          <PocketTopFields editable={editable} issues={issues} onChange={onChange} />
+          <PocketOpeningFields editable={editable} issues={issues} onChange={onChange} />
         </Accordion.ItemBody>
       </Accordion.ItemContent>
     </Accordion.Item>

@@ -38,38 +38,38 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
     () =>
       createListCollection<PocketOpeningSchema>({
         items: [component.defaultOpening, ...component.openings],
-        itemToString: (top) => top.name,
-        itemToValue: (top) => top.id,
+        itemToString: (opening) => opening.name,
+        itemToValue: (opening) => opening.id,
       }),
     [component.defaultOpening, component.openings],
   )
 
   const handleMappingChange = useCallback(
-    (pocketNumber: number, pocketTop: PocketOpeningSchema): void => {
-      const pocketTopMapping: Partial<Record<number, string>> = { ...editable.openingMapping }
-      if (pocketTop.id === component.defaultOpening.id) {
-        delete pocketTopMapping[pocketNumber]
+    (pocketNumber: number, opening: PocketOpeningSchema): void => {
+      const openingMapping: Partial<Record<number, string>> = { ...editable.openingMapping }
+      if (opening.id === component.defaultOpening.id) {
+        delete openingMapping[pocketNumber]
       } else {
-        pocketTopMapping[pocketNumber] = pocketTop.id
+        openingMapping[pocketNumber] = opening.id
       }
-      onChange({ ...editable, openingMapping: pocketTopMapping })
+      onChange({ ...editable, openingMapping })
     },
     [component.defaultOpening.id, editable, onChange],
   )
 
   const rows = useMemo<PocketAssignmentRow[]>(() => {
-    const pocketTopAccessor = accessors.pocketCluster(component)
+    const openingAccessor = accessors.pocketCluster(component)
 
     return Array.from({ length: component.pocketCount }, (_, index): PocketAssignmentRow => {
       const pocketNumber = index + 1
       return {
         pocketNumber,
         pocketType: pocketNumber === component.pocketCount ? 'front-pocket' : 't-pocket',
-        selectedValue: [pocketTopAccessor.pocketTop(pocketNumber).id],
+        selectedValue: [openingAccessor.opening(pocketNumber).id],
         onChange: (details: SelectValueChangeDetails<PocketOpeningSchema>): void => {
-          const top = details.items[0]
-          if (isDefined(top)) {
-            handleMappingChange(pocketNumber, top)
+          const opening = details.items[0]
+          if (isDefined(opening)) {
+            handleMappingChange(pocketNumber, opening)
           }
         },
       }
@@ -124,9 +124,9 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
                     </Select.Control>
                     <Select.Positioner>
                       <Select.Content>
-                        {collection.items.map((top) => (
-                          <Select.Item key={top.id} item={top}>
-                            {top.name}
+                        {collection.items.map((opening) => (
+                          <Select.Item key={opening.id} item={opening}>
+                            {opening.name}
                             <Select.ItemIndicator />
                           </Select.Item>
                         ))}

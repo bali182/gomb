@@ -3,35 +3,38 @@ import BigNumber from 'bignumber.js'
 import type { PocketOrientationSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathCommand, PathSchema, PointSchema, RectSchema } from '../schemas/geometry'
 
-type RecessedPocketTopVertex = {
+type RecessedPocketOpeningVertex = {
   point: PointSchema
   radius: BigNumber
 }
 
-export const calculateRecessedPocketTopPath = (
-  adjustedPocketTop: RecessedPocketOpeningSchema,
+export const calculateRecessedPocketOpeningPath = (
+  adjustedOpening: RecessedPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
 ): PathSchema => {
   const isVertical = orientation === 'up' || orientation === 'down'
   const width = isVertical ? pocketRect.width : pocketRect.height
-  const vertices = createRecessedVertices(adjustedPocketTop, width)
+  const vertices = createRecessedVertices(adjustedOpening, width)
   const commands = calculateRecessedCommands(vertices)
   const path = { commands: removeZeroLengthLines(commands) }
 
-  return transformPocketTopPath(path, pocketRect, orientation)
+  return transformPocketOpeningPath(path, pocketRect, orientation)
 }
 
-const createRecessedVertices = (pocketTop: RecessedPocketOpeningSchema, width: BigNumber): RecessedPocketTopVertex[] => {
+const createRecessedVertices = (
+  opening: RecessedPocketOpeningSchema,
+  width: BigNumber,
+): RecessedPocketOpeningVertex[] => {
   const zero = new BigNumber(0)
-  const vertices: RecessedPocketTopVertex[] = [{ point: { x: zero, y: zero }, radius: zero }]
+  const vertices: RecessedPocketOpeningVertex[] = [{ point: { x: zero, y: zero }, radius: zero }]
 
-  if (pocketTop.depth > 0 && pocketTop.outerInset < width.dividedBy(2).toNumber()) {
-    const outer = new BigNumber(pocketTop.outerInset)
-    const inner = new BigNumber(pocketTop.innerInset)
-    const depth = new BigNumber(pocketTop.depth)
-    const outerRadius = new BigNumber(pocketTop.outerRadius)
-    const innerRadius = new BigNumber(pocketTop.innerRadius)
+  if (opening.depth > 0 && opening.outerInset < width.dividedBy(2).toNumber()) {
+    const outer = new BigNumber(opening.outerInset)
+    const inner = new BigNumber(opening.innerInset)
+    const depth = new BigNumber(opening.depth)
+    const outerRadius = new BigNumber(opening.outerRadius)
+    const innerRadius = new BigNumber(opening.innerRadius)
     vertices.push(
       { point: { x: outer, y: zero }, radius: outerRadius },
       { point: { x: inner, y: depth }, radius: innerRadius },
@@ -47,7 +50,7 @@ const createRecessedVertices = (pocketTop: RecessedPocketOpeningSchema, width: B
   )
 }
 
-const calculateRecessedCommands = (vertices: RecessedPocketTopVertex[]): PathCommand[] => {
+const calculateRecessedCommands = (vertices: RecessedPocketOpeningVertex[]): PathCommand[] => {
   const commands: PathCommand[] = [{ type: 'moveTo', point: vertices[0].point }]
 
   for (let index = 1; index < vertices.length - 1; index += 1) {
@@ -60,7 +63,7 @@ const calculateRecessedCommands = (vertices: RecessedPocketTopVertex[]): PathCom
 
 const calculateCornerCommands = (
   previous: PointSchema,
-  vertex: RecessedPocketTopVertex,
+  vertex: RecessedPocketOpeningVertex,
   next: PointSchema,
 ): PathCommand[] => {
   const { point, radius } = vertex
@@ -120,7 +123,7 @@ const removeZeroLengthLines = (commands: PathCommand[]): PathCommand[] => {
   return result
 }
 
-const transformPocketTopPath = (
+const transformPocketOpeningPath = (
   path: PathSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
@@ -129,11 +132,11 @@ const transformPocketTopPath = (
     (command: PathCommand): PathCommand =>
       command.type === 'close'
         ? command
-        : { ...command, point: transformPocketTopPoint(command.point, pocketRect, orientation) },
+        : { ...command, point: transformPocketOpeningPoint(command.point, pocketRect, orientation) },
   ),
 })
 
-const transformPocketTopPoint = (
+const transformPocketOpeningPoint = (
   point: PointSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,

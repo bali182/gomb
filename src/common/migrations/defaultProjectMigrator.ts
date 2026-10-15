@@ -5,7 +5,7 @@ import {
   defaultPanel,
   defaultPocketCluster,
   defaultPocketClusterStitchLine,
-  defaultRecessedPocketTop,
+  defaultRecessedPocketOpening,
   defaultRootPanel,
   defaultStitchingSettings,
 } from '../defaultStates'
@@ -82,15 +82,15 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireValue(pocketCluster, 'type', 'pocket-cluster')
 
     const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
-    const defaultPocketTop = m.applyDefaults<PocketOpeningSchema>(
+    const defaultOpening = m.applyDefaults<PocketOpeningSchema>(
       m.requireObjectField<PocketClusterSchema, PocketOpeningSchema>(migrated, 'defaultOpening'),
       defaultPocketCluster.defaultOpening,
     )
-    m.requireValue(defaultPocketTop, 'id', 'own:default')
-    migrated.defaultOpening = migratePocketTop(defaultPocketTop)
+    m.requireValue(defaultOpening, 'id', 'own:default')
+    migrated.defaultOpening = migratePocketOpening(defaultOpening)
     migrated.openings = m
       .requireArray<PocketClusterSchema, PocketOpeningSchema>(migrated, 'openings')
-      .map(migratePocketTop)
+      .map(migratePocketOpening)
     const mapping = m.requireObjectField<PocketClusterSchema, PocketClusterSchema['openingMapping']>(
       migrated,
       'openingMapping',
@@ -132,24 +132,24 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   },
 }
 
-const migratePocketTop = (input: DeepPartial<PocketOpeningSchema>): DeepPartial<PocketOpeningSchema> => {
-  const pocketTop = m.requireObject<PocketOpeningSchema>(input)
-  const id = m.requireString(pocketTop, 'id')
-  const name = m.requireString(pocketTop, 'name')
-  m.requirePrimitiveUnion(pocketTop, 'type', ['straight', 'recessed'])
+const migratePocketOpening = (input: DeepPartial<PocketOpeningSchema>): DeepPartial<PocketOpeningSchema> => {
+  const opening = m.requireObject<PocketOpeningSchema>(input)
+  const id = m.requireString(opening, 'id')
+  const name = m.requireString(opening, 'name')
+  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed'])
 
-  const own = migratePocketTopOwn(pocketTop)
+  const own = migratePocketOpeningOwn(opening)
   return { ...own, id, name }
 }
 
-const migratePocketTopOwn = (pocketTop: DeepPartial<PocketOpeningOwnSchema>): DeepPartial<PocketOpeningOwnSchema> => {
-  switch (pocketTop.type) {
+const migratePocketOpeningOwn = (opening: DeepPartial<PocketOpeningOwnSchema>): DeepPartial<PocketOpeningOwnSchema> => {
+  switch (opening.type) {
     case 'straight':
       return { type: 'straight' }
     case 'recessed':
-      return m.applyDefaults<RecessedPocketOpeningSchema>(pocketTop, defaultRecessedPocketTop)
+      return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
     default:
-      throw new Error('Missing pocket top type')
+      throw new Error('Missing pocket opening type')
   }
 }
 

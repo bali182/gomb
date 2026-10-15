@@ -140,20 +140,20 @@ const computedSubProject = (computedSubProject: ComputedSubProjectSchema) => {
 }
 
 const pocketCluster = (cluster: PocketClusterSchema) => {
-  const optionalPocketTop = (id: string | undefined): PocketOpeningSchema | undefined => {
+  const optionalOpening = (id: string | undefined): PocketOpeningSchema | undefined => {
     if (!isDefined(id)) {
       return undefined
     }
     return id === cluster.defaultOpening.id
       ? cluster.defaultOpening
-      : cluster.openings.find((pocketTop) => pocketTop.id === id)
+      : cluster.openings.find((opening) => opening.id === id)
   }
-  const pocketTop = (pocketNumber: number): PocketOpeningSchema =>
-    optionalPocketTop(cluster.openingMapping[pocketNumber]) ?? cluster.defaultOpening
+  const opening = (pocketNumber: number): PocketOpeningSchema =>
+    optionalOpening(cluster.openingMapping[pocketNumber]) ?? cluster.defaultOpening
 
   return {
-    optional: { pocketTop: optionalPocketTop },
-    pocketTop,
+    optional: { opening: optionalOpening },
+    opening,
   }
 }
 

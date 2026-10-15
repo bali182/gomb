@@ -4,8 +4,8 @@ import type { AnchorSchema } from '../schemas/common'
 import type {
   LayoutOrientationSchema,
   PocketClusterSchema,
-  PocketOrientationSchema,
   PocketOpeningSchema,
+  PocketOrientationSchema,
 } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type {
@@ -20,7 +20,7 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
-import { validatePocketTopSchema } from './validatePocketTopSchema'
+import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 const pocketOrientationValues: Record<PocketOrientationSchema, boolean> = {
@@ -51,22 +51,22 @@ export const validatePocketClusterSchema = (
   currentValue: PocketClusterSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<PocketClusterSchema> => {
-  const pocketTops = [input.defaultOpening, ...input.openings]
-  const currentTopAccessor = accessors.pocketCluster(currentValue)
-  const defaultPocketTopResult = validatePocketTopSchema(
+  const openings = [input.defaultOpening, ...input.openings]
+  const currentOpeningAccessor = accessors.pocketCluster(currentValue)
+  const defaultOpeningResult = validatePocketOpeningSchema(
     input.defaultOpening,
     currentValue.defaultOpening,
-    pocketTops,
+    openings,
     context,
   )
-  const pocketTopResults = input.openings.map((pocketTop) => {
-    const previous = currentTopAccessor.optional.pocketTop(pocketTop.id)
+  const openingResults = input.openings.map((opening) => {
+    const previous = currentOpeningAccessor.optional.opening(opening.id)
     const fallback: PocketOpeningSchema = {
       ...defaultPocketCluster.defaultOpening,
-      id: pocketTop.id,
-      name: getUnusedName(currentValue.defaultOpening.name, new Set(pocketTops.map((top) => top.name))),
+      id: opening.id,
+      name: getUnusedName(currentValue.defaultOpening.name, new Set(openings.map((opening) => opening.name))),
     }
-    return validatePocketTopSchema(pocketTop, previous ?? fallback, pocketTops, context)
+    return validatePocketOpeningSchema(opening, previous ?? fallback, openings, context)
   })
   const nameResult = validateName(
     input.name,
@@ -132,8 +132,8 @@ export const validatePocketClusterSchema = (
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
   const issues: ValidationIssuesSchema<PocketClusterSchema> = {
-    defaultOpening: defaultPocketTopResult.issues,
-    openings: pocketTopResults.map((result) => result.issues),
+    defaultOpening: defaultOpeningResult.issues,
+    openings: openingResults.map((result) => result.issues),
     openingMapping: Object.fromEntries(Object.keys(input.openingMapping).map((key) => [key, undefined])),
     autoHeight: undefined,
     autoWidth: undefined,
@@ -169,8 +169,8 @@ export const validatePocketClusterSchema = (
   }
 
   const committedValue: PocketClusterSchema = {
-    defaultOpening: defaultPocketTopResult.committedValue,
-    openings: pocketTopResults.map((result) => result.committedValue),
+    defaultOpening: defaultOpeningResult.committedValue,
+    openings: openingResults.map((result) => result.committedValue),
     openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
@@ -209,8 +209,8 @@ export const validatePocketClusterSchema = (
   }
 
   if (
-    !defaultPocketTopResult.isValid ||
-    pocketTopResults.some((result) => !result.isValid) ||
+    !defaultOpeningResult.isValid ||
+    openingResults.some((result) => !result.isValid) ||
     !nameResult.isValid ||
     !colorResult.isValid ||
     !layoutOrientationResult.isValid ||
@@ -239,8 +239,8 @@ export const validatePocketClusterSchema = (
   }
 
   const value: PocketClusterSchema = {
-    defaultOpening: defaultPocketTopResult.value,
-    openings: pocketTopResults.map((result) => result.committedValue),
+    defaultOpening: defaultOpeningResult.value,
+    openings: openingResults.map((result) => result.committedValue),
     openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,

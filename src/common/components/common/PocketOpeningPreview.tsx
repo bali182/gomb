@@ -3,21 +3,21 @@ import { useMemo, type FC } from 'react'
 
 import { ZERO } from '../../constants/layout'
 import { usePath } from '../../hooks/usePath'
-import { calculatePocketTopPath } from '../../logic/calculatePocketTopPath'
-import type { PocketOrientationSchema, PocketOpeningOwnSchema } from '../../schemas/components'
+import { calculatePocketOpeningPath } from '../../logic/calculatePocketOpeningPath'
+import type { PocketOpeningOwnSchema, PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
 import { getViewBox } from '../../utils/getViewBox'
 
-type PocketTopPreviewProps = {
-  adjustedPocketTop: PocketOpeningOwnSchema
+type PocketOpeningPreviewProps = {
+  adjustedOpening: PocketOpeningOwnSchema
   pocketRect: RectSchema
   orientation: PocketOrientationSchema
   width: number
   height: number
 }
 
-export const PocketTopPreview: FC<PocketTopPreviewProps> = ({
-  adjustedPocketTop,
+export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
+  adjustedOpening,
   pocketRect,
   orientation,
   width,
@@ -34,26 +34,23 @@ export const PocketTopPreview: FC<PocketTopPreviewProps> = ({
   }, [orientation, pocketRect])
 
   const path = useMemo<PathSchema>(
-    () => calculatePocketTopPath(adjustedPocketTop, normalizedRect, 'up'),
-    [adjustedPocketTop, normalizedRect],
+    () => calculatePocketOpeningPath(adjustedOpening, normalizedRect, 'up'),
+    [adjustedOpening, normalizedRect],
   )
 
   const pathData = usePath(path)
 
   const depth = useMemo<BigNumber>(() => {
-    switch (adjustedPocketTop.type) {
+    switch (adjustedOpening.type) {
       case 'straight':
         return ZERO
       case 'recessed':
-        if (
-          adjustedPocketTop.depth > 0 &&
-          normalizedRect.width.dividedBy(2).isGreaterThan(adjustedPocketTop.outerInset)
-        ) {
-          return new BigNumber(adjustedPocketTop.depth)
+        if (adjustedOpening.depth > 0 && normalizedRect.width.dividedBy(2).isGreaterThan(adjustedOpening.outerInset)) {
+          return new BigNumber(adjustedOpening.depth)
         }
         return ZERO
     }
-  }, [adjustedPocketTop, normalizedRect.width])
+  }, [adjustedOpening, normalizedRect.width])
 
   const viewBox = useMemo<string>(() => {
     const bounds: RectSchema = { x: ZERO, y: ZERO, width: normalizedRect.width, height: depth }

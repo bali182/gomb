@@ -1,25 +1,29 @@
 import BigNumber from 'bignumber.js'
 
-import type { PocketOrientationSchema, PocketOpeningOwnSchema, RecessedPocketOpeningSchema } from '../schemas/components'
+import type {
+  PocketOpeningOwnSchema,
+  PocketOrientationSchema,
+  RecessedPocketOpeningSchema,
+} from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
 
-export const getAdjustedPocketTop = (
-  pocketTop: PocketOpeningOwnSchema,
+export const getAdjustedPocketOpening = (
+  opening: PocketOpeningOwnSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
   openingCornerRadius: BigNumber,
 ): PocketOpeningOwnSchema => {
-  switch (pocketTop.type) {
+  switch (opening.type) {
     case 'straight':
-      return pocketTop
+      return opening
     case 'recessed':
-      return getAdjustedRecessedPocketTop(pocketTop, pocketRect, orientation, openingCornerRadius)
+      return getAdjustedRecessedPocketOpening(opening, pocketRect, orientation, openingCornerRadius)
   }
 }
 
-const getAdjustedRecessedPocketTop = (
-  pocketTop: RecessedPocketOpeningSchema,
+const getAdjustedRecessedPocketOpening = (
+  opening: RecessedPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
   openingCornerRadius: BigNumber,
@@ -27,14 +31,14 @@ const getAdjustedRecessedPocketTop = (
   const isVertical = orientation === 'up' || orientation === 'down'
   const halfWidth = (isVertical ? pocketRect.width : pocketRect.height).dividedBy(2)
   const pocketDepth = isVertical ? pocketRect.height : pocketRect.width
-  const outerInset = clamp(pocketTop.outerInset, openingCornerRadius, halfWidth)
-  const innerInset = clamp(pocketTop.innerInset, BigNumber.maximum(openingCornerRadius, outerInset), halfWidth)
-  const depth = clamp(pocketTop.depth, 0, pocketDepth)
+  const outerInset = clamp(opening.outerInset, openingCornerRadius, halfWidth)
+  const innerInset = clamp(opening.innerInset, BigNumber.maximum(openingCornerRadius, outerInset), halfWidth)
+  const depth = clamp(opening.depth, 0, pocketDepth)
   const outerToInnerDistance = innerInset.minus(outerInset)
   const sideLength = outerToInnerDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.isZero() ? new BigNumber(0) : depth.dividedBy(sideLength.plus(outerToInnerDistance))
-  let outerRadius = BigNumber.maximum(pocketTop.outerRadius, 0)
-  let innerRadius = BigNumber.maximum(pocketTop.innerRadius, 0)
+  let outerRadius = BigNumber.maximum(opening.outerRadius, 0)
+  let innerRadius = BigNumber.maximum(opening.innerRadius, 0)
 
   if (angleFactor.isZero()) {
     outerRadius = new BigNumber(0)

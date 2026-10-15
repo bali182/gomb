@@ -3,7 +3,7 @@ import { useCallback, useState, type FC } from 'react'
 
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import { useTranslation } from '../../hooks/useTranslation'
-import { createPocketTop } from '../../operations/subProject/utils/createPocketTop'
+import { createPocketOpening } from '../../operations/subProject/utils/createPocketOpening'
 import type { HasIdentitySchema } from '../../schemas/common'
 import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
@@ -11,10 +11,10 @@ import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { getEditableSchema } from '../../utils/getEditableSchema'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
-import { PocketTopAccordionItem } from './PocketTopAccordionItem'
+import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
 
-type PocketTopsEditorProps = {
+type PocketOpeningsEditorProps = {
   component: PocketClusterSchema
   editable: EditableSchema<PocketClusterSchema>
   issues: ValidationIssuesSchema<PocketClusterSchema>
@@ -22,7 +22,7 @@ type PocketTopsEditorProps = {
   onChangeImmediately: (update: ImmediateUpdater<PocketClusterSchema>) => void
 }
 
-export const PocketTopsEditor: FC<PocketTopsEditorProps> = ({
+export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   component,
   editable,
   issues,
@@ -33,29 +33,29 @@ export const PocketTopsEditor: FC<PocketTopsEditorProps> = ({
   const [openIds, setOpenIds] = useState<string[]>([component.defaultOpening.id])
 
   const handleAdd = useCallback((): void => {
-    let addedTopId: string | undefined
+    let addedOpeningId: string | undefined
     onChangeImmediately(
       (
         current: EditableSchema<PocketClusterSchema>,
         currentValue: PocketClusterSchema,
       ): EditableSchema<PocketClusterSchema> => {
-        const pocketTops: readonly HasIdentitySchema[] = [currentValue.defaultOpening, ...currentValue.openings]
-        const pocketTop = createPocketTop(pocketTops, t.defaultNames.pocketTop)
-        addedTopId = pocketTop.id
-        return { ...current, openings: [...current.openings, getEditableSchema(pocketTop, { language })] }
+        const openings: readonly HasIdentitySchema[] = [currentValue.defaultOpening, ...currentValue.openings]
+        const opening = createPocketOpening(openings, t.defaultNames.pocketOpening)
+        addedOpeningId = opening.id
+        return { ...current, openings: [...current.openings, getEditableSchema(opening, { language })] }
       },
     )
-    if (isDefined(addedTopId)) {
-      setOpenIds([addedTopId])
+    if (isDefined(addedOpeningId)) {
+      setOpenIds([addedOpeningId])
     }
-  }, [language, onChangeImmediately, t.defaultNames.pocketTop])
+  }, [language, onChangeImmediately, t.defaultNames.pocketOpening])
 
   const handleDelete = useCallback(
     (id: string): void => {
       onChangeImmediately(
         (current: EditableSchema<PocketClusterSchema>): EditableSchema<PocketClusterSchema> => ({
           ...current,
-          openings: current.openings.filter((top) => top.id !== id),
+          openings: current.openings.filter((opening) => opening.id !== id),
         }),
       )
       setOpenIds((current) => current.filter((openId) => openId !== id))
@@ -63,16 +63,19 @@ export const PocketTopsEditor: FC<PocketTopsEditorProps> = ({
     [onChangeImmediately],
   )
 
-  const handleDefaultTopChange = useCallback(
-    (defaultPocketTop: EditableSchema<PocketOpeningSchema>): void => {
-      onChange({ ...editable, defaultOpening: defaultPocketTop })
+  const handleDefaultOpeningChange = useCallback(
+    (defaultOpening: EditableSchema<PocketOpeningSchema>): void => {
+      onChange({ ...editable, defaultOpening })
     },
     [editable, onChange],
   )
 
-  const handleTopChange = useCallback(
+  const handleOpeningChange = useCallback(
     (updated: EditableSchema<PocketOpeningSchema>): void => {
-      onChange({ ...editable, openings: editable.openings.map((top) => (top.id === updated.id ? updated : top)) })
+      onChange({
+        ...editable,
+        openings: editable.openings.map((opening) => (opening.id === updated.id ? updated : opening)),
+      })
     },
     [editable, onChange],
   )
@@ -86,34 +89,34 @@ export const PocketTopsEditor: FC<PocketTopsEditorProps> = ({
       <SectionGroup.SectionFullWidthContent>
         <Stack gap="3">
           <Accordion.Root multiple={false} collapsible value={openIds} onValueChange={handleAccordionChange} size="sm">
-            <PocketTopAccordionItem
+            <PocketOpeningAccordionItem
               pocketCluster={component}
-              pocketTop={component.defaultOpening}
+              opening={component.defaultOpening}
               editable={editable.defaultOpening}
               issues={issues.defaultOpening}
-              onChange={handleDefaultTopChange}
+              onChange={handleDefaultOpeningChange}
             />
-            {component.openings.map((top) => {
-              const editableIndex = editable.openings.findIndex((item) => item.id === top.id)
-              const editableTop = editable.openings[editableIndex]
-              if (!isDefined(editableTop)) {
+            {component.openings.map((opening) => {
+              const editableIndex = editable.openings.findIndex((item) => item.id === opening.id)
+              const editableOpening = editable.openings[editableIndex]
+              if (!isDefined(editableOpening)) {
                 return undefined
               }
               return (
-                <PocketTopAccordionItem
-                  key={top.id}
+                <PocketOpeningAccordionItem
+                  key={opening.id}
                   pocketCluster={component}
-                  pocketTop={top}
-                  editable={editableTop}
+                  opening={opening}
+                  editable={editableOpening}
                   issues={issues.openings[editableIndex]}
-                  onChange={handleTopChange}
-                  onDelete={() => handleDelete(top.id)}
+                  onChange={handleOpeningChange}
+                  onDelete={() => handleDelete(opening.id)}
                 />
               )
             })}
           </Accordion.Root>
           <Button size="xs" variant="outline" onClick={handleAdd}>
-            {t.project.editors.actions.pocketTops.add}
+            {t.project.editors.actions.pocketOpenings.add}
           </Button>
         </Stack>
       </SectionGroup.SectionFullWidthContent>

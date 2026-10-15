@@ -249,8 +249,8 @@ export const EN = {
           clone: 'Clone',
           delete: 'Delete',
         },
-        pocketTops: {
-          add: 'Add pocket top',
+        pocketOpenings: {
+          add: 'Add pocket opening',
           delete: 'Delete',
         },
         stitchLines: {
@@ -404,10 +404,10 @@ export const EN = {
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
           } satisfies SectionTranslationSchema<PocketsSchema>,
-          pocketTop: {
+          pocketOpening: {
             title: 'Pocket opening shape',
-            name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket top.' },
-            type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this top.' },
+            name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket opening.' },
+            type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this opening.' },
             outerInset: {
               label: 'Outer inset',
               tooltip: 'Distance from either opening edge to the outer corner, in mm.',
@@ -742,7 +742,7 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
-          pocketTop: {
+          pocketOpening: {
             straight: 'Straight',
             recessed: 'Recessed',
           } satisfies EnumTranslationSchema<PocketOpeningOwnSchema['type']>,
@@ -784,7 +784,7 @@ export const EN = {
         },
       },
       controls: {
-        pocketTops: {
+        pocketOpenings: {
           default: 'Default',
           assignedPockets: (numbers: readonly number[]): string => `Pockets: ${numbers.join(', ')}`,
           unassigned: 'No pockets assigned',
@@ -888,7 +888,7 @@ export const EN = {
     rootPanel: 'Module',
     panel: 'Panel',
     pocketCluster: 'Pocket cluster',
-    pocketTop: 'Pocket top',
+    pocketOpening: 'Pocket opening',
     componentBoundsStitchLine: 'Stitching',
     pocketClusterStitchLine: 'Pocket stitching',
     hole: 'Hole',

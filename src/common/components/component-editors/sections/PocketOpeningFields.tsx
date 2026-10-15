@@ -7,30 +7,34 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 
-import { defaultRecessedPocketTop } from '../../../defaultStates'
+import { defaultRecessedPocketOpening } from '../../../defaultStates'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasIdentitySchema } from '../../../schemas/common'
-import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../../../schemas/components'
+import type {
+  PocketOpeningOwnSchema,
+  PocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+} from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { getEditableSchema } from '../../../utils/getEditableSchema'
 import { SectionGroup } from '../../common/SectionGroup'
-import { RecessedPocketTopFields } from './RecessedPocketTopFields'
+import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 
-type PocketTopFieldsProps = {
+type PocketOpeningFieldsProps = {
   editable: EditableSchema<PocketOpeningSchema>
   issues: ValidationIssuesSchema<PocketOpeningSchema>
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 
-export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, onChange }) => {
+export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, issues, onChange }) => {
   const { t, language } = useTranslation()
 
   const collection = useMemo<ListCollection<PocketOpeningOwnSchema['type']>>(
     () =>
       createListCollection<PocketOpeningOwnSchema['type']>({
         items: ['straight', 'recessed'],
-        itemToString: (type) => t.project.editors.enums.components.pocketTop[type],
+        itemToString: (type) => t.project.editors.enums.components.pocketOpening[type],
         itemToValue: (type) => type,
       }),
     [t],
@@ -46,7 +50,7 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
           onChange({ ...identity, type: 'straight' })
           break
         case 'recessed':
-          onChange({ ...getEditableSchema(defaultRecessedPocketTop, { language }), ...identity })
+          onChange({ ...getEditableSchema(defaultRecessedPocketOpening, { language }), ...identity })
           break
       }
     },
@@ -55,8 +59,8 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
 
   return (
     <SectionGroup.Root>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.name.tooltip}>
-        {t.project.editors.sections.components.pocketTop.name.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.name.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.name.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.name}>
         <Input
@@ -66,8 +70,8 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
           onChange={(event) => onChange({ ...editable, name: event.currentTarget.value })}
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketTop.type.tooltip}>
-        {t.project.editors.sections.components.pocketTop.type.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.type.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.type.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.type}>
         <Select.Root
@@ -90,7 +94,7 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
             <Select.Content>
               {collection.items.map((type) => (
                 <Select.Item key={type} item={type}>
-                  {t.project.editors.enums.components.pocketTop[type]}
+                  {t.project.editors.enums.components.pocketOpening[type]}
                   <Select.ItemIndicator />
                 </Select.Item>
               ))}
@@ -98,18 +102,18 @@ export const PocketTopFields: FC<PocketTopFieldsProps> = ({ editable, issues, on
           </Select.Positioner>
         </Select.Root>
       </SectionGroup.SectionRowEditor>
-      <PocketTopShapeFields editable={editable} issues={issues} onChange={onChange} />
+      <PocketOpeningShapeFields editable={editable} issues={issues} onChange={onChange} />
     </SectionGroup.Root>
   )
 }
 
-const PocketTopShapeFields: FC<PocketTopFieldsProps> = ({ editable, issues, onChange }) => {
+const PocketOpeningShapeFields: FC<PocketOpeningFieldsProps> = ({ editable, issues, onChange }) => {
   switch (editable.type) {
     case 'straight':
       return undefined
     case 'recessed':
       return (
-        <RecessedPocketTopFields
+        <RecessedPocketOpeningFields
           editable={editable}
           issues={issues as ValidationIssuesSchema<RecessedPocketOpeningSchema>}
           onChange={(updated: EditableSchema<RecessedPocketOpeningSchema>): void =>
