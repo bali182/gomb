@@ -818,7 +818,6 @@ export const HU = {
     rootPanel: 'Modul',
     panel: 'Panel',
     pocketCluster: 'Zsebcsoport',
-    pocketOpening: 'Zsebnyílás',
     componentBoundsStitchLine: 'Varrás',
     pocketClusterStitchLine: 'Zsebvarrás',
     hole: 'Lyuk',

@@ -132,7 +132,7 @@ export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   outerInset: 15,
   innerInset: 30,
   depth: 10,
-  outerRadius: 2,
+  outerRadius: 10,
   innerRadius: 10,
 }
 

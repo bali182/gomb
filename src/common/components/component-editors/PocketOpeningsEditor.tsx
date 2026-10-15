@@ -1,12 +1,13 @@
-import { Accordion, Button, Stack, type AccordionValueChangeDetails } from '@chakra-ui/react'
+import { Accordion, Button, Menu, Portal, Stack, type AccordionValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useState, type FC } from 'react'
 
 import { PiPlusCircle } from 'react-icons/pi'
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import { useTranslation } from '../../hooks/useTranslation'
 import { createPocketOpening } from '../../operations/subProject/utils/createPocketOpening'
+import { portalRef } from '../../portalRef'
 import type { HasIdentitySchema } from '../../schemas/common'
-import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { getEditableSchema } from '../../utils/getEditableSchema'
@@ -14,6 +15,8 @@ import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
+
+const openingTypes: PocketOpeningOwnSchema['type'][] = ['straight', 'recessed']
 
 type PocketOpeningsEditorProps = {
   component: PocketClusterSchema
@@ -33,18 +36,21 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   const { t, language } = useTranslation()
   const [openIds, setOpenIds] = useState<string[]>([])
 
-  const handleAdd = useCallback((): void => {
-    onChangeImmediately(
-      (
-        current: EditableSchema<PocketClusterSchema>,
-        currentValue: PocketClusterSchema,
-      ): EditableSchema<PocketClusterSchema> => {
-        const openings: readonly HasIdentitySchema[] = [currentValue.defaultOpening, ...currentValue.openings]
-        const opening = createPocketOpening(openings, t.defaultNames.pocketOpening)
-        return { ...current, openings: [...current.openings, getEditableSchema(opening, { language })] }
-      },
-    )
-  }, [language, onChangeImmediately, t.defaultNames.pocketOpening])
+  const handleAdd = useCallback(
+    (type: PocketOpeningOwnSchema['type']): void => {
+      onChangeImmediately(
+        (
+          current: EditableSchema<PocketClusterSchema>,
+          currentValue: PocketClusterSchema,
+        ): EditableSchema<PocketClusterSchema> => {
+          const openings: readonly HasIdentitySchema[] = [currentValue.defaultOpening, ...currentValue.openings]
+          const opening = createPocketOpening(type, openings, t.project.editors.enums.components.pocketOpening[type])
+          return { ...current, openings: [...current.openings, getEditableSchema(opening, { language })] }
+        },
+      )
+    },
+    [language, onChangeImmediately, t],
+  )
 
   const handleDelete = useCallback(
     (id: string): void => {
@@ -111,9 +117,24 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
               )
             })}
           </Accordion.Root>
-          <Button size="xs" variant="outline" onClick={handleAdd} mx="3.5">
-            <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
-          </Button>
+          <Menu.Root>
+            <Menu.Trigger asChild>
+              <Button size="xs" variant="outline" mx="3.5">
+                <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
+              </Button>
+            </Menu.Trigger>
+            <Portal container={portalRef}>
+              <Menu.Positioner>
+                <Menu.Content>
+                  {openingTypes.map((type) => (
+                    <Menu.Item key={type} value={type} onSelect={() => handleAdd(type)}>
+                      <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
+                    </Menu.Item>
+                  ))}
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
         </Stack>
       </SectionGroup.SectionFullWidthContent>
       <PocketAssignmentsSection component={component} editable={editable} onChange={onChange} />

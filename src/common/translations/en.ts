@@ -887,7 +887,6 @@ export const EN = {
     rootPanel: 'Module',
     panel: 'Panel',
     pocketCluster: 'Pocket cluster',
-    pocketOpening: 'Pocket opening',
     componentBoundsStitchLine: 'Stitching',
     pocketClusterStitchLine: 'Pocket stitching',
     hole: 'Hole',
