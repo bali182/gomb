@@ -36,6 +36,12 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   const { t, language } = useTranslation()
   const [openIds, setOpenIds] = useState<string[]>([])
 
+  const handleClose = useCallback((id: string): void => {
+    setOpenIds((current: string[]): string[] =>
+      current.includes(id) ? current.filter((openId) => openId !== id) : current,
+    )
+  }, [])
+
   const handleAdd = useCallback(
     (type: PocketOpeningOwnSchema['type']): void => {
       onChangeImmediately(
@@ -60,9 +66,9 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
           openings: current.openings.filter((opening) => opening.id !== id),
         }),
       )
-      setOpenIds((current) => current.filter((openId) => openId !== id))
+      handleClose(id)
     },
-    [onChangeImmediately],
+    [handleClose, onChangeImmediately],
   )
 
   const handleDefaultOpeningChange = useCallback(
@@ -97,6 +103,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
               editable={editable.defaultOpening}
               issues={issues.defaultOpening}
               onChange={handleDefaultOpeningChange}
+              onClose={handleClose}
             />
             {component.openings.map((opening) => {
               const editableIndex = editable.openings.findIndex((item) => item.id === opening.id)
@@ -112,12 +119,13 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
                   editable={editableOpening}
                   issues={issues.openings[editableIndex]}
                   onChange={handleOpeningChange}
+                  onClose={handleClose}
                   onDelete={() => handleDelete(opening.id)}
                 />
               )
             })}
           </Accordion.Root>
-          <Menu.Root>
+          <Menu.Root size="sm" positioning={{ sameWidth: true, placement: 'bottom-start' }}>
             <Menu.Trigger asChild>
               <Button size="xs" variant="outline" mx="3.5">
                 <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
@@ -125,7 +133,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
             </Menu.Trigger>
             <Portal container={portalRef}>
               <Menu.Positioner>
-                <Menu.Content>
+                <Menu.Content width="full">
                   {openingTypes.map((type) => (
                     <Menu.Item key={type} value={type} onSelect={() => handleAdd(type)}>
                       <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>

@@ -790,8 +790,7 @@ export const EN = {
         },
         pocketAssignments: {
           pocket: (number: number): string => `Pocket ${number}`,
-          tPocket: 'T pocket',
-          frontPocket: 'Front pocket',
+          tPocket: (number: number): string => `T-pocket ${number}`,
         },
         cardPicker: {
           noCard: 'None',

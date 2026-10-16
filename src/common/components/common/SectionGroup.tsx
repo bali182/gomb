@@ -1,12 +1,11 @@
-import { Box, Grid, Icon, Spacer, Text, chakra } from '@chakra-ui/react'
+import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
 import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
 
-import { PiInfo } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { isRecord } from '../../utils/isRecord'
-import { Tooltip } from './Tooltip'
+import { TooltipIcon } from './TooltipIcon'
 
 type SectionGroupRootProps = {
   children: ReactNode
@@ -100,11 +99,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
   return (
     <Text alignItems="center" alignSelf="center" color="fg.muted" display="flex" gap="1" pl="4" textStyle="sm">
       <span>{children}</span>
-      {isDefined(tooltip) && (
-        <Tooltip content={tooltip}>
-          <Icon cursor="pointer" as={PiInfo} size="sm" />
-        </Tooltip>
-      )}
+      {isDefined(tooltip) && <TooltipIcon content={tooltip} severity="info" />}
     </Text>
   )
 }

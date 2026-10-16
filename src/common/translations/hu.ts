@@ -721,8 +721,7 @@ export const HU = {
         },
         pocketAssignments: {
           pocket: (number: number): string => `${number}. zseb`,
-          tPocket: 'T-zseb',
-          frontPocket: 'Elülső zseb',
+          tPocket: (number: number): string => `${number}. T-zseb`,
         },
         cardPicker: {
           noCard: 'Nincs',

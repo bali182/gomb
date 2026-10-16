@@ -91,18 +91,15 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
               templateColumns="subgrid"
               alignItems="center"
               px="4"
-              py="3"
+              py="2"
               _notLast={{ borderBottomWidth: '1px' }}
             >
               <HStack gap="2">
                 <PocketTypeIcon type={pocketType} />
                 <Text textStyle="sm">
-                  {t.project.editors.controls.pocketAssignments.pocket(pocketNumber)}
-                  <Text as="span" display="block" color="fg.muted" textStyle="xs">
-                    {pocketType === 'front-pocket'
-                      ? t.project.editors.controls.pocketAssignments.frontPocket
-                      : t.project.editors.controls.pocketAssignments.tPocket}
-                  </Text>
+                  {pocketType === 'front-pocket'
+                    ? t.project.editors.controls.pocketAssignments.pocket(pocketNumber)
+                    : t.project.editors.controls.pocketAssignments.tPocket(pocketNumber)}
                 </Text>
               </HStack>
               <Flex align="center" justify="center" color="fg.muted">
@@ -112,7 +109,7 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
                 collection={collection}
                 value={selectedValue}
                 onValueChange={handleChange}
-                positioning={{ strategy: 'fixed' }}
+                positioning={{ strategy: 'fixed', sameWidth: true }}
                 size="xs"
                 width="full"
                 minW="0"
@@ -129,7 +126,7 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
                   </Select.IndicatorGroup>
                 </Select.Control>
                 <Select.Positioner>
-                  <Select.Content>
+                  <Select.Content width="full">
                     {collection.items.map((opening) => (
                       <Select.Item key={opening.id} item={opening}>
                         {opening.name}
