@@ -882,6 +882,7 @@ export const EN = {
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
   defaultNames: {
+    defaultPocketOpening: 'Default',
     project: 'Project',
     rootPanel: 'Module',
     panel: 'Panel',

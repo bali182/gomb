@@ -1,26 +1,7 @@
-import { LanguageSchema } from '../schemas/settings'
-import { EN } from '../translations/en'
-import { HU } from '../translations/hu'
-import { TranslationSchema } from '../translations/translationSchema'
+import { getTranslation, type TranslationResult } from '../translations/getTranslation'
 import { useGlobalSettings } from './useGlobalSettings'
 
-export type UseTranslationResult = {
-  language: LanguageSchema
-  t: TranslationSchema
-}
-
-const languages: Record<LanguageSchema, UseTranslationResult> = {
-  'en-GB': {
-    language: 'en-GB',
-    t: EN,
-  },
-  'hu-HU': {
-    language: 'hu-HU',
-    t: HU,
-  },
-}
-
-export const useTranslation = (): UseTranslationResult => {
+export const useTranslation = (): TranslationResult => {
   const { settings } = useGlobalSettings()
-  return languages[settings.app.language]
+  return getTranslation(settings.app.language)
 }

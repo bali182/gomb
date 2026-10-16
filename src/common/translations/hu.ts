@@ -813,6 +813,7 @@ export const HU = {
     },
   },
   defaultNames: {
+    defaultPocketOpening: 'Alapértelmezett',
     project: 'Projekt',
     rootPanel: 'Modul',
     panel: 'Panel',

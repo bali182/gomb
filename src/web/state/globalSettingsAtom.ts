@@ -7,11 +7,11 @@ import { getSystemTheme } from '../../common/utils/getSystemTheme'
 import { getWebDefaultLanguage } from '../../common/utils/getWebDefaultLanguage'
 import { readGlobalSettingsFromStorage, saveGlobalSettingsToStorage } from './storage'
 
-const globalSettingsStorageAtom = atom<GlobalSettingsSchema>(
-  readGlobalSettingsFromStorage(
-    createDefaultGlobalSettings({ language: getWebDefaultLanguage(), theme: getSystemTheme() }),
-  ),
+export const initialGlobalSettings: GlobalSettingsSchema = readGlobalSettingsFromStorage(
+  createDefaultGlobalSettings({ language: getWebDefaultLanguage(), theme: getSystemTheme() }),
 )
+
+const globalSettingsStorageAtom = atom<GlobalSettingsSchema>(initialGlobalSettings)
 
 export const globalSettingsAtom = atom(
   (get): GlobalSettingsSchema => get(globalSettingsStorageAtom),

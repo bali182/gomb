@@ -2,6 +2,7 @@ import typia from 'typia'
 
 import { migrateGlobalSettings } from '../../common/migrations/migrateGlobalSettings'
 import { migrateProject } from '../../common/migrations/migrateProject'
+import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { GlobalSettingsSchema } from '../../common/schemas/settings'
 
@@ -17,12 +18,12 @@ export const saveGlobalSettingsToStorage = (settings: GlobalSettingsSchema): voi
   safeWriteStorage('global-settings', settings)
 }
 
-export const readProjectsFromStorage = (): ProjectSchema[] => {
+export const readProjectsFromStorage = (context: ProjectMigrationContextSchema): ProjectSchema[] => {
   return safeReadStorage<ProjectSchema[]>('projects', [], (raw) => {
     if (!Array.isArray(raw)) {
       throw new Error('Expected projects array')
     }
-    return typia.assert<ProjectSchema[]>(raw.map(migrateProject))
+    return typia.assert<ProjectSchema[]>(raw.map((project) => migrateProject(project, context)))
   })
 }
 

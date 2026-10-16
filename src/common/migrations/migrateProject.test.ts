@@ -2,13 +2,16 @@ import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 
 import { VERSION } from '../../version'
-import type { DeepPartial } from '../schemas/migration'
+import type { DeepPartial, ProjectMigrationContextSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
 import { d } from '../testData'
+import { EN } from '../translations/en'
 import { createProject } from '../utils/createProject'
 import { createSubProject } from '../utils/createSubProject'
 import { isDefined } from '../utils/isDefined'
 import { migrateProject } from './migrateProject'
+
+const context: ProjectMigrationContextSchema = { t: EN }
 
 const createProjectWithSubProject = (): ProjectSchema => {
   const project = createProject('Project')
@@ -34,7 +37,7 @@ describe('migrateProject', () => {
     delete legacyProject.colorSettings?.threadColor
     delete root.autoLayoutGap
 
-    const migratedProject = migrateProject(legacyProject)
+    const migratedProject = migrateProject(legacyProject, context)
 
     expect(migratedProject.version).toBe(VERSION)
     expect(migratedProject.colorSettings?.threadColor).toBe(project.colorSettings.threadColor)
@@ -47,11 +50,11 @@ describe('migrateProject', () => {
 
     delete legacyProject.version
 
-    expect(migrateProject(legacyProject)).toEqual(migrateProject(legacyProject))
+    expect(migrateProject(legacyProject, context)).toEqual(migrateProject(legacyProject, context))
   })
 
   it('does not create a project from an empty object', () => {
-    expect(() => migrateProject({})).toThrow()
+    expect(() => migrateProject({}, context)).toThrow()
   })
 
   it('does not migrate a component with a missing type', () => {
@@ -66,7 +69,7 @@ describe('migrateProject', () => {
     delete legacyProject.version
     delete root.type
 
-    expect(() => migrateProject(legacyProject)).toThrow()
+    expect(() => migrateProject(legacyProject, context)).toThrow()
   })
 
   it('does not migrate a component bounds stitch line with an invalid target type', () => {
@@ -84,7 +87,7 @@ describe('migrateProject', () => {
 
     delete legacyProject.version
 
-    expect(() => migrateProject(legacyProject)).toThrow()
+    expect(() => migrateProject(legacyProject, context)).toThrow()
   })
 
   it('migrates an older project version to the current version', () => {
@@ -94,13 +97,13 @@ describe('migrateProject', () => {
       version: '0.0.6',
     }
 
-    expect(migrateProject(legacyProject).version).toBe(VERSION)
+    expect(migrateProject(legacyProject, context).version).toBe(VERSION)
   })
 
   it('preserves project values with the current version', () => {
     const project = createProjectWithSubProject()
 
-    expect(migrateProject(project)).toEqual(project)
+    expect(migrateProject(project, context)).toEqual(project)
   })
 
   it('adds missing card offsets with the current version while preserving existing values', () => {
@@ -121,7 +124,7 @@ describe('migrateProject', () => {
     delete incompletePocket.cardCrossAxisOffset
     delete incompletePocket.cardOpeningOffset
 
-    const migratedProject = migrateProject(input)
+    const migratedProject = migrateProject(input, context)
 
     expect(migratedProject).toEqual(project)
     expect(typia.is<ProjectSchema>(migratedProject)).toBe(true)
@@ -135,6 +138,6 @@ describe('migrateProject', () => {
       version: `${Number(major) + 1}.0.0`,
     }
 
-    expect(migrateProject(newerProject).version).toBe(VERSION)
+    expect(migrateProject(newerProject, context).version).toBe(VERSION)
   })
 })

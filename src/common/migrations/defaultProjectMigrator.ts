@@ -75,16 +75,23 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
 
     return m.applyDefaults<PanelSchema>(panel, defaultPanel)
   },
-  pocketCluster: (input) => {
+  pocketCluster: (input, { t }) => {
     const pocketCluster = m.requireObject<PocketClusterSchema>(input)
     m.requireString(pocketCluster, 'id')
     m.requireString(pocketCluster, 'name')
     m.requireValue(pocketCluster, 'type', 'pocket-cluster')
 
-    const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, defaultPocketCluster)
+    const defaultOpeningDefaults: PocketOpeningSchema = {
+      ...defaultPocketCluster.defaultOpening,
+      name: t.defaultNames.defaultPocketOpening,
+    }
+    const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, {
+      ...defaultPocketCluster,
+      defaultOpening: defaultOpeningDefaults,
+    })
     const defaultOpening = m.applyDefaults<PocketOpeningSchema>(
       m.requireObjectField<PocketClusterSchema, PocketOpeningSchema>(migrated, 'defaultOpening'),
-      defaultPocketCluster.defaultOpening,
+      defaultOpeningDefaults,
     )
     m.requireValue(defaultOpening, 'id', 'own:default')
     migrated.defaultOpening = migratePocketOpening(defaultOpening)
