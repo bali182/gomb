@@ -351,7 +351,7 @@ export const HU = {
             },
           },
           pocketOpening: {
-            title: 'Zsebnyílás formája',
+            title: 'Zsebnyílások',
             name: { label: 'Név', tooltip: 'A zsebnyílás azonosítására használt nevet állítja.' },
             type: { label: 'Forma', tooltip: 'Az ehhez a beállításhoz rendelt zsebek nyílásformáját állítja.' },
             outerInset: {

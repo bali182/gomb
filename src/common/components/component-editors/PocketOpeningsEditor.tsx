@@ -1,4 +1,4 @@
-import { Accordion, Button, Menu, Portal, Stack, type AccordionValueChangeDetails } from '@chakra-ui/react'
+import { Accordion, Menu, Portal, type AccordionValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useState, type FC } from 'react'
 
 import { PiPlusCircle } from 'react-icons/pi'
@@ -13,6 +13,7 @@ import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { getEditableSchema } from '../../utils/getEditableSchema'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
+import { SectionHeaderButton } from '../common/SectionHeaderButton'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
 
@@ -94,9 +95,40 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
 
   return (
     <>
-      <SectionGroup.SectionFullWidthContent padded={false}>
-        <Stack gap="3">
-          <Accordion.Root multiple={false} collapsible value={openIds} onValueChange={handleAccordionChange} size="sm">
+      <SectionGroup.Section spaced={false}>
+        <SectionGroup.SectionHeader
+          rightAddon={
+            <Menu.Root size="sm" positioning={{ sameWidth: false, placement: 'bottom-end' }}>
+              <Menu.Trigger asChild>
+                <SectionHeaderButton>
+                  <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
+                </SectionHeaderButton>
+              </Menu.Trigger>
+              <Portal container={portalRef}>
+                <Menu.Positioner>
+                  <Menu.Content width="max-content">
+                    {openingTypes.map((type) => (
+                      <Menu.Item key={type} value={type} whiteSpace="nowrap" onSelect={() => handleAdd(type)}>
+                        <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
+          }
+        >
+          {t.project.editors.sections.components.pocketOpening.title}
+        </SectionGroup.SectionHeader>
+        <SectionGroup.SectionFullWidthContent padded={false}>
+          <Accordion.Root
+            multiple={false}
+            collapsible
+            value={openIds}
+            onValueChange={handleAccordionChange}
+            size="sm"
+            borderTopWidth="1px"
+          >
             <PocketOpeningAccordionItem
               pocketCluster={component}
               opening={component.defaultOpening}
@@ -125,26 +157,8 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
               )
             })}
           </Accordion.Root>
-          <Menu.Root size="sm" positioning={{ sameWidth: true, placement: 'bottom-start' }}>
-            <Menu.Trigger asChild>
-              <Button size="xs" variant="outline" mx="3.5">
-                <PiPlusCircle /> {t.project.editors.actions.pocketOpenings.add}
-              </Button>
-            </Menu.Trigger>
-            <Portal container={portalRef}>
-              <Menu.Positioner>
-                <Menu.Content width="full">
-                  {openingTypes.map((type) => (
-                    <Menu.Item key={type} value={type} onSelect={() => handleAdd(type)}>
-                      <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
-                    </Menu.Item>
-                  ))}
-                </Menu.Content>
-              </Menu.Positioner>
-            </Portal>
-          </Menu.Root>
-        </Stack>
-      </SectionGroup.SectionFullWidthContent>
+        </SectionGroup.SectionFullWidthContent>
+      </SectionGroup.Section>
       <PocketAssignmentsSection component={component} editable={editable} onChange={onChange} />
     </>
   )

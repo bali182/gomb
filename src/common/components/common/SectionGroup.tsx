@@ -10,6 +10,7 @@ import { TooltipIcon } from './TooltipIcon'
 type SectionGroupRootProps = {
   children: ReactNode
   padded?: boolean
+  spaced?: boolean
 }
 
 type SectionGroupSectionProps = {
@@ -49,7 +50,7 @@ const severityPriorities: Record<SeveritySchema, number> = {
   warning: 2,
 }
 
-const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true }) => {
+const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true, spaced = true }) => {
   return (
     <Grid
       flex="1"
@@ -57,7 +58,7 @@ const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true }
       minH="0"
       overflowY="auto"
       pb={padded ? '3' : '0'}
-      rowGap="3"
+      rowGap={spaced ? '3' : '0'}
     >
       {children}
     </Grid>

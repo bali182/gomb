@@ -405,7 +405,7 @@ export const EN = {
             },
           } satisfies SectionTranslationSchema<PocketsSchema>,
           pocketOpening: {
-            title: 'Pocket opening shape',
+            title: 'Pocket openings',
             name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket opening.' },
             type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this opening.' },
             outerInset: {

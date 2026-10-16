@@ -63,7 +63,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value="pocket-openings" display="flex" flex="1" minH="0" pt="0">
-        <SectionGroup.Root padded={false}>
+        <SectionGroup.Root padded={false} spaced={false}>
           <PocketOpeningsEditor
             component={component}
             editable={editable}

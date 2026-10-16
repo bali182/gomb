@@ -1,6 +1,7 @@
-import { Button } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
+
+import { SectionHeaderButton } from './SectionHeaderButton'
 
 type SectionHeaderToggleProps = {
   value: boolean
@@ -24,17 +25,13 @@ export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
   }, [onChange, value])
 
   return (
-    <Button
+    <SectionHeaderButton
       onClick={handleClick}
-      size="2xs"
-      borderRadius="full"
-      height="5"
-      borderColor="border.emphasized"
       background={value ? 'bg.emphasized' : undefined}
       variant={value ? 'ghost' : 'subtle'}
     >
       {value ? <OnIcon /> : <OffIcon />}
       {value ? onLabel : offLabel}
-    </Button>
+    </SectionHeaderButton>
   )
 }
