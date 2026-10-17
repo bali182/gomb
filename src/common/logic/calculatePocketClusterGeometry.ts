@@ -2,12 +2,16 @@ import { ZERO, ZERO_CORNER_RADIUS } from '../constants/layout'
 import type { PocketClusterSchema } from '../schemas/components'
 import type { ComputedTPocketSchema, ComputedTopPocketSchema } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
+import { accessors } from '../utils/accessors'
 import { initial } from '../utils/initial'
+import { isDefined } from '../utils/isDefined'
 import { last } from '../utils/last'
+import { calculateFrontPocketPath } from './calculateFrontPocketPath'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
 import { calculatePocketCard } from './calculatePocketCard'
-import { calculateRectPath } from './calculateRectPath'
 import { calculateTPocketPath } from './calculateTPocketPath'
+import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
+import { getMaximumOpeningCornerRadius } from './pocketUtils'
 
 export type PocketClusterGeometry = {
   frontPocket: ComputedTopPocketSchema
@@ -22,12 +26,27 @@ export const calculatePocketClusterGeometry = (
   const pocketRects = calculatePocketBoundingBoxes(pocketCluster, rect)
   const topPocketRect = last(pocketRects)
 
-  if (!topPocketRect) {
+  if (!isDefined(topPocketRect)) {
     throw new Error('Pocket cluster must contain at least one pocket')
   }
 
   const topPocketRadius = calculateTopPocketRadius(pocketCluster, radius)
-  const frontPocketPath = calculateRectPath(topPocketRect, topPocketRadius)
+  const tPocketRects = initial(pocketRects)
+  const openingCornerRadius =
+    tPocketRects.length > 0 ? getMaximumOpeningCornerRadius(radius, pocketCluster.orientation) : ZERO
+  const openingAccessor = accessors.pocketCluster(pocketCluster)
+  const adjustedFrontOpening = getAdjustedPocketOpening(
+    openingAccessor.opening(pocketCluster.pocketCount),
+    topPocketRect,
+    pocketCluster.orientation,
+    openingCornerRadius,
+  )
+  const frontPocketPath = calculateFrontPocketPath(
+    topPocketRect,
+    topPocketRadius,
+    pocketCluster.orientation,
+    adjustedFrontOpening,
+  )
 
   return {
     frontPocket: {
@@ -40,9 +59,15 @@ export const calculatePocketClusterGeometry = (
       cornerRadius: topPocketRadius,
       card: calculatePocketCard(pocketCluster, topPocketRect),
     },
-    tPockets: initial(pocketRects).map((pocketRect, index): ComputedTPocketSchema => {
+    tPockets: tPocketRects.map((pocketRect, index): ComputedTPocketSchema => {
       const cornerRadius = index === 0 ? radius : ZERO_CORNER_RADIUS
-      const path = calculateTPocketPath(pocketRect, pocketCluster, cornerRadius)
+      const adjustedOpening = getAdjustedPocketOpening(
+        openingAccessor.opening(index + 1),
+        topPocketRect,
+        pocketCluster.orientation,
+        openingCornerRadius,
+      )
+      const path = calculateTPocketPath(pocketRect, pocketCluster, cornerRadius, adjustedOpening)
 
       return {
         type: 'computed-t-pocket',

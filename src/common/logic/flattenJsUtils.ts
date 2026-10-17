@@ -59,11 +59,25 @@ const getPathCommandsFromFace = (face: Flatten.Face): PathCommand[] => {
     return []
   }
 
-  return [
-    { type: 'moveTo', point: fromFlattenPoint(firstShape.start) },
+  const startPoint = fromFlattenPoint(firstShape.start)
+  const commands: PathCommand[] = [
+    { type: 'moveTo', point: startPoint },
     ...face.shapes.flatMap(getPathCommandsFromShape),
-    { type: 'close' },
   ]
+  const lastCommand = commands[commands.length - 1]
+
+  // Flatten considers endpoints equal within its tolerance, but our path processing uses exact equality.
+  // Reuse the start point when the final endpoint is equivalent so closing the contour does not add a tiny line.
+  if (
+    (lastCommand.type === 'lineTo' || lastCommand.type === 'arcTo') &&
+    Flatten.Utils.EQ(lastCommand.point.x.toNumber(), startPoint.x.toNumber()) &&
+    Flatten.Utils.EQ(lastCommand.point.y.toNumber(), startPoint.y.toNumber())
+  ) {
+    commands[commands.length - 1] = { ...lastCommand, point: startPoint }
+  }
+
+  commands.push({ type: 'close' })
+  return commands
 }
 
 const getPathCommandsFromShape = (shape: Flatten.Segment | Flatten.Arc): PathCommand[] => {

@@ -7,7 +7,7 @@ import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
 import { validateComponentSchema } from '../validators/validateComponentSchema'
 import { useComponent } from './useComponent'
-import { useEditableModel } from './useEditableModel'
+import { ImmediateUpdater, useEditableModel } from './useEditableModel'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
@@ -18,6 +18,7 @@ export type UseEditableComponentResult = {
   editableComponent: EditableSchema<ComponentSchema>
   validationIssues: ValidationIssuesSchema<ComponentSchema>
   setComponent: (component: EditableSchema<ComponentSchema>) => void
+  setComponentImmediately: (update: ImmediateUpdater<ComponentSchema>) => void
 }
 
 export const useEditableComponent = (componentId: string): UseEditableComponentResult => {
@@ -39,7 +40,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
     [updateComponent],
   )
 
-  const { editableValue, setValue, validationIssues } = useEditableModel({
+  const { editableValue, setValue, setValueImmediately, validationIssues } = useEditableModel({
     commit,
     context,
     validate: validateComponentSchema,
@@ -51,6 +52,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
     component,
     editableComponent: editableValue,
     setComponent: setValue,
+    setComponentImmediately: setValueImmediately,
     validationIssues,
   }
 }

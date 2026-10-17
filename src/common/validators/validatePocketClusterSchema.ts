@@ -1,5 +1,12 @@
+import { defaultPocketCluster } from '../defaultStates'
+import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
 import type { AnchorSchema } from '../schemas/common'
-import type { LayoutOrientationSchema, PocketClusterSchema, PocketOrientationSchema } from '../schemas/components'
+import type {
+  LayoutOrientationSchema,
+  PocketClusterSchema,
+  PocketOpeningSchema,
+  PocketOrientationSchema,
+} from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type {
   ComponentBasedValidationContextSchema,
@@ -7,11 +14,13 @@ import type {
   ValidationResultSchema,
 } from '../schemas/validation'
 import type { CardSchemaId } from '../schemas/valuables'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
+import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 const pocketOrientationValues: Record<PocketOrientationSchema, boolean> = {
@@ -42,6 +51,23 @@ export const validatePocketClusterSchema = (
   currentValue: PocketClusterSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<PocketClusterSchema> => {
+  const openings = [input.defaultOpening, ...input.openings]
+  const currentOpeningAccessor = accessors.pocketCluster(currentValue)
+  const defaultOpeningResult = validatePocketOpeningSchema(
+    input.defaultOpening,
+    currentValue.defaultOpening,
+    openings,
+    context,
+  )
+  const openingResults = input.openings.map((opening) => {
+    const previous = currentOpeningAccessor.optional.opening(opening.id)
+    const fallback: PocketOpeningSchema = {
+      ...defaultPocketCluster.defaultOpening,
+      id: opening.id,
+      name: getUnusedName(currentValue.defaultOpening.name, new Set(openings.map((opening) => opening.name))),
+    }
+    return validatePocketOpeningSchema(opening, previous ?? fallback, openings, context)
+  })
   const nameResult = validateName(
     input.name,
     currentValue.name,
@@ -106,6 +132,9 @@ export const validatePocketClusterSchema = (
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
   const issues: ValidationIssuesSchema<PocketClusterSchema> = {
+    defaultOpening: defaultOpeningResult.issues,
+    openings: openingResults.map((result) => result.issues),
+    openingMapping: Object.fromEntries(Object.keys(input.openingMapping).map((key) => [key, undefined])),
     autoHeight: undefined,
     autoWidth: undefined,
     offAxisAnchor: offAxisAnchorResult.issues,
@@ -140,6 +169,9 @@ export const validatePocketClusterSchema = (
   }
 
   const committedValue: PocketClusterSchema = {
+    defaultOpening: defaultOpeningResult.committedValue,
+    openings: openingResults.map((result) => result.committedValue),
+    openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
@@ -177,6 +209,8 @@ export const validatePocketClusterSchema = (
   }
 
   if (
+    !defaultOpeningResult.isValid ||
+    openingResults.some((result) => !result.isValid) ||
     !nameResult.isValid ||
     !colorResult.isValid ||
     !layoutOrientationResult.isValid ||
@@ -205,6 +239,9 @@ export const validatePocketClusterSchema = (
   }
 
   const value: PocketClusterSchema = {
+    defaultOpening: defaultOpeningResult.value,
+    openings: openingResults.map((result) => result.committedValue),
+    openingMapping: input.openingMapping,
     autoHeight: input.autoHeight,
     autoWidth: input.autoWidth,
     bottomLeftRadius: bottomLeftRadiusResult.value,

@@ -2,10 +2,16 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { isDefined } from '../utils/isDefined'
 
-export const useThrottledCallback = <T extends unknown[]>(
-  callback: (...args: T) => void,
+export type UseThrottledCallbackResult<T extends unknown[], R> = {
+  call: (...args: T) => R | undefined
+  flush: () => R | undefined
+  cancel: () => void
+}
+
+export const useThrottledCallback = <T extends unknown[], R>(
+  callback: (...args: T) => R,
   throttle: number,
-): ((...args: T) => void) => {
+): UseThrottledCallbackResult<T, R> => {
   const callbackRef = useRef(callback)
   const lastCallTimeRef = useRef<number | undefined>(undefined)
   const pendingArgsRef = useRef<T | undefined>(undefined)
@@ -15,7 +21,8 @@ export const useThrottledCallback = <T extends unknown[]>(
     callbackRef.current = callback
   }, [callback])
 
-  const flush = useCallback((): void => {
+  const flush = useCallback((): R | undefined => {
+    clearTimeout(timeoutRef.current)
     timeoutRef.current = undefined
     const pendingArgs = pendingArgsRef.current
 
@@ -25,11 +32,18 @@ export const useThrottledCallback = <T extends unknown[]>(
 
     pendingArgsRef.current = undefined
     lastCallTimeRef.current = Date.now()
-    callbackRef.current(...pendingArgs)
+    return callbackRef.current(...pendingArgs)
+  }, [])
+
+  const cancel = useCallback((): void => {
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = undefined
+    pendingArgsRef.current = undefined
+    lastCallTimeRef.current = undefined
   }, [])
 
   const throttledCallback = useCallback(
-    (...args: T): void => {
+    (...args: T): R | undefined => {
       const currentTime = Date.now()
       const lastCallTime = lastCallTimeRef.current
 
@@ -38,8 +52,7 @@ export const useThrottledCallback = <T extends unknown[]>(
         timeoutRef.current = undefined
         pendingArgsRef.current = undefined
         lastCallTimeRef.current = currentTime
-        callbackRef.current(...args)
-        return
+        return callbackRef.current(...args)
       }
 
       pendingArgsRef.current = args
@@ -52,13 +65,8 @@ export const useThrottledCallback = <T extends unknown[]>(
   )
 
   useEffect(() => {
-    return (): void => {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = undefined
-      pendingArgsRef.current = undefined
-      lastCallTimeRef.current = undefined
-    }
-  }, [throttle])
+    return cancel
+  }, [cancel, throttle])
 
-  return throttle === 0 ? callback : throttledCallback
+  return { call: throttle === 0 ? callback : throttledCallback, flush, cancel }
 }

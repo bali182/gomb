@@ -3,6 +3,7 @@ import { addAutoStitchLineRadii } from './addAutoStitchLineRadii'
 import { addComputedSizes } from './addComputedSizes'
 import { adjustStitchLines } from './adjustStitchLines'
 import { deleteOrphanedHoles } from './deleteOrphanedHoles'
+import { deleteOrphanedPocketOpeningMappings } from './deleteOrphanedPocketOpeningMappings'
 import { deleteOrphanedStitchLines } from './deleteOrphanedStitchLines'
 
 type PatcherFunctionSchema = (
@@ -12,6 +13,7 @@ type PatcherFunctionSchema = (
 
 const patchers: PatcherFunctionSchema[] = [
   addComputedSizes,
+  deleteOrphanedPocketOpeningMappings,
   deleteOrphanedHoles,
   deleteOrphanedStitchLines,
   adjustStitchLines,

@@ -1,24 +1,26 @@
 import BigNumber from 'bignumber.js'
 
 import { ZERO } from '../constants/layout'
-import type { PocketClusterSchema } from '../schemas/components'
+import type { PocketClusterSchema, PocketOpeningOwnSchema } from '../schemas/components'
 import type { CornerRadiusSchema, PathCommand, PathSchema, RectSchema } from '../schemas/geometry'
+import { calculatePocketOpeningPath } from './calculatePocketOpeningPath'
 import { getTPocketTabDepth } from './pocketUtils'
 
 export const calculateTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   switch (pocketCluster.orientation) {
     case 'up':
-      return calculateUpTPocketPath(rect, pocketCluster, cornerRadius)
+      return calculateUpTPocketPath(rect, pocketCluster, cornerRadius, adjustedOpening)
     case 'down':
-      return calculateDownTPocketPath(rect, pocketCluster, cornerRadius)
+      return calculateDownTPocketPath(rect, pocketCluster, cornerRadius, adjustedOpening)
     case 'left':
-      return calculateLeftTPocketPath(rect, pocketCluster, cornerRadius)
+      return calculateLeftTPocketPath(rect, pocketCluster, cornerRadius, adjustedOpening)
     case 'right':
-      return calculateRightTPocketPath(rect, pocketCluster, cornerRadius)
+      return calculateRightTPocketPath(rect, pocketCluster, cornerRadius, adjustedOpening)
   }
 }
 
@@ -26,6 +28,7 @@ const calculateUpTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -39,6 +42,9 @@ const calculateUpTPocketPath = (
   const tabBottomY = top.plus(tPocketTabDepth)
   const commands: PathCommand[] = [
     { type: 'moveTo', point: { x: left.plus(topLeftRadius), y: top } },
+    ...calculatePocketOpeningPath(adjustedOpening, rect, pocketCluster.orientation).commands.filter(
+      (command, index, commands) => index > 0 && (index < commands.length - 1 || command.type !== 'lineTo'),
+    ),
     { type: 'lineTo', point: { x: right.minus(topRightRadius), y: top } },
   ]
 
@@ -79,6 +85,7 @@ const calculateDownTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -110,7 +117,12 @@ const calculateDownTPocketPath = (
     })
   }
 
-  commands.push({ type: 'lineTo', point: { x: left.plus(bottomLeftRadius), y: bottom } })
+  commands.push(
+    ...calculatePocketOpeningPath(adjustedOpening, rect, pocketCluster.orientation).commands.filter(
+      (command, index, commands) => index > 0 && (index < commands.length - 1 || command.type !== 'lineTo'),
+    ),
+    { type: 'lineTo', point: { x: left.plus(bottomLeftRadius), y: bottom } },
+  )
 
   if (bottomLeftRadius.isGreaterThan(ZERO)) {
     commands.push({
@@ -130,6 +142,7 @@ const calculateLeftTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -161,7 +174,12 @@ const calculateLeftTPocketPath = (
     })
   }
 
-  commands.push({ type: 'lineTo', point: { x: left, y: top.plus(topLeftRadius) } })
+  commands.push(
+    ...calculatePocketOpeningPath(adjustedOpening, rect, pocketCluster.orientation).commands.filter(
+      (command, index, commands) => index > 0 && (index < commands.length - 1 || command.type !== 'lineTo'),
+    ),
+    { type: 'lineTo', point: { x: left, y: top.plus(topLeftRadius) } },
+  )
 
   if (topLeftRadius.isGreaterThan(ZERO)) {
     commands.push({
@@ -181,6 +199,7 @@ const calculateRightTPocketPath = (
   rect: RectSchema,
   pocketCluster: PocketClusterSchema,
   cornerRadius: CornerRadiusSchema,
+  adjustedOpening: PocketOpeningOwnSchema,
 ): PathSchema => {
   const left = rect.x
   const top = rect.y
@@ -194,6 +213,9 @@ const calculateRightTPocketPath = (
   const tabLeftX = right.minus(tPocketTabDepth)
   const commands: PathCommand[] = [
     { type: 'moveTo', point: { x: right, y: top.plus(topRightRadius) } },
+    ...calculatePocketOpeningPath(adjustedOpening, rect, pocketCluster.orientation).commands.filter(
+      (command, index, commands) => index > 0 && (index < commands.length - 1 || command.type !== 'lineTo'),
+    ),
     { type: 'lineTo', point: { x: right, y: bottom.minus(bottomRightRadius) } },
   ]
 

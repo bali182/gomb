@@ -14,9 +14,12 @@ import type {
   HasAutoDimensionsSchema,
   HasCardsSchema,
   HasLayoutSchema,
+  HasPocketOpenings,
   LayoutOrientationSchema,
+  PocketOpeningOwnSchema,
   PocketOrientationSchema,
   PocketsSchema,
+  RecessedPocketOpeningSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -223,6 +226,7 @@ export const EN = {
         components: {
           layout: 'Layout',
           pockets: 'Pockets',
+          pocketOpenings: 'Pocket openings',
         },
         stitchLines: {
           settings: 'Settings',
@@ -243,6 +247,10 @@ export const EN = {
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
           clone: 'Clone',
+          delete: 'Delete',
+        },
+        pocketOpenings: {
+          add: 'Add design',
           delete: 'Delete',
         },
         stitchLines: {
@@ -396,6 +404,32 @@ export const EN = {
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
           } satisfies SectionTranslationSchema<PocketsSchema>,
+          pocketOpening: {
+            title: 'Pocket openings',
+            name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket opening.' },
+            type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this opening.' },
+            outerInset: {
+              label: 'Outer inset',
+              tooltip: 'Distance from either opening edge to the outer corner, in mm.',
+            },
+            innerInset: {
+              label: 'Inner inset',
+              tooltip: 'Distance from either opening edge to the inner corner, in mm.',
+            },
+            depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
+            outerRadius: {
+              label: 'Outer radius',
+              tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
+            },
+            innerRadius: {
+              label: 'Inner radius',
+              tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
+            },
+          } satisfies SectionTranslationSchema<RecessedPocketOpeningSchema & HasName>,
+          pocketAssignments: {
+            title: 'Pocket assignments',
+            openingMapping: { label: 'Pocket opening' },
+          } satisfies SectionTranslationSchema<Pick<HasPocketOpenings, 'openingMapping'>>,
           cards: {
             title: 'Cards',
             cardId: {
@@ -708,6 +742,10 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
+          pocketOpening: {
+            straight: 'Straight',
+            recessed: 'Recessed',
+          } satisfies EnumTranslationSchema<PocketOpeningOwnSchema['type']>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',
@@ -746,6 +784,14 @@ export const EN = {
         },
       },
       controls: {
+        pocketOpenings: {
+          assignedPockets: (numbers: readonly number[]): string => `Pockets: ${numbers.join(', ')}`,
+          unassigned: 'No pockets assigned',
+        },
+        pocketAssignments: {
+          pocket: (number: number): string => `Pocket ${number}`,
+          tPocket: (number: number): string => `T-pocket ${number}`,
+        },
         cardPicker: {
           noCard: 'None',
           landscape: 'Landscape',
@@ -836,6 +882,7 @@ export const EN = {
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
   defaultNames: {
+    defaultPocketOpening: 'Default',
     project: 'Project',
     rootPanel: 'Module',
     panel: 'Panel',

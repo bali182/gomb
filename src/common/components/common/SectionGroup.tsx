@@ -1,19 +1,21 @@
-import { Box, Grid, Icon, Spacer, Text, chakra } from '@chakra-ui/react'
+import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
 import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
 
-import { PiInfo } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { isRecord } from '../../utils/isRecord'
-import { Tooltip } from './Tooltip'
+import { TooltipIcon } from './TooltipIcon'
 
 type SectionGroupRootProps = {
   children: ReactNode
+  padded?: boolean
+  spaced?: boolean
 }
 
 type SectionGroupSectionProps = {
   children: ReactNode
+  spaced?: boolean
 }
 
 type SectionGroupSectionHeaderProps = {
@@ -35,6 +37,7 @@ type SectionGroupSectionRowEditorProps = {
 type SectionGroupSectionFullWidthContentProps = {
   children: ReactNode
   issue?: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
+  padded?: boolean
 }
 
 type SectionGroupIssueProps = {
@@ -47,17 +50,24 @@ const severityPriorities: Record<SeveritySchema, number> = {
   warning: 2,
 }
 
-const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children }) => {
+const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true, spaced = true }) => {
   return (
-    <Grid flex="1" gridTemplateColumns="max-content minmax(0, 1fr)" minH="0" overflowY="auto" pb="3" rowGap="3">
+    <Grid
+      flex="1"
+      gridTemplateColumns="max-content minmax(0, 1fr)"
+      minH="0"
+      overflowY="auto"
+      pb={padded ? '3' : '0'}
+      rowGap={spaced ? '3' : '0'}
+    >
       {children}
     </Grid>
   )
 }
 
-const SectionGroupSection: FC<SectionGroupSectionProps> = ({ children }) => {
+const SectionGroupSection: FC<SectionGroupSectionProps> = ({ children, spaced = true }) => {
   return (
-    <Grid columnGap="4" gridColumn="1 / -1" gridTemplateColumns="subgrid" rowGap="3">
+    <Grid columnGap="4" gridColumn="1 / -1" gridTemplateColumns="subgrid" rowGap={spaced ? '3' : '0'}>
       {children}
     </Grid>
   )
@@ -90,11 +100,7 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
   return (
     <Text alignItems="center" alignSelf="center" color="fg.muted" display="flex" gap="1" pl="4" textStyle="sm">
       <span>{children}</span>
-      {isDefined(tooltip) && (
-        <Tooltip content={tooltip}>
-          <Icon cursor="pointer" as={PiInfo} size="sm" />
-        </Tooltip>
-      )}
+      {isDefined(tooltip) && <TooltipIcon content={tooltip} severity="info" />}
     </Text>
   )
 }
@@ -157,9 +163,13 @@ const SectionGroupSectionRowEditor: FC<SectionGroupSectionRowEditorProps> = ({ c
   )
 }
 
-const SectionGroupSectionFullWidthContent: FC<SectionGroupSectionFullWidthContentProps> = ({ children, issue }) => {
+const SectionGroupSectionFullWidthContent: FC<SectionGroupSectionFullWidthContentProps> = ({
+  children,
+  issue,
+  padded = true,
+}) => {
   return (
-    <chakra.div gridColumn="1 / -1" minWidth="0" px="4">
+    <chakra.div gridColumn="1 / -1" minWidth="0" px={padded ? '4' : '0'}>
       {children}
       <SectionGroupIssue issue={issue} />
     </chakra.div>

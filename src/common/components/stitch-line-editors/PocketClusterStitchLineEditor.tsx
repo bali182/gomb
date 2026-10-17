@@ -1,6 +1,7 @@
 import { type FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
+import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { PocketClusterStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
@@ -25,8 +26,9 @@ export const PocketClusterStitchLineEditor: FC<PocketClusterStitchLineEditorProp
   resolvedEditable,
 }) => {
   const { t } = useTranslation()
+  const { activeTab, onTabChange } = useFloatingEditorTab(editable.id, 'settings')
   return (
-    <Tabs.Root defaultValue="settings">
+    <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
         <Tabs.Trigger value="settings">{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
         <Tabs.Trigger value="overrides">{t.project.editors.tabs.stitchLines.overrides}</Tabs.Trigger>

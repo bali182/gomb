@@ -22,6 +22,7 @@ import type {
   HasLayoutSchema,
   PanelSchema,
   PocketClusterSchema,
+  RecessedPocketOpeningSchema,
   RootPanelSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
@@ -126,6 +127,15 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   children: [],
 }
 
+export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
+  type: 'recessed',
+  outerInset: 15,
+  innerInset: 30,
+  depth: 10,
+  outerRadius: 10,
+  innerRadius: 10,
+}
+
 export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof HasName> = {
   ...defaultHasLayout,
   ...defaultHasCornerRadius,
@@ -133,6 +143,9 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   ...defaultHasOffAxisAnchor,
   ...defaultHasSqueeze,
   type: 'pocket-cluster',
+  defaultOpening: { id: 'own:default', name: 'Default', type: 'straight' },
+  openings: [],
+  openingMapping: {},
   children: [],
   orientation: 'up',
   cardCrossAxisOffset: 0,

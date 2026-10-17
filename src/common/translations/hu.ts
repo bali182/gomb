@@ -174,6 +174,7 @@ export const HU = {
         components: {
           layout: 'Elrendezés',
           pockets: 'Zsebek',
+          pocketOpenings: 'Zsebnyílások',
         },
         stitchLines: {
           settings: 'Beállítások',
@@ -194,6 +195,10 @@ export const HU = {
           addPocketStitching: 'Zsebvarrás hozzáadása',
           exportToPng: 'Exportálás PNG-be',
           clone: 'Duplikálás',
+          delete: 'Törlés',
+        },
+        pocketOpenings: {
+          add: 'Dizájn hozzáadása',
           delete: 'Törlés',
         },
         stitchLines: {
@@ -344,6 +349,29 @@ export const HU = {
               label: 'Keskenyedés',
               tooltip: 'A T alakú zseb oldalfalainak dőlését állítja be.',
             },
+          },
+          pocketOpening: {
+            title: 'Zsebnyílások',
+            name: { label: 'Név', tooltip: 'A zsebnyílás azonosítására használt nevet állítja.' },
+            type: { label: 'Forma', tooltip: 'Az ehhez a beállításhoz rendelt zsebek nyílásformáját állítja.' },
+            outerInset: {
+              label: 'Külső betolás',
+              tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            },
+            innerInset: {
+              label: 'Belső betolás',
+              tooltip: 'A belső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            },
+            depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
+            outerRadius: {
+              label: 'Külső sugár',
+              tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
+            },
+            innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
+          },
+          pocketAssignments: {
+            title: 'Zsebek hozzárendelése',
+            openingMapping: { label: 'Zsebnyílás' },
           },
           cards: {
             title: 'Kártyák',
@@ -645,6 +673,10 @@ export const HU = {
           },
         },
         components: {
+          pocketOpening: {
+            straight: 'Egyenes',
+            recessed: 'Ívelt',
+          },
           pocketOrientation: {
             up: 'Fent',
             down: 'Lent',
@@ -683,6 +715,14 @@ export const HU = {
         },
       },
       controls: {
+        pocketOpenings: {
+          assignedPockets: (numbers: readonly number[]): string => `Zsebek: ${numbers.join(', ')}`,
+          unassigned: 'Nincs hozzárendelt zseb',
+        },
+        pocketAssignments: {
+          pocket: (number: number): string => `${number}. zseb`,
+          tPocket: (number: number): string => `${number}. T-zseb`,
+        },
         cardPicker: {
           noCard: 'Nincs',
           landscape: 'Fekvő',
@@ -773,6 +813,7 @@ export const HU = {
     },
   },
   defaultNames: {
+    defaultPocketOpening: 'Alapértelmezett',
     project: 'Projekt',
     rootPanel: 'Modul',
     panel: 'Panel',

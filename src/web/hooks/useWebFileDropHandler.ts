@@ -4,9 +4,10 @@ import { ProjectFileDropResultSchema } from '../../common/components/common/File
 import { toaster } from '../../common/components/Toaster'
 import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
+import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import { ProjectSchema } from '../../common/schemas/project'
 import { id } from '../../common/utils/id'
-import { parseProjectFileContents } from '../../common/utils/parseProjectFileContents'
+import { loadProjectFromContents } from '../../common/utils/loadProjectFromContents'
 import { webAppRoutes } from '../webAppRoutes'
 import { useProjects } from './useProjects'
 
@@ -36,7 +37,8 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
       let project
 
       try {
-        project = parseProjectFileContents(await result.value.text())
+        const context: ProjectMigrationContextSchema = { t }
+        project = loadProjectFromContents(await result.value.text(), context)
       } catch {
         toaster.create({
           closable: true,
@@ -55,13 +57,7 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
       addProject(importedProject)
       navigate(webAppRoutes.project(importedProject.id))
     },
-    [
-      addProject,
-      navigate,
-      t.project.toast.openFailed,
-      t.project.toast.dropProjectFileInvalidExtension,
-      t.project.toast.dropProjectFileMultipleFiles,
-    ],
+    [addProject, navigate, t],
   )
 
   return { onDrop }

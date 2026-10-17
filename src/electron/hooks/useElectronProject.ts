@@ -7,10 +7,11 @@ import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import type { LoadableSchema } from '../../common/schemas/loadable'
+import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
 import { id } from '../../common/utils/id'
 import { isDefined } from '../../common/utils/isDefined'
-import { parseProjectFileContents } from '../../common/utils/parseProjectFileContents'
+import { loadProjectFromContents } from '../../common/utils/loadProjectFromContents'
 import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
@@ -105,7 +106,8 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     let project: ProjectSchema
 
     try {
-      project = parseProjectFileContents(response.contents)
+      const context: ProjectMigrationContextSchema = { t }
+      project = loadProjectFromContents(response.contents, context)
     } catch {
       setElectronProject(Loadable.failed())
       return
@@ -118,7 +120,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
         project,
       }),
     )
-  }, [filePath, setElectronProject])
+  }, [filePath, setElectronProject, t])
 
   const navigateToProject = useCallback(
     (filePath: string, project: ProjectSchema, preferredSubProjectId?: string): void => {
