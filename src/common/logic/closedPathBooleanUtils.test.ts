@@ -1,7 +1,9 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
+import type { RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
+import { calculateFrontPocketPath } from './calculateFrontPocketPath'
 import { calculateRectPath } from './calculateRectPath'
 import {
   intersectClosedPaths,
@@ -66,6 +68,54 @@ const isInsideRectilinearPath = (path: PathSchema, x: number, y: number): boolea
 }
 
 describe('closed path boolean operations', () => {
+  it.each([34.999999, 34.9999999, 35, 35.0000001, 35.000001])(
+    'exports short arc fragments after splitting at x=%s',
+    (x) => {
+      const circle = rectangle(20, 20, 30, 30, 15)
+      const strip = rectangle(x, 0, 30, 70)
+      const offset = x - 35
+      const leftArea = (Math.PI * 225) / 2 + offset * Math.sqrt(225 - offset ** 2) + 225 * Math.asin(offset / 15)
+      const rightArea = Math.PI * 225 - leftArea
+
+      expect(getArea(unionClosedPaths(circle, [strip]))).toBeCloseTo(2100 + leftArea, 7)
+      expect(getArea(unionClosedPaths(strip, [circle]))).toBeCloseTo(2100 + leftArea, 7)
+      expect(getArea(intersectClosedPaths(circle, strip))).toBeCloseTo(rightArea, 7)
+      expect(getArea(subtractClosedPaths(circle, [strip]))).toBeCloseTo(leftArea, 7)
+      expect(getArea(subtractClosedPaths(strip, [circle]))).toBeCloseTo(2100 - rightArea, 7)
+    },
+  )
+
+  it.each([1, 5, 15].flatMap((outerRadius) => [5, 10].map((shift) => ({ outerRadius, shift }))))(
+    'unites pockets sharing an R15 arc with outer R$outerRadius and shift $shift',
+    ({ outerRadius, shift }) => {
+      const corner = new BigNumber(0)
+      const corners = { topLeft: corner, topRight: corner, bottomLeft: corner, bottomRight: corner }
+      const opening: RecessedPocketOpeningSchema = {
+        type: 'recessed',
+        outerInset: 35,
+        innerOffset: 15,
+        depth: 15,
+        outerRadius,
+        innerRadius: 15,
+      }
+      const first = calculateFrontPocketPath(
+        { x: corner, y: corner, width: new BigNumber(100), height: new BigNumber(100) },
+        corners,
+        'up',
+        opening,
+      )
+      const second = calculateFrontPocketPath(
+        { x: corner, y: new BigNumber(shift), width: new BigNumber(100), height: new BigNumber(100 - shift) },
+        corners,
+        'up',
+        { ...opening, depth: 15 - shift },
+      )
+
+      expect(getArea(unionClosedPaths(first, [second]))).toBeCloseTo(getArea(first), 7)
+      expect(getArea(unionClosedPaths(second, [first]))).toBeCloseTo(getArea(first), 7)
+    },
+  )
+
   it('unites overlapping rectangles and keeps disconnected islands', () => {
     const result = unionClosedPaths(rectangle(0, 0, 10, 10), [rectangle(5, 0, 10, 10), rectangle(30, 0, 10, 10)])
     expect(getArea(result)).toBeCloseTo(250, 8)

@@ -142,7 +142,7 @@ const collectIntersections = (contours: Contour[]): void => {
 }
 
 const isWithinSegment = (point: Vector2, segment: PlineIntersectVisitContext): boolean => {
-  if (segment.v1.bulge !== 0) {
+  if (!segment.v1.bulgeIsZero()) {
     return true
   }
   // The library also reports intersections just beyond line endpoints within its position tolerance.
@@ -421,7 +421,7 @@ const getPolylineCommands = (polyline: Polyline): PathCommand[] => {
     const end = polyline.at(endIndex)
     const endpoint = endIndex === 0 ? startPoint : toPathPoint(end.pos())
 
-    if (start.bulge === 0) {
+    if (start.bulgeIsZero()) {
       commands.push({ type: 'lineTo', point: endpoint })
       continue
     }
