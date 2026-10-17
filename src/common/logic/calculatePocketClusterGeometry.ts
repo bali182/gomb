@@ -55,7 +55,6 @@ export const calculatePocketClusterGeometry = (
       componentId: pocketCluster.id,
       boundingRect: topPocketRect,
       path: frontPocketPath,
-      uncutPath: frontPocketPath,
       cornerRadius: topPocketRadius,
       card: calculatePocketCard(pocketCluster, topPocketRect),
     },
@@ -76,7 +75,6 @@ export const calculatePocketClusterGeometry = (
         boundingRect: pocketRect,
         cornerRadius,
         path,
-        uncutPath: path,
         card: calculatePocketCard(pocketCluster, pocketRect),
       }
     }),

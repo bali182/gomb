@@ -31,10 +31,6 @@ export type HasComputedCornerRadiusSchema = {
   cornerRadius: CornerRadiusSchema
 }
 
-export type HasUncutPathSchema = {
-  uncutPath: PathSchema
-}
-
 export type HasComputedChildrenSchema = {
   children: ComputedComponentSchema[]
 }
@@ -51,7 +47,6 @@ export type BaseComputedSchema = HasComponentReferenceSchema & HasPathSchema & H
 
 export type ComputedRootPanelSchema = HasTypeSchema<'computed-root-panel'> &
   BaseComputedSchema &
-  HasUncutPathSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
   HasComputedChildrenSchema
@@ -59,7 +54,6 @@ export type ComputedRootPanelSchema = HasTypeSchema<'computed-root-panel'> &
 export type ComputedPanelSchema = HasTypeSchema<'computed-panel'> &
   BaseComputedSchema &
   HasLayoutBoundingRectSchema &
-  HasUncutPathSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
   HasComputedChildrenSchema
@@ -67,14 +61,12 @@ export type ComputedPanelSchema = HasTypeSchema<'computed-panel'> &
 export type ComputedTopPocketSchema = HasTypeSchema<'computed-top-pocket'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
-  HasUncutPathSchema &
   HasId &
   HasComputedCardSchema
 
 export type ComputedTPocketSchema = HasTypeSchema<'computed-t-pocket'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
-  HasUncutPathSchema &
   HasId &
   HasComputedCardSchema
 
@@ -88,7 +80,6 @@ export type ComputedCardSchema = HasTypeSchema<'computed-card'> &
 export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster'> &
   BaseComputedSchema &
   HasLayoutBoundingRectSchema &
-  HasUncutPathSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
   HasComputedChildrenSchema & {
