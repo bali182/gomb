@@ -5,6 +5,19 @@ import type { PathCommand, PathSchema, PointSchema } from '../schemas/geometry'
 import { getClosedPathLoops } from './pathSegments'
 import type { PathSegment } from './pathSegmentTypes'
 
+export const unionClosedPaths = (first: PathSchema, others: readonly PathSchema[]): PathSchema => {
+  if (others.length === 0) {
+    return first
+  }
+
+  const polygon = others.reduce<Flatten.Polygon>(
+    (result, path) => Flatten.BooleanOperations.unify(result, toFlattenPolygon(path)),
+    toFlattenPolygon(first),
+  )
+
+  return fromFlattenPolygon(polygon)
+}
+
 export const subtractClosedPaths = (subject: PathSchema, holes: readonly PathSchema[]): PathSchema => {
   const polygon = holes.reduce<Flatten.Polygon>(
     (result, hole) => Flatten.BooleanOperations.subtract(result, toFlattenPolygon(hole)),

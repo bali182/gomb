@@ -25,6 +25,7 @@ import { calculateLayoutBoundingBoxes } from './calculateLayoutBoundingBoxes'
 import { calculatePocketClusterGeometry } from './calculatePocketClusterGeometry'
 import { calculateRectPath } from './calculateRectPath'
 import { getCornerRadius } from './cornerRadiusUtils'
+import { unionClosedPaths } from './flattenJsUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { normalizePocketCluster } from './normalizePocketCluster'
 import { calculateStitchLines } from './stitching/calculateStitchLines'
@@ -224,7 +225,10 @@ const computePocketCluster = (
     resolvedStitchLines,
     computedComponents,
   )
-  const path = calculateRectPath(boundingRect, cornerRadius)
+  const path = unionClosedPaths(
+    geometry.frontPocket.path,
+    geometry.tPockets.map((pocket) => pocket.path),
+  )
   const computed: ComputedPocketClusterSchema = {
     type: 'computed-pocket-cluster',
     componentId: pocketCluster.id,
