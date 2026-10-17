@@ -1,13 +1,22 @@
+import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
-import { defaultStitchingSettings } from '../defaultStates'
+import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { PanelSchema, PocketClusterSchema, PocketOrientationSchema, RootPanelSchema } from '../schemas/components'
 import type { ComputedComponentSchema } from '../schemas/computed'
-import type { NumberCornerRadiusSchema } from '../schemas/geometry'
+import type { NumberCornerRadiusSchema, PathSchema } from '../schemas/geometry'
+import type { HoleSchema } from '../schemas/hole'
+import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
+import { isDefined } from '../utils/isDefined'
+import { translateExportElement } from './exports/exportGeometryUtils'
+import { getExportElementsForComponent } from './exports/getExportElements'
 import { getComputedSubProject } from './getComputedSubProject'
+import { isPointInClosedPath } from './isPointInClosedPath'
+import { getClosedPathLoops, getPathSegments } from './pathSegments'
+import { getPathSegmentMidpoint } from './pathSegmentUtils'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
 
@@ -47,6 +56,248 @@ const expectBoundingRect = (component: ComputedComponentSchema, expected: Expect
     component.boundingRect.height.toNumber(),
   ]).toEqual(expected)
 }
+
+const getClosedPathArea = (path: PathSchema): number => {
+  return getClosedPathLoops(path)
+    .flat()
+    .reduce((area, segment) => {
+      if (segment.type === 'line') {
+        return area + segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y)).toNumber() / 2
+      }
+      return (
+        area +
+        (segment.center.x
+          .times(segment.end.y.minus(segment.start.y))
+          .minus(segment.center.y.times(segment.end.x.minus(segment.start.x)))
+          .toNumber() +
+          segment.radius.pow(2).toNumber() * segment.sweepAngle) /
+          2
+      )
+    }, 0)
+}
+
+type PanelCutoutTestCase = {
+  name: string
+  holes: ExpectedBoundingRect[]
+  removedArea: number
+  highlightAreas: number[]
+}
+
+describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutouts', (ownerType) => {
+  const ownerId = ownerType === 'root-panel' ? 'root' : 'panel'
+  const otherId = ownerType === 'root-panel' ? 'panel' : 'root'
+  const width = ownerType === 'root-panel' ? 160 : 100
+  const height = ownerType === 'root-panel' ? 180 : 100
+  const area = width * height
+  const otherArea = ownerType === 'root-panel' ? 10000 : 28800
+
+  const createFixture = (holes: HoleSchema[], radius = 0): SubProjectSchema => {
+    const corners = {
+      topLeftRadius: radius,
+      topRightRadius: radius,
+      bottomLeftRadius: radius,
+      bottomRightRadius: radius,
+    }
+    return d.subProject({
+      id: 'sub-project',
+      root: d.rootPanel({
+        id: 'root',
+        width: 160,
+        height: 180,
+        children: ['panel'],
+        ...(ownerType === 'root-panel' ? corners : {}),
+      }),
+      components: [
+        d.panel({
+          id: 'panel',
+          width: 100,
+          height: 100,
+          autoWidth: false,
+          autoHeight: false,
+          ...(ownerType === 'panel' ? corners : {}),
+        }),
+      ],
+      holes,
+      stitchLines: [d.componentBoundsStitchLine({ id: 'stitch-line', targetId: ownerId, targetType: 'component' })],
+    })
+  }
+
+  const createHole = (id: string, [x, y, holeWidth, holeHeight]: ExpectedBoundingRect, radius = 0): HoleSchema => {
+    return {
+      ...d.hole({ id, componentId: ownerId }),
+      xAnchor: 'start',
+      yAnchor: 'start',
+      xOffset: x,
+      yOffset: y,
+      width: holeWidth,
+      height: holeHeight,
+      topLeftRadius: radius,
+      topRightRadius: radius,
+      bottomLeftRadius: radius,
+      bottomRightRadius: radius,
+    }
+  }
+
+  it.each<PanelCutoutTestCase>([
+    { name: 'an internal hole', holes: [[20, 20, 20, 20]], removedArea: 400, highlightAreas: [400] },
+    {
+      name: 'overlapping holes',
+      holes: [
+        [20, 20, 20, 20],
+        [30, 30, 20, 20],
+      ],
+      removedArea: 700,
+      highlightAreas: [400, 400],
+    },
+    {
+      name: 'a containing hole',
+      holes: [
+        [20, 20, 10, 10],
+        [10, 10, 40, 40],
+      ],
+      removedArea: 1600,
+      highlightAreas: [100, 1600],
+    },
+    {
+      name: 'identical holes',
+      holes: [
+        [20, 20, 20, 20],
+        [20, 20, 20, 20],
+      ],
+      removedArea: 400,
+      highlightAreas: [400, 400],
+    },
+    { name: 'an external hole', holes: [[-40, 20, 20, 20]], removedArea: 0, highlightAreas: [0] },
+    { name: 'a hole crossing the edge', holes: [[-10, 20, 30, 20]], removedArea: 400, highlightAreas: [400] },
+  ])('computes $name and only cuts its owner', (testCase) => {
+    const holes = testCase.holes.map((bounds, index) => createHole(`hole-${index}`, bounds))
+    const computed = getComputedSubProject(createFixture(holes), defaultStitchingSettings)
+    const owner = computed.components[ownerId]
+
+    expect(owner.boundingRect.width.toNumber()).toBe(width)
+    expect(owner.boundingRect.height.toNumber()).toBe(height)
+    expect(getClosedPathArea(owner.path)).toBeCloseTo(area - testCase.removedArea, 7)
+    expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
+    computed.holes.forEach((hole, index) => {
+      expect(getClosedPathArea(hole.highlightPath)).toBeCloseTo(testCase.highlightAreas[index], 7)
+    })
+  })
+
+  it('preserves the material island enclosed by several holes', () => {
+    const bounds: ExpectedBoundingRect[] = [
+      [10, 10, 80, 20],
+      [10, 70, 80, 20],
+      [10, 10, 20, 80],
+      [70, 10, 20, 80],
+    ]
+    const holes = bounds.map((rectangle, index) => createHole(`hole-${index}`, rectangle))
+    const computed = getComputedSubProject(createFixture(holes), defaultStitchingSettings)
+    const owner = computed.components[ownerId]
+    const islandCenter = { x: owner.boundingRect.x.plus(50), y: owner.boundingRect.y.plus(50) }
+    expect(getClosedPathArea(owner.path)).toBeCloseTo(area - 4800, 7)
+    expect(isPointInClosedPath(islandCenter, owner.path)).toBe(true)
+    expect(isPointInClosedPath({ x: owner.boundingRect.x.plus(20), y: islandCenter.y }, owner.path)).toBe(false)
+    expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
+    computed.holes.forEach((hole) => expect(getClosedPathArea(hole.highlightPath)).toBeCloseTo(1600, 7))
+  })
+
+  it('keeps both pieces when a hole splits the whole component', () => {
+    const computed = getComputedSubProject(
+      createFixture([createHole('split', [40, -10, 20, height + 20])]),
+      defaultStitchingSettings,
+    )
+    const owner = computed.components[ownerId]
+    expect(getClosedPathArea(owner.path)).toBeCloseTo(area - 20 * height, 7)
+    expect(getClosedPathLoops(owner.path)).toHaveLength(2)
+    for (const [x, inside] of [
+      [20, true],
+      [50, false],
+      [80, true],
+    ] as const) {
+      expect(
+        isPointInClosedPath({ x: owner.boundingRect.x.plus(x), y: owner.boundingRect.y.plus(50) }, owner.path),
+      ).toBe(inside)
+    }
+  })
+
+  it('clips the hole highlight against a rounded outer corner', () => {
+    const computed = getComputedSubProject(
+      createFixture([createHole('corner', [0, 0, 10, 10])], 10),
+      defaultStitchingSettings,
+    )
+    const quarterCircle = (Math.PI * 100) / 4
+    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(quarterCircle, 7)
+    expect(getClosedPathArea(computed.components[ownerId].path)).toBeCloseTo(
+      area - (4 - Math.PI) * 100 - quarterCircle,
+      7,
+    )
+    expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
+  })
+
+  it('allows a hole to remove the whole component', () => {
+    const computed = getComputedSubProject(
+      createFixture([createHole('cover', [-10, -10, width + 20, height + 20])]),
+      defaultStitchingSettings,
+    )
+    expect(computed.components[ownerId].path.commands).toEqual([])
+    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(area, 7)
+    expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
+  })
+
+  it.each(['start', 'middle', 'end'] as const)('places and cuts %s-anchored holes in owner coordinates', (xAnchor) => {
+    const hole = { ...createHole('anchored', [10, 10, 20, 10]), xAnchor, yAnchor: 'end' as const }
+    const computed = getComputedSubProject(createFixture([hole]), defaultStitchingSettings)
+    const owner = computed.components[ownerId]
+    const localX = xAnchor === 'start' ? 10 : xAnchor === 'middle' ? width / 2 : width - 30
+    expect(computed.holes[0].boundingRect.x.toNumber()).toBe(owner.boundingRect.x.plus(localX).toNumber())
+    expect(computed.holes[0].boundingRect.y.toNumber()).toBe(owner.boundingRect.y.plus(height - 20).toNumber())
+    expect(getClosedPathArea(owner.path)).toBeCloseTo(area - 200, 7)
+    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(200, 7)
+  })
+
+  it.each(['svg', 'pdf', 'png'] as const)('passes the cut contour and clipped stitches to %s export', (format) => {
+    const subProject = createFixture(
+      [createHole('circle', [40, 40, 30, 30], 15), createHole('notch', [30, 0, 20, 20])],
+      10,
+    )
+    const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+    const elements = getExportElementsForComponent(
+      subProject,
+      computed,
+      ownerId,
+      { ...defaultExportParams, format },
+      defaultStitchingSettings,
+    )
+    const exported = elements.find((element) => element.id === ownerId)
+    if (!isDefined(exported) || exported.type !== 'export-panel') {
+      throw new Error('Expected the owner panel in export')
+    }
+    const expectedArea = area - (4 - Math.PI) * 100 - Math.PI * 225 - 400
+    expect(getClosedPathArea(exported.path)).toBeCloseTo(expectedArea, 7)
+    expect(exported.stitchLines).toHaveLength(1)
+    const stitchHoles = exported.stitchLines.flatMap((stitchLine) => stitchLine.holes)
+    expect(stitchHoles.length).toBeGreaterThan(0)
+    stitchHoles.forEach((hole) => expect(isPointInClosedPath(hole.center, exported.path)).toBe(true))
+    const stitchPaths = exported.stitchLines.flatMap((stitchLine) => stitchLine.paths)
+    expect(stitchPaths.length).toBeGreaterThan(0)
+    stitchPaths
+      .flatMap((path) => getPathSegments(path))
+      .forEach((segment) => {
+        expect(isPointInClosedPath(getPathSegmentMidpoint(segment), exported.path)).toBe(true)
+      })
+
+    const translated = translateExportElement(exported, { x: new BigNumber(250), y: new BigNumber(-75) })
+    if (translated.type !== 'export-panel') {
+      throw new Error('Expected a translated panel')
+    }
+    expect(getClosedPathArea(translated.path)).toBeCloseTo(expectedArea, 7)
+    translated.stitchLines
+      .flatMap((stitchLine) => stitchLine.holes)
+      .forEach((hole) => {
+        expect(isPointInClosedPath(hole.center, translated.path)).toBe(true)
+      })
+  })
+})
 
 describe('getComputedSubProject layout', () => {
   it.each<FixedLayoutTestCase>([
