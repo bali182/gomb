@@ -11,6 +11,7 @@ import {
   subtractClosedPaths,
   unionClosedPaths,
 } from './closedPathBooleanUtils'
+import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops } from './pathSegments'
 
 type NearContactCase = {
@@ -66,6 +67,157 @@ const isInsideRectilinearPath = (path: PathSchema, x: number, y: number): boolea
   }
   return winding !== 0
 }
+
+const polygon = (points: readonly (readonly [number, number])[]): PathSchema => ({
+  commands: [
+    ...points.map(([x, y], index) => ({
+      type: index === 0 ? ('moveTo' as const) : ('lineTo' as const),
+      point: { x: new BigNumber(x), y: new BigNumber(y) },
+    })),
+    { type: 'close' },
+  ],
+})
+
+describe('self-intersecting closed paths', () => {
+  const enclosing = rectangle(-20, -20, 40, 40)
+
+  it.each([false, true])('keeps both lobes of a zero-signed-area bow tie, reversed=%s', (reversed) => {
+    const points: readonly (readonly [number, number])[] = [
+      [0, 0],
+      [10, 10],
+      [0, 10],
+      [10, 0],
+    ]
+    const crossing = polygon(reversed ? [...points].reverse() : points)
+    const normalized = intersectClosedPaths(crossing, enclosing)
+
+    expect(getClosedPathLoops(normalized)).toHaveLength(2)
+    expect(getArea(normalized)).toBeCloseTo(50, 8)
+    expect(isInsideRectilinearPath(normalized, 5, 2)).toBe(true)
+    expect(isInsideRectilinearPath(normalized, 5, 8)).toBe(true)
+    expect(isInsideRectilinearPath(normalized, 1, 5)).toBe(false)
+    expect(getArea(subtractClosedPaths(crossing, [rectangle(0, 0, 10, 5)]))).toBeCloseTo(25, 8)
+    expect(getArea(subtractClosedPaths(enclosing, [crossing]))).toBeCloseTo(1550, 8)
+    expect(getArea(unionClosedPaths(crossing, [rectangle(0, 0, 10, 5)]))).toBeCloseTo(75, 8)
+    expect(isClosedPathCoveredBy(crossing, enclosing)).toBe(true)
+    expect(isClosedPathCoveredBy(crossing, rectangle(0, 0, 10, 5))).toBe(false)
+  })
+
+  it.each([false, true])('splits several crossings without changing non-zero fill, reversed=%s', (reversed) => {
+    const points: readonly (readonly [number, number])[] = [
+      [0, 0],
+      [10, 10],
+      [0, 10],
+      [10, 0],
+      [5, 12],
+    ]
+    const source = polygon(reversed ? [...points].reverse() : points)
+    const normalized = intersectClosedPaths(source, enclosing)
+    for (let x = 0.25; x < 10; x += 0.5) {
+      for (let y = 0.125; y < 12; y += 0.5) {
+        expect(isInsideRectilinearPath(normalized, x, y)).toBe(isInsideRectilinearPath(source, x, y))
+      }
+    }
+  })
+
+  it.each([false, true])('preserves self-touching loops and retraced edges, reversed=%s', (reversed) => {
+    const points: readonly (readonly [number, number])[] = [
+      [0, 0],
+      [4, 0],
+      [4, 4],
+      [0, 4],
+      [0, 0],
+      [-4, 0],
+      [-4, -4],
+      [0, -4],
+      [0, 0],
+      [2, -2],
+      [0, 0],
+    ]
+    const source = polygon(reversed ? [...points].reverse() : points)
+    const normalized = intersectClosedPaths(source, enclosing)
+    expect(getArea(normalized)).toBeCloseTo(32, 8)
+    expect(isInsideRectilinearPath(normalized, 2, 2)).toBe(true)
+    expect(isInsideRectilinearPath(normalized, -2, -2)).toBe(true)
+    expect(isInsideRectilinearPath(normalized, 1, -1.5)).toBe(false)
+  })
+
+  it.each([false, true])('resolves partially overlapping edges using non-zero fill, opposite=%s', (opposite) => {
+    const inner: readonly (readonly [number, number])[] = [
+      [0, 0],
+      [5, 0],
+      [5, 5],
+      [0, 5],
+      [0, 0],
+    ]
+    const source = polygon([[0, 0], [10, 0], [10, 10], [0, 10], [0, 0], ...(opposite ? [...inner].reverse() : inner)])
+    const normalized = intersectClosedPaths(source, enclosing)
+    expect(getArea(normalized)).toBeCloseTo(opposite ? 75 : 100, 8)
+    expect(isInsideRectilinearPath(normalized, 2, 2)).toBe(!opposite)
+    expect(isInsideRectilinearPath(normalized, 7, 7)).toBe(true)
+  })
+
+  it('removes a retraced circular arc without filling the space next to it', () => {
+    const point = (x: number, y: number) => ({ x: new BigNumber(x), y: new BigNumber(y) })
+    const source: PathSchema = {
+      commands: [
+        ...polygon([
+          [0, 0],
+          [10, 0],
+          [10, 10],
+          [0, 10],
+          [0, 0],
+        ]).commands.slice(0, -1),
+        { type: 'arcTo', radius: new BigNumber(5), reversed: false, point: point(10, 0) },
+        { type: 'arcTo', radius: new BigNumber(5), reversed: true, point: point(0, 0) },
+        { type: 'close' },
+      ],
+    }
+    const normalized = intersectClosedPaths(source, enclosing)
+    expect(getArea(normalized)).toBeCloseTo(100, 8)
+    expect(isInsideRectilinearPath(normalized, 5, 5)).toBe(true)
+    expect(isInsideRectilinearPath(normalized, 5, -2)).toBe(false)
+  })
+
+  it.each([
+    { reversed: false, opposite: false },
+    { reversed: false, opposite: true },
+    { reversed: true, opposite: false },
+    { reversed: true, opposite: true },
+  ])(
+    'retains intersecting circular arcs and their winding, reversed=$reversed opposite=$opposite',
+    ({ reversed, opposite }) => {
+      const point = (x: number, y: number) => ({ x: new BigNumber(x), y: new BigNumber(y) })
+      const radius = new BigNumber(5)
+      const source: PathSchema = {
+        commands: [
+          { type: 'moveTo', point: point(0, 4) },
+          { type: 'arcTo', radius, reversed, point: point(-6, -4) },
+          { type: 'arcTo', radius, reversed, point: point(0, 4) },
+          { type: 'arcTo', radius, reversed: reversed !== opposite, point: point(6, -4) },
+          { type: 'arcTo', radius, reversed: reversed !== opposite, point: point(0, 4) },
+          { type: 'close' },
+        ],
+      }
+      const normalized = intersectClosedPaths(source, enclosing)
+      const overlap = 50 * Math.acos(0.6) - 24
+      const area = 50 * Math.PI - overlap * (opposite ? 2 : 1)
+      expect(getArea(normalized)).toBeCloseTo(area, 7)
+      expect(getArea(unionClosedPaths(source, [rectangle(15, 15, 2, 2)]))).toBeCloseTo(area + 4, 7)
+      expect(getArea(subtractClosedPaths(enclosing, [source]))).toBeCloseTo(1600 - area, 7)
+      expect(isClosedPathCoveredBy(source, enclosing)).toBe(true)
+      expect(isPointInClosedPath(point(0.1, 0.3), normalized)).toBe(!opposite)
+      expect(isPointInClosedPath(point(-5, 0.3), normalized)).toBe(true)
+      expect(isPointInClosedPath(point(5, 0.3), normalized)).toBe(true)
+      for (const segment of getClosedPathLoops(normalized).flat()) {
+        expect(segment.type).toBe('arc')
+        if (segment.type === 'arc') {
+          expect(segment.radius.toNumber()).toBeCloseTo(5, 8)
+        }
+      }
+    },
+  )
+})
 
 describe('closed path boolean operations', () => {
   it.each([34.999999, 34.9999999, 35, 35.0000001, 35.000001])(

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import type { BooleanOp, PlineIntersectVisitContext, PlineSegIntr, Vector2 } from 'cavalier-contours-js'
+import type { BooleanOp, PlineIntersect, PlineIntersectVisitContext, PlineSegIntr, Vector2 } from 'cavalier-contours-js'
 import {
   FUZZY_EPSILON,
   plineSegIntr,
@@ -397,7 +397,54 @@ const arePositionsEqual = (first: Vector2, second: Vector2): boolean => {
 const toPolylines = (path: PathSchema): Polyline[] => {
   return getClosedPathLoops(path)
     .map((segments) => Polyline.fromVertexes(segments.map(toPolylineVertex), true))
+    .flatMap(splitSelfIntersectingPolyline)
     .filter((polyline) => polyline.vertexCount >= 2 && Math.abs(polyline.area()) >= AREA_EPSILON)
+}
+
+/**
+ * Split a crossing contour into closed walks before treating its area sign as its interior direction.
+ * Follow the original traversal and extract a loop whenever it returns to an earlier vertex.
+ * Keeping each loop's direction preserves the original non-zero winding, including holes and overlaps.
+ */
+const splitSelfIntersectingPolyline = (polyline: Polyline): Polyline[] => {
+  if (polyline.vertexCount < 2) {
+    return []
+  }
+
+  const intersections: PlineIntersect[] = []
+  polyline.visitSelfIntersectsOpt(
+    (intersection: PlineIntersect): void => {
+      intersections.push(intersection)
+    },
+    { posEqualEps: POSITION_EPSILON },
+  )
+
+  if (intersections.length === 0) {
+    return [polyline]
+  }
+
+  const contour = createContour(polyline, 'first')
+  for (const intersection of intersections) {
+    const points = intersection.kind === 'basic' ? [intersection.point] : [intersection.point1, intersection.point2]
+    contour.splitPoints[intersection.startIndex1].push(...points)
+    contour.splitPoints[intersection.startIndex2].push(...points)
+  }
+
+  const result: Polyline[] = []
+  const walk: ContourEdge[] = []
+  for (const edge of splitContour(contour)) {
+    walk.push(edge)
+    const loopStart = walk.findIndex((previous) => arePositionsEqual(previous.start.pos(), edge.end.pos()))
+    if (loopStart >= 0) {
+      result.push(
+        Polyline.fromVertexes(
+          walk.splice(loopStart).map((segment) => segment.start),
+          true,
+        ),
+      )
+    }
+  }
+  return result
 }
 
 const toPolylineVertex = (segment: PathSegment): PlineVertex => {

@@ -83,6 +83,84 @@ type PanelCutoutTestCase = {
   highlightAreas: number[]
 }
 
+describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
+  'self-intersecting pocket openings facing %s',
+  (orientation) => {
+    it.each([42, 51])('computes all pockets and subtracts holes with outer inset %s', (outerInset) => {
+      const isVertical = orientation === 'up' || orientation === 'down'
+      const root = d.rootPanel({
+        id: 'root',
+        width: isVertical ? 102.6 : 92.6,
+        height: isVertical ? 92.6 : 102.6,
+        children: ['cluster'],
+      })
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        orientation,
+        pocketCount: 3,
+        pocketStep: 10,
+        topLeftRadius: 8,
+        topRightRadius: 8,
+        bottomLeftRadius: 8,
+        bottomRightRadius: 8,
+        defaultOpening: {
+          id: 'own:default',
+          name: 'Default',
+          type: 'recessed',
+          outerInset,
+          innerOffset: 8,
+          depth: 10,
+          outerRadius: 55,
+          innerRadius: 39,
+        },
+      })
+      const subProject = d.subProject({ id: 'sub-project', root, components: [cluster] })
+      const originalInput = JSON.stringify(subProject)
+      const before = getComputedSubProject(subProject, defaultStitchingSettings)
+      const beforeCluster = accessors.computedSubProject(before).pocketCluster(cluster.id)
+      expect(beforeCluster.tPockets).toHaveLength(2)
+      expect(getClosedPathArea(beforeCluster.path)).toBeGreaterThan(0)
+
+      const hole: HoleSchema = {
+        ...d.hole({ id: 'hole', componentId: cluster.id }),
+        width: 6,
+        height: 6,
+        xAnchor: 'middle',
+        yAnchor: 'middle',
+        xOffset: 0,
+        yOffset: 0,
+      }
+      const withHole = getComputedSubProject({ ...subProject, holes: [hole] }, defaultStitchingSettings)
+      const afterCluster = accessors.computedSubProject(withHole).pocketCluster(cluster.id)
+      expect(getClosedPathArea(beforeCluster.path) - getClosedPathArea(afterCluster.path)).toBeCloseTo(36, 6)
+      expect(
+        isPointInClosedPath(
+          { x: new BigNumber(root.width / 2), y: new BigNumber(root.height / 2) },
+          beforeCluster.path,
+        ),
+      ).toBe(true)
+      expect(
+        isPointInClosedPath({ x: new BigNumber(root.width / 2), y: new BigNumber(root.height / 2) }, afterCluster.path),
+      ).toBe(false)
+      for (const path of [
+        afterCluster.path,
+        afterCluster.frontPocket.path,
+        ...afterCluster.tPockets.map((pocket) => pocket.path),
+      ]) {
+        expect(getClosedPathLoops(path).length).toBeGreaterThan(0)
+        for (const segment of getClosedPathLoops(path).flat()) {
+          expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
+          expect(segment.end.x.isFinite() && segment.end.y.isFinite()).toBe(true)
+          if (segment.type === 'arc') {
+            expect([8, 39, 55].some((radius) => Math.abs(segment.radius.toNumber() - radius) < 1e-7)).toBe(true)
+          }
+        }
+      }
+      expect(JSON.stringify(subProject)).toBe(originalInput)
+    })
+  },
+)
+
 describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutouts', (ownerType) => {
   const ownerId = ownerType === 'root-panel' ? 'root' : 'panel'
   const otherId = ownerType === 'root-panel' ? 'panel' : 'root'
