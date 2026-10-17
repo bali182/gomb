@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useReducer, useState } from 'react'
 
 import type { EditableSchema, EditableSchemaContextSchema } from '../schemas/editable'
 import type { ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { isDefined } from '../utils/isDefined'
 import { isReferentiallyEqual } from '../utils/isReferentiallyEqual'
+import { editableModelReducer, type EditableModelState } from './editableModelReducer'
 import { useThrottledCallback } from './useThrottledCallback'
 
 export type ImmediateUpdater<T> = (current: EditableSchema<T>, currentValue: T) => EditableSchema<T>
@@ -26,6 +27,36 @@ type UseEditableModelOptions<T, C> = {
   throttle?: number
 }
 
+/**
+ * Edits a model without putting incomplete form input into the project.
+ * Input changes immediately. Validated project writes are throttled.
+ *
+ * NORMAL EDIT
+ * setValue → 'edit' stores the input and sets needsCommit.
+ * The processing effect sends validationResult.committedValue to the throttle
+ * and dispatches 'edit-processed' to avoid scheduling the same input again.
+ * The throttle keeps only the latest waiting value.
+ *
+ * PROJECT WRITE
+ * commitLocally dispatches 'commit-sent', then calls commit.
+ * sentValue identifies our own write when it returns through the value prop.
+ *
+ * IMMEDIATE EDIT
+ * setValueImmediately queues an updater. Execution happens in the processing effect.
+ * It flushes the throttle and commits any input not yet scheduled.
+ * Then it runs, validates and commits each updater in order without throttling.
+ * Each updater receives the previous editable and committed values.
+ * 'immediate-applied' adopts the final input. Executed requests are removed.
+ *
+ * INCOMING PROJECT VALUE
+ * The layout effect handles incoming changes before further input processing.
+ * A match with sentValue dispatches 'project-acknowledged', preserving newer input.
+ * Otherwise it cancels pending work and dispatches 'project-replaced' to reload input.
+ * Example: our committed 11 returns while input is already 12 → input stays 12.
+ * Processing waits while value differs from the already handled projectValue.
+ *
+ * needsCommit means “input not yet scheduled”, not “project write still pending”.
+ */
 export const useEditableModel = <T, C extends EditableSchemaContextSchema>({
   commit,
   context,
@@ -34,89 +65,113 @@ export const useEditableModel = <T, C extends EditableSchemaContextSchema>({
   isEqual = isReferentiallyEqual,
   throttle = 0,
 }: UseEditableModelOptions<T, C>): UseEditableModelResult<T> => {
-  const [isDirty, setIsDirty] = useState(false)
-  const [locallyCommittedValue, setLocallyCommittedValue] = useState<T | undefined>(undefined)
-  const [lastObservedValue, setLastObservedValue] = useState(value)
-  const [editableValue, setEditableValue] = useState<EditableSchema<T>>(() => getEditableSchema(value, context))
-  const editableValueRef = useRef(editableValue)
-  const processedEditableValueRef = useRef(editableValue)
-  const committedValueRef = useRef(value)
+  const [state, dispatch] = useReducer(
+    editableModelReducer<T>,
+    value,
+    (initialValue: T): EditableModelState<T> => ({
+      editableValue: getEditableSchema(initialValue, context),
+      projectValue: initialValue,
+      sentValue: undefined,
+      needsCommit: false,
+    }),
+  )
+  const [pendingUpdates, setPendingUpdates] = useState<ImmediateUpdater<T>[]>([])
 
   const commitLocally = useCallback(
-    (committedValue: T): void => {
-      committedValueRef.current = committedValue
-      setLocallyCommittedValue(committedValue)
+    (committedValue: T): T => {
+      dispatch({ type: 'commit-sent', value: committedValue })
       commit(committedValue)
+      return committedValue
     },
     [commit],
   )
-  const { call: throttledCommit, flush: flushCommit } = useThrottledCallback(commitLocally, throttle)
 
-  const validationResult = validate(
-    editableValue,
-    isDefined(locallyCommittedValue) ? locallyCommittedValue : value,
-    context,
-  )
+  const {
+    call: throttledCommit,
+    flush: flushCommit,
+    cancel: cancelCommit,
+  } = useThrottledCallback(commitLocally, throttle)
+
+  const validationResult = validate(state.editableValue, isDefined(state.sentValue) ? state.sentValue : value, context)
+
+  useLayoutEffect(() => {
+    if (value === state.projectValue) {
+      return
+    }
+
+    if (isEqual(value, state.sentValue)) {
+      dispatch({ type: 'project-acknowledged', value })
+      return
+    }
+
+    cancelCommit()
+    setPendingUpdates((current: ImmediateUpdater<T>[]): ImmediateUpdater<T>[] => (current.length === 0 ? current : []))
+    dispatch({ type: 'project-replaced', value, editableValue: getEditableSchema(value, context) })
+  }, [cancelCommit, context, isEqual, state.projectValue, state.sentValue, value])
 
   useEffect(() => {
-    if (value === lastObservedValue) {
+    // Wait until the project value has been acknowledged or adopted before processing the draft.
+    if (value !== state.projectValue) {
       return
     }
 
-    setLastObservedValue(value)
-
-    if (isEqual(value, locallyCommittedValue)) {
-      setLocallyCommittedValue(undefined)
-      return
-    }
-
-    const updatedEditable = getEditableSchema(value, context)
-    editableValueRef.current = updatedEditable
-    processedEditableValueRef.current = updatedEditable
-    committedValueRef.current = value
-    setLocallyCommittedValue(undefined)
-    setEditableValue(updatedEditable)
-    setIsDirty(false)
-  }, [context, isEqual, lastObservedValue, locallyCommittedValue, value])
-
-  useEffect(() => {
-    if (!isDirty || editableValue !== editableValueRef.current || editableValue === processedEditableValueRef.current) {
-      return
-    }
-
-    processedEditableValueRef.current = editableValue
-    throttledCommit(validate(editableValue, committedValueRef.current, context).committedValue)
-  }, [context, editableValue, isDirty, throttledCommit, validate])
-
-  const setValue = useCallback((updatedValue: EditableSchema<T>): void => {
-    editableValueRef.current = updatedValue
-    setEditableValue(updatedValue)
-    setIsDirty(true)
-  }, [])
-
-  const setValueImmediately = useCallback(
-    (update: ImmediateUpdater<T>): void => {
-      flushCommit()
-
-      // setValue may have run before its processing effect. Commit that newer input
-      // after the queued commit, so the updater sees its validated fallback values too.
-      const current = editableValueRef.current
-      if (current !== processedEditableValueRef.current) {
-        processedEditableValueRef.current = current
-        commitLocally(validate(current, committedValueRef.current, context).committedValue)
+    if (pendingUpdates.length === 0) {
+      if (!state.needsCommit) {
+        return
       }
 
-      const currentValue = committedValueRef.current
-      const updatedValue = update(current, currentValue)
-      const result = validate(updatedValue, currentValue, context)
-      editableValueRef.current = updatedValue
-      processedEditableValueRef.current = updatedValue
-      setEditableValue(updatedValue)
-      setIsDirty(false)
-      commitLocally(result.committedValue)
-    },
-    [commitLocally, context, flushCommit, validate],
-  )
+      dispatch({ type: 'edit-processed', editableValue: state.editableValue })
+      throttledCommit(validationResult.committedValue)
+      return
+    }
 
-  return { editableValue, setValue, setValueImmediately, validationIssues: validationResult.issues, value }
+    let currentEditable = state.editableValue
+    let currentValue = isDefined(state.sentValue) ? state.sentValue : value
+    const flushedValue = flushCommit()
+    if (isDefined(flushedValue)) {
+      currentValue = flushedValue
+    }
+
+    if (state.needsCommit) {
+      currentValue = commitLocally(validate(currentEditable, currentValue, context).committedValue)
+    }
+
+    for (const update of pendingUpdates) {
+      currentEditable = update(currentEditable, currentValue)
+      currentValue = commitLocally(validate(currentEditable, currentValue, context).committedValue)
+    }
+
+    dispatch({
+      type: 'immediate-applied',
+      sourceEditableValue: state.editableValue,
+      editableValue: currentEditable,
+    })
+    setPendingUpdates((current: ImmediateUpdater<T>[]): ImmediateUpdater<T>[] => current.slice(pendingUpdates.length))
+  }, [
+    commitLocally,
+    context,
+    flushCommit,
+    pendingUpdates,
+    state,
+    throttledCommit,
+    validate,
+    validationResult.committedValue,
+    value,
+  ])
+
+  const setValue = useCallback((updatedValue: EditableSchema<T>): void => {
+    dispatch({ type: 'edit', editableValue: updatedValue })
+  }, [])
+
+  const setValueImmediately = useCallback((update: ImmediateUpdater<T>): void => {
+    setPendingUpdates((current: ImmediateUpdater<T>[]): ImmediateUpdater<T>[] => [...current, update])
+  }, [])
+
+  return {
+    editableValue: state.editableValue,
+    setValue,
+    setValueImmediately,
+    validationIssues: validationResult.issues,
+    value,
+  }
 }
