@@ -67,14 +67,14 @@ const validateRecessedPocketOpeningSchema = (
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<RecessedPocketOpeningSchema> => {
   const outerInset = validateNumber(input.outerInset, currentValue.outerInset, context, { min: 0 })
-  const innerInset = validateNumber(input.innerInset, currentValue.innerInset, context, { min: 0 })
+  const innerOffset = validateNumber(input.innerOffset, currentValue.innerOffset, context, { min: 0 })
   const depth = validateNumber(input.depth, currentValue.depth, context, { min: 0 })
   const outerRadius = validateNumber(input.outerRadius, currentValue.outerRadius, context, { min: 0 })
   const innerRadius = validateNumber(input.innerRadius, currentValue.innerRadius, context, { min: 0 })
   const issues: ValidationIssuesSchema<RecessedPocketOpeningSchema> = {
     type: undefined,
     outerInset: outerInset.issues,
-    innerInset: innerInset.issues,
+    innerOffset: innerOffset.issues,
     depth: depth.issues,
     outerRadius: outerRadius.issues,
     innerRadius: innerRadius.issues,
@@ -82,13 +82,13 @@ const validateRecessedPocketOpeningSchema = (
   const committedValue: RecessedPocketOpeningSchema = {
     type: 'recessed',
     outerInset: outerInset.committedValue,
-    innerInset: innerInset.committedValue,
+    innerOffset: innerOffset.committedValue,
     depth: depth.committedValue,
     outerRadius: outerRadius.committedValue,
     innerRadius: innerRadius.committedValue,
   }
 
-  if (!outerInset.isValid || !innerInset.isValid || !depth.isValid || !outerRadius.isValid || !innerRadius.isValid) {
+  if (!outerInset.isValid || !innerOffset.isValid || !depth.isValid || !outerRadius.isValid || !innerRadius.isValid) {
     return createInvalidValidationResult<RecessedPocketOpeningSchema>(issues, committedValue)
   }
 
@@ -97,7 +97,7 @@ const validateRecessedPocketOpeningSchema = (
     {
       type: 'recessed',
       outerInset: outerInset.value,
-      innerInset: innerInset.value,
+      innerOffset: innerOffset.value,
       depth: depth.value,
       outerRadius: outerRadius.value,
       innerRadius: innerRadius.value,

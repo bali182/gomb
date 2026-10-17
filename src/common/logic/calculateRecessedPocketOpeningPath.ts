@@ -31,14 +31,15 @@ const createRecessedVertices = (
 
   if (opening.depth > 0 && opening.outerInset < width.dividedBy(2).toNumber()) {
     const outer = new BigNumber(opening.outerInset)
-    const inner = new BigNumber(opening.innerInset)
+    const halfWidth = width.dividedBy(2)
+    const innerOffset = new BigNumber(opening.innerOffset)
     const depth = new BigNumber(opening.depth)
     const outerRadius = new BigNumber(opening.outerRadius)
     const innerRadius = new BigNumber(opening.innerRadius)
     vertices.push(
       { point: { x: outer, y: zero }, radius: outerRadius },
-      { point: { x: inner, y: depth }, radius: innerRadius },
-      { point: { x: width.minus(inner), y: depth }, radius: innerRadius },
+      { point: { x: halfWidth.minus(innerOffset), y: depth }, radius: innerRadius },
+      { point: { x: halfWidth.plus(innerOffset), y: depth }, radius: innerRadius },
       { point: { x: width.minus(outer), y: zero }, radius: outerRadius },
     )
   }

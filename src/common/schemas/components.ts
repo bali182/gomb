@@ -59,8 +59,8 @@ export type RecessedPocketOpeningSchema = {
   type: 'recessed'
   /** Distance from either opening edge to the outer corner, in mm. */
   outerInset: number
-  /** Distance from either opening edge to the inner corner, in mm. */
-  innerInset: number
+  /** Distance outward from the opening center to each inner corner, in mm. */
+  innerOffset: number
   outerRadius: number
   innerRadius: number
   depth: number
