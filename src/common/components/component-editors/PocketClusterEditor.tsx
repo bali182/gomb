@@ -2,6 +2,7 @@ import type { FC } from 'react'
 
 import { Tabs } from '@chakra-ui/react'
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
+import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
@@ -34,9 +35,10 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   parent,
 }) => {
   const { t } = useTranslation()
+  const { activeTab, onTabChange } = useFloatingEditorTab(component.id, 'layout')
 
   return (
-    <Tabs.Root defaultValue="layout" display="flex" flexDirection="column" minH="0">
+    <Tabs.Root value={activeTab} onValueChange={onTabChange} display="flex" flexDirection="column" minH="0">
       <Tabs.List alignItems="center" pr="2">
         <Tabs.Trigger value="layout">{t.project.editors.tabs.components.layout}</Tabs.Trigger>
         <Tabs.Trigger value="pockets">{t.project.editors.tabs.components.pockets}</Tabs.Trigger>
