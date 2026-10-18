@@ -6,8 +6,9 @@ import { PiCar, PiLink, PiLinkBreak, PiPencilLine } from 'react-icons/pi'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema, HasCornerRadiusValuesSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { has } from '../../../utils/has'
+import { isDefined } from '../../../utils/isDefined'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
@@ -15,7 +16,7 @@ import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
 type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
   value: T
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<HasCornerRadiusSchema>
+  issues: IssuesSchema<HasCornerRadiusSchema>
   onChange: (updated: EditableSchema<T>) => void
 }
 
@@ -30,8 +31,11 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const hasAuto = has<Partial<HasAutoCornerRadiusSchema>>(editable, 'autoCornerRadius')
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
 
-  const individualRadiusIssues = useMemo(
-    () => [issues.topLeftRadius, issues.topRightRadius, issues.bottomLeftRadius, issues.bottomRightRadius],
+  const individualRadiusIssues = useMemo<readonly IssueSchema[]>(
+    () =>
+      [issues.topLeftRadius, issues.topRightRadius, issues.bottomLeftRadius, issues.bottomRightRadius].filter(
+        isDefined,
+      ),
     [issues.bottomLeftRadius, issues.bottomRightRadius, issues.topLeftRadius, issues.topRightRadius],
   )
 

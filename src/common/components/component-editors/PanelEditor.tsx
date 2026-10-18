@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import type { ComponentSchema, PanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
@@ -12,7 +12,7 @@ import { SqueezeSection } from './sections/SqueezeSection'
 type PanelEditorProps = {
   component: PanelSchema
   editable: EditableSchema<PanelSchema>
-  issues: ValidationIssuesSchema<PanelSchema>
+  issues: IssuesSchema<PanelSchema>
   onChange: (updated: EditableSchema<PanelSchema>) => void
   parent: ComponentSchema
 }

@@ -6,7 +6,8 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSqueezeSchema, HasSqueezeValuesSchema } from '../../../schemas/common'
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
+import { isDefined } from '../../../utils/isDefined'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
@@ -14,7 +15,7 @@ import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
 type SqueezeSectionProps<T> = {
   component: T
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
@@ -26,12 +27,12 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
 }: SqueezeSectionProps<T>): ReactNode {
   const { t } = useTranslation()
 
-  const horizontalIssues = useMemo(
-    () => [issues.leftSqueeze, issues.rightSqueeze],
+  const horizontalIssues = useMemo<readonly IssueSchema[]>(
+    () => [issues.leftSqueeze, issues.rightSqueeze].filter(isDefined),
     [issues.leftSqueeze, issues.rightSqueeze],
   )
-  const verticalIssues = useMemo(
-    () => [issues.topSqueeze, issues.bottomSqueeze],
+  const verticalIssues = useMemo<readonly IssueSchema[]>(
+    () => [issues.topSqueeze, issues.bottomSqueeze].filter(isDefined),
     [issues.bottomSqueeze, issues.topSqueeze],
   )
 

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef, type FC } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import type { ColorValue } from '../../hooks/useColors'
-import type { IssueSchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { ColorSwatchPicker } from './ColorSwatchPicker'
 

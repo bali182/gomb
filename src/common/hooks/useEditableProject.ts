@@ -2,8 +2,9 @@ import { useMemo } from 'react'
 
 import { LANGUAGE } from '../constants/language'
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { ProjectSchema } from '../schemas/project'
-import type { ProjectBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
+import type { ProjectBasedValidationContextSchema } from '../schemas/validation'
 import { optionalComparators } from '../utils/comparators'
 import { validateProjectSchema } from '../validators/validateProjectSchema'
 import { useEditableModel } from './useEditableModel'
@@ -15,7 +16,7 @@ export type UseEditableProjectResult = {
   editableProject: EditableSchema<ProjectSchema>
   project: ProjectSchema
   setProject: (project: EditableSchema<ProjectSchema>) => void
-  validationIssues: ValidationIssuesSchema<ProjectSchema>
+  validationIssues: IssuesSchema<ProjectSchema>
 }
 
 export const useEditableProject = (projects: readonly ProjectSchema[]): UseEditableProjectResult => {

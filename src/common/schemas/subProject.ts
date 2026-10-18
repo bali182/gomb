@@ -2,6 +2,7 @@ import { ComponentSchema } from './components'
 import { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from './computed'
 import { RectSchema } from './geometry'
 import { HoleSchema } from './hole'
+import type { SubProjectLimitsSchema } from './limits'
 import { StitchLineSchema } from './stitching'
 
 export type SubProjectSchema = {
@@ -12,7 +13,7 @@ export type SubProjectSchema = {
   stitchLines: StitchLineSchema[]
 }
 
-export type ComputedSubProjectSchema = {
+export type ComputedSubProjectGeometrySchema = {
   id: string
   root: string
   components: Record<string, ComputedComponentSchema>
@@ -20,4 +21,8 @@ export type ComputedSubProjectSchema = {
   /** Mapping between the component the stitchlines are drawn on top, and the stitchline itself. */
   stitchLines: Record<string, ComputedStitchLineSchema[]>
   viewBox: RectSchema
+}
+
+export type ComputedSubProjectSchema = ComputedSubProjectGeometrySchema & {
+  limits: SubProjectLimitsSchema
 }

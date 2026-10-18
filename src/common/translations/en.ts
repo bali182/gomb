@@ -23,6 +23,7 @@ import type {
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
+import type { LimitReasonSchema } from '../schemas/limits'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,
@@ -970,6 +971,16 @@ export const EN = {
       invalid: 'The specified path is invalid or not writable.',
       validationFailed: 'The file path could not be validated.',
     },
+  },
+  limits: {
+    reasons: {
+      'parent-corner-radius': (value: string): string => `The parent corner requires a radius of at least ${value} mm.`,
+      'corner-radius-exceeds-edge-length': (value: string): string =>
+        `The available edge length limits the radius to ${value} mm.`,
+      'corner-radii-share-edge': (value: string): string => `The adjacent corner limits the radius to ${value} mm.`,
+      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
+        `The spacing between pockets limits the opening-side corner radius to ${value} mm.`,
+    } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {
     size: (size: string) => `${size}mm`,

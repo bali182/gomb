@@ -4,8 +4,8 @@ import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
 import { CornerRadiusSection } from '../component-editors/sections/CornerRadiusSection'
 import { StitchSidesAndCornersSection } from './sections/StitchSidesAndCornersSection'
@@ -14,7 +14,7 @@ import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 type ComponentBoundsStitchLineEditorProps = {
   value: ComponentBoundsStitchLineSchema
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  issues: ValidationIssuesSchema<ComponentBoundsStitchLineSchema>
+  issues: IssuesSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
   onReset: (key: keyof StitchLineCommonConfigSchema) => void
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<ComponentBoundsStitchLineSchema>

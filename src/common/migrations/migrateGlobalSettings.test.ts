@@ -2,8 +2,8 @@ import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 
 import { VERSION } from '../../version'
-import type { DeepPartial } from '../schemas/migration'
 import type { GlobalSettingsSchema } from '../schemas/settings'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { createDefaultGlobalSettings } from '../utils/createDefaultGlobalSettings'
 import { migrateGlobalSettings } from './migrateGlobalSettings'
 
@@ -12,7 +12,7 @@ const defaults = createDefaultGlobalSettings({ language: 'en-GB', theme: 'light'
 describe('migrateGlobalSettings', () => {
   it('adds nested defaults to versionless settings while preserving existing values and arrays', () => {
     const splitterSizes: [string, string] = ['250px', '450px']
-    const legacySettings: DeepPartial<GlobalSettingsSchema> = {
+    const legacySettings: DeepPartialSchema<GlobalSettingsSchema> = {
       app: { theme: 'dark' },
       ui: { splitterSizes },
       edit: { step: 5 },
@@ -43,7 +43,7 @@ describe('migrateGlobalSettings', () => {
   })
 
   it('migrates an older settings version', () => {
-    const legacySettings: DeepPartial<GlobalSettingsSchema> = {
+    const legacySettings: DeepPartialSchema<GlobalSettingsSchema> = {
       ...defaults,
       version: '0.0.0',
     }
@@ -57,7 +57,7 @@ describe('migrateGlobalSettings', () => {
 
   it('adds nested defaults with the current version while preserving existing values', () => {
     const splitterSizes: [string, string] = ['250px', '450px']
-    const input: DeepPartial<GlobalSettingsSchema> = {
+    const input: DeepPartialSchema<GlobalSettingsSchema> = {
       version: VERSION,
       app: { theme: 'dark' },
       ui: { splitterSizes },

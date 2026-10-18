@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiProhibit } from 'react-icons/pi'
 
-import type { IssueSchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { NumberInput } from '../common/NumberInput'
 import { Tooltip } from '../common/Tooltip'
 import { HIDDEN_INPUT_OPACITY } from './colors'

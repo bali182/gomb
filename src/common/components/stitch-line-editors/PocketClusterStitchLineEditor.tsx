@@ -4,15 +4,15 @@ import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { PocketClusterStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketStitchingSection } from './sections/PocketStitchingSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 
 type PocketClusterStitchLineEditorProps = {
   editable: EditableSchema<PocketClusterStitchLineSchema>
-  issues: ValidationIssuesSchema<PocketClusterStitchLineSchema>
+  issues: IssuesSchema<PocketClusterStitchLineSchema>
   onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
   onReset: (key: keyof StitchLineCommonConfigSchema) => void
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<PocketClusterStitchLineSchema>

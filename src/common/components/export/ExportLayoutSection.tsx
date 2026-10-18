@@ -2,14 +2,14 @@ import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ExportSettingsSchema } from '../../schemas/settings'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 
 type ExportLayoutSectionProps = {
   editable: EditableSchema<ExportSettingsSchema>
-  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 

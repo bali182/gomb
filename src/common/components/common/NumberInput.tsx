@@ -3,7 +3,7 @@ import { useEffect, useRef, type FC, type ReactNode } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import { useNumberEditorStepContext } from '../../contexts/NumberEditorStepContext'
-import type { IssueSchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 
 type NumberInputProps = {

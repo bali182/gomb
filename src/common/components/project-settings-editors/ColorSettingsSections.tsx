@@ -12,14 +12,14 @@ import {
 import { useColors } from '../../hooks/useColors'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ProjectSchema } from '../../schemas/project'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { ColorInput } from '../common/ColorInput'
 import { SectionGroup } from '../common/SectionGroup'
 
 type ProjectComponentSettingsSectionProps = {
   editable: EditableSchema<ProjectSchema>
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
 }
 
@@ -133,10 +133,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.leatherColor.tooltip}>
           {t.project.editors.sections.project.components.leatherColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.leatherColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.leatherColor}>
           <ColorInput
             colors={leatherColorValues}
-            issue={issues.colorSettings.leatherColor}
+            issue={issues.colorSettings?.leatherColor}
             onChange={handleLeatherColorChange}
             value={editable.colorSettings.leatherColor}
           />
@@ -145,10 +145,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.strokeColor.tooltip}>
           {t.project.editors.sections.project.components.strokeColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.strokeColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.strokeColor}>
           <ColorInput
             colors={strokeColorValues}
-            issue={issues.colorSettings.strokeColor}
+            issue={issues.colorSettings?.strokeColor}
             onChange={handleStrokeColorChange}
             value={editable.colorSettings.strokeColor}
           />
@@ -157,10 +157,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.cardColor.tooltip}>
           {t.project.editors.sections.project.components.cardColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.cardColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.cardColor}>
           <ColorInput
             colors={cardColorValues}
-            issue={issues.colorSettings.cardColor}
+            issue={issues.colorSettings?.cardColor}
             onChange={handleCardColorChange}
             value={editable.colorSettings.cardColor}
           />
@@ -174,10 +174,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.stitchHoleColor.tooltip}>
           {t.project.editors.sections.project.stitching.stitchHoleColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchHoleColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.stitchHoleColor}>
           <ColorInput
             colors={stitchHoleColorValues}
-            issue={issues.colorSettings.stitchHoleColor}
+            issue={issues.colorSettings?.stitchHoleColor}
             onChange={handleStitchHoleColorChange}
             value={editable.colorSettings.stitchHoleColor}
           />
@@ -185,10 +185,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.stitchLineColor.tooltip}>
           {t.project.editors.sections.project.stitching.stitchLineColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.stitchLineColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.stitchLineColor}>
           <ColorInput
             colors={stitchLineColorValues}
-            issue={issues.colorSettings.stitchLineColor}
+            issue={issues.colorSettings?.stitchLineColor}
             onChange={handleStitchLineColorChange}
             value={editable.colorSettings.stitchLineColor}
           />
@@ -196,10 +196,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.stitching.threadColor.tooltip}>
           {t.project.editors.sections.project.stitching.threadColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.threadColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.threadColor}>
           <ColorInput
             colors={threadColorValues}
-            issue={issues.colorSettings.threadColor}
+            issue={issues.colorSettings?.threadColor}
             onChange={handleThreadColorChange}
             value={editable.colorSettings.threadColor}
           />
@@ -213,10 +213,10 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.selection.selectionColor.tooltip}>
           {t.project.editors.sections.project.selection.selectionColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings.selectionColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.selectionColor}>
           <ColorInput
             colors={selectionColorValues}
-            issue={issues.colorSettings.selectionColor}
+            issue={issues.colorSettings?.selectionColor}
             onChange={handleSelectionColorChange}
             value={editable.colorSettings.selectionColor}
           />

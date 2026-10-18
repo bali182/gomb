@@ -6,7 +6,7 @@ import { leatherColors } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
 import type { BaseComponentSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { IssueSchema, ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssueSchema, IssuesSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { ColorSwatchPicker } from '../common/ColorSwatchPicker'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
@@ -15,7 +15,7 @@ type ComponentFloatingEditorHeaderProps<T extends BaseComponentSchema> = {
   baseColor: string
   editable: EditableSchema<T>
   icon: IconType
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   menu: ReactElement
   onChange: (updated: EditableSchema<T>) => void
   onResetColor: () => void

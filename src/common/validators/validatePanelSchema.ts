@@ -1,11 +1,8 @@
 import type { AnchorSchema } from '../schemas/common'
 import type { LayoutOrientationSchema, PanelSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
@@ -62,7 +59,7 @@ export const validatePanelSchema = (
   const bottomSqueezeResult = validateNumber(input.bottomSqueeze, currentValue.bottomSqueeze, context)
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
-  const issues: ValidationIssuesSchema<PanelSchema> = {
+  const issues: IssuesSchema<PanelSchema> = {
     autoHeight: undefined,
     autoWidth: undefined,
     bottomLeftRadius: bottomLeftRadiusResult.issues,

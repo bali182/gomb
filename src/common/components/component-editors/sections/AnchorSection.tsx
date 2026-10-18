@@ -13,13 +13,13 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
 import type { ComponentSchema, HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type AnchorSectionProps<T> = {
   parent: ComponentSchema
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 

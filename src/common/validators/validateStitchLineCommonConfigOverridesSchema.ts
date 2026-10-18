@@ -1,11 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
+import type { IssueSchema, IssuesSchema } from '../schemas/issues'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
-import type {
-  ComponentBasedValidationContextSchema,
-  IssueSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
@@ -27,7 +23,7 @@ export const validateStitchLineCommonConfigOverridesSchema = (
     ...currentValue,
   }
   const resolvedResult = validateStitchLineCommonConfigSchema(resolvedEditable, resolvedCurrentValue, context)
-  const issues: ValidationIssuesSchema<StitchLineCommonConfigOverridesSchema> = {
+  const issues: IssuesSchema<StitchLineCommonConfigOverridesSchema> = {
     stitchHoleDistance: getOverrideIssue(input.stitchHoleDistance, resolvedResult.issues.stitchHoleDistance),
     stitchHoleLength: getOverrideIssue(input.stitchHoleLength, resolvedResult.issues.stitchHoleLength),
     stitchHoleThickness: getOverrideIssue(input.stitchHoleThickness, resolvedResult.issues.stitchHoleThickness),

@@ -1,9 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { ZERO } from '../../constants/layout'
-import { CornerRadiusSchema, RectSchema } from '../../schemas/geometry'
+import { CornerRadiusSchema } from '../../schemas/geometry'
 import { ResolvedComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { getCornerRadius } from '../cornerRadiusUtils'
 import { getAdjustedCornerRadius } from '../getAdjustedCornerRadius'
+import { getComponentBoundsStitchLineCornerRadiusLimits } from '../limits/getComponentBoundsStitchLineCornerRadiusLimits'
 import { ComponentBoundsStitchLineTarget } from './helperTypes'
 
 export const getStitchLineAutoCornerRadius = (
@@ -26,35 +27,10 @@ export const getStitchLineCornerRadius = (
   if (stitchLine.autoCornerRadius) {
     return getStitchLineAutoCornerRadius(stitchLine, target)
   }
-  return getAdjustedCornerRadius({
-    boundingRect: getAdjustedBoundingRect(stitchLine, target),
-    cornerRadius: getCornerRadius(stitchLine),
-  })
-}
-
-const getAdjustedBoundingRect = (
-  stitchLine: ResolvedComponentBoundsStitchLineSchema,
-  target: ComponentBoundsStitchLineTarget,
-): RectSchema => {
-  const margin = new BigNumber(stitchLine.stitchMargin)
-  const { x, y, width, height } = target.boundingRect
-
-  switch (stitchLine.targetType) {
-    case 'component':
-      return {
-        x: x.plus(margin),
-        y: y.plus(margin),
-        width: width.minus(margin.times(2)),
-        height: height.minus(margin.times(2)),
-      }
-    case 'hole':
-      return {
-        x: x.minus(margin),
-        y: y.minus(margin),
-        width: width.plus(margin.times(2)),
-        height: height.plus(margin.times(2)),
-      }
-  }
+  return getAdjustedCornerRadius(
+    getCornerRadius(stitchLine),
+    getComponentBoundsStitchLineCornerRadiusLimits(stitchLine, target),
+  )
 }
 
 const getCorner = (

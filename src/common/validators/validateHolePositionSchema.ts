@@ -1,11 +1,8 @@
 import type { AnchorSchema, HasXYOffsetSchema } from '../schemas/common'
 import type { EditableSchema } from '../schemas/editable'
 import type { HasAnchorsSchema } from '../schemas/hole'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
@@ -26,7 +23,7 @@ export const validateHolePositionSchema = (
   const xOffsetResult = validateNumber(input.xOffset, currentValue.xOffset, context)
   const yOffsetResult = validateNumber(input.yOffset, currentValue.yOffset, context)
 
-  const issues: ValidationIssuesSchema<HasAnchorsSchema & HasXYOffsetSchema> = {
+  const issues: IssuesSchema<HasAnchorsSchema & HasXYOffsetSchema> = {
     xAnchor: xAnchorResult.issues,
     xOffset: xOffsetResult.issues,
     yAnchor: yAnchorResult.issues,

@@ -3,8 +3,9 @@ import { useCallback, useMemo } from 'react'
 import { LANGUAGE } from '../constants/language'
 import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { StitchLineCommonConfigSchema, StitchLineSchema } from '../schemas/stitching'
-import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
+import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { validateStitchLineSchema } from '../validators/validateStitchLineSchema'
 import { useEditableModel } from './useEditableModel'
@@ -19,7 +20,7 @@ export type UseEditableStitchLineResult = {
   resolvedEditableStitchLine: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<StitchLineSchema>
   setStitchLine: (stitchLine: EditableSchema<StitchLineSchema>) => void
   stitchLine: StitchLineSchema
-  validationIssues: ValidationIssuesSchema<StitchLineSchema>
+  validationIssues: IssuesSchema<StitchLineSchema>
 }
 
 export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLineResult => {

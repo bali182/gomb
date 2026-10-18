@@ -6,9 +6,9 @@ import { ColorSettingsSections } from '../../../common/components/project-settin
 import { ProjectStitchingSection } from '../../../common/components/project-settings-editors/ProjectStitchingSection'
 import { useTranslation } from '../../../common/hooks/useTranslation'
 import type { EditableSchema } from '../../../common/schemas/editable'
+import type { IssueSchema, IssuesSchema } from '../../../common/schemas/issues'
 import type { LoadableSchema } from '../../../common/schemas/loadable'
 import type { ProjectSchema } from '../../../common/schemas/project'
-import type { IssueSchema, ValidationIssuesSchema } from '../../../common/schemas/validation'
 import { ElectronProjectBasicSection } from './ElectronProjectBasicSection'
 
 type ElectronProjectSettingsEditorProps = {
@@ -16,7 +16,7 @@ type ElectronProjectSettingsEditorProps = {
   filePath: string
   filePathIssue: LoadableSchema<IssueSchema | undefined>
   isFilePathManuallyModified: boolean
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
   onFilePathChange: (filePath: string) => void
   onFilePathReset: () => void

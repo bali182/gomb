@@ -1,10 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { PocketClusterStitchLineSchema, StitchDirectionSchema } from '../schemas/stitching'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
@@ -32,7 +29,7 @@ export const validatePocketClusterStitchLineSchema = (
     context,
   )
 
-  const issues: ValidationIssuesSchema<PocketClusterStitchLineSchema> = {
+  const issues: IssuesSchema<PocketClusterStitchLineSchema> = {
     targetId: undefined,
     targetType: undefined,
     endOffset: endOffsetResult.issues,

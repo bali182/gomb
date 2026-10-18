@@ -1,11 +1,8 @@
-import type {
-  ValidationIssuesSchema,
-  ValidationResultInvalidSchema,
-  ValidationResultValidSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ValidationResultInvalidSchema, ValidationResultValidSchema } from '../schemas/validation'
 
 export const createValidValidationResult = <T>(
-  issues: ValidationIssuesSchema<T>,
+  issues: IssuesSchema<T>,
   value: T,
   committedValue = value,
 ): ValidationResultValidSchema<T> => {
@@ -18,7 +15,7 @@ export const createValidValidationResult = <T>(
 }
 
 export const createInvalidValidationResult = <T>(
-  issues: ValidationIssuesSchema<T>,
+  issues: IssuesSchema<T>,
   committedValue: T,
 ): ValidationResultInvalidSchema<T> => {
   return {

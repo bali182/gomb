@@ -1,6 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
-import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 
@@ -36,7 +37,7 @@ export const validateStitchLineCommonConfigSchema = (
     },
   )
 
-  const issues: ValidationIssuesSchema<StitchLineCommonConfigSchema> = {
+  const issues: IssuesSchema<StitchLineCommonConfigSchema> = {
     stitchHoleDistance: stitchHoleDistanceResult.issues,
     stitchHoleLength: stitchHoleLengthResult.issues,
     stitchHoleThickness: stitchHoleThicknessResult.issues,

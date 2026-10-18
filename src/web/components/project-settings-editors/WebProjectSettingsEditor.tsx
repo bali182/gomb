@@ -6,13 +6,13 @@ import { ColorSettingsSections } from '../../../common/components/project-settin
 import { ProjectStitchingSection } from '../../../common/components/project-settings-editors/ProjectStitchingSection'
 import { useTranslation } from '../../../common/hooks/useTranslation'
 import type { EditableSchema } from '../../../common/schemas/editable'
+import type { IssuesSchema } from '../../../common/schemas/issues'
 import type { ProjectSchema } from '../../../common/schemas/project'
-import type { ValidationIssuesSchema } from '../../../common/schemas/validation'
 import { WebProjectBasicSection } from './WebProjectBasicSection'
 
 type WebProjectSettingsEditorProps = {
   editable: EditableSchema<ProjectSchema>
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
 }
 

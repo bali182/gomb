@@ -5,14 +5,14 @@ import { PiArrowsHorizontal, PiArrowsVertical, PiColumns, PiRows, PiRuler } from
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasLayoutSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type LayoutSectionProps<T> = {
   component: T
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 

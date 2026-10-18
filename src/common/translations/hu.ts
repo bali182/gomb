@@ -2,6 +2,7 @@ import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
+import type { LimitReasonSchema } from '../schemas/limits'
 import type { LanguageSchema } from '../schemas/settings'
 import type { TranslationSchema } from './translationSchema'
 
@@ -900,6 +901,16 @@ export const HU = {
       invalid: 'A megadott útvonal érvénytelen vagy nem írható.',
       validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
+  },
+  limits: {
+    reasons: {
+      'parent-corner-radius': (value: string): string => `A szülő sarka miatt a sugár legalább ${value} mm.`,
+      'corner-radius-exceeds-edge-length': (value: string): string =>
+        `A rendelkezésre álló oldalhossz miatt a sugár legfeljebb ${value} mm.`,
+      'corner-radii-share-edge': (value: string): string => `A szomszédos sarok miatt a sugár legfeljebb ${value} mm.`,
+      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
+        `A zsebek közötti távolság miatt a nyílás felőli sarok sugara legfeljebb ${value} mm.`,
+    } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {
     size: (size: string): string => `${size}mm`,

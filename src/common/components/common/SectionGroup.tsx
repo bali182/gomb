@@ -2,9 +2,10 @@ import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
 import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
-import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { isRecord } from '../../utils/isRecord'
+import { issueComparator } from '../../utils/issueComparator'
 import { TooltipIcon } from './TooltipIcon'
 
 type SectionGroupRootProps = {
@@ -31,23 +32,17 @@ type SectionGroupSectionRowTitleProps = {
 
 type SectionGroupSectionRowEditorProps = {
   children: ReactNode
-  issue?: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
+  issue?: IssueSchema | readonly IssueSchema[] | undefined
 }
 
 type SectionGroupSectionFullWidthContentProps = {
   children: ReactNode
-  issue?: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
+  issue?: IssueSchema | readonly IssueSchema[] | undefined
   padded?: boolean
 }
 
 type SectionGroupIssueProps = {
-  issue: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
-}
-
-const severityPriorities: Record<SeveritySchema, number> = {
-  error: 3,
-  info: 1,
-  warning: 2,
+  issue: IssueSchema | readonly IssueSchema[] | undefined
 }
 
 const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true, spaced = true }) => {
@@ -111,26 +106,14 @@ const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
     if (!isDefined(issues) || isRecord(issues)) {
       return issues
     }
-    const definedIssues = issues.filter((candidateIssue): candidateIssue is IssueSchema => isDefined(candidateIssue))
+    const highestSeverityIssue = Array.from(issues).sort(issueComparator)[0]
 
-    if (definedIssues.length === 0) {
-      return undefined
-    }
-
-    if (definedIssues.length === 1) {
-      return definedIssues[0]
-    }
-
-    const highestSeverityIssue = definedIssues.reduce((currentIssue, candidateIssue) => {
-      return severityPriorities[candidateIssue.severity] > severityPriorities[currentIssue.severity]
-        ? candidateIssue
-        : currentIssue
-    })
-
-    return {
-      message: t.validation.multipleIssues(definedIssues.length),
-      severity: highestSeverityIssue.severity,
-    }
+    return issues.length > 1
+      ? {
+          message: t.validation.multipleIssues(issues.length),
+          severity: highestSeverityIssue.severity,
+        }
+      : highestSeverityIssue
   }, [issues, t.validation])
 
   const color = useMemo<ComponentProps<typeof Text>['color']>(() => {

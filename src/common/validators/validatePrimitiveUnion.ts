@@ -1,4 +1,5 @@
-import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 
@@ -49,7 +50,7 @@ export function validatePrimitiveUnion<T extends string>(
     )
   }
 
-  return createValidValidationResult<T>(undefined as ValidationIssuesSchema<T>, value)
+  return createValidValidationResult<T>(undefined as IssuesSchema<T>, value)
 }
 
 const isAllowedPrimitiveUnionValue = <T extends string>(

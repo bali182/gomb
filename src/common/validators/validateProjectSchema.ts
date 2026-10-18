@@ -1,10 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { ProjectSchema } from '../schemas/project'
-import type {
-  ProjectBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { ProjectBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateColorSettings } from './validateColorSettings'
 import { validateName } from './validateName'
@@ -22,7 +19,7 @@ export const validateProjectSchema = (
     context,
   )
   const colorSettingsResult = validateColorSettings(input.colorSettings, currentValue.colorSettings, context)
-  const issues: ValidationIssuesSchema<ProjectSchema> = {
+  const issues: IssuesSchema<ProjectSchema> = {
     id: undefined,
     name: nameResult.issues,
     version: undefined,

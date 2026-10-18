@@ -8,11 +8,8 @@ import type {
   PocketOrientationSchema,
 } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import type { CardSchemaId } from '../schemas/valuables'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
@@ -131,7 +128,7 @@ export const validatePocketClusterSchema = (
   const bottomSqueezeResult = validateNumber(input.bottomSqueeze, currentValue.bottomSqueeze, context)
   const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
 
-  const issues: ValidationIssuesSchema<PocketClusterSchema> = {
+  const issues: IssuesSchema<PocketClusterSchema> = {
     defaultOpening: defaultOpeningResult.issues,
     openings: openingResults.map((result) => result.issues),
     openingMapping: Object.fromEntries(Object.keys(input.openingMapping).map((key) => [key, undefined])),

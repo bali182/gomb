@@ -10,56 +10,58 @@ import type {
 } from './stitching'
 import type { SubProjectSchema } from './subProject'
 
-export type DeepPartial<T> = T extends readonly (infer Item)[]
-  ? DeepPartial<Item>[]
-  : T extends object
-    ? { [Property in keyof T]?: DeepPartial<T[Property]> }
-    : T
+import type { DeepPartialSchema } from './utils'
 
 export type ProjectMigrationContextSchema = {
   t: TranslationSchema
 }
 
 export type ProjectMigration = (
-  project: DeepPartial<ProjectSchema>,
+  project: DeepPartialSchema<ProjectSchema>,
   context: ProjectMigrationContextSchema,
-) => DeepPartial<ProjectSchema>
+) => DeepPartialSchema<ProjectSchema>
 
 export type GlobalSettingsMigration = (
-  settings: DeepPartial<GlobalSettingsSchema>,
+  settings: DeepPartialSchema<GlobalSettingsSchema>,
   defaults: GlobalSettingsSchema,
-) => DeepPartial<GlobalSettingsSchema>
+) => DeepPartialSchema<GlobalSettingsSchema>
 
 export type ProjectMigratorSchema = {
-  project: (input: DeepPartial<ProjectSchema>, context: ProjectMigrationContextSchema) => DeepPartial<ProjectSchema>
+  project: (
+    input: DeepPartialSchema<ProjectSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<ProjectSchema>
   subProject: (
-    input: DeepPartial<SubProjectSchema>,
+    input: DeepPartialSchema<SubProjectSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<SubProjectSchema>
+  ) => DeepPartialSchema<SubProjectSchema>
   colorSettings: (
-    input: DeepPartial<ColorSettingsSchema>,
+    input: DeepPartialSchema<ColorSettingsSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<ColorSettingsSchema>
+  ) => DeepPartialSchema<ColorSettingsSchema>
   stitchingSettings: (
-    input: DeepPartial<StitchLineCommonConfigSchema>,
+    input: DeepPartialSchema<StitchLineCommonConfigSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<StitchLineCommonConfigSchema>
+  ) => DeepPartialSchema<StitchLineCommonConfigSchema>
   rootPanel: (
-    input: DeepPartial<RootPanelSchema>,
+    input: DeepPartialSchema<RootPanelSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<RootPanelSchema>
-  panel: (input: DeepPartial<PanelSchema>, context: ProjectMigrationContextSchema) => DeepPartial<PanelSchema>
+  ) => DeepPartialSchema<RootPanelSchema>
+  panel: (
+    input: DeepPartialSchema<PanelSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<PanelSchema>
   pocketCluster: (
-    input: DeepPartial<PocketClusterSchema>,
+    input: DeepPartialSchema<PocketClusterSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<PocketClusterSchema>
-  hole: (input: DeepPartial<HoleSchema>, context: ProjectMigrationContextSchema) => DeepPartial<HoleSchema>
+  ) => DeepPartialSchema<PocketClusterSchema>
+  hole: (input: DeepPartialSchema<HoleSchema>, context: ProjectMigrationContextSchema) => DeepPartialSchema<HoleSchema>
   componentBoundsStitchLine: (
-    input: DeepPartial<ComponentBoundsStitchLineSchema>,
+    input: DeepPartialSchema<ComponentBoundsStitchLineSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<ComponentBoundsStitchLineSchema>
+  ) => DeepPartialSchema<ComponentBoundsStitchLineSchema>
   pocketClusterStitchLine: (
-    input: DeepPartial<PocketClusterStitchLineSchema>,
+    input: DeepPartialSchema<PocketClusterStitchLineSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartial<PocketClusterStitchLineSchema>
+  ) => DeepPartialSchema<PocketClusterStitchLineSchema>
 }

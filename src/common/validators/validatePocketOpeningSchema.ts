@@ -2,7 +2,8 @@ import { defaultRecessedPocketOpening } from '../defaultStates'
 import type { HasIdentitySchema } from '../schemas/common'
 import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
@@ -16,7 +17,7 @@ export const validatePocketOpeningSchema = (
 ): ValidationResultSchema<PocketOpeningSchema> => {
   const ownResult = validatePocketOpeningOwnSchema(input, currentValue, context)
   const nameResult = validateName(input.name, currentValue.name, currentValue.id, openings, context)
-  const issues: ValidationIssuesSchema<PocketOpeningSchema> = {
+  const issues: IssuesSchema<PocketOpeningSchema> = {
     ...ownResult.issues,
     id: undefined,
     name: nameResult.issues,
@@ -71,7 +72,7 @@ const validateRecessedPocketOpeningSchema = (
   const depth = validateNumber(input.depth, currentValue.depth, context, { min: 0 })
   const outerRadius = validateNumber(input.outerRadius, currentValue.outerRadius, context, { min: 0 })
   const innerRadius = validateNumber(input.innerRadius, currentValue.innerRadius, context, { min: 0 })
-  const issues: ValidationIssuesSchema<RecessedPocketOpeningSchema> = {
+  const issues: IssuesSchema<RecessedPocketOpeningSchema> = {
     type: undefined,
     outerInset: outerInset.issues,
     innerOffset: innerOffset.issues,

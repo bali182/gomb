@@ -2,8 +2,8 @@ import type { FC } from 'react'
 
 import type { EditableSchema } from '../../schemas/editable'
 
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ExportSettingsSchema } from '../../schemas/settings'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { SectionGroup } from '../common/SectionGroup'
 import { ExportContentSection } from './ExportContentSection'
 import { ExportLayoutSection } from './ExportLayoutSection'
@@ -11,7 +11,7 @@ import { ExportPageSection } from './ExportPageSection'
 
 type ExportEditorProps = {
   editable: EditableSchema<ExportSettingsSchema>
-  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 

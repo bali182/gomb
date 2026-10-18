@@ -1,18 +1,17 @@
 import type { ComponentSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
-import type {
-  DeepPartial,
-  ProjectMigration,
-  ProjectMigrationContextSchema,
-  ProjectMigratorSchema,
-} from '../schemas/migration'
+import type { ProjectMigration, ProjectMigrationContextSchema, ProjectMigratorSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { m } from './migrationUtils'
 
 export const createProjectMigration = (migrator: ProjectMigratorSchema): ProjectMigration => {
-  return (project: DeepPartial<ProjectSchema>, context: ProjectMigrationContextSchema): DeepPartial<ProjectSchema> => {
+  return (
+    project: DeepPartialSchema<ProjectSchema>,
+    context: ProjectMigrationContextSchema,
+  ): DeepPartialSchema<ProjectSchema> => {
     const migratedProject = migrator.project(project, context)
     const migratedColorSettings = migrator.colorSettings(m.requireObject(migratedProject.colorSettings), context)
     const migratedStitchingSettings = migrator.stitchingSettings(
@@ -34,14 +33,14 @@ export const createProjectMigration = (migrator: ProjectMigratorSchema): Project
 
 const migrateSubProject = (
   migrator: ProjectMigratorSchema,
-  subProject: DeepPartial<SubProjectSchema>,
+  subProject: DeepPartialSchema<SubProjectSchema>,
   context: ProjectMigrationContextSchema,
-): DeepPartial<SubProjectSchema> => {
+): DeepPartialSchema<SubProjectSchema> => {
   const migratedSubProject = migrator.subProject(m.requireObject(subProject), context)
   const components = Object.fromEntries(
     Object.entries(m.requireObject(migratedSubProject.components)).map(([id, component]) => [
       id,
-      migrateComponent(migrator, component as DeepPartial<ComponentSchema>, context),
+      migrateComponent(migrator, component as DeepPartialSchema<ComponentSchema>, context),
     ]),
   )
   const holes = m
@@ -61,9 +60,9 @@ const migrateSubProject = (
 
 const migrateComponent = (
   migrator: ProjectMigratorSchema,
-  component: DeepPartial<ComponentSchema>,
+  component: DeepPartialSchema<ComponentSchema>,
   context: ProjectMigrationContextSchema,
-): DeepPartial<ComponentSchema> => {
+): DeepPartialSchema<ComponentSchema> => {
   switch (component.type) {
     case 'root-panel':
       return migrator.rootPanel(component, context)
@@ -78,9 +77,9 @@ const migrateComponent = (
 
 const migrateStitchLine = (
   migrator: ProjectMigratorSchema,
-  stitchLine: DeepPartial<StitchLineSchema>,
+  stitchLine: DeepPartialSchema<StitchLineSchema>,
   context: ProjectMigrationContextSchema,
-): DeepPartial<StitchLineSchema> => {
+): DeepPartialSchema<StitchLineSchema> => {
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line':
       return migrator.componentBoundsStitchLine(stitchLine, context)

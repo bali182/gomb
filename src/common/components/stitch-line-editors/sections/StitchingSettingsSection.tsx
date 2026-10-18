@@ -2,8 +2,8 @@ import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
+import type { IssuesSchema } from '../../../schemas/issues'
 import type { StitchLineCommonConfigSchema } from '../../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { isDefined } from '../../../utils/isDefined'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -11,7 +11,7 @@ import { StitchHoleDistanceEditor } from '../StitchHoleDistanceEditor'
 
 type StitchingSettingsSectionProps<T extends Partial<StitchLineCommonConfigSchema>> = {
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
   onReset?: (key: keyof StitchLineCommonConfigSchema) => void
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<T>

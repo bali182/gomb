@@ -3,8 +3,8 @@ import { useCallback, type FC } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { StitchLineCornerToggle } from './StitchLineCornerToggle'
 import { StitchLineDirectionSwitch } from './StitchLineDirectionSwitch'
 import { StitchLineDisconnectedCornerSwitch } from './StitchLineDisconnectedCornerSwitch'
@@ -13,7 +13,7 @@ import { StitchLineOffsetInput, type StitchLineOffsetField } from './StitchLineO
 
 type StitchLineSidesAndCornersProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  issues: ValidationIssuesSchema<ComponentBoundsStitchLineSchema>
+  issues: IssuesSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
 }
 

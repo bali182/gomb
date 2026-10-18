@@ -14,7 +14,11 @@ import type {
 } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
 import type { ResolvedStitchLineSchema, StitchLineCommonConfigSchema } from '../schemas/stitching'
-import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import type {
+  ComputedSubProjectGeometrySchema,
+  ComputedSubProjectSchema,
+  SubProjectSchema,
+} from '../schemas/subProject'
 import { getResolvedStitchLine } from '../utils/getResolvedStitchLine'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -27,6 +31,9 @@ import { calculateRectPath } from './calculateRectPath'
 import { unionClosedPaths } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
+import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
+import { getPocketClusterCornerRadiusLimits } from './limits/getPocketClusterCornerRadiusLimits'
+import { getSubProjectLimits } from './limits/getSubProjectLimits'
 import { normalizePocketCluster } from './normalizePocketCluster'
 import { calculateStitchLines } from './stitching/calculateStitchLines'
 
@@ -61,7 +68,7 @@ export const getComputedSubProject = (
   )
   applyHolePathsToComputedComponents(computedComponents, holes)
 
-  return {
+  const geometry: ComputedSubProjectGeometrySchema = {
     id: subProject.id,
     root: root.componentId,
     components: computedComponents,
@@ -69,6 +76,7 @@ export const getComputedSubProject = (
     stitchLines,
     viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines).flat()),
   }
+  return { ...geometry, limits: getSubProjectLimits(subProject, geometry, stitchingSettings) }
 }
 
 const computeComponent = (
@@ -117,7 +125,11 @@ const computeRootPanel = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedRootPanelSchema => {
-  const cornerRadius = getAdjustedCornerRadius({ boundingRect, cornerRadius: getCornerRadius(rootPanel) })
+  const requestedRadius = getCornerRadius(rootPanel)
+  const cornerRadius = getAdjustedCornerRadius(
+    requestedRadius,
+    getCornerRadiusLimits({ boundingRect, cornerRadius: requestedRadius }),
+  )
   const path = calculateRectPath(boundingRect, cornerRadius)
   const layoutChildren = assertLayoutChildren(getComponentChildren(rootPanel, subProject))
   const computedLayoutGap = calculateGap(layoutChildren, boundingRect, rootPanel)
@@ -157,12 +169,16 @@ const computePanel = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedPanelSchema => {
-  const cornerRadius = getAdjustedCornerRadius({
-    boundingRect,
-    cornerRadius: getCornerRadius(panel),
-    parentBoundingRect,
-    parentCornerRadius,
-  })
+  const requestedRadius = getCornerRadius(panel)
+  const cornerRadius = getAdjustedCornerRadius(
+    requestedRadius,
+    getCornerRadiusLimits({
+      boundingRect,
+      cornerRadius: requestedRadius,
+      parentBoundingRect,
+      parentCornerRadius,
+    }),
+  )
   const path = calculateRectPath(boundingRect, cornerRadius)
   const layoutChildren = assertLayoutChildren(getComponentChildren(panel, subProject))
   const computedLayoutGap = calculateGap(layoutChildren, boundingRect, panel)
@@ -203,13 +219,17 @@ const computePocketCluster = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedPocketClusterSchema => {
-  const cornerRadius = getAdjustedCornerRadius({
-    boundingRect,
-    cornerRadius: getCornerRadius(pocketCluster),
-    parentBoundingRect,
-    parentCornerRadius,
-    radiusCap: getPocketClusterRadiusCap(pocketCluster),
-  })
+  const requestedRadius = getCornerRadius(pocketCluster)
+  const cornerRadius = getAdjustedCornerRadius(
+    requestedRadius,
+    getPocketClusterCornerRadiusLimits({
+      boundingRect,
+      cornerRadius: requestedRadius,
+      parentBoundingRect,
+      parentCornerRadius,
+      pocketCluster,
+    }),
+  )
   const normalizedPocketCluster = normalizePocketCluster(pocketCluster, boundingRect)
   const geometry = calculatePocketClusterGeometry(normalizedPocketCluster, boundingRect, cornerRadius)
   const layoutChildren = assertLayoutChildren(getComponentChildren(pocketCluster, subProject))
@@ -245,21 +265,6 @@ const computePocketCluster = (
   computedComponents[pocketCluster.id] = computed
 
   return computed
-}
-
-const getPocketClusterRadiusCap = (pocketCluster: PocketClusterSchema): Partial<CornerRadiusSchema> => {
-  const pocketStep = new BigNumber(pocketCluster.pocketStep)
-
-  switch (pocketCluster.orientation) {
-    case 'up':
-      return { topLeft: pocketStep, topRight: pocketStep }
-    case 'right':
-      return { topRight: pocketStep, bottomRight: pocketStep }
-    case 'down':
-      return { bottomRight: pocketStep, bottomLeft: pocketStep }
-    case 'left':
-      return { bottomLeft: pocketStep, topLeft: pocketStep }
-  }
 }
 
 const computeLayoutChildren = (

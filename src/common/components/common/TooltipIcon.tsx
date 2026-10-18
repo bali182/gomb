@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiInfo, PiWarningCircle } from 'react-icons/pi'
 
-import type { SeveritySchema } from '../../schemas/validation'
+import type { SeveritySchema } from '../../schemas/issues'
 import { Tooltip } from './Tooltip'
 
 type TooltipIconProps = {

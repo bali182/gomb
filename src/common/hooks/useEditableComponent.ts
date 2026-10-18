@@ -4,7 +4,8 @@ import { LANGUAGE } from '../constants/language'
 import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { ComponentSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { validateComponentSchema } from '../validators/validateComponentSchema'
 import { useComponent } from './useComponent'
 import { ImmediateUpdater, useEditableModel } from './useEditableModel'
@@ -16,7 +17,7 @@ import { useTranslation } from './useTranslation'
 export type UseEditableComponentResult = {
   component: ComponentSchema
   editableComponent: EditableSchema<ComponentSchema>
-  validationIssues: ValidationIssuesSchema<ComponentSchema>
+  validationIssues: IssuesSchema<ComponentSchema>
   setComponent: (component: EditableSchema<ComponentSchema>) => void
   setComponentImmediately: (update: ImmediateUpdater<ComponentSchema>) => void
 }

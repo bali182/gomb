@@ -6,7 +6,7 @@ import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningsEditor } from './PocketOpeningsEditor'
 import { AnchorSection } from './sections/AnchorSection'
@@ -20,7 +20,7 @@ import { SqueezeSection } from './sections/SqueezeSection'
 type PocketClusterEditorProps = {
   component: PocketClusterSchema
   editable: EditableSchema<PocketClusterSchema>
-  issues: ValidationIssuesSchema<PocketClusterSchema>
+  issues: IssuesSchema<PocketClusterSchema>
   onChange: (updated: EditableSchema<PocketClusterSchema>) => void
   onChangeImmediately: (update: ImmediateUpdater<PocketClusterSchema>) => void
   parent: ComponentSchema

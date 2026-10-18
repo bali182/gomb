@@ -3,7 +3,7 @@ import { useCallback, type FC } from 'react'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { PocketClusterSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import type { CardSchemaId } from '../../../schemas/valuables'
 import { isDefined } from '../../../utils/isDefined'
 import { CardPicker } from '../../common/CardPicker'
@@ -12,7 +12,7 @@ import { SectionGroup } from '../../common/SectionGroup'
 
 type CardsSectionProps = {
   editable: EditableSchema<PocketClusterSchema>
-  issues: ValidationIssuesSchema<PocketClusterSchema>
+  issues: IssuesSchema<PocketClusterSchema>
   onChange: (updated: EditableSchema<PocketClusterSchema>) => void
 }
 

@@ -2,8 +2,9 @@ import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 
 import { VERSION } from '../../version'
-import type { DeepPartial, ProjectMigrationContextSchema } from '../schemas/migration'
+import type { ProjectMigrationContextSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { d } from '../testData'
 import { EN } from '../translations/en'
 import { createProject } from '../utils/createProject'
@@ -26,7 +27,7 @@ const createProjectWithSubProject = (): ProjectSchema => {
 describe('migrateProject', () => {
   it('adds missing defaults to a versionless project', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const root = Object.values(legacyProject.subProjects?.[0]?.components ?? {})[0]
 
     if (!isDefined(root)) {
@@ -46,7 +47,7 @@ describe('migrateProject', () => {
 
   it('returns the same result when a versionless project is migrated repeatedly', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
 
     delete legacyProject.version
 
@@ -59,7 +60,7 @@ describe('migrateProject', () => {
 
   it('does not migrate a component with a missing type', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const root = Object.values(legacyProject.subProjects?.[0]?.components ?? {})[0]
 
     if (!isDefined(root)) {
@@ -83,7 +84,7 @@ describe('migrateProject', () => {
       id: 'project',
       subProjects: [d.subProject({ id: 'sub-project', root: rootPanel, stitchLines: [stitchLine] })],
     })
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
 
     delete legacyProject.version
 
@@ -92,7 +93,7 @@ describe('migrateProject', () => {
 
   it('migrates an older project version to the current version', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = {
+    const legacyProject: DeepPartialSchema<ProjectSchema> = {
       ...project,
       version: '0.0.6',
     }
@@ -114,7 +115,7 @@ describe('migrateProject', () => {
       id: 'project',
       subProjects: [d.subProject({ id: 'sub-project', root, components: [pocket, existingPocket] })],
     })
-    const input: DeepPartial<ProjectSchema> = structuredClone(project)
+    const input: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const incompletePocket = input.subProjects?.[0]?.components?.[pocket.id]
 
     if (!isDefined(incompletePocket) || incompletePocket.type !== 'pocket-cluster') {
@@ -133,7 +134,7 @@ describe('migrateProject', () => {
   it('migrates projects with a different version', () => {
     const project = createProjectWithSubProject()
     const [major] = VERSION.split('.')
-    const newerProject: DeepPartial<ProjectSchema> = {
+    const newerProject: DeepPartialSchema<ProjectSchema> = {
       ...project,
       version: `${Number(major) + 1}.0.0`,
     }

@@ -18,7 +18,7 @@ import type {
   RootPanelSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
-import type { DeepPartial, ProjectMigratorSchema } from '../schemas/migration'
+import type { ProjectMigratorSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
@@ -27,6 +27,7 @@ import type {
   StitchLineCommonConfigSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { createProjectMigration } from './createProjectMigration'
 import { m } from './migrationUtils'
 
@@ -139,7 +140,9 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   },
 }
 
-const migratePocketOpening = (input: DeepPartial<PocketOpeningSchema>): DeepPartial<PocketOpeningSchema> => {
+const migratePocketOpening = (
+  input: DeepPartialSchema<PocketOpeningSchema>,
+): DeepPartialSchema<PocketOpeningSchema> => {
   const opening = m.requireObject<PocketOpeningSchema>(input)
   const id = m.requireString(opening, 'id')
   const name = m.requireString(opening, 'name')
@@ -149,7 +152,9 @@ const migratePocketOpening = (input: DeepPartial<PocketOpeningSchema>): DeepPart
   return { ...own, id, name }
 }
 
-const migratePocketOpeningOwn = (opening: DeepPartial<PocketOpeningOwnSchema>): DeepPartial<PocketOpeningOwnSchema> => {
+const migratePocketOpeningOwn = (
+  opening: DeepPartialSchema<PocketOpeningOwnSchema>,
+): DeepPartialSchema<PocketOpeningOwnSchema> => {
   switch (opening.type) {
     case 'straight':
       return { type: 'straight' }

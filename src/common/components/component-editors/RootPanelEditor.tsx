@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import type { RootPanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
@@ -10,7 +10,7 @@ import { SizeSection } from './sections/SizeSection'
 type RootPanelEditorProps = {
   component: RootPanelSchema
   editable: EditableSchema<RootPanelSchema>
-  issues: ValidationIssuesSchema<RootPanelSchema>
+  issues: IssuesSchema<RootPanelSchema>
   onChange: (updated: EditableSchema<RootPanelSchema>) => void
 }
 

@@ -1,6 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type { ColorSettingsSchema } from '../schemas/settings'
-import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateHexColor } from './validateHexColor'
 
@@ -17,7 +18,7 @@ export const validateColorSettings = (
   const cardColorResult = validateHexColor(input.cardColor, currentValue.cardColor, context)
   const threadColorResult = validateHexColor(input.threadColor, currentValue.threadColor, context)
 
-  const issues: ValidationIssuesSchema<ColorSettingsSchema> = {
+  const issues: IssuesSchema<ColorSettingsSchema> = {
     cardColor: cardColorResult.issues,
     leatherColor: leatherColorResult.issues,
     selectionColor: selectionColorResult.issues,
