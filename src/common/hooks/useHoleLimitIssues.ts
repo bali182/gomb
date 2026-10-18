@@ -4,7 +4,7 @@ import type { IssuesSchema } from '../schemas/issues'
 import { accessors } from '../utils/accessors'
 import { getLimitIssues } from '../utils/getLimitIssues'
 import { isDefined } from '../utils/isDefined'
-import { noIssues } from '../utils/noIssues'
+import { noIssues } from '../utils/issueUtils'
 import { useSubProject } from './useSubProject'
 import { useTranslation } from './useTranslation'
 

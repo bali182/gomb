@@ -286,15 +286,19 @@ export const EN = {
               tooltip: 'Use the same corner rounding everywhere, or set each corner separately.',
             },
             topLeftRadius: {
+              label: 'Top-left corner',
               tooltip: 'Sets the radius of the top-left corner.',
             },
             topRightRadius: {
+              label: 'Top-right corner',
               tooltip: 'Sets the radius of the top-right corner.',
             },
             bottomLeftRadius: {
+              label: 'Bottom-left corner',
               tooltip: 'Sets the radius of the bottom-left corner.',
             },
             bottomRightRadius: {
+              label: 'Bottom-right corner',
               tooltip: 'Sets the radius of the bottom-right corner.',
             },
           } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
@@ -367,15 +371,19 @@ export const EN = {
                 'Moves the top and bottom edges. Positive values move them inward. Negative values extend them outward.',
             },
             topSqueeze: {
+              label: 'Top edge',
               tooltip: 'Moves the top edge. Positive values move it inward. Negative values extend it outward.',
             },
             rightSqueeze: {
+              label: 'Right edge',
               tooltip: 'Moves the right edge. Positive values move it inward. Negative values extend it outward.',
             },
             bottomSqueeze: {
+              label: 'Bottom edge',
               tooltip: 'Moves the bottom edge. Positive values move it inward. Negative values extend it outward.',
             },
             leftSqueeze: {
+              label: 'Left edge',
               tooltip: 'Moves the left edge. Positive values move it inward. Negative values extend it outward.',
             },
             individualSqueeze: {
@@ -494,86 +502,110 @@ export const EN = {
           sidesAndCorners: {
             title: 'Seam line',
             top: {
+              label: 'Top edge',
               tooltip: 'Turns stitching on or off along the top edge.',
             },
             right: {
+              label: 'Right edge',
               tooltip: 'Turns stitching on or off along the right edge.',
             },
             bottom: {
+              label: 'Bottom edge',
               tooltip: 'Turns stitching on or off along the bottom edge.',
             },
             left: {
+              label: 'Left edge',
               tooltip: 'Turns stitching on or off along the left edge.',
             },
             topLeftCorner: {
+              label: 'Top-left corner',
               tooltip: 'Turns stitching on or off at the top-left corner.',
             },
             topRightCorner: {
+              label: 'Top-right corner',
               tooltip: 'Turns stitching on or off at the top-right corner.',
             },
             bottomRightCorner: {
+              label: 'Bottom-right corner',
               tooltip: 'Turns stitching on or off at the bottom-right corner.',
             },
             bottomLeftCorner: {
+              label: 'Bottom-left corner',
               tooltip: 'Turns stitching on or off at the bottom-left corner.',
             },
             stitchDisconnectedTopLeftCorner: {
+              label: 'Top-left corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the top and left edges are stitched but the corner is not.',
             },
             stitchDisconnectedTopRightCorner: {
+              label: 'Top-right corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the top and right edges are stitched but the corner is not.',
             },
             stitchDisconnectedBottomLeftCorner: {
+              label: 'Bottom-left corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the bottom and left edges are stitched but the corner is not.',
             },
             stitchDisconnectedBottomRightCorner: {
+              label: 'Bottom-right corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the bottom and right edges are stitched but the corner is not.',
             },
             topStitchDirection: {
+              label: 'Top edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the top edge.',
             },
             rightStitchDirection: {
+              label: 'Right edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the right edge.',
             },
             bottomStitchDirection: {
+              label: 'Bottom edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the bottom edge.',
             },
             leftStitchDirection: {
+              label: 'Left edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the left edge.',
             },
             topStartOffset: {
+              label: 'Top edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             topEndOffset: {
+              label: 'Top edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightStartOffset: {
+              label: 'Right edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightEndOffset: {
+              label: 'Right edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomStartOffset: {
+              label: 'Bottom edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomEndOffset: {
+              label: 'Bottom edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftStartOffset: {
+              label: 'Left edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftEndOffset: {
+              label: 'Left edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
@@ -945,7 +977,6 @@ export const EN = {
     } satisfies Record<CardSchemaId, string>,
   },
   validation: {
-    multipleIssues: (count: number) => `${count} issues`,
     name: {
       empty: 'Name cannot be empty.',
       duplicate: 'This name is already in use.',

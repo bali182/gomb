@@ -1,9 +1,9 @@
-import { Box, HStack, IconButton, Input, InputGroup, Separator, type InputProps } from '@chakra-ui/react'
+import { Box, HStack, IconButton, Input, InputGroup, Separator, type InputProps, type Tokens } from '@chakra-ui/react'
 import { useEffect, useRef, type FC, type ReactNode } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import { useNumberEditorStepContext } from '../../contexts/NumberEditorStepContext'
-import type { IssueSchema } from '../../schemas/issues'
+import type { IssueSchema, SeveritySchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 
 type NumberInputProps = {
@@ -21,6 +21,11 @@ type NumberInputProps = {
   opacity?: number
 }
 
+const issueBorderColors: Partial<Record<SeveritySchema, Tokens['colors']>> = {
+  error: 'border.error',
+  warning: 'border.warning',
+}
+
 // TODO do we need this as a component?
 export const NumberInput: FC<NumberInputProps> = ({
   disabled,
@@ -36,7 +41,7 @@ export const NumberInput: FC<NumberInputProps> = ({
   isResetEnabled,
   opacity,
 }) => {
-  const isInvalid = isDefined(issue) && issue.severity === 'error'
+  const issueBorderColor = isDefined(issue) ? issueBorderColors[issue.severity] : undefined
   const { step } = useNumberEditorStepContext()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -51,8 +56,9 @@ export const NumberInput: FC<NumberInputProps> = ({
 
   const input = (
     <Input
-      aria-invalid={isInvalid}
+      borderColor={issueBorderColor}
       disabled={disabled}
+      focusRingColor={issueBorderColor}
       inputMode="decimal"
       onChange={(event) => onChange(event.currentTarget.value)}
       ref={inputRef}

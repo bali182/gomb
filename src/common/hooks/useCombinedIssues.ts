@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { IssuesSchema } from '../schemas/issues'
 import { isDefined } from '../utils/isDefined'
 import { isRecord } from '../utils/isRecord'
-import { issueComparator } from '../utils/issueComparator'
+import { issueComparator } from '../utils/issueUtils'
 import { narrowers } from '../utils/narrowers'
 
 /** Merges model-shaped issues. Higher severity wins, with earlier sources winning ties. */

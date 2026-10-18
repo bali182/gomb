@@ -8,7 +8,7 @@ import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema, HasCornerRadiusValues
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { has } from '../../../utils/has'
-import { isDefined } from '../../../utils/isDefined'
+import { getLabeledIssues } from '../../../utils/issueUtils'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
@@ -32,11 +32,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
 
   const individualRadiusIssues = useMemo<readonly IssueSchema[]>(
-    () =>
-      [issues.topLeftRadius, issues.topRightRadius, issues.bottomLeftRadius, issues.bottomRightRadius].filter(
-        isDefined,
-      ),
-    [issues.bottomLeftRadius, issues.bottomRightRadius, issues.topLeftRadius, issues.topRightRadius],
+    () => getLabeledIssues<HasCornerRadiusSchema>(issues, t.project.editors.sections.common.cornerRadius),
+    [issues, t],
   )
 
   const handleRadiusTypeChange = useCallback(

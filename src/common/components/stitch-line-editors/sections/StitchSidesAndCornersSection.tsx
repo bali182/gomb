@@ -3,7 +3,7 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { ComponentBoundsStitchLineSchema } from '../../../schemas/stitching'
-import { isDefined } from '../../../utils/isDefined'
+import { getLabeledIssues } from '../../../utils/issueUtils'
 import { SectionGroup } from '../../common/SectionGroup'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
 
@@ -17,33 +17,8 @@ export const StitchSidesAndCornersSection = ({ editable, issues, onChange }: Sti
   const { t } = useTranslation()
   const stitchSidesAndCornersIssues = useMemo<readonly IssueSchema[]>(
     () =>
-      [
-        issues.top,
-        issues.right,
-        issues.bottom,
-        issues.left,
-        issues.topLeftCorner,
-        issues.topRightCorner,
-        issues.bottomRightCorner,
-        issues.bottomLeftCorner,
-        issues.stitchDisconnectedTopLeftCorner,
-        issues.stitchDisconnectedTopRightCorner,
-        issues.stitchDisconnectedBottomRightCorner,
-        issues.stitchDisconnectedBottomLeftCorner,
-        issues.topStitchDirection,
-        issues.rightStitchDirection,
-        issues.bottomStitchDirection,
-        issues.leftStitchDirection,
-        issues.topStartOffset,
-        issues.topEndOffset,
-        issues.rightStartOffset,
-        issues.rightEndOffset,
-        issues.bottomStartOffset,
-        issues.bottomEndOffset,
-        issues.leftStartOffset,
-        issues.leftEndOffset,
-      ].filter(isDefined),
-    [issues],
+      getLabeledIssues<ComponentBoundsStitchLineSchema>(issues, t.project.editors.sections.stitchLines.sidesAndCorners),
+    [issues, t],
   )
 
   return (

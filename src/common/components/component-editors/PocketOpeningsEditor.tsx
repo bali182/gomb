@@ -12,7 +12,7 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { getEditableSchema } from '../../utils/getEditableSchema'
 import { isDefined } from '../../utils/isDefined'
-import { noIssues } from '../../utils/noIssues'
+import { noIssues } from '../../utils/issueUtils'
 import { SectionGroup } from '../common/SectionGroup'
 import { SectionHeaderButton } from '../common/SectionHeaderButton'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
@@ -102,7 +102,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
 
   return (
     <>
-      <SectionGroup.Section spaced={false}>
+      <SectionGroup.ContentGroup>
         <SectionGroup.SectionHeader
           rightAddon={
             <Menu.Root size="sm" positioning={{ sameWidth: false, placement: 'bottom-end' }}>
@@ -165,7 +165,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
             })}
           </Accordion.Root>
         </SectionGroup.SectionFullWidthContent>
-      </SectionGroup.Section>
+      </SectionGroup.ContentGroup>
       <PocketAssignmentsSection component={component} editable={editable} onChange={onChange} />
     </>
   )

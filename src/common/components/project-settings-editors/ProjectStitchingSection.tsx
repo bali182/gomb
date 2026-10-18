@@ -4,7 +4,7 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { ProjectSchema } from '../../schemas/project'
 import type { StitchLineCommonConfigSchema } from '../../schemas/stitching'
-import { noIssues } from '../../utils/noIssues'
+import { noIssues } from '../../utils/issueUtils'
 import { SectionGroup } from '../common/SectionGroup'
 import { StitchingSettingsSection } from '../stitch-line-editors/sections/StitchingSettingsSection'
 

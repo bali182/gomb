@@ -7,7 +7,7 @@ import type { HasSqueezeSchema, HasSqueezeValuesSchema } from '../../../schemas/
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
-import { isDefined } from '../../../utils/isDefined'
+import { getLabeledIssues } from '../../../utils/issueUtils'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
@@ -27,14 +27,20 @@ export function SqueezeSection<T extends HasSqueezeSchema & HasAutoDimensionsSch
 }: SqueezeSectionProps<T>): ReactNode {
   const { t } = useTranslation()
 
-  const horizontalIssues = useMemo<readonly IssueSchema[]>(
-    () => [issues.leftSqueeze, issues.rightSqueeze].filter(isDefined),
-    [issues.leftSqueeze, issues.rightSqueeze],
-  )
-  const verticalIssues = useMemo<readonly IssueSchema[]>(
-    () => [issues.topSqueeze, issues.bottomSqueeze].filter(isDefined),
-    [issues.bottomSqueeze, issues.topSqueeze],
-  )
+  const horizontalIssues = useMemo<readonly IssueSchema[]>(() => {
+    const rowIssues: IssuesSchema<HasSqueezeValuesSchema> = {
+      leftSqueeze: issues.leftSqueeze,
+      rightSqueeze: issues.rightSqueeze,
+    }
+    return getLabeledIssues<HasSqueezeValuesSchema>(rowIssues, t.project.editors.sections.components.squeeze)
+  }, [issues.leftSqueeze, issues.rightSqueeze, t])
+  const verticalIssues = useMemo<readonly IssueSchema[]>(() => {
+    const rowIssues: IssuesSchema<HasSqueezeValuesSchema> = {
+      topSqueeze: issues.topSqueeze,
+      bottomSqueeze: issues.bottomSqueeze,
+    }
+    return getLabeledIssues<HasSqueezeValuesSchema>(rowIssues, t.project.editors.sections.components.squeeze)
+  }, [issues.bottomSqueeze, issues.topSqueeze, t])
 
   const handleSqueezeTypeChange = useCallback(
     (uniformSqueeze: boolean) => {

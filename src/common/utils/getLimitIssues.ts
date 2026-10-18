@@ -4,7 +4,7 @@ import type { NumericBoundSchema, NumericFieldLimitsSchema, NumericLimitsSchema 
 import type { NumericFieldNameSchema } from '../schemas/utils'
 import type { TranslationResult } from '../translations/getTranslation'
 import { isDefined } from './isDefined'
-import { noIssues } from './noIssues'
+import { noIssues } from './issueUtils'
 
 /** Evaluates only this model's own numeric fields, leaving nested models to their editors. */
 export const getLimitIssues = <T extends HasTypeSchema<string>>(
