@@ -32,9 +32,9 @@ const getAdjustedRecessedPocketOpening = (
   const halfWidth = (isVertical ? pocketRect.width : pocketRect.height).dividedBy(2)
   const pocketDepth = isVertical ? pocketRect.height : pocketRect.width
   const outerInset = clamp(opening.outerInset, openingCornerRadius, halfWidth)
-  const innerInset = clamp(opening.innerInset, BigNumber.maximum(openingCornerRadius, outerInset), halfWidth)
+  const innerOffset = clamp(opening.innerOffset, 0, halfWidth.minus(outerInset))
   const depth = clamp(opening.depth, 0, pocketDepth)
-  const outerToInnerDistance = innerInset.minus(outerInset)
+  const outerToInnerDistance = halfWidth.minus(innerOffset).minus(outerInset)
   const sideLength = outerToInnerDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.isZero() ? new BigNumber(0) : depth.dividedBy(sideLength.plus(outerToInnerDistance))
   let outerRadius = BigNumber.maximum(opening.outerRadius, 0)
@@ -48,7 +48,7 @@ const getAdjustedRecessedPocketOpening = (
       outerRadius.times(angleFactor),
       BigNumber.maximum(outerInset.minus(openingCornerRadius), 0),
     )
-    let innerLength = BigNumber.minimum(innerRadius.times(angleFactor), halfWidth.minus(innerInset))
+    let innerLength = BigNumber.minimum(innerRadius.times(angleFactor), innerOffset)
     const halfSide = sideLength.dividedBy(2)
 
     if (outerLength.plus(innerLength).isGreaterThan(sideLength)) {
@@ -69,7 +69,7 @@ const getAdjustedRecessedPocketOpening = (
   return {
     type: 'recessed',
     outerInset: outerInset.toNumber(),
-    innerInset: innerInset.toNumber(),
+    innerOffset: innerOffset.toNumber(),
     depth: depth.toNumber(),
     outerRadius: outerRadius.toNumber(),
     innerRadius: innerRadius.toNumber(),

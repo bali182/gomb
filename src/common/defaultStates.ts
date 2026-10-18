@@ -130,7 +130,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
 export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   type: 'recessed',
   outerInset: 15,
-  innerInset: 30,
+  innerOffset: 15,
   depth: 10,
   outerRadius: 10,
   innerRadius: 10,

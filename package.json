@@ -28,6 +28,7 @@
     "@resvg/resvg-wasm": "2.6.2",
     "bignumber.js": "11.1.5",
     "bowser": "2.14.1",
+    "cavalier-contours-js": "0.1.1",
     "comlink": "4.4.2",
     "country-flag-icons": "1.6.20",
     "culori": "4.0.2",

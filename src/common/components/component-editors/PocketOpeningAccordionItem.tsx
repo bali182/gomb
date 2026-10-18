@@ -1,14 +1,10 @@
 import { Accordion, Box, Button, HStack, Input, Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
-import type BigNumber from 'bignumber.js'
-import { useCallback, useEffect, useMemo, type ChangeEvent, type FC } from 'react'
+import { useCallback, useEffect, type ChangeEvent, type FC } from 'react'
 import { PiCaretDown, PiTrash } from 'react-icons/pi'
 
-import { ZERO } from '../../constants/layout'
 import { defaultRecessedPocketOpening } from '../../defaultStates'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useTranslation } from '../../hooks/useTranslation'
-import { getAdjustedPocketOpening } from '../../logic/getAdjustedPocketOpening'
-import { getMaximumOpeningCornerRadius } from '../../logic/pocketUtils'
 import { portalRef } from '../../portalRef'
 import type { HasIdentitySchema } from '../../schemas/common'
 import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
@@ -78,16 +74,6 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
     [editable.id, editable.name, language, onChange],
   )
 
-  const openingCornerRadius = useMemo<BigNumber>(
-    () => (computed.tPockets.length > 0 ? getMaximumOpeningCornerRadius(computed.cornerRadius, orientation) : ZERO),
-    [computed.cornerRadius, computed.tPockets.length, orientation],
-  )
-
-  const adjustedOpening = useMemo<PocketOpeningOwnSchema>(
-    () => getAdjustedPocketOpening(opening, pocketRect, orientation, openingCornerRadius),
-    [openingCornerRadius, orientation, pocketRect, opening],
-  )
-
   return (
     <Accordion.Item value={editable.id}>
       <Box position="relative" bg="bg.muted">
@@ -107,7 +93,7 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
             <PiCaretDown />
           </Accordion.ItemIndicator>
           <PocketOpeningPreview
-            adjustedOpening={adjustedOpening}
+            adjustedOpening={opening}
             pocketRect={pocketRect}
             orientation={orientation}
             width={60}

@@ -24,6 +24,7 @@ import { calculateHoles } from './calculateHoles'
 import { calculateLayoutBoundingBoxes } from './calculateLayoutBoundingBoxes'
 import { calculatePocketClusterGeometry } from './calculatePocketClusterGeometry'
 import { calculateRectPath } from './calculateRectPath'
+import { unionClosedPaths } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { normalizePocketCluster } from './normalizePocketCluster'
@@ -136,7 +137,6 @@ const computeRootPanel = (
     componentId: rootPanel.id,
     boundingRect,
     path,
-    uncutPath: path,
     children,
     cornerRadius,
     computedLayoutGap,
@@ -183,7 +183,6 @@ const computePanel = (
     boundingRect,
     layoutBoundingRect,
     path,
-    uncutPath: path,
     children,
     cornerRadius,
     computedLayoutGap,
@@ -226,14 +225,16 @@ const computePocketCluster = (
     resolvedStitchLines,
     computedComponents,
   )
-  const path = calculateRectPath(boundingRect, cornerRadius)
+  const path = unionClosedPaths(
+    geometry.frontPocket.path,
+    geometry.tPockets.map((pocket) => pocket.path),
+  )
   const computed: ComputedPocketClusterSchema = {
     type: 'computed-pocket-cluster',
     componentId: pocketCluster.id,
     boundingRect,
     layoutBoundingRect,
     path,
-    uncutPath: path,
     cornerRadius,
     children,
     computedLayoutGap,

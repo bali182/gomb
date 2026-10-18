@@ -21,9 +21,9 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
     },
     [editable, onChange],
   )
-  const handleInnerInsetChange = useCallback(
-    (innerInset: string): void => {
-      onChange({ ...editable, innerInset })
+  const handleInnerOffsetChange = useCallback(
+    (innerOffset: string): void => {
+      onChange({ ...editable, innerOffset })
     },
     [editable, onChange],
   )
@@ -59,14 +59,14 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.innerInset.tooltip}>
-        {t.project.editors.sections.components.pocketOpening.innerInset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.innerOffset.tooltip}>
+        {t.project.editors.sections.components.pocketOpening.innerOffset.label}
       </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.innerInset}>
+      <SectionGroup.SectionRowEditor issue={issues.innerOffset}>
         <NumberInput
-          value={editable.innerInset}
-          issue={issues.innerInset}
-          onChange={handleInnerInsetChange}
+          value={editable.innerOffset}
+          issue={issues.innerOffset}
+          onChange={handleInnerOffsetChange}
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>

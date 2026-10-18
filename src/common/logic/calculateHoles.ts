@@ -6,8 +6,8 @@ import type { RectSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
 import { isDefined } from '../utils/isDefined'
 import { calculateRectPath } from './calculateRectPath'
+import { intersectClosedPaths, isClosedPathCoveredBy } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
-import { intersectClosedPaths, isClosedPathCoveredBy } from './flattenJsUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 
 export const calculateHoles = (

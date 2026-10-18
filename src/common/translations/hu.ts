@@ -358,9 +358,9 @@ export const HU = {
               label: 'Külső betolás',
               tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
             },
-            innerInset: {
-              label: 'Belső betolás',
-              tooltip: 'A belső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            innerOffset: {
+              label: 'Belső eltolás',
+              tooltip: 'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
             },
             depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
             outerRadius: {

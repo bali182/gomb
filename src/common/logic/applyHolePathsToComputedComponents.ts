@@ -1,7 +1,7 @@
 import type { ComputedComponentSchema, ComputedHoleSchema } from '../schemas/computed'
 import type { PathSchema } from '../schemas/geometry'
 import { isDefined } from '../utils/isDefined'
-import { subtractClosedPaths } from './flattenJsUtils'
+import { subtractClosedPaths } from './closedPathBooleanUtils'
 
 export const applyHolePathsToComputedComponents = (
   components: Record<string, ComputedComponentSchema>,

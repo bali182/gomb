@@ -412,9 +412,10 @@ export const EN = {
               label: 'Outer inset',
               tooltip: 'Distance from either opening edge to the outer corner, in mm.',
             },
-            innerInset: {
-              label: 'Inner inset',
-              tooltip: 'Distance from either opening edge to the inner corner, in mm.',
+            innerOffset: {
+              label: 'Inner offset',
+              tooltip:
+                'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
             },
             depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
             outerRadius: {

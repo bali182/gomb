@@ -3,101 +3,156 @@ import BigNumber from 'bignumber.js'
 import type { PocketOrientationSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathCommand, PathSchema, PointSchema, RectSchema } from '../schemas/geometry'
 
-type RecessedPocketOpeningVertex = {
-  point: PointSchema
-  radius: BigNumber
-}
-
 export const calculateRecessedPocketOpeningPath = (
-  adjustedOpening: RecessedPocketOpeningSchema,
+  opening: RecessedPocketOpeningSchema,
   pocketRect: RectSchema,
   orientation: PocketOrientationSchema,
 ): PathSchema => {
   const isVertical = orientation === 'up' || orientation === 'down'
   const width = isVertical ? pocketRect.width : pocketRect.height
-  const vertices = createRecessedVertices(adjustedOpening, width)
-  const commands = calculateRecessedCommands(vertices)
-  const path = { commands: removeZeroLengthLines(commands) }
+  const commands = calculateRecessedCommands(opening, width)
+  const path: PathSchema = { commands: removeZeroLengthLines(commands) }
 
   return transformPocketOpeningPath(path, pocketRect, orientation)
 }
 
-const createRecessedVertices = (
-  opening: RecessedPocketOpeningSchema,
-  width: BigNumber,
-): RecessedPocketOpeningVertex[] => {
+const calculateRecessedCommands = (opening: RecessedPocketOpeningSchema, width: BigNumber): PathCommand[] => {
   const zero = new BigNumber(0)
-  const vertices: RecessedPocketOpeningVertex[] = [{ point: { x: zero, y: zero }, radius: zero }]
+  const halfWidth = width.dividedBy(2)
 
-  if (opening.depth > 0 && opening.outerInset < width.dividedBy(2).toNumber()) {
-    const outer = new BigNumber(opening.outerInset)
-    const inner = new BigNumber(opening.innerInset)
-    const depth = new BigNumber(opening.depth)
-    const outerRadius = new BigNumber(opening.outerRadius)
-    const innerRadius = new BigNumber(opening.innerRadius)
-    vertices.push(
-      { point: { x: outer, y: zero }, radius: outerRadius },
-      { point: { x: inner, y: depth }, radius: innerRadius },
-      { point: { x: width.minus(inner), y: depth }, radius: innerRadius },
-      { point: { x: width.minus(outer), y: zero }, radius: outerRadius },
-    )
+  if (opening.depth === 0 || halfWidth.isLessThanOrEqualTo(opening.outerInset)) {
+    return [
+      { type: 'moveTo', point: { x: zero, y: zero } },
+      { type: 'lineTo', point: { x: width, y: zero } },
+    ]
   }
 
-  vertices.push({ point: { x: width, y: zero }, radius: zero })
-  return vertices.filter(
-    ({ point }, index) =>
-      index === 0 || !point.x.isEqualTo(vertices[index - 1].point.x) || !point.y.isEqualTo(vertices[index - 1].point.y),
-  )
+  const depth = new BigNumber(opening.depth)
+  const horizontalDistance = halfWidth.minus(opening.innerOffset).minus(opening.outerInset)
+  const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
+  const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
+  const requiredLength = new BigNumber(opening.outerRadius).plus(opening.innerRadius).times(angleFactor)
+  const leftTransition = requiredLength.isGreaterThanOrEqualTo(sideLength)
+    ? calculateTouchingTransitionCommands(opening, width, angleFactor)
+    : calculateSeparatedTransitionCommands(opening, width, angleFactor)
+
+  return createSymmetricOpeningCommands(leftTransition, width)
 }
 
-const calculateRecessedCommands = (vertices: RecessedPocketOpeningVertex[]): PathCommand[] => {
-  const commands: PathCommand[] = [{ type: 'moveTo', point: vertices[0].point }]
+const calculateSeparatedTransitionCommands = (
+  opening: RecessedPocketOpeningSchema,
+  width: BigNumber,
+  angleFactor: BigNumber,
+): PathCommand[] => {
+  const zero = new BigNumber(0)
+  const outerRadius = new BigNumber(opening.outerRadius)
+  const innerRadius = new BigNumber(opening.innerRadius)
+  const depth = new BigNumber(opening.depth)
+  const denominator = angleFactor.pow(2).plus(1)
+  const sine = angleFactor.times(2).dividedBy(denominator)
+  const oneMinusCosine = angleFactor.pow(2).times(2).dividedBy(denominator)
+  const outerStart: PointSchema = {
+    x: new BigNumber(opening.outerInset).minus(outerRadius.times(angleFactor)),
+    y: zero,
+  }
+  const innerEnd: PointSchema = {
+    x: width.dividedBy(2).minus(opening.innerOffset).plus(innerRadius.times(angleFactor)),
+    y: depth,
+  }
+  const commands: PathCommand[] = [{ type: 'moveTo', point: outerStart }]
 
-  for (let index = 1; index < vertices.length - 1; index += 1) {
-    commands.push(...calculateCornerCommands(vertices[index - 1].point, vertices[index], vertices[index + 1].point))
+  if (outerRadius.isGreaterThan(0)) {
+    commands.push({
+      type: 'arcTo',
+      point: { x: outerStart.x.plus(outerRadius.times(sine)), y: outerRadius.times(oneMinusCosine) },
+      radius: outerRadius,
+      reversed: false,
+    })
   }
 
-  commands.push({ type: 'lineTo', point: vertices[vertices.length - 1].point })
+  commands.push({
+    type: 'lineTo',
+    point: { x: innerEnd.x.minus(innerRadius.times(sine)), y: depth.minus(innerRadius.times(oneMinusCosine)) },
+  })
+
+  if (innerRadius.isGreaterThan(0)) {
+    commands.push({ type: 'arcTo', point: innerEnd, radius: innerRadius, reversed: true })
+  }
+
   return commands
 }
 
-const calculateCornerCommands = (
-  previous: PointSchema,
-  vertex: RecessedPocketOpeningVertex,
-  next: PointSchema,
+const calculateTouchingTransitionCommands = (
+  opening: RecessedPocketOpeningSchema,
+  width: BigNumber,
+  angleFactor: BigNumber,
 ): PathCommand[] => {
-  const { point, radius } = vertex
-  const incomingX = point.x.minus(previous.x)
-  const incomingY = point.y.minus(previous.y)
-  const outgoingX = next.x.minus(point.x)
-  const outgoingY = next.y.minus(point.y)
-  const incomingLength = incomingX.pow(2).plus(incomingY.pow(2)).sqrt()
-  const outgoingLength = outgoingX.pow(2).plus(outgoingY.pow(2)).sqrt()
-  const turn = incomingX.times(outgoingY).minus(incomingY.times(outgoingX))
-
-  if (radius.isZero() || turn.isZero()) {
-    return [{ type: 'lineTo', point }]
+  const zero = new BigNumber(0)
+  const outerRadius = new BigNumber(opening.outerRadius)
+  const innerRadius = new BigNumber(opening.innerRadius)
+  const depth = new BigNumber(opening.depth)
+  const radiusSum = outerRadius.plus(innerRadius)
+  const innerEnd: PointSchema = {
+    x: width.dividedBy(2).minus(opening.innerOffset).plus(innerRadius.times(angleFactor)),
+    y: depth,
   }
 
-  const cosine = incomingX
-    .times(outgoingX)
-    .plus(incomingY.times(outgoingY))
-    .dividedBy(incomingLength.times(outgoingLength))
-  const factor = new BigNumber(1).minus(cosine).dividedBy(new BigNumber(1).plus(cosine)).sqrt()
-  const length = radius.times(factor)
-  const start = {
-    x: point.x.minus(incomingX.dividedBy(incomingLength).times(length)),
-    y: point.y.minus(incomingY.dividedBy(incomingLength).times(length)),
+  // The centers are radiusSum apart. Their vertical separation is depth - radiusSum.
+  // Solving for their horizontal separation keeps both radii and the inner circle unchanged.
+  const centerDistanceX = depth.times(radiusSum.times(2).minus(depth)).sqrt()
+  const outerStart: PointSchema = { x: innerEnd.x.minus(centerDistanceX), y: zero }
+  const tangentPoint: PointSchema = {
+    x: innerEnd.x.minus(centerDistanceX.times(innerRadius).dividedBy(radiusSum)),
+    y: depth.times(outerRadius).dividedBy(radiusSum),
   }
-  const end = {
-    x: point.x.plus(outgoingX.dividedBy(outgoingLength).times(length)),
-    y: point.y.plus(outgoingY.dividedBy(outgoingLength).times(length)),
+  const commands: PathCommand[] = [{ type: 'moveTo', point: outerStart }]
+
+  if (outerRadius.isGreaterThan(0)) {
+    commands.push({ type: 'arcTo', point: tangentPoint, radius: outerRadius, reversed: false })
+  }
+  if (innerRadius.isGreaterThan(0)) {
+    commands.push({ type: 'arcTo', point: innerEnd, radius: innerRadius, reversed: true })
   }
 
-  return [
-    { type: 'lineTo', point: start },
-    { type: 'arcTo', point: end, radius, reversed: turn.isNegative() },
-  ]
+  return commands
+}
+
+const createSymmetricOpeningCommands = (leftTransition: PathCommand[], width: BigNumber): PathCommand[] => {
+  const zero = new BigNumber(0)
+  const commands: PathCommand[] = [{ type: 'moveTo', point: { x: zero, y: zero } }]
+  const rightTransition: PathCommand[] = []
+  let previousPoint: PointSchema = { x: zero, y: zero }
+
+  for (const command of leftTransition) {
+    switch (command.type) {
+      case 'moveTo':
+        commands.push({ type: 'lineTo', point: command.point })
+        previousPoint = command.point
+        break
+      case 'lineTo':
+      case 'arcTo': {
+        commands.push(command)
+        const mirroredPoint: PointSchema = { x: width.minus(previousPoint.x), y: previousPoint.y }
+        // Reflection and reversing traversal cancel each other's change of arc direction.
+        rightTransition.unshift(
+          command.type === 'arcTo'
+            ? { type: 'arcTo', point: mirroredPoint, radius: command.radius, reversed: command.reversed }
+            : { type: 'lineTo', point: mirroredPoint },
+        )
+        previousPoint = command.point
+        break
+      }
+      case 'close':
+        break
+    }
+  }
+
+  commands.push(
+    { type: 'lineTo', point: { x: width.minus(previousPoint.x), y: previousPoint.y } },
+    ...rightTransition,
+    { type: 'lineTo', point: { x: width, y: zero } },
+  )
+  return commands
 }
 
 const removeZeroLengthLines = (commands: PathCommand[]): PathCommand[] => {
