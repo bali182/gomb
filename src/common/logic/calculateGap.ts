@@ -19,7 +19,7 @@ export const calculateGap = (
       return sum
     }
 
-    return sum.plus(clamp(getMainAxisSize(child, parent), ZERO, parentSpace))
+    return sum.plus(clamp(getMainAxisSize(child, parent), ZERO))
   }, ZERO)
   const autoSizeCount = new BigNumber(children.filter((child) => isMainAxisAuto(child, parent)).length).plus(
     BigNumber.maximum(new BigNumber(children.length).minus(1), ZERO),

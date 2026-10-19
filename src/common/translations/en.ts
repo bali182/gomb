@@ -7,7 +7,7 @@ import type {
   HasName,
   HasOffAxisAnchor,
   HasSizeSchema,
-  HasSqueezeSchema,
+  HasStretchSchema,
   HasXYOffsetSchema,
 } from '../schemas/common'
 import type {
@@ -324,7 +324,7 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasOffAxisAnchor>,
           autoSize: {
             title: 'Size',
-            squeezeActive: 'Squeeze is active!',
+            stretchActive: 'Stretch is active!',
             width: {
               label: 'Width',
               placeholder: 'Fill',
@@ -358,38 +358,38 @@ export const EN = {
               tooltip: 'Adjusts the gaps between child components so the panel is filled.',
             },
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
-          squeeze: {
-            title: 'Squeeze',
+          stretch: {
+            title: 'Stretch',
             horizontal: {
               label: 'Horizontal',
               tooltip:
-                'Moves the left and right edges. Positive values move them inward. Negative values extend them outward.',
+                'Moves the left and right edges. Positive values extend them outward. Negative values move them inward.',
             },
             vertical: {
               label: 'Vertical',
               tooltip:
-                'Moves the top and bottom edges. Positive values move them inward. Negative values extend them outward.',
+                'Moves the top and bottom edges. Positive values extend them outward. Negative values move them inward.',
             },
-            topSqueeze: {
+            topStretch: {
               label: 'Top edge',
-              tooltip: 'Moves the top edge. Positive values move it inward. Negative values extend it outward.',
+              tooltip: 'Moves the top edge. Positive values extend it outward. Negative values move it inward.',
             },
-            rightSqueeze: {
+            rightStretch: {
               label: 'Right edge',
-              tooltip: 'Moves the right edge. Positive values move it inward. Negative values extend it outward.',
+              tooltip: 'Moves the right edge. Positive values extend it outward. Negative values move it inward.',
             },
-            bottomSqueeze: {
+            bottomStretch: {
               label: 'Bottom edge',
-              tooltip: 'Moves the bottom edge. Positive values move it inward. Negative values extend it outward.',
+              tooltip: 'Moves the bottom edge. Positive values extend it outward. Negative values move it inward.',
             },
-            leftSqueeze: {
+            leftStretch: {
               label: 'Left edge',
-              tooltip: 'Moves the left edge. Positive values move it inward. Negative values extend it outward.',
+              tooltip: 'Moves the left edge. Positive values extend it outward. Negative values move it inward.',
             },
-            individualSqueeze: {
+            individualStretch: {
               tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.',
             },
-          } satisfies SectionTranslationSchema<HasSqueezeSchema>,
+          } satisfies SectionTranslationSchema<HasStretchSchema>,
           pockets: {
             title: 'Pockets',
             orientation: {
@@ -790,9 +790,9 @@ export const EN = {
             horizontal: 'Horizontal',
             vertical: 'Vertical',
           } satisfies EnumTranslationSchema<LayoutOrientationSchema>,
-          individualSqueeze: {
-            false: 'Uniform squeeze',
-            true: 'Individual squeeze',
+          individualStretch: {
+            false: 'Uniform stretch',
+            true: 'Individual stretch',
           } satisfies EnumTranslationSchema<boolean>,
         },
         export: {

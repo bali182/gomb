@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest'
 
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
-import type { PanelSchema, PocketClusterSchema, PocketOrientationSchema, RootPanelSchema } from '../schemas/components'
+import type { AnchorSchema } from '../schemas/common'
+import type {
+  LayoutOrientationSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketOrientationSchema,
+  RootPanelSchema,
+} from '../schemas/components'
 import type { ComputedComponentSchema } from '../schemas/computed'
 import type { NumberCornerRadiusSchema, PathSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
@@ -44,9 +51,19 @@ type PocketClusterOffAxisAnchorTestCase = {
   expectedCrossAxisPosition: number
 }
 
-type PositiveSqueezeTestCase = {
+type InwardStretchTestCase = {
   panel: Partial<PanelSchema>
   expectedBoundingRect: ExpectedBoundingRect
+}
+
+type SpaceDistributionTestCase = {
+  name: string
+  fixedSizes: number[]
+  autoCount: number
+  autoGap: boolean
+  gap: number
+  expectedGap: number
+  expectedAutoSize: number
 }
 
 const expectBoundingRect = (component: ComputedComponentSchema, expected: ExpectedBoundingRect) => {
@@ -550,7 +567,7 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.panel(auto.id), [100, 0, 0, 40])
   })
 
-  it('clamps fixed main-axis and cross-axis sizes to the parent bounds', () => {
+  it('preserves fixed main-axis and cross-axis sizes beyond the parent bounds', () => {
     const root = d.rootPanel({
       id: 'root',
       width: 100,
@@ -580,8 +597,8 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(wide.id), [0, 0, 100, 20])
-    expectBoundingRect(computed.panel(tall.id), [100, 0, 20, 60])
+    expectBoundingRect(computed.panel(wide.id), [0, 0, 200, 20])
+    expectBoundingRect(computed.panel(tall.id), [200, -40, 20, 100])
   })
 
   it.each<LayoutGapTestCase>([
@@ -775,7 +792,7 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.panel(child.id), [0, 40, 100, 60])
   })
 
-  it('uses the clamped cross-axis size to position a fixed child', () => {
+  it('uses the full cross-axis size to position an oversized fixed child', () => {
     const root = d.rootPanel({
       id: 'root',
       width: 100,
@@ -787,7 +804,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, 0, 100, 60])
+    expectBoundingRect(computed.panel(child.id), [0, -40, 100, 100])
   })
 
   it.each<PocketClusterOffAxisAnchorTestCase>([
@@ -804,12 +821,12 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.pocketCluster(cluster.id), [0, testCase.expectedCrossAxisPosition, 100, 60])
   })
 
-  it.each<PositiveSqueezeTestCase>([
-    { panel: { topSqueeze: 10 }, expectedBoundingRect: [0, 10, 60, 50] },
-    { panel: { rightSqueeze: 10 }, expectedBoundingRect: [0, 0, 50, 60] },
-    { panel: { bottomSqueeze: 10 }, expectedBoundingRect: [0, 0, 60, 50] },
-    { panel: { leftSqueeze: 10 }, expectedBoundingRect: [10, 0, 50, 60] },
-  ])('squeezes each panel edge inward', (testCase) => {
+  it.each<InwardStretchTestCase>([
+    { panel: { topStretch: -10 }, expectedBoundingRect: [0, 10, 60, 50] },
+    { panel: { rightStretch: -10 }, expectedBoundingRect: [0, 0, 50, 60] },
+    { panel: { bottomStretch: -10 }, expectedBoundingRect: [0, 0, 60, 50] },
+    { panel: { leftStretch: -10 }, expectedBoundingRect: [10, 0, 50, 60] },
+  ])('moves each panel edge inward with negative stretch', (testCase) => {
     const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['child'] })
     const child = d.panel({
       id: 'child',
@@ -827,7 +844,7 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.panel(child.id), testCase.expectedBoundingRect)
   })
 
-  it('clamps each positive squeeze to half of the original axis size minus one', () => {
+  it('limits negative stretch to retain one millimeter of material', () => {
     const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['child'] })
     const child = d.panel({
       id: 'child',
@@ -836,10 +853,10 @@ describe('getComputedSubProject layout', () => {
       height: 60,
       autoHeight: false,
       offAxisAnchor: 'start',
-      topSqueeze: 100,
-      rightSqueeze: 100,
-      bottomSqueeze: 100,
-      leftSqueeze: 100,
+      topStretch: -100,
+      rightStretch: -100,
+      bottomStretch: -100,
+      leftStretch: -100,
     })
     const computed = accessors.computedSubProject(
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
@@ -848,7 +865,7 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.panel(child.id), [29.5, 29.5, 1, 1])
   })
 
-  it('clamps negative vertical squeezes to the parent bounds independently', () => {
+  it('allows positive vertical stretch beyond the parent bounds', () => {
     const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['child'] })
     const child = d.panel({
       id: 'child',
@@ -857,17 +874,17 @@ describe('getComputedSubProject layout', () => {
       height: 60,
       autoHeight: false,
       offAxisAnchor: 'middle',
-      topSqueeze: -100,
-      bottomSqueeze: -100,
+      topStretch: 100,
+      bottomStretch: 100,
     })
     const computed = accessors.computedSubProject(
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, 0, 60, 100])
+    expectBoundingRect(computed.panel(child.id), [0, -80, 60, 260])
   })
 
-  it('clamps negative horizontal squeezes to the parent bounds independently', () => {
+  it('allows positive horizontal stretch beyond the parent bounds', () => {
     const root = d.rootPanel({
       id: 'root',
       width: 100,
@@ -882,17 +899,17 @@ describe('getComputedSubProject layout', () => {
       height: 60,
       autoHeight: false,
       offAxisAnchor: 'middle',
-      rightSqueeze: -100,
-      leftSqueeze: -100,
+      rightStretch: 100,
+      leftStretch: 100,
     })
     const computed = accessors.computedSubProject(
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, 0, 100, 60])
+    expectBoundingRect(computed.panel(child.id), [-80, 0, 260, 60])
   })
 
-  it('does not use a squeezed bounding box to position the next sibling', () => {
+  it('does not use a stretched bounding box to position the next sibling', () => {
     const root = d.rootPanel({
       id: 'root',
       width: 100,
@@ -900,7 +917,7 @@ describe('getComputedSubProject layout', () => {
       layoutGap: 10,
       children: ['first', 'second'],
     })
-    const first = d.panel({ id: 'first', width: 20, autoWidth: false, rightSqueeze: -100 })
+    const first = d.panel({ id: 'first', width: 20, autoWidth: false, rightStretch: 100 })
     const second = d.panel({ id: 'second', width: 20, autoWidth: false })
     const computed = accessors.computedSubProject(
       getComputedSubProject(
@@ -909,19 +926,19 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(first.id), [0, 0, 100, 40])
+    expectBoundingRect(computed.panel(first.id), [0, 0, 120, 40])
     expectBoundingRect(computed.panel(second.id), [30, 0, 20, 40])
   })
 
-  it('applies squeeze to pocket clusters', () => {
+  it('applies stretch to pocket clusters', () => {
     const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
     const cluster = d.pocketCluster({
       id: 'cluster',
       height: 60,
       autoHeight: false,
       offAxisAnchor: 'middle',
-      topSqueeze: 10,
-      bottomSqueeze: 20,
+      topStretch: -10,
+      bottomStretch: -20,
     })
     const computed = accessors.computedSubProject(
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [cluster] }), defaultStitchingSettings),
@@ -1122,3 +1139,303 @@ describe('getComputedSubProject layout', () => {
     expect(patched.components.cluster.layoutGap).toBe(60)
   })
 })
+
+describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
+  'layout overflow and stretch: %s',
+  (layoutOrientation) => {
+    const isHorizontal = layoutOrientation === 'horizontal'
+
+    describe.each(['panel', 'pocket-cluster'] as const)('%s children', (type) => {
+      it.each<SpaceDistributionTestCase>([
+        {
+          name: 'empty layout',
+          fixedSizes: [],
+          autoCount: 0,
+          autoGap: true,
+          gap: 30,
+          expectedGap: 0,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'manual gaps and fixed children',
+          fixedSizes: [20, 30],
+          autoCount: 0,
+          autoGap: false,
+          gap: 10,
+          expectedGap: 10,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'one auto child and one auto gap',
+          fixedSizes: [20],
+          autoCount: 1,
+          autoGap: true,
+          gap: 0,
+          expectedGap: 40,
+          expectedAutoSize: 40,
+        },
+        {
+          name: 'several auto children and gaps',
+          fixedSizes: [20],
+          autoCount: 2,
+          autoGap: true,
+          gap: 0,
+          expectedGap: 20,
+          expectedAutoSize: 20,
+        },
+        {
+          name: 'one oversized fixed child',
+          fixedSizes: [120],
+          autoCount: 2,
+          autoGap: true,
+          gap: 0,
+          expectedGap: 0,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'several fixed children overflowing together',
+          fixedSizes: [70, 70],
+          autoCount: 1,
+          autoGap: false,
+          gap: 10,
+          expectedGap: 10,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'exactly full fixed space',
+          fixedSizes: [100],
+          autoCount: 1,
+          autoGap: false,
+          gap: 0,
+          expectedGap: 0,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'manual gaps consuming all remaining space',
+          fixedSizes: [20],
+          autoCount: 1,
+          autoGap: false,
+          gap: 80,
+          expectedGap: 80,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'manual gaps exceeding the parent',
+          fixedSizes: [20],
+          autoCount: 2,
+          autoGap: false,
+          gap: 100,
+          expectedGap: 100,
+          expectedAutoSize: 0,
+        },
+        {
+          name: 'shared space after manual gaps',
+          fixedSizes: [20],
+          autoCount: 2,
+          autoGap: false,
+          gap: 10,
+          expectedGap: 10,
+          expectedAutoSize: 30,
+        },
+        {
+          name: 'auto children filling without gaps',
+          fixedSizes: [],
+          autoCount: 2,
+          autoGap: false,
+          gap: 0,
+          expectedGap: 0,
+          expectedAutoSize: 50,
+        },
+        {
+          name: 'fixed children sharing the auto gap',
+          fixedSizes: [20, 30],
+          autoCount: 0,
+          autoGap: true,
+          gap: 0,
+          expectedGap: 50,
+          expectedAutoSize: 0,
+        },
+      ])('$name', ({ fixedSizes, autoCount, autoGap, gap, expectedGap, expectedAutoSize }) => {
+        const fixed = fixedSizes.map((size, index) => {
+          const config = {
+            id: 'fixed-' + index,
+            width: isHorizontal ? size : 60,
+            height: isHorizontal ? 60 : size,
+            autoWidth: false,
+            autoHeight: false,
+          }
+          return type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+        })
+        const automatic = Array.from({ length: autoCount }, (_, index) =>
+          type === 'panel' ? d.panel({ id: 'auto-' + index }) : d.pocketCluster({ id: 'auto-' + index }),
+        )
+        const children = [...fixed, ...automatic]
+        const root = d.rootPanel({
+          id: 'root',
+          width: isHorizontal ? 100 : 60,
+          height: isHorizontal ? 60 : 100,
+          layoutOrientation,
+          layoutGap: gap,
+          autoLayoutGap: autoGap,
+          children: children.map((child) => child.id),
+        })
+        const source = d.subProject({ id: 'sub-project', root, components: children })
+        const snapshot = structuredClone(source)
+        const computed = getComputedSubProject(source, defaultStitchingSettings)
+        expect(computed.components[root.id].computedLayoutGap.toNumber()).toBe(expectedGap)
+        let position = 0
+        for (const [index, child] of children.entries()) {
+          const size = index < fixed.length ? fixedSizes[index] : expectedAutoSize
+          const bounds = computed.components[child.id].boundingRect
+          expect(bounds.x.toNumber()).toBeCloseTo(isHorizontal ? position : 0, 10)
+          expect(bounds.y.toNumber()).toBeCloseTo(isHorizontal ? 0 : position, 10)
+          expect(bounds.width.toNumber()).toBeCloseTo(isHorizontal ? size : 60, 10)
+          expect(bounds.height.toNumber()).toBeCloseTo(isHorizontal ? 60 : size, 10)
+          position += size + expectedGap
+        }
+        expect(source).toEqual(snapshot)
+      })
+
+      it.each<AnchorSchema>(['start', 'middle', 'end'])('anchors an oversized child at %s', (offAxisAnchor) => {
+        const root = d.rootPanel({
+          id: 'root',
+          width: isHorizontal ? 100 : 60,
+          height: isHorizontal ? 60 : 100,
+          layoutOrientation,
+          children: ['child'],
+        })
+        const config = {
+          id: 'child',
+          width: isHorizontal ? 130 : 100,
+          height: isHorizontal ? 100 : 130,
+          autoWidth: false,
+          autoHeight: false,
+          offAxisAnchor,
+        }
+        const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+        const computed = getComputedSubProject(
+          d.subProject({
+            id: 'sub-project',
+            root,
+            components: [child],
+          }),
+          defaultStitchingSettings,
+        )
+        const crossPosition = { start: 0, middle: -20, end: -40 }[offAxisAnchor]
+        expectBoundingRect(
+          computed.components[child.id],
+          isHorizontal ? [0, crossPosition, 130, 100] : [crossPosition, 0, 100, 130],
+        )
+      })
+
+      it.each([
+        { size: 0, stretch: -100, expectedSize: 0, inset: 0 },
+        { size: 0.5, stretch: -100, expectedSize: 0.5, inset: 0 },
+        { size: 1, stretch: -100, expectedSize: 1, inset: 0 },
+        { size: 10, stretch: -100, expectedSize: 1, inset: 4.5 },
+        { size: 0, stretch: 5, expectedSize: 10, inset: -5 },
+        { size: 10, stretch: 0, expectedSize: 10, inset: 0 },
+        { size: 10, stretch: 100, expectedSize: 210, inset: -100 },
+      ])('applies stretch $stretch to a $size mm child', ({ size, stretch, expectedSize, inset }) => {
+        const root = d.rootPanel({ id: 'root', children: ['child'], layoutOrientation })
+        const config = {
+          id: 'child',
+          width: size,
+          height: size,
+          autoWidth: false,
+          autoHeight: false,
+          offAxisAnchor: 'start' as const,
+          topStretch: stretch,
+          rightStretch: stretch,
+          bottomStretch: stretch,
+          leftStretch: stretch,
+        }
+        const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+        const computed = getComputedSubProject(
+          d.subProject({
+            id: 'sub-project',
+            root,
+            components: [child],
+          }),
+          defaultStitchingSettings,
+        )
+        expectBoundingRect(computed.components[child.id], [inset, inset, expectedSize, expectedSize])
+        const computedAccessor = accessors.computedSubProject(computed)
+        const bounds = (type === 'panel' ? computedAccessor.panel(child.id) : computedAccessor.pocketCluster(child.id))
+          .layoutBoundingRect
+        expect(bounds.width.toNumber()).toBe(size)
+        expect(bounds.height.toNumber()).toBe(size)
+      })
+
+      it('applies asymmetric stretch after alignment without moving siblings', () => {
+        const root = d.rootPanel({
+          id: 'root',
+          width: 100,
+          height: 100,
+          layoutOrientation,
+          layoutGap: 10,
+          children: ['child', 'sibling'],
+        })
+        const config = {
+          id: 'child',
+          width: 40,
+          height: 40,
+          autoWidth: false,
+          autoHeight: false,
+          offAxisAnchor: 'middle' as const,
+          leftStretch: 7,
+          rightStretch: -3,
+          topStretch: -4,
+          bottomStretch: 6,
+        }
+        const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+        const sibling = d.panel({ id: 'sibling', width: 20, height: 20, autoWidth: false, autoHeight: false })
+        const computed = getComputedSubProject(
+          d.subProject({
+            id: 'sub-project',
+            root,
+            components: [child, sibling],
+          }),
+          defaultStitchingSettings,
+        )
+        expectBoundingRect(computed.components[child.id], isHorizontal ? [-7, 34, 44, 42] : [23, 4, 44, 42])
+        expectBoundingRect(computed.components[sibling.id], isHorizontal ? [50, 40, 20, 20] : [40, 50, 20, 20])
+      })
+    })
+
+    it('keeps nested zero-sized panels and pocket clusters computable', () => {
+      const root = d.rootPanel({
+        id: 'root',
+        width: 100,
+        height: 100,
+        layoutOrientation,
+        children: ['fixed', 'container'],
+      })
+      const fixed = d.panel({ id: 'fixed', width: 120, height: 120, autoWidth: false, autoHeight: false })
+      const container = d.panel({
+        id: 'container',
+        layoutOrientation: isHorizontal ? 'vertical' : 'horizontal',
+        children: ['nested-fixed', 'nested-panel', 'cluster'],
+      })
+      const nestedFixed = d.panel({ id: 'nested-fixed', width: 100, height: 100, autoWidth: false, autoHeight: false })
+      const nestedPanel = d.panel({ id: 'nested-panel' })
+      const cluster = d.pocketCluster({ id: 'cluster' })
+      const computed = getComputedSubProject(
+        d.subProject({
+          id: 'sub-project',
+          root,
+          components: [fixed, container, nestedFixed, nestedPanel, cluster],
+        }),
+        defaultStitchingSettings,
+      )
+      const parent = computed.components[container.id].boundingRect
+      for (const child of [nestedPanel, cluster]) {
+        const bounds = computed.components[child.id].boundingRect
+        expect(bounds.width.toNumber()).toBe(0)
+        expect(bounds.height.toNumber()).toBe(0)
+        expect(bounds.x.isFinite() && bounds.y.isFinite()).toBe(true)
+        expect(bounds.x.gte(parent.x) && bounds.y.gte(parent.y)).toBe(true)
+      }
+    })
+  },
+)

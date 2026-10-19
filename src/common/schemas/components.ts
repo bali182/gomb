@@ -3,7 +3,7 @@ import {
   HasIdentitySchema,
   HasOffAxisAnchor,
   HasSizeSchema,
-  HasSqueezeSchema,
+  HasStretchSchema,
   HasTypeSchema,
 } from './common'
 import { CardSchemaId } from './valuables'
@@ -47,7 +47,7 @@ export type PanelSchema = HasTypeSchema<'panel'> &
   HasChildrenSchema &
   HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
-  HasSqueezeSchema
+  HasStretchSchema
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
@@ -113,7 +113,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasOffAxisAnchor &
   HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
-  HasSqueezeSchema &
+  HasStretchSchema &
   PocketsSchema &
   HasCardsSchema &
   HasPocketOpenings

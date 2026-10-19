@@ -14,7 +14,7 @@ import type {
   HasId,
   HasName,
   HasOffAxisAnchor,
-  HasSqueezeSchema,
+  HasStretchSchema,
   HasXYOffsetSchema,
 } from './schemas/common'
 import type {
@@ -100,12 +100,12 @@ export const defaultHasOffAxisAnchor: HasOffAxisAnchor = {
   offAxisAnchor: 'middle',
 }
 
-export const defaultHasSqueeze: HasSqueezeSchema = {
-  individualSqueeze: true,
-  topSqueeze: 0,
-  rightSqueeze: 0,
-  bottomSqueeze: 0,
-  leftSqueeze: 0,
+export const defaultHasStretch: HasStretchSchema = {
+  individualStretch: true,
+  topStretch: 0,
+  rightStretch: 0,
+  bottomStretch: 0,
+  leftStretch: 0,
 }
 
 export const defaultRootPanel: Omit<RootPanelSchema, keyof HasId | keyof HasName> = {
@@ -122,7 +122,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   ...defaultHasCornerRadius,
   ...defaultHasFillableSize,
   ...defaultHasOffAxisAnchor,
-  ...defaultHasSqueeze,
+  ...defaultHasStretch,
   type: 'panel',
   children: [],
 }
@@ -141,7 +141,7 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   ...defaultHasCornerRadius,
   ...defaultHasFillableSize,
   ...defaultHasOffAxisAnchor,
-  ...defaultHasSqueeze,
+  ...defaultHasStretch,
   type: 'pocket-cluster',
   defaultOpening: { id: 'own:default', name: 'Default', type: 'straight' },
   openings: [],

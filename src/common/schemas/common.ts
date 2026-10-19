@@ -63,15 +63,15 @@ export type HasXYOffsetSchema = {
   yOffset: number
 }
 
-export type HasSqueezeValuesSchema = {
-  topSqueeze: number
-  rightSqueeze: number
-  bottomSqueeze: number
-  leftSqueeze: number
+export type HasStretchValuesSchema = {
+  topStretch: number
+  rightStretch: number
+  bottomStretch: number
+  leftStretch: number
 }
 
-export type HasSqueezeSchema = HasSqueezeValuesSchema & {
-  individualSqueeze: boolean
+export type HasStretchSchema = HasStretchValuesSchema & {
+  individualStretch: boolean
 }
 
 export type HasOffAxisAnchor = {

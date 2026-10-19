@@ -7,7 +7,7 @@ import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
-import { SqueezeSection } from './sections/SqueezeSection'
+import { StretchSection } from './sections/StretchSection'
 
 type PanelEditorProps = {
   component: PanelSchema
@@ -22,7 +22,7 @@ export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues,
     <SectionGroup.Root>
       <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <AnchorSection<PanelSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <SqueezeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <StretchSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <CornerRadiusSection<PanelSchema> value={component} editable={editable} issues={issues} onChange={onChange} />
       <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
     </SectionGroup.Root>

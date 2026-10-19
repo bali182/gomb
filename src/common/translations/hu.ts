@@ -272,7 +272,7 @@ export const HU = {
           },
           autoSize: {
             title: 'Méret',
-            squeezeActive: 'A méretkorrekció aktív!',
+            stretchActive: 'A méretkorrekció aktív!',
             width: {
               label: 'Szélesség',
               placeholder: 'Kitöltés',
@@ -306,33 +306,33 @@ export const HU = {
               tooltip: 'A gyermekkomponensek közötti távolságokat a panel kitöltéséhez igazítja.',
             },
           },
-          squeeze: {
+          stretch: {
             title: 'Méretkorrekció',
             horizontal: {
               label: 'Vízszintes',
-              tooltip: 'A bal és jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+              tooltip: 'A bal és jobb élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja őket.',
             },
             vertical: {
               label: 'Függőleges',
-              tooltip: 'A felső és alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+              tooltip: 'A felső és alsó élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja őket.',
             },
-            topSqueeze: {
+            topStretch: {
               label: 'Felső oldal',
-              tooltip: 'A felső élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+              tooltip: 'A felső élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            rightSqueeze: {
+            rightStretch: {
               label: 'Jobb oldal',
-              tooltip: 'A jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+              tooltip: 'A jobb élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            bottomSqueeze: {
+            bottomStretch: {
               label: 'Alsó oldal',
-              tooltip: 'Az alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+              tooltip: 'Az alsó élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            leftSqueeze: {
+            leftStretch: {
               label: 'Bal oldal',
-              tooltip: 'A bal élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+              tooltip: 'A bal élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            individualSqueeze: {
+            individualStretch: {
               tooltip: 'Minden élen azonos beállítást használ, vagy külön is beállíthatja őket.',
             },
           },
@@ -720,7 +720,7 @@ export const HU = {
             horizontal: 'Vízszintes',
             vertical: 'Függőleges',
           },
-          individualSqueeze: {
+          individualStretch: {
             false: 'Egységes méretkorrekció',
             true: 'Oldalankénti méretkorrekció',
           },
