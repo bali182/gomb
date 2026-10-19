@@ -1,18 +1,21 @@
 import { Accordion, Box, Button, HStack, Input, Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
-import { useCallback, useEffect, type ChangeEvent, type FC } from 'react'
+import { useCallback, useEffect, useMemo, type ChangeEvent, type FC } from 'react'
 import { PiCaretDown, PiTrash } from 'react-icons/pi'
 
 import { defaultRecessedPocketOpening } from '../../defaultStates'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { usePocketOpeningLimitIssues } from '../../hooks/usePocketOpeningLimitIssues'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
+import { getAdjustedPocketOpening } from '../../logic/getAdjustedPocketOpening'
 import { portalRef } from '../../portalRef'
 import type { HasIdentitySchema } from '../../schemas/common'
-import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
+import { accessors } from '../../utils/accessors'
 import { getEditableSchema } from '../../utils/getEditableSchema'
 import { isDefined } from '../../utils/isDefined'
 import { PocketOpeningPreview } from '../common/PocketOpeningPreview'
@@ -29,7 +32,7 @@ type PocketOpeningAccordionItemProps = {
   onDelete?: () => void
 }
 
-const openingTypes: PocketOpeningOwnSchema['type'][] = ['straight', 'recessed']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed']
 
 export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = ({
   pocketCluster,
@@ -45,6 +48,14 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
 
   const { t, language } = useTranslation()
   const computed = useComputedComponent<ComputedPocketClusterSchema>(pocketCluster.id)
+  const { computedSubProject } = useSubProject()
+  const limits = accessors.subProjectLimits(computedSubProject.limits).optional.opening(pocketCluster.id, opening.id)
+  const adjustedOpening = useMemo<PocketOpeningSchema>(() => {
+    if (!isDefined(limits) || limits.type !== opening.type) {
+      return opening
+    }
+    return getAdjustedPocketOpening(opening, limits)
+  }, [opening, limits])
   const pocketRect = computed.frontPocket.boundingRect
   const orientation = pocketCluster.orientation
   const isDefault = opening.id === pocketCluster.defaultOpening.id
@@ -98,7 +109,7 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
             <PiCaretDown />
           </Accordion.ItemIndicator>
           <PocketOpeningPreview
-            adjustedOpening={opening}
+            adjustedOpening={adjustedOpening}
             pocketRect={pocketRect}
             orientation={orientation}
             width={60}

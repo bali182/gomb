@@ -941,6 +941,13 @@ export const HU = {
       'corner-radii-share-edge': (value: string): string => `A szomszédos sarok miatt a sugár legfeljebb ${value} mm.`,
       'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
         `A zsebek közötti távolság miatt a nyílás felőli sarok sugara legfeljebb ${value} mm.`,
+      'pocket-opening-width': (value: string): string =>
+        `A nyílás rendelkezésre álló szélessége miatt az érték legfeljebb ${value} mm.`,
+      'pocket-opening-boundary': (value: string): string => `A zseb körvonala miatt az érték legfeljebb ${value} mm.`,
+      'pocket-opening-corner-clearance': (value: string): string =>
+        `A zseb saroklekerekítése miatt a határérték ${value} mm.`,
+      'pocket-opening-depth': (value: string): string =>
+        `A zseb mélysége miatt a kivágás legfeljebb ${value} mm mély lehet.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {

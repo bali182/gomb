@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it, vi, type BenchCompareOptions } from 'vitest'
 
 import { defaultStitchingSettings } from '../defaultStates'
-import type { PocketOpeningOwnSchema } from '../schemas/components'
+import type { PocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
@@ -21,7 +21,7 @@ vi.doUnmock('./closedPathBooleanUtils')
 type ClusterBenchmarkParams = {
   clusterCount: number
   pocketCount: number
-  opening: PocketOpeningOwnSchema
+  opening: PocketOpeningSchema
   holesPerCluster: number
 }
 
@@ -30,8 +30,10 @@ type ComputationBenchmarkCase = {
   subProject: SubProjectSchema
 }
 
-const straight: PocketOpeningOwnSchema = { type: 'straight' }
-const recessed: PocketOpeningOwnSchema = {
+const straight: PocketOpeningSchema = { id: 'own:default', name: 'Default', type: 'straight' }
+const recessed: PocketOpeningSchema = {
+  id: 'own:default',
+  name: 'Default',
   type: 'recessed',
   outerInset: 18,
   innerOffset: 15,
@@ -61,7 +63,7 @@ const createClusterSubProject = ({
         bottomLeftRadius: 4,
         topRightRadius: 4,
         bottomRightRadius: 4,
-        defaultOpening: { ...opening, id: 'own:default', name: 'Default' },
+        defaultOpening: opening,
       }),
     ]),
     holes: clusterIds.flatMap((componentId) =>

@@ -1,3 +1,4 @@
+import { POSITION_EPSILON } from '../constants/layout'
 import type { PathSchema, PointSchema } from '../schemas/geometry'
 import { getPathSegments } from './pathSegments'
 import type { ArcPathSegment, PathSegment } from './pathSegmentTypes'
@@ -24,8 +25,11 @@ const getHorizontalRayIntersections = (point: PointSchema, segments: PathSegment
     return getArcRayIntersections(point, segment)
   })
 
+  // Adjacent arcs can report slightly different coordinates for the same crossing.
   return intersections.filter((intersection, index) => {
-    return !intersections.slice(0, index).some((previous) => previous.x.isEqualTo(intersection.x))
+    return !intersections
+      .slice(0, index)
+      .some((previous) => previous.x.minus(intersection.x).abs().isLessThanOrEqualTo(POSITION_EPSILON))
   })
 }
 

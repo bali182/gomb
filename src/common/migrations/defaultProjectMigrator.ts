@@ -12,7 +12,6 @@ import {
 import type {
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningOwnSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
@@ -148,16 +147,9 @@ const migratePocketOpening = (
   const name = m.requireString(opening, 'name')
   m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed'])
 
-  const own = migratePocketOpeningOwn(opening)
-  return { ...own, id, name }
-}
-
-const migratePocketOpeningOwn = (
-  opening: DeepPartialSchema<PocketOpeningOwnSchema>,
-): DeepPartialSchema<PocketOpeningOwnSchema> => {
   switch (opening.type) {
     case 'straight':
-      return { type: 'straight' }
+      return { id, name, type: 'straight' }
     case 'recessed':
       return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
     default:

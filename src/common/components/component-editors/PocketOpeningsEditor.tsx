@@ -7,7 +7,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 import { createPocketOpening } from '../../operations/subProject/utils/createPocketOpening'
 import { portalRef } from '../../portalRef'
 import type { HasIdentitySchema } from '../../schemas/common'
-import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { getEditableSchema } from '../../utils/getEditableSchema'
@@ -18,7 +18,7 @@ import { SectionHeaderButton } from '../common/SectionHeaderButton'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
 
-const openingTypes: PocketOpeningOwnSchema['type'][] = ['straight', 'recessed']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed']
 
 type PocketOpeningsEditorProps = {
   component: PocketClusterSchema
@@ -51,7 +51,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   }, [])
 
   const handleAdd = useCallback(
-    (type: PocketOpeningOwnSchema['type']): void => {
+    (type: PocketOpeningSchema['type']): void => {
       onChangeImmediately(
         (
           current: EditableSchema<PocketClusterSchema>,

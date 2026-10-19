@@ -1,5 +1,8 @@
 import BigNumber from 'bignumber.js'
 
-export const clamp = (value: BigNumber.Value, min: BigNumber.Value, max: BigNumber.Value): BigNumber => {
-  return BigNumber.minimum(BigNumber.maximum(value, min), max)
+import { isDefined } from './isDefined'
+
+export const clamp = (value: number | BigNumber, min?: number | BigNumber, max?: number | BigNumber): BigNumber => {
+  const lowerBounded = isDefined(min) ? BigNumber.maximum(value, min) : new BigNumber(value)
+  return isDefined(max) ? BigNumber.minimum(lowerBounded, max) : lowerBounded
 }

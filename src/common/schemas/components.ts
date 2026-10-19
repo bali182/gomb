@@ -51,11 +51,11 @@ export type PanelSchema = HasTypeSchema<'panel'> &
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
-export type StraightPocketOpeningSchema = {
+export type StraightPocketOpeningOwnSchema = {
   type: 'straight'
 }
 
-export type RecessedPocketOpeningSchema = {
+export type RecessedPocketOpeningOwnSchema = {
   type: 'recessed'
   /** Distance from either opening edge to the outer corner, in mm. */
   outerInset: number
@@ -66,9 +66,12 @@ export type RecessedPocketOpeningSchema = {
   depth: number
 }
 
-export type PocketOpeningOwnSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema
+export type StraightPocketOpeningSchema = HasIdentitySchema & StraightPocketOpeningOwnSchema
+export type RecessedPocketOpeningSchema = HasIdentitySchema & RecessedPocketOpeningOwnSchema
 
-export type PocketOpeningSchema = HasIdentitySchema & PocketOpeningOwnSchema
+export type PocketOpeningOwnSchema = StraightPocketOpeningOwnSchema | RecessedPocketOpeningOwnSchema
+
+export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema
 
 export type HasPocketOpenings = {
   defaultOpening: PocketOpeningSchema

@@ -12,7 +12,7 @@ import type { SeveritySchema } from './issues'
 import type { ComponentBoundsStitchLineSchema, PocketClusterStitchLineSchema } from './stitching'
 import type { NumericFieldNameSchema } from './utils'
 
-export type LimitReasonSchema =
+export type CornerRadiusLimitReasonSchema =
   /** A touching parent corner requires a larger radius. */
   | 'parent-corner-radius'
   /** The radius is limited by the available edge length. */
@@ -21,6 +21,18 @@ export type LimitReasonSchema =
   | 'corner-radii-share-edge'
   /** The opening-side corner radius is limited by the pocket step. */
   | 'opening-corner-radius-exceeds-pocket-step'
+
+export type RecessedPocketOpeningLimitsReasonSchema =
+  /** The opening parameters share the available width. */
+  | 'pocket-opening-width'
+  /** The recess must remain inside the pocket outline. */
+  | 'pocket-opening-boundary'
+  /** Opening-side corner rounding requires additional clearance. */
+  | 'pocket-opening-corner-clearance'
+  /** At least 1 mm of pocket material must remain below the recess. */
+  | 'pocket-opening-depth'
+
+export type LimitReasonSchema = CornerRadiusLimitReasonSchema | RecessedPocketOpeningLimitsReasonSchema
 
 export type NumericBoundSchema = {
   value: BigNumber

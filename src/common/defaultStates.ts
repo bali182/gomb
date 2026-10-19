@@ -22,7 +22,7 @@ import type {
   HasLayoutSchema,
   PanelSchema,
   PocketClusterSchema,
-  RecessedPocketOpeningSchema,
+  RecessedPocketOpeningOwnSchema,
   RootPanelSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
@@ -127,7 +127,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   children: [],
 }
 
-export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
+export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
   type: 'recessed',
   outerInset: 15,
   innerOffset: 15,

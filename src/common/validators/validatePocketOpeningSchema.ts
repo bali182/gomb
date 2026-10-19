@@ -1,6 +1,6 @@
 import { defaultRecessedPocketOpening } from '../defaultStates'
 import type { HasIdentitySchema } from '../schemas/common'
-import type { PocketOpeningOwnSchema, PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
+import type { PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
@@ -15,48 +15,53 @@ export const validatePocketOpeningSchema = (
   openings: readonly HasIdentitySchema[],
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<PocketOpeningSchema> => {
-  const ownResult = validatePocketOpeningOwnSchema(input, currentValue, context)
+  const typeResult = validatePocketOpeningByType(input, currentValue, context)
   const nameResult = validateName(input.name, currentValue.name, currentValue.id, openings, context)
   const issues: IssuesSchema<PocketOpeningSchema> = {
-    ...ownResult.issues,
+    ...typeResult.issues,
     id: undefined,
     name: nameResult.issues,
   }
   const committedValue: PocketOpeningSchema = {
-    ...ownResult.committedValue,
+    ...typeResult.committedValue,
     id: currentValue.id,
     name: nameResult.committedValue,
   }
 
-  if (!ownResult.isValid || !nameResult.isValid) {
+  if (!typeResult.isValid || !nameResult.isValid) {
     return createInvalidValidationResult<PocketOpeningSchema>(issues, committedValue)
   }
 
   return createValidValidationResult<PocketOpeningSchema>(
     issues,
-    { ...ownResult.value, id: currentValue.id, name: nameResult.value },
+    { ...typeResult.value, id: currentValue.id, name: nameResult.value },
     committedValue,
   )
 }
 
-const validatePocketOpeningOwnSchema = (
-  input: EditableSchema<PocketOpeningOwnSchema>,
-  currentValue: PocketOpeningOwnSchema,
+const validatePocketOpeningByType = (
+  input: EditableSchema<PocketOpeningSchema>,
+  currentValue: PocketOpeningSchema,
   context: BaseValidationContextSchema,
-): ValidationResultSchema<PocketOpeningOwnSchema> => {
+): ValidationResultSchema<PocketOpeningSchema> => {
   const typeResult = validatePrimitiveUnion(input.type, currentValue.type, { straight: true, recessed: true }, context)
 
   if (!typeResult.isValid) {
-    return createInvalidValidationResult<PocketOpeningOwnSchema>({ type: typeResult.issues }, currentValue)
+    return createInvalidValidationResult<PocketOpeningSchema>({ type: typeResult.issues }, currentValue)
   }
 
   switch (input.type) {
     case 'straight':
-      return createValidValidationResult<PocketOpeningOwnSchema>({ type: undefined }, { type: 'straight' })
+      return createValidValidationResult<PocketOpeningSchema>(
+        { type: undefined },
+        { id: currentValue.id, name: currentValue.name, type: 'straight' },
+      )
     case 'recessed':
       return validateRecessedPocketOpeningSchema(
         input,
-        currentValue.type === 'recessed' ? currentValue : defaultRecessedPocketOpening,
+        currentValue.type === 'recessed'
+          ? currentValue
+          : { ...defaultRecessedPocketOpening, id: currentValue.id, name: currentValue.name },
         context,
       )
   }
@@ -81,6 +86,7 @@ const validateRecessedPocketOpeningSchema = (
     innerRadius: innerRadius.issues,
   }
   const committedValue: RecessedPocketOpeningSchema = {
+    ...currentValue,
     type: 'recessed',
     outerInset: outerInset.committedValue,
     innerOffset: innerOffset.committedValue,
@@ -96,6 +102,7 @@ const validateRecessedPocketOpeningSchema = (
   return createValidValidationResult<RecessedPocketOpeningSchema>(
     issues,
     {
+      ...currentValue,
       type: 'recessed',
       outerInset: outerInset.value,
       innerOffset: innerOffset.value,

@@ -16,6 +16,8 @@ const rect: RectSchema = {
 }
 
 const createOpening = (overrides: Partial<RecessedPocketOpeningSchema> = {}): RecessedPocketOpeningSchema => ({
+  id: 'own:test',
+  name: 'Test',
   type: 'recessed',
   outerInset: 29,
   innerOffset: 15,

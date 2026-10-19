@@ -29,9 +29,7 @@ const PocketOpeningShapeFields: FC<PocketOpeningFieldsProps> = ({ editable, issu
         <RecessedPocketOpeningFields
           editable={editable}
           issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={(updated: EditableSchema<RecessedPocketOpeningSchema>): void =>
-            onChange({ ...updated, id: editable.id, name: editable.name })
-          }
+          onChange={onChange}
         />
       )
   }

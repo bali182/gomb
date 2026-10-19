@@ -13,6 +13,7 @@ import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { translateExportElement } from './exports/exportGeometryUtils'
 import { getExportElementsForComponent } from './exports/getExportElements'
+import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops, getPathSegments } from './pathSegments'
@@ -118,6 +119,16 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
       const originalInput = JSON.stringify(subProject)
       const before = getComputedSubProject(subProject, defaultStitchingSettings)
       const beforeCluster = accessors.computedSubProject(before).pocketCluster(cluster.id)
+      const openingLimits = accessors
+        .subProjectLimits(before.limits)
+        .optional.opening(cluster.id, cluster.defaultOpening.id)
+      if (!isDefined(openingLimits)) {
+        throw new Error('Expected opening limits')
+      }
+      const adjustedOpening = getAdjustedPocketOpening(cluster.defaultOpening, openingLimits)
+      if (adjustedOpening.type !== 'recessed') {
+        throw new Error('Expected recessed opening')
+      }
       expect(beforeCluster.tPockets).toHaveLength(2)
       expect(getClosedPathArea(beforeCluster.path)).toBeGreaterThan(0)
 
@@ -152,7 +163,11 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
           expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
           expect(segment.end.x.isFinite() && segment.end.y.isFinite()).toBe(true)
           if (segment.type === 'arc') {
-            expect([8, 39, 55].some((radius) => Math.abs(segment.radius.toNumber() - radius) < 1e-7)).toBe(true)
+            expect(
+              [8, adjustedOpening.innerRadius, adjustedOpening.outerRadius].some(
+                (radius) => Math.abs(segment.radius.toNumber() - radius) < 1e-7,
+              ),
+            ).toBe(true)
           }
         }
       }
