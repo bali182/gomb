@@ -19,7 +19,7 @@ export const getSettings = async (): Promise<GlobalSettingsSchema> => {
     const settings: unknown = JSON.parse(contents)
     const migratedSettings = migrateGlobalSettings(settings, defaults)
 
-    if (typia.is<GlobalSettingsSchema>(migratedSettings)) {
+    if (typia.misc.createIsPrune<GlobalSettingsSchema>()(migratedSettings)) {
       return migratedSettings
     }
   } catch (error) {

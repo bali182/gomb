@@ -10,7 +10,7 @@ type StorageKey = 'global-settings' | 'projects'
 
 export const readGlobalSettingsFromStorage = (defaultValue: GlobalSettingsSchema): GlobalSettingsSchema => {
   return safeReadStorage<GlobalSettingsSchema>('global-settings', defaultValue, (raw) =>
-    typia.assert<GlobalSettingsSchema>(migrateGlobalSettings(raw, defaultValue)),
+    typia.misc.createAssertPrune<GlobalSettingsSchema>()(migrateGlobalSettings(raw, defaultValue)),
   )
 }
 
@@ -23,7 +23,7 @@ export const readProjectsFromStorage = (context: ProjectMigrationContextSchema):
     if (!Array.isArray(raw)) {
       throw new Error('Expected projects array')
     }
-    return typia.assert<ProjectSchema[]>(raw.map((project) => migrateProject(project, context)))
+    return typia.misc.createAssertPrune<ProjectSchema[]>()(raw.map((project) => migrateProject(project, context)))
   })
 }
 
