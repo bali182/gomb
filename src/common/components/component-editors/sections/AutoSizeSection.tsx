@@ -3,30 +3,31 @@ import { useCallback } from 'react'
 import { PiArrowsHorizontal, PiArrowsVertical, PiRuler, PiWarningBold } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { HasSqueezeSchema } from '../../../schemas/common'
+import type { HasStretchSchema } from '../../../schemas/common'
 import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type AutoSizeSectionProps<T> = {
   component: T
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSchema>({
+export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSchema>({
+  component,
   editable,
   issues,
   onChange,
 }: AutoSizeSectionProps<T>) {
   const { t } = useTranslation()
-  const hasActiveHorizontalSqueeze = editable.leftSqueeze !== '0' || editable.rightSqueeze !== '0'
-  const hasActiveVerticalSqueeze = editable.topSqueeze !== '0' || editable.bottomSqueeze !== '0'
+  const hasActiveHorizontalStretch = component.leftStretch !== 0 || component.rightStretch !== 0
+  const hasActiveVerticalStretch = component.topStretch !== 0 || component.bottomStretch !== 0
   const hasTransformedManualSize =
-    (!editable.autoWidth && hasActiveHorizontalSqueeze) || (!editable.autoHeight && hasActiveVerticalSqueeze)
+    (!component.autoWidth && hasActiveHorizontalStretch) || (!component.autoHeight && hasActiveVerticalStretch)
 
   const handleAutoWidthChange = useCallback(
     (autoWidth: boolean) => {
@@ -76,7 +77,7 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasSqueezeSc
             <HStack color="fg.warning" gap="1">
               <PiWarningBold />
               <Text fontWeight="bold" textStyle="xs">
-                {t.project.editors.sections.components.autoSize.squeezeActive}
+                {t.project.editors.sections.components.autoSize.stretchActive}
               </Text>
             </HStack>
           ) : undefined

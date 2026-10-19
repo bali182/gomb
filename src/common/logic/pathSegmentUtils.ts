@@ -1,11 +1,10 @@
 import BigNumber from 'bignumber.js'
 
-import { TWO, ZERO } from '../constants/layout'
+import { POSITION_EPSILON, TWO, ZERO } from '../constants/layout'
 import type { PathArcToSchema, PointSchema } from '../schemas/geometry'
 import type { ArcPathSegment, LinePathSegment, PathSegment } from './pathSegmentTypes'
 
 const TWO_PI = Math.PI * 2
-const ARC_DISTANCE_SQUARED_EPSILON = new BigNumber('0.000000000001')
 
 export const createArcPathSegment = (start: PointSchema, command: PathArcToSchema): ArcPathSegment => {
   const chordDx = command.point.x.minus(start.x)
@@ -135,10 +134,12 @@ export const isPointOnPathSegment = (point: PointSchema, segment: PathSegment): 
   }
 
   const distanceSquared = point.x.minus(segment.center.x).pow(2).plus(point.y.minus(segment.center.y).pow(2))
-  const radiusSquared = segment.radius.pow(2)
+  const minimumRadius = BigNumber.maximum(segment.radius.minus(POSITION_EPSILON), 0)
+  const maximumRadius = segment.radius.plus(POSITION_EPSILON)
 
   return (
-    distanceSquared.minus(radiusSquared).abs().isLessThanOrEqualTo(ARC_DISTANCE_SQUARED_EPSILON) &&
+    distanceSquared.isGreaterThanOrEqualTo(minimumRadius.pow(2)) &&
+    distanceSquared.isLessThanOrEqualTo(maximumRadius.pow(2)) &&
     isPointOnArc(point, segment)
   )
 }

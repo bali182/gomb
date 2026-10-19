@@ -7,12 +7,14 @@ import type {
   ComputedRootPanelSchema,
 } from '../schemas/computed'
 import type { HoleSchema } from '../schemas/hole'
+import type { IssueSchema } from '../schemas/issues'
 import type { ModelObjectSchema } from '../schemas/modelObject'
 import type {
   ComponentBoundsStitchLineSchema,
   PocketClusterStitchLineSchema,
   StitchLineSchema,
 } from '../schemas/stitching'
+import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
@@ -52,6 +54,14 @@ export const narrowers = {
     // Hole
     hole: (input: ModelObjectSchema): input is HoleSchema => {
       return hasType(input, 'hole')
+    },
+    // Issue
+    issue: (input: unknown): input is IssueSchema => {
+      return (
+        isRecord(input) &&
+        typeof input.message === 'string' &&
+        (input.severity === 'error' || input.severity === 'warning' || input.severity === 'info')
+      )
     },
   },
   assert: {

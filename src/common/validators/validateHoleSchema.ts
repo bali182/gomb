@@ -1,10 +1,7 @@
 import type { EditableSchema } from '../schemas/editable'
 import type { HoleSchema } from '../schemas/hole'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateHolePositionSchema } from './validateHolePositionSchema'
 import { validateName } from './validateName'
@@ -23,7 +20,7 @@ export const validateHoleSchema = (
   const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context)
   const bottomLeftRadiusResult = validateNumber(input.bottomLeftRadius, currentValue.bottomLeftRadius, context)
   const bottomRightRadiusResult = validateNumber(input.bottomRightRadius, currentValue.bottomRightRadius, context)
-  const issues: ValidationIssuesSchema<HoleSchema> = {
+  const issues: IssuesSchema<HoleSchema> = {
     type: undefined,
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,

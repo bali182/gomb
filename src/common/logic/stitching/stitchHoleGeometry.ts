@@ -1,14 +1,11 @@
 import BigNumber from 'bignumber.js'
 
-import { TWO, ZERO } from '../../constants/layout'
+import { POSITION_EPSILON, STITCH_HOLE_ENDPOINT_EPSILON_MM, TWO, ZERO } from '../../constants/layout'
 import type { PointSchema } from '../../schemas/geometry'
 import { isDefined } from '../../utils/isDefined'
 import { getPointDistance } from '../geometryUtils'
 import type { StitchCornerPathFragment, StitchPathFragment } from './calculateStitchLinePaths'
 
-const PARAMETER_EPSILON = new BigNumber('0.000000000001')
-const STITCH_HOLE_ENDPOINT_EPSILON_MM = new BigNumber('0.0001')
-const ANGLE_EPSILON = 0.000000001
 const FULL_TURN = Math.PI * 2
 
 export type StitchHoleLineSegment = {
@@ -67,10 +64,24 @@ export const findNextStitchHole = (
 ): StitchHoleIntersection | undefined => {
   for (let segmentIndex = cursor.segmentIndex; segmentIndex < segments.length; segmentIndex += 1) {
     const segment = segments[segmentIndex]
+    const segmentLength =
+      segment.type === 'line'
+        ? getPointDistance(segment.start, segment.end)
+        : segment.radius.times(
+            getClockwiseAngleDifference(
+              getPointAngle(segment.center, segment.start),
+              getPointAngle(segment.center, segment.end),
+            ),
+          )
+    if (segmentLength.isZero()) {
+      continue
+    }
+    // Convert mm into normalized progress, keeping the physical tolerance independent of segment length.
+    const parameterEpsilon = new BigNumber(POSITION_EPSILON).dividedBy(segmentLength)
     const minimumProgress = segmentIndex === cursor.segmentIndex ? getSegmentProgress(segment, cursor.point) : ZERO
     const intersections = getSegmentCircleIntersections(segment, previousHoleCenter, stitchHoleDistance)
     const nextIntersection = intersections.find(({ progress }) =>
-      progress.isGreaterThan(minimumProgress.plus(PARAMETER_EPSILON)),
+      progress.isGreaterThan(minimumProgress.plus(parameterEpsilon)),
     )
 
     if (isDefined(nextIntersection)) {
@@ -82,7 +93,7 @@ export const findNextStitchHole = (
 
     if (
       isSegmentEndAtStitchHoleDistance(previousHoleCenter, segment.end, stitchHoleDistance) &&
-      new BigNumber(1).isGreaterThan(minimumProgress.plus(PARAMETER_EPSILON))
+      new BigNumber(1).isGreaterThan(minimumProgress.plus(parameterEpsilon))
     ) {
       return {
         center: segment.end,
@@ -242,8 +253,9 @@ const getArcProgress = (segment: StitchHoleArcSegment, point: PointSchema): BigN
   const pointAngle = getPointAngle(segment.center, point)
   const arcAngle = getClockwiseAngleDifference(startAngle, endAngle)
   const pointAngleDifference = getClockwiseAngleDifference(startAngle, pointAngle)
+  const angleEpsilon = POSITION_EPSILON / segment.radius.toNumber()
 
-  if (pointAngleDifference > arcAngle + ANGLE_EPSILON) {
+  if (pointAngleDifference > arcAngle + angleEpsilon) {
     return new BigNumber(-1)
   }
 
@@ -268,5 +280,5 @@ const getRotationFromVector = (x: BigNumber, y: BigNumber): number => {
 }
 
 const areNumberPointsEqual = (first: { x: number; y: number }, second: { x: number; y: number }): boolean => {
-  return Math.abs(first.x - second.x) < ANGLE_EPSILON && Math.abs(first.y - second.y) < ANGLE_EPSILON
+  return Math.abs(first.x - second.x) < POSITION_EPSILON && Math.abs(first.y - second.y) < POSITION_EPSILON
 }

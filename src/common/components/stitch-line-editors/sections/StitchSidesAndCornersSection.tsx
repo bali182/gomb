@@ -1,20 +1,25 @@
 import { useMemo } from 'react'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { EditableSchema } from '../../../schemas/editable'
+import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { ComponentBoundsStitchLineSchema } from '../../../schemas/stitching'
-import { ValidationIssuesSchema } from '../../../schemas/validation'
+import { getLabeledIssues } from '../../../utils/issueUtils'
 import { SectionGroup } from '../../common/SectionGroup'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
 
 type StitchSidesAndCornersSectionProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  issues: ValidationIssuesSchema<ComponentBoundsStitchLineSchema>
+  issues: IssuesSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
 }
 
 export const StitchSidesAndCornersSection = ({ editable, issues, onChange }: StitchSidesAndCornersSectionProps) => {
   const { t } = useTranslation()
-  const stitchSidesAndCornersIssues = useMemo(() => Object.values(issues), [issues])
+  const stitchSidesAndCornersIssues = useMemo<readonly IssueSchema[]>(
+    () =>
+      getLabeledIssues<ComponentBoundsStitchLineSchema>(issues, t.project.editors.sections.stitchLines.sidesAndCorners),
+    [issues, t],
+  )
 
   return (
     <SectionGroup.Section>

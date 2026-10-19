@@ -4,12 +4,12 @@ import { useMemo, type FC } from 'react'
 import { ZERO } from '../../constants/layout'
 import { usePath } from '../../hooks/usePath'
 import { calculatePocketOpeningPath } from '../../logic/calculatePocketOpeningPath'
-import type { PocketOpeningOwnSchema, PocketOrientationSchema } from '../../schemas/components'
+import type { PocketOpeningSchema, PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
 import { getViewBox } from '../../utils/getViewBox'
 
 type PocketOpeningPreviewProps = {
-  adjustedOpening: PocketOpeningOwnSchema
+  adjustedOpening: PocketOpeningSchema
   pocketRect: RectSchema
   orientation: PocketOrientationSchema
   width: number

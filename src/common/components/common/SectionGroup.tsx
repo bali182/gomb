@@ -1,10 +1,9 @@
 import { Box, Grid, Spacer, Text, chakra } from '@chakra-ui/react'
-import { ComponentProps, useMemo, type FC, type ReactNode } from 'react'
+import type { FC, ReactNode } from 'react'
 
-import { useTranslation } from '../../hooks/useTranslation'
-import type { IssueSchema, SeveritySchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
-import { isRecord } from '../../utils/isRecord'
+import { IssueDisplay } from './IssueDisplay'
 import { TooltipIcon } from './TooltipIcon'
 
 type SectionGroupRootProps = {
@@ -15,7 +14,10 @@ type SectionGroupRootProps = {
 
 type SectionGroupSectionProps = {
   children: ReactNode
-  spaced?: boolean
+}
+
+type SectionGroupContentGroupProps = {
+  children: ReactNode
 }
 
 type SectionGroupSectionHeaderProps = {
@@ -31,23 +33,13 @@ type SectionGroupSectionRowTitleProps = {
 
 type SectionGroupSectionRowEditorProps = {
   children: ReactNode
-  issue?: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
+  issue?: IssueSchema | readonly IssueSchema[] | undefined
 }
 
 type SectionGroupSectionFullWidthContentProps = {
   children: ReactNode
-  issue?: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
+  issue?: IssueSchema | readonly IssueSchema[] | undefined
   padded?: boolean
-}
-
-type SectionGroupIssueProps = {
-  issue: IssueSchema | readonly (IssueSchema | undefined)[] | undefined
-}
-
-const severityPriorities: Record<SeveritySchema, number> = {
-  error: 3,
-  info: 1,
-  warning: 2,
 }
 
 const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true, spaced = true }) => {
@@ -65,11 +57,19 @@ const SectionGroupRoot: FC<SectionGroupRootProps> = ({ children, padded = true, 
   )
 }
 
-const SectionGroupSection: FC<SectionGroupSectionProps> = ({ children, spaced = true }) => {
+const SectionGroupSection: FC<SectionGroupSectionProps> = ({ children }) => {
   return (
-    <Grid columnGap="4" gridColumn="1 / -1" gridTemplateColumns="subgrid" rowGap={spaced ? '3' : '0'}>
+    <Grid columnGap="4" gridColumn="1 / -1" gridTemplateColumns="subgrid" rowGap="3">
       {children}
     </Grid>
+  )
+}
+
+const SectionGroupContentGroup: FC<SectionGroupContentGroupProps> = ({ children }) => {
+  return (
+    <Box display="flex" flexDirection="column" gridColumn="1 / -1" minWidth="0">
+      {children}
+    </Box>
   )
 }
 
@@ -105,61 +105,20 @@ const SectionGroupSectionRowTitle: FC<SectionGroupSectionRowTitleProps> = ({ chi
   )
 }
 
-const SectionGroupIssue: FC<SectionGroupIssueProps> = ({ issue: issues }) => {
-  const { t } = useTranslation()
-  const issue = useMemo<IssueSchema | undefined>(() => {
-    if (!isDefined(issues) || isRecord(issues)) {
-      return issues
-    }
-    const definedIssues = issues.filter((candidateIssue): candidateIssue is IssueSchema => isDefined(candidateIssue))
-
-    if (definedIssues.length === 0) {
-      return undefined
-    }
-
-    if (definedIssues.length === 1) {
-      return definedIssues[0]
-    }
-
-    const highestSeverityIssue = definedIssues.reduce((currentIssue, candidateIssue) => {
-      return severityPriorities[candidateIssue.severity] > severityPriorities[currentIssue.severity]
-        ? candidateIssue
-        : currentIssue
-    })
-
-    return {
-      message: t.validation.multipleIssues(definedIssues.length),
-      severity: highestSeverityIssue.severity,
-    }
-  }, [issues, t.validation])
-
-  const color = useMemo<ComponentProps<typeof Text>['color']>(() => {
-    if (!isDefined(issue)) {
-      return undefined
-    }
-    switch (issue.severity) {
-      case 'error':
-        return 'fg.error'
-      case 'warning':
-        return 'fg.warning'
-      case 'info':
-        return 'fg.info'
-    }
-  }, [issue])
-
-  return isDefined(issue) ? (
-    <Text color={color} textStyle="xs">
-      {issue.message}
-    </Text>
-  ) : null
-}
-
 const SectionGroupSectionRowEditor: FC<SectionGroupSectionRowEditorProps> = ({ children, issue }) => {
+  const hasIssue = isDefined(issue) && (!Array.isArray(issue) || issue.length > 0)
+
   return (
-    <chakra.div minWidth="0" pr="4">
-      {children}
-      <SectionGroupIssue issue={issue} />
-    </chakra.div>
+    <>
+      <chakra.div minWidth="0" pr="4">
+        {children}
+      </chakra.div>
+      {hasIssue && (
+        <chakra.div gridColumn="1 / -1" minWidth="0" px="4" mt="-1.5">
+          <IssueDisplay issue={issue} />
+        </chakra.div>
+      )}
+    </>
   )
 }
 
@@ -171,7 +130,7 @@ const SectionGroupSectionFullWidthContent: FC<SectionGroupSectionFullWidthConten
   return (
     <chakra.div gridColumn="1 / -1" minWidth="0" px={padded ? '4' : '0'}>
       {children}
-      <SectionGroupIssue issue={issue} />
+      <IssueDisplay issue={issue} />
     </chakra.div>
   )
 }
@@ -179,6 +138,7 @@ const SectionGroupSectionFullWidthContent: FC<SectionGroupSectionFullWidthConten
 export const SectionGroup = {
   Root: SectionGroupRoot,
   Section: SectionGroupSection,
+  ContentGroup: SectionGroupContentGroup,
   SectionFullWidthContent: SectionGroupSectionFullWidthContent,
   SectionHeader: SectionGroupSectionHeader,
   SectionRowTitle: SectionGroupSectionRowTitle,

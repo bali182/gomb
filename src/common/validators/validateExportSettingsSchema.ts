@@ -1,8 +1,9 @@
 import type { EditableSchema } from '../schemas/editable'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
+import type { IssuesSchema } from '../schemas/issues'
 import type { PageSchemaId } from '../schemas/page'
 import type { ExportSettingsSchema, ExportStitchLineModeSchema } from '../schemas/settings'
-import type { BaseValidationContextSchema, ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
@@ -58,7 +59,7 @@ export const validateExportSettingsSchema = (
   )
   const layoutResult = validatePrimitiveUnion(input.layout, currentValue.layout, pageLayouts, context)
 
-  const issues: ValidationIssuesSchema<ExportSettingsSchema> = {
+  const issues: IssuesSchema<ExportSettingsSchema> = {
     childMarkers: undefined,
     cutHelperDistance: cutHelperDistanceResult.issues,
     gap: gapResult.issues,

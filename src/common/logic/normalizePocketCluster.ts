@@ -3,28 +3,20 @@ import BigNumber from 'bignumber.js'
 import type { PocketClusterSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
+import { getPocketsLimits } from './limits/getPocketsLimits'
 
 export const normalizePocketCluster = (pocketCluster: PocketClusterSchema, rect: RectSchema): PocketClusterSchema => {
   const pocketCount = BigNumber.maximum(
     new BigNumber(pocketCluster.pocketCount).integerValue(BigNumber.ROUND_FLOOR),
     new BigNumber(1),
   )
-  const tPocketCount = pocketCount.minus(1)
-  const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
-  const stackLength = isVertical ? rect.height : rect.width
-  const crossSize = isVertical ? rect.width : rect.height
-  const pocketStep = clamp(
-    pocketCluster.pocketStep,
-    new BigNumber(0),
-    stackLength.dividedBy(BigNumber.maximum(tPocketCount, new BigNumber(1))),
-  )
-  const halfCrossSize = crossSize.dividedBy(2)
+  const normalized: PocketClusterSchema = { ...pocketCluster, pocketCount: pocketCount.toNumber() }
+  const limits = getPocketsLimits(normalized, rect)
 
   return {
-    ...pocketCluster,
-    pocketCount: pocketCount.toNumber(),
-    pocketStep: pocketStep.toNumber(),
-    tPocketTabWidth: clamp(pocketCluster.tPocketTabWidth, 0, halfCrossSize).toNumber(),
-    tPocketTaper: clamp(pocketCluster.tPocketTaper, 0, halfCrossSize).toNumber(),
+    ...normalized,
+    pocketStep: clamp(normalized.pocketStep, 0, limits.pocketStep?.max?.value).toNumber(),
+    tPocketTabWidth: clamp(normalized.tPocketTabWidth, 0, limits.tPocketTabWidth?.max?.value).toNumber(),
+    tPocketTaper: clamp(normalized.tPocketTaper, 0, limits.tPocketTaper?.max?.value).toNumber(),
   }
 }

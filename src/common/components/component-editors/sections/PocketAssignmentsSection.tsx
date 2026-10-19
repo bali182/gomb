@@ -78,7 +78,7 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
   }, [component, handleMappingChange])
 
   return (
-    <SectionGroup.Section spaced={false}>
+    <SectionGroup.ContentGroup>
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.components.pocketAssignments.title}
       </SectionGroup.SectionHeader>
@@ -140,6 +140,6 @@ export const PocketAssignmentsSection: FC<PocketAssignmentsSectionProps> = ({ co
           ))}
         </Grid>
       </SectionGroup.SectionFullWidthContent>
-    </SectionGroup.Section>
+    </SectionGroup.ContentGroup>
   )
 }

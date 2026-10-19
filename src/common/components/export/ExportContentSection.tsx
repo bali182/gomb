@@ -9,8 +9,8 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
@@ -22,7 +22,7 @@ type ExportStitchLineModeOption = {
 
 type ExportContentSectionProps = {
   editable: EditableSchema<ExportSettingsSchema>
-  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 

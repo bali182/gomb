@@ -8,11 +8,8 @@ import type {
   PocketOrientationSchema,
 } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import type { CardSchemaId } from '../schemas/valuables'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
@@ -97,8 +94,8 @@ export const validatePocketClusterSchema = (
   const bottomRightRadiusResult = validateNumber(input.bottomRightRadius, currentValue.bottomRightRadius, context, {
     min: 0,
   })
-  const widthResult = validateNumber(input.width, currentValue.width, context, { min: 0, minInclusive: false })
-  const heightResult = validateNumber(input.height, currentValue.height, context, { min: 0, minInclusive: false })
+  const widthResult = validateNumber(input.width, currentValue.width, context, { min: 0 })
+  const heightResult = validateNumber(input.height, currentValue.height, context, { min: 0 })
   const orientationResult = validatePrimitiveUnion(
     input.orientation,
     currentValue.orientation,
@@ -126,12 +123,12 @@ export const validatePocketClusterSchema = (
     min: 0,
     minInclusive: false,
   })
-  const topSqueezeResult = validateNumber(input.topSqueeze, currentValue.topSqueeze, context)
-  const rightSqueezeResult = validateNumber(input.rightSqueeze, currentValue.rightSqueeze, context)
-  const bottomSqueezeResult = validateNumber(input.bottomSqueeze, currentValue.bottomSqueeze, context)
-  const leftSqueezeResult = validateNumber(input.leftSqueeze, currentValue.leftSqueeze, context)
+  const topStretchResult = validateNumber(input.topStretch, currentValue.topStretch, context)
+  const rightStretchResult = validateNumber(input.rightStretch, currentValue.rightStretch, context)
+  const bottomStretchResult = validateNumber(input.bottomStretch, currentValue.bottomStretch, context)
+  const leftStretchResult = validateNumber(input.leftStretch, currentValue.leftStretch, context)
 
-  const issues: ValidationIssuesSchema<PocketClusterSchema> = {
+  const issues: IssuesSchema<PocketClusterSchema> = {
     defaultOpening: defaultOpeningResult.issues,
     openings: openingResults.map((result) => result.issues),
     openingMapping: Object.fromEntries(Object.keys(input.openingMapping).map((key) => [key, undefined])),
@@ -148,7 +145,7 @@ export const validatePocketClusterSchema = (
     height: heightResult.issues,
     id: undefined,
     individualRadii: undefined,
-    individualSqueeze: undefined,
+    individualStretch: undefined,
     layoutGap: layoutGapResult.issues,
     layoutOrientation: layoutOrientationResult.issues,
     name: nameResult.issues,
@@ -162,10 +159,10 @@ export const validatePocketClusterSchema = (
     type: undefined,
     width: widthResult.issues,
     autoLayoutGap: undefined,
-    topSqueeze: topSqueezeResult.issues,
-    rightSqueeze: rightSqueezeResult.issues,
-    bottomSqueeze: bottomSqueezeResult.issues,
-    leftSqueeze: leftSqueezeResult.issues,
+    topStretch: topStretchResult.issues,
+    rightStretch: rightStretchResult.issues,
+    bottomStretch: bottomStretchResult.issues,
+    leftStretch: leftStretchResult.issues,
   }
 
   const committedValue: PocketClusterSchema = {
@@ -183,7 +180,7 @@ export const validatePocketClusterSchema = (
     height: heightResult.committedValue,
     id: currentValue.id,
     individualRadii: input.individualRadii,
-    individualSqueeze: input.individualSqueeze,
+    individualStretch: input.individualStretch,
     layoutGap: layoutGapResult.committedValue,
     layoutOrientation: layoutOrientationResult.committedValue,
     name: nameResult.committedValue,
@@ -198,10 +195,10 @@ export const validatePocketClusterSchema = (
     type: currentValue.type,
     width: widthResult.committedValue,
     autoLayoutGap: input.autoLayoutGap,
-    topSqueeze: topSqueezeResult.committedValue,
-    rightSqueeze: rightSqueezeResult.committedValue,
-    bottomSqueeze: bottomSqueezeResult.committedValue,
-    leftSqueeze: leftSqueezeResult.committedValue,
+    topStretch: topStretchResult.committedValue,
+    rightStretch: rightStretchResult.committedValue,
+    bottomStretch: bottomStretchResult.committedValue,
+    leftStretch: leftStretchResult.committedValue,
   }
 
   if (isDefined(colorResult.committedValue)) {
@@ -230,10 +227,10 @@ export const validatePocketClusterSchema = (
     !pocketStepResult.isValid ||
     !tPocketTabWidthResult.isValid ||
     !tPocketTaperResult.isValid ||
-    !topSqueezeResult.isValid ||
-    !rightSqueezeResult.isValid ||
-    !bottomSqueezeResult.isValid ||
-    !leftSqueezeResult.isValid
+    !topStretchResult.isValid ||
+    !rightStretchResult.isValid ||
+    !bottomStretchResult.isValid ||
+    !leftStretchResult.isValid
   ) {
     return createInvalidValidationResult(issues, committedValue)
   }
@@ -253,7 +250,7 @@ export const validatePocketClusterSchema = (
     height: heightResult.value,
     id: currentValue.id,
     individualRadii: input.individualRadii,
-    individualSqueeze: input.individualSqueeze,
+    individualStretch: input.individualStretch,
     layoutGap: layoutGapResult.value,
     layoutOrientation: layoutOrientationResult.value,
     name: nameResult.value,
@@ -268,10 +265,10 @@ export const validatePocketClusterSchema = (
     type: currentValue.type,
     width: widthResult.value,
     autoLayoutGap: input.autoLayoutGap,
-    topSqueeze: topSqueezeResult.value,
-    rightSqueeze: rightSqueezeResult.value,
-    bottomSqueeze: bottomSqueezeResult.value,
-    leftSqueeze: leftSqueezeResult.value,
+    topStretch: topStretchResult.value,
+    rightStretch: rightStretchResult.value,
+    bottomStretch: bottomStretchResult.value,
+    leftStretch: leftStretchResult.value,
   }
 
   if (isDefined(colorResult.value)) {

@@ -4,13 +4,13 @@ import type { IconType } from 'react-icons'
 
 import type { HasIdentitySchema } from '../../schemas/common'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 
 type IdentityFloatingEditorHeaderProps<T> = {
   editable: EditableSchema<T>
   icon: IconType
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   menu: ReactElement
   onChange: (updated: EditableSchema<T>) => void
   rightAddon?: ReactNode

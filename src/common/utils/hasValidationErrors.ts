@@ -1,8 +1,9 @@
-import type { IssueSchema, SeveritySchema, ValidationIssuesSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
 import { isDefined } from './isDefined'
 import { isRecord } from './isRecord'
+import { narrowers } from './narrowers'
 
-export const hasValidationErrors = <T>(result: ValidationIssuesSchema<T>): boolean => {
+export const hasValidationErrors = <T>(result: IssuesSchema<T>): boolean => {
   return hasValidationErrorsInValue(result)
 }
 
@@ -11,7 +12,7 @@ const hasValidationErrorsInValue = (value: unknown): boolean => {
     return false
   }
 
-  if (isIssueSchema(value)) {
+  if (narrowers.is.issue(value)) {
     return value.severity === 'error'
   }
 
@@ -24,16 +25,4 @@ const hasValidationErrorsInValue = (value: unknown): boolean => {
   }
 
   return false
-}
-
-const isIssueSchema = (value: unknown): value is IssueSchema => {
-  if (!isRecord(value)) {
-    return false
-  }
-
-  return isSeverity(value.severity) && typeof value.message === 'string'
-}
-
-const isSeverity = (value: unknown): value is SeveritySchema => {
-  return value === 'error' || value === 'warning' || value === 'info'
 }

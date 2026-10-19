@@ -1,19 +1,21 @@
 import { useCallback, type FC } from 'react'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useStitchLineLimitIssues } from '../../hooks/useStitchLineLimitIssues'
 
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type {
   ComponentBoundsStitchLineSchema,
   PocketClusterStitchLineSchema,
   StitchLineCommonConfigSchema,
   StitchLineSchema,
 } from '../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { ComponentBoundsStitchLineEditor } from './ComponentBoundsStitchLineEditor'
 import { PocketClusterStitchLineEditor } from './PocketClusterStitchLineEditor'
 
 type StitchLineEditorProps = {
   editable: EditableSchema<StitchLineSchema>
-  issues: ValidationIssuesSchema<StitchLineSchema>
+  issues: IssuesSchema<StitchLineSchema>
   onChange: (updated: EditableSchema<StitchLineSchema>) => void
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<StitchLineSchema>
   stitchLine: StitchLineSchema
@@ -21,11 +23,14 @@ type StitchLineEditorProps = {
 
 export const StitchLineEditor: FC<StitchLineEditorProps> = ({
   editable,
-  issues,
+  issues: incomingIssues,
   onChange,
   resolvedEditable,
   stitchLine,
 }) => {
+  const limitIssues = useStitchLineLimitIssues(stitchLine)
+  const issues = useCombinedIssues<StitchLineSchema>(incomingIssues, limitIssues)
+
   const handleReset = useCallback(
     (key: keyof StitchLineCommonConfigSchema): void => {
       const updatedEditable = { ...editable }
@@ -41,7 +46,7 @@ export const StitchLineEditor: FC<StitchLineEditorProps> = ({
         <ComponentBoundsStitchLineEditor
           value={stitchLine}
           editable={editable as EditableSchema<ComponentBoundsStitchLineSchema>}
-          issues={issues as ValidationIssuesSchema<ComponentBoundsStitchLineSchema>}
+          issues={issues as IssuesSchema<ComponentBoundsStitchLineSchema>}
           onChange={onChange}
           onReset={handleReset}
           resolvedEditable={
@@ -54,7 +59,7 @@ export const StitchLineEditor: FC<StitchLineEditorProps> = ({
       return (
         <PocketClusterStitchLineEditor
           editable={editable as EditableSchema<PocketClusterStitchLineSchema>}
-          issues={issues as ValidationIssuesSchema<PocketClusterStitchLineSchema>}
+          issues={issues as IssuesSchema<PocketClusterStitchLineSchema>}
           onChange={onChange}
           onReset={handleReset}
           resolvedEditable={

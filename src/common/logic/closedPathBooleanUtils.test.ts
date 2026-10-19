@@ -243,6 +243,8 @@ describe('closed path boolean operations', () => {
       const corner = new BigNumber(0)
       const corners = { topLeft: corner, topRight: corner, bottomLeft: corner, bottomRight: corner }
       const opening: RecessedPocketOpeningSchema = {
+        id: 'own:test',
+        name: 'Test',
         type: 'recessed',
         outerInset: 35,
         innerOffset: 15,

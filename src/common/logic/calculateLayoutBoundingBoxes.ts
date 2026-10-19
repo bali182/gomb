@@ -4,6 +4,7 @@ import { ZERO } from '../constants/layout'
 import type { ComponentSchema, PanelSchema, PocketClusterSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
+import { getStretchLimits } from './limits/getStretchLimits'
 
 type CalculateLayoutBoundingBoxesParams = {
   component: ComponentSchema
@@ -53,7 +54,7 @@ const calculateHorizontalDefaultBoundingBoxes = ({
     nextLeft = nextLeft.plus(width).plus(computedGap)
 
     boundingBoxes[child.id] = {
-      boundingRect: applySqueezeToBoundingBox(child, boundingBox, boundingRect),
+      boundingRect: applyStretchToBoundingBox(child, boundingBox),
       layoutBoundingRect: boundingBox,
     }
   }
@@ -86,7 +87,7 @@ const calculateVerticalDefaultBoundingBoxes = ({
     nextTop = nextTop.plus(height).plus(computedGap)
 
     boundingBoxes[child.id] = {
-      boundingRect: applySqueezeToBoundingBox(child, boundingBox, boundingRect),
+      boundingRect: applyStretchToBoundingBox(child, boundingBox),
       layoutBoundingRect: boundingBox,
     }
   }
@@ -109,7 +110,7 @@ const calculateMainAxisSizes = (
       continue
     }
 
-    sizesById[child.id] = clamp(getMainAxisSize(child, parent), ZERO, parentSpace)
+    sizesById[child.id] = clamp(getMainAxisSize(child, parent), ZERO)
   }
 
   const fixedComponentSpace = Object.values(sizesById).reduce((sum, componentSize) => sum.plus(componentSize), ZERO)
@@ -140,7 +141,7 @@ const calculateCrossAxisSize = (
     return parentSpace
   }
 
-  return clamp(getCrossAxisSize(child, parent), ZERO, parentSpace)
+  return clamp(getCrossAxisSize(child, parent), ZERO)
 }
 
 const calculateHorizontalCrossAxisPosition = (
@@ -173,45 +174,21 @@ const calculateVerticalCrossAxisPosition = (
   }
 }
 
-const applySqueezeToBoundingBox = (
+const applyStretchToBoundingBox = (
   component: PanelSchema | PocketClusterSchema,
   boundingBox: RectSchema,
-  parentBoundingBox: RectSchema,
 ): RectSchema => {
-  const maximumHorizontalSqueeze = BigNumber.maximum(boundingBox.width.dividedBy(2).minus(0.5), ZERO)
-  const maximumVerticalSqueeze = BigNumber.maximum(boundingBox.height.dividedBy(2).minus(0.5), ZERO)
-  const leftSqueeze = clamp(
-    component.leftSqueeze,
-    BigNumber.minimum(parentBoundingBox.x.minus(boundingBox.x), ZERO),
-    maximumHorizontalSqueeze,
-  )
-  const rightSqueeze = clamp(
-    component.rightSqueeze,
-    BigNumber.minimum(
-      boundingBox.x.plus(boundingBox.width).minus(parentBoundingBox.x.plus(parentBoundingBox.width)),
-      ZERO,
-    ),
-    maximumHorizontalSqueeze,
-  )
-  const topSqueeze = clamp(
-    component.topSqueeze,
-    BigNumber.minimum(parentBoundingBox.y.minus(boundingBox.y), ZERO),
-    maximumVerticalSqueeze,
-  )
-  const bottomSqueeze = clamp(
-    component.bottomSqueeze,
-    BigNumber.minimum(
-      boundingBox.y.plus(boundingBox.height).minus(parentBoundingBox.y.plus(parentBoundingBox.height)),
-      ZERO,
-    ),
-    maximumVerticalSqueeze,
-  )
+  const limits = getStretchLimits(component, boundingBox)
+  const leftStretch = clamp(component.leftStretch, limits.leftStretch.min?.value)
+  const rightStretch = clamp(component.rightStretch, limits.rightStretch.min?.value)
+  const topStretch = clamp(component.topStretch, limits.topStretch.min?.value)
+  const bottomStretch = clamp(component.bottomStretch, limits.bottomStretch.min?.value)
 
   return {
-    x: boundingBox.x.plus(leftSqueeze),
-    y: boundingBox.y.plus(topSqueeze),
-    width: boundingBox.width.minus(leftSqueeze).minus(rightSqueeze),
-    height: boundingBox.height.minus(topSqueeze).minus(bottomSqueeze),
+    x: boundingBox.x.minus(leftStretch),
+    y: boundingBox.y.minus(topStretch),
+    width: boundingBox.width.plus(leftStretch).plus(rightStretch),
+    height: boundingBox.height.plus(topStretch).plus(bottomStretch),
   }
 }
 

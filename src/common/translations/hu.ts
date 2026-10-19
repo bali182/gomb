@@ -2,6 +2,7 @@ import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
+import type { LimitReasonSchema } from '../schemas/limits'
 import type { LanguageSchema } from '../schemas/settings'
 import type { TranslationSchema } from './translationSchema'
 
@@ -233,15 +234,19 @@ export const HU = {
               tooltip: 'Azonos saroklekerekítést használ minden saroknál, vagy külön is beállíthatja őket.',
             },
             topLeftRadius: {
+              label: 'Bal felső sarok',
               tooltip: 'A bal felső sarok lekerekítését állítja be.',
             },
             topRightRadius: {
+              label: 'Jobb felső sarok',
               tooltip: 'A jobb felső sarok lekerekítését állítja be.',
             },
             bottomLeftRadius: {
+              label: 'Bal alsó sarok',
               tooltip: 'A bal alsó sarok lekerekítését állítja be.',
             },
             bottomRightRadius: {
+              label: 'Jobb alsó sarok',
               tooltip: 'A jobb alsó sarok lekerekítését állítja be.',
             },
           },
@@ -267,7 +272,7 @@ export const HU = {
           },
           autoSize: {
             title: 'Méret',
-            squeezeActive: 'A méretkorrekció aktív!',
+            stretchActive: 'A méretkorrekció aktív!',
             width: {
               label: 'Szélesség',
               placeholder: 'Kitöltés',
@@ -301,29 +306,33 @@ export const HU = {
               tooltip: 'A gyermekkomponensek közötti távolságokat a panel kitöltéséhez igazítja.',
             },
           },
-          squeeze: {
+          stretch: {
             title: 'Méretkorrekció',
             horizontal: {
               label: 'Vízszintes',
-              tooltip: 'A bal és jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+              tooltip: 'A bal és jobb élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja őket.',
             },
             vertical: {
               label: 'Függőleges',
-              tooltip: 'A felső és alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja őket.',
+              tooltip: 'A felső és alsó élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja őket.',
             },
-            topSqueeze: {
-              tooltip: 'A felső élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            topStretch: {
+              label: 'Felső oldal',
+              tooltip: 'A felső élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            rightSqueeze: {
-              tooltip: 'A jobb élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            rightStretch: {
+              label: 'Jobb oldal',
+              tooltip: 'A jobb élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            bottomSqueeze: {
-              tooltip: 'Az alsó élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            bottomStretch: {
+              label: 'Alsó oldal',
+              tooltip: 'Az alsó élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            leftSqueeze: {
-              tooltip: 'A bal élt mozgatja. A pozitív érték befelé, a negatív kifelé mozgatja.',
+            leftStretch: {
+              label: 'Bal oldal',
+              tooltip: 'A bal élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            individualSqueeze: {
+            individualStretch: {
               tooltip: 'Minden élen azonos beállítást használ, vagy külön is beállíthatja őket.',
             },
           },
@@ -435,82 +444,106 @@ export const HU = {
           sidesAndCorners: {
             title: 'Varrásvonal',
             top: {
+              label: 'Felső oldal',
               tooltip: 'Be vagy kikapcsolja a varrást a felső élen.',
             },
             right: {
+              label: 'Jobb oldal',
               tooltip: 'Be vagy kikapcsolja a varrást a jobb élen.',
             },
             bottom: {
+              label: 'Alsó oldal',
               tooltip: 'Be vagy kikapcsolja a varrást az alsó élen.',
             },
             left: {
+              label: 'Bal oldal',
               tooltip: 'Be vagy kikapcsolja a varrást a bal élen.',
             },
             topLeftCorner: {
+              label: 'Bal felső sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a bal felső sarokban.',
             },
             topRightCorner: {
+              label: 'Jobb felső sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a jobb felső sarokban.',
             },
             bottomRightCorner: {
+              label: 'Jobb alsó sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a jobb alsó sarokban.',
             },
             bottomLeftCorner: {
+              label: 'Bal alsó sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a bal alsó sarokban.',
             },
             stitchDisconnectedTopLeftCorner: {
+              label: 'Bal felső sarok áthidaló öltése',
               tooltip: 'Öltést ad a sarokhoz, ha a felső és bal él varrott, de maga a sarok nem.',
             },
             stitchDisconnectedTopRightCorner: {
+              label: 'Jobb felső sarok áthidaló öltése',
               tooltip: 'Öltést ad a sarokhoz, ha a felső és jobb él varrott, de maga a sarok nem.',
             },
             stitchDisconnectedBottomLeftCorner: {
+              label: 'Bal alsó sarok áthidaló öltése',
               tooltip: 'Öltést ad a sarokhoz, ha az alsó és bal él varrott, de maga a sarok nem.',
             },
             stitchDisconnectedBottomRightCorner: {
+              label: 'Jobb alsó sarok áthidaló öltése',
               tooltip: 'Öltést ad a sarokhoz, ha az alsó és jobb él varrott, de maga a sarok nem.',
             },
             topStitchDirection: {
+              label: 'Felső oldal varrásiránya',
               tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a felső élen.',
             },
             rightStitchDirection: {
+              label: 'Jobb oldal varrásiránya',
               tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a jobb élen.',
             },
             bottomStitchDirection: {
+              label: 'Alsó oldal varrásiránya',
               tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal az alsó élen.',
             },
             leftStitchDirection: {
+              label: 'Bal oldal varrásiránya',
               tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a bal élen.',
             },
             topStartOffset: {
+              label: 'Felső oldal kezdőeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             topEndOffset: {
+              label: 'Felső oldal végeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             rightStartOffset: {
+              label: 'Jobb oldal kezdőeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             rightEndOffset: {
+              label: 'Jobb oldal végeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             bottomStartOffset: {
+              label: 'Alsó oldal kezdőeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             bottomEndOffset: {
+              label: 'Alsó oldal végeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             leftStartOffset: {
+              label: 'Bal oldal kezdőeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
             leftEndOffset: {
+              label: 'Bal oldal végeltolása',
               tooltip:
                 'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
@@ -687,7 +720,7 @@ export const HU = {
             horizontal: 'Vízszintes',
             vertical: 'Függőleges',
           },
-          individualSqueeze: {
+          individualStretch: {
             false: 'Egységes méretkorrekció',
             true: 'Oldalankénti méretkorrekció',
           },
@@ -874,7 +907,6 @@ export const HU = {
     },
   },
   validation: {
-    multipleIssues: (count: number): string => `${count} hiba`,
     name: {
       empty: 'A név nem lehet üres.',
       duplicate: 'Ez a név már foglalt.',
@@ -900,6 +932,32 @@ export const HU = {
       invalid: 'A megadott útvonal érvénytelen vagy nem írható.',
       validationFailed: 'A fájlútvonal ellenőrzése nem sikerült.',
     },
+  },
+  limits: {
+    reasons: {
+      'cluster-size-and-pocket-count': (value: string): string =>
+        `A zsebcsoport mérete és a zsebek száma miatt a lépésköz legfeljebb ${value} mm.`,
+      't-pocket-tab-width-exceeds-half-width': (value: string): string =>
+        `A vállbevágás mindkét oldalról befelé értendő, ezért legfeljebb ${value} mm lehet.`,
+      't-pocket-taper-exceeds-half-width': (value: string): string =>
+        `Az alsó szűkítés mindkét oldalról befelé értendő, ezért legfeljebb ${value} mm lehet.`,
+      'stretch-component-size': (value: string): string =>
+        `A komponens mérete miatt a nyújtás legalább ${value} mm lehet.`,
+      'stretch-opposite-edge': (value: string): string => `A szemközti él miatt a nyújtás legalább ${value} mm lehet.`,
+      'parent-corner-radius': (value: string): string => `A szülő sarka miatt a sugár legalább ${value} mm.`,
+      'corner-radius-exceeds-edge-length': (value: string): string =>
+        `A rendelkezésre álló oldalhossz miatt a sugár legfeljebb ${value} mm.`,
+      'corner-radii-share-edge': (value: string): string => `A szomszédos sarok miatt a sugár legfeljebb ${value} mm.`,
+      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
+        `A zsebek közötti távolság miatt a nyílás felőli sarok sugara legfeljebb ${value} mm.`,
+      'pocket-opening-width': (value: string): string =>
+        `A nyílás rendelkezésre álló szélessége miatt az érték legfeljebb ${value} mm.`,
+      'pocket-opening-boundary': (value: string): string => `A zseb körvonala miatt az érték legfeljebb ${value} mm.`,
+      'pocket-opening-corner-clearance': (value: string): string =>
+        `A zseb saroklekerekítése miatt a határérték ${value} mm.`,
+      'pocket-opening-depth': (value: string): string =>
+        `A zseb mélysége miatt a kivágás legfeljebb ${value} mm mély lehet.`,
+    } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {
     size: (size: string): string => `${size}mm`,

@@ -12,7 +12,7 @@ import { PiArrowCounterClockwise, PiCreditCard } from 'react-icons/pi'
 
 import { cards, landscapeCards, portraitCards } from '../../data/cards'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { IssueSchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import type { CardSchema, CardSchemaId } from '../../schemas/valuables'
 import { isDefined } from '../../utils/isDefined'
 

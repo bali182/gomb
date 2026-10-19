@@ -4,13 +4,13 @@ import { useCallback, type ChangeEvent, type FC } from 'react'
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { useTranslation } from '../../../common/hooks/useTranslation'
 import type { EditableSchema } from '../../../common/schemas/editable'
+import type { IssuesSchema } from '../../../common/schemas/issues'
 import type { ProjectSchema } from '../../../common/schemas/project'
-import type { ValidationIssuesSchema } from '../../../common/schemas/validation'
 import { isDefined } from '../../../common/utils/isDefined'
 
 type WebProjectBasicSectionProps = {
   editable: EditableSchema<ProjectSchema>
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
 }
 

@@ -3,13 +3,13 @@ import { useCallback, type FC } from 'react'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { RecessedPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type RecessedPocketOpeningFieldsProps = {
   editable: EditableSchema<RecessedPocketOpeningSchema>
-  issues: ValidationIssuesSchema<RecessedPocketOpeningSchema>
+  issues: IssuesSchema<RecessedPocketOpeningSchema>
   onChange: (updated: EditableSchema<RecessedPocketOpeningSchema>) => void
 }
 

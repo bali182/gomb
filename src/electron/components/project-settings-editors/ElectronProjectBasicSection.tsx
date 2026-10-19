@@ -5,9 +5,9 @@ import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { useTranslation } from '../../../common/hooks/useTranslation'
 import { Loadable } from '../../../common/loadable'
 import type { EditableSchema } from '../../../common/schemas/editable'
+import type { IssueSchema, IssuesSchema } from '../../../common/schemas/issues'
 import type { LoadableSchema } from '../../../common/schemas/loadable'
 import type { ProjectSchema } from '../../../common/schemas/project'
-import type { IssueSchema, ValidationIssuesSchema } from '../../../common/schemas/validation'
 import { isDefined } from '../../../common/utils/isDefined'
 import { ElectronFilePicker } from './ElectronFilePicker'
 
@@ -16,7 +16,7 @@ type ElectronProjectBasicSectionProps = {
   filePath: string
   filePathIssue: LoadableSchema<IssueSchema | undefined>
   isFilePathManuallyModified: boolean
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
   onFilePathChange: (filePath: string) => void
   onFilePathReset: () => void

@@ -1,5 +1,5 @@
 import { Accordion, Menu, Portal, type AccordionValueChangeDetails } from '@chakra-ui/react'
-import { useCallback, useState, type FC } from 'react'
+import { useCallback, useMemo, useState, type FC } from 'react'
 
 import { PiPlusCircle } from 'react-icons/pi'
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
@@ -7,22 +7,23 @@ import { useTranslation } from '../../hooks/useTranslation'
 import { createPocketOpening } from '../../operations/subProject/utils/createPocketOpening'
 import { portalRef } from '../../portalRef'
 import type { HasIdentitySchema } from '../../schemas/common'
-import type { PocketClusterSchema, PocketOpeningOwnSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { getEditableSchema } from '../../utils/getEditableSchema'
 import { isDefined } from '../../utils/isDefined'
+import { noIssues } from '../../utils/issueUtils'
 import { SectionGroup } from '../common/SectionGroup'
 import { SectionHeaderButton } from '../common/SectionHeaderButton'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
 
-const openingTypes: PocketOpeningOwnSchema['type'][] = ['straight', 'recessed']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed']
 
 type PocketOpeningsEditorProps = {
   component: PocketClusterSchema
   editable: EditableSchema<PocketClusterSchema>
-  issues: ValidationIssuesSchema<PocketClusterSchema>
+  issues: IssuesSchema<PocketClusterSchema>
   onChange: (updated: EditableSchema<PocketClusterSchema>) => void
   onChangeImmediately: (update: ImmediateUpdater<PocketClusterSchema>) => void
 }
@@ -37,6 +38,12 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   const { t, language } = useTranslation()
   const [openIds, setOpenIds] = useState<string[]>([])
 
+  const defaultOpeningIssues = issues.defaultOpening ?? noIssues<PocketOpeningSchema>()
+  const openingIssues = useMemo<IssuesSchema<PocketOpeningSchema>[]>(
+    () => editable.openings.map((_, index) => issues.openings?.[index] ?? noIssues<PocketOpeningSchema>()),
+    [editable.openings, issues.openings],
+  )
+
   const handleClose = useCallback((id: string): void => {
     setOpenIds((current: string[]): string[] =>
       current.includes(id) ? current.filter((openId) => openId !== id) : current,
@@ -44,7 +51,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
   }, [])
 
   const handleAdd = useCallback(
-    (type: PocketOpeningOwnSchema['type']): void => {
+    (type: PocketOpeningSchema['type']): void => {
       onChangeImmediately(
         (
           current: EditableSchema<PocketClusterSchema>,
@@ -95,7 +102,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
 
   return (
     <>
-      <SectionGroup.Section spaced={false}>
+      <SectionGroup.ContentGroup>
         <SectionGroup.SectionHeader
           rightAddon={
             <Menu.Root size="sm" positioning={{ sameWidth: false, placement: 'bottom-end' }}>
@@ -133,7 +140,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
               pocketCluster={component}
               opening={component.defaultOpening}
               editable={editable.defaultOpening}
-              issues={issues.defaultOpening}
+              issues={defaultOpeningIssues}
               onChange={handleDefaultOpeningChange}
               onClose={handleClose}
             />
@@ -149,7 +156,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
                   pocketCluster={component}
                   opening={opening}
                   editable={editableOpening}
-                  issues={issues.openings[editableIndex]}
+                  issues={openingIssues[editableIndex]}
                   onChange={handleOpeningChange}
                   onClose={handleClose}
                   onDelete={() => handleDelete(opening.id)}
@@ -158,7 +165,7 @@ export const PocketOpeningsEditor: FC<PocketOpeningsEditorProps> = ({
             })}
           </Accordion.Root>
         </SectionGroup.SectionFullWidthContent>
-      </SectionGroup.Section>
+      </SectionGroup.ContentGroup>
       <PocketAssignmentsSection component={component} editable={editable} onChange={onChange} />
     </>
   )

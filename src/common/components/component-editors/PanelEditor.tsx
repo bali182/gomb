@@ -1,18 +1,18 @@
 import { FC } from 'react'
 import type { ComponentSchema, PanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
-import { SqueezeSection } from './sections/SqueezeSection'
+import { StretchSection } from './sections/StretchSection'
 
 type PanelEditorProps = {
   component: PanelSchema
   editable: EditableSchema<PanelSchema>
-  issues: ValidationIssuesSchema<PanelSchema>
+  issues: IssuesSchema<PanelSchema>
   onChange: (updated: EditableSchema<PanelSchema>) => void
   parent: ComponentSchema
 }
@@ -22,7 +22,7 @@ export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues,
     <SectionGroup.Root>
       <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <AnchorSection<PanelSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <SqueezeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <StretchSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <CornerRadiusSection<PanelSchema> value={component} editable={editable} issues={issues} onChange={onChange} />
       <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
     </SectionGroup.Root>

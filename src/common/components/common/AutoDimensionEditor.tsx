@@ -2,7 +2,7 @@ import { Box, HStack, Switch } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 
-import type { IssueSchema } from '../../schemas/validation'
+import type { IssueSchema } from '../../schemas/issues'
 import { NumberInput } from './NumberInput'
 
 type AutoDimensionEditorProps = {

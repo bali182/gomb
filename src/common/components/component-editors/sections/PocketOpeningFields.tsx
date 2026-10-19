@@ -3,12 +3,12 @@ import type { FC } from 'react'
 
 import type { PocketOpeningSchema, RecessedPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 
 type PocketOpeningFieldsProps = {
   editable: EditableSchema<PocketOpeningSchema>
-  issues: ValidationIssuesSchema<PocketOpeningSchema>
+  issues: IssuesSchema<PocketOpeningSchema>
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 
@@ -28,10 +28,8 @@ const PocketOpeningShapeFields: FC<PocketOpeningFieldsProps> = ({ editable, issu
       return (
         <RecessedPocketOpeningFields
           editable={editable}
-          issues={issues as ValidationIssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={(updated: EditableSchema<RecessedPocketOpeningSchema>): void =>
-            onChange({ ...updated, id: editable.id, name: editable.name })
-          }
+          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
+          onChange={onChange}
         />
       )
   }

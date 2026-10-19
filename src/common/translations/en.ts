@@ -7,7 +7,7 @@ import type {
   HasName,
   HasOffAxisAnchor,
   HasSizeSchema,
-  HasSqueezeSchema,
+  HasStretchSchema,
   HasXYOffsetSchema,
 } from '../schemas/common'
 import type {
@@ -16,13 +16,14 @@ import type {
   HasLayoutSchema,
   HasPocketOpenings,
   LayoutOrientationSchema,
-  PocketOpeningOwnSchema,
+  PocketOpeningSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  RecessedPocketOpeningSchema,
+  RecessedPocketOpeningOwnSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
+import type { LimitReasonSchema } from '../schemas/limits'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,
@@ -285,15 +286,19 @@ export const EN = {
               tooltip: 'Use the same corner rounding everywhere, or set each corner separately.',
             },
             topLeftRadius: {
+              label: 'Top-left corner',
               tooltip: 'Sets the radius of the top-left corner.',
             },
             topRightRadius: {
+              label: 'Top-right corner',
               tooltip: 'Sets the radius of the top-right corner.',
             },
             bottomLeftRadius: {
+              label: 'Bottom-left corner',
               tooltip: 'Sets the radius of the bottom-left corner.',
             },
             bottomRightRadius: {
+              label: 'Bottom-right corner',
               tooltip: 'Sets the radius of the bottom-right corner.',
             },
           } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
@@ -319,7 +324,7 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasOffAxisAnchor>,
           autoSize: {
             title: 'Size',
-            squeezeActive: 'Squeeze is active!',
+            stretchActive: 'Stretch is active!',
             width: {
               label: 'Width',
               placeholder: 'Fill',
@@ -353,34 +358,38 @@ export const EN = {
               tooltip: 'Adjusts the gaps between child components so the panel is filled.',
             },
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
-          squeeze: {
-            title: 'Squeeze',
+          stretch: {
+            title: 'Stretch',
             horizontal: {
               label: 'Horizontal',
               tooltip:
-                'Moves the left and right edges. Positive values move them inward. Negative values extend them outward.',
+                'Moves the left and right edges. Positive values extend them outward. Negative values move them inward.',
             },
             vertical: {
               label: 'Vertical',
               tooltip:
-                'Moves the top and bottom edges. Positive values move them inward. Negative values extend them outward.',
+                'Moves the top and bottom edges. Positive values extend them outward. Negative values move them inward.',
             },
-            topSqueeze: {
-              tooltip: 'Moves the top edge. Positive values move it inward. Negative values extend it outward.',
+            topStretch: {
+              label: 'Top edge',
+              tooltip: 'Moves the top edge. Positive values extend it outward. Negative values move it inward.',
             },
-            rightSqueeze: {
-              tooltip: 'Moves the right edge. Positive values move it inward. Negative values extend it outward.',
+            rightStretch: {
+              label: 'Right edge',
+              tooltip: 'Moves the right edge. Positive values extend it outward. Negative values move it inward.',
             },
-            bottomSqueeze: {
-              tooltip: 'Moves the bottom edge. Positive values move it inward. Negative values extend it outward.',
+            bottomStretch: {
+              label: 'Bottom edge',
+              tooltip: 'Moves the bottom edge. Positive values extend it outward. Negative values move it inward.',
             },
-            leftSqueeze: {
-              tooltip: 'Moves the left edge. Positive values move it inward. Negative values extend it outward.',
+            leftStretch: {
+              label: 'Left edge',
+              tooltip: 'Moves the left edge. Positive values extend it outward. Negative values move it inward.',
             },
-            individualSqueeze: {
+            individualStretch: {
               tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.',
             },
-          } satisfies SectionTranslationSchema<HasSqueezeSchema>,
+          } satisfies SectionTranslationSchema<HasStretchSchema>,
           pockets: {
             title: 'Pockets',
             orientation: {
@@ -426,7 +435,7 @@ export const EN = {
               label: 'Inner radius',
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketOpeningSchema & HasName>,
+          } satisfies SectionTranslationSchema<RecessedPocketOpeningOwnSchema & HasName>,
           pocketAssignments: {
             title: 'Pocket assignments',
             openingMapping: { label: 'Pocket opening' },
@@ -493,86 +502,110 @@ export const EN = {
           sidesAndCorners: {
             title: 'Seam line',
             top: {
+              label: 'Top edge',
               tooltip: 'Turns stitching on or off along the top edge.',
             },
             right: {
+              label: 'Right edge',
               tooltip: 'Turns stitching on or off along the right edge.',
             },
             bottom: {
+              label: 'Bottom edge',
               tooltip: 'Turns stitching on or off along the bottom edge.',
             },
             left: {
+              label: 'Left edge',
               tooltip: 'Turns stitching on or off along the left edge.',
             },
             topLeftCorner: {
+              label: 'Top-left corner',
               tooltip: 'Turns stitching on or off at the top-left corner.',
             },
             topRightCorner: {
+              label: 'Top-right corner',
               tooltip: 'Turns stitching on or off at the top-right corner.',
             },
             bottomRightCorner: {
+              label: 'Bottom-right corner',
               tooltip: 'Turns stitching on or off at the bottom-right corner.',
             },
             bottomLeftCorner: {
+              label: 'Bottom-left corner',
               tooltip: 'Turns stitching on or off at the bottom-left corner.',
             },
             stitchDisconnectedTopLeftCorner: {
+              label: 'Top-left corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the top and left edges are stitched but the corner is not.',
             },
             stitchDisconnectedTopRightCorner: {
+              label: 'Top-right corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the top and right edges are stitched but the corner is not.',
             },
             stitchDisconnectedBottomLeftCorner: {
+              label: 'Bottom-left corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the bottom and left edges are stitched but the corner is not.',
             },
             stitchDisconnectedBottomRightCorner: {
+              label: 'Bottom-right corner bridging stitch',
               tooltip:
                 'Adds a stitch across this corner when the bottom and right edges are stitched but the corner is not.',
             },
             topStitchDirection: {
+              label: 'Top edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the top edge.',
             },
             rightStitchDirection: {
+              label: 'Right edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the right edge.',
             },
             bottomStitchDirection: {
+              label: 'Bottom edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the bottom edge.',
             },
             leftStitchDirection: {
+              label: 'Left edge stitch direction',
               tooltip: 'Changes which way the stitch line runs along the left edge.',
             },
             topStartOffset: {
+              label: 'Top edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             topEndOffset: {
+              label: 'Top edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightStartOffset: {
+              label: 'Right edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             rightEndOffset: {
+              label: 'Right edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomStartOffset: {
+              label: 'Bottom edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             bottomEndOffset: {
+              label: 'Bottom edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftStartOffset: {
+              label: 'Left edge start offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
             leftEndOffset: {
+              label: 'Left edge end offset',
               tooltip:
                 'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
             },
@@ -746,7 +779,7 @@ export const EN = {
           pocketOpening: {
             straight: 'Straight',
             recessed: 'Recessed',
-          } satisfies EnumTranslationSchema<PocketOpeningOwnSchema['type']>,
+          } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',
@@ -757,9 +790,9 @@ export const EN = {
             horizontal: 'Horizontal',
             vertical: 'Vertical',
           } satisfies EnumTranslationSchema<LayoutOrientationSchema>,
-          individualSqueeze: {
-            false: 'Uniform squeeze',
-            true: 'Individual squeeze',
+          individualStretch: {
+            false: 'Uniform stretch',
+            true: 'Individual stretch',
           } satisfies EnumTranslationSchema<boolean>,
         },
         export: {
@@ -944,7 +977,6 @@ export const EN = {
     } satisfies Record<CardSchemaId, string>,
   },
   validation: {
-    multipleIssues: (count: number) => `${count} issues`,
     name: {
       empty: 'Name cannot be empty.',
       duplicate: 'This name is already in use.',
@@ -970,6 +1002,31 @@ export const EN = {
       invalid: 'The specified path is invalid or not writable.',
       validationFailed: 'The file path could not be validated.',
     },
+  },
+  limits: {
+    reasons: {
+      'cluster-size-and-pocket-count': (value: string): string =>
+        `The cluster size and pocket count limit the spacing to ${value} mm.`,
+      't-pocket-tab-width-exceeds-half-width': (value: string): string =>
+        `The shoulder inset applies inward from both sides, so it cannot exceed ${value} mm.`,
+      't-pocket-taper-exceeds-half-width': (value: string): string =>
+        `The bottom taper applies inward from both sides, so it cannot exceed ${value} mm.`,
+      'stretch-component-size': (value: string): string =>
+        `The component size sets the minimum stretch to ${value} mm.`,
+      'stretch-opposite-edge': (value: string): string => `The opposite edge sets the minimum stretch to ${value} mm.`,
+      'parent-corner-radius': (value: string): string => `The parent corner requires a radius of at least ${value} mm.`,
+      'corner-radius-exceeds-edge-length': (value: string): string =>
+        `The available edge length limits the radius to ${value} mm.`,
+      'corner-radii-share-edge': (value: string): string => `The adjacent corner limits the radius to ${value} mm.`,
+      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
+        `The spacing between pockets limits the opening-side corner radius to ${value} mm.`,
+      'pocket-opening-width': (value: string): string =>
+        `The available opening width limits this value to ${value} mm.`,
+      'pocket-opening-boundary': (value: string): string => `The pocket outline limits this value to ${value} mm.`,
+      'pocket-opening-corner-clearance': (value: string): string =>
+        `The pocket corner rounding sets this limit to ${value} mm.`,
+      'pocket-opening-depth': (value: string): string => `The pocket depth limits the recess depth to ${value} mm.`,
+    } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {
     size: (size: string) => `${size}mm`,

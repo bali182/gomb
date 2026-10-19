@@ -1,31 +1,34 @@
 import { VERSION } from '../../version'
 import { HasVersionSchema } from '../schemas/common'
-import type { DeepPartial } from '../schemas/migration'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { isRecord } from '../utils/isRecord'
 import { parseSemanticVersion } from '../utils/parseSemanticVersion'
 
 export const m = {
-  requireObject: <T extends object>(input: DeepPartial<T> | undefined): DeepPartial<T> => {
+  requireObject: <T extends object>(input: DeepPartialSchema<T> | undefined): DeepPartialSchema<T> => {
     if (!isRecord(input)) {
       throw new Error('Expected object')
     }
 
-    return input as DeepPartial<T>
+    return input as DeepPartialSchema<T>
   },
   requireObjectField: <T extends object, Value extends object>(
-    input: DeepPartial<T>,
+    input: DeepPartialSchema<T>,
     key: keyof T,
-  ): DeepPartial<Value> => {
+  ): DeepPartialSchema<Value> => {
     const value = (input as Partial<T>)[key]
 
     if (!isRecord(value)) {
       throw new Error(`Expected ${String(key)} object`)
     }
 
-    return value as DeepPartial<Value>
+    return value as DeepPartialSchema<Value>
   },
-  requireArray: <T extends object, Item extends object>(input: DeepPartial<T>, key: keyof T): DeepPartial<Item>[] => {
-    const value = (input as Partial<T>)[key] as DeepPartial<Item>[] | undefined
+  requireArray: <T extends object, Item extends object>(
+    input: DeepPartialSchema<T>,
+    key: keyof T,
+  ): DeepPartialSchema<Item>[] => {
+    const value = (input as Partial<T>)[key] as DeepPartialSchema<Item>[] | undefined
 
     if (!Array.isArray(value)) {
       throw new Error(`Expected ${String(key)} array`)
@@ -33,7 +36,7 @@ export const m = {
 
     return value
   },
-  requireString: <T extends object>(input: DeepPartial<T>, key: keyof T): string => {
+  requireString: <T extends object>(input: DeepPartialSchema<T>, key: keyof T): string => {
     const value = (input as Partial<T>)[key]
     if (typeof value !== 'string') {
       throw new Error(`Expected ${String(key)} string`)
@@ -42,7 +45,7 @@ export const m = {
     return value as string
   },
   requirePrimitiveUnion: <T extends object, Value extends string>(
-    input: DeepPartial<T>,
+    input: DeepPartialSchema<T>,
     key: keyof T,
     allowedValues: readonly Value[],
   ): Value => {
@@ -53,7 +56,7 @@ export const m = {
 
     return value as Value
   },
-  requireValue: <T extends object, Value>(input: DeepPartial<T>, key: keyof T, expectedValue: Value): Value => {
+  requireValue: <T extends object, Value>(input: DeepPartialSchema<T>, key: keyof T, expectedValue: Value): Value => {
     if ((input as Partial<T>)[key] !== expectedValue) {
       throw new Error(`Expected ${String(key)} to equal ${String(expectedValue)}`)
     }
@@ -61,8 +64,11 @@ export const m = {
     return expectedValue
   },
 
-  applyDefaults: <T extends object>(input: DeepPartial<T>, defaults: DeepPartial<T>): DeepPartial<T> => {
-    const output = { ...input } as DeepPartial<T>
+  applyDefaults: <T extends object>(
+    input: DeepPartialSchema<T>,
+    defaults: DeepPartialSchema<T>,
+  ): DeepPartialSchema<T> => {
+    const output = { ...input } as DeepPartialSchema<T>
     const shallowOutput = output as Partial<T>
     const shallowDefaults = defaults as Partial<T>
 
@@ -103,9 +109,9 @@ export const compareVersion = (projectVersion: string | undefined): number => {
 
 export const migrateVersionedObject = <T extends HasVersionSchema>(
   input: unknown,
-  migrator: (input: DeepPartial<T>) => DeepPartial<T>,
-): DeepPartial<T> => {
-  const value = m.requireObject(input as DeepPartial<T>)
+  migrator: (input: DeepPartialSchema<T>) => DeepPartialSchema<T>,
+): DeepPartialSchema<T> => {
+  const value = m.requireObject(input as DeepPartialSchema<T>)
   const comparison = compareVersion(value.version)
 
   if (comparison === 0) {

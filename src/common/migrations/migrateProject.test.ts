@@ -2,8 +2,10 @@ import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 
 import { VERSION } from '../../version'
-import type { DeepPartial, ProjectMigrationContextSchema } from '../schemas/migration'
+import type { HasStretchSchema } from '../schemas/common'
+import type { ProjectMigrationContextSchema } from '../schemas/migration'
 import type { ProjectSchema } from '../schemas/project'
+import type { DeepPartialSchema } from '../schemas/utils'
 import { d } from '../testData'
 import { EN } from '../translations/en'
 import { createProject } from '../utils/createProject'
@@ -23,10 +25,99 @@ const createProjectWithSubProject = (): ProjectSchema => {
   }
 }
 
+describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (type) => {
+  const createInput = (fields: Partial<HasStretchSchema> = {}) => {
+    const root = d.rootPanel({ id: 'root', children: ['child'] })
+    const project = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sub-project', root })],
+    })
+    const subProject = project.subProjects[0]
+    return {
+      ...project,
+      subProjects: [
+        {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            child: { id: 'child', name: 'Child', type, ...fields },
+          },
+        },
+      ],
+    }
+  }
+
+  it('fills missing stretch fields with zero and individual mode with true', () => {
+    const input = createInput()
+    const snapshot = structuredClone(input)
+    const migrated = migrateProject(input, context)
+    expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
+      individualStretch: true,
+      topStretch: 0,
+      rightStretch: 0,
+      bottomStretch: 0,
+      leftStretch: 0,
+    })
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
+    expect(input).toEqual(snapshot)
+  })
+
+  it('preserves supplied signed values and fills only missing fields', () => {
+    const migrated = migrateProject(
+      createInput({
+        individualStretch: false,
+        topStretch: 12,
+        leftStretch: -7,
+      }),
+      context,
+    )
+    expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
+      individualStretch: false,
+      topStretch: 12,
+      rightStretch: 0,
+      bottomStretch: 0,
+      leftStretch: -7,
+    })
+    expect(migrateProject(migrated, context)).toEqual(migrated)
+  })
+
+  it('does not copy or invert legacy squeeze values into stretch fields', () => {
+    const input = createInput()
+    const subProject = input.subProjects[0]
+    const legacy = {
+      ...input,
+      subProjects: [
+        {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            child: {
+              ...subProject.components.child,
+              individualSqueeze: false,
+              topSqueeze: 10,
+              rightSqueeze: -20,
+              bottomSqueeze: 30,
+              leftSqueeze: -40,
+            },
+          },
+        },
+      ],
+    }
+    const migrated = migrateProject(legacy, context)
+    expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
+      individualStretch: true,
+      topStretch: 0,
+      rightStretch: 0,
+      bottomStretch: 0,
+      leftStretch: 0,
+    })
+  })
+})
+
 describe('migrateProject', () => {
   it('adds missing defaults to a versionless project', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const root = Object.values(legacyProject.subProjects?.[0]?.components ?? {})[0]
 
     if (!isDefined(root)) {
@@ -46,7 +137,7 @@ describe('migrateProject', () => {
 
   it('returns the same result when a versionless project is migrated repeatedly', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
 
     delete legacyProject.version
 
@@ -59,7 +150,7 @@ describe('migrateProject', () => {
 
   it('does not migrate a component with a missing type', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const root = Object.values(legacyProject.subProjects?.[0]?.components ?? {})[0]
 
     if (!isDefined(root)) {
@@ -83,7 +174,7 @@ describe('migrateProject', () => {
       id: 'project',
       subProjects: [d.subProject({ id: 'sub-project', root: rootPanel, stitchLines: [stitchLine] })],
     })
-    const legacyProject: DeepPartial<ProjectSchema> = structuredClone(project)
+    const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)
 
     delete legacyProject.version
 
@@ -92,7 +183,7 @@ describe('migrateProject', () => {
 
   it('migrates an older project version to the current version', () => {
     const project = createProjectWithSubProject()
-    const legacyProject: DeepPartial<ProjectSchema> = {
+    const legacyProject: DeepPartialSchema<ProjectSchema> = {
       ...project,
       version: '0.0.6',
     }
@@ -114,7 +205,7 @@ describe('migrateProject', () => {
       id: 'project',
       subProjects: [d.subProject({ id: 'sub-project', root, components: [pocket, existingPocket] })],
     })
-    const input: DeepPartial<ProjectSchema> = structuredClone(project)
+    const input: DeepPartialSchema<ProjectSchema> = structuredClone(project)
     const incompletePocket = input.subProjects?.[0]?.components?.[pocket.id]
 
     if (!isDefined(incompletePocket) || incompletePocket.type !== 'pocket-cluster') {
@@ -133,7 +224,7 @@ describe('migrateProject', () => {
   it('migrates projects with a different version', () => {
     const project = createProjectWithSubProject()
     const [major] = VERSION.split('.')
-    const newerProject: DeepPartial<ProjectSchema> = {
+    const newerProject: DeepPartialSchema<ProjectSchema> = {
       ...project,
       version: `${Number(major) + 1}.0.0`,
     }

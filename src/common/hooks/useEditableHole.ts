@@ -4,7 +4,8 @@ import { LANGUAGE } from '../constants/language'
 import { HOT_EDITOR_THROTTLE } from '../constants/throttle'
 import type { EditableSchema } from '../schemas/editable'
 import type { HoleSchema } from '../schemas/hole'
-import type { ComponentBasedValidationContextSchema, ValidationIssuesSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { validateHoleSchema } from '../validators/validateHoleSchema'
 import { useEditableModel } from './useEditableModel'
 import { useHole } from './useHole'
@@ -17,7 +18,7 @@ export type UseEditableHoleResult = {
   editableHole: EditableSchema<HoleSchema>
   hole: HoleSchema
   setHole: (hole: EditableSchema<HoleSchema>) => void
-  validationIssues: ValidationIssuesSchema<HoleSchema>
+  validationIssues: IssuesSchema<HoleSchema>
 }
 
 export const useEditableHole = (holeId: string): UseEditableHoleResult => {

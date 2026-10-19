@@ -111,11 +111,11 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualSqueeze === b.individualSqueeze &&
-      a.topSqueeze === b.topSqueeze &&
-      a.rightSqueeze === b.rightSqueeze &&
-      a.bottomSqueeze === b.bottomSqueeze &&
-      a.leftSqueeze === b.leftSqueeze
+      a.individualStretch === b.individualStretch &&
+      a.topStretch === b.topStretch &&
+      a.rightStretch === b.rightStretch &&
+      a.bottomStretch === b.bottomStretch &&
+      a.leftStretch === b.leftStretch
     )
   },
   pocketCluster: (a: PocketClusterSchema, b: PocketClusterSchema): boolean => {
@@ -133,11 +133,11 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualSqueeze === b.individualSqueeze &&
-      a.topSqueeze === b.topSqueeze &&
-      a.rightSqueeze === b.rightSqueeze &&
-      a.bottomSqueeze === b.bottomSqueeze &&
-      a.leftSqueeze === b.leftSqueeze &&
+      a.individualStretch === b.individualStretch &&
+      a.topStretch === b.topStretch &&
+      a.rightStretch === b.rightStretch &&
+      a.bottomStretch === b.bottomStretch &&
+      a.leftStretch === b.leftStretch &&
       a.pocketCount === b.pocketCount &&
       a.pocketStep === b.pocketStep &&
       a.orientation === b.orientation &&

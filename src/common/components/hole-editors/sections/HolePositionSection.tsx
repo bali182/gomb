@@ -13,13 +13,13 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { HasAnchorsSchema } from '../../../schemas/hole'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type HolePositionSectionProps<T> = {
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<T>
+  issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 

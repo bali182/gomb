@@ -4,14 +4,14 @@ import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
+import type { IssuesSchema } from '../../../schemas/issues'
 import type { PocketClusterStitchLineSchema } from '../../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketStitchingSectionProps = {
   editable: EditableSchema<PocketClusterStitchLineSchema>
-  issues: ValidationIssuesSchema<PocketClusterStitchLineSchema>
+  issues: IssuesSchema<PocketClusterStitchLineSchema>
   onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
 }
 

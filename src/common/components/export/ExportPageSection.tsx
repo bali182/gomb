@@ -6,9 +6,9 @@ import { pages } from '../../data/pages'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../../schemas/export'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { PageSchema, PageSchemaId } from '../../schemas/page'
 import type { ExportSettingsSchema } from '../../schemas/settings'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
 
@@ -24,7 +24,7 @@ type ExportPageOption = {
 
 type ExportPageSectionProps = {
   editable: EditableSchema<ExportSettingsSchema>
-  issues: ValidationIssuesSchema<ExportSettingsSchema>
+  issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 

@@ -1,15 +1,16 @@
 import { useCallback, type FC } from 'react'
 
 import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
 import type { ProjectSchema } from '../../schemas/project'
 import type { StitchLineCommonConfigSchema } from '../../schemas/stitching'
-import type { ValidationIssuesSchema } from '../../schemas/validation'
+import { noIssues } from '../../utils/issueUtils'
 import { SectionGroup } from '../common/SectionGroup'
 import { StitchingSettingsSection } from '../stitch-line-editors/sections/StitchingSettingsSection'
 
 type ProjectStitchingSectionProps = {
   editable: EditableSchema<ProjectSchema>
-  issues: ValidationIssuesSchema<ProjectSchema>
+  issues: IssuesSchema<ProjectSchema>
   onChange: (updated: EditableSchema<ProjectSchema>) => void
 }
 
@@ -25,7 +26,7 @@ export const ProjectStitchingSection: FC<ProjectStitchingSectionProps> = ({ edit
     <SectionGroup.Root>
       <StitchingSettingsSection<StitchLineCommonConfigSchema>
         editable={editable.stitchingSettings}
-        issues={issues.stitchingSettings}
+        issues={issues.stitchingSettings ?? noIssues<StitchLineCommonConfigSchema>()}
         onChange={handleStitchingSettingsChange}
         resolvedEditable={editable.stitchingSettings}
       />

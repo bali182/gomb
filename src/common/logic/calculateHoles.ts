@@ -9,6 +9,7 @@ import { calculateRectPath } from './calculateRectPath'
 import { intersectClosedPaths, isClosedPathCoveredBy } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
+import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 
 export const calculateHoles = (
   holes: HoleSchema[],
@@ -32,7 +33,11 @@ const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema
   )
 
   // Holes have no parent, so parent component is not a limiting factor when calculating the radius
-  const cornerRadius = getAdjustedCornerRadius({ boundingRect, cornerRadius: getCornerRadius(hole) })
+  const requestedRadius = getCornerRadius(hole)
+  const cornerRadius = getAdjustedCornerRadius(
+    requestedRadius,
+    getCornerRadiusLimits({ boundingRect, cornerRadius: requestedRadius }),
+  )
 
   const path = calculateRectPath(boundingRect, cornerRadius)
 

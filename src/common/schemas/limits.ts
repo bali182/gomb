@@ -1,0 +1,91 @@
+import type BigNumber from 'bignumber.js'
+import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
+import type {
+  PanelSchema,
+  PocketClusterSchema,
+  PocketsSchema,
+  RecessedPocketOpeningSchema,
+  RootPanelSchema,
+  StraightPocketOpeningSchema,
+} from './components'
+import type { HoleSchema } from './hole'
+import type { SeveritySchema } from './issues'
+import type { ComponentBoundsStitchLineSchema, PocketClusterStitchLineSchema } from './stitching'
+import type { NumericFieldNameSchema } from './utils'
+
+export type CornerRadiusLimitReasonSchema =
+  /** A touching parent corner requires a larger radius. */
+  | 'parent-corner-radius'
+  /** The radius is limited by the available edge length. */
+  | 'corner-radius-exceeds-edge-length'
+  /** Two corners share the available length of the same edge. */
+  | 'corner-radii-share-edge'
+  /** The opening-side corner radius is limited by the pocket step. */
+  | 'opening-corner-radius-exceeds-pocket-step'
+
+export type RecessedPocketOpeningLimitsReasonSchema =
+  /** The opening parameters share the available width. */
+  | 'pocket-opening-width'
+  /** The recess must remain inside the pocket outline. */
+  | 'pocket-opening-boundary'
+  /** Opening-side corner rounding requires additional clearance. */
+  | 'pocket-opening-corner-clearance'
+  /** At least 1 mm of pocket material must remain below the recess. */
+  | 'pocket-opening-depth'
+
+export type StretchLimitReasonSchema =
+  /** Compression cannot exceed the component's original size along this axis. Applies when the opposite edge is neither stretched nor compressed. */
+  | 'stretch-component-size'
+  /** Compression is limited by the remaining size after opposite-edge stretch, or half the original size if that edge compresses beyond halfway. */
+  | 'stretch-opposite-edge'
+
+export type PocketClusterLimitReasonSchema =
+  /** Pocket spacing cannot exceed the cluster's stack-axis length divided by the pocket count. */
+  | 'cluster-size-and-pocket-count'
+  /** Shoulder insets extend inward from both sides and cannot exceed half the pocket width. */
+  | 't-pocket-tab-width-exceeds-half-width'
+  /** Bottom taper extends inward from both sides and cannot exceed half the pocket width. */
+  | 't-pocket-taper-exceeds-half-width'
+
+export type LimitReasonSchema =
+  | CornerRadiusLimitReasonSchema
+  | RecessedPocketOpeningLimitsReasonSchema
+  | StretchLimitReasonSchema
+  | PocketClusterLimitReasonSchema
+
+export type NumericBoundSchema = {
+  value: BigNumber
+  reason: LimitReasonSchema
+  severity: SeveritySchema
+}
+export type NumericFieldLimitsSchema = {
+  min?: NumericBoundSchema
+  max?: NumericBoundSchema
+}
+
+export type NumericLimitsSchema<T extends HasTypeSchema<string>> = Pick<T, 'type'> &
+  Partial<Record<NumericFieldNameSchema<T>, NumericFieldLimitsSchema>>
+
+export type RootPanelLimitsSchema = NumericLimitsSchema<RootPanelSchema>
+export type PanelLimitsSchema = NumericLimitsSchema<PanelSchema>
+export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
+export type StraightPocketOpeningLimitsSchema = NumericLimitsSchema<StraightPocketOpeningSchema>
+export type RecessedPocketOpeningLimitsSchema = NumericLimitsSchema<RecessedPocketOpeningSchema>
+export type PocketOpeningLimitsSchema = StraightPocketOpeningLimitsSchema | RecessedPocketOpeningLimitsSchema
+export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema> & {
+  openings: Record<string, PocketOpeningLimitsSchema>
+}
+export type ComponentLimitsSchema = RootPanelLimitsSchema | PanelLimitsSchema | PocketClusterLimitsSchema
+export type ComponentBoundsStitchLineLimitsSchema = NumericLimitsSchema<ComponentBoundsStitchLineSchema>
+export type PocketClusterStitchLineLimitsSchema = NumericLimitsSchema<PocketClusterStitchLineSchema>
+export type StitchLineLimitsSchema = ComponentBoundsStitchLineLimitsSchema | PocketClusterStitchLineLimitsSchema
+export type CornerRadiusLimitsSchema = Partial<
+  Record<NumericFieldNameSchema<HasCornerRadiusValuesSchema>, NumericFieldLimitsSchema>
+>
+export type StretchLimitsSchema = Record<keyof HasStretchValuesSchema, NumericFieldLimitsSchema>
+export type PocketsLimitsSchema = Partial<Record<NumericFieldNameSchema<PocketsSchema>, NumericFieldLimitsSchema>>
+export type SubProjectLimitsSchema = {
+  components: Record<string, ComponentLimitsSchema>
+  holes: Record<string, HoleLimitsSchema>
+  stitchLines: Record<string, StitchLineLimitsSchema>
+}

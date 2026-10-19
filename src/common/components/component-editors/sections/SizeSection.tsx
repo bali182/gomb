@@ -3,13 +3,13 @@ import { useCallback, type ReactNode } from 'react'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSizeSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { ValidationIssuesSchema } from '../../../schemas/validation'
+import type { IssuesSchema } from '../../../schemas/issues'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type SizeSectionProps<T> = {
   editable: EditableSchema<T>
-  issues: ValidationIssuesSchema<HasSizeSchema>
+  issues: IssuesSchema<HasSizeSchema>
   onChange: (updated: EditableSchema<T>) => void
 }
 

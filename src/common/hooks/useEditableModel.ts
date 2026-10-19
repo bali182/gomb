@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useState } from 'react'
 
 import type { EditableSchema, EditableSchemaContextSchema } from '../schemas/editable'
-import type { ValidationIssuesSchema, ValidationResultSchema } from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ValidationResultSchema } from '../schemas/validation'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { isDefined } from '../utils/isDefined'
 import { isReferentiallyEqual } from '../utils/isReferentiallyEqual'
@@ -12,7 +13,7 @@ export type ImmediateUpdater<T> = (current: EditableSchema<T>, currentValue: T) 
 
 export type UseEditableModelResult<T> = {
   editableValue: EditableSchema<T>
-  validationIssues: ValidationIssuesSchema<T>
+  validationIssues: IssuesSchema<T>
   value: T
   setValue: (value: EditableSchema<T>) => void
   setValueImmediately: (update: ImmediateUpdater<T>) => void

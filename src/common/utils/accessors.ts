@@ -7,11 +7,18 @@ import type {
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type {
+  ComponentLimitsSchema,
+  HoleLimitsSchema,
+  PocketOpeningLimitsSchema,
+  StitchLineLimitsSchema,
+  SubProjectLimitsSchema,
+} from '../schemas/limits'
+import type {
   ComponentBoundsStitchLineSchema,
   PocketClusterStitchLineSchema,
   StitchLineSchema,
 } from '../schemas/stitching'
-import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import type { ComputedSubProjectGeometrySchema, SubProjectSchema } from '../schemas/subProject'
 import { isDefined } from './isDefined'
 import { narrowers } from './narrowers'
 
@@ -88,7 +95,7 @@ const subProject = (subProject: SubProjectSchema) => {
   }
 }
 
-const computedSubProject = (computedSubProject: ComputedSubProjectSchema) => {
+const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema) => {
   const component = (id: string) => {
     const anyComponent = computedSubProject.components[id]
     if (!isDefined(anyComponent)) {
@@ -157,10 +164,23 @@ const pocketCluster = (cluster: PocketClusterSchema) => {
   }
 }
 
+const subProjectLimits = (limits: SubProjectLimitsSchema) => ({
+  optional: {
+    component: (id: string): ComponentLimitsSchema | undefined => limits.components[id],
+    hole: (id: string): HoleLimitsSchema | undefined => limits.holes[id],
+    stitchLine: (id: string): StitchLineLimitsSchema | undefined => limits.stitchLines[id],
+    opening: (pocketClusterId: string, openingId: string): PocketOpeningLimitsSchema | undefined => {
+      const cluster = limits.components[pocketClusterId]
+      return cluster?.type === 'pocket-cluster' ? cluster.openings[openingId] : undefined
+    },
+  },
+})
+
 export const accessors = {
   subProject,
   computedSubProject,
   pocketCluster,
+  subProjectLimits,
 }
 
 const createMissingErrorMessage = (componentType: string, ownerType: string, ownerId: string, ownerName?: string) => {

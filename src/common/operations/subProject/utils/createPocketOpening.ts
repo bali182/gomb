@@ -1,11 +1,11 @@
 import { defaultRecessedPocketOpening } from '../../../defaultStates'
 import type { HasIdentitySchema } from '../../../schemas/common'
-import type { PocketOpeningOwnSchema, PocketOpeningSchema } from '../../../schemas/components'
+import type { PocketOpeningSchema } from '../../../schemas/components'
 import { safeId } from '../../../utils/id'
 import { getUnusedName } from './getUnusedName'
 
 export const createPocketOpening = (
-  type: PocketOpeningOwnSchema['type'],
+  type: PocketOpeningSchema['type'],
   openings: readonly HasIdentitySchema[],
   baseName: string,
 ): PocketOpeningSchema => {

@@ -1,10 +1,7 @@
 import type { LayoutOrientationSchema, RootPanelSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
-import type {
-  ComponentBasedValidationContextSchema,
-  ValidationIssuesSchema,
-  ValidationResultSchema,
-} from '../schemas/validation'
+import type { IssuesSchema } from '../schemas/issues'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
@@ -52,7 +49,7 @@ export const validateRootPanelSchema = (
   const widthResult = validateNumber(input.width, currentValue.width, context, { min: 0, minInclusive: false })
   const heightResult = validateNumber(input.height, currentValue.height, context, { min: 0, minInclusive: false })
 
-  const issues: ValidationIssuesSchema<RootPanelSchema> = {
+  const issues: IssuesSchema<RootPanelSchema> = {
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
     children: input.children.map(() => undefined),

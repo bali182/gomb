@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import type { BooleanOp, PlineIntersect, PlineIntersectVisitContext, PlineSegIntr, Vector2 } from 'cavalier-contours-js'
 import {
-  FUZZY_EPSILON,
   plineSegIntr,
   PlineVertex,
   Polyline,
@@ -11,6 +10,7 @@ import {
   segTangentVector,
 } from 'cavalier-contours-js'
 
+import { AREA_EPSILON, POSITION_EPSILON } from '../constants/layout'
 import type { PathCommand, PathSchema, PointSchema } from '../schemas/geometry'
 import { isDefined } from '../utils/isDefined'
 import { getClosedPathLoops } from './pathSegments'
@@ -36,9 +36,6 @@ type BoundarySides = {
   right: boolean
 }
 
-// Use the same precision as the library's geometric primitives, including winding calculations.
-const POSITION_EPSILON = FUZZY_EPSILON
-const AREA_EPSILON = POSITION_EPSILON * POSITION_EPSILON
 const FULL_TURN = 2 * Math.PI
 
 /**
