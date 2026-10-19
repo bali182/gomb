@@ -33,6 +33,7 @@ import { getCornerRadius } from './cornerRadiusUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 import { getPocketClusterCornerRadiusLimits } from './limits/getPocketClusterCornerRadiusLimits'
+import { getPocketsLimits } from './limits/getPocketsLimits'
 import { getSubProjectLimits } from './limits/getSubProjectLimits'
 import { normalizePocketCluster } from './normalizePocketCluster'
 import { calculateStitchLines } from './stitching/calculateStitchLines'
@@ -219,6 +220,7 @@ const computePocketCluster = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedPocketClusterSchema => {
+  const pocketsLimits = getPocketsLimits(pocketCluster, boundingRect)
   const requestedRadius = getCornerRadius(pocketCluster)
   const cornerRadius = getAdjustedCornerRadius(
     requestedRadius,
@@ -228,6 +230,7 @@ const computePocketCluster = (
       parentBoundingRect,
       parentCornerRadius,
       pocketCluster,
+      pocketsLimits,
     }),
   )
   const normalizedPocketCluster = normalizePocketCluster(pocketCluster, boundingRect)

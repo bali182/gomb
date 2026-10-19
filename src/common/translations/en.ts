@@ -1005,6 +1005,12 @@ export const EN = {
   },
   limits: {
     reasons: {
+      'cluster-size-and-pocket-count': (value: string): string =>
+        `The cluster size and pocket count limit the spacing to ${value} mm.`,
+      't-pocket-tab-width-exceeds-half-width': (value: string): string =>
+        `The shoulder inset applies inward from both sides, so it cannot exceed ${value} mm.`,
+      't-pocket-taper-exceeds-half-width': (value: string): string =>
+        `The bottom taper applies inward from both sides, so it cannot exceed ${value} mm.`,
       'stretch-component-size': (value: string): string =>
         `The component size sets the minimum stretch to ${value} mm.`,
       'stretch-opposite-edge': (value: string): string => `The opposite edge sets the minimum stretch to ${value} mm.`,

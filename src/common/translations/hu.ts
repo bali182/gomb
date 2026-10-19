@@ -935,6 +935,12 @@ export const HU = {
   },
   limits: {
     reasons: {
+      'cluster-size-and-pocket-count': (value: string): string =>
+        `A zsebcsoport mérete és a zsebek száma miatt a lépésköz legfeljebb ${value} mm.`,
+      't-pocket-tab-width-exceeds-half-width': (value: string): string =>
+        `A vállbevágás mindkét oldalról befelé értendő, ezért legfeljebb ${value} mm lehet.`,
+      't-pocket-taper-exceeds-half-width': (value: string): string =>
+        `Az alsó szűkítés mindkét oldalról befelé értendő, ezért legfeljebb ${value} mm lehet.`,
       'stretch-component-size': (value: string): string =>
         `A komponens mérete miatt a nyújtás legalább ${value} mm lehet.`,
       'stretch-opposite-edge': (value: string): string => `A szemközti él miatt a nyújtás legalább ${value} mm lehet.`,

@@ -14,6 +14,7 @@ import { calculatePocketClusterGeometry } from '../calculatePocketClusterGeometr
 import { calculateRecessedPocketOpeningPath } from '../calculateRecessedPocketOpeningPath'
 import { getCornerRadius } from '../cornerRadiusUtils'
 import { getAdjustedPocketOpening } from '../getAdjustedPocketOpening'
+import { normalizePocketCluster } from '../normalizePocketCluster'
 import { getPathSegmentIntersections } from '../pathSegmentIntersections'
 import { getPathSegments } from '../pathSegments'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
@@ -43,7 +44,7 @@ const createFixture = (
     innerRadius: 15,
     ...overrides,
   }
-  const pocketCluster = d.pocketCluster({
+  const sourcePocketCluster = d.pocketCluster({
     id: 'cluster',
     pocketCount: 3,
     pocketStep: 10,
@@ -62,8 +63,14 @@ const createFixture = (
     width: new BigNumber(width),
     height: new BigNumber(height),
   }
+  const pocketCluster = normalizePocketCluster(sourcePocketCluster, rect)
   const geometry = calculatePocketClusterGeometry(
-    { ...pocketCluster, defaultOpening: { ...opening, type: 'straight' }, openings: [], openingMapping: {} },
+    {
+      ...pocketCluster,
+      defaultOpening: { ...opening, type: 'straight' },
+      openings: [],
+      openingMapping: {},
+    },
     rect,
     getCornerRadius(pocketCluster),
   )
@@ -237,4 +244,48 @@ describe('getRecessedPocketOpeningLimits', () => {
     getRecessedPocketOpeningLimits(fixture.opening, fixture.pocketCluster, fixture.frontPocket, fixture.tPockets)
     expect(JSON.stringify(fixture)).toBe(before)
   })
+
+  describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
+    'bounded source parameters: %s',
+    (orientation) => {
+      it.each([
+        {
+          pocketStep: 60,
+          tPocketTabWidth: 8,
+          tPocketTaper: 20,
+          expectedStep: 100 / 3,
+          expectedTab: 8,
+          expectedTaper: 20,
+        },
+        { pocketStep: 10, tPocketTabWidth: 70, tPocketTaper: 20, expectedStep: 10, expectedTab: 50, expectedTaper: 20 },
+        { pocketStep: 10, tPocketTabWidth: 8, tPocketTaper: 70, expectedStep: 10, expectedTab: 8, expectedTaper: 50 },
+      ])(
+        'uses actual geometry for step $pocketStep, tab $tPocketTabWidth and taper $tPocketTaper',
+        ({ pocketStep, tPocketTabWidth, tPocketTaper, expectedStep, expectedTab, expectedTaper }) => {
+          const fixture = createFixture(
+            { outerInset: 10, innerOffset: 35, depth: 70, outerRadius: 40, innerRadius: 7 },
+            { orientation, pocketStep, tPocketTabWidth, tPocketTaper },
+          )
+          const corrected: PocketClusterSchema = {
+            ...fixture.pocketCluster,
+            pocketStep: expectedStep,
+            tPocketTabWidth: expectedTab,
+            tPocketTaper: expectedTaper,
+          }
+          const expected = getRecessedPocketOpeningLimits(
+            fixture.opening,
+            corrected,
+            fixture.frontPocket,
+            fixture.tPockets,
+          )
+          expect(fixture.limits).toEqual(expected)
+          expect(fixture.pocketCluster).toMatchObject({
+            pocketStep: expectedStep,
+            tPocketTabWidth: expectedTab,
+            tPocketTaper: expectedTaper,
+          })
+        },
+      )
+    },
+  )
 })

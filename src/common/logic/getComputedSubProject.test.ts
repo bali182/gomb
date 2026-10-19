@@ -8,6 +8,7 @@ import type {
   LayoutOrientationSchema,
   PanelSchema,
   PocketClusterSchema,
+  PocketOpeningSchema,
   PocketOrientationSchema,
   RootPanelSchema,
 } from '../schemas/components'
@@ -1616,3 +1617,155 @@ describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (t
     })
   })
 })
+
+describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
+  'pocket parameter limits: %s',
+  (orientation) => {
+    const vertical = orientation === 'up' || orientation === 'down'
+
+    it.each([false, true])(
+      'uses the bounded step for pocket geometry and corner radii with recessed %s',
+      (recessed) => {
+        const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+        const opening: PocketOpeningSchema = recessed
+          ? {
+              id: 'own:default',
+              name: 'Default',
+              type: 'recessed',
+              outerInset: 40,
+              innerOffset: 5,
+              depth: 10,
+              innerRadius: 5,
+              outerRadius: 5,
+            }
+          : { id: 'own:default', name: 'Default', type: 'straight' }
+        const cluster = d.pocketCluster({
+          id: 'cluster',
+          orientation,
+          pocketCount: 3,
+          pocketStep: 60,
+          tPocketTabWidth: 70,
+          tPocketTaper: 80,
+          topLeftRadius: 50,
+          topRightRadius: 50,
+          bottomLeftRadius: 50,
+          bottomRightRadius: 50,
+          individualRadii: true,
+          defaultOpening: opening,
+        })
+        const input = d.subProject({ id: 'sub-project', root, components: [cluster] })
+        const snapshot = structuredClone(input)
+        const computed = getComputedSubProject(input, defaultStitchingSettings)
+        const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+        const limits = computed.limits.components[cluster.id]
+        const step = 100 / 3
+        const rects = [...result.tPockets, result.frontPocket].map((pocket) => pocket.boundingRect)
+        for (const [index, rect] of rects.entries()) {
+          const expectedStart = (orientation === 'up' || orientation === 'left' ? index : 2 - index) * step
+          expect((vertical ? rect.y : rect.x).toNumber()).toBeCloseTo(expectedStart, 10)
+          expect((vertical ? rect.height : rect.width).toNumber()).toBeCloseTo(step, 10)
+          expect((vertical ? rect.width : rect.height).toNumber()).toBe(100)
+        }
+        const corners = {
+          up: ['topLeft', 'topRight'],
+          down: ['bottomLeft', 'bottomRight'],
+          left: ['topLeft', 'bottomLeft'],
+          right: ['topRight', 'bottomRight'],
+        } as const
+        for (const corner of corners[orientation]) {
+          expect(result.cornerRadius[corner].toNumber()).toBeCloseTo(step, 10)
+          const field = {
+            topLeft: 'topLeftRadius',
+            topRight: 'topRightRadius',
+            bottomLeft: 'bottomLeftRadius',
+            bottomRight: 'bottomRightRadius',
+          } as const
+          expect(limits).toMatchObject({
+            [field[corner]]: { max: { value: new BigNumber(100).dividedBy(3) } },
+          })
+        }
+        expect(limits).toMatchObject({
+          pocketStep: { max: { value: new BigNumber(100).dividedBy(3) } },
+          tPocketTabWidth: { max: { value: new BigNumber(50) } },
+          tPocketTaper: { max: { value: new BigNumber(50) } },
+        })
+        expect(input).toEqual(snapshot)
+      },
+    )
+
+    it('uses stretched cluster dimensions for pocket limits', () => {
+      const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        orientation,
+        pocketCount: 3,
+        pocketStep: 100,
+        tPocketTabWidth: 100,
+        tPocketTaper: 100,
+        rightStretch: 20,
+        bottomStretch: 50,
+      })
+      const computed = getComputedSubProject(
+        d.subProject({
+          id: 'sub-project',
+          root,
+          components: [cluster],
+        }),
+        defaultStitchingSettings,
+      )
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      expect(result.boundingRect.width.toNumber()).toBe(120)
+      expect(result.boundingRect.height.toNumber()).toBe(150)
+      const limits = computed.limits.components[cluster.id]
+      expect(limits).toMatchObject({
+        pocketStep: { max: { value: new BigNumber(vertical ? 50 : 40) } },
+        tPocketTabWidth: { max: { value: new BigNumber(vertical ? 60 : 75) } },
+        tPocketTaper: { max: { value: new BigNumber(vertical ? 60 : 75) } },
+      })
+    })
+
+    it('keeps zero-size clusters finite and reports zero maxima', () => {
+      const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        orientation,
+        width: 0,
+        height: 0,
+        autoWidth: false,
+        autoHeight: false,
+        topLeftRadius: 10,
+        topRightRadius: 10,
+        bottomLeftRadius: 10,
+        bottomRightRadius: 10,
+        defaultOpening: {
+          id: 'own:default',
+          name: 'Default',
+          type: 'recessed',
+          outerInset: 15,
+          innerOffset: 15,
+          depth: 10,
+          innerRadius: 10,
+          outerRadius: 10,
+        },
+      })
+      const computed = getComputedSubProject(
+        d.subProject({
+          id: 'sub-project',
+          root,
+          components: [cluster],
+        }),
+        defaultStitchingSettings,
+      )
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      expectBoundingRect(result, [0, 50, 0, 0])
+      expect(computed.limits.components[cluster.id]).toMatchObject({
+        pocketStep: { max: { value: new BigNumber(0) } },
+        tPocketTabWidth: { max: { value: new BigNumber(0) } },
+        tPocketTaper: { max: { value: new BigNumber(0) } },
+      })
+      for (const radius of Object.values(result.cornerRadius)) {
+        expect(radius.toNumber()).toBe(0)
+      }
+    })
+  },
+)

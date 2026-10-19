@@ -1,20 +1,23 @@
 import BigNumber from 'bignumber.js'
 import type { PocketClusterSchema } from '../../schemas/components'
-import type { CornerRadiusLimitsSchema, NumericFieldLimitsSchema } from '../../schemas/limits'
+import type { CornerRadiusLimitsSchema, NumericFieldLimitsSchema, PocketsLimitsSchema } from '../../schemas/limits'
+import { clamp } from '../../utils/clamp'
 import { isDefined } from '../../utils/isDefined'
 import { getCornerRadiusLimits, type GetCornerRadiusLimitsParams } from './getCornerRadiusLimits'
 
 export type GetPocketClusterCornerRadiusLimitsParams = GetCornerRadiusLimitsParams & {
   pocketCluster: PocketClusterSchema
+  pocketsLimits: PocketsLimitsSchema
 }
 
 /** Opening-side cluster corners also obey the existing pocket-step maximum. */
 export const getPocketClusterCornerRadiusLimits = ({
   pocketCluster,
+  pocketsLimits,
   ...params
 }: GetPocketClusterCornerRadiusLimitsParams): CornerRadiusLimitsSchema => {
   const limits = getCornerRadiusLimits(params)
-  const step = new BigNumber(pocketCluster.pocketStep)
+  const step = clamp(pocketCluster.pocketStep, 0, pocketsLimits.pocketStep?.max?.value)
   switch (pocketCluster.orientation) {
     case 'up':
       return {

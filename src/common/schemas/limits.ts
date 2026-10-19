@@ -3,6 +3,7 @@ import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema
 import type {
   PanelSchema,
   PocketClusterSchema,
+  PocketsSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
   StraightPocketOpeningSchema,
@@ -32,12 +33,25 @@ export type RecessedPocketOpeningLimitsReasonSchema =
   /** At least 1 mm of pocket material must remain below the recess. */
   | 'pocket-opening-depth'
 
-export type StretchLimitReasonSchema = 'stretch-component-size' | 'stretch-opposite-edge'
+export type StretchLimitReasonSchema =
+  /** Compression cannot exceed the component's original size along this axis. Applies when the opposite edge is neither stretched nor compressed. */
+  | 'stretch-component-size'
+  /** Compression is limited by the remaining size after opposite-edge stretch, or half the original size if that edge compresses beyond halfway. */
+  | 'stretch-opposite-edge'
+
+export type PocketClusterLimitReasonSchema =
+  /** Pocket spacing cannot exceed the cluster's stack-axis length divided by the pocket count. */
+  | 'cluster-size-and-pocket-count'
+  /** Shoulder insets extend inward from both sides and cannot exceed half the pocket width. */
+  | 't-pocket-tab-width-exceeds-half-width'
+  /** Bottom taper extends inward from both sides and cannot exceed half the pocket width. */
+  | 't-pocket-taper-exceeds-half-width'
 
 export type LimitReasonSchema =
   | CornerRadiusLimitReasonSchema
   | RecessedPocketOpeningLimitsReasonSchema
   | StretchLimitReasonSchema
+  | PocketClusterLimitReasonSchema
 
 export type NumericBoundSchema = {
   value: BigNumber
@@ -69,6 +83,7 @@ export type CornerRadiusLimitsSchema = Partial<
   Record<NumericFieldNameSchema<HasCornerRadiusValuesSchema>, NumericFieldLimitsSchema>
 >
 export type StretchLimitsSchema = Record<keyof HasStretchValuesSchema, NumericFieldLimitsSchema>
+export type PocketsLimitsSchema = Partial<Record<NumericFieldNameSchema<PocketsSchema>, NumericFieldLimitsSchema>>
 export type SubProjectLimitsSchema = {
   components: Record<string, ComponentLimitsSchema>
   holes: Record<string, HoleLimitsSchema>
