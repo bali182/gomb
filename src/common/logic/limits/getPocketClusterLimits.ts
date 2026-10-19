@@ -5,6 +5,7 @@ import { getCornerRadius } from '../cornerRadiusUtils'
 import { normalizePocketCluster } from '../normalizePocketCluster'
 import { getPocketClusterCornerRadiusLimits } from './getPocketClusterCornerRadiusLimits'
 import { getPocketOpeningLimits } from './getPocketOpeningLimits'
+import { getStretchLimits } from './getStretchLimits'
 
 export const getPocketClusterLimits = (
   pocketCluster: PocketClusterSchema,
@@ -23,6 +24,7 @@ export const getPocketClusterLimits = (
   }
   return {
     type: pocketCluster.type,
+    ...getStretchLimits(pocketCluster, computed.layoutBoundingRect),
     ...getPocketClusterCornerRadiusLimits({
       pocketCluster,
       boundingRect: computed.boundingRect,

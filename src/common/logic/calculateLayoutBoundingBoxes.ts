@@ -4,6 +4,7 @@ import { ZERO } from '../constants/layout'
 import type { ComponentSchema, PanelSchema, PocketClusterSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
+import { getStretchLimits } from './limits/getStretchLimits'
 
 type CalculateLayoutBoundingBoxesParams = {
   component: ComponentSchema
@@ -177,12 +178,11 @@ const applyStretchToBoundingBox = (
   component: PanelSchema | PocketClusterSchema,
   boundingBox: RectSchema,
 ): RectSchema => {
-  const minimumHorizontalStretch = BigNumber.maximum(boundingBox.width.dividedBy(2).minus(0.5), ZERO).negated()
-  const minimumVerticalStretch = BigNumber.maximum(boundingBox.height.dividedBy(2).minus(0.5), ZERO).negated()
-  const leftStretch = clamp(component.leftStretch, minimumHorizontalStretch)
-  const rightStretch = clamp(component.rightStretch, minimumHorizontalStretch)
-  const topStretch = clamp(component.topStretch, minimumVerticalStretch)
-  const bottomStretch = clamp(component.bottomStretch, minimumVerticalStretch)
+  const limits = getStretchLimits(component, boundingBox)
+  const leftStretch = clamp(component.leftStretch, limits.leftStretch.min?.value)
+  const rightStretch = clamp(component.rightStretch, limits.rightStretch.min?.value)
+  const topStretch = clamp(component.topStretch, limits.topStretch.min?.value)
+  const bottomStretch = clamp(component.bottomStretch, limits.bottomStretch.min?.value)
 
   return {
     x: boundingBox.x.minus(leftStretch),

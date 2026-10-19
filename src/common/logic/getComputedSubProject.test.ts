@@ -56,6 +56,16 @@ type InwardStretchTestCase = {
   expectedBoundingRect: ExpectedBoundingRect
 }
 
+type OpposingStretchTestCase = {
+  first: number
+  second: number
+  adjustedFirst: number
+  adjustedSecond: number
+  firstMinimum: number
+  secondMinimum: number
+  expectedSize: number
+}
+
 type SpaceDistributionTestCase = {
   name: string
   fixedSizes: number[]
@@ -844,7 +854,7 @@ describe('getComputedSubProject layout', () => {
     expectBoundingRect(computed.panel(child.id), testCase.expectedBoundingRect)
   })
 
-  it('limits negative stretch to retain one millimeter of material', () => {
+  it('allows opposing negative stretch to reduce the component to zero', () => {
     const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['child'] })
     const child = d.panel({
       id: 'child',
@@ -862,7 +872,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [29.5, 29.5, 1, 1])
+    expectBoundingRect(computed.panel(child.id), [30, 30, 0, 0])
   })
 
   it('allows positive vertical stretch beyond the parent bounds', () => {
@@ -1330,9 +1340,9 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
 
       it.each([
         { size: 0, stretch: -100, expectedSize: 0, inset: 0 },
-        { size: 0.5, stretch: -100, expectedSize: 0.5, inset: 0 },
-        { size: 1, stretch: -100, expectedSize: 1, inset: 0 },
-        { size: 10, stretch: -100, expectedSize: 1, inset: 4.5 },
+        { size: 0.5, stretch: -100, expectedSize: 0, inset: 0.25 },
+        { size: 1, stretch: -100, expectedSize: 0, inset: 0.5 },
+        { size: 10, stretch: -100, expectedSize: 0, inset: 5 },
         { size: 0, stretch: 5, expectedSize: 10, inset: -5 },
         { size: 10, stretch: 0, expectedSize: 10, inset: 0 },
         { size: 10, stretch: 100, expectedSize: 210, inset: -100 },
@@ -1439,3 +1449,170 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
     })
   },
 )
+
+describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (type) => {
+  describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('%s axis', (axis) => {
+    it.each<OpposingStretchTestCase>([
+      {
+        first: -80,
+        second: -20,
+        adjustedFirst: -80,
+        adjustedSecond: -20,
+        firstMinimum: -80,
+        secondMinimum: -50,
+        expectedSize: 0,
+      },
+      {
+        first: -80,
+        second: -30,
+        adjustedFirst: -70,
+        adjustedSecond: -30,
+        firstMinimum: -70,
+        secondMinimum: -50,
+        expectedSize: 0,
+      },
+      {
+        first: -30,
+        second: -80,
+        adjustedFirst: -30,
+        adjustedSecond: -70,
+        firstMinimum: -50,
+        secondMinimum: -70,
+        expectedSize: 0,
+      },
+      {
+        first: -80,
+        second: -80,
+        adjustedFirst: -50,
+        adjustedSecond: -50,
+        firstMinimum: -50,
+        secondMinimum: -50,
+        expectedSize: 0,
+      },
+      {
+        first: -120,
+        second: 0,
+        adjustedFirst: -100,
+        adjustedSecond: 0,
+        firstMinimum: -100,
+        secondMinimum: -50,
+        expectedSize: 0,
+      },
+      {
+        first: 30,
+        second: -120,
+        adjustedFirst: 30,
+        adjustedSecond: -120,
+        firstMinimum: -50,
+        secondMinimum: -130,
+        expectedSize: 10,
+      },
+      {
+        first: 30,
+        second: -140,
+        adjustedFirst: 30,
+        adjustedSecond: -130,
+        firstMinimum: -50,
+        secondMinimum: -130,
+        expectedSize: 0,
+      },
+      {
+        first: 30,
+        second: 40,
+        adjustedFirst: 30,
+        adjustedSecond: 40,
+        firstMinimum: -140,
+        secondMinimum: -130,
+        expectedSize: 170,
+      },
+    ])(
+      'calculates geometry and original-layout limits for $first / $second',
+      ({ first, second, adjustedFirst, adjustedSecond, firstMinimum, secondMinimum, expectedSize }) => {
+        const horizontal = axis === 'horizontal'
+        const firstField = horizontal ? 'leftStretch' : 'topStretch'
+        const secondField = horizontal ? 'rightStretch' : 'bottomStretch'
+        const root = d.rootPanel({
+          id: 'root',
+          width: 200,
+          height: 200,
+          children: ['child', 'sibling'],
+          layoutOrientation: axis,
+          layoutGap: 10,
+        })
+        const config = {
+          id: 'child',
+          width: horizontal ? 100 : 60,
+          height: horizontal ? 60 : 100,
+          autoWidth: false,
+          autoHeight: false,
+          offAxisAnchor: 'start' as const,
+          [firstField]: first,
+          [secondField]: second,
+        }
+        const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+        const sibling = d.panel({
+          id: 'sibling',
+          width: 20,
+          height: 20,
+          autoWidth: false,
+          autoHeight: false,
+          offAxisAnchor: 'start',
+        })
+        const source = d.subProject({ id: 'sub-project', root, components: [child, sibling] })
+        const snapshot = structuredClone(source)
+        const computed = getComputedSubProject(source, defaultStitchingSettings)
+        const computedAccessor = accessors.computedSubProject(computed)
+        const result = type === 'panel' ? computedAccessor.panel(child.id) : computedAccessor.pocketCluster(child.id)
+        expectBoundingRect(
+          result,
+          horizontal ? [-adjustedFirst, 0, expectedSize, 60] : [0, -adjustedFirst, 60, expectedSize],
+        )
+        expect(result.layoutBoundingRect.width.toNumber()).toBe(horizontal ? 100 : 60)
+        expect(result.layoutBoundingRect.height.toNumber()).toBe(horizontal ? 60 : 100)
+        expect(computed.limits.components[child.id]).toMatchObject({
+          [firstField]: { min: { value: new BigNumber(firstMinimum) } },
+          [secondField]: { min: { value: new BigNumber(secondMinimum) } },
+        })
+        expectBoundingRect(computed.components[sibling.id], horizontal ? [110, 0, 20, 20] : [0, 110, 20, 20])
+        const end = horizontal
+          ? result.boundingRect.x.plus(result.boundingRect.width)
+          : result.boundingRect.y.plus(result.boundingRect.height)
+        expect(end.toNumber()).toBe(100 + adjustedSecond)
+        expect(source).toEqual(snapshot)
+      },
+    )
+  })
+
+  it('uses separate width and height limits for uniform compression', () => {
+    const root = d.rootPanel({ id: 'root', width: 200, height: 200, children: ['child'] })
+    const config = {
+      id: 'child',
+      width: 100,
+      height: 60,
+      autoWidth: false,
+      autoHeight: false,
+      offAxisAnchor: 'start' as const,
+      individualStretch: false,
+      leftStretch: -80,
+      rightStretch: -80,
+      topStretch: -80,
+      bottomStretch: -80,
+    }
+    const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
+    const computed = getComputedSubProject(
+      d.subProject({
+        id: 'sub-project',
+        root,
+        components: [child],
+      }),
+      defaultStitchingSettings,
+    )
+    expectBoundingRect(computed.components[child.id], [50, 30, 0, 0])
+    expect(computed.limits.components[child.id]).toMatchObject({
+      leftStretch: { min: { value: new BigNumber(-50) } },
+      rightStretch: { min: { value: new BigNumber(-50) } },
+      topStretch: { min: { value: new BigNumber(-30) } },
+      bottomStretch: { min: { value: new BigNumber(-30) } },
+    })
+  })
+})

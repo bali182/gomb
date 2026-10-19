@@ -935,6 +935,9 @@ export const HU = {
   },
   limits: {
     reasons: {
+      'stretch-component-size': (value: string): string =>
+        `A komponens mérete miatt a nyújtás legalább ${value} mm lehet.`,
+      'stretch-opposite-edge': (value: string): string => `A szemközti él miatt a nyújtás legalább ${value} mm lehet.`,
       'parent-corner-radius': (value: string): string => `A szülő sarka miatt a sugár legalább ${value} mm.`,
       'corner-radius-exceeds-edge-length': (value: string): string =>
         `A rendelkezésre álló oldalhossz miatt a sugár legfeljebb ${value} mm.`,

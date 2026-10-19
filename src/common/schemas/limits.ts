@@ -1,5 +1,5 @@
 import type BigNumber from 'bignumber.js'
-import type { HasCornerRadiusValuesSchema, HasTypeSchema } from './common'
+import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
 import type {
   PanelSchema,
   PocketClusterSchema,
@@ -32,7 +32,12 @@ export type RecessedPocketOpeningLimitsReasonSchema =
   /** At least 1 mm of pocket material must remain below the recess. */
   | 'pocket-opening-depth'
 
-export type LimitReasonSchema = CornerRadiusLimitReasonSchema | RecessedPocketOpeningLimitsReasonSchema
+export type StretchLimitReasonSchema = 'stretch-component-size' | 'stretch-opposite-edge'
+
+export type LimitReasonSchema =
+  | CornerRadiusLimitReasonSchema
+  | RecessedPocketOpeningLimitsReasonSchema
+  | StretchLimitReasonSchema
 
 export type NumericBoundSchema = {
   value: BigNumber
@@ -63,6 +68,7 @@ export type StitchLineLimitsSchema = ComponentBoundsStitchLineLimitsSchema | Poc
 export type CornerRadiusLimitsSchema = Partial<
   Record<NumericFieldNameSchema<HasCornerRadiusValuesSchema>, NumericFieldLimitsSchema>
 >
+export type StretchLimitsSchema = Record<keyof HasStretchValuesSchema, NumericFieldLimitsSchema>
 export type SubProjectLimitsSchema = {
   components: Record<string, ComponentLimitsSchema>
   holes: Record<string, HoleLimitsSchema>

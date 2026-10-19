@@ -1005,6 +1005,9 @@ export const EN = {
   },
   limits: {
     reasons: {
+      'stretch-component-size': (value: string): string =>
+        `The component size sets the minimum stretch to ${value} mm.`,
+      'stretch-opposite-edge': (value: string): string => `The opposite edge sets the minimum stretch to ${value} mm.`,
       'parent-corner-radius': (value: string): string => `The parent corner requires a radius of at least ${value} mm.`,
       'corner-radius-exceeds-edge-length': (value: string): string =>
         `The available edge length limits the radius to ${value} mm.`,

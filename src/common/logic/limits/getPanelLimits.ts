@@ -3,6 +3,7 @@ import type { ComputedComponentSchema, ComputedPanelSchema } from '../../schemas
 import type { PanelLimitsSchema } from '../../schemas/limits'
 import { getCornerRadius } from '../cornerRadiusUtils'
 import { getCornerRadiusLimits } from './getCornerRadiusLimits'
+import { getStretchLimits } from './getStretchLimits'
 
 export const getPanelLimits = (
   panel: PanelSchema,
@@ -10,6 +11,7 @@ export const getPanelLimits = (
   parent: ComputedComponentSchema,
 ): PanelLimitsSchema => ({
   type: panel.type,
+  ...getStretchLimits(panel, computed.layoutBoundingRect),
   ...getCornerRadiusLimits({
     boundingRect: computed.boundingRect,
     cornerRadius: getCornerRadius(panel),
