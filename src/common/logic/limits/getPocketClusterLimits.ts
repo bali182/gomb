@@ -30,7 +30,6 @@ export const getPocketClusterLimits = (
     ...getStretchLimits(pocketCluster, computed.layoutBoundingRect),
     ...getPocketClusterCornerRadiusLimits({
       pocketCluster,
-      pocketsLimits,
       boundingRect: computed.boundingRect,
       cornerRadius: getCornerRadius(pocketCluster),
       parentBoundingRect: parent.boundingRect,

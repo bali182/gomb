@@ -13,10 +13,12 @@ import { d } from '../../testData'
 import { calculatePocketClusterGeometry } from '../calculatePocketClusterGeometry'
 import { calculateRecessedPocketOpeningPath } from '../calculateRecessedPocketOpeningPath'
 import { getCornerRadius } from '../cornerRadiusUtils'
+import { getAdjustedCornerRadius } from '../getAdjustedCornerRadius'
 import { getAdjustedPocketOpening } from '../getAdjustedPocketOpening'
 import { normalizePocketCluster } from '../normalizePocketCluster'
 import { getPathSegmentIntersections } from '../pathSegmentIntersections'
 import { getPathSegments } from '../pathSegments'
+import { getPocketClusterCornerRadiusLimits } from './getPocketClusterCornerRadiusLimits'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 
 type OpeningLimitsFixture = {
@@ -72,7 +74,14 @@ const createFixture = (
       openingMapping: {},
     },
     rect,
-    getCornerRadius(pocketCluster),
+    getAdjustedCornerRadius(
+      getCornerRadius(pocketCluster),
+      getPocketClusterCornerRadiusLimits({
+        pocketCluster,
+        boundingRect: rect,
+        cornerRadius: getCornerRadius(pocketCluster),
+      }),
+    ),
   )
   return {
     opening,
@@ -95,11 +104,11 @@ describe('getRecessedPocketOpeningLimits', () => {
     expectBound(limits.innerOffset?.max, 50, 'pocket-opening-width')
   })
 
-  it('reserves opening-side corner space before bounding the offsets', () => {
+  it('does not reserve space for ignored opening-side cluster radii', () => {
     const { limits } = createFixture({ outerInset: 0, innerOffset: 49 }, { topLeftRadius: 8, topRightRadius: 3 })
-    expectBound(limits.outerInset?.min, 8, 'pocket-opening-corner-clearance')
-    expectBound(limits.innerOffset?.max, 42, 'pocket-opening-corner-clearance')
-    expectBound(limits.outerInset?.max, 8, 'pocket-opening-width')
+    expect(limits.outerInset?.min).toBeUndefined()
+    expectBound(limits.innerOffset?.max, 50, 'pocket-opening-width')
+    expectBound(limits.outerInset?.max, 1, 'pocket-opening-width')
   })
 
   it('leaves one millimetre below the recess', () => {
@@ -164,7 +173,10 @@ describe('getRecessedPocketOpeningLimits', () => {
   })
 
   it('uses only assigned pockets, and both representative pockets when unassigned', () => {
-    const fixture = createFixture({}, { topLeftRadius: 8 })
+    const fixture = createFixture(
+      { outerInset: 5, innerOffset: 40, depth: 100 },
+      { bottomLeftRadius: 40, bottomRightRadius: 30, tPocketTabWidth: 0, tPocketTaper: 0 },
+    )
     const shared = { ...fixture.opening, id: 'own:shared' }
     const { pocketCluster, frontPocket, tPockets } = fixture
     const frontOnly: PocketClusterSchema = {
@@ -186,15 +198,24 @@ describe('getRecessedPocketOpeningLimits', () => {
       frontPocket,
       tPockets,
     )
-    expectBound(unused.outerInset?.min, 8, 'pocket-opening-corner-clearance')
-    expectBound(firstT.outerInset?.min, 8, 'pocket-opening-corner-clearance')
-    expectBound(front.outerInset?.min, 0, 'pocket-opening-corner-clearance')
-    expectBound(laterT.outerInset?.min, 0, 'pocket-opening-corner-clearance')
+    expectBound(unused.depth?.max, 40 + Math.sqrt(700), 'pocket-opening-boundary')
+    expectBound(front.depth?.max, 40 + Math.sqrt(700), 'pocket-opening-boundary')
+    expectBound(firstT.depth?.max, 79, 'pocket-opening-depth')
+    expectBound(laterT.depth?.max, 79, 'pocket-opening-depth')
   })
 
   it('resolves missing opening references to the default opening', () => {
-    const fixture = createFixture({}, { topLeftRadius: 8, openingMapping: { 1: 'own:missing', 3: 'own:missing' } })
-    expectBound(fixture.limits.outerInset?.min, 8, 'pocket-opening-corner-clearance')
+    const fixture = createFixture(
+      { outerInset: 5, innerOffset: 40, depth: 100 },
+      {
+        bottomLeftRadius: 40,
+        bottomRightRadius: 30,
+        tPocketTabWidth: 0,
+        tPocketTaper: 0,
+        openingMapping: { 1: 'own:missing', 3: 'own:missing' },
+      },
+    )
+    expectBound(fixture.limits.depth?.max, 40 + Math.sqrt(700), 'pocket-opening-boundary')
   })
 
   it('does not constrain radii at zero depth', () => {

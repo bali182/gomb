@@ -11,10 +11,10 @@ import type { NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../.
 import { accessors } from '../../utils/accessors'
 import { clamp } from '../../utils/clamp'
 import { isDefined } from '../../utils/isDefined'
-import { getMaximumOpeningCornerRadius, getTPocketTabDepth } from '../pocketUtils'
+import { getTPocketTabDepth } from '../pocketUtils'
 
 /**
- * Reserves room for pocket corners, then preserves the inner offset before adjusting the outer inset.
+ * Preserves the inner offset before adjusting the outer inset.
  * Depth is bounded using the unrounded recess. Inner rounding stays inside that recess, while outer
  * rounding can expand it. The inner radius is therefore fixed before finding the outer radius limit.
  * Only bounds are returned. The source opening is never changed.
@@ -29,15 +29,9 @@ export const getRecessedPocketOpeningLimits = (
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? frontPocket.boundingRect.width : frontPocket.boundingRect.height
   const halfWidth = width.dividedBy(2)
-  const cornerClearance = BigNumber.minimum(
-    halfWidth,
-    BigNumber.maximum(
-      ...pockets.map((pocket) => getMaximumOpeningCornerRadius(pocket.cornerRadius, pocketCluster.orientation)),
-    ),
-  )
   const innerOffsetMaximum: NumericBoundSchema = {
-    value: BigNumber.maximum(halfWidth.minus(cornerClearance), 0),
-    reason: cornerClearance.isZero() ? 'pocket-opening-width' : 'pocket-opening-corner-clearance',
+    value: halfWidth,
+    reason: 'pocket-opening-width',
     severity: 'warning',
   }
   const adjusted: RecessedPocketOpeningSchema = {
@@ -49,7 +43,7 @@ export const getRecessedPocketOpeningLimits = (
     reason: 'pocket-opening-width',
     severity: 'warning',
   }
-  adjusted.outerInset = clamp(opening.outerInset, cornerClearance, outerInsetMaximum.value).toNumber()
+  adjusted.outerInset = clamp(opening.outerInset, 0, outerInsetMaximum.value).toNumber()
 
   let depthMaximum: NumericBoundSchema | undefined
   for (const pocket of pockets) {
@@ -65,7 +59,6 @@ export const getRecessedPocketOpeningLimits = (
     type: 'recessed',
     innerOffset: { max: innerOffsetMaximum },
     outerInset: {
-      min: { value: cornerClearance, reason: 'pocket-opening-corner-clearance', severity: 'warning' },
       max: outerInsetMaximum,
     },
     depth: { max: depthMaximum },
@@ -227,8 +220,7 @@ const getOuterRadiusMaximum = (
   const depth = new BigNumber(opening.depth)
   const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
-  const cornerClearance = getMaximumOpeningCornerRadius(pocket.cornerRadius, pocketCluster.orientation)
-  const availableTop = BigNumber.maximum(new BigNumber(opening.outerInset).minus(cornerClearance), 0)
+  const availableTop = new BigNumber(opening.outerInset)
   const separatedMaximum = availableTop.dividedBy(angleFactor)
   const innerEndX = width
     .dividedBy(2)
@@ -236,12 +228,7 @@ const getOuterRadiusMaximum = (
     .plus(new BigNumber(opening.innerRadius).times(angleFactor))
   let upperBound = separatedMaximum
   if (separatedMaximum.plus(opening.innerRadius).times(angleFactor).isGreaterThan(sideLength)) {
-    upperBound = innerEndX
-      .minus(cornerClearance)
-      .pow(2)
-      .plus(depth.pow(2))
-      .dividedBy(depth.times(2))
-      .minus(opening.innerRadius)
+    upperBound = innerEndX.pow(2).plus(depth.pow(2)).dividedBy(depth.times(2)).minus(opening.innerRadius)
   }
   upperBound = BigNumber.maximum(upperBound, 0)
   const maximum: NumericBoundSchema = { value: upperBound, reason: 'pocket-opening-width', severity: 'warning' }

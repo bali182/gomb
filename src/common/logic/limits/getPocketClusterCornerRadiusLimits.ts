@@ -1,57 +1,56 @@
-import BigNumber from 'bignumber.js'
-import type { PocketClusterSchema } from '../../schemas/components'
-import type { CornerRadiusLimitsSchema, NumericFieldLimitsSchema, PocketsLimitsSchema } from '../../schemas/limits'
-import { clamp } from '../../utils/clamp'
+import { ZERO } from '../../constants/layout'
+import type { PocketClusterSchema, PocketOrientationSchema } from '../../schemas/components'
+import type { CornerRadiusSchema } from '../../schemas/geometry'
+import type { CornerRadiusLimitsSchema, NumericFieldLimitsSchema } from '../../schemas/limits'
 import { isDefined } from '../../utils/isDefined'
 import { getCornerRadiusLimits, type GetCornerRadiusLimitsParams } from './getCornerRadiusLimits'
 
 export type GetPocketClusterCornerRadiusLimitsParams = GetCornerRadiusLimitsParams & {
   pocketCluster: PocketClusterSchema
-  pocketsLimits: PocketsLimitsSchema
 }
 
-/** Opening-side cluster corners also obey the existing pocket-step maximum. */
+/** Opening-side radii are ignored, including when calculating limits for the closed side. */
 export const getPocketClusterCornerRadiusLimits = ({
   pocketCluster,
-  pocketsLimits,
+  cornerRadius,
+  parentCornerRadius,
   ...params
 }: GetPocketClusterCornerRadiusLimitsParams): CornerRadiusLimitsSchema => {
-  const limits = getCornerRadiusLimits(params)
-  const step = clamp(pocketCluster.pocketStep, 0, pocketsLimits.pocketStep?.max?.value)
-  switch (pocketCluster.orientation) {
+  const { orientation } = pocketCluster
+  const limits = getCornerRadiusLimits({
+    ...params,
+    cornerRadius: getClosedSideCornerRadius(cornerRadius, orientation),
+    parentCornerRadius: isDefined(parentCornerRadius)
+      ? getClosedSideCornerRadius(parentCornerRadius, orientation)
+      : undefined,
+  })
+  const ignored: NumericFieldLimitsSchema = {
+    max: { value: ZERO, reason: 'pocket-opening-corner-radius-ignored', severity: 'info' },
+  }
+  switch (orientation) {
     case 'up':
-      return {
-        ...limits,
-        topLeftRadius: applyPocketStep(limits.topLeftRadius, step),
-        topRightRadius: applyPocketStep(limits.topRightRadius, step),
-      }
+      return { ...limits, topLeftRadius: ignored, topRightRadius: ignored }
     case 'down':
-      return {
-        ...limits,
-        bottomLeftRadius: applyPocketStep(limits.bottomLeftRadius, step),
-        bottomRightRadius: applyPocketStep(limits.bottomRightRadius, step),
-      }
+      return { ...limits, bottomLeftRadius: ignored, bottomRightRadius: ignored }
     case 'left':
-      return {
-        ...limits,
-        topLeftRadius: applyPocketStep(limits.topLeftRadius, step),
-        bottomLeftRadius: applyPocketStep(limits.bottomLeftRadius, step),
-      }
+      return { ...limits, topLeftRadius: ignored, bottomLeftRadius: ignored }
     case 'right':
-      return {
-        ...limits,
-        topRightRadius: applyPocketStep(limits.topRightRadius, step),
-        bottomRightRadius: applyPocketStep(limits.bottomRightRadius, step),
-      }
+      return { ...limits, topRightRadius: ignored, bottomRightRadius: ignored }
   }
 }
 
-const applyPocketStep = (limits: NumericFieldLimitsSchema | undefined, step: BigNumber): NumericFieldLimitsSchema => {
-  if (isDefined(limits?.max) && limits.max.value.lte(step)) {
-    return limits
-  }
-  return {
-    min: isDefined(limits?.min) ? { ...limits.min, value: BigNumber.minimum(limits.min.value, step) } : undefined,
-    max: { value: step, reason: 'opening-corner-radius-exceeds-pocket-step', severity: 'warning' },
+const getClosedSideCornerRadius = (
+  cornerRadius: CornerRadiusSchema,
+  orientation: PocketOrientationSchema,
+): CornerRadiusSchema => {
+  switch (orientation) {
+    case 'up':
+      return { ...cornerRadius, topLeft: ZERO, topRight: ZERO }
+    case 'down':
+      return { ...cornerRadius, bottomLeft: ZERO, bottomRight: ZERO }
+    case 'left':
+      return { ...cornerRadius, topLeft: ZERO, bottomLeft: ZERO }
+    case 'right':
+      return { ...cornerRadius, topRight: ZERO, bottomRight: ZERO }
   }
 }

@@ -1018,13 +1018,10 @@ export const EN = {
       'corner-radius-exceeds-edge-length': (value: string): string =>
         `The available edge length limits the radius to ${value} mm.`,
       'corner-radii-share-edge': (value: string): string => `The adjacent corner limits the radius to ${value} mm.`,
-      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
-        `The spacing between pockets limits the opening-side corner radius to ${value} mm.`,
+      'pocket-opening-corner-radius-ignored': (): string => 'Corner rounding is ignored on the pocket opening side.',
       'pocket-opening-width': (value: string): string =>
         `The available opening width limits this value to ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `The pocket outline limits this value to ${value} mm.`,
-      'pocket-opening-corner-clearance': (value: string): string =>
-        `The pocket corner rounding sets this limit to ${value} mm.`,
       'pocket-opening-depth': (value: string): string => `The pocket depth limits the recess depth to ${value} mm.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },

@@ -18,7 +18,7 @@ const opening: RecessedPocketOpeningSchema = {
 const limits: RecessedPocketOpeningLimitsSchema = {
   type: 'recessed',
   outerInset: {
-    min: { value: new BigNumber(10), reason: 'pocket-opening-corner-clearance', severity: 'warning' },
+    min: { value: new BigNumber(10), reason: 'pocket-opening-width', severity: 'warning' },
     max: { value: new BigNumber(30), reason: 'pocket-opening-width', severity: 'warning' },
   },
   innerOffset: { max: { value: new BigNumber(20), reason: 'pocket-opening-width', severity: 'warning' } },

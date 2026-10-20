@@ -20,16 +20,14 @@ export type CornerRadiusLimitReasonSchema =
   | 'corner-radius-exceeds-edge-length'
   /** Two corners share the available length of the same edge. */
   | 'corner-radii-share-edge'
-  /** The opening-side corner radius is limited by the pocket step. */
-  | 'opening-corner-radius-exceeds-pocket-step'
+  /** Cluster corner rounding is ignored on the pocket opening side. */
+  | 'pocket-opening-corner-radius-ignored'
 
 export type RecessedPocketOpeningLimitsReasonSchema =
   /** The opening parameters share the available width. */
   | 'pocket-opening-width'
   /** The recess must remain inside the pocket outline. */
   | 'pocket-opening-boundary'
-  /** Opening-side corner rounding requires additional clearance. */
-  | 'pocket-opening-corner-clearance'
   /** At least 1 mm of pocket material must remain below the recess. */
   | 'pocket-opening-depth'
 

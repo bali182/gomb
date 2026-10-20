@@ -1623,8 +1623,65 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
   (orientation) => {
     const vertical = orientation === 'up' || orientation === 'down'
 
+    it.each([1, 3])(
+      'keeps only closed-side rounding in pockets and automatic stitching with %i pockets',
+      (pocketCount) => {
+        const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+        const cluster = d.pocketCluster({
+          id: 'cluster',
+          orientation,
+          pocketCount,
+          pocketStep: 10,
+          individualRadii: true,
+          topLeftRadius: 20,
+          topRightRadius: 20,
+          bottomLeftRadius: 20,
+          bottomRightRadius: 20,
+          defaultOpening: { id: 'own:default', name: 'Default', type: 'straight' },
+        })
+        const input = d.subProject({
+          id: 'sub-project',
+          root,
+          components: [cluster],
+          stitchLines: [
+            d.componentBoundsStitchLine({
+              id: 'stitch-line',
+              targetId: cluster.id,
+              targetType: 'component',
+              autoCornerRadius: true,
+              stitchMargin: 5,
+            }),
+          ],
+        })
+        const snapshot = structuredClone(input)
+        const computed = getComputedSubProject(input, defaultStitchingSettings)
+        const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+        const expected: Record<PocketOrientationSchema, NumberCornerRadiusSchema> = {
+          up: { topLeft: 0, topRight: 0, bottomLeft: 20, bottomRight: 20 },
+          down: { topLeft: 20, topRight: 20, bottomLeft: 0, bottomRight: 0 },
+          left: { topLeft: 0, topRight: 20, bottomLeft: 0, bottomRight: 20 },
+          right: { topLeft: 20, topRight: 0, bottomLeft: 20, bottomRight: 0 },
+        }
+        const stitchLine = computed.stitchLines[cluster.id][0]
+        for (const corner of ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const) {
+          const radius = expected[orientation][corner]
+          expect(result.cornerRadius[corner].toNumber()).toBe(radius)
+          expect(result.frontPocket.cornerRadius[corner].toNumber()).toBe(radius)
+          expect(stitchLine.autoComputedCornerRadius[corner].toNumber()).toBe(radius === 0 ? 0 : radius - 5)
+        }
+        expect(result.frontPocket.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(2)
+        for (const pocket of result.tPockets) {
+          expect(pocket.path.commands.some((command) => command.type === 'arcTo')).toBe(false)
+          for (const radius of Object.values(pocket.cornerRadius)) {
+            expect(radius.toNumber()).toBe(0)
+          }
+        }
+        expect(input).toEqual(snapshot)
+      },
+    )
+
     it.each([false, true])(
-      'uses the bounded step for pocket geometry and corner radii with recessed %s',
+      'uses the bounded step for pocket geometry and ignores opening-side radii with recessed %s',
       (recessed) => {
         const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
         const opening: PocketOpeningSchema = recessed
@@ -1673,7 +1730,7 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
           right: ['topRight', 'bottomRight'],
         } as const
         for (const corner of corners[orientation]) {
-          expect(result.cornerRadius[corner].toNumber()).toBeCloseTo(step, 10)
+          expect(result.cornerRadius[corner].toNumber()).toBe(0)
           const field = {
             topLeft: 'topLeftRadius',
             topRight: 'topRightRadius',
@@ -1681,7 +1738,7 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
             bottomRight: 'bottomRightRadius',
           } as const
           expect(limits).toMatchObject({
-            [field[corner]]: { max: { value: new BigNumber(100).dividedBy(3) } },
+            [field[corner]]: { max: { value: new BigNumber(0) } },
           })
         }
         expect(limits).toMatchObject({
