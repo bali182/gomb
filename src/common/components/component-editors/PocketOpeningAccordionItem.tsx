@@ -2,7 +2,7 @@ import { Accordion, Box, Button, HStack, Input, Menu, Portal, type MenuValueChan
 import { useCallback, useEffect, useMemo, type ChangeEvent, type FC } from 'react'
 import { PiCaretDown, PiTrash } from 'react-icons/pi'
 
-import { defaultRecessedPocketOpening } from '../../defaultStates'
+import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../../defaultStates'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { usePocketOpeningLimitIssues } from '../../hooks/usePocketOpeningLimitIssues'
@@ -32,7 +32,7 @@ type PocketOpeningAccordionItemProps = {
   onDelete?: () => void
 }
 
-const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted']
 
 export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = ({
   pocketCluster,
@@ -85,6 +85,9 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
         case 'recessed':
           onChange({ ...getEditableSchema(defaultRecessedPocketOpening, { language }), ...identity })
           break
+        case 'slanted':
+          onChange({ ...getEditableSchema(defaultSlantedPocketOpening, { language }), ...identity })
+          break
       }
     },
     [editable.id, editable.name, language, onChange],
@@ -111,7 +114,8 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
           <PocketOpeningPreview
             adjustedOpening={adjustedOpening}
             pocketRect={pocketRect}
-            orientation={orientation}
+            pocketCluster={pocketCluster}
+            cornerRadius={computed.frontPocket.cornerRadius}
             width={60}
             height={30}
           />
@@ -169,7 +173,7 @@ export const PocketOpeningAccordionItem: FC<PocketOpeningAccordionItemProps> = (
       </Box>
       <Accordion.ItemContent>
         <Accordion.ItemBody px="0" pt="3" pb="0">
-          <PocketOpeningFields editable={editable} issues={issues} onChange={onChange} />
+          <PocketOpeningFields editable={editable} issues={issues} orientation={orientation} onChange={onChange} />
         </Accordion.ItemBody>
       </Accordion.ItemContent>
     </Accordion.Item>

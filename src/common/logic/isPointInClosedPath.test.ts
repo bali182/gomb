@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest'
 
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../constants/layout'
 import type { PathSchema, PointSchema } from '../schemas/geometry'
-import { calculateFrontPocketPath } from './calculateFrontPocketPath'
+import { d } from '../testData'
 import { calculateRectPath } from './calculateRectPath'
 import { isPointInClosedPath } from './isPointInClosedPath'
+import { createPocketCalculator } from './pockets/createPocketCalculator'
 
 const point = (x: BigNumber.Value, y: BigNumber.Value): PointSchema => ({
   x: new BigNumber(x),
@@ -14,10 +15,8 @@ const point = (x: BigNumber.Value, y: BigNumber.Value): PointSchema => ({
 
 describe('isPointInClosedPath', () => {
   it('counts the shared inner-arc junction once, before and after cutting a hole', () => {
-    const path = calculateFrontPocketPath(
-      { ...point(0, 0), width: new BigNumber('72.6'), height: new BigNumber('102.6') },
-      ZERO_CORNER_RADIUS,
-      'right',
+    const path = createPocketCalculator(
+      d.pocketCluster({ id: 'cluster', orientation: 'right' }),
       {
         id: 'own:test',
         name: 'Test',
@@ -28,7 +27,9 @@ describe('isPointInClosedPath', () => {
         outerRadius: 55,
         innerRadius: 8,
       },
-    )
+      { ...point(0, 0), width: new BigNumber('72.6'), height: new BigNumber('102.6') },
+      ZERO_CORNER_RADIUS,
+    ).getFrontPocketPath()
     const hole = calculateRectPath(
       { ...point('33.3', '48.3'), width: new BigNumber(6), height: new BigNumber(6) },
       ZERO_CORNER_RADIUS,

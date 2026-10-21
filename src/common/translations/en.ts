@@ -20,6 +20,8 @@ import type {
   PocketOrientationSchema,
   PocketsSchema,
   RecessedPocketOpeningOwnSchema,
+  SlantedPocketOpeningOwnSchema,
+  SlantedPocketOpeningSideSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -49,6 +51,7 @@ import type {
 import type { ThemeSchema } from '../schemas/theme'
 import type {
   DialogTranslationSchema,
+  EditorFieldTranslations,
   EnumTranslationSchema,
   NativeDialogTranslationSchema,
   SectionTranslationSchema,
@@ -435,7 +438,13 @@ export const EN = {
               label: 'Inner radius',
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketOpeningOwnSchema & HasName>,
+            offset: { label: 'Offset', tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.' },
+            side: {
+              label: 'Lower side',
+              tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
+            },
+          } satisfies SectionTranslationSchema<RecessedPocketOpeningOwnSchema & HasName> &
+            EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
           pocketAssignments: {
             title: 'Pocket assignments',
             openingMapping: { label: 'Pocket opening' },
@@ -779,7 +788,14 @@ export const EN = {
           pocketOpening: {
             straight: 'Straight',
             recessed: 'Recessed',
+            slanted: 'Slanted',
           } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
+          slantedPocketOpeningSide: {
+            up: { start: 'Left', end: 'Right' },
+            right: { start: 'Top', end: 'Bottom' },
+            down: { start: 'Right', end: 'Left' },
+            left: { start: 'Bottom', end: 'Top' },
+          } satisfies Record<PocketOrientationSchema, EnumTranslationSchema<SlantedPocketOpeningSideSchema>>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',
@@ -1018,14 +1034,13 @@ export const EN = {
       'corner-radius-exceeds-edge-length': (value: string): string =>
         `The available edge length limits the radius to ${value} mm.`,
       'corner-radii-share-edge': (value: string): string => `The adjacent corner limits the radius to ${value} mm.`,
-      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
-        `The spacing between pockets limits the opening-side corner radius to ${value} mm.`,
+      'pocket-opening-corner-radius-ignored': (): string => 'Corner rounding is ignored on the pocket opening side.',
       'pocket-opening-width': (value: string): string =>
         `The available opening width limits this value to ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `The pocket outline limits this value to ${value} mm.`,
-      'pocket-opening-corner-clearance': (value: string): string =>
-        `The pocket corner rounding sets this limit to ${value} mm.`,
       'pocket-opening-depth': (value: string): string => `The pocket depth limits the recess depth to ${value} mm.`,
+      'slanted-pocket-opening-offset-exceeds-pocket': (value: string): string =>
+        `The pocket shape limits the offset to ${value} mm.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {

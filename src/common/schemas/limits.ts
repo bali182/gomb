@@ -6,6 +6,7 @@ import type {
   PocketsSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
+  SlantedPocketOpeningSchema,
   StraightPocketOpeningSchema,
 } from './components'
 import type { HoleSchema } from './hole'
@@ -20,18 +21,20 @@ export type CornerRadiusLimitReasonSchema =
   | 'corner-radius-exceeds-edge-length'
   /** Two corners share the available length of the same edge. */
   | 'corner-radii-share-edge'
-  /** The opening-side corner radius is limited by the pocket step. */
-  | 'opening-corner-radius-exceeds-pocket-step'
+  /** Cluster corner rounding is ignored on the pocket opening side. */
+  | 'pocket-opening-corner-radius-ignored'
 
 export type RecessedPocketOpeningLimitsReasonSchema =
   /** The opening parameters share the available width. */
   | 'pocket-opening-width'
   /** The recess must remain inside the pocket outline. */
   | 'pocket-opening-boundary'
-  /** Opening-side corner rounding requires additional clearance. */
-  | 'pocket-opening-corner-clearance'
   /** At least 1 mm of pocket material must remain below the recess. */
   | 'pocket-opening-depth'
+
+export type SlantedPocketOpeningLimitsReasonSchema =
+  /** The shortened endpoint and its T-pocket shoulder must not pass the pocket's closed edge or corner rounding. */
+  'slanted-pocket-opening-offset-exceeds-pocket'
 
 export type StretchLimitReasonSchema =
   /** Compression cannot exceed the component's original size along this axis. Applies when the opposite edge is neither stretched nor compressed. */
@@ -52,6 +55,7 @@ export type LimitReasonSchema =
   | RecessedPocketOpeningLimitsReasonSchema
   | StretchLimitReasonSchema
   | PocketClusterLimitReasonSchema
+  | SlantedPocketOpeningLimitsReasonSchema
 
 export type NumericBoundSchema = {
   value: BigNumber
@@ -71,7 +75,11 @@ export type PanelLimitsSchema = NumericLimitsSchema<PanelSchema>
 export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
 export type StraightPocketOpeningLimitsSchema = NumericLimitsSchema<StraightPocketOpeningSchema>
 export type RecessedPocketOpeningLimitsSchema = NumericLimitsSchema<RecessedPocketOpeningSchema>
-export type PocketOpeningLimitsSchema = StraightPocketOpeningLimitsSchema | RecessedPocketOpeningLimitsSchema
+export type SlantedPocketOpeningLimitsSchema = NumericLimitsSchema<SlantedPocketOpeningSchema>
+export type PocketOpeningLimitsSchema =
+  | StraightPocketOpeningLimitsSchema
+  | RecessedPocketOpeningLimitsSchema
+  | SlantedPocketOpeningLimitsSchema
 export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema> & {
   openings: Record<string, PocketOpeningLimitsSchema>
 }

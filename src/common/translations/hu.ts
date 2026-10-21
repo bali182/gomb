@@ -377,6 +377,14 @@ export const HU = {
               tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
             },
             innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
+            offset: {
+              label: 'Eltérés',
+              tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',
+            },
+            side: {
+              label: 'Alacsonyabb oldal',
+              tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
+            },
           },
           pocketAssignments: {
             title: 'Zsebek hozzárendelése',
@@ -709,6 +717,13 @@ export const HU = {
           pocketOpening: {
             straight: 'Egyenes',
             recessed: 'Ívelt',
+            slanted: 'Ferde',
+          },
+          slantedPocketOpeningSide: {
+            up: { start: 'Bal', end: 'Jobb' },
+            right: { start: 'Felső', end: 'Alsó' },
+            down: { start: 'Jobb', end: 'Bal' },
+            left: { start: 'Alsó', end: 'Felső' },
           },
           pocketOrientation: {
             up: 'Fent',
@@ -948,15 +963,15 @@ export const HU = {
       'corner-radius-exceeds-edge-length': (value: string): string =>
         `A rendelkezésre álló oldalhossz miatt a sugár legfeljebb ${value} mm.`,
       'corner-radii-share-edge': (value: string): string => `A szomszédos sarok miatt a sugár legfeljebb ${value} mm.`,
-      'opening-corner-radius-exceeds-pocket-step': (value: string): string =>
-        `A zsebek közötti távolság miatt a nyílás felőli sarok sugara legfeljebb ${value} mm.`,
+      'pocket-opening-corner-radius-ignored': (): string =>
+        'A nyílás felőli oldalon a saroklekerekítést figyelmen kívül hagyjuk.',
       'pocket-opening-width': (value: string): string =>
         `A nyílás rendelkezésre álló szélessége miatt az érték legfeljebb ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `A zseb körvonala miatt az érték legfeljebb ${value} mm.`,
-      'pocket-opening-corner-clearance': (value: string): string =>
-        `A zseb saroklekerekítése miatt a határérték ${value} mm.`,
       'pocket-opening-depth': (value: string): string =>
         `A zseb mélysége miatt a kivágás legfeljebb ${value} mm mély lehet.`,
+      'slanted-pocket-opening-offset-exceeds-pocket': (value: string): string =>
+        `A zseb alakja miatt az eltérés legfeljebb ${value} mm.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,
   },
   formatters: {

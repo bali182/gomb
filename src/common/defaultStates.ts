@@ -24,6 +24,7 @@ import type {
   PocketClusterSchema,
   RecessedPocketOpeningOwnSchema,
   RootPanelSchema,
+  SlantedPocketOpeningOwnSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
 import type { MagicFixSettingsSchema } from './schemas/magic-fix-3/magicFixSettings3'
@@ -134,6 +135,12 @@ export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
   depth: 10,
   outerRadius: 10,
   innerRadius: 10,
+}
+
+export const defaultSlantedPocketOpening: SlantedPocketOpeningOwnSchema = {
+  type: 'slanted',
+  offset: 15,
+  side: 'end',
 }
 
 export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof HasName> = {

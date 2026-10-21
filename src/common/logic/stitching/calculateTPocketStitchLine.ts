@@ -2,11 +2,14 @@ import BigNumber from 'bignumber.js'
 
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
-import type { LineSchema, PathSchema } from '../../schemas/geometry'
+import type { LineSchema, PathSchema, PointSchema } from '../../schemas/geometry'
 import type { ResolvedPocketClusterStitchLineSchema } from '../../schemas/stitching'
-import { clamp } from '../../utils/clamp'
-import { createPathFromConnectedSegments } from '../pathSegments'
-import { getTPocketTabDepth } from '../pocketUtils'
+import { arePointsEqual } from '../../utils/arePointsEqual'
+import { isDefined } from '../../utils/isDefined'
+import { last } from '../../utils/last'
+import { getPathSegmentIntersections } from '../pathSegmentIntersections'
+import { createPathFromConnectedSegments, getPathSegments } from '../pathSegments'
+import type { LinePathSegment } from '../pathSegmentTypes'
 
 export type CalculatedTPocketStitchLine = {
   line: LineSchema
@@ -15,59 +18,54 @@ export type CalculatedTPocketStitchLine = {
 
 export const calculateTPocketStitchLine = (
   stitchLine: ResolvedPocketClusterStitchLineSchema,
-  normalizedPocketCluster: PocketClusterSchema,
+  pocketCluster: PocketClusterSchema,
   tPocket: ComputedTPocketSchema,
-): CalculatedTPocketStitchLine => {
-  const { boundingRect } = tPocket
-  const left = boundingRect.x
-  const top = boundingRect.y
-  const right = left.plus(boundingRect.width)
-  const bottom = top.plus(boundingRect.height)
-  const stitchMargin = new BigNumber(stitchLine.stitchMargin)
-  const taper = new BigNumber(normalizedPocketCluster.tPocketTaper)
-  const tabDepth = getTPocketTabDepth(normalizedPocketCluster, boundingRect)
-  const stackLength =
-    normalizedPocketCluster.orientation === 'up' || normalizedPocketCluster.orientation === 'down'
-      ? boundingRect.height
-      : boundingRect.width
-  const taperLength = stackLength.minus(tabDepth)
-  const taperProgress = taperLength.isZero() ? new BigNumber(0) : stitchMargin.dividedBy(taperLength)
-  const startInset = taper.minus(taper.times(taperProgress))
-  const endInset = taper.minus(taper.times(taperProgress))
+): CalculatedTPocketStitchLine | undefined => {
+  const candidate = getMarginLine(stitchLine, pocketCluster, tPocket)
+  if (arePointsEqual(candidate.start, candidate.end)) {
+    return undefined
+  }
+  const intersections = getStitchLineIntersections(candidate, tPocket.path)
+  const start = intersections[0]
+  const end = last(intersections)
+  if (!isDefined(start) || !isDefined(end) || arePointsEqual(start, end)) {
+    return undefined
+  }
   const startOffset = new BigNumber(stitchLine.startOffset)
   const endOffset = new BigNumber(stitchLine.endOffset)
+  const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
+  const line: LineSchema = isVertical
+    ? { start: { x: start.x.minus(startOffset), y: start.y }, end: { x: end.x.plus(endOffset), y: end.y } }
+    : { start: { x: start.x, y: start.y.minus(startOffset) }, end: { x: end.x, y: end.y.plus(endOffset) } }
+  return { line, path: createPathFromConnectedSegments([{ type: 'line', ...line }]) }
+}
 
-  let line: LineSchema
-
-  switch (normalizedPocketCluster.orientation) {
+const getMarginLine = (
+  stitchLine: ResolvedPocketClusterStitchLineSchema,
+  pocketCluster: PocketClusterSchema,
+  pocket: ComputedTPocketSchema,
+): LineSchema => {
+  const rect = pocket.boundingRect
+  const right = rect.x.plus(rect.width)
+  const bottom = rect.y.plus(rect.height)
+  const margin = new BigNumber(stitchLine.stitchMargin)
+  switch (pocketCluster.orientation) {
     case 'up':
-      line = {
-        start: { x: clamp(left.plus(startInset), left, right).minus(startOffset), y: bottom.minus(stitchMargin) },
-        end: { x: clamp(right.minus(endInset), left, right).plus(endOffset), y: bottom.minus(stitchMargin) },
-      }
-      break
+      return { start: { x: rect.x, y: bottom.minus(margin) }, end: { x: right, y: bottom.minus(margin) } }
     case 'down':
-      line = {
-        start: { x: clamp(left.plus(startInset), left, right).minus(startOffset), y: top.plus(stitchMargin) },
-        end: { x: clamp(right.minus(endInset), left, right).plus(endOffset), y: top.plus(stitchMargin) },
-      }
-      break
+      return { start: { x: rect.x, y: rect.y.plus(margin) }, end: { x: right, y: rect.y.plus(margin) } }
     case 'left':
-      line = {
-        start: { x: right.minus(stitchMargin), y: clamp(top.plus(startInset), top, bottom).minus(startOffset) },
-        end: { x: right.minus(stitchMargin), y: clamp(bottom.minus(endInset), top, bottom).plus(endOffset) },
-      }
-      break
+      return { start: { x: right.minus(margin), y: rect.y }, end: { x: right.minus(margin), y: bottom } }
     case 'right':
-      line = {
-        start: { x: left.plus(stitchMargin), y: clamp(top.plus(startInset), top, bottom).minus(startOffset) },
-        end: { x: left.plus(stitchMargin), y: clamp(bottom.minus(endInset), top, bottom).plus(endOffset) },
-      }
-      break
+      return { start: { x: rect.x.plus(margin), y: rect.y }, end: { x: rect.x.plus(margin), y: bottom } }
   }
+}
 
-  return {
-    line,
-    path: createPathFromConnectedSegments([{ type: 'line', start: line.start, end: line.end }]),
-  }
+/** Sort along the candidate line, so duplicate vertex hits cannot change the two outer endpoints. */
+const getStitchLineIntersections = (line: LineSchema, path: PathSchema): PointSchema[] => {
+  const candidate: LinePathSegment = { type: 'line', ...line }
+  return getPathSegments(path)
+    .flatMap((segment) => getPathSegmentIntersections(candidate, segment))
+    .sort((first, second) => first.firstProgress.comparedTo(second.firstProgress) ?? 0)
+    .map((intersection) => intersection.point)
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
-import { calculateFrontPocketPath } from './calculateFrontPocketPath'
+import { d } from '../testData'
 import { calculateRectPath } from './calculateRectPath'
 import {
   intersectClosedPaths,
@@ -13,6 +13,7 @@ import {
 } from './closedPathBooleanUtils'
 import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops } from './pathSegments'
+import { createPocketCalculator } from './pockets/createPocketCalculator'
 
 type NearContactCase = {
   radius: number
@@ -252,18 +253,19 @@ describe('closed path boolean operations', () => {
         outerRadius,
         innerRadius: 15,
       }
-      const first = calculateFrontPocketPath(
+      const cluster = d.pocketCluster({ id: 'cluster', orientation: 'up' })
+      const first = createPocketCalculator(
+        cluster,
+        opening,
         { x: corner, y: corner, width: new BigNumber(100), height: new BigNumber(100) },
         corners,
-        'up',
-        opening,
-      )
-      const second = calculateFrontPocketPath(
+      ).getFrontPocketPath()
+      const second = createPocketCalculator(
+        cluster,
+        { ...opening, depth: 15 - shift },
         { x: corner, y: new BigNumber(shift), width: new BigNumber(100), height: new BigNumber(100 - shift) },
         corners,
-        'up',
-        { ...opening, depth: 15 - shift },
-      )
+      ).getFrontPocketPath()
 
       expect(getArea(unionClosedPaths(first, [second]))).toBeCloseTo(getArea(first), 7)
       expect(getArea(unionClosedPaths(second, [first]))).toBeCloseTo(getArea(first), 7)

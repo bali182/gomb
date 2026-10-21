@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
+import { POSITION_EPSILON } from '../constants/layout'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { AnchorSchema } from '../schemas/common'
 import type {
@@ -11,6 +12,7 @@ import type {
   PocketOpeningSchema,
   PocketOrientationSchema,
   RootPanelSchema,
+  SlantedPocketOpeningSchema,
 } from '../schemas/components'
 import type { ComputedComponentSchema } from '../schemas/computed'
 import type { NumberCornerRadiusSchema, PathSchema } from '../schemas/geometry'
@@ -28,6 +30,150 @@ import { getClosedPathLoops, getPathSegments } from './pathSegments'
 import { getPathSegmentMidpoint } from './pathSegmentUtils'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
+
+describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
+  'slanted pocket cluster facing %s',
+  (orientation) => {
+    const vertical = orientation === 'up' || orientation === 'down'
+    const createFixture = (side: 'start' | 'end', offset = 15) => {
+      const opening: SlantedPocketOpeningSchema = { id: 'own:default', name: 'Default', type: 'slanted', offset, side }
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        orientation,
+        pocketCount: 3,
+        pocketStep: 20,
+        tPocketTabWidth: 10,
+        tPocketTaper: 35,
+        defaultOpening: opening,
+      })
+      const root = d.rootPanel({
+        id: 'root',
+        width: vertical ? 100 : 130,
+        height: vertical ? 130 : 100,
+        children: [cluster.id],
+      })
+      const subProject = d.subProject({
+        id: 'sub-project',
+        root,
+        components: [cluster],
+        stitchLines: [
+          d.pocketClusterStitchLine({
+            id: 'stitch',
+            targetId: cluster.id,
+            targetType: 'component',
+            stitchMargin: 15,
+            startOffset: 0,
+            endOffset: 0,
+          }),
+        ],
+      })
+      return { cluster, subProject }
+    }
+
+    it.each(['start', 'end'] as const)('computes all pockets, joins and stitches with the %s side lower', (side) => {
+      const { cluster, subProject } = createFixture(side)
+      const snapshot = structuredClone(subProject)
+      const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      expect(result.tPockets).toHaveLength(2)
+      expectBoundingRect(result, vertical ? [0, 0, 100, 130] : [0, 0, 130, 100])
+      expect(getClosedPathArea(result.path)).toBeGreaterThan(0)
+      for (const [index, pocket] of [...result.tPockets, result.frontPocket].entries()) {
+        const rect = pocket.boundingRect
+        expect((vertical ? rect.height : rect.width).toNumber()).toBe(90)
+        expect((vertical ? rect.y : rect.x).toNumber()).toBe(
+          (orientation === 'up' || orientation === 'left' ? index : 2 - index) * 20,
+        )
+        expect(getClosedPathLoops(pocket.path)).toHaveLength(1)
+        for (const segment of getPathSegments(pocket.path)) {
+          for (const point of [segment.start, segment.end]) {
+            expect(point.x.toNumber()).toBeGreaterThanOrEqual(rect.x.toNumber())
+            expect(point.x.toNumber()).toBeLessThanOrEqual(rect.x.plus(rect.width).toNumber())
+            expect(point.y.toNumber()).toBeGreaterThanOrEqual(rect.y.toNumber())
+            expect(point.y.toNumber()).toBeLessThanOrEqual(rect.y.plus(rect.height).toNumber())
+          }
+        }
+      }
+      const routes = computed.stitchLines[cluster.id][0].routes
+      expect(routes).toHaveLength(2)
+      for (const [index, route] of routes.entries()) {
+        const segments = getPathSegments(route.path)
+        expect(segments).toHaveLength(1)
+        expect(route.holes.length).toBeGreaterThan(0)
+        const pocketSegments = getPathSegments(result.tPockets[index].path)
+        for (const point of [segments[0].start, segments[0].end]) {
+          // Intersection coordinates are rounded BigNumbers, so compare boundary distance with the shared tolerance.
+          expect(
+            pocketSegments.some((edge) => {
+              const dx = edge.end.x.minus(edge.start.x)
+              const dy = edge.end.y.minus(edge.start.y)
+              const length = dx.pow(2).plus(dy.pow(2)).sqrt()
+              const distance = dx
+                .times(point.y.minus(edge.start.y))
+                .minus(dy.times(point.x.minus(edge.start.x)))
+                .abs()
+                .dividedBy(length)
+              return (
+                distance.lte(POSITION_EPSILON) &&
+                point.x.gte(BigNumber.minimum(edge.start.x, edge.end.x)) &&
+                point.x.lte(BigNumber.maximum(edge.start.x, edge.end.x)) &&
+                point.y.gte(BigNumber.minimum(edge.start.y, edge.end.y)) &&
+                point.y.lte(BigNumber.maximum(edge.start.y, edge.end.y))
+              )
+            }),
+          ).toBe(true)
+        }
+        expect(isPointInClosedPath(getPathSegmentMidpoint(segments[0]), result.tPockets[index].path)).toBe(true)
+      }
+      expect(subProject).toEqual(snapshot)
+    })
+
+    it('resolves different openings per pocket without changing their allocation', () => {
+      const { cluster, subProject } = createFixture('end')
+      const mixed: PocketClusterSchema = {
+        ...cluster,
+        openings: [
+          { id: 'own:straight', name: 'Straight', type: 'straight' },
+          {
+            id: 'own:recessed',
+            name: 'Recessed',
+            type: 'recessed',
+            depth: 10,
+            outerInset: 35,
+            innerOffset: 15,
+            outerRadius: 5,
+            innerRadius: 5,
+          },
+        ],
+        openingMapping: { 2: 'own:straight', 3: 'own:recessed' },
+      }
+      const computed = getComputedSubProject(
+        { ...subProject, components: { ...subProject.components, [cluster.id]: mixed } },
+        defaultStitchingSettings,
+      )
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      const first = getPathSegments(result.tPockets[0].path)[0]
+      const second = getPathSegments(result.tPockets[1].path)[0]
+      expect((vertical ? first.end.y.minus(first.start.y) : first.end.x.minus(first.start.x)).abs().toNumber()).toBe(15)
+      expect((vertical ? second.end.y.minus(second.start.y) : second.end.x.minus(second.start.x)).toNumber()).toBe(0)
+      expect(getPathSegments(result.frontPocket.path).some((segment) => segment.type === 'arc')).toBe(true)
+      expect(computed.stitchLines[cluster.id][0].routes).toHaveLength(2)
+    })
+
+    it('bounds excessive offsets and omits stitches outside the computed pockets', () => {
+      const { cluster, subProject } = createFixture('start', 1000)
+      const computed = getComputedSubProject(
+        { ...subProject, stitchLines: subProject.stitchLines.map((line) => ({ ...line, stitchMargin: 1000 })) },
+        defaultStitchingSettings,
+      )
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      const limits = accessors.subProjectLimits(computed.limits).optional.opening(cluster.id, cluster.defaultOpening.id)
+      expect(limits).toMatchObject({ type: 'slanted', offset: { max: { value: new BigNumber(70) } } })
+      expect(getClosedPathArea(result.path)).toBeGreaterThan(0)
+      expect(computed.stitchLines[cluster.id][0].routes).toEqual([])
+    })
+  },
+)
 
 type FixedLayoutTestCase = {
   rootPanel: Partial<RootPanelSchema>
@@ -1623,8 +1769,65 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
   (orientation) => {
     const vertical = orientation === 'up' || orientation === 'down'
 
+    it.each([1, 3])(
+      'keeps only closed-side rounding in pockets and automatic stitching with %i pockets',
+      (pocketCount) => {
+        const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
+        const cluster = d.pocketCluster({
+          id: 'cluster',
+          orientation,
+          pocketCount,
+          pocketStep: 10,
+          individualRadii: true,
+          topLeftRadius: 20,
+          topRightRadius: 20,
+          bottomLeftRadius: 20,
+          bottomRightRadius: 20,
+          defaultOpening: { id: 'own:default', name: 'Default', type: 'straight' },
+        })
+        const input = d.subProject({
+          id: 'sub-project',
+          root,
+          components: [cluster],
+          stitchLines: [
+            d.componentBoundsStitchLine({
+              id: 'stitch-line',
+              targetId: cluster.id,
+              targetType: 'component',
+              autoCornerRadius: true,
+              stitchMargin: 5,
+            }),
+          ],
+        })
+        const snapshot = structuredClone(input)
+        const computed = getComputedSubProject(input, defaultStitchingSettings)
+        const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+        const expected: Record<PocketOrientationSchema, NumberCornerRadiusSchema> = {
+          up: { topLeft: 0, topRight: 0, bottomLeft: 20, bottomRight: 20 },
+          down: { topLeft: 20, topRight: 20, bottomLeft: 0, bottomRight: 0 },
+          left: { topLeft: 0, topRight: 20, bottomLeft: 0, bottomRight: 20 },
+          right: { topLeft: 20, topRight: 0, bottomLeft: 20, bottomRight: 0 },
+        }
+        const stitchLine = computed.stitchLines[cluster.id][0]
+        for (const corner of ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const) {
+          const radius = expected[orientation][corner]
+          expect(result.cornerRadius[corner].toNumber()).toBe(radius)
+          expect(result.frontPocket.cornerRadius[corner].toNumber()).toBe(radius)
+          expect(stitchLine.autoComputedCornerRadius[corner].toNumber()).toBe(radius === 0 ? 0 : radius - 5)
+        }
+        expect(result.frontPocket.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(2)
+        for (const pocket of result.tPockets) {
+          expect(pocket.path.commands.some((command) => command.type === 'arcTo')).toBe(false)
+          for (const radius of Object.values(pocket.cornerRadius)) {
+            expect(radius.toNumber()).toBe(0)
+          }
+        }
+        expect(input).toEqual(snapshot)
+      },
+    )
+
     it.each([false, true])(
-      'uses the bounded step for pocket geometry and corner radii with recessed %s',
+      'uses the bounded step for pocket geometry and ignores opening-side radii with recessed %s',
       (recessed) => {
         const root = d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] })
         const opening: PocketOpeningSchema = recessed
@@ -1673,7 +1876,7 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
           right: ['topRight', 'bottomRight'],
         } as const
         for (const corner of corners[orientation]) {
-          expect(result.cornerRadius[corner].toNumber()).toBeCloseTo(step, 10)
+          expect(result.cornerRadius[corner].toNumber()).toBe(0)
           const field = {
             topLeft: 'topLeftRadius',
             topRight: 'topRightRadius',
@@ -1681,7 +1884,7 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
             bottomRight: 'bottomRightRadius',
           } as const
           expect(limits).toMatchObject({
-            [field[corner]]: { max: { value: new BigNumber(100).dividedBy(3) } },
+            [field[corner]]: { max: { value: new BigNumber(0) } },
           })
         }
         expect(limits).toMatchObject({

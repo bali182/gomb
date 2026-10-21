@@ -1,4 +1,4 @@
-import { defaultRecessedPocketOpening } from '../../../defaultStates'
+import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../../../defaultStates'
 import type { HasIdentitySchema } from '../../../schemas/common'
 import type { PocketOpeningSchema } from '../../../schemas/components'
 import { safeId } from '../../../utils/id'
@@ -22,5 +22,7 @@ export const createPocketOpening = (
       return { ...identity, type: 'straight' }
     case 'recessed':
       return { ...defaultRecessedPocketOpening, ...identity }
+    case 'slanted':
+      return { ...defaultSlantedPocketOpening, ...identity }
   }
 }
