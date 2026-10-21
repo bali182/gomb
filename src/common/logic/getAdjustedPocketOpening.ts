@@ -7,6 +7,12 @@ export const getAdjustedPocketOpening = (
   opening: PocketOpeningSchema,
   limits: PocketOpeningLimitsSchema,
 ): PocketOpeningSchema => {
+  if (opening.type === 'slanted' && limits.type === 'slanted') {
+    return {
+      ...opening,
+      offset: clamp(opening.offset, limits.offset?.min?.value, limits.offset?.max?.value).toNumber(),
+    }
+  }
   if (opening.type !== 'recessed' || limits.type !== 'recessed') {
     return opening
   }

@@ -1,6 +1,10 @@
-import { defaultRecessedPocketOpening } from '../defaultStates'
+import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../defaultStates'
 import type { HasIdentitySchema } from '../schemas/common'
-import type { PocketOpeningSchema, RecessedPocketOpeningSchema } from '../schemas/components'
+import type {
+  PocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+} from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
@@ -44,7 +48,12 @@ const validatePocketOpeningByType = (
   currentValue: PocketOpeningSchema,
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<PocketOpeningSchema> => {
-  const typeResult = validatePrimitiveUnion(input.type, currentValue.type, { straight: true, recessed: true }, context)
+  const typeResult = validatePrimitiveUnion(
+    input.type,
+    currentValue.type,
+    { straight: true, recessed: true, slanted: true },
+    context,
+  )
 
   if (!typeResult.isValid) {
     return createInvalidValidationResult<PocketOpeningSchema>({ type: typeResult.issues }, currentValue)
@@ -64,7 +73,38 @@ const validatePocketOpeningByType = (
           : { ...defaultRecessedPocketOpening, id: currentValue.id, name: currentValue.name },
         context,
       )
+    case 'slanted':
+      return validateSlantedPocketOpeningSchema(
+        input,
+        currentValue.type === 'slanted'
+          ? currentValue
+          : { ...defaultSlantedPocketOpening, id: currentValue.id, name: currentValue.name },
+        context,
+      )
   }
+}
+
+const validateSlantedPocketOpeningSchema = (
+  input: EditableSchema<SlantedPocketOpeningSchema>,
+  currentValue: SlantedPocketOpeningSchema,
+  context: BaseValidationContextSchema,
+): ValidationResultSchema<SlantedPocketOpeningSchema> => {
+  const offset = validateNumber(input.offset, currentValue.offset, context, { min: 0, minInclusive: false })
+  const side = validatePrimitiveUnion(input.side, currentValue.side, { start: true, end: true }, context)
+  const issues: IssuesSchema<SlantedPocketOpeningSchema> = { offset: offset.issues, side: side.issues }
+  const committedValue: SlantedPocketOpeningSchema = {
+    ...currentValue,
+    offset: offset.committedValue,
+    side: side.committedValue,
+  }
+  if (!offset.isValid || !side.isValid) {
+    return createInvalidValidationResult<SlantedPocketOpeningSchema>(issues, committedValue)
+  }
+  return createValidValidationResult<SlantedPocketOpeningSchema>(
+    issues,
+    { ...currentValue, offset: offset.value, side: side.value },
+    committedValue,
+  )
 }
 
 const validateRecessedPocketOpeningSchema = (

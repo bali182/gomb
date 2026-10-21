@@ -3,15 +3,17 @@ import { useMemo, type FC } from 'react'
 
 import { ZERO } from '../../constants/layout'
 import { usePath } from '../../hooks/usePath'
-import { calculatePocketOpeningPath } from '../../logic/calculatePocketOpeningPath'
-import type { PocketOpeningSchema, PocketOrientationSchema } from '../../schemas/components'
-import type { PathSchema, RectSchema } from '../../schemas/geometry'
+import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
+import type { PocketCalculator } from '../../logic/pockets/PocketCalculator'
+import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { CornerRadiusSchema, PathSchema, RectSchema } from '../../schemas/geometry'
 import { getViewBox } from '../../utils/getViewBox'
 
 type PocketOpeningPreviewProps = {
   adjustedOpening: PocketOpeningSchema
   pocketRect: RectSchema
-  orientation: PocketOrientationSchema
+  pocketCluster: PocketClusterSchema
+  cornerRadius: CornerRadiusSchema
   width: number
   height: number
 }
@@ -19,24 +21,26 @@ type PocketOpeningPreviewProps = {
 export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
   adjustedOpening,
   pocketRect,
-  orientation,
+  pocketCluster,
+  cornerRadius,
   width,
   height,
 }) => {
+  const calculator = useMemo<PocketCalculator<PocketOpeningSchema>>(
+    () => createPocketCalculator(pocketCluster, adjustedOpening, pocketRect, cornerRadius),
+    [pocketCluster, adjustedOpening, pocketRect, cornerRadius],
+  )
   const normalizedRect = useMemo<RectSchema>(() => {
-    const isVertical = orientation === 'up' || orientation === 'down'
+    const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
     return {
       x: ZERO,
       y: ZERO,
       width: isVertical ? pocketRect.width : pocketRect.height,
       height: isVertical ? pocketRect.height : pocketRect.width,
     }
-  }, [orientation, pocketRect])
+  }, [pocketCluster.orientation, pocketRect])
 
-  const path = useMemo<PathSchema>(
-    () => calculatePocketOpeningPath(adjustedOpening, normalizedRect, 'up'),
-    [adjustedOpening, normalizedRect],
-  )
+  const path = useMemo<PathSchema>(() => calculator.getPocketOpeningPath(), [calculator])
 
   const pathData = usePath(path)
 
@@ -44,6 +48,8 @@ export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
     switch (adjustedOpening.type) {
       case 'straight':
         return ZERO
+      case 'slanted':
+        return new BigNumber(adjustedOpening.offset)
       case 'recessed':
         if (adjustedOpening.depth > 0 && normalizedRect.width.dividedBy(2).isGreaterThan(adjustedOpening.outerInset)) {
           return new BigNumber(adjustedOpening.depth)

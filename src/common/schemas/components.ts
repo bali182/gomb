@@ -66,12 +66,26 @@ export type RecessedPocketOpeningOwnSchema = {
   depth: number
 }
 
+export type SlantedPocketOpeningSideSchema = 'start' | 'end'
+
+export type SlantedPocketOpeningOwnSchema = {
+  type: 'slanted'
+  /** Distance inward from the original opening edge at the selected endpoint, in mm. */
+  offset: number
+  /** The shortened endpoint follows the opening's traversal direction when the cluster rotates. */
+  side: SlantedPocketOpeningSideSchema
+}
+
 export type StraightPocketOpeningSchema = HasIdentitySchema & StraightPocketOpeningOwnSchema
 export type RecessedPocketOpeningSchema = HasIdentitySchema & RecessedPocketOpeningOwnSchema
+export type SlantedPocketOpeningSchema = HasIdentitySchema & SlantedPocketOpeningOwnSchema
 
-export type PocketOpeningOwnSchema = StraightPocketOpeningOwnSchema | RecessedPocketOpeningOwnSchema
+export type PocketOpeningOwnSchema =
+  | StraightPocketOpeningOwnSchema
+  | RecessedPocketOpeningOwnSchema
+  | SlantedPocketOpeningOwnSchema
 
-export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema
+export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema | SlantedPocketOpeningSchema
 
 export type HasPocketOpenings = {
   defaultOpening: PocketOpeningSchema

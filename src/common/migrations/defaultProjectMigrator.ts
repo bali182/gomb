@@ -7,6 +7,7 @@ import {
   defaultPocketClusterStitchLine,
   defaultRecessedPocketOpening,
   defaultRootPanel,
+  defaultSlantedPocketOpening,
   defaultStitchingSettings,
 } from '../defaultStates'
 import type {
@@ -15,6 +16,7 @@ import type {
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
+  SlantedPocketOpeningSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectMigratorSchema } from '../schemas/migration'
@@ -145,13 +147,15 @@ const migratePocketOpening = (
   const opening = m.requireObject<PocketOpeningSchema>(input)
   const id = m.requireString(opening, 'id')
   const name = m.requireString(opening, 'name')
-  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed'])
+  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed', 'slanted'])
 
   switch (opening.type) {
     case 'straight':
       return { id, name, type: 'straight' }
     case 'recessed':
       return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
+    case 'slanted':
+      return m.applyDefaults<SlantedPocketOpeningSchema>(opening, defaultSlantedPocketOpening)
     default:
       throw new Error('Missing pocket opening type')
   }

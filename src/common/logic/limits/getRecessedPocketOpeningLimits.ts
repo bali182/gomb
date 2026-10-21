@@ -8,10 +8,9 @@ import type {
 } from '../../schemas/components'
 import type { ComputedTopPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
 import type { NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../../schemas/limits'
-import { accessors } from '../../utils/accessors'
 import { clamp } from '../../utils/clamp'
 import { isDefined } from '../../utils/isDefined'
-import { getTPocketTabDepth } from '../pocketUtils'
+import { getRelevantOpeningPockets, getTPocketTabDepth } from '../pocketUtils'
 
 /**
  * Preserves the inner offset before adjusting the outer inset.
@@ -25,7 +24,7 @@ export const getRecessedPocketOpeningLimits = (
   frontPocket: ComputedTopPocketSchema,
   tPockets: readonly ComputedTPocketSchema[],
 ): RecessedPocketOpeningLimitsSchema => {
-  const pockets = getRelevantPockets(opening, pocketCluster, frontPocket, tPockets)
+  const pockets = getRelevantOpeningPockets(opening, pocketCluster, frontPocket, tPockets)
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? frontPocket.boundingRect.width : frontPocket.boundingRect.height
   const halfWidth = width.dividedBy(2)
@@ -83,31 +82,6 @@ export const getRecessedPocketOpeningLimits = (
   }
   limits.outerRadius = { max: outerRadiusMaximum }
   return limits
-}
-
-const getRelevantPockets = (
-  opening: RecessedPocketOpeningSchema,
-  pocketCluster: PocketClusterSchema,
-  frontPocket: ComputedTopPocketSchema,
-  tPockets: readonly ComputedTPocketSchema[],
-): readonly (ComputedTopPocketSchema | ComputedTPocketSchema)[] => {
-  const openingAccessor = accessors.pocketCluster(pocketCluster)
-  const pockets: (ComputedTopPocketSchema | ComputedTPocketSchema)[] = []
-  const tPocket = tPockets.find((_, index) => openingAccessor.opening(index + 1).id === opening.id)
-  if (isDefined(tPocket)) {
-    pockets.push(tPocket)
-  }
-  if (openingAccessor.opening(pocketCluster.pocketCount).id === opening.id) {
-    pockets.push(frontPocket)
-  }
-  if (pockets.length === 0) {
-    pockets.push(frontPocket)
-    const firstTPocket = tPockets[0]
-    if (isDefined(firstTPocket)) {
-      pockets.push(firstTPocket)
-    }
-  }
-  return pockets
 }
 
 const getFrontPocketDepthMaximum = (

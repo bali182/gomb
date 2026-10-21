@@ -6,12 +6,11 @@ import { accessors } from '../utils/accessors'
 import { initial } from '../utils/initial'
 import { isDefined } from '../utils/isDefined'
 import { last } from '../utils/last'
-import { calculateFrontPocketPath } from './calculateFrontPocketPath'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
 import { calculatePocketCard } from './calculatePocketCard'
-import { calculateTPocketPath } from './calculateTPocketPath'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 import { getPocketOpeningLimits } from './limits/getPocketOpeningLimits'
+import { createPocketCalculator } from './pockets/createPocketCalculator'
 
 // DUMMY straight opening.
 const STRAIGHT_OPENING: StraightPocketOpeningSchema = {
@@ -48,21 +47,22 @@ export const calculatePocketClusterGeometry = (
   return {
     frontPocket: {
       ...frontPocket,
-      path: calculateFrontPocketPath(
+      path: createPocketCalculator(
+        pocketCluster,
+        adjustedOpenings[openingAccessor.opening(pocketCluster.pocketCount).id],
         topPocketRect,
         radius,
-        pocketCluster.orientation,
-        adjustedOpenings[openingAccessor.opening(pocketCluster.pocketCount).id],
-      ),
+      ).getFrontPocketPath(),
     },
     tPockets: tPockets.map(
       (pocket: ComputedTPocketSchema, index: number): ComputedTPocketSchema => ({
         ...pocket,
-        path: calculateTPocketPath(
-          pocket.boundingRect,
+        path: createPocketCalculator(
           pocketCluster,
           adjustedOpenings[openingAccessor.opening(index + 1).id],
-        ),
+          pocket.boundingRect,
+          pocket.cornerRadius,
+        ).getTPocketPath(),
       }),
     ),
   }
@@ -77,7 +77,7 @@ const calculateBaseFrontPocket = (
   id: `${pocketCluster.id}-top-pocket`,
   componentId: pocketCluster.id,
   boundingRect: pocketRect,
-  path: calculateFrontPocketPath(pocketRect, cornerRadius, pocketCluster.orientation, STRAIGHT_OPENING),
+  path: createPocketCalculator(pocketCluster, STRAIGHT_OPENING, pocketRect, cornerRadius).getFrontPocketPath(),
   cornerRadius,
   card: calculatePocketCard(pocketCluster, pocketRect),
 })
@@ -93,7 +93,7 @@ const calculateBaseTPockets = (
       id: `${pocketCluster.id}-t-pocket-${index}`,
       boundingRect: pocketRect,
       cornerRadius: ZERO_CORNER_RADIUS,
-      path: calculateTPocketPath(pocketRect, pocketCluster, STRAIGHT_OPENING),
+      path: createPocketCalculator(pocketCluster, STRAIGHT_OPENING, pocketRect, ZERO_CORNER_RADIUS).getTPocketPath(),
       card: calculatePocketCard(pocketCluster, pocketRect),
     }),
   )

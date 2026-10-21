@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
-import type { RecessedPocketOpeningSchema } from '../schemas/components'
+import type { RecessedPocketOpeningSchema, SlantedPocketOpeningSchema } from '../schemas/components'
 import type { RecessedPocketOpeningLimitsSchema } from '../schemas/limits'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 
@@ -84,5 +84,30 @@ describe('getAdjustedPocketOpening', () => {
 
   it('returns the original opening when the limit discriminator differs', () => {
     expect(getAdjustedPocketOpening(opening, { type: 'straight' })).toBe(opening)
+  })
+
+  it('bounds the slanted offset while preserving side, identity and source values', () => {
+    const slanted: SlantedPocketOpeningSchema = {
+      id: 'own:slanted',
+      name: 'Slanted',
+      type: 'slanted',
+      offset: 90,
+      side: 'start',
+    }
+    const bound = {
+      value: new BigNumber(20),
+      reason: 'slanted-pocket-opening-offset-exceeds-pocket',
+      severity: 'warning',
+    } as const
+    expect(getAdjustedPocketOpening(slanted, { type: 'slanted', offset: { max: bound } })).toEqual({
+      ...slanted,
+      offset: 20,
+    })
+    expect(getAdjustedPocketOpening(slanted, { type: 'slanted' })).toEqual(slanted)
+    expect(
+      getAdjustedPocketOpening(slanted, { type: 'slanted', offset: { max: { ...bound, value: new BigNumber(0) } } }),
+    ).toEqual({ ...slanted, offset: 0 })
+    expect(getAdjustedPocketOpening(slanted, { type: 'straight' })).toBe(slanted)
+    expect(slanted.offset).toBe(90)
   })
 })

@@ -6,6 +6,7 @@ import type {
   PocketsSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
+  SlantedPocketOpeningSchema,
   StraightPocketOpeningSchema,
 } from './components'
 import type { HoleSchema } from './hole'
@@ -31,6 +32,10 @@ export type RecessedPocketOpeningLimitsReasonSchema =
   /** At least 1 mm of pocket material must remain below the recess. */
   | 'pocket-opening-depth'
 
+export type SlantedPocketOpeningLimitsReasonSchema =
+  /** The shortened endpoint and its T-pocket shoulder must not pass the pocket's closed edge or corner rounding. */
+  'slanted-pocket-opening-offset-exceeds-pocket'
+
 export type StretchLimitReasonSchema =
   /** Compression cannot exceed the component's original size along this axis. Applies when the opposite edge is neither stretched nor compressed. */
   | 'stretch-component-size'
@@ -50,6 +55,7 @@ export type LimitReasonSchema =
   | RecessedPocketOpeningLimitsReasonSchema
   | StretchLimitReasonSchema
   | PocketClusterLimitReasonSchema
+  | SlantedPocketOpeningLimitsReasonSchema
 
 export type NumericBoundSchema = {
   value: BigNumber
@@ -69,7 +75,11 @@ export type PanelLimitsSchema = NumericLimitsSchema<PanelSchema>
 export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
 export type StraightPocketOpeningLimitsSchema = NumericLimitsSchema<StraightPocketOpeningSchema>
 export type RecessedPocketOpeningLimitsSchema = NumericLimitsSchema<RecessedPocketOpeningSchema>
-export type PocketOpeningLimitsSchema = StraightPocketOpeningLimitsSchema | RecessedPocketOpeningLimitsSchema
+export type SlantedPocketOpeningLimitsSchema = NumericLimitsSchema<SlantedPocketOpeningSchema>
+export type PocketOpeningLimitsSchema =
+  | StraightPocketOpeningLimitsSchema
+  | RecessedPocketOpeningLimitsSchema
+  | SlantedPocketOpeningLimitsSchema
 export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema> & {
   openings: Record<string, PocketOpeningLimitsSchema>
 }

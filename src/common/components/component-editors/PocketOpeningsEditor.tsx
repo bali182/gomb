@@ -18,7 +18,7 @@ import { SectionHeaderButton } from '../common/SectionHeaderButton'
 import { PocketOpeningAccordionItem } from './PocketOpeningAccordionItem'
 import { PocketAssignmentsSection } from './sections/PocketAssignmentsSection'
 
-const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted']
 
 type PocketOpeningsEditorProps = {
   component: PocketClusterSchema

@@ -115,6 +115,30 @@ describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (
 })
 
 describe('migrateProject', () => {
+  it('fills missing slanted opening fields and preserves supplied slanted values', () => {
+    const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster' })
+    const project: DeepPartialSchema<ProjectSchema> = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sub-project', root, components: [cluster] })],
+    })
+    const partialCluster = project.subProjects?.[0]?.components?.[cluster.id]
+    if (!isDefined(partialCluster) || partialCluster.type !== 'pocket-cluster') {
+      throw new Error('Expected pocket cluster')
+    }
+    partialCluster.defaultOpening = { id: 'own:default', name: 'Default', type: 'slanted' }
+    partialCluster.openings = [{ id: 'own:second', name: 'Second', type: 'slanted', offset: 23, side: 'start' }]
+    const snapshot = structuredClone(project)
+    const migrated = migrateProject(project, context)
+    expect(migrated.subProjects?.[0]?.components?.[cluster.id]).toMatchObject({
+      defaultOpening: { id: 'own:default', name: 'Default', type: 'slanted', offset: 15, side: 'end' },
+      openings: [{ id: 'own:second', name: 'Second', type: 'slanted', offset: 23, side: 'start' }],
+    })
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
+    expect(migrateProject(migrated, context)).toEqual(migrated)
+    expect(project).toEqual(snapshot)
+  })
+
   it('adds missing defaults to a versionless project', () => {
     const project = createProjectWithSubProject()
     const legacyProject: DeepPartialSchema<ProjectSchema> = structuredClone(project)

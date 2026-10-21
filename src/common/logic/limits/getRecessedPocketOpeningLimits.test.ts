@@ -11,13 +11,13 @@ import type { RectSchema } from '../../schemas/geometry'
 import type { LimitReasonSchema, NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../../schemas/limits'
 import { d } from '../../testData'
 import { calculatePocketClusterGeometry } from '../calculatePocketClusterGeometry'
-import { calculateRecessedPocketOpeningPath } from '../calculateRecessedPocketOpeningPath'
 import { getCornerRadius } from '../cornerRadiusUtils'
 import { getAdjustedCornerRadius } from '../getAdjustedCornerRadius'
 import { getAdjustedPocketOpening } from '../getAdjustedPocketOpening'
 import { normalizePocketCluster } from '../normalizePocketCluster'
 import { getPathSegmentIntersections } from '../pathSegmentIntersections'
 import { getPathSegments } from '../pathSegments'
+import { createPocketCalculator } from '../pockets/createPocketCalculator'
 import { getPocketClusterCornerRadiusLimits } from './getPocketClusterCornerRadiusLimits'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 
@@ -234,7 +234,7 @@ describe('getRecessedPocketOpeningLimits', () => {
   it.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
     'prevents crossing arcs facing %s',
     (orientation) => {
-      const { opening, limits, frontPocket } = createFixture(
+      const { opening, limits, frontPocket, pocketCluster } = createFixture(
         { outerInset: 42, innerOffset: 8, depth: 10, outerRadius: 55, innerRadius: 39 },
         { orientation },
       )
@@ -243,7 +243,12 @@ describe('getRecessedPocketOpeningLimits', () => {
         throw new Error('Expected recessed opening')
       }
       const segments = getPathSegments(
-        calculateRecessedPocketOpeningPath(adjusted, frontPocket.boundingRect, orientation),
+        createPocketCalculator(
+          pocketCluster,
+          adjusted,
+          frontPocket.boundingRect,
+          frontPocket.cornerRadius,
+        ).getPocketOpeningPath(),
       )
       for (let i = 0; i < segments.length; i += 1) {
         for (let j = i + 2; j < segments.length; j += 1) {

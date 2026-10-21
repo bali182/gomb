@@ -2,7 +2,7 @@ import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type { PocketClusterSchema, PocketOrientationSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema, ComputedStitchLineSchema } from '../../schemas/computed'
 import type { ResolvedPocketClusterStitchLineSchema, StitchSideSchema } from '../../schemas/stitching'
-import { normalizePocketCluster } from '../normalizePocketCluster'
+import { isDefined } from '../../utils/isDefined'
 import { calculateRouteStitches } from './calculateRouteStitches'
 import { calculateStitchLineBoundingRect } from './calculateStitchLineBoundingRect'
 import { calculateTPocketStitchHoles } from './calculateTPocketStitchHoles'
@@ -13,10 +13,9 @@ export const calculatePocketClusterStitchLine = (
   pocketCluster: PocketClusterSchema,
   computedPocketCluster: ComputedPocketClusterSchema,
 ): ComputedStitchLineSchema => {
-  const normalizedPocketCluster = normalizePocketCluster(pocketCluster, computedPocketCluster.boundingRect)
-  const calculatedStitchLines = computedPocketCluster.tPockets.map((tPocket) =>
-    calculateTPocketStitchLine(stitchLine, normalizedPocketCluster, tPocket),
-  )
+  const calculatedStitchLines = computedPocketCluster.tPockets
+    .map((tPocket) => calculateTPocketStitchLine(stitchLine, pocketCluster, tPocket))
+    .filter(isDefined)
   const points = calculatedStitchLines.flatMap((calculatedStitchLine) => [
     calculatedStitchLine.line.start,
     calculatedStitchLine.line.end,
@@ -30,7 +29,7 @@ export const calculatePocketClusterStitchLine = (
       holes,
       isClosed: false,
       stitches: calculateRouteStitches(holes, false),
-      labelPosition: getPocketClusterStitchRouteLabelPosition(normalizedPocketCluster.orientation),
+      labelPosition: getPocketClusterStitchRouteLabelPosition(pocketCluster.orientation),
       disconnectedCorners: {
         'top-left': undefined,
         'top-right': undefined,
