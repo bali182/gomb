@@ -761,7 +761,6 @@ export const HU = {
         },
       },
       controls: {
-        pockets: { missingFront: 'A zsebcsoportból hiányzik az elülső zseb.' },
         cardPicker: {
           noCard: 'Nincs',
           landscape: 'Fekvő',
@@ -775,6 +774,13 @@ export const HU = {
         },
         stitchHoleDistance: {
           noMatchingValues: 'Nincs egyező érték.',
+        },
+      },
+      emptyStates: {
+        missingFrontPocket: {
+          title: 'Hiányzó elülső zseb',
+          description: 'A zsebcsoportnak taralmaznia kell legalább egy elülső zsebet.',
+          action: 'Elülső zseb hozzáadása',
         },
       },
     },
@@ -796,7 +802,8 @@ export const HU = {
       sourceHint: 'Ezt másolod',
       selectAll: {
         label: 'Összes',
-        tooltip: 'Minden alkalmazható beállítás kijelölése vagy törlése. Az összes kijelölése a meglévő varrások felülírását is bekapcsolja.',
+        tooltip:
+          'Minden alkalmazható beállítás kijelölése vagy törlése. Az összes kijelölése a meglévő varrások felülírását is bekapcsolja.',
       },
       columns: {
         copyShape: {

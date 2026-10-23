@@ -54,6 +54,7 @@ import type {
   DialogTranslationSchema,
   EditorFieldTranslationSchema,
   EditorFieldTranslations,
+  EmptyStateTranslationSchema,
   EnumTranslationSchema,
   NativeDialogTranslationSchema,
   SectionTranslationSchema,
@@ -833,9 +834,6 @@ export const EN = {
         },
       },
       controls: {
-        pockets: {
-          missingFront: 'The pocket cluster has no front pocket.',
-        },
         cardPicker: {
           noCard: 'None',
           landscape: 'Landscape',
@@ -851,6 +849,13 @@ export const EN = {
           noMatchingValues: 'No matching values.',
         },
       },
+      emptyStates: {
+        missingFrontPocket: {
+          title: 'Missing front pocket',
+          description: 'A pocket cluster must contain at least one front pocket.',
+          action: 'Add front pocket',
+        },
+      } satisfies Record<string, EmptyStateTranslationSchema>,
     },
     errors: {
       moduleNotFound: {
@@ -870,7 +875,8 @@ export const EN = {
       sourceHint: 'Copying this',
       selectAll: {
         label: 'All',
-        tooltip: 'Select or deselect all applicable settings. Selecting all also enables overwriting existing stitching.',
+        tooltip:
+          'Select or deselect all applicable settings. Selecting all also enables overwriting existing stitching.',
       } satisfies EditorFieldTranslationSchema,
       columns: {
         copyShape: {
