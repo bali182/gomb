@@ -136,9 +136,6 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
 
   const cardStyles = useMemo<DrawAreaCardStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaCardStyleParams): string => {
-      if (isSelected(owner) || isHovered(owner)) {
-        return addAlpha(cardColor)
-      }
       return selectionObstructingComponentIds.has(owner.id) ? addAlpha(cardColor) : cardColor
     }
     const getStrokeColor = ({ owner }: DrawAreaCardStyleParams): string => {
@@ -158,7 +155,7 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
         return STROKE_THICKNESS
       },
     }
-  }, [isHovered, isSelected, cardColor, strokeColor, selectionObstructingComponentIds])
+  }, [cardColor, strokeColor, selectionObstructingComponentIds])
 
   const holeStyles = useMemo<DrawAreaHoleStyles>(
     () => ({

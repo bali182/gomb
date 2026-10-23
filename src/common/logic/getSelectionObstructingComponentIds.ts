@@ -1,4 +1,5 @@
 import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
+import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import type { ComponentSchema } from '../schemas/components'
 import { HoleSchema } from '../schemas/hole'
 import type { ModelObjectSchema } from '../schemas/modelObject'
@@ -33,14 +34,38 @@ const getComponentObstructingComponentIds = (
   component: ComponentSchema,
   subProject: SubProjectSchema,
 ): ReadonlySet<string> => {
-  if (component.type !== 'pocket-cluster') {
-    return EmptySet
+  switch (component.type) {
+    case 'pocket-cluster': {
+      const obstructingComponentIds = new Set(getComponentDescendants(component, subProject))
+      obstructingComponentIds.delete(component.id)
+
+      return obstructingComponentIds
+    }
+    case 't-pocket':
+    case 'front-pocket': {
+      const parent = getComponentParent(component.id, subProject)
+      if (!isDefined(parent) || !narrowers.is.pocketCluster(parent)) {
+        return EmptySet
+      }
+
+      const index = parent.children.indexOf(component.id)
+      if (index < 0) {
+        return EmptySet
+      }
+
+      const accessor = accessors.subProject(subProject)
+      const obstructingComponentIds = new Set<string>()
+      for (const siblingId of parent.children.slice(index + 1)) {
+        const sibling = accessor.component(siblingId)
+        for (const descendantId of getComponentDescendants(sibling, subProject)) {
+          obstructingComponentIds.add(descendantId)
+        }
+      }
+      return obstructingComponentIds
+    }
+    default:
+      return EmptySet
   }
-
-  const obstructingComponentIds = new Set(getComponentDescendants(component, subProject))
-  obstructingComponentIds.delete(component.id)
-
-  return obstructingComponentIds
 }
 
 const getStitchLineObstructingComponentIds = (
@@ -53,12 +78,12 @@ const getStitchLineObstructingComponentIds = (
     return EmptySet
   }
 
+  if (stitchLine.type === 't-pocket-stitch-line') {
+    return getComponentObstructingComponentIds(underlyingComponent, subProject)
+  }
+
   const coveredComponentIds = new Set(getComponentDescendants(underlyingComponent, subProject))
   coveredComponentIds.delete(underlyingComponent.id)
-
-  if (underlyingComponent.type === 'pocket-cluster' && stitchLine.type === 't-pocket-stitch-line') {
-    coveredComponentIds.add(underlyingComponent.id)
-  }
 
   return coveredComponentIds
 }

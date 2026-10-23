@@ -19,6 +19,7 @@ export const Card: FC<CardProps> = ({ owner, path }) => {
   return (
     <path
       d={pathData}
+      pointerEvents="none"
       fill={cardStyles.getBackgroundColor(styleParams)}
       stroke={cardStyles.getStrokeColor(styleParams)}
       strokeWidth={cardStyles.getStrokeThickness(styleParams)}
