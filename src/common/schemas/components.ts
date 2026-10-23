@@ -50,13 +50,11 @@ export type PanelSchema = HasTypeSchema<'panel'> &
   HasStretchSchema
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
+export type SlantedPocketOpeningSideSchema = 'start' | 'end'
 
-export type StraightPocketOpeningSchema = {
-  type: 'straight'
-}
+export type StraightPocketOpeningSchema = HasTypeSchema<'straight'>
 
-export type RecessedPocketOpeningSchema = {
-  type: 'recessed'
+export type RecessedPocketOpeningOwnSchema = {
   /** Distance inward from either opening edge, in mm. */
   outerInset: number
   /** Distance outward from the opening center, in mm. */
@@ -66,15 +64,16 @@ export type RecessedPocketOpeningSchema = {
   depth: number
 }
 
-export type SlantedPocketOpeningSideSchema = 'start' | 'end'
+export type RecessedPocketOpeningSchema = RecessedPocketOpeningOwnSchema & HasTypeSchema<'recessed'>
 
-export type SlantedPocketOpeningSchema = {
-  type: 'slanted'
+export type SlantedPocketOpeningOwnSchema = {
   /** Inward displacement of the selected opening endpoint, in mm. */
   offset: number
   /** Endpoint in the opening's traversal direction, rotating with the cluster. */
   side: SlantedPocketOpeningSideSchema
 }
+
+export type SlantedPocketOpeningSchema = HasTypeSchema<'slanted'> & SlantedPocketOpeningOwnSchema
 
 export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema | SlantedPocketOpeningSchema
 

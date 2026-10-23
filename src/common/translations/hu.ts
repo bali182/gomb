@@ -172,6 +172,7 @@ export const HU = {
       tabs: {
         components: {
           layout: 'Elrendezés',
+          cards: 'Kártyák',
           pockets: 'Zsebek',
           pocketOpenings: 'Zsebnyílások',
         },
@@ -356,7 +357,11 @@ export const HU = {
           },
           pocketOpening: {
             title: 'Zsebnyílás',
-            type: { label: 'Forma', tooltip: 'A zseb nyílásának formáját állítja.' },
+          },
+          straightPocketOpening: {
+            straightDescription: 'Az egyenes zsebnyílásnak nincsenek további beállításai.',
+          },
+          recessedPocketOpening: {
             outerInset: {
               label: 'Külső betolás',
               tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
@@ -371,6 +376,8 @@ export const HU = {
               tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
             },
             innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
+          },
+          slantedPocketOpening: {
             offset: {
               label: 'Eltérés',
               tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',

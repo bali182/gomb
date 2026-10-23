@@ -5,7 +5,7 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
-import { PocketOpeningFields } from './sections/PocketOpeningFields'
+import { PocketOpeningSection } from './sections/PocketOpeningSection'
 type TPocketEditorProps = {
   component: TPocketSchema
   editable: EditableSchema<TPocketSchema>
@@ -29,13 +29,6 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
   )
   return (
     <SectionGroup.Root>
-      <PocketOpeningFields
-        pocket={component}
-        cluster={parent}
-        editable={editable.opening}
-        issues={issues.opening}
-        onChange={handleOpeningChange}
-      />
       <SectionGroup.Section>
         <SectionGroup.SectionHeader>{t.project.editors.sections.components.tPocket.title}</SectionGroup.SectionHeader>
         <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.tPocket.tPocketTabWidth.tooltip}>
@@ -61,6 +54,13 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
           />
         </SectionGroup.SectionRowEditor>
       </SectionGroup.Section>
+      <PocketOpeningSection
+        pocket={component}
+        cluster={parent}
+        editable={editable.opening}
+        issues={issues.opening}
+        onChange={handleOpeningChange}
+      />
     </SectionGroup.Root>
   )
 }

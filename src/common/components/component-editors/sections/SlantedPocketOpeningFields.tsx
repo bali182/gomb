@@ -57,8 +57,8 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
 
   return (
     <>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.side.tooltip}>
-        {t.project.editors.sections.components.pocketOpening.side.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.slantedPocketOpening.side.tooltip}>
+        {t.project.editors.sections.components.slantedPocketOpening.side.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.side}>
         <Select.Root
@@ -92,8 +92,8 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
           </Select.Positioner>
         </Select.Root>
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pocketOpening.offset.tooltip}>
-        {t.project.editors.sections.components.pocketOpening.offset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.slantedPocketOpening.offset.tooltip}>
+        {t.project.editors.sections.components.slantedPocketOpening.offset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.offset}>
         <NumberInput value={editable.offset} issue={issues.offset} onChange={handleOffsetChange} unit="mm" />

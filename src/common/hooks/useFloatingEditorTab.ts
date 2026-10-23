@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import type { TabsValueChangeDetails } from '@chakra-ui/react'
 import { useAtom } from 'jotai'
@@ -9,9 +9,21 @@ type UseFloatingEditorTabResult = {
   onTabChange: (details: TabsValueChangeDetails) => void
 }
 
-export const useFloatingEditorTab = (modelId: string, defaultTab: string): UseFloatingEditorTabResult => {
-  const [tabs, setTabs] = useAtom(floatingEditorTabsAtom)
-  const activeTab = tabs[modelId] ?? defaultTab
+type UseFloatingEditorTabParams = {
+  modelId: string
+  defaultTab: string
+  tabs: Record<string, string>
+}
+
+export const useFloatingEditorTab = ({
+  modelId,
+  defaultTab,
+  tabs,
+}: UseFloatingEditorTabParams): UseFloatingEditorTabResult => {
+  const [storedTabs, setTabs] = useAtom(floatingEditorTabsAtom)
+  const activeTab = storedTabs[modelId] ?? defaultTab
+
+  const possibleTabs = useMemo<Set<string>>(() => new Set(Object.values(tabs)), [tabs])
 
   const onTabChange = useCallback(
     (details: TabsValueChangeDetails): void => {
@@ -25,5 +37,5 @@ export const useFloatingEditorTab = (modelId: string, defaultTab: string): UseFl
     [modelId, setTabs],
   )
 
-  return { activeTab, onTabChange }
+  return { activeTab: possibleTabs.has(activeTab) ? activeTab : defaultTab, onTabChange }
 }

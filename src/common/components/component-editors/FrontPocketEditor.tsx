@@ -6,7 +6,7 @@ import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
-import { PocketOpeningFields } from './sections/PocketOpeningFields'
+import { PocketOpeningSection } from './sections/PocketOpeningSection'
 type FrontPocketEditorProps = {
   component: FrontPocketSchema
   editable: EditableSchema<FrontPocketSchema>
@@ -33,13 +33,6 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
   }, [parent.orientation])
   return (
     <SectionGroup.Root>
-      <PocketOpeningFields
-        pocket={component}
-        cluster={parent}
-        editable={editable.opening}
-        issues={issues.opening}
-        onChange={handleOpeningChange}
-      />
       <CornerRadiusSection
         value={component}
         editable={editable}
@@ -48,6 +41,13 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
         disabledFields={disabledFields}
       />
       <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <PocketOpeningSection
+        pocket={component}
+        cluster={parent}
+        editable={editable.opening}
+        issues={issues.opening}
+        onChange={handleOpeningChange}
+      />
     </SectionGroup.Root>
   )
 }

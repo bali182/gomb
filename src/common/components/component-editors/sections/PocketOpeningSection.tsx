@@ -1,4 +1,4 @@
-import { Button, Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
+import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PiCaretDown } from 'react-icons/pi'
 import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../../../defaultStates'
@@ -21,10 +21,12 @@ import { getEditableSchema } from '../../../utils/getEditableSchema'
 import { noIssues } from '../../../utils/issueUtils'
 import { PocketOpeningPreview } from '../../common/PocketOpeningPreview'
 import { SectionGroup } from '../../common/SectionGroup'
+import { SectionHeaderButton } from '../../common/SectionHeaderButton'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
+import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
-type PocketOpeningFieldsProps = {
+type PocketOpeningSectionProps = {
   pocket: PocketSchema
   cluster: PocketClusterSchema
   editable: EditableSchema<PocketOpeningSchema>
@@ -32,7 +34,8 @@ type PocketOpeningFieldsProps = {
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted']
-export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({
+
+export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
   pocket,
   cluster,
   editable,
@@ -70,24 +73,27 @@ export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader
-        leftAddon={
-          <PocketOpeningPreview
-            pocket={pocket}
-            pocketCluster={cluster}
-            pocketRect={computed.boundingRect}
-            cornerRadius={computed.cornerRadius}
-            adjustedOpening={adjustedOpening}
-            width={60}
-            height={30}
-          />
-        }
         rightAddon={
           <Menu.Root size="sm">
             <Menu.Trigger asChild>
-              <Button size="xs" variant="ghost" _hover={{ bg: 'bg.emphasized' }} _expanded={{ bg: 'bg.emphasized' }}>
+              <SectionHeaderButton
+                size="xs"
+                variant="ghost"
+                _hover={{ bg: 'bg.emphasized' }}
+                _expanded={{ bg: 'bg.emphasized' }}
+              >
+                <PocketOpeningPreview
+                  pocket={pocket}
+                  pocketCluster={cluster}
+                  pocketRect={computed.boundingRect}
+                  cornerRadius={computed.cornerRadius}
+                  adjustedOpening={adjustedOpening}
+                  width={50}
+                  height={30}
+                />
                 {t.project.editors.enums.components.pocketOpening[editable.type]}
                 <PiCaretDown />
-              </Button>
+              </SectionHeaderButton>
             </Menu.Trigger>
             <Portal container={portalRef}>
               <Menu.Positioner>
@@ -108,6 +114,14 @@ export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({
       >
         {t.project.editors.sections.components.pocketOpening.title}
       </SectionGroup.SectionHeader>
+
+      {editable.type === 'straight' && (
+        <StraightPocketOpeningFields
+          editable={editable}
+          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
+          onChange={onChange}
+        />
+      )}
       {editable.type === 'recessed' && (
         <RecessedPocketOpeningFields
           editable={editable}

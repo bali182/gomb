@@ -29,7 +29,6 @@ import type {
   TPocketSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
-import type { MagicFixSettingsSchema } from './schemas/magic-fix-3/magicFixSettings3'
 import type { ColorSettingsSchema, ExportSettingsSchema } from './schemas/settings'
 
 import type {
@@ -58,14 +57,6 @@ export const defaultExportParams: ExportSettingsSchema = {
   page: 'A4',
   orientation: 'portrait',
   layout: 'compact',
-}
-
-export const defaultMagicFix3Settings: MagicFixSettingsSchema = {
-  accuracy: 0.01,
-  minimumEdgeDistance: 2,
-  minimumEdgeCrossingMultiplier: 0.5,
-  dimensionModifyRange: { maxDecreaseMultiplier: 0.5, maxIncreaseMultiplier: 0.5 },
-  stitchLineOffsetModifyRange: { maxDecreaseMultiplier: 0.5, maxIncreaseMultiplier: 0.5 },
 }
 
 export const defaultColorSettings: ColorSettingsSchema = {

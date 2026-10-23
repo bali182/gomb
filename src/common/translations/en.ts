@@ -18,8 +18,8 @@ import type {
   PocketOpeningSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  RecessedPocketOpeningSchema,
-  SlantedPocketOpeningSchema,
+  RecessedPocketOpeningOwnSchema,
+  SlantedPocketOpeningOwnSchema,
   SlantedPocketOpeningSideSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -227,6 +227,7 @@ export const EN = {
       tabs: {
         components: {
           layout: 'Layout',
+          cards: 'Cards',
           pockets: 'Pockets',
           pocketOpenings: 'Pocket openings',
         },
@@ -413,7 +414,11 @@ export const EN = {
           } satisfies SectionTranslationSchema<Pick<TPocketSchema, 'tPocketTabWidth' | 'tPocketTaper'>>,
           pocketOpening: {
             title: 'Pocket opening',
-            type: { label: 'Shape', tooltip: 'Sets this pocket’s opening shape.' },
+          },
+          straightPocketOpening: {
+            straightDescription: 'Straight pocket openings have no additional settings.',
+          },
+          recessedPocketOpening: {
             outerInset: {
               label: 'Outer inset',
               tooltip: 'Distance from either opening edge to the outer corner, in mm.',
@@ -432,13 +437,14 @@ export const EN = {
               label: 'Inner radius',
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
+          } satisfies EditorFieldTranslations<keyof RecessedPocketOpeningOwnSchema>,
+          slantedPocketOpening: {
             offset: { label: 'Offset', tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.' },
             side: {
               label: 'Lower side',
               tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketOpeningSchema> &
-            EditorFieldTranslations<keyof SlantedPocketOpeningSchema>,
+          } satisfies EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
           cards: {
             title: 'Cards',
             cardId: {
