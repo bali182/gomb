@@ -1,16 +1,24 @@
 import BigNumber from 'bignumber.js'
+import { ZERO_CORNER_RADIUS } from '../constants/layout'
 
 import { getComponentChildren } from '../operations/subProject/utils/getComponentChildren'
-import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  ComponentSchema,
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketSchema,
+  RootPanelSchema,
+} from '../schemas/components'
 import type {
   ComputedCardSchema,
   ComputedComponentSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
+  ComputedPocketSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
   HasBoundingRectSchema,
-  HasComputedCardSchema,
 } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
 import type { ResolvedStitchLineSchema, StitchLineCommonConfigSchema } from '../schemas/stitching'
@@ -61,12 +69,13 @@ export const getComputedSubProject = (
   const holes = calculateHoles(subProject.holes, computedComponents)
   const stitchLines = calculateStitchLines(
     resolvedStitchLines,
-    subProject.components,
+    subProject,
     computedComponents,
-    subProject.holes,
     holes,
   )
   applyHolePathsToComputedComponents(computedComponents, holes)
+
+  updatePocketClusterPaths(computedComponents)
 
   const geometry: ComputedSubProjectGeometrySchema = {
     id: subProject.id,
@@ -93,6 +102,9 @@ const computeComponent = (
     throw new Error('Unexpected parameters')
   }
   switch (component.type) {
+    case 'front-pocket':
+    case 't-pocket':
+      throw new Error('Pockets must be calculated by their cluster')
     case 'panel':
       return computePanel(
         component,
@@ -219,47 +231,34 @@ const computePocketCluster = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedPocketClusterSchema => {
-  const requestedRadius = getCornerRadius(pocketCluster)
   const cornerRadius = getAdjustedCornerRadius(
-    requestedRadius,
+    ZERO_CORNER_RADIUS,
     getPocketClusterCornerRadiusLimits({
+      pocketCluster,
       boundingRect,
-      cornerRadius: requestedRadius,
+      cornerRadius: ZERO_CORNER_RADIUS,
       parentBoundingRect,
       parentCornerRadius,
-      pocketCluster,
     }),
   )
-  const normalizedPocketCluster = normalizePocketCluster(pocketCluster, boundingRect)
-  const geometry = calculatePocketClusterGeometry(normalizedPocketCluster, boundingRect, cornerRadius)
-  const layoutChildren = assertLayoutChildren(getComponentChildren(pocketCluster, subProject))
-  const computedLayoutGap = calculateGap(layoutChildren, geometry.frontPocket.boundingRect, pocketCluster)
-  const children = computeLayoutChildren(
-    pocketCluster,
-    geometry.frontPocket.boundingRect,
+  const pockets = getComponentChildren(pocketCluster, subProject).filter(
+    (child): child is PocketSchema => child.type === 'front-pocket' || child.type === 't-pocket',
+  )
+  const normalizedPocketCluster = normalizePocketCluster(
+    { ...pocketCluster, children: pockets.map((pocket) => pocket.id) },
     boundingRect,
-    cornerRadius,
-    computedLayoutGap,
-    layoutChildren,
-    subProject,
-    resolvedStitchLines,
-    computedComponents,
   )
-  const path = unionClosedPaths(
-    geometry.frontPocket.path,
-    geometry.tPockets.map((pocket) => pocket.path),
-  )
+  const geometry = calculatePocketClusterGeometry(normalizedPocketCluster, pockets, boundingRect, cornerRadius)
+  completePocketChildren(geometry.children, subProject, resolvedStitchLines, computedComponents)
   const computed: ComputedPocketClusterSchema = {
     type: 'computed-pocket-cluster',
     componentId: pocketCluster.id,
     boundingRect,
     layoutBoundingRect,
-    path,
+    // Filled by updatePocketClusterPaths after hole subtraction.
+    path: { commands: [] },
     cornerRadius,
-    children,
-    computedLayoutGap,
-    frontPocket: geometry.frontPocket,
-    tPockets: geometry.tPockets,
+    children: geometry.children,
   }
 
   computedComponents[pocketCluster.id] = computed
@@ -268,7 +267,7 @@ const computePocketCluster = (
 }
 
 const computeLayoutChildren = (
-  component: ComponentSchema,
+  component: RootPanelSchema | PanelSchema | FrontPocketSchema,
   layoutBoundingRect: RectSchema,
   parentBoundingRect: RectSchema,
   parentCornerRadius: CornerRadiusSchema,
@@ -314,9 +313,8 @@ const getSubProjectViewBox = (
   stitchLines: ComputedStitchLineSchema[],
 ): RectSchema => {
   const cards = components
-    .filter(narrowers.is.computedPocketCluster)
-    .flatMap((c): HasComputedCardSchema[] => [c.frontPocket, ...c.tPockets])
-    .flatMap((p): ComputedCardSchema[] => (isDefined(p.card) ? [p.card] : []))
+    .filter((component) => component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket')
+    .flatMap((pocket): ComputedCardSchema[] => (isDefined(pocket.card) ? [pocket.card] : []))
   const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...cards]
   const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
 
@@ -342,5 +340,52 @@ const getSubProjectViewBox = (
     y: minY,
     width: maxX.minus(minX),
     height: maxY.minus(minY),
+  }
+}
+
+/**
+ * Pocket geometry is calculated before the front pocket's normal child layout.
+ * Complete the pockets in place so the cluster's children and the component map share the same instances.
+ */
+const completePocketChildren = (
+  pockets: readonly ComputedPocketSchema[],
+  subProject: SubProjectSchema,
+  resolvedStitchLines: ResolvedStitchLineSchema[],
+  computedComponents: Record<string, ComputedComponentSchema>,
+): void => {
+  for (const computedPocket of pockets) {
+    if (computedPocket.type === 'computed-front-pocket') {
+      const source = narrowers.assert.frontPocket(subProject.components[computedPocket.componentId])
+      const layoutChildren = assertLayoutChildren(getComponentChildren(source, subProject))
+      computedPocket.computedLayoutGap = calculateGap(layoutChildren, computedPocket.boundingRect, source)
+      computedPocket.children = computeLayoutChildren(
+        source,
+        computedPocket.boundingRect,
+        computedPocket.boundingRect,
+        computedPocket.cornerRadius,
+        computedPocket.computedLayoutGap,
+        layoutChildren,
+        subProject,
+        resolvedStitchLines,
+        computedComponents,
+      )
+    }
+    computedComponents[computedPocket.componentId] = computedPocket
+  }
+}
+
+/**
+ * The cluster owns no material, so its selection contour is the union of its pockets.
+ * Update its path after hole subtraction to include the pockets' finished cut contours.
+ */
+const updatePocketClusterPaths = (computedComponents: Record<string, ComputedComponentSchema>): void => {
+  for (const component of Object.values(computedComponents)) {
+    if (component.type !== 'computed-pocket-cluster') {
+      continue
+    }
+    component.path = unionClosedPaths(
+      { commands: [] },
+      component.children.map((pocket) => pocket.path),
+    )
   }
 }

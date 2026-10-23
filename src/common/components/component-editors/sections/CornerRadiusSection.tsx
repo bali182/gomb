@@ -14,6 +14,7 @@ import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
 
 type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
+  disabledFields?: readonly (keyof HasCornerRadiusValuesSchema)[]
   value: T
   editable: EditableSchema<T>
   issues: IssuesSchema<HasCornerRadiusSchema>
@@ -21,6 +22,7 @@ type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoC
 }
 
 export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>>({
+  disabledFields,
   editable,
   issues,
   value,
@@ -46,10 +48,10 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
       ).toString()
 
       const radiusOverrides: EditableSchema<HasCornerRadiusValuesSchema> = {
-        topLeftRadius: largestRadius,
-        topRightRadius: largestRadius,
-        bottomLeftRadius: largestRadius,
-        bottomRightRadius: largestRadius,
+        topLeftRadius: disabledFields?.includes('topLeftRadius') ? editable.topLeftRadius : largestRadius,
+        topRightRadius: disabledFields?.includes('topRightRadius') ? editable.topRightRadius : largestRadius,
+        bottomLeftRadius: disabledFields?.includes('bottomLeftRadius') ? editable.bottomLeftRadius : largestRadius,
+        bottomRightRadius: disabledFields?.includes('bottomRightRadius') ? editable.bottomRightRadius : largestRadius,
       }
       onChange({
         ...editable,
@@ -57,7 +59,15 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
         ...(uniformRadii ? radiusOverrides : {}),
       })
     },
-    [editable, onChange, value.bottomLeftRadius, value.bottomRightRadius, value.topLeftRadius, value.topRightRadius],
+    [
+      disabledFields,
+      editable,
+      onChange,
+      value.bottomLeftRadius,
+      value.bottomRightRadius,
+      value.topLeftRadius,
+      value.topRightRadius,
+    ],
   )
   const handleAutoChange = useCallback(
     (manualRadii: boolean) => {
@@ -79,14 +89,14 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
       } else {
         onChange({
           ...editable,
-          topLeftRadius: radius,
-          topRightRadius: radius,
-          bottomLeftRadius: radius,
-          bottomRightRadius: radius,
+          topLeftRadius: disabledFields?.includes('topLeftRadius') ? editable.topLeftRadius : radius,
+          topRightRadius: disabledFields?.includes('topRightRadius') ? editable.topRightRadius : radius,
+          bottomLeftRadius: disabledFields?.includes('bottomLeftRadius') ? editable.bottomLeftRadius : radius,
+          bottomRightRadius: disabledFields?.includes('bottomRightRadius') ? editable.bottomRightRadius : radius,
         })
       }
     },
-    [editable, onChange],
+    [disabledFields, editable, onChange],
   )
 
   return (
@@ -129,7 +139,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             onChange={handleIndividualRadiusChange('topLeftRadius')}
             startAddon={<TbRadiusTopLeft />}
             unit="mm"
-            disabled={disabled}
+            disabled={disabled || disabledFields?.includes('topLeftRadius')}
             value={disabled ? '' : editable.topLeftRadius}
             placeholder={
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
@@ -140,7 +150,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             onChange={handleIndividualRadiusChange('topRightRadius')}
             startAddon={<TbRadiusTopRight />}
             unit="mm"
-            disabled={disabled}
+            disabled={disabled || disabledFields?.includes('topRightRadius')}
             value={disabled ? '' : editable.topRightRadius}
             placeholder={
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
@@ -151,7 +161,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             onChange={handleIndividualRadiusChange('bottomLeftRadius')}
             startAddon={<TbRadiusBottomLeft />}
             unit="mm"
-            disabled={disabled}
+            disabled={disabled || disabledFields?.includes('bottomLeftRadius')}
             value={disabled ? '' : editable.bottomLeftRadius}
             placeholder={
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
@@ -162,7 +172,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             onChange={handleIndividualRadiusChange('bottomRightRadius')}
             startAddon={<TbRadiusBottomRight />}
             unit="mm"
-            disabled={disabled}
+            disabled={disabled || disabledFields?.includes('bottomRightRadius')}
             value={disabled ? '' : editable.bottomRightRadius}
             placeholder={
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined

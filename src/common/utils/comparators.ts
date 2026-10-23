@@ -1,12 +1,20 @@
-import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  ComponentSchema,
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketOpeningSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
   ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
   StitchLineCommonConfigSchema,
   StitchLineSchema,
+  TPocketStitchLineSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { isDefined } from './isDefined'
@@ -72,6 +80,12 @@ export const comparators = {
       return comparators.pocketCluster(a, b)
     }
 
+    if (a.type === 'front-pocket' && b.type === 'front-pocket') {
+      return comparators.frontPocket(a, b)
+    }
+    if (a.type === 't-pocket' && b.type === 't-pocket') {
+      return comparators.tPocket(a, b)
+    }
     return false
   },
   rootPanel: (a: RootPanelSchema, b: RootPanelSchema): boolean => {
@@ -83,11 +97,6 @@ export const comparators = {
       a.layoutGap === b.layoutGap &&
       a.autoLayoutGap === b.autoLayoutGap &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
-      a.individualRadii === b.individualRadii &&
-      a.topLeftRadius === b.topLeftRadius &&
-      a.topRightRadius === b.topRightRadius &&
-      a.bottomLeftRadius === b.bottomLeftRadius &&
-      a.bottomRightRadius === b.bottomRightRadius &&
       a.width === b.width &&
       a.height === b.height
     )
@@ -102,11 +111,6 @@ export const comparators = {
       a.autoLayoutGap === b.autoLayoutGap &&
       a.offAxisAnchor === b.offAxisAnchor &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
-      a.individualRadii === b.individualRadii &&
-      a.topLeftRadius === b.topLeftRadius &&
-      a.topRightRadius === b.topRightRadius &&
-      a.bottomLeftRadius === b.bottomLeftRadius &&
-      a.bottomRightRadius === b.bottomRightRadius &&
       a.width === b.width &&
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
@@ -118,17 +122,52 @@ export const comparators = {
       a.leftStretch === b.leftStretch
     )
   },
+  pocketOpening: (a: PocketOpeningSchema, b: PocketOpeningSchema): boolean => {
+    if (a.type === 'straight' && b.type === 'straight') {
+      return true
+    }
+    if (a.type === 'slanted' && b.type === 'slanted') {
+      return a.offset === b.offset && a.side === b.side
+    }
+    if (a.type === 'recessed' && b.type === 'recessed') {
+      return (
+        a.outerInset === b.outerInset &&
+        a.innerOffset === b.innerOffset &&
+        a.depth === b.depth &&
+        a.outerRadius === b.outerRadius &&
+        a.innerRadius === b.innerRadius
+      )
+    }
+    return false
+  },
+  frontPocket: (a: FrontPocketSchema, b: FrontPocketSchema): boolean =>
+    a.id === b.id &&
+    a.name === b.name &&
+    a.color === b.color &&
+    a.layoutOrientation === b.layoutOrientation &&
+    a.layoutGap === b.layoutGap &&
+    a.autoLayoutGap === b.autoLayoutGap &&
+    a.individualRadii === b.individualRadii &&
+    a.topLeftRadius === b.topLeftRadius &&
+    a.topRightRadius === b.topRightRadius &&
+    a.bottomLeftRadius === b.bottomLeftRadius &&
+    a.bottomRightRadius === b.bottomRightRadius &&
+    areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+    comparators.pocketOpening(a.opening, b.opening),
+  tPocket: (a: TPocketSchema, b: TPocketSchema): boolean =>
+    a.id === b.id &&
+    a.name === b.name &&
+    a.color === b.color &&
+    a.tPocketTabWidth === b.tPocketTabWidth &&
+    a.tPocketTaper === b.tPocketTaper &&
+    areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+    comparators.pocketOpening(a.opening, b.opening),
   pocketCluster: (a: PocketClusterSchema, b: PocketClusterSchema): boolean => {
     return (
       a.id === b.id &&
       a.name === b.name &&
       a.color === b.color &&
       a.offAxisAnchor === b.offAxisAnchor &&
-      a.individualRadii === b.individualRadii &&
-      a.topLeftRadius === b.topLeftRadius &&
-      a.topRightRadius === b.topRightRadius &&
-      a.bottomLeftRadius === b.bottomLeftRadius &&
-      a.bottomRightRadius === b.bottomRightRadius &&
       a.width === b.width &&
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
@@ -138,11 +177,9 @@ export const comparators = {
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
-      a.pocketCount === b.pocketCount &&
+      areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.pocketStep === b.pocketStep &&
       a.orientation === b.orientation &&
-      a.tPocketTabWidth === b.tPocketTabWidth &&
-      a.tPocketTaper === b.tPocketTaper &&
       a.cardId === b.cardId &&
       a.cardCrossAxisOffset === b.cardCrossAxisOffset &&
       a.cardOpeningOffset === b.cardOpeningOffset
@@ -160,10 +197,6 @@ export const comparators = {
       a.yOffset === b.yOffset &&
       a.width === b.width &&
       a.height === b.height &&
-      a.individualRadii === b.individualRadii &&
-      a.topLeftRadius === b.topLeftRadius &&
-      a.topRightRadius === b.topRightRadius &&
-      a.bottomLeftRadius === b.bottomLeftRadius &&
       a.bottomRightRadius === b.bottomRightRadius
     )
   },
@@ -177,8 +210,8 @@ export const comparators = {
       return comparators.componentBoundsStitchLine(a, b)
     }
 
-    if (a.type === 'pocket-cluster-stitch-line' && b.type === 'pocket-cluster-stitch-line') {
-      return comparators.pocketClusterStitchLine(a, b)
+    if (a.type === 't-pocket-stitch-line' && b.type === 't-pocket-stitch-line') {
+      return comparators.tPocketStitchLine(a, b)
     }
 
     return false
@@ -222,7 +255,7 @@ export const comparators = {
       a.bottomLeftCorner === b.bottomLeftCorner
     )
   },
-  pocketClusterStitchLine: (a: PocketClusterStitchLineSchema, b: PocketClusterStitchLineSchema): boolean => {
+  tPocketStitchLine: (a: TPocketStitchLineSchema, b: TPocketStitchLineSchema): boolean => {
     return (
       a.id === b.id &&
       a.name === b.name &&

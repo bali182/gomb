@@ -11,13 +11,16 @@ import type { ComputedSubProjectGeometrySchema, SubProjectSchema } from '../../s
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
+import { normalizePocketCluster } from '../normalizePocketCluster'
 import type { ComponentBoundsStitchLineTarget } from '../stitching/helperTypes'
 import { getComponentBoundsStitchLineLimits } from './getComponentBoundsStitchLineLimits'
+import { getFrontPocketLimits } from './getFrontPocketLimits'
 import { getHoleLimits } from './getHoleLimits'
 import { getPanelLimits } from './getPanelLimits'
 import { getPocketClusterLimits } from './getPocketClusterLimits'
-import { getPocketClusterStitchLineLimits } from './getPocketClusterStitchLineLimits'
 import { getRootPanelLimits } from './getRootPanelLimits'
+import { getTPocketLimits } from './getTPocketLimits'
+import { getTPocketStitchLineLimits } from './getTPocketStitchLineLimits'
 
 /** Uses completed geometry without rebuilding paths, layout, holes or stitch routes. */
 export const getSubProjectLimits = (
@@ -46,7 +49,7 @@ const collectComponentLimits = (
     if (!isDefined(component)) {
       continue
     }
-    const componentLimits = getComponentLimits(component, computed, parents[component.id])
+    const componentLimits = getComponentLimits(component, computed, parents[component.id], subProject)
     if (isDefined(componentLimits)) {
       limits[component.id] = componentLimits
     }
@@ -115,12 +118,12 @@ const getStitchLineLimits = (
       }
       return getComponentBoundsStitchLineLimits(stitchLine, computed, target)
     }
-    case 'pocket-cluster-stitch-line': {
+    case 't-pocket-stitch-line': {
       const cluster = computedSubProject.components[stitchLine.targetId]
-      if (!isDefined(cluster) || cluster.type !== 'computed-pocket-cluster') {
+      if (!isDefined(cluster) || cluster.type !== 'computed-t-pocket') {
         return undefined
       }
-      return getPocketClusterStitchLineLimits(stitchLine, computed, cluster)
+      return getTPocketStitchLineLimits(stitchLine, computed, cluster)
     }
   }
 }
@@ -129,15 +132,49 @@ const getComponentLimits = (
   component: ComponentSchema,
   computed: ComputedComponentSchema,
   parent: ComputedComponentSchema | undefined,
+  subProject: SubProjectSchema,
 ): ComponentLimitsSchema | undefined => {
   switch (component.type) {
     case 'root-panel':
       return getRootPanelLimits(component, narrowers.assert.computedRootPanel(computed))
     case 'panel':
-      return isDefined(parent) ? getPanelLimits(component, narrowers.assert.computedPanel(computed), parent) : undefined
+      if (!isDefined(parent)) {
+        return undefined
+      }
+      return getPanelLimits(component, narrowers.assert.computedPanel(computed), parent)
+    case 'front-pocket': {
+      if (!isDefined(parent) || parent.type !== 'computed-pocket-cluster') {
+        return undefined
+      }
+      const cluster = subProject.components[parent.componentId]
+      if (!isDefined(cluster) || cluster.type !== 'pocket-cluster') {
+        return undefined
+      }
+      return getFrontPocketLimits(
+        component,
+        narrowers.assert.computedFrontPocket(computed),
+        normalizePocketCluster(cluster, parent.boundingRect),
+        parent,
+      )
+    }
+    case 't-pocket': {
+      if (!isDefined(parent) || parent.type !== 'computed-pocket-cluster') {
+        return undefined
+      }
+      const cluster = subProject.components[parent.componentId]
+      if (!isDefined(cluster) || cluster.type !== 'pocket-cluster') {
+        return undefined
+      }
+      return getTPocketLimits(
+        component,
+        narrowers.assert.computedTPocket(computed),
+        normalizePocketCluster(cluster, parent.boundingRect),
+      )
+    }
     case 'pocket-cluster':
-      return isDefined(parent)
-        ? getPocketClusterLimits(component, narrowers.assert.computedPocketCluster(computed), parent)
-        : undefined
+      if (!isDefined(parent)) {
+        return undefined
+      }
+      return getPocketClusterLimits(component, narrowers.assert.computedPocketCluster(computed), parent)
   }
 }

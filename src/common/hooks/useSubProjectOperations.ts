@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from 'react'
 
 import { useEditorContext } from '../contexts/EditorContext'
-import { addComponent as addComponentPure } from '../operations/subProject/addComponent'
+import {
+  addComponent as addComponentPure,
+  type ComponentInsertionPositionSchema,
+} from '../operations/subProject/addComponent'
 import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
 import { cloneComponent as cloneComponentPure } from '../operations/subProject/cloneComponent'
@@ -22,11 +25,12 @@ import { createStitchLine } from '../operations/subProject/utils/createStitchLin
 import { getUnusedComponentName } from '../operations/subProject/utils/getUnusedComponentName'
 import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
 import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
-import type { ComponentSchema } from '../schemas/components'
+import type { ComponentSchema, PocketClusterSchema, PocketSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectSchema } from '../schemas/project'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
 import { getUnusedStitchLineName } from '../utils/getUnusedStitchLineName'
 import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
@@ -35,7 +39,12 @@ import { useSubProjectHistory } from './useSubProjectHistory'
 import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
-  addComponent: (parentId: string, type: ComponentSchema['type']) => ComponentSchema
+  addComponent: (
+    parentId: string,
+    type: Exclude<ComponentSchema['type'], 'pocket-cluster'>,
+    position: ComponentInsertionPositionSchema,
+  ) => ComponentSchema
+  addPocketCluster: (parentId: string, position: ComponentInsertionPositionSchema) => PocketClusterSchema | undefined
   addHole: (componentId: string) => HoleSchema
   addStitchLineToComponent: (componentId: string, type: StitchLineSchema['type']) => StitchLineSchema
   addStitchLineToHole: (holeId: string) => StitchLineSchema
@@ -61,7 +70,11 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { t } = useTranslation()
 
   const addComponent = useCallback(
-    (parentId: string, type: ComponentSchema['type']): ComponentSchema => {
+    (
+      parentId: string,
+      type: Exclude<ComponentSchema['type'], 'pocket-cluster'>,
+      position: ComponentInsertionPositionSchema,
+    ): ComponentSchema => {
       const currentProject = ensureProject(project)
       const currentSubProject = ensureSubProject(subProject)
       const component = createComponent({
@@ -73,9 +86,59 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       })
 
       recordChange(currentSubProject)
-      setSubProject(addComponentPure(currentSubProject, { component, parentId }))
+      setSubProject(
+        addComponentPure(currentSubProject, {
+          component,
+          parentId,
+          position,
+        }),
+      )
 
       return component
+    },
+    [project, recordChange, setSubProject, settings.edit.addBaseColor, subProject, t],
+  )
+
+  const addPocketCluster = useCallback(
+    (parentId: string, position: ComponentInsertionPositionSchema): PocketClusterSchema | undefined => {
+      const currentProject = ensureProject(project)
+      const currentSubProject = ensureSubProject(subProject)
+      const pocketCluster = createComponent<PocketClusterSchema>({
+        type: 'pocket-cluster',
+        color: settings.edit.addBaseColor ? currentProject.colorSettings.leatherColor : undefined,
+        id: id(),
+        name: getUnusedComponentName('pocket-cluster', currentSubProject, t.defaultNames),
+        stitchingSettings: currentProject.stitchingSettings,
+      })
+
+      const withCluster = addComponentPure(currentSubProject, {
+        parentId,
+        component: pocketCluster,
+        position,
+      })
+
+      if (withCluster === currentSubProject) {
+        return undefined
+      }
+
+      const pocketTypes: readonly PocketSchema['type'][] = ['t-pocket', 't-pocket', 'front-pocket']
+      const updatedSubProject = pocketTypes.reduce<SubProjectSchema>((current, type) => {
+        const pocket = createComponent<PocketSchema>({
+          type,
+          id: id(),
+          name: getUnusedComponentName(type, current, t.defaultNames),
+          stitchingSettings: currentProject.stitchingSettings,
+        })
+        return addComponentPure(current, {
+          parentId: pocketCluster.id,
+          component: pocket,
+          position: 'end',
+        })
+      }, withCluster)
+
+      recordChange(currentSubProject)
+      setSubProject(updatedSubProject)
+      return accessors.subProject(updatedSubProject).pocketCluster(pocketCluster.id)
     },
     [project, recordChange, setSubProject, settings.edit.addBaseColor, subProject, t],
   )
@@ -291,6 +354,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   return useMemo<UseSubProjectOperationsOutput>(
     () => ({
       addComponent,
+      addPocketCluster,
       addHole,
       addStitchLineToComponent,
       addStitchLineToHole,
@@ -310,6 +374,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     }),
     [
       addComponent,
+      addPocketCluster,
       addHole,
       addStitchLineToComponent,
       addStitchLineToHole,

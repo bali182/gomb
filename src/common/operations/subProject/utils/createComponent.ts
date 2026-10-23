@@ -1,6 +1,18 @@
-import { defaultPanel, defaultPocketCluster, defaultRootPanel } from '../../../defaultStates'
-import { HasIdentitySchema } from '../../../schemas/common'
-import { ComponentSchema, HasColorSchema } from '../../../schemas/components'
+import {
+  defaultFrontPocket,
+  defaultPanel,
+  defaultPocketCluster,
+  defaultRootPanel,
+  defaultTPocket,
+} from '../../../defaultStates'
+import type {
+  ComponentSchema,
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from '../../../schemas/components'
 import { StitchLineCommonConfigSchema } from '../../../schemas/stitching'
 import { isDefined } from '../../../utils/isDefined'
 import { getClosestPocketStepSize, getClosestRootDimensions } from './dimensionUtils'
@@ -24,28 +36,53 @@ const createComponentRaw = ({
   name,
   stitchingSettings,
 }: CreateComponentParams<ComponentSchema>): ComponentSchema => {
-  const common: HasColorSchema & HasIdentitySchema = { id, name, ...(isDefined(color) ? { color } : {}) }
-
   switch (type) {
-    case 'panel': {
-      return {
-        ...defaultPanel,
-        ...common,
+    case 'front-pocket': {
+      const component: FrontPocketSchema = {
+        ...defaultFrontPocket,
+        id,
+        name,
+        ...(isDefined(color) ? { color } : {}),
       }
+      return component
+    }
+    case 't-pocket': {
+      const component: TPocketSchema = {
+        ...defaultTPocket,
+        id,
+        name,
+        ...(isDefined(color) ? { color } : {}),
+      }
+      return component
+    }
+    case 'panel': {
+      const component: PanelSchema = {
+        ...defaultPanel,
+        id,
+        name,
+        ...(isDefined(color) ? { color } : {}),
+      }
+      return component
     }
     case 'root-panel': {
-      return {
+      const component: RootPanelSchema = {
         ...defaultRootPanel,
-        ...common,
+        id,
+        name,
+        ...(isDefined(color) ? { color } : {}),
         ...getClosestRootDimensions(defaultRootPanel, stitchingSettings),
       }
+      return component
     }
     case 'pocket-cluster': {
-      return {
+      const component: PocketClusterSchema = {
         ...defaultPocketCluster,
-        ...common,
+        id,
+        name,
+        ...(isDefined(color) ? { color } : {}),
         pocketStep: getClosestPocketStepSize(defaultPocketCluster.pocketStep, stitchingSettings),
       }
+      return component
     }
   }
 }

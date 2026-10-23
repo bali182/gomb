@@ -29,7 +29,12 @@ const findComponentNestingLevel = (
       continue
     }
 
-    const childNestingLevel = findComponentNestingLevel(componentId, child, subProject, currentNestingLevel + 1)
+    const childNestingLevel = findComponentNestingLevel(
+      componentId,
+      child,
+      subProject,
+      component.type === 'pocket-cluster' ? currentNestingLevel : currentNestingLevel + 1,
+    )
 
     if (isDefined(childNestingLevel)) {
       return childNestingLevel

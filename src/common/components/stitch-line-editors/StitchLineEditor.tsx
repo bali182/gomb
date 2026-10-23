@@ -6,12 +6,12 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type {
   ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
   StitchLineCommonConfigSchema,
   StitchLineSchema,
+  TPocketStitchLineSchema,
 } from '../../schemas/stitching'
 import { ComponentBoundsStitchLineEditor } from './ComponentBoundsStitchLineEditor'
-import { PocketClusterStitchLineEditor } from './PocketClusterStitchLineEditor'
+import { TPocketStitchLineEditor } from './TPocketStitchLineEditor'
 
 type StitchLineEditorProps = {
   editable: EditableSchema<StitchLineSchema>
@@ -55,16 +55,15 @@ export const StitchLineEditor: FC<StitchLineEditorProps> = ({
           }
         />
       )
-    case 'pocket-cluster-stitch-line':
+    case 't-pocket-stitch-line':
       return (
-        <PocketClusterStitchLineEditor
-          editable={editable as EditableSchema<PocketClusterStitchLineSchema>}
-          issues={issues as IssuesSchema<PocketClusterStitchLineSchema>}
+        <TPocketStitchLineEditor
+          editable={editable as EditableSchema<TPocketStitchLineSchema>}
+          issues={issues as IssuesSchema<TPocketStitchLineSchema>}
           onChange={onChange}
           onReset={handleReset}
           resolvedEditable={
-            resolvedEditable as EditableSchema<StitchLineCommonConfigSchema> &
-              EditableSchema<PocketClusterStitchLineSchema>
+            resolvedEditable as EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<TPocketStitchLineSchema>
           }
         />
       )

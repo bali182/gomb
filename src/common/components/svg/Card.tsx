@@ -2,12 +2,12 @@ import type { FC } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { usePath } from '../../hooks/usePath'
-import type { PocketClusterSchema } from '../../schemas/components'
+import type { PocketSchema } from '../../schemas/components'
 import type { DrawAreaCardStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
 
 type CardProps = {
-  owner: PocketClusterSchema
+  owner: PocketSchema
   path: PathSchema
 }
 

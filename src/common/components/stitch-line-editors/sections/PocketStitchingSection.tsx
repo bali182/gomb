@@ -5,14 +5,14 @@ import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
-import type { PocketClusterStitchLineSchema } from '../../../schemas/stitching'
+import type { TPocketStitchLineSchema } from '../../../schemas/stitching'
 import { NumberInput } from '../../common/NumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketStitchingSectionProps = {
-  editable: EditableSchema<PocketClusterStitchLineSchema>
-  issues: IssuesSchema<PocketClusterStitchLineSchema>
-  onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
+  editable: EditableSchema<TPocketStitchLineSchema>
+  issues: IssuesSchema<TPocketStitchLineSchema>
+  onChange: (updated: EditableSchema<TPocketStitchLineSchema>) => void
 }
 
 export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {

@@ -10,6 +10,10 @@ export const addComputedSizes = (
 ): SubProjectSchema => {
   return updateProjectComponents(subProject, computedProject, (_id, component, computedComponent) => {
     switch (component.type) {
+      case 't-pocket':
+        return component
+      case 'front-pocket':
+        return updateAutoLayoutGapComponent(component, narrowers.assert.computedFrontPocket(computedComponent))
       case 'root-panel': {
         const computedRootPanel = narrowers.assert.computedRootPanel(computedComponent)
         return updateAutoLayoutGapComponent(component, computedRootPanel)
@@ -20,7 +24,7 @@ export const addComputedSizes = (
       }
       case 'pocket-cluster': {
         const computedCluster = narrowers.assert.computedPocketCluster(computedComponent)
-        return updateAutoLayoutGapComponent(updateAutoSizeComponent(component, computedCluster), computedCluster)
+        return updateAutoSizeComponent(component, computedCluster)
       }
     }
   })

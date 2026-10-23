@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { d } from '../testData'
+import { accessors } from '../utils/accessors'
 import { addComputedSizes } from './addComputedSizes'
 
 describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (type) => {
@@ -51,7 +52,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
       expect(patched.components[child.id]).toMatchObject(
         layoutOrientation === 'horizontal' ? { width: 0, height: 100 } : { width: 100, height: 0 },
       )
-      expect(patched.components[root.id].layoutGap).toBe(0)
+      expect(accessors.subProject(patched).rootPanel().layoutGap).toBe(0)
       expect(subProject).toEqual(snapshot)
     },
   )

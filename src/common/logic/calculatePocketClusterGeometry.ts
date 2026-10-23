@@ -1,105 +1,98 @@
-import { ZERO_CORNER_RADIUS } from '../constants/layout'
-import type { PocketClusterSchema, PocketOpeningSchema, StraightPocketOpeningSchema } from '../schemas/components'
-import type { ComputedTPocketSchema, ComputedTopPocketSchema } from '../schemas/computed'
+import { ZERO, ZERO_CORNER_RADIUS } from '../constants/layout'
+import type { PocketClusterSchema, PocketSchema, TPocketSchema } from '../schemas/components'
+import type { ComputedFrontPocketSchema, ComputedPocketSchema, ComputedTPocketSchema } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
-import { accessors } from '../utils/accessors'
-import { initial } from '../utils/initial'
-import { isDefined } from '../utils/isDefined'
-import { last } from '../utils/last'
+import { clamp } from '../utils/clamp'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
 import { calculatePocketCard } from './calculatePocketCard'
+import { getCornerRadius } from './cornerRadiusUtils'
+import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
+import { getFrontPocketCornerRadiusLimits } from './limits/getFrontPocketCornerRadiusLimits'
 import { getPocketOpeningLimits } from './limits/getPocketOpeningLimits'
+import { getTPocketLimits } from './limits/getTPocketLimits'
 import { createPocketCalculator } from './pockets/createPocketCalculator'
 
-// DUMMY straight opening.
-const STRAIGHT_OPENING: StraightPocketOpeningSchema = {
-  id: 'internal:straight-opening',
-  name: 'Straight',
-  type: 'straight',
-}
-
-export type PocketClusterGeometry = {
-  frontPocket: ComputedTopPocketSchema
-  tPockets: ComputedTPocketSchema[]
-}
+export type PocketClusterGeometry = { children: ComputedPocketSchema[] }
 
 export const calculatePocketClusterGeometry = (
-  pocketCluster: PocketClusterSchema,
+  cluster: PocketClusterSchema,
+  pockets: readonly PocketSchema[],
   rect: RectSchema,
   radius: CornerRadiusSchema,
-): PocketClusterGeometry => {
-  const pocketRects = calculatePocketBoundingBoxes(pocketCluster, rect)
-  const topPocketRect = last(pocketRects)
+): PocketClusterGeometry => ({
+  children: pockets.map((pocket, index): ComputedPocketSchema => {
+    const boundingRect = calculatePocketBoundingBox(cluster, rect, index)
+    const cornerRadius = getPocketCornerRadius(pocket, boundingRect, rect, radius, cluster)
 
-  if (!isDefined(topPocketRect)) {
-    throw new Error('Pocket cluster must contain at least one pocket')
-  }
-
-  const frontPocket = calculateBaseFrontPocket(pocketCluster, topPocketRect, radius)
-  const tPockets = calculateBaseTPockets(pocketCluster, initial(pocketRects))
-  const adjustedOpenings: Record<string, PocketOpeningSchema> = {}
-  for (const opening of [pocketCluster.defaultOpening, ...pocketCluster.openings]) {
-    const limits = getPocketOpeningLimits(opening, pocketCluster, frontPocket, tPockets)
-    adjustedOpenings[opening.id] = getAdjustedPocketOpening(opening, limits)
-  }
-  const openingAccessor = accessors.pocketCluster(pocketCluster)
-  return {
-    frontPocket: {
-      ...frontPocket,
-      path: createPocketCalculator(
-        pocketCluster,
-        adjustedOpenings[openingAccessor.opening(pocketCluster.pocketCount).id],
-        topPocketRect,
-        radius,
-      ).getFrontPocketPath(),
-    },
-    tPockets: tPockets.map(
-      (pocket: ComputedTPocketSchema, index: number): ComputedTPocketSchema => ({
-        ...pocket,
+    if (pocket.type === 'front-pocket') {
+      const computed: ComputedFrontPocketSchema = {
+        type: 'computed-front-pocket',
+        componentId: pocket.id,
+        boundingRect,
+        cornerRadius,
+        card: calculatePocketCard(cluster, boundingRect),
+        children: [],
+        path: { commands: [] },
+        computedLayoutGap: ZERO,
+      }
+      const limits = getPocketOpeningLimits(pocket, cluster, computed)
+      return {
+        ...computed,
         path: createPocketCalculator(
-          pocketCluster,
-          adjustedOpenings[openingAccessor.opening(index + 1).id],
-          pocket.boundingRect,
-          pocket.cornerRadius,
-        ).getTPocketPath(),
-      }),
-    ),
-  }
-}
-
-const calculateBaseFrontPocket = (
-  pocketCluster: PocketClusterSchema,
-  pocketRect: RectSchema,
-  cornerRadius: CornerRadiusSchema,
-): ComputedTopPocketSchema => ({
-  type: 'computed-top-pocket',
-  id: `${pocketCluster.id}-top-pocket`,
-  componentId: pocketCluster.id,
-  boundingRect: pocketRect,
-  path: createPocketCalculator(pocketCluster, STRAIGHT_OPENING, pocketRect, cornerRadius).getFrontPocketPath(),
-  cornerRadius,
-  card: calculatePocketCard(pocketCluster, pocketRect),
-})
-
-const calculateBaseTPockets = (
-  pocketCluster: PocketClusterSchema,
-  pocketRects: readonly RectSchema[],
-): ComputedTPocketSchema[] =>
-  pocketRects.map(
-    (pocketRect: RectSchema, index: number): ComputedTPocketSchema => ({
+          pocket,
+          cluster,
+          getAdjustedPocketOpening(pocket.opening, limits),
+          boundingRect,
+          cornerRadius,
+        ).getFrontPocketPath(),
+      }
+    }
+    const computed: ComputedTPocketSchema = {
       type: 'computed-t-pocket',
-      componentId: pocketCluster.id,
-      id: `${pocketCluster.id}-t-pocket-${index}`,
-      boundingRect: pocketRect,
-      cornerRadius: ZERO_CORNER_RADIUS,
-      path: createPocketCalculator(pocketCluster, STRAIGHT_OPENING, pocketRect, ZERO_CORNER_RADIUS).getTPocketPath(),
-      card: calculatePocketCard(pocketCluster, pocketRect),
-    }),
+      componentId: pocket.id,
+      boundingRect,
+      cornerRadius,
+      card: calculatePocketCard(cluster, boundingRect),
+      children: [],
+      path: { commands: [] },
+    }
+    const limits = getTPocketLimits(pocket, computed, cluster)
+    const adjusted: TPocketSchema = {
+      ...pocket,
+      tPocketTabWidth: clamp(pocket.tPocketTabWidth, 0, limits.tPocketTabWidth?.max?.value).toNumber(),
+      tPocketTaper: clamp(pocket.tPocketTaper, 0, limits.tPocketTaper?.max?.value).toNumber(),
+    }
+    return {
+      ...computed,
+      path: createPocketCalculator(
+        adjusted,
+        cluster,
+        getAdjustedPocketOpening(pocket.opening, limits.opening),
+        boundingRect,
+        cornerRadius,
+      ).getTPocketPath(),
+    }
+  }),
+})
+const getPocketCornerRadius = (
+  pocket: PocketSchema,
+  boundingRect: RectSchema,
+  clusterRect: RectSchema,
+  radius: CornerRadiusSchema,
+  cluster: PocketClusterSchema,
+): CornerRadiusSchema => {
+  if (pocket.type !== 'front-pocket') {
+    return ZERO_CORNER_RADIUS
+  }
+  const limits = getFrontPocketCornerRadiusLimits(
+    {
+      boundingRect,
+      cornerRadius: getCornerRadius(pocket),
+      parentBoundingRect: clusterRect,
+      parentCornerRadius: radius,
+    },
+    cluster,
   )
-
-const calculatePocketBoundingBoxes = (pocketCluster: PocketClusterSchema, rect: RectSchema): RectSchema[] => {
-  return Array.from({ length: pocketCluster.pocketCount }, (_, index) =>
-    calculatePocketBoundingBox(pocketCluster, rect, index),
-  )
+  return getAdjustedCornerRadius(getCornerRadius(pocket), limits)
 }

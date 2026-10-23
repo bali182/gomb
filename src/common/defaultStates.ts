@@ -18,13 +18,15 @@ import type {
   HasXYOffsetSchema,
 } from './schemas/common'
 import type {
+  FrontPocketSchema,
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   PanelSchema,
   PocketClusterSchema,
-  RecessedPocketOpeningOwnSchema,
+  RecessedPocketOpeningSchema,
   RootPanelSchema,
-  SlantedPocketOpeningOwnSchema,
+  SlantedPocketOpeningSchema,
+  TPocketSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
 import type { MagicFixSettingsSchema } from './schemas/magic-fix-3/magicFixSettings3'
@@ -32,8 +34,8 @@ import type { ColorSettingsSchema, ExportSettingsSchema } from './schemas/settin
 
 import type {
   ComponentBoundsStitchLineOwnSchema,
-  PocketClusterStitchLineOwnSchema,
   StitchLineCommonConfigSchema,
+  TPocketStitchLineOwnSchema,
 } from './schemas/stitching'
 
 export const defaultStitchingSettings: StitchLineCommonConfigSchema = {
@@ -128,7 +130,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   children: [],
 }
 
-export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
+export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   type: 'recessed',
   outerInset: 15,
   innerOffset: 15,
@@ -137,30 +139,36 @@ export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
   innerRadius: 10,
 }
 
-export const defaultSlantedPocketOpening: SlantedPocketOpeningOwnSchema = {
+export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
   type: 'slanted',
   offset: 15,
   side: 'end',
 }
 
-export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof HasName> = {
+export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName> = {
   ...defaultHasLayout,
   ...defaultHasCornerRadius,
+  type: 'front-pocket',
+  children: [],
+  opening: { type: 'straight' },
+}
+export const defaultTPocket: Omit<TPocketSchema, keyof HasId | keyof HasName> = {
+  type: 't-pocket',
+  children: [],
+  opening: { type: 'straight' },
+  tPocketTabWidth: 8,
+  tPocketTaper: 20,
+}
+export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof HasName> = {
   ...defaultHasFillableSize,
   ...defaultHasOffAxisAnchor,
   ...defaultHasStretch,
   type: 'pocket-cluster',
-  defaultOpening: { id: 'own:default', name: 'Default', type: 'straight' },
-  openings: [],
-  openingMapping: {},
   children: [],
   orientation: 'up',
   cardCrossAxisOffset: 0,
   cardOpeningOffset: 0,
-  pocketCount: 3,
   pocketStep: 10,
-  tPocketTabWidth: 8,
-  tPocketTaper: 20,
 }
 
 export const defaultComponentBoundsStitchLine: ComponentBoundsStitchLineOwnSchema = {
@@ -196,7 +204,7 @@ export const defaultComponentBoundsStitchLine: ComponentBoundsStitchLineOwnSchem
   topRightRadius: 0,
 }
 
-export const defaultPocketClusterStitchLine: PocketClusterStitchLineOwnSchema = {
+export const defaultTPocketStitchLine: TPocketStitchLineOwnSchema = {
   endOffset: 0,
   startOffset: 0,
   stitchDirection: 'start-to-end',

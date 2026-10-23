@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getComputedSubProject } from '../logic/getComputedSubProject'
-import type { PocketClusterSchema, SlantedPocketOpeningSchema } from '../schemas/components'
+import type { PocketClusterSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { d } from '../testData'
@@ -83,73 +83,5 @@ describe('validatePocketClusterSchema dimensions and stretch', () => {
       expect(result.committedValue.width).toBe(80)
       expect(component).toEqual(snapshot)
     })
-  })
-})
-
-describe('validatePocketClusterSchema slanted openings', () => {
-  const slanted: SlantedPocketOpeningSchema = {
-    id: 'own:slanted',
-    name: 'Slanted',
-    type: 'slanted',
-    offset: 15,
-    side: 'end',
-  }
-
-  it('switches from straight to slanted and preserves identity', () => {
-    const { component, input, context } = createFixture()
-    const result = validatePocketClusterSchema(
-      {
-        ...input,
-        defaultOpening: getEditableSchema(
-          { ...slanted, id: component.defaultOpening.id },
-          { language: context.language },
-        ),
-      },
-      component,
-      context,
-    )
-    expect(result.isValid).toBe(true)
-    expect(result.value?.defaultOpening).toEqual({ ...slanted, id: component.defaultOpening.id })
-  })
-
-  it.each(['0', '-1', '', '-', 'abc'])('rejects offset %s and retains valid sibling changes', (offset) => {
-    const { component, input, context } = createFixture()
-    const current = { ...component, defaultOpening: slanted }
-    const editable = getEditableSchema(slanted, { language: context.language })
-    const result = validatePocketClusterSchema(
-      { ...input, defaultOpening: { ...editable, offset, side: 'start' } },
-      current,
-      context,
-    )
-    expect(result.isValid).toBe(false)
-    expect(result.issues.defaultOpening).toMatchObject({ offset: { severity: 'error' } })
-    expect(result.committedValue.defaultOpening).toEqual({ ...slanted, side: 'start' })
-  })
-
-  it('validates stored slanted openings as well as the default opening', () => {
-    const { component, input, context } = createFixture()
-    const current = { ...component, openings: [slanted] }
-    const editable = getEditableSchema(slanted, { language: context.language })
-    const result = validatePocketClusterSchema(
-      { ...input, openings: [{ ...editable, offset: '25', side: 'start' }] },
-      current,
-      context,
-    )
-    expect(result.isValid).toBe(true)
-    expect(result.value?.openings).toEqual([{ ...slanted, offset: 25, side: 'start' }])
-  })
-
-  it('rejects an unknown side and preserves the previous side', () => {
-    const { component, input, context } = createFixture()
-    const editable = getEditableSchema(slanted, { language: context.language })
-    Reflect.set(editable, 'side', 'unknown')
-    const result = validatePocketClusterSchema(
-      { ...input, defaultOpening: editable },
-      { ...component, defaultOpening: slanted },
-      context,
-    )
-    expect(result.isValid).toBe(false)
-    expect(result.issues.defaultOpening).toMatchObject({ side: { severity: 'error' } })
-    expect(result.committedValue.defaultOpening).toEqual(slanted)
   })
 })

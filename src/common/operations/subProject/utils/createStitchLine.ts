@@ -1,4 +1,4 @@
-import { defaultComponentBoundsStitchLine, defaultPocketClusterStitchLine } from '../../../defaultStates'
+import { defaultComponentBoundsStitchLine, defaultTPocketStitchLine } from '../../../defaultStates'
 import type { HasTargetSchema } from '../../../schemas/common'
 import type { StitchLineSchema } from '../../../schemas/stitching'
 
@@ -11,10 +11,10 @@ export const createStitchLine = (
   switch (type) {
     case 'component-bounds-stitch-line':
       return { ...defaultComponentBoundsStitchLine, ...target, id, name, type }
-    case 'pocket-cluster-stitch-line':
+    case 't-pocket-stitch-line':
       if (target.targetType === 'hole') {
         throw new Error('Pocket cluster stitch lines cannot target holes')
       }
-      return { ...defaultPocketClusterStitchLine, ...target, id, name, type }
+      return { ...defaultTPocketStitchLine, ...target, id, name, type }
   }
 }

@@ -10,6 +10,13 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import { exportComponentPng } from '../logic/exports/exportComponentPng'
+import {
+  canAddChild,
+  canAddHole,
+  canCloneComponent,
+  canDeleteComponent,
+  getComponentStitchLineType,
+} from '../operations/subProject/utils/componentRules'
 import { portalRef } from '../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
@@ -47,7 +54,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea(false)
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent } = useSubProjectOperations()
+  const { addComponent, addPocketCluster, addHole, addStitchLineToComponent, cloneComponent, deleteComponent } =
+    useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -92,10 +100,14 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const handleAddChild = useCallback(
     (type: ComponentSchema['type']): void => {
-      addComponent(component.id, type)
+      if (type === 'pocket-cluster') {
+        addPocketCluster(component.id, 'end')
+      } else {
+        addComponent(component.id, type, type === 't-pocket' ? 'start' : 'end')
+      }
       onAddChild({ targetId: component.id, targetType: 'component' }, type)
     },
-    [addComponent, component.id, onAddChild],
+    [addComponent, addPocketCluster, component.id, onAddChild],
   )
 
   const handleDelete = useCallback((): void => {
@@ -104,6 +116,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         deleteRoot()
         break
       }
+      case 't-pocket':
       case 'panel':
       case 'pocket-cluster': {
         deleteComponent(component.id)
@@ -119,6 +132,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         cloneSubProject(subProject)
         break
       }
+      case 't-pocket':
       case 'panel':
       case 'pocket-cluster': {
         cloneComponent(component.id)
@@ -158,6 +172,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const HoleIcon = getModelIcon('hole')
 
+  const canClone = component.type === 'root-panel' || canCloneComponent(component)
+  const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
   return (
     <Box onClick={handleActionsClick}>
       <Menu.Root>
@@ -171,12 +187,21 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
             <Menu.Content>
               {!subProjectOnly && (
                 <>
-                  <AddChildComponentMenuSection component={component} onAddChild={handleAddChild} />
-                  <Menu.Item value="hole" onSelect={handleAddHole}>
-                    <HoleIcon />
-                    <Menu.ItemText>{t.project.editors.actions.components.addHole}</Menu.ItemText>
-                  </Menu.Item>
-                  <Menu.Separator />
+                  <AddChildComponentMenuSection
+                    subProject={subProject}
+                    component={component}
+                    onAddChild={handleAddChild}
+                  />
+                  {canAddHole(component) && (
+                    <>
+                      <Menu.Item value="hole" onSelect={handleAddHole}>
+                        <HoleIcon />
+                        <Menu.ItemText>{t.project.editors.actions.components.addHole}</Menu.ItemText>
+                      </Menu.Item>
+                      <Menu.Separator />
+                    </>
+                  )}
+
                   <AddComponentStitchLineMenu component={component} onAddStitchLine={handleAddStitchLine} />
                 </>
               )}
@@ -184,20 +209,25 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 <PiImage />
                 <Menu.ItemText>{t.project.editors.actions.components.exportToPng}</Menu.ItemText>
               </Menu.Item>
-              <Menu.Separator />
-              <Menu.Item value="clone" onSelect={handleClone}>
-                <PiCopy />
-                <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
-              </Menu.Item>
-              <Menu.Item
-                onSelect={handleDelete}
-                value="delete"
-                color="fg.error"
-                _hover={{ bg: 'bg.error', color: 'fg.error' }}
-              >
-                <PiTrash />
-                <Menu.ItemText>{t.project.editors.actions.components.delete}</Menu.ItemText>
-              </Menu.Item>
+
+              {(canClone || canDelete) && <Menu.Separator />}
+              {canClone && (
+                <Menu.Item value="clone" onSelect={handleClone}>
+                  <PiCopy />
+                  <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
+                </Menu.Item>
+              )}
+              {canDelete && (
+                <Menu.Item
+                  onSelect={handleDelete}
+                  value="delete"
+                  color="fg.error"
+                  _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                >
+                  <PiTrash />
+                  <Menu.ItemText>{t.project.editors.actions.components.delete}</Menu.ItemText>
+                </Menu.Item>
+              )}
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
@@ -207,17 +237,21 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 }
 
 type AddChildComponentMenuProps = {
+  subProject: SubProjectSchema
   onAddChild: (type: ComponentSchema['type']) => void
   component: ComponentSchema
 }
 
-const possibleChildTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster']
+const childTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster', 't-pocket', 'front-pocket']
 
-const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild }) => {
+const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild, component, subProject }) => {
+  const possibleChildTypes = childTypes.filter((type) => canAddChild(component, type, subProject))
   const { t } = useTranslation()
 
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
     () => ({
+      'front-pocket': t.project.editors.actions.components.addFrontPocket,
+      't-pocket': t.project.editors.actions.components.addTPocket,
       panel: t.project.editors.actions.components.addPanel,
       'root-panel': t.project.editors.actions.components.addRootPanel,
       'pocket-cluster': t.project.editors.actions.components.addPocketCluster,
@@ -250,21 +284,14 @@ export const AddComponentStitchLineMenu: FC<AddComponentStitchLineMenuProps> = (
   const { t } = useTranslation()
 
   const possibleTypes = useMemo<StitchLineSchema['type'][]>(() => {
-    switch (component.type) {
-      case 'root-panel':
-      case 'panel':
-        return ['component-bounds-stitch-line']
-      case 'pocket-cluster':
-        return ['component-bounds-stitch-line', 'pocket-cluster-stitch-line']
-      default:
-        return []
-    }
-  }, [component.type])
+    const type = getComponentStitchLineType(component)
+    return isDefined(type) ? [type] : []
+  }, [component])
 
   const labels = useMemo<Record<StitchLineSchema['type'], string>>(
     () => ({
       'component-bounds-stitch-line': t.project.editors.actions.components.addStitching,
-      'pocket-cluster-stitch-line': t.project.editors.actions.components.addPocketStitching,
+      't-pocket-stitch-line': t.project.editors.actions.components.addStitching,
     }),
     [t],
   )

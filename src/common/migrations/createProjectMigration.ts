@@ -64,6 +64,10 @@ const migrateComponent = (
   context: ProjectMigrationContextSchema,
 ): DeepPartialSchema<ComponentSchema> => {
   switch (component.type) {
+    case 'front-pocket':
+      return migrator.frontPocket(component, context)
+    case 't-pocket':
+      return migrator.tPocket(component, context)
     case 'root-panel':
       return migrator.rootPanel(component, context)
     case 'panel':
@@ -83,8 +87,8 @@ const migrateStitchLine = (
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line':
       return migrator.componentBoundsStitchLine(stitchLine, context)
-    case 'pocket-cluster-stitch-line':
-      return migrator.pocketClusterStitchLine(stitchLine, context)
+    case 't-pocket-stitch-line':
+      return migrator.tPocketStitchLine(stitchLine, context)
     default:
       throw new Error('Unknown stitch line type')
   }

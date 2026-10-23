@@ -1,23 +1,23 @@
-import type { ComponentSchema } from '../../schemas/components'
 import type { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from '../../schemas/computed'
-import type { HoleSchema } from '../../schemas/hole'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
+import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { calculateComponentBoundsStitchLine } from './calculateComponentBoundsStitchLine'
 import { calculateStitchLine } from './calculateStitchLine'
 
 export const calculateStitchLines = (
   stitchLines: ResolvedStitchLineSchema[],
-  components: Record<string, ComponentSchema>,
+  subProject: SubProjectSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
-  holes: readonly HoleSchema[],
   computedHoles: readonly ComputedHoleSchema[],
 ): Record<string, ComputedStitchLineSchema[]> => {
   const computedStitchLines: ComputedStitchLineSchema[] = []
+  const accessor = accessors.subProject(subProject)
 
   for (const stitchLine of stitchLines) {
     if (stitchLine.targetType === 'hole') {
-      const hole = holes.find((candidate) => candidate.id === stitchLine.targetId)
+      const hole = accessor.optional.hole(stitchLine.targetId)
       const computedHole = computedHoles.find((candidate) => candidate.holeId === stitchLine.targetId)
 
       if (!isDefined(hole) || !isDefined(computedHole)) {
@@ -38,14 +38,10 @@ export const calculateStitchLines = (
       continue
     }
 
-    const component = components[stitchLine.targetId]
-    const computedComponent = computedComponents[stitchLine.targetId]
-
-    if (!isDefined(component) || !isDefined(computedComponent)) {
-      continue
+    const computedStitchLine = calculateStitchLine(stitchLine, subProject, computedComponents)
+    if (isDefined(computedStitchLine)) {
+      computedStitchLines.push(computedStitchLine)
     }
-    const computedStitchLine = calculateStitchLine(stitchLine, component, computedComponent, computedComponents)
-    computedStitchLines.push(computedStitchLine)
   }
 
   return groupByTarget(computedStitchLines)

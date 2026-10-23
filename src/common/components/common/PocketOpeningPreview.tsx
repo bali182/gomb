@@ -5,11 +5,12 @@ import { ZERO } from '../../constants/layout'
 import { usePath } from '../../hooks/usePath'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
 import type { PocketCalculator } from '../../logic/pockets/PocketCalculator'
-import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, PathSchema, RectSchema } from '../../schemas/geometry'
 import { getViewBox } from '../../utils/getViewBox'
 
 type PocketOpeningPreviewProps = {
+  pocket: PocketSchema
   adjustedOpening: PocketOpeningSchema
   pocketRect: RectSchema
   pocketCluster: PocketClusterSchema
@@ -19,6 +20,7 @@ type PocketOpeningPreviewProps = {
 }
 
 export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
+  pocket,
   adjustedOpening,
   pocketRect,
   pocketCluster,
@@ -27,8 +29,8 @@ export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
   height,
 }) => {
   const calculator = useMemo<PocketCalculator<PocketOpeningSchema>>(
-    () => createPocketCalculator(pocketCluster, adjustedOpening, pocketRect, cornerRadius),
-    [pocketCluster, adjustedOpening, pocketRect, cornerRadius],
+    () => createPocketCalculator(pocket, pocketCluster, adjustedOpening, pocketRect, cornerRadius),
+    [pocket, pocketCluster, adjustedOpening, pocketRect, cornerRadius],
   )
   const normalizedRect = useMemo<RectSchema>(() => {
     const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'

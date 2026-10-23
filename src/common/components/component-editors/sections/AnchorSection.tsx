@@ -1,5 +1,5 @@
 import { SegmentGroup } from '@chakra-ui/react'
-import { useCallback, type ReactNode } from 'react'
+import { useCallback, useMemo, type ReactNode } from 'react'
 import {
   PiAlignBottomSimple,
   PiAlignCenterHorizontalSimple,
@@ -31,7 +31,14 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
 }: AnchorSectionProps<T>): ReactNode {
   const { t } = useTranslation()
 
-  const isOffAxisFill = parent.layoutOrientation === 'horizontal' ? editable.autoHeight : editable.autoWidth
+  const isOffAxisFill = useMemo<boolean>(() => {
+    if (parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket') {
+      if (parent.layoutOrientation === 'vertical') {
+        return editable.autoWidth
+      }
+    }
+    return editable.autoHeight
+  }, [parent, editable.autoHeight, editable.autoWidth])
 
   const handleOffAxisAnchorChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
@@ -56,26 +63,46 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="start">
             <SegmentGroup.ItemHiddenInput />
-            {parent.layoutOrientation === 'horizontal' ? <PiAlignTopSimple /> : <PiAlignLeftSimple />}
-            {parent.layoutOrientation === 'horizontal'
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal' ? (
+              <PiAlignTopSimple />
+            ) : (
+              <PiAlignLeftSimple />
+            )}
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.start
               : t.project.editors.enums.common.anchor.horizontal.start}
           </SegmentGroup.Item>
           <SegmentGroup.Item value="middle">
             <SegmentGroup.ItemHiddenInput />
-            {parent.layoutOrientation === 'horizontal' ? (
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal' ? (
               <PiAlignCenterVerticalSimple />
             ) : (
               <PiAlignCenterHorizontalSimple />
             )}
-            {parent.layoutOrientation === 'horizontal'
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.middle
               : t.project.editors.enums.common.anchor.horizontal.middle}
           </SegmentGroup.Item>
           <SegmentGroup.Item value="end">
             <SegmentGroup.ItemHiddenInput />
-            {parent.layoutOrientation === 'horizontal' ? <PiAlignBottomSimple /> : <PiAlignRightSimple />}
-            {parent.layoutOrientation === 'horizontal'
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal' ? (
+              <PiAlignBottomSimple />
+            ) : (
+              <PiAlignRightSimple />
+            )}
+            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+              ? parent.layoutOrientation
+              : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.end
               : t.project.editors.enums.common.anchor.horizontal.end}
           </SegmentGroup.Item>

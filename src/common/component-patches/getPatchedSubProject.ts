@@ -3,8 +3,10 @@ import { addAutoStitchLineRadii } from './addAutoStitchLineRadii'
 import { addComputedSizes } from './addComputedSizes'
 import { adjustStitchLines } from './adjustStitchLines'
 import { deleteOrphanedHoles } from './deleteOrphanedHoles'
-import { deleteOrphanedPocketOpeningMappings } from './deleteOrphanedPocketOpeningMappings'
 import { deleteOrphanedStitchLines } from './deleteOrphanedStitchLines'
+import { deletePocketClusterHoles } from './deletePocketClusterHoles'
+import { deleteTPocketChildren } from './deleteTPocketChildren'
+import { deleteUnsupportedStitchLines } from './deleteUnsupportedStitchLines'
 
 type PatcherFunctionSchema = (
   subProject: SubProjectSchema,
@@ -12,8 +14,10 @@ type PatcherFunctionSchema = (
 ) => SubProjectSchema
 
 const patchers: PatcherFunctionSchema[] = [
+  deleteTPocketChildren,
   addComputedSizes,
-  deleteOrphanedPocketOpeningMappings,
+  deletePocketClusterHoles,
+  deleteUnsupportedStitchLines,
   deleteOrphanedHoles,
   deleteOrphanedStitchLines,
   adjustStitchLines,

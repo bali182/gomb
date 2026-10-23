@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
 import type { LineSchema, PathSchema, PointSchema } from '../../schemas/geometry'
-import type { ResolvedPocketClusterStitchLineSchema } from '../../schemas/stitching'
+import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 import { arePointsEqual } from '../../utils/arePointsEqual'
 import { isDefined } from '../../utils/isDefined'
 import { last } from '../../utils/last'
@@ -17,7 +17,7 @@ export type CalculatedTPocketStitchLine = {
 }
 
 export const calculateTPocketStitchLine = (
-  stitchLine: ResolvedPocketClusterStitchLineSchema,
+  stitchLine: ResolvedTPocketStitchLineSchema,
   pocketCluster: PocketClusterSchema,
   tPocket: ComputedTPocketSchema,
 ): CalculatedTPocketStitchLine | undefined => {
@@ -41,7 +41,7 @@ export const calculateTPocketStitchLine = (
 }
 
 const getMarginLine = (
-  stitchLine: ResolvedPocketClusterStitchLineSchema,
+  stitchLine: ResolvedTPocketStitchLineSchema,
   pocketCluster: PocketClusterSchema,
   pocket: ComputedTPocketSchema,
 ): LineSchema => {

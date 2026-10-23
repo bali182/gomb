@@ -51,15 +51,15 @@ export type PanelSchema = HasTypeSchema<'panel'> &
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
 
-export type StraightPocketOpeningOwnSchema = {
+export type StraightPocketOpeningSchema = {
   type: 'straight'
 }
 
-export type RecessedPocketOpeningOwnSchema = {
+export type RecessedPocketOpeningSchema = {
   type: 'recessed'
-  /** Distance from either opening edge to the outer corner, in mm. */
+  /** Distance inward from either opening edge, in mm. */
   outerInset: number
-  /** Distance outward from the opening center to each inner corner, in mm. */
+  /** Distance outward from the opening center, in mm. */
   innerOffset: number
   outerRadius: number
   innerRadius: number
@@ -68,43 +68,41 @@ export type RecessedPocketOpeningOwnSchema = {
 
 export type SlantedPocketOpeningSideSchema = 'start' | 'end'
 
-export type SlantedPocketOpeningOwnSchema = {
+export type SlantedPocketOpeningSchema = {
   type: 'slanted'
-  /** Distance inward from the original opening edge at the selected endpoint, in mm. */
+  /** Inward displacement of the selected opening endpoint, in mm. */
   offset: number
-  /** The shortened endpoint follows the opening's traversal direction when the cluster rotates. */
+  /** Endpoint in the opening's traversal direction, rotating with the cluster. */
   side: SlantedPocketOpeningSideSchema
 }
 
-export type StraightPocketOpeningSchema = HasIdentitySchema & StraightPocketOpeningOwnSchema
-export type RecessedPocketOpeningSchema = HasIdentitySchema & RecessedPocketOpeningOwnSchema
-export type SlantedPocketOpeningSchema = HasIdentitySchema & SlantedPocketOpeningOwnSchema
-
-export type PocketOpeningOwnSchema =
-  | StraightPocketOpeningOwnSchema
-  | RecessedPocketOpeningOwnSchema
-  | SlantedPocketOpeningOwnSchema
-
 export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema | SlantedPocketOpeningSchema
 
-export type HasPocketOpenings = {
-  defaultOpening: PocketOpeningSchema
-  openings: PocketOpeningSchema[]
-  /** One-based pocket numbers. Missing entries use defaultOpening. */
-  openingMapping: Partial<Record<number, string>>
+export type HasPocketOpeningSchema = {
+  opening: PocketOpeningSchema
 }
 
+export type FrontPocketSchema = HasTypeSchema<'front-pocket'> &
+  BaseComponentSchema &
+  HasChildrenSchema &
+  HasLayoutSchema &
+  HasCornerRadiusSchema &
+  HasPocketOpeningSchema
+
+export type TPocketSchema = HasTypeSchema<'t-pocket'> &
+  BaseComponentSchema &
+  HasChildrenSchema &
+  HasPocketOpeningSchema & {
+    tPocketTabWidth: number
+    tPocketTaper: number
+  }
+
+export type PocketSchema = FrontPocketSchema | TPocketSchema
+
 export type PocketsSchema = {
-  /** How many pockets do we have in this cluster (min 1) */
-  pocketCount: number
-  /** How far each pocket is offset from the previous one along the stack axis */
+  /** Offset between adjacent pocket bounding boxes along the stack axis. */
   pocketStep: number
-  /** Direction where the pocket opening is. Example means you can put the card in from the top, and left means from the left side. */
   orientation: PocketOrientationSchema
-  /** Size of the flaps/tabs on the T-Pockets */
-  tPocketTabWidth: number
-  /** How much the t pockets taper from the 2 * tPocketTabWidth reduced width to the bottom of the pocket */
-  tPocketTaper: number
 }
 
 export type HasCardsSchema = {
@@ -116,20 +114,14 @@ export type HasCardsSchema = {
   cardOpeningOffset: number
 }
 
-/**
- * A cluster of pockets.
- * Does not hold individual pockets, rather pocketCount-1 T-Pockets and 1 top pocket (computed internally).
- */
+/** Arranges physical pocket components. Its children are T-pockets followed by one front pocket. */
 export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   BaseComponentSchema &
-  HasLayoutSchema &
   HasChildrenSchema &
   HasOffAxisAnchor &
-  HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
   HasStretchSchema &
   PocketsSchema &
-  HasCardsSchema &
-  HasPocketOpenings
+  HasCardsSchema
 
-export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema
+export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema | FrontPocketSchema | TPocketSchema

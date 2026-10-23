@@ -99,28 +99,28 @@ export type HasBasicOffsetsSchema = {
   endOffset: number
 }
 
-export type PocketClusterStitchLineOwnSchema = HasBasicOffsetsSchema & {
+export type TPocketStitchLineOwnSchema = HasBasicOffsetsSchema & {
   stitchDirection: StitchDirectionSchema
 }
 
-export type PocketClusterStitchLineSchema = HasTypeSchema<'pocket-cluster-stitch-line'> &
+export type TPocketStitchLineSchema = HasTypeSchema<'t-pocket-stitch-line'> &
   HasIdentitySchema &
   HasComponentTargetSchema &
   Partial<StitchLineCommonConfigSchema> &
-  PocketClusterStitchLineOwnSchema
+  TPocketStitchLineOwnSchema
 
-export type StitchLineSchema = ComponentBoundsStitchLineSchema | PocketClusterStitchLineSchema
+export type StitchLineSchema = ComponentBoundsStitchLineSchema | TPocketStitchLineSchema
 
-export type ResolvedComponentBoundsStitchLineSchema = HasIdentitySchema &
+export type ResolvedComponentBoundsStitchLineSchema = HasTypeSchema<'component-bounds-stitch-line'> &
+  HasIdentitySchema &
   HasTargetSchema &
   StitchLineCommonConfigSchema &
-  ComponentBoundsStitchLineOwnSchema &
-  HasTypeSchema<'component-bounds-stitch-line'>
+  ComponentBoundsStitchLineOwnSchema
 
-export type ResolvedPocketClusterStitchLineSchema = HasTypeSchema<'pocket-cluster-stitch-line'> &
+export type ResolvedTPocketStitchLineSchema = HasTypeSchema<'t-pocket-stitch-line'> &
   HasIdentitySchema &
   HasComponentTargetSchema &
   StitchLineCommonConfigSchema &
-  PocketClusterStitchLineOwnSchema
+  TPocketStitchLineOwnSchema
 
-export type ResolvedStitchLineSchema = ResolvedComponentBoundsStitchLineSchema | ResolvedPocketClusterStitchLineSchema
+export type ResolvedStitchLineSchema = ResolvedComponentBoundsStitchLineSchema | ResolvedTPocketStitchLineSchema

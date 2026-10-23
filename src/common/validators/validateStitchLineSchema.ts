@@ -1,12 +1,8 @@
 import type { EditableSchema } from '../schemas/editable'
-import type {
-  ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
-  StitchLineSchema,
-} from '../schemas/stitching'
+import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { validateComponentBoundsStitchLineSchema } from './validateComponentBoundsStitchLineSchema'
-import { validatePocketClusterStitchLineSchema } from './validatePocketClusterStitchLineSchema'
+import { validateTPocketStitchLineSchema } from './validateTPocketStitchLineSchema'
 
 export const validateStitchLineSchema = (
   input: EditableSchema<StitchLineSchema>,
@@ -20,11 +16,7 @@ export const validateStitchLineSchema = (
         currentValue,
         context,
       )
-    case 'pocket-cluster-stitch-line':
-      return validatePocketClusterStitchLineSchema(
-        input as EditableSchema<PocketClusterStitchLineSchema>,
-        currentValue,
-        context,
-      )
+    case 't-pocket-stitch-line':
+      return validateTPocketStitchLineSchema(input as EditableSchema<TPocketStitchLineSchema>, currentValue, context)
   }
 }

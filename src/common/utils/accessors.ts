@@ -1,23 +1,20 @@
 import type {
   ComponentSchema,
+  FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
+  PocketSchema,
   RootPanelSchema,
+  TPocketSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type {
   ComponentLimitsSchema,
   HoleLimitsSchema,
-  PocketOpeningLimitsSchema,
   StitchLineLimitsSchema,
   SubProjectLimitsSchema,
 } from '../schemas/limits'
-import type {
-  ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
-  StitchLineSchema,
-} from '../schemas/stitching'
+import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import type { ComputedSubProjectGeometrySchema, SubProjectSchema } from '../schemas/subProject'
 import { isDefined } from './isDefined'
 import { narrowers } from './narrowers'
@@ -74,12 +71,24 @@ const subProject = (subProject: SubProjectSchema) => {
     return narrowers.assert.pocketCluster(component(id))
   }
 
+  const pocket = (id: string): PocketSchema => {
+    return narrowers.assert.pocket(component(id))
+  }
+
+  const frontPocket = (id: string): FrontPocketSchema => {
+    return narrowers.assert.frontPocket(component(id))
+  }
+
+  const tPocket = (id: string): TPocketSchema => {
+    return narrowers.assert.tPocket(component(id))
+  }
+
   const componentBoundsStitchLine = (id: string): ComponentBoundsStitchLineSchema => {
     return narrowers.assert.componentBoundsStitchLine(stitchLine(id))
   }
 
-  const pocketClusterStitchLine = (id: string): PocketClusterStitchLineSchema => {
-    return narrowers.assert.pocketClusterStitchLine(stitchLine(id))
+  const tPocketStitchLine = (id: string): TPocketStitchLineSchema => {
+    return narrowers.assert.tPocketStitchLine(stitchLine(id))
   }
 
   return {
@@ -90,8 +99,11 @@ const subProject = (subProject: SubProjectSchema) => {
     rootPanel,
     panel,
     pocketCluster,
+    pocket,
+    frontPocket,
+    tPocket,
     componentBoundsStitchLine,
-    pocketClusterStitchLine,
+    tPocketStitchLine,
   }
 }
 
@@ -136,6 +148,14 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
     return narrowers.assert.computedPocketCluster(component(id))
   }
 
+  const frontPocket = (id: string) => {
+    return narrowers.assert.computedFrontPocket(component(id))
+  }
+
+  const tPocket = (id: string) => {
+    return narrowers.assert.computedTPocket(component(id))
+  }
+
   return {
     component,
     stitchLine,
@@ -143,24 +163,8 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
     rootPanel,
     panel,
     pocketCluster,
-  }
-}
-
-const pocketCluster = (cluster: PocketClusterSchema) => {
-  const optionalOpening = (id: string | undefined): PocketOpeningSchema | undefined => {
-    if (!isDefined(id)) {
-      return undefined
-    }
-    return id === cluster.defaultOpening.id
-      ? cluster.defaultOpening
-      : cluster.openings.find((opening) => opening.id === id)
-  }
-  const opening = (pocketNumber: number): PocketOpeningSchema =>
-    optionalOpening(cluster.openingMapping[pocketNumber]) ?? cluster.defaultOpening
-
-  return {
-    optional: { opening: optionalOpening },
-    opening,
+    frontPocket,
+    tPocket,
   }
 }
 
@@ -169,17 +173,12 @@ const subProjectLimits = (limits: SubProjectLimitsSchema) => ({
     component: (id: string): ComponentLimitsSchema | undefined => limits.components[id],
     hole: (id: string): HoleLimitsSchema | undefined => limits.holes[id],
     stitchLine: (id: string): StitchLineLimitsSchema | undefined => limits.stitchLines[id],
-    opening: (pocketClusterId: string, openingId: string): PocketOpeningLimitsSchema | undefined => {
-      const cluster = limits.components[pocketClusterId]
-      return cluster?.type === 'pocket-cluster' ? cluster.openings[openingId] : undefined
-    },
   },
 })
 
 export const accessors = {
   subProject,
   computedSubProject,
-  pocketCluster,
   subProjectLimits,
 }
 

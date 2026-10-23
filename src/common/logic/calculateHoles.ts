@@ -17,7 +17,7 @@ export const calculateHoles = (
 ): ComputedHoleSchema[] => {
   return holes.flatMap((hole): ComputedHoleSchema[] => {
     const ownerComponent = computedComponents[hole.componentId]
-    if (!isDefined(ownerComponent)) {
+    if (!isDefined(ownerComponent) || ownerComponent.type === 'computed-pocket-cluster') {
       return []
     }
     return [calculateHole(hole, ownerComponent)]

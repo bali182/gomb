@@ -1,5 +1,4 @@
-import { Fragment, useCallback, useId, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
-
+import { useCallback, useId, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
@@ -8,16 +7,10 @@ import { usePath } from '../../hooks/usePath'
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import { StitchSideSchema } from '../../schemas/stitching'
-import { isDefined } from '../../utils/isDefined'
-import { Card } from './Card'
-import { HoleHighlights } from './HoleHighlights'
-import { Panel } from './Panel'
+import { Pocket } from './Pocket'
 import { PocketStitchMask } from './PocketStitchMask'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
-import { TPocket } from './TPocket'
-import { TPocketStitchLines } from './TPocketStitchLines'
 
 type PocketClusterProps = {
   componentId: string
@@ -28,112 +21,43 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
   const maskId = useId()
   const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const pocketCluster = useComponent<PocketClusterSchema>(componentId)
-  const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
-  const pathData = usePath(computedPocketCluster.path)
-  const frontPocketPathData = usePath(computedPocketCluster.frontPocket.path)
-  const isSelected = selection.isSelected(pocketCluster) || selection.isHovered(pocketCluster)
-  const clusterStyleParams: DrawAreaComponentStyleParams = {
-    component: pocketCluster,
-    nestingLevel,
-  }
 
-  const handlePointerEnter = useCallback<PointerEventHandler<SVGGElement>>(() => {
-    selection.hover(pocketCluster)
-  }, [pocketCluster, selection])
-  const handlePointerLeave = useCallback<PointerEventHandler<SVGGElement>>(() => {
-    selection.clearHover()
-  }, [selection])
-  const handleClick = useCallback<MouseEventHandler<SVGGElement>>(
-    (event) => {
+  const cluster = useComponent<PocketClusterSchema>(componentId)
+  const computed = useComputedComponent<ComputedPocketClusterSchema>(componentId)
+  const pathData = usePath(computed.path)
+  const active = selection.isSelected(cluster) || selection.isHovered(cluster)
+
+  const style: DrawAreaComponentStyleParams = { component: cluster, nestingLevel }
+
+  const onClick = useCallback(
+    (event: MouseEvent): void => {
       event.stopPropagation()
-      selection.select(pocketCluster)
+      selection.select(cluster)
     },
-    [pocketCluster, selection],
+    [cluster, selection],
   )
-
-  const topPocketLabelLocation = useMemo<StitchSideSchema>(() => {
-    switch (pocketCluster.orientation) {
-      case 'up':
-        return 'top'
-      case 'down':
-        return 'bottom'
-      case 'left':
-        return 'left'
-      case 'right':
-        return 'right'
-    }
-  }, [pocketCluster.orientation])
 
   return (
     <>
       {isShowingCards && <PocketStitchMask id={maskId} componentId={componentId} nestingLevel={nestingLevel} />}
-      <g
-        data-component-id={pocketCluster.id}
-        onClick={isInteractive ? handleClick : undefined}
-        onPointerEnter={isInteractive ? handlePointerEnter : undefined}
-        onPointerLeave={isInteractive ? handlePointerLeave : undefined}
-      >
-        {isSelected && (
+      <g data-component-id={componentId} onClick={isInteractive ? onClick : undefined}>
+        {active && (
           <path
             d={pathData}
-            fill={componentStyles.getBackgroundColor(clusterStyleParams)}
-            filter={componentStyles.getFilter(clusterStyleParams)}
-            stroke={componentStyles.getBorderColor(clusterStyleParams)}
-            strokeWidth={componentStyles.getBorderThickness(clusterStyleParams)}
+            fill={componentStyles.getBackgroundColor(style)}
+            stroke={componentStyles.getBorderColor(style)}
+            strokeWidth={componentStyles.getBorderThickness(style)}
+            filter={componentStyles.getFilter(style)}
           />
         )}
-        {computedPocketCluster.tPockets.map((pocket, pocketIndex) => {
-          return (
-            <Fragment key={pocket.id}>
-              {isShowingCards && isDefined(pocket.card) && <Card owner={pocketCluster} path={pocket.card.path} />}
-              <TPocket
-                fill={componentStyles.getBackgroundColor(clusterStyleParams)}
-                path={pocket.path}
-                stroke={componentStyles.getBorderColor(clusterStyleParams)}
-                strokeWidth={componentStyles.getBorderThickness(clusterStyleParams)}
-              />
-              <TPocketStitchLines componentId={pocketCluster.id} pocketIndex={pocketIndex} />
-            </Fragment>
-          )
-        })}
-
-        {isShowingCards && isDefined(computedPocketCluster.frontPocket.card) && (
-          <Card owner={pocketCluster} path={computedPocketCluster.frontPocket.card.path} />
-        )}
-        <path
-          d={frontPocketPathData}
-          fill={componentStyles.getBackgroundColor(clusterStyleParams)}
-          stroke={componentStyles.getBorderColor(clusterStyleParams)}
-          strokeWidth={componentStyles.getBorderThickness(clusterStyleParams)}
-        />
+        {computed.children.map((pocket) => (
+          <Pocket key={pocket.componentId} componentId={pocket.componentId} nestingLevel={nestingLevel} />
+        ))}
       </g>
-      {settings.view.componentDimensionsVisible && isSelected && (
-        <>
-          <SizeLabel reference="bottom-right" boundingRect={computedPocketCluster.boundingRect} />
-          <SizeLabel reference={topPocketLabelLocation} boundingRect={computedPocketCluster.frontPocket.boundingRect} />
-        </>
+      {settings.view.componentDimensionsVisible && active && (
+        <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <StitchLines componentId={pocketCluster.id} maskId={isShowingCards ? maskId : undefined} />
-      <HoleHighlights componentId={pocketCluster.id} />
-      {computedPocketCluster.children.map((component) => {
-        switch (component.type) {
-          case 'computed-panel':
-            return (
-              <Panel componentId={component.componentId} key={component.componentId} nestingLevel={nestingLevel + 1} />
-            )
-          case 'computed-pocket-cluster':
-            return (
-              <PocketCluster
-                componentId={component.componentId}
-                key={component.componentId}
-                nestingLevel={nestingLevel + 1}
-              />
-            )
-          case 'computed-root-panel':
-            throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
-        }
-      })}
+      <StitchLines componentId={componentId} maskId={isShowingCards ? maskId : undefined} />
     </>
   )
 }

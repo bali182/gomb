@@ -1,5 +1,6 @@
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
+import { canDeleteComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export type DeleteComponentParams = {
@@ -12,7 +13,7 @@ export const deleteComponent = (
 ): SubProjectSchema => {
   const component = subProject.components[componentId]
 
-  if (!isDefined(component) || component.type === 'root-panel') {
+  if (!isDefined(component) || !canDeleteComponent(component)) {
     return subProject
   }
 

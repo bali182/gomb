@@ -30,10 +30,8 @@ type ComputationBenchmarkCase = {
   subProject: SubProjectSchema
 }
 
-const straight: PocketOpeningSchema = { id: 'own:default', name: 'Default', type: 'straight' }
+const straight: PocketOpeningSchema = { type: 'straight' }
 const recessed: PocketOpeningSchema = {
-  id: 'own:default',
-  name: 'Default',
   type: 'recessed',
   outerInset: 18,
   innerOffset: 15,
@@ -53,22 +51,28 @@ const createClusterSubProject = ({
   return d.subProject({
     id: 'benchmark',
     root: d.rootPanel({ id: 'root', width: clusterCount * 120, height: 160, children: panelIds }),
-    components: panelIds.flatMap((panelId, index) => [
-      d.panel({ id: panelId, children: [clusterIds[index]] }),
-      d.pocketCluster({
-        id: clusterIds[index],
-        pocketCount,
-        pocketStep: 10,
-        topLeftRadius: 4,
-        bottomLeftRadius: 4,
-        topRightRadius: 4,
-        bottomRightRadius: 4,
-        defaultOpening: opening,
-      }),
-    ]),
+    components: panelIds.flatMap((panelId, index) => {
+      const pocketIds = Array.from({ length: pocketCount }, (_, number) => clusterIds[index] + '-pocket-' + number)
+      return [
+        d.panel({ id: panelId, children: [clusterIds[index]] }),
+        d.pocketCluster({ id: clusterIds[index], children: pocketIds, pocketStep: 10 }),
+        ...pocketIds.map((id, number) =>
+          number === pocketCount - 1
+            ? d.frontPocket({
+                id,
+                opening,
+                topLeftRadius: 4,
+                topRightRadius: 4,
+                bottomLeftRadius: 4,
+                bottomRightRadius: 4,
+              })
+            : d.tPocket({ id, opening }),
+        ),
+      ]
+    }),
     holes: clusterIds.flatMap((componentId) =>
       Array.from({ length: holesPerCluster }, (_, index) => ({
-        ...d.hole({ id: `${componentId}-hole-${index}`, componentId }),
+        ...d.hole({ id: `${componentId}-hole-${index}`, componentId: componentId + '-pocket-0' }),
         xAnchor: 'start' as const,
         yAnchor: 'start' as const,
         xOffset: 24 + index * 18,
@@ -83,7 +87,7 @@ const createClusterSubProject = ({
     ),
     stitchLines: clusterIds.flatMap((targetId): StitchLineSchema[] => [
       d.componentBoundsStitchLine({ id: `${targetId}-bounds`, targetId, targetType: 'component' }),
-      d.pocketClusterStitchLine({ id: `${targetId}-pockets`, targetId, targetType: 'component' }),
+      d.tPocketStitchLine({ id: `${targetId}-pockets`, targetId: targetId + '-pocket-0', targetType: 'component' }),
     ]),
   })
 }
@@ -179,13 +183,6 @@ const expectEquivalentSubProject = (current: ComputedSubProjectSchema, previous:
     const previousComponent = previous.components[id]
     expect(component.type).toBe(previousComponent.type)
     expectEquivalentPath(component.path, previousComponent.path)
-    if (component.type === 'computed-pocket-cluster' && previousComponent.type === 'computed-pocket-cluster') {
-      expectEquivalentPath(component.frontPocket.path, previousComponent.frontPocket.path)
-      expect(component.tPockets).toHaveLength(previousComponent.tPockets.length)
-      component.tPockets.forEach((pocket, index) =>
-        expectEquivalentPath(pocket.path, previousComponent.tPockets[index].path),
-      )
-    }
   }
   expect(current.holes).toHaveLength(previous.holes.length)
   current.holes.forEach((hole, index) => expectEquivalentPath(hole.highlightPath, previous.holes[index].highlightPath))

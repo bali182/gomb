@@ -8,7 +8,7 @@ export const getStitchLineNameByType = (
   switch (type) {
     case 'component-bounds-stitch-line':
       return defaultNames.componentBoundsStitchLine
-    case 'pocket-cluster-stitch-line':
-      return defaultNames.pocketClusterStitchLine
+    case 't-pocket-stitch-line':
+      return defaultNames.tPocketStitchLine
   }
 }

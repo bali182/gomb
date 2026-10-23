@@ -4,6 +4,12 @@ import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from '
 import { PiDotsSixVertical } from 'react-icons/pi'
 
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
+import { useSubProject } from '../../hooks/useSubProject'
+import {
+  canAddHole,
+  canMoveComponent,
+  getComponentStitchLineType,
+} from '../../operations/subProject/utils/componentRules'
 import { isDefined } from '../../utils/isDefined'
 import { DropInsideIndicator, ReorderDropIndicator } from './ComponentTreeDropIndicators'
 import { TreeItemVisual } from './TreeItemVisual'
@@ -35,9 +41,10 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   renderMenu,
 }) => {
   const selection = useSubProjectSelectionContext()
+  const { subProject } = useSubProject()
   const { component } = node
   const isActiveComponent = activeDragData?.kind === 'component' && activeDragData.componentId === component.id
-  const isDraggable = hasDragAndDrop && component.type !== 'root-panel'
+  const isDraggable = hasDragAndDrop && component.type !== 'root-panel' && component.type !== 'front-pocket'
   const canReorder = hasDragAndDrop && (!isDefined(activeDragData) || activeDragData.kind === 'component')
   const isExpandable = node.children.length > 0
 
@@ -61,11 +68,11 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'component':
         return false
       case 'hole':
-        return true
+        return canAddHole(component)
       case 'stitch-line':
-        return activeDragData.stitchLineType === 'component-bounds-stitch-line' || component.type === 'pocket-cluster'
+        return getComponentStitchLineType(component) === activeDragData.stitchLineType
     }
-  }, [activeDragData, component.type, hasDragAndDrop])
+  }, [activeDragData, component, hasDragAndDrop])
 
   const isDisabledForActiveDrag = useMemo<boolean>(() => {
     if (!isDefined(activeDragData) || isActiveComponent) {
@@ -77,16 +84,42 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'hole':
         return false
       case 'stitch-line':
-        return activeDragData.stitchLineType === 'pocket-cluster-stitch-line' && component.type !== 'pocket-cluster'
+        return getComponentStitchLineType(component) !== activeDragData.stitchLineType
     }
-  }, [activeDragData, component.type, isActiveComponent])
+  }, [activeDragData, component, isActiveComponent])
+
+  const insideBeforeComponentId = useMemo<string | undefined>(() => {
+    if (component.type !== 'pocket-cluster') {
+      return undefined
+    }
+    if (activeDragData?.kind === 'component') {
+      return component.children.find((childId) => childId !== activeDragData.componentId)
+    }
+    return component.children[0]
+  }, [component, activeDragData])
 
   const dropPositions = useMemo<ComponentTreeDropPosition[]>(() => {
     if (component.type === 'root-panel') {
       return ['inside']
     }
-    return nodeState.expanded ? ['before', 'inside'] : ['before', 'inside', 'after']
-  }, [component, nodeState.expanded])
+    const positions: ComponentTreeDropPosition[] = nodeState.expanded
+      ? ['before', 'inside']
+      : ['before', 'inside', 'after']
+    return positions.filter((position) => {
+      if (activeDragData?.kind !== 'component') {
+        return true
+      }
+      if (position === 'after' && component.type === 'front-pocket') {
+        return false
+      }
+      return canMoveComponent(subProject, {
+        componentId: activeDragData.componentId,
+        targetParentId: position === 'inside' ? component.id : (node.parentId ?? component.id),
+        beforeComponentId:
+          position === 'before' ? component.id : position === 'after' ? node.nextSiblingId : insideBeforeComponentId,
+      })
+    })
+  }, [component, nodeState.expanded, activeDragData, subProject, node.parentId, node.nextSiblingId, insideBeforeComponentId])
 
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({
     data: {
@@ -127,11 +160,11 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
 
   const insideDropData = useMemo<ComponentReorderDropData>(
     () => ({
-      beforeComponentId: undefined,
+      beforeComponentId: insideBeforeComponentId,
       kind: 'component-reorder',
       targetParentId: component.id,
     }),
-    [component.id],
+    [component.id, insideBeforeComponentId],
   )
 
   const { isOver: isAttachmentDropOver, setNodeRef: setAttachmentDropNodeRef } = useDroppable({

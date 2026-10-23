@@ -16,10 +16,9 @@ const point = (x: BigNumber.Value, y: BigNumber.Value): PointSchema => ({
 describe('isPointInClosedPath', () => {
   it('counts the shared inner-arc junction once, before and after cutting a hole', () => {
     const path = createPocketCalculator(
+      d.frontPocket({ id: 'front' }),
       d.pocketCluster({ id: 'cluster', orientation: 'right' }),
       {
-        id: 'own:test',
-        name: 'Test',
         type: 'recessed',
         outerInset: 43.3,
         innerOffset: 8,

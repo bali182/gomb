@@ -1,5 +1,4 @@
 import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../defaultStates'
-import type { HasIdentitySchema } from '../schemas/common'
 import type {
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
@@ -9,39 +8,14 @@ import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
-import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 export const validatePocketOpeningSchema = (
   input: EditableSchema<PocketOpeningSchema>,
   currentValue: PocketOpeningSchema,
-  openings: readonly HasIdentitySchema[],
   context: BaseValidationContextSchema,
-): ValidationResultSchema<PocketOpeningSchema> => {
-  const typeResult = validatePocketOpeningByType(input, currentValue, context)
-  const nameResult = validateName(input.name, currentValue.name, currentValue.id, openings, context)
-  const issues: IssuesSchema<PocketOpeningSchema> = {
-    ...typeResult.issues,
-    id: undefined,
-    name: nameResult.issues,
-  }
-  const committedValue: PocketOpeningSchema = {
-    ...typeResult.committedValue,
-    id: currentValue.id,
-    name: nameResult.committedValue,
-  }
-
-  if (!typeResult.isValid || !nameResult.isValid) {
-    return createInvalidValidationResult<PocketOpeningSchema>(issues, committedValue)
-  }
-
-  return createValidValidationResult<PocketOpeningSchema>(
-    issues,
-    { ...typeResult.value, id: currentValue.id, name: nameResult.value },
-    committedValue,
-  )
-}
+): ValidationResultSchema<PocketOpeningSchema> => validatePocketOpeningByType(input, currentValue, context)
 
 const validatePocketOpeningByType = (
   input: EditableSchema<PocketOpeningSchema>,
@@ -61,24 +35,17 @@ const validatePocketOpeningByType = (
 
   switch (input.type) {
     case 'straight':
-      return createValidValidationResult<PocketOpeningSchema>(
-        { type: undefined },
-        { id: currentValue.id, name: currentValue.name, type: 'straight' },
-      )
+      return createValidValidationResult<PocketOpeningSchema>({ type: undefined }, { type: 'straight' })
     case 'recessed':
       return validateRecessedPocketOpeningSchema(
         input,
-        currentValue.type === 'recessed'
-          ? currentValue
-          : { ...defaultRecessedPocketOpening, id: currentValue.id, name: currentValue.name },
+        currentValue.type === 'recessed' ? currentValue : defaultRecessedPocketOpening,
         context,
       )
     case 'slanted':
       return validateSlantedPocketOpeningSchema(
         input,
-        currentValue.type === 'slanted'
-          ? currentValue
-          : { ...defaultSlantedPocketOpening, id: currentValue.id, name: currentValue.name },
+        currentValue.type === 'slanted' ? currentValue : defaultSlantedPocketOpening,
         context,
       )
   }

@@ -1,0 +1,228 @@
+import BigNumber from 'bignumber.js'
+import { describe, expect, it } from 'vitest'
+import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
+import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
+import type { PocketOrientationSchema, SlantedPocketOpeningSchema } from '../schemas/components'
+import { d } from '../testData'
+import { accessors } from '../utils/accessors'
+import { getExportElementsForComponent } from './exports/getExportElements'
+import { getComputedSubProject } from './getComputedSubProject'
+import { isPointInClosedPath } from './isPointInClosedPath'
+import { getClosedPathLoops, getPathSegments } from './pathSegments'
+
+describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
+  'physical pocket components: %s',
+  (orientation) => {
+    const vertical = orientation === 'up' || orientation === 'down'
+    const fixture = (offset = 15) => {
+      const opening: SlantedPocketOpeningSchema = { type: 'slanted', offset, side: 'end' }
+      const pockets = [
+        d.tPocket({ id: 't1', opening, tPocketTabWidth: 10, tPocketTaper: 35 }),
+        d.tPocket({ id: 't2', opening }),
+        d.frontPocket({ id: 'front', opening }),
+      ]
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        orientation,
+        pocketStep: 20,
+        children: pockets.map((pocket) => pocket.id),
+      })
+      const root = d.rootPanel({
+        id: 'root',
+        width: vertical ? 100 : 130,
+        height: vertical ? 130 : 100,
+        children: [cluster.id],
+      })
+      const subProject = d.subProject({
+        id: 'sub',
+        root,
+        components: [cluster, ...pockets],
+        stitchLines: [
+          d.tPocketStitchLine({ id: 'bottom', targetId: 't1', targetType: 'component', stitchMargin: 15 }),
+          d.componentBoundsStitchLine({ id: 'border', targetId: 'cluster', targetType: 'component' }),
+        ],
+      })
+      return { cluster, pockets, subProject }
+    }
+    it('registers pockets under their own IDs, preserves allocation and clips their own stitching', () => {
+      const { cluster, subProject } = fixture()
+      const before = structuredClone(subProject)
+      const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      expect(result.children.map((pocket) => pocket.componentId)).toEqual(['t1', 't2', 'front'])
+      result.children.forEach((pocket, index) => {
+        expect(computed.components[pocket.componentId]).toBe(pocket)
+        expect((vertical ? pocket.boundingRect.height : pocket.boundingRect.width).toNumber()).toBe(90)
+        expect((vertical ? pocket.boundingRect.y : pocket.boundingRect.x).toNumber()).toBe(
+          (orientation === 'up' || orientation === 'left' ? index : 2 - index) * 20,
+        )
+        expect(getClosedPathLoops(pocket.path)).toHaveLength(1)
+      })
+      expect(computed.stitchLines.t1[0].routes).toHaveLength(1)
+      expect(computed.stitchLines.cluster[0].type).toBe('component-bounds-stitch-line')
+      const elements = getExportElementsForComponent(
+        subProject,
+        computed,
+        'cluster',
+        { ...defaultExportParams, stitchLineMode: 'related-stitch-lines' },
+        defaultStitchingSettings,
+      )
+      expect(elements.map((element) => element.id)).toEqual(['t1', 't2', 'front'])
+      expect(elements[0].stitchLines.some((line) => line.stitchLine.id === 'bottom')).toBe(true)
+      expect(
+        elements.slice(1).every((element) => !element.stitchLines.some((line) => line.stitchLine.id === 'bottom')),
+      ).toBe(true)
+      expect(subProject).toEqual(before)
+    })
+    it.each(['own-stitch-lines', 'related-stitch-lines', 'all-stitch-lines'] as const)(
+      'keeps the cluster border on every pocket in %s exports',
+      (stitchLineMode) => {
+        const { subProject } = fixture()
+        const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+        const elements = getExportElementsForComponent(
+          subProject,
+          computed,
+          'cluster',
+          { ...defaultExportParams, stitchLineMode },
+          defaultStitchingSettings,
+        )
+        expect(elements).toHaveLength(3)
+        for (const element of elements) {
+          expect(element.stitchLines.some((line) => line.stitchLine.id === 'border')).toBe(true)
+        }
+      },
+    )
+    it('stores independent opening bounds under each pocket component', () => {
+      const { subProject } = fixture(1000)
+      const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+      expect(computed.limits.components.t1).toMatchObject({
+        type: 't-pocket',
+        opening: { type: 'slanted', offset: { max: { value: new BigNumber(70) } } },
+      })
+      expect(computed.limits.components.front).toMatchObject({
+        type: 'front-pocket',
+        opening: { type: 'slanted', offset: { max: { value: new BigNumber(90) } } },
+      })
+      const cluster = accessors.computedSubProject(computed).pocketCluster('cluster')
+      for (const pocket of cluster.children) {
+        for (const segment of getPathSegments(pocket.path)) {
+          expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
+        }
+      }
+    })
+    it('bounds step and each T-pocket shape independently', () => {
+      const { subProject } = fixture()
+      const source = accessors.subProject(subProject)
+      const changed = {
+        ...subProject,
+        components: {
+          ...subProject.components,
+          cluster: { ...source.pocketCluster('cluster'), pocketStep: 500 },
+          t1: { ...source.tPocket('t1'), tPocketTabWidth: 500, tPocketTaper: 500 },
+        },
+      }
+      const computed = getComputedSubProject(changed, defaultStitchingSettings)
+      expect(computed.limits.components.cluster).toMatchObject({
+        pocketStep: { max: { value: new BigNumber(130).dividedBy(3) } },
+      })
+      expect(computed.limits.components.t1).toMatchObject({
+        tPocketTabWidth: { max: { value: new BigNumber(50) } },
+        tPocketTaper: { max: { value: new BigNumber(50) } },
+      })
+    })
+    it('inherits closed corner radii through the cluster and front pocket', () => {
+      const { subProject } = fixture(1)
+      const root = accessors.subProject(subProject).rootPanel()
+      const changed = {
+        ...subProject,
+        components: {
+          ...subProject.components,
+          root: { ...root, topLeftRadius: 12, topRightRadius: 12, bottomLeftRadius: 12, bottomRightRadius: 12 },
+        },
+      }
+      const computed = getComputedSubProject(changed, defaultStitchingSettings)
+      const cluster = accessors.computedSubProject(computed).pocketCluster('cluster')
+      const front = accessors.computedSubProject(computed).frontPocket('front')
+      const expected =
+        orientation === 'up'
+          ? ['bottomLeft', 'bottomRight']
+          : orientation === 'down'
+            ? ['topLeft', 'topRight']
+            : orientation === 'left'
+              ? ['topRight', 'bottomRight']
+              : ['topLeft', 'bottomLeft']
+      for (const [corner, radius] of Object.entries(front.cornerRadius)) {
+        expect(radius.toNumber()).toBe(expected.includes(corner) ? 12 : 0)
+      }
+      expect(Object.values(cluster.cornerRadius).some((radius) => radius.toNumber() === 12)).toBe(true)
+    })
+    it('lays out normal children inside the front pocket', () => {
+      const { subProject } = fixture()
+      const front = accessors.subProject(subProject).frontPocket('front')
+      const child = d.panel({ id: 'child' })
+      const changed = {
+        ...subProject,
+        components: { ...subProject.components, front: { ...front, children: [child.id] }, child },
+      }
+      const computed = getComputedSubProject(changed, defaultStitchingSettings)
+      const parent = accessors.computedSubProject(computed).frontPocket('front')
+      expect(computed.components.child.boundingRect).toEqual(parent.boundingRect)
+      expect(parent.children.map((child) => child.componentId)).toEqual(['child'])
+    })
+  },
+)
+describe('invalid pocket states and patchers', () => {
+  it('builds the cluster selection contour from the cut pocket contours', () => {
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] }),
+      components: [cluster, d.frontPocket({ id: 'front' })],
+      holes: [d.hole({ id: 'hole', componentId: 'front', width: 10, height: 10 })],
+    })
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const center = { x: new BigNumber(50), y: new BigNumber(50) }
+    expect(isPointInClosedPath(center, computed.components.front.path)).toBe(false)
+    expect(isPointInClosedPath(center, computed.components.cluster.path)).toBe(false)
+  })
+  it('supports empty and frontless clusters without throwing', () => {
+    for (const children of [[], ['t']]) {
+      const cluster = d.pocketCluster({ id: 'cluster', children })
+      const source = d.subProject({
+        id: 'sub',
+        root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+        components: [cluster, d.tPocket({ id: 't' })],
+      })
+      const computed = getComputedSubProject(source, defaultStitchingSettings)
+      expect(accessors.computedSubProject(computed).pocketCluster('cluster').children.length).toBe(children.length)
+    }
+  })
+  it('removes forbidden T-pocket descendants, cluster holes and unsupported stitching separately', () => {
+    const t = d.tPocket({ id: 't', children: ['zombie'] })
+    const front = d.frontPocket({ id: 'front' })
+    const zombie = d.panel({ id: 'zombie', children: ['nested'] })
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [cluster, t, front, zombie, d.panel({ id: 'nested' })],
+      holes: [
+        d.hole({ id: 'cluster-hole', componentId: 'cluster' }),
+        d.hole({ id: 'zombie-hole', componentId: 'zombie' }),
+      ],
+      stitchLines: [
+        d.componentBoundsStitchLine({ id: 'invalid', targetId: 'front', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'orphan', targetId: 'zombie', targetType: 'component' }),
+      ],
+    })
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    expect(computed.components.zombie).toBeUndefined()
+    expect(computed.holes).toEqual([])
+    const patched = getPatchedSubProject(source, computed)
+    expect(patched.components.zombie).toBeUndefined()
+    expect(patched.components.nested).toBeUndefined()
+    expect(patched.components.t.children).toEqual([])
+    expect(patched.holes).toEqual([])
+    expect(patched.stitchLines).toEqual([])
+  })
+})

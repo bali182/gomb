@@ -1,5 +1,6 @@
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
+import { canMoveComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 import { getComponentParent } from './utils/getComponentParent'
 
@@ -13,6 +14,9 @@ export const moveComponent = (
   subProject: SubProjectSchema,
   { beforeComponentId, componentId, targetParentId }: MoveComponentParams,
 ): SubProjectSchema => {
+  if (!canMoveComponent(subProject, { beforeComponentId, componentId, targetParentId })) {
+    return subProject
+  }
   const movedComponent = subProject.components[componentId]
   const targetParent = subProject.components[targetParentId]
 

@@ -6,6 +6,10 @@ export const getComponentNameByType = (
   defaultNames: TranslationSchema['defaultNames'],
 ): string => {
   switch (type) {
+    case 'front-pocket':
+      return defaultNames.frontPocket
+    case 't-pocket':
+      return defaultNames.tPocket
     case 'root-panel':
       return defaultNames.rootPanel
     case 'panel':

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 import { ZERO } from '../../constants/layout'
-import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, PathCommand, PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
 
 /** One pocket's immutable calculation inputs. Opening paths are local previews, complete paths are positioned. */
@@ -10,6 +10,7 @@ export abstract class PocketCalculator<T extends PocketOpeningSchema> {
   protected readonly depth: BigNumber
 
   constructor(
+    protected readonly pocket: PocketSchema,
     protected readonly pocketCluster: PocketClusterSchema,
     protected readonly opening: T,
     protected readonly pocketRect: RectSchema,
@@ -53,7 +54,10 @@ export abstract class PocketCalculator<T extends PocketOpeningSchema> {
   }
 
   protected getTPocketBottomCommands(): PathCommand[] {
-    const taper = new BigNumber(this.pocketCluster.tPocketTaper)
+    if (this.pocket.type !== 't-pocket') {
+      throw new Error('T-pocket bottom requires a T-pocket')
+    }
+    const taper = new BigNumber(this.pocket.tPocketTaper)
     return [
       { type: 'lineTo', point: { x: this.width.minus(taper), y: this.depth } },
       { type: 'lineTo', point: { x: taper, y: this.depth } },

@@ -1,22 +1,22 @@
-import type { PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
-import type { ComputedTopPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
+import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { PocketOpeningLimitsSchema } from '../../schemas/limits'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 import { getSlantedPocketOpeningLimits } from './getSlantedPocketOpeningLimits'
 import { getStraightPocketOpeningLimits } from './getStraightPocketOpeningLimits'
 
 export const getPocketOpeningLimits = (
-  opening: PocketOpeningSchema,
-  pocketCluster: PocketClusterSchema,
-  frontPocket: ComputedTopPocketSchema,
-  tPockets: readonly ComputedTPocketSchema[],
+  pocket: PocketSchema,
+  cluster: PocketClusterSchema,
+  computed: ComputedPocketSchema,
 ): PocketOpeningLimitsSchema => {
+  const opening = pocket.opening
   switch (opening.type) {
     case 'straight':
-      return getStraightPocketOpeningLimits(opening, pocketCluster, frontPocket, tPockets)
+      return getStraightPocketOpeningLimits(opening, pocket, cluster, computed)
     case 'recessed':
-      return getRecessedPocketOpeningLimits(opening, pocketCluster, frontPocket, tPockets)
+      return getRecessedPocketOpeningLimits(opening, pocket, cluster, computed)
     case 'slanted':
-      return getSlantedPocketOpeningLimits(opening, pocketCluster, frontPocket, tPockets)
+      return getSlantedPocketOpeningLimits(opening, pocket, cluster, computed)
   }
 }

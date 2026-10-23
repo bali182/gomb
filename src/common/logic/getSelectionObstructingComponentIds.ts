@@ -56,7 +56,7 @@ const getStitchLineObstructingComponentIds = (
   const coveredComponentIds = new Set(getComponentDescendants(underlyingComponent, subProject))
   coveredComponentIds.delete(underlyingComponent.id)
 
-  if (underlyingComponent.type === 'pocket-cluster' && stitchLine.type === 'pocket-cluster-stitch-line') {
+  if (underlyingComponent.type === 'pocket-cluster' && stitchLine.type === 't-pocket-stitch-line') {
     coveredComponentIds.add(underlyingComponent.id)
   }
 

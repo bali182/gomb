@@ -6,6 +6,7 @@ import {
   type CloneComponentNameGenerators,
   type CloneComponentSettings,
 } from './cloneComponentTree'
+import { canCloneComponent } from './utils/componentRules'
 import { getComponentParent } from './utils/getComponentParent'
 
 export type CloneComponentParams = {
@@ -21,7 +22,7 @@ export const cloneComponent = (
 ): SubProjectSchema => {
   const sourceComponent = subProject.components[componentId]
 
-  if (!isDefined(sourceComponent) || sourceComponent.type === 'root-panel') {
+  if (!isDefined(sourceComponent) || !canCloneComponent(sourceComponent)) {
     return subProject
   }
 

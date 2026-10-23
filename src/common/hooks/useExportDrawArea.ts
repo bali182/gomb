@@ -79,13 +79,13 @@ export const useExportDrawArea = (
           case 'export-panel':
             return element.component.name
           case 'export-front-pocket':
-            return t.project.export.frontPocketName(element.ownerComponent.name)
+            return element.component.name
           case 'export-t-pocket':
-            return t.project.export.tPocketName(element.ownerComponent.name, element.pocketIndex + 1)
+            return element.component.name
         }
       },
     }),
-    [settings.showNames, t.project.export],
+    [settings.showNames],
   )
 
   const exportTextStyles = useMemo<DrawAreaExportTextStyles>(

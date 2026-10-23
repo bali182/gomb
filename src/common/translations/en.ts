@@ -14,14 +14,14 @@ import type {
   HasAutoDimensionsSchema,
   HasCardsSchema,
   HasLayoutSchema,
-  HasPocketOpenings,
   LayoutOrientationSchema,
   PocketOpeningSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  RecessedPocketOpeningOwnSchema,
-  SlantedPocketOpeningOwnSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
   SlantedPocketOpeningSideSchema,
+  TPocketSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -45,8 +45,8 @@ import type {
   HasStitchedSidesSchema,
   HasStitchedUnconnectedCornersSchema,
   HasVerticalDirectionsSchema,
-  PocketClusterStitchLineOwnSchema,
   StitchLineCommonConfigSchema,
+  TPocketStitchLineOwnSchema,
 } from '../schemas/stitching'
 import type { ThemeSchema } from '../schemas/theme'
 import type {
@@ -132,8 +132,6 @@ export const EN = {
     },
     export: {
       pageName: (name: string, pageNumber: number): string => `${name}-${String(pageNumber).padStart(3, '0')}`,
-      frontPocketName: (ownerName: string): string => `${ownerName} - front pocket`,
-      tPocketName: (ownerName: string, index: number): string => `${ownerName} - Pocket ${index}`,
     },
     menus: {
       file: {
@@ -246,15 +244,13 @@ export const EN = {
           addPanel: 'Add panel',
           addRootPanel: 'Add module',
           addPocketCluster: 'Add pocket cluster',
+          addFrontPocket: 'Add front pocket',
+          addTPocket: 'Add T-pocket',
           addHole: 'Add hole',
           addStitching: 'Add stitching',
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
           clone: 'Clone',
-          delete: 'Delete',
-        },
-        pocketOpenings: {
-          add: 'Add design',
           delete: 'Delete',
         },
         stitchLines: {
@@ -399,14 +395,13 @@ export const EN = {
               label: 'Opening',
               tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
             },
-            pocketCount: {
-              label: 'Count',
-              tooltip: 'Sets how many pockets are created in this pocket cluster.',
-            },
             pocketStep: {
               label: 'Spacing',
               tooltip: 'Sets the distance between adjacent pockets.',
             },
+          } satisfies SectionTranslationSchema<PocketsSchema>,
+          tPocket: {
+            title: 'T-pocket',
             tPocketTabWidth: {
               label: 'Tab width',
               tooltip: 'Sets the width of the retaining tabs on T-shaped pockets.',
@@ -415,11 +410,10 @@ export const EN = {
               label: 'Taper',
               tooltip: 'Sets the slope of the sides of a T-shaped pocket.',
             },
-          } satisfies SectionTranslationSchema<PocketsSchema>,
+          } satisfies SectionTranslationSchema<Pick<TPocketSchema, 'tPocketTabWidth' | 'tPocketTaper'>>,
           pocketOpening: {
-            title: 'Pocket openings',
-            name: { label: 'Name', tooltip: 'Sets the name used to identify this pocket opening.' },
-            type: { label: 'Shape', tooltip: 'Sets the opening shape for pockets assigned to this opening.' },
+            title: 'Pocket opening',
+            type: { label: 'Shape', tooltip: 'Sets this pocket’s opening shape.' },
             outerInset: {
               label: 'Outer inset',
               tooltip: 'Distance from either opening edge to the outer corner, in mm.',
@@ -443,12 +437,8 @@ export const EN = {
               label: 'Lower side',
               tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
             },
-          } satisfies SectionTranslationSchema<RecessedPocketOpeningOwnSchema & HasName> &
-            EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
-          pocketAssignments: {
-            title: 'Pocket assignments',
-            openingMapping: { label: 'Pocket opening' },
-          } satisfies SectionTranslationSchema<Pick<HasPocketOpenings, 'openingMapping'>>,
+          } satisfies SectionTranslationSchema<RecessedPocketOpeningSchema> &
+            EditorFieldTranslations<keyof SlantedPocketOpeningSchema>,
           cards: {
             title: 'Cards',
             cardId: {
@@ -507,7 +497,7 @@ export const EN = {
               label: 'Direction',
               tooltip: 'Changes which way the stitch line runs along the pocket.',
             },
-          } satisfies SectionTranslationSchema<PocketClusterStitchLineOwnSchema>,
+          } satisfies SectionTranslationSchema<TPocketStitchLineOwnSchema>,
           sidesAndCorners: {
             title: 'Seam line',
             top: {
@@ -834,13 +824,8 @@ export const EN = {
         },
       },
       controls: {
-        pocketOpenings: {
-          assignedPockets: (numbers: readonly number[]): string => `Pockets: ${numbers.join(', ')}`,
-          unassigned: 'No pockets assigned',
-        },
-        pocketAssignments: {
-          pocket: (number: number): string => `Pocket ${number}`,
-          tPocket: (number: number): string => `T-pocket ${number}`,
+        pockets: {
+          missingFront: 'The pocket cluster has no front pocket.',
         },
         cardPicker: {
           noCard: 'None',
@@ -932,13 +917,14 @@ export const EN = {
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
   defaultNames: {
-    defaultPocketOpening: 'Default',
     project: 'Project',
     rootPanel: 'Module',
     panel: 'Panel',
     pocketCluster: 'Pocket cluster',
+    frontPocket: 'Front pocket',
+    tPocket: 'T-pocket',
     componentBoundsStitchLine: 'Stitching',
-    pocketClusterStitchLine: 'Pocket stitching',
+    tPocketStitchLine: 'Pocket stitching',
     hole: 'Hole',
   },
   data: {

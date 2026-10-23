@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
 
 import { Panel } from '../../components/svg/Panel'
+import { Pocket } from '../../components/svg/Pocket'
 import { PocketCluster } from '../../components/svg/PocketCluster'
 import { RootPanel } from '../../components/svg/RootPanel'
 import {
@@ -45,6 +46,10 @@ export const renderSvgComponentToString = ({
 
   let content: ReactNode
   switch (component.type) {
+    case 'front-pocket':
+    case 't-pocket':
+      content = <Pocket componentId={componentId} nestingLevel={nestingLevel} />
+      break
     case 'root-panel':
       content = <RootPanel componentId={componentId} nestingLevel={nestingLevel} />
       break

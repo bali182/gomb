@@ -77,8 +77,6 @@ export const HU = {
     },
     export: {
       pageName: (name: string, pageNumber: number): string => `${name}-${String(pageNumber).padStart(3, '0')}`,
-      frontPocketName: (ownerName: string): string => `${ownerName} - elülső zseb`,
-      tPocketName: (ownerName: string, index: number): string => `${ownerName} - ${index}. zseb`,
     },
     menus: {
       file: {
@@ -191,15 +189,13 @@ export const HU = {
           addPanel: 'Panel hozzáadása',
           addRootPanel: 'Modul hozzáadása',
           addPocketCluster: 'Zsebcsoport hozzáadása',
+          addFrontPocket: 'Elülső zseb hozzáadása',
+          addTPocket: 'T-zseb hozzáadása',
           addHole: 'Lyuk hozzáadása',
           addStitching: 'Varrás hozzáadása',
           addPocketStitching: 'Zsebvarrás hozzáadása',
           exportToPng: 'Exportálás PNG-be',
           clone: 'Duplikálás',
-          delete: 'Törlés',
-        },
-        pocketOpenings: {
-          add: 'Dizájn hozzáadása',
           delete: 'Törlés',
         },
         stitchLines: {
@@ -342,14 +338,13 @@ export const HU = {
               label: 'Nyílás',
               tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártya behelyezéséhez.',
             },
-            pocketCount: {
-              label: 'Darabszám',
-              tooltip: 'A zsebcsoportban létrehozott zsebek számát állítja be.',
-            },
             pocketStep: {
               label: 'Zsebek eltolása',
               tooltip: 'Az egymást követő zsebek egymáshoz képesti eltolását állítja be.',
             },
+          },
+          tPocket: {
+            title: 'T-zseb',
             tPocketTabWidth: {
               label: 'Fül szélessége',
               tooltip: 'A T alakú zsebek kártyatartó füleinek szélességét állítja be.',
@@ -360,9 +355,8 @@ export const HU = {
             },
           },
           pocketOpening: {
-            title: 'Zsebnyílások',
-            name: { label: 'Név', tooltip: 'A zsebnyílás azonosítására használt nevet állítja.' },
-            type: { label: 'Forma', tooltip: 'Az ehhez a beállításhoz rendelt zsebek nyílásformáját állítja.' },
+            title: 'Zsebnyílás',
+            type: { label: 'Forma', tooltip: 'A zseb nyílásának formáját állítja.' },
             outerInset: {
               label: 'Külső betolás',
               tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
@@ -385,10 +379,6 @@ export const HU = {
               label: 'Alacsonyabb oldal',
               tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
             },
-          },
-          pocketAssignments: {
-            title: 'Zsebek hozzárendelése',
-            openingMapping: { label: 'Zsebnyílás' },
           },
           cards: {
             title: 'Kártyák',
@@ -763,14 +753,7 @@ export const HU = {
         },
       },
       controls: {
-        pocketOpenings: {
-          assignedPockets: (numbers: readonly number[]): string => `Zsebek: ${numbers.join(', ')}`,
-          unassigned: 'Nincs hozzárendelt zseb',
-        },
-        pocketAssignments: {
-          pocket: (number: number): string => `${number}. zseb`,
-          tPocket: (number: number): string => `${number}. T-zseb`,
-        },
+        pockets: { missingFront: 'A zsebcsoportból hiányzik az elülső zseb.' },
         cardPicker: {
           noCard: 'Nincs',
           landscape: 'Fekvő',
@@ -861,13 +844,14 @@ export const HU = {
     },
   },
   defaultNames: {
-    defaultPocketOpening: 'Alapértelmezett',
     project: 'Projekt',
     rootPanel: 'Modul',
     panel: 'Panel',
     pocketCluster: 'Zsebcsoport',
+    frontPocket: 'Elülső zseb',
+    tPocket: 'T-zseb',
     componentBoundsStitchLine: 'Varrás',
-    pocketClusterStitchLine: 'Zsebvarrás',
+    tPocketStitchLine: 'Zsebvarrás',
     hole: 'Lyuk',
   },
   data: {

@@ -1,6 +1,7 @@
 import type BigNumber from 'bignumber.js'
 import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
 import type {
+  FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketsSchema,
@@ -8,10 +9,11 @@ import type {
   RootPanelSchema,
   SlantedPocketOpeningSchema,
   StraightPocketOpeningSchema,
+  TPocketSchema,
 } from './components'
 import type { HoleSchema } from './hole'
 import type { SeveritySchema } from './issues'
-import type { ComponentBoundsStitchLineSchema, PocketClusterStitchLineSchema } from './stitching'
+import type { ComponentBoundsStitchLineSchema, TPocketStitchLineSchema } from './stitching'
 import type { NumericFieldNameSchema } from './utils'
 
 export type CornerRadiusLimitReasonSchema =
@@ -80,13 +82,18 @@ export type PocketOpeningLimitsSchema =
   | StraightPocketOpeningLimitsSchema
   | RecessedPocketOpeningLimitsSchema
   | SlantedPocketOpeningLimitsSchema
-export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema> & {
-  openings: Record<string, PocketOpeningLimitsSchema>
-}
-export type ComponentLimitsSchema = RootPanelLimitsSchema | PanelLimitsSchema | PocketClusterLimitsSchema
+export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema>
+export type FrontPocketLimitsSchema = NumericLimitsSchema<FrontPocketSchema> & { opening: PocketOpeningLimitsSchema }
+export type TPocketLimitsSchema = NumericLimitsSchema<TPocketSchema> & { opening: PocketOpeningLimitsSchema }
+export type ComponentLimitsSchema =
+  | RootPanelLimitsSchema
+  | PanelLimitsSchema
+  | PocketClusterLimitsSchema
+  | FrontPocketLimitsSchema
+  | TPocketLimitsSchema
 export type ComponentBoundsStitchLineLimitsSchema = NumericLimitsSchema<ComponentBoundsStitchLineSchema>
-export type PocketClusterStitchLineLimitsSchema = NumericLimitsSchema<PocketClusterStitchLineSchema>
-export type StitchLineLimitsSchema = ComponentBoundsStitchLineLimitsSchema | PocketClusterStitchLineLimitsSchema
+export type TPocketStitchLineLimitsSchema = NumericLimitsSchema<TPocketStitchLineSchema>
+export type StitchLineLimitsSchema = ComponentBoundsStitchLineLimitsSchema | TPocketStitchLineLimitsSchema
 export type CornerRadiusLimitsSchema = Partial<
   Record<NumericFieldNameSchema<HasCornerRadiusValuesSchema>, NumericFieldLimitsSchema>
 >

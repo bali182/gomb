@@ -1,6 +1,6 @@
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
-import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
-import type { ComputedComponentSchema, ComputedPocketClusterSchema } from '../../schemas/computed'
+import type { ComponentSchema } from '../../schemas/components'
+import type { ComputedComponentSchema } from '../../schemas/computed'
 import type {
   ExportElementSchema,
   ExportFrontPocketSchema,
@@ -22,224 +22,96 @@ export const getExportElements = (
   computedProject: ComputedProjectSchema,
   settings: ExportSettingsSchema,
 ): ExportElementSchema[] => {
-  const elements = project.subProjects.flatMap((subProject) => {
-    const computedSubProject = computedProject.subProjects.find((candidate) => candidate.id === subProject.id)
-
-    if (!isDefined(computedSubProject)) {
-      throw new Error(`Computed subproject not found: ${subProject.id}`)
+  return project.subProjects.flatMap((subProject) => {
+    const computed = computedProject.subProjects.find((candidate) => candidate.id === subProject.id)
+    if (!isDefined(computed)) {
+      throw new Error('Computed subproject not found')
     }
-
-    return getExportElementsForComponent(
-      subProject,
-      computedSubProject,
-      subProject.root,
-      settings,
-      project.stitchingSettings,
-    )
+    return getExportElementsForComponent(subProject, computed, subProject.root, settings, project.stitchingSettings)
   })
-  return elements
 }
 
 export const getExportElementsForComponent = (
   subProject: SubProjectSchema,
-  computedProject: ComputedSubProjectSchema,
-  componentId: string,
-  settings: ExportSettingsSchema,
-  stitchingSettings: StitchLineCommonConfigSchema,
-): ExportElementSchema[] => {
-  const component = subProject.components[componentId]
-  const computedComponent = computedProject.components[componentId]
-
-  if (!isDefined(component) || !isDefined(computedComponent)) {
-    throw new Error(`Component not found: ${componentId}`)
-  }
-
-  switch (component.type) {
-    case 'root-panel':
-    case 'panel':
-      return getExportPanelElements(
-        subProject,
-        computedProject,
-        component,
-        computedComponent,
-        settings,
-        stitchingSettings,
-      )
-    case 'pocket-cluster':
-      return getExportPocketElements(
-        subProject,
-        computedProject,
-        component,
-        computedComponent,
-        settings,
-        stitchingSettings,
-      )
-  }
-}
-
-const getExportPanelElements = (
-  subProject: SubProjectSchema,
-  computedProject: ComputedSubProjectSchema,
-  component: ComponentSchema,
-  computedComponent: ComputedComponentSchema,
-  settings: ExportSettingsSchema,
-  stitchingSettings: StitchLineCommonConfigSchema,
-): ExportElementSchema[] => {
-  if (
-    (component.type !== 'root-panel' && component.type !== 'panel') ||
-    (computedComponent.type !== 'computed-root-panel' && computedComponent.type !== 'computed-panel')
-  ) {
-    throw new Error(`Expected computed panel: ${component.id}`)
-  }
-
-  const panel = getExportPanel(subProject, computedProject, component.id, settings, stitchingSettings)
-  const children = computedComponent.children.flatMap((child) => {
-    return getExportElementsForComponent(subProject, computedProject, child.componentId, settings, stitchingSettings)
-  })
-
-  return [panel, ...children]
-}
-
-const getExportPanel = (
-  subProject: SubProjectSchema,
   computedSubProject: ComputedSubProjectSchema,
   componentId: string,
   settings: ExportSettingsSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
-): ExportPanelSchema => {
+): ExportElementSchema[] => {
   const component = subProject.components[componentId]
-  const computedComponent = computedSubProject.components[componentId]
-
-  if (
-    !isDefined(component) ||
-    !isDefined(computedComponent) ||
-    (component.type !== 'root-panel' && component.type !== 'panel') ||
-    (computedComponent.type !== 'computed-root-panel' && computedComponent.type !== 'computed-panel')
-  ) {
-    throw new Error(`Expected panel component: ${componentId}`)
+  const computed = computedSubProject.components[componentId]
+  if (!isDefined(component) || !isDefined(computed)) {
+    return []
   }
-
-  const cutHelperBoundingRect = getExportCutHelperBoundingRect(
-    computedComponent.boundingRect,
-    settings.cutHelperDistance,
+  const children = computed.children.flatMap((child) =>
+    getExportElementsForComponent(subProject, computedSubProject, child.componentId, settings, stitchingSettings),
   )
+  if (component.type === 'pocket-cluster') {
+    return children
+  }
+  if (computed.type === 'computed-pocket-cluster') {
+    return []
+  }
+  const element = getExportElement(component, computed, subProject, computedSubProject, settings, stitchingSettings)
+  return [element, ...children]
+}
 
-  return {
+const getExportElement = (
+  component: ComponentSchema,
+  computed: ComputedComponentSchema,
+  subProject: SubProjectSchema,
+  computedSubProject: ComputedSubProjectSchema,
+  settings: ExportSettingsSchema,
+  stitchingSettings: StitchLineCommonConfigSchema,
+): ExportElementSchema => {
+  const rect = getExportCutHelperBoundingRect(computed.boundingRect, settings.cutHelperDistance)
+  const cutHelper = isDefined(rect) ? calculateRectPath(rect, ZERO_CORNER_RADIUS) : undefined
+  const stitchLines = getExportStitchLines(
+    subProject,
+    computedSubProject,
+    computed,
+    settings.stitchLineMode,
+    stitchingSettings,
+  )
+  if (component.type === 'front-pocket' && computed.type === 'computed-front-pocket') {
+    const element: ExportFrontPocketSchema = {
+      type: 'export-front-pocket',
+      id: component.id,
+      subProject,
+      component,
+      pocket: computed,
+      cutHelper,
+      cutHelperBoundingRect: rect,
+      stitchLines,
+    }
+    return element
+  }
+  if (component.type === 't-pocket' && computed.type === 'computed-t-pocket') {
+    const element: ExportTPocketSchema = {
+      type: 'export-t-pocket',
+      id: component.id,
+      subProject,
+      component,
+      pocket: computed,
+      cutHelper,
+      cutHelperBoundingRect: rect,
+      stitchLines,
+    }
+    return element
+  }
+  const element: ExportPanelSchema = {
     type: 'export-panel',
     id: component.id,
     subProject,
     component,
-    boundingRect: computedComponent.boundingRect,
-    ...(isDefined(cutHelperBoundingRect)
-      ? {
-          cutHelper: calculateRectPath(cutHelperBoundingRect, ZERO_CORNER_RADIUS),
-          cutHelperBoundingRect,
-        }
-      : {}),
-    path: computedComponent.path,
+    boundingRect: computed.boundingRect,
+    cutHelper,
+    cutHelperBoundingRect: rect,
+    stitchLines,
+    path: computed.path,
     childMarkerPaths: settings.childMarkers
-      ? getExportChildMarkerPaths(computedComponent.children, computedComponent.boundingRect)
+      ? getExportChildMarkerPaths(computed.children, computed.boundingRect)
       : [],
-    stitchLines: getExportStitchLines(
-      subProject,
-      computedSubProject,
-      computedComponent,
-      settings.stitchLineMode,
-      stitchingSettings,
-    ),
   }
-}
-
-const getExportPocketElements = (
-  subProject: SubProjectSchema,
-  computedSubProject: ComputedSubProjectSchema,
-  component: ComponentSchema,
-  computedComponent: ComputedComponentSchema,
-  settings: ExportSettingsSchema,
-  stitchingSettings: StitchLineCommonConfigSchema,
-): ExportElementSchema[] => {
-  if (component.type !== 'pocket-cluster' || computedComponent.type !== 'computed-pocket-cluster') {
-    throw new Error(`Expected computed pocket cluster: ${component.id}`)
-  }
-
-  const pockets: [ExportFrontPocketSchema, ...ExportTPocketSchema[]] = [
-    getExportFrontPocket(subProject, computedSubProject, component, computedComponent, settings, stitchingSettings),
-    ...computedComponent.tPockets.map((pocket, pocketIndex) =>
-      getExportTPocket(subProject, computedSubProject, component, pocket, pocketIndex, settings, stitchingSettings),
-    ),
-  ]
-  const children = computedComponent.children.flatMap((child) => {
-    return getExportElementsForComponent(subProject, computedSubProject, child.componentId, settings, stitchingSettings)
-  })
-
-  return [...pockets, ...children]
-}
-
-const getExportFrontPocket = (
-  subProject: SubProjectSchema,
-  computedSubProject: ComputedSubProjectSchema,
-  ownerComponent: PocketClusterSchema,
-  computedComponent: ComputedPocketClusterSchema,
-  settings: ExportSettingsSchema,
-  stitchingSettings: StitchLineCommonConfigSchema,
-): ExportFrontPocketSchema => {
-  const cutHelperBoundingRect = getExportCutHelperBoundingRect(
-    computedComponent.frontPocket.boundingRect,
-    settings.cutHelperDistance,
-  )
-
-  return {
-    type: 'export-front-pocket',
-    id: `${ownerComponent.id}--front-pocket`,
-    subProject,
-    ownerComponent,
-    pocket: computedComponent.frontPocket,
-    ...(isDefined(cutHelperBoundingRect)
-      ? {
-          cutHelper: calculateRectPath(cutHelperBoundingRect, ZERO_CORNER_RADIUS),
-          cutHelperBoundingRect,
-        }
-      : {}),
-    stitchLines: getExportStitchLines(
-      subProject,
-      computedSubProject,
-      computedComponent.frontPocket,
-      settings.stitchLineMode,
-      stitchingSettings,
-    ),
-  }
-}
-
-const getExportTPocket = (
-  subProject: SubProjectSchema,
-  computedSubProject: ComputedSubProjectSchema,
-  ownerComponent: PocketClusterSchema,
-  pocket: ComputedPocketClusterSchema['tPockets'][number],
-  pocketIndex: number,
-  settings: ExportSettingsSchema,
-  stitchingSettings: StitchLineCommonConfigSchema,
-): ExportTPocketSchema => {
-  const cutHelperBoundingRect = getExportCutHelperBoundingRect(pocket.boundingRect, settings.cutHelperDistance)
-
-  return {
-    type: 'export-t-pocket',
-    id: `${ownerComponent.id}--t-pocket-${pocketIndex}`,
-    subProject,
-    ownerComponent,
-    pocketIndex,
-    pocket,
-    ...(isDefined(cutHelperBoundingRect)
-      ? {
-          cutHelper: calculateRectPath(cutHelperBoundingRect, ZERO_CORNER_RADIUS),
-          cutHelperBoundingRect,
-        }
-      : {}),
-    stitchLines: getExportStitchLines(
-      subProject,
-      computedSubProject,
-      pocket,
-      settings.stitchLineMode,
-      stitchingSettings,
-    ),
-  }
+  return element
 }

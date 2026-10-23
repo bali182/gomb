@@ -4,13 +4,14 @@ import { OUTER_RADIUS_SEARCH_PRECISION } from '../../constants/layout'
 import type {
   PocketClusterSchema,
   PocketOrientationSchema,
+  PocketSchema,
   RecessedPocketOpeningSchema,
+  TPocketSchema,
 } from '../../schemas/components'
-import type { ComputedTopPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
+import type { ComputedFrontPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
 import type { NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../../schemas/limits'
 import { clamp } from '../../utils/clamp'
-import { isDefined } from '../../utils/isDefined'
-import { getRelevantOpeningPockets, getTPocketTabDepth } from '../pocketUtils'
+import { getTPocketTabDepth } from '../pocketUtils'
 
 /**
  * Preserves the inner offset before adjusting the outer inset.
@@ -20,13 +21,12 @@ import { getRelevantOpeningPockets, getTPocketTabDepth } from '../pocketUtils'
  */
 export const getRecessedPocketOpeningLimits = (
   opening: RecessedPocketOpeningSchema,
+  sourcePocket: PocketSchema,
   pocketCluster: PocketClusterSchema,
-  frontPocket: ComputedTopPocketSchema,
-  tPockets: readonly ComputedTPocketSchema[],
+  computedPocket: ComputedFrontPocketSchema | ComputedTPocketSchema,
 ): RecessedPocketOpeningLimitsSchema => {
-  const pockets = getRelevantOpeningPockets(opening, pocketCluster, frontPocket, tPockets)
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
-  const width = isVertical ? frontPocket.boundingRect.width : frontPocket.boundingRect.height
+  const width = isVertical ? computedPocket.boundingRect.width : computedPocket.boundingRect.height
   const halfWidth = width.dividedBy(2)
   const innerOffsetMaximum: NumericBoundSchema = {
     value: halfWidth,
@@ -44,15 +44,13 @@ export const getRecessedPocketOpeningLimits = (
   }
   adjusted.outerInset = clamp(opening.outerInset, 0, outerInsetMaximum.value).toNumber()
 
-  let depthMaximum: NumericBoundSchema | undefined
-  for (const pocket of pockets) {
-    const maximum =
-      pocket.type === 'computed-top-pocket'
-        ? getFrontPocketDepthMaximum(adjusted, pocket, pocketCluster.orientation)
-        : getTPocketDepthMaximum(adjusted, pocket, pocketCluster)
-    if (!isDefined(depthMaximum) || maximum.value.isLessThan(depthMaximum.value)) {
-      depthMaximum = maximum
-    }
+  let depthMaximum: NumericBoundSchema
+  if (computedPocket.type === 'computed-front-pocket') {
+    depthMaximum = getFrontPocketDepthMaximum(adjusted, computedPocket, pocketCluster.orientation)
+  } else if (sourcePocket.type === 't-pocket') {
+    depthMaximum = getTPocketDepthMaximum(adjusted, computedPocket, pocketCluster, sourcePocket)
+  } else {
+    depthMaximum = { value: new BigNumber(0), reason: 'pocket-opening-boundary', severity: 'warning' }
   }
   const limits: RecessedPocketOpeningLimitsSchema = {
     type: 'recessed',
@@ -62,9 +60,7 @@ export const getRecessedPocketOpeningLimits = (
     },
     depth: { max: depthMaximum },
   }
-  if (isDefined(depthMaximum)) {
-    adjusted.depth = clamp(opening.depth, 0, depthMaximum.value).toNumber()
-  }
+  adjusted.depth = clamp(opening.depth, 0, depthMaximum.value).toNumber()
   if (adjusted.depth === 0) {
     return limits
   }
@@ -73,20 +69,13 @@ export const getRecessedPocketOpeningLimits = (
   limits.innerRadius = { max: innerRadiusMaximum }
   adjusted.innerRadius = clamp(opening.innerRadius, 0, innerRadiusMaximum.value).toNumber()
 
-  let outerRadiusMaximum: NumericBoundSchema | undefined
-  for (const pocket of pockets) {
-    const maximum = getOuterRadiusMaximum(adjusted, pocket, pocketCluster)
-    if (!isDefined(outerRadiusMaximum) || maximum.value.isLessThan(outerRadiusMaximum.value)) {
-      outerRadiusMaximum = maximum
-    }
-  }
-  limits.outerRadius = { max: outerRadiusMaximum }
+  limits.outerRadius = { max: getOuterRadiusMaximum(adjusted, computedPocket, pocketCluster, sourcePocket) }
   return limits
 }
 
 const getFrontPocketDepthMaximum = (
   opening: RecessedPocketOpeningSchema,
-  pocket: ComputedTopPocketSchema,
+  pocket: ComputedFrontPocketSchema,
   orientation: PocketOrientationSchema,
 ): NumericBoundSchema => {
   const isVertical = orientation === 'up' || orientation === 'down'
@@ -132,13 +121,14 @@ const getTPocketDepthMaximum = (
   opening: RecessedPocketOpeningSchema,
   pocket: ComputedTPocketSchema,
   pocketCluster: PocketClusterSchema,
+  sourcePocket: TPocketSchema,
 ): NumericBoundSchema => {
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
   const pocketDepth = isVertical ? pocket.boundingRect.height : pocket.boundingRect.width
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)
-  const tabWidth = new BigNumber(pocketCluster.tPocketTabWidth)
-  const taper = new BigNumber(pocketCluster.tPocketTaper)
+  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth)
+  const taper = new BigNumber(sourcePocket.tPocketTaper)
   const innerCornerX = width.dividedBy(2).minus(opening.innerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
@@ -185,8 +175,9 @@ const getInnerRadiusMaximum = (opening: RecessedPocketOpeningSchema, openingWidt
 
 const getOuterRadiusMaximum = (
   opening: RecessedPocketOpeningSchema,
-  pocket: ComputedTopPocketSchema | ComputedTPocketSchema,
+  pocket: ComputedFrontPocketSchema | ComputedTPocketSchema,
   pocketCluster: PocketClusterSchema,
+  sourcePocket: PocketSchema,
 ): NumericBoundSchema => {
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
@@ -206,14 +197,14 @@ const getOuterRadiusMaximum = (
   }
   upperBound = BigNumber.maximum(upperBound, 0)
   const maximum: NumericBoundSchema = { value: upperBound, reason: 'pocket-opening-width', severity: 'warning' }
-  if (pocket.type === 'computed-top-pocket') {
+  if (pocket.type === 'computed-front-pocket' || sourcePocket.type !== 't-pocket') {
     return maximum
   }
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)
   if (depth.isLessThanOrEqualTo(tabDepth)) {
     return maximum
   }
-  const tabWidth = new BigNumber(pocketCluster.tPocketTabWidth)
+  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth)
   if (
     getOuterTransitionX({ ...opening, outerRadius: upperBound.toNumber() }, width, tabDepth).isGreaterThanOrEqualTo(
       tabWidth,

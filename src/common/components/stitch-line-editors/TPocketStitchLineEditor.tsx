@@ -5,20 +5,20 @@ import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
-import type { PocketClusterStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
+import type { StitchLineCommonConfigSchema, TPocketStitchLineSchema } from '../../schemas/stitching'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketStitchingSection } from './sections/PocketStitchingSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 
-type PocketClusterStitchLineEditorProps = {
-  editable: EditableSchema<PocketClusterStitchLineSchema>
-  issues: IssuesSchema<PocketClusterStitchLineSchema>
-  onChange: (updated: EditableSchema<PocketClusterStitchLineSchema>) => void
+type TPocketStitchLineEditorProps = {
+  editable: EditableSchema<TPocketStitchLineSchema>
+  issues: IssuesSchema<TPocketStitchLineSchema>
+  onChange: (updated: EditableSchema<TPocketStitchLineSchema>) => void
   onReset: (key: keyof StitchLineCommonConfigSchema) => void
-  resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<PocketClusterStitchLineSchema>
+  resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<TPocketStitchLineSchema>
 }
 
-export const PocketClusterStitchLineEditor: FC<PocketClusterStitchLineEditorProps> = ({
+export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
   editable,
   issues,
   onChange,
@@ -40,7 +40,7 @@ export const PocketClusterStitchLineEditor: FC<PocketClusterStitchLineEditorProp
       </Tabs.Content>
       <Tabs.Content value="overrides" pt={0}>
         <SectionGroup.Root>
-          <StitchingSettingsSection<PocketClusterStitchLineSchema>
+          <StitchingSettingsSection<TPocketStitchLineSchema>
             editable={editable}
             issues={issues}
             onChange={onChange}

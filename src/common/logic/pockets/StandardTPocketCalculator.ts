@@ -9,8 +9,11 @@ import { PocketCalculator } from './PocketCalculator'
 /** Openings opting into the conventional horizontal T-pocket shoulders. */
 export abstract class StandardTPocketCalculator<T extends PocketOpeningSchema> extends PocketCalculator<T> {
   getTPocketPath(): PathSchema {
+    if (this.pocket.type !== 't-pocket') {
+      throw new Error('T-pocket path requires a T-pocket')
+    }
     const tabDepth = getTPocketTabDepth(this.pocketCluster, this.pocketRect)
-    const tabWidth = new BigNumber(this.pocketCluster.tPocketTabWidth)
+    const tabWidth = new BigNumber(this.pocket.tPocketTabWidth)
     return this.transformPath({
       commands: [
         ...this.getPocketOpeningPath().commands,

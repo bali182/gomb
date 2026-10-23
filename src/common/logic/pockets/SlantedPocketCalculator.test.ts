@@ -10,8 +10,6 @@ import { getPathSegments } from '../pathSegments'
 import { createPocketCalculator } from './createPocketCalculator'
 
 const opening: SlantedPocketOpeningSchema = {
-  id: 'own:slanted',
-  name: 'Slanted',
   type: 'slanted',
   offset: 15,
   side: 'end',
@@ -33,12 +31,16 @@ describe('SlantedPocketCalculator', () => {
       id: 'cluster',
       orientation: 'up',
       pocketStep: 20,
-      tPocketTabWidth: 10,
-      tPocketTaper: 35,
     })
     const selected = { ...opening, side }
     const snapshot = JSON.stringify({ cluster, selected, rect })
-    const calculator = createPocketCalculator(cluster, selected, rect, ZERO_CORNER_RADIUS)
+    const calculator = createPocketCalculator(
+      d.tPocket({ id: 't', tPocketTabWidth: 10, tPocketTaper: 35 }),
+      cluster,
+      selected,
+      rect,
+      ZERO_CORNER_RADIUS,
+    )
     expect(points(calculator.getPocketOpeningPath())).toEqual(
       side === 'end'
         ? [
@@ -91,16 +93,20 @@ describe('SlantedPocketCalculator', () => {
         id: 'cluster',
         orientation,
         pocketStep: 20,
-        tPocketTabWidth: 10,
-        tPocketTaper: 35,
       })
       const radius = new BigNumber(5)
-      const calculator = createPocketCalculator(cluster, opening, pocketRect, {
-        topLeft: radius,
-        topRight: radius,
-        bottomLeft: radius,
-        bottomRight: radius,
-      })
+      const calculator = createPocketCalculator(
+        d.tPocket({ id: 't', tPocketTabWidth: 10, tPocketTaper: 35 }),
+        cluster,
+        opening,
+        pocketRect,
+        {
+          topLeft: radius,
+          topRight: radius,
+          bottomLeft: radius,
+          bottomRight: radius,
+        },
+      )
       const expected: Record<PocketOrientationSchema, number[][]> = {
         up: [
           [11, 17],
@@ -139,8 +145,9 @@ describe('SlantedPocketCalculator', () => {
   )
 
   it('keeps zero-width and zero-offset corrected openings finite', () => {
-    const cluster = d.pocketCluster({ id: 'cluster', pocketStep: 0, tPocketTabWidth: 0, tPocketTaper: 0 })
+    const cluster = d.pocketCluster({ id: 'cluster', pocketStep: 0 })
     const calculator = createPocketCalculator(
+      d.tPocket({ id: 't', tPocketTabWidth: 0, tPocketTaper: 0 }),
       cluster,
       { ...opening, offset: 0 },
       { ...rect, width: new BigNumber(0) },

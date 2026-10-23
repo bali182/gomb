@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import { ComputedStitchHoleSchema } from '../../schemas/computed'
 import type { LineSchema } from '../../schemas/geometry'
-import type { ResolvedPocketClusterStitchLineSchema } from '../../schemas/stitching'
+import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import { getStitchHoleLine } from './getStitchHoleLine'
 import {
@@ -13,7 +13,7 @@ import {
 } from './stitchHoleGeometry'
 
 export const calculateTPocketStitchHoles = (
-  stitchLine: ResolvedPocketClusterStitchLineSchema,
+  stitchLine: ResolvedTPocketStitchLineSchema,
   line: LineSchema,
 ): ComputedStitchHoleSchema[] => {
   const stitchHoleDistance = new BigNumber(stitchLine.stitchHoleDistance)

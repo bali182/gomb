@@ -1,6 +1,6 @@
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
-import type { PocketClusterStitchLineSchema, StitchDirectionSchema } from '../schemas/stitching'
+import type { StitchDirectionSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
@@ -13,11 +13,11 @@ const stitchDirectionValues: Record<StitchDirectionSchema, boolean> = {
   'start-to-end': true,
 }
 
-export const validatePocketClusterStitchLineSchema = (
-  input: EditableSchema<PocketClusterStitchLineSchema>,
-  currentValue: PocketClusterStitchLineSchema,
+export const validateTPocketStitchLineSchema = (
+  input: EditableSchema<TPocketStitchLineSchema>,
+  currentValue: TPocketStitchLineSchema,
   context: ComponentBasedValidationContextSchema,
-): ValidationResultSchema<PocketClusterStitchLineSchema> => {
+): ValidationResultSchema<TPocketStitchLineSchema> => {
   const nameResult = validateName(input.name, currentValue.name, input.id, context.subProject.stitchLines, context)
   const commonConfigResult = validateStitchLineCommonConfigOverridesSchema(input, currentValue, context)
   const startOffsetResult = validateNumber(input.startOffset, currentValue.startOffset, context)
@@ -29,7 +29,7 @@ export const validatePocketClusterStitchLineSchema = (
     context,
   )
 
-  const issues: IssuesSchema<PocketClusterStitchLineSchema> = {
+  const issues: IssuesSchema<TPocketStitchLineSchema> = {
     targetId: undefined,
     targetType: undefined,
     endOffset: endOffsetResult.issues,
@@ -45,7 +45,7 @@ export const validatePocketClusterStitchLineSchema = (
     type: undefined,
   }
 
-  const committedValue: PocketClusterStitchLineSchema = {
+  const committedValue: TPocketStitchLineSchema = {
     ...commonConfigResult.committedValue,
     targetType: currentValue.targetType,
     targetId: input.targetId,

@@ -2,6 +2,7 @@ import type { HasComponentTargetSchema, HasHoleTargetSchema } from '../../schema
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
+import { getComponentStitchLineType } from './utils/componentRules'
 
 export type MoveStitchLineToComponentParams = HasComponentTargetSchema & {
   stitchLineId: string
@@ -33,7 +34,7 @@ export const moveStitchLine = (subProject: SubProjectSchema, params: MoveStitchL
       if (!isDefined(targetComponent)) {
         return subProject
       }
-      if (stitchLine.type === 'pocket-cluster-stitch-line' && targetComponent.type !== 'pocket-cluster') {
+      if (getComponentStitchLineType(targetComponent) !== stitchLine.type) {
         return subProject
       }
       return updateStitchLine(subProject, { ...stitchLine, targetType: params.targetType, targetId: params.targetId })

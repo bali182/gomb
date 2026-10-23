@@ -17,15 +17,6 @@ export const applyHolePathsToComputedComponents = (
     }
 
     component.path = subtractClosedPaths(component.path, holePaths)
-
-    if (component.type !== 'computed-pocket-cluster') {
-      return
-    }
-
-    component.frontPocket.path = subtractClosedPaths(component.frontPocket.path, holePaths)
-    component.tPockets.forEach((pocket) => {
-      pocket.path = subtractClosedPaths(pocket.path, holePaths)
-    })
   })
 }
 

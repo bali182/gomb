@@ -1,12 +1,12 @@
 import type { TranslationSchema } from '../translations/translationSchema'
-import type { PanelSchema, PocketClusterSchema, RootPanelSchema } from './components'
+import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema, TPocketSchema } from './components'
 import type { HoleSchema } from './hole'
 import type { ProjectSchema } from './project'
 import type { ColorSettingsSchema, GlobalSettingsSchema } from './settings'
 import type {
   ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
   StitchLineCommonConfigSchema,
+  TPocketStitchLineSchema,
 } from './stitching'
 import type { SubProjectSchema } from './subProject'
 
@@ -55,13 +55,21 @@ export type ProjectMigratorSchema = {
     input: DeepPartialSchema<PocketClusterSchema>,
     context: ProjectMigrationContextSchema,
   ) => DeepPartialSchema<PocketClusterSchema>
+  frontPocket: (
+    input: DeepPartialSchema<FrontPocketSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<FrontPocketSchema>
+  tPocket: (
+    input: DeepPartialSchema<TPocketSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<TPocketSchema>
   hole: (input: DeepPartialSchema<HoleSchema>, context: ProjectMigrationContextSchema) => DeepPartialSchema<HoleSchema>
   componentBoundsStitchLine: (
     input: DeepPartialSchema<ComponentBoundsStitchLineSchema>,
     context: ProjectMigrationContextSchema,
   ) => DeepPartialSchema<ComponentBoundsStitchLineSchema>
-  pocketClusterStitchLine: (
-    input: DeepPartialSchema<PocketClusterStitchLineSchema>,
+  tPocketStitchLine: (
+    input: DeepPartialSchema<TPocketStitchLineSchema>,
     context: ProjectMigrationContextSchema,
-  ) => DeepPartialSchema<PocketClusterStitchLineSchema>
+  ) => DeepPartialSchema<TPocketStitchLineSchema>
 }

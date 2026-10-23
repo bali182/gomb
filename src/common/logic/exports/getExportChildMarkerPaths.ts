@@ -10,15 +10,11 @@ export const getExportChildMarkerPaths = (
   parentBoundingRect: RectSchema,
 ): PathSchema[] => {
   const parentMarkerLines = getBoundingRectMarkerLines(parentBoundingRect)
-  const boundingRects = children.flatMap((child) => {
-    switch (child.type) {
-      case 'computed-root-panel':
-      case 'computed-panel':
-        return [child.boundingRect]
-      case 'computed-pocket-cluster':
-        return [child.frontPocket.boundingRect, ...child.tPockets.map((pocket) => pocket.boundingRect)]
-    }
-  })
+  const boundingRects = children.flatMap((child) =>
+    child.type === 'computed-pocket-cluster'
+      ? child.children.map((pocket) => pocket.boundingRect)
+      : [child.boundingRect],
+  )
 
   const markerLines = boundingRects.flatMap((boundingRect) => {
     return getBoundingRectMarkerLines(boundingRect).filter(

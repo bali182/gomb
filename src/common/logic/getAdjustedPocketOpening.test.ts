@@ -6,8 +6,6 @@ import type { RecessedPocketOpeningLimitsSchema } from '../schemas/limits'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 
 const opening: RecessedPocketOpeningSchema = {
-  id: 'own:test',
-  name: 'Test',
   type: 'recessed',
   outerInset: 5,
   innerOffset: 25,
@@ -29,8 +27,6 @@ const limits: RecessedPocketOpeningLimitsSchema = {
 describe('getAdjustedPocketOpening', () => {
   it('applies the supplied bounds and preserves unconstrained fields', () => {
     expect(getAdjustedPocketOpening(opening, limits)).toEqual({
-      id: 'own:test',
-      name: 'Test',
       type: 'recessed',
       outerInset: 10,
       innerOffset: 20,
@@ -39,8 +35,6 @@ describe('getAdjustedPocketOpening', () => {
       innerRadius: 15,
     })
     expect(opening).toEqual({
-      id: 'own:test',
-      name: 'Test',
       type: 'recessed',
       outerInset: 5,
       innerOffset: 25,
@@ -52,8 +46,6 @@ describe('getAdjustedPocketOpening', () => {
 
   it('applies the outer inset maximum without changing the inner radius', () => {
     expect(getAdjustedPocketOpening({ ...opening, outerInset: 90 }, limits)).toEqual({
-      id: 'own:test',
-      name: 'Test',
       type: 'recessed',
       outerInset: 30,
       innerOffset: 20,
@@ -65,8 +57,6 @@ describe('getAdjustedPocketOpening', () => {
 
   it('keeps values that already satisfy their bounds', () => {
     const requested: RecessedPocketOpeningSchema = {
-      id: 'own:test',
-      name: 'Test',
       type: 'recessed',
       outerInset: 20,
       innerOffset: 15,
@@ -78,7 +68,7 @@ describe('getAdjustedPocketOpening', () => {
   })
 
   it('returns straight openings unchanged', () => {
-    const straight = { id: 'own:straight', name: 'Straight', type: 'straight' } as const
+    const straight = { type: 'straight' } as const
     expect(getAdjustedPocketOpening(straight, { type: 'straight' })).toBe(straight)
   })
 
@@ -88,8 +78,6 @@ describe('getAdjustedPocketOpening', () => {
 
   it('bounds the slanted offset while preserving side, identity and source values', () => {
     const slanted: SlantedPocketOpeningSchema = {
-      id: 'own:slanted',
-      name: 'Slanted',
       type: 'slanted',
       offset: 90,
       side: 'start',

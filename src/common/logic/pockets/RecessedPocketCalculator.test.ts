@@ -18,8 +18,6 @@ const rect: RectSchema = {
 }
 
 const createOpening = (overrides: Partial<RecessedPocketOpeningSchema> = {}): RecessedPocketOpeningSchema => ({
-  id: 'own:test',
-  name: 'Test',
   type: 'recessed',
   outerInset: 29,
   innerOffset: 15,
@@ -35,6 +33,7 @@ const createOpeningPath = (
   orientation: PocketOrientationSchema,
 ): PathSchema =>
   new RecessedPocketCalculator(
+    d.frontPocket({ id: 'front' }),
     d.pocketCluster({ id: 'cluster', orientation }),
     opening,
     pocketRect,
@@ -259,6 +258,7 @@ describe.each<OrientationTestCase>([
 ])('recessed opening facing $orientation', ({ orientation, width, height, start, end, bottom, innerCenter }) => {
   it('rotates and translates the opening without changing its radii or joins', () => {
     const calculator = new RecessedPocketCalculator(
+      d.frontPocket({ id: 'front' }),
       d.pocketCluster({ id: 'cluster', orientation }),
       createOpening({ outerInset: 35, depth: 15, outerRadius: 5, innerRadius: 15 }),
       { x: new BigNumber(11), y: new BigNumber(17), width: new BigNumber(width), height: new BigNumber(height) },

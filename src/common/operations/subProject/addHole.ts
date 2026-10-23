@@ -6,6 +6,10 @@ export type AddHoleParams = {
 }
 
 export const addHole = (subProject: SubProjectSchema, params: AddHoleParams): SubProjectSchema => {
+  const component = subProject.components[params.hole.componentId]
+  if (component?.type === 'pocket-cluster') {
+    return subProject
+  }
   return {
     ...subProject,
     holes: [...subProject.holes, params.hole],

@@ -244,8 +244,6 @@ describe('closed path boolean operations', () => {
       const corner = new BigNumber(0)
       const corners = { topLeft: corner, topRight: corner, bottomLeft: corner, bottomRight: corner }
       const opening: RecessedPocketOpeningSchema = {
-        id: 'own:test',
-        name: 'Test',
         type: 'recessed',
         outerInset: 35,
         innerOffset: 15,
@@ -255,12 +253,14 @@ describe('closed path boolean operations', () => {
       }
       const cluster = d.pocketCluster({ id: 'cluster', orientation: 'up' })
       const first = createPocketCalculator(
+        d.frontPocket({ id: 'front' }),
         cluster,
         opening,
         { x: corner, y: corner, width: new BigNumber(100), height: new BigNumber(100) },
         corners,
       ).getFrontPocketPath()
       const second = createPocketCalculator(
+        d.frontPocket({ id: 'front' }),
         cluster,
         { ...opening, depth: 15 - shift },
         { x: corner, y: new BigNumber(shift), width: new BigNumber(100), height: new BigNumber(100 - shift) },

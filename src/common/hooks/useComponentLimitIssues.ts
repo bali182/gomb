@@ -16,6 +16,18 @@ export const useComponentLimitIssues = (component: ComponentSchema): IssuesSchem
     if (!isDefined(limits) || limits.type !== component.type) {
       return noIssues<ComponentSchema>()
     }
+    if (component.type === 'front-pocket' && limits.type === 'front-pocket') {
+      return {
+        ...getLimitIssues(component, limits, translation),
+        opening: getLimitIssues(component.opening, limits.opening, translation),
+      }
+    }
+    if (component.type === 't-pocket' && limits.type === 't-pocket') {
+      return {
+        ...getLimitIssues(component, limits, translation),
+        opening: getLimitIssues(component.opening, limits.opening, translation),
+      }
+    }
     return getLimitIssues(component, limits, translation)
   }, [component, limits, translation])
 }

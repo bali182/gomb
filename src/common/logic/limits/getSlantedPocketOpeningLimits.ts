@@ -1,48 +1,43 @@
 import BigNumber from 'bignumber.js'
-
-import type { PocketClusterSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
-import type { ComputedTopPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
+import { ZERO } from '../../constants/layout'
+import type { PocketClusterSchema, PocketSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
+import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { SlantedPocketOpeningLimitsSchema } from '../../schemas/limits'
-import { getRelevantOpeningPockets, getTPocketTabDepth } from '../pocketUtils'
+import { getTPocketTabDepth } from '../pocketUtils'
 
 export const getSlantedPocketOpeningLimits = (
   opening: SlantedPocketOpeningSchema,
-  pocketCluster: PocketClusterSchema,
-  frontPocket: ComputedTopPocketSchema,
-  tPockets: readonly ComputedTPocketSchema[],
+  pocket: PocketSchema,
+  cluster: PocketClusterSchema,
+  computed: ComputedPocketSchema,
 ): SlantedPocketOpeningLimitsSchema => {
-  const pockets = getRelevantOpeningPockets(opening, pocketCluster, frontPocket, tPockets)
-  const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
-  const width = isVertical ? frontPocket.boundingRect.width : frontPocket.boundingRect.height
-  const maximum = width.isZero()
-    ? new BigNumber(0)
-    : BigNumber.maximum(
-        BigNumber.minimum(
-          ...pockets.map((pocket): BigNumber => {
-            const depth = isVertical ? pocket.boundingRect.height : pocket.boundingRect.width
-            if (pocket.type === 'computed-t-pocket') {
-              return depth.minus(getTPocketTabDepth(pocketCluster, pocket.boundingRect))
-            }
-            return depth.minus(getClosedCornerRadius(opening, pocketCluster, pocket))
-          }),
-        ),
-        0,
-      )
+  const vertical = cluster.orientation === 'up' || cluster.orientation === 'down'
+  const depth = vertical ? computed.boundingRect.height : computed.boundingRect.width
+  const width = vertical ? computed.boundingRect.width : computed.boundingRect.height
+  const reserved = getReservedDepth(opening, pocket, cluster, computed)
   return {
-    type: 'slanted',
+    type: opening.type,
     offset: {
-      max: { value: maximum, reason: 'slanted-pocket-opening-offset-exceeds-pocket', severity: 'warning' },
+      max: {
+        value: width.isZero() ? ZERO : BigNumber.maximum(depth.minus(reserved), 0),
+        reason: 'slanted-pocket-opening-offset-exceeds-pocket',
+        severity: 'warning',
+      },
     },
   }
 }
 
-const getClosedCornerRadius = (
+const getReservedDepth = (
   opening: SlantedPocketOpeningSchema,
-  pocketCluster: PocketClusterSchema,
-  pocket: ComputedTopPocketSchema,
+  pocket: PocketSchema,
+  cluster: PocketClusterSchema,
+  computed: ComputedPocketSchema,
 ): BigNumber => {
-  const radius = pocket.cornerRadius
-  switch (pocketCluster.orientation) {
+  if (pocket.type === 't-pocket') {
+    return getTPocketTabDepth(cluster, computed.boundingRect)
+  }
+  const radius = computed.cornerRadius
+  switch (cluster.orientation) {
     case 'up':
       return opening.side === 'start' ? radius.bottomLeft : radius.bottomRight
     case 'right':

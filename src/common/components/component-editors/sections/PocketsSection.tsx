@@ -32,41 +32,11 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
     [editable, onChange],
   )
 
-  const handlePocketCountChange = useCallback(
-    (pocketCount: string) => {
-      onChange({
-        ...editable,
-        pocketCount,
-      })
-    },
-    [editable, onChange],
-  )
-
   const handlePocketStepChange = useCallback(
     (pocketStep: string) => {
       onChange({
         ...editable,
         pocketStep,
-      })
-    },
-    [editable, onChange],
-  )
-
-  const handleTPocketTabWidthChange = useCallback(
-    (tPocketTabWidth: string) => {
-      onChange({
-        ...editable,
-        tPocketTabWidth,
-      })
-    },
-    [editable, onChange],
-  )
-
-  const handleTPocketTaperChange = useCallback(
-    (tPocketTaper: string) => {
-      onChange({
-        ...editable,
-        tPocketTaper,
       })
     },
     [editable, onChange],
@@ -100,19 +70,6 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketCount.tooltip}>
-        {t.project.editors.sections.components.pockets.pocketCount.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.pocketCount}>
-        <NumberInput
-          issue={issues.pocketCount}
-          onChange={handlePocketCountChange}
-          step={1}
-          unit="db"
-          value={editable.pocketCount}
-        />
-      </SectionGroup.SectionRowEditor>
-
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketStep.tooltip}>
         {t.project.editors.sections.components.pockets.pocketStep.label}
       </SectionGroup.SectionRowTitle>
@@ -122,30 +79,6 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
           onChange={handlePocketStepChange}
           unit="mm"
           value={editable.pocketStep}
-        />
-      </SectionGroup.SectionRowEditor>
-
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.tPocketTabWidth.tooltip}>
-        {t.project.editors.sections.components.pockets.tPocketTabWidth.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
-        <NumberInput
-          issue={issues.tPocketTabWidth}
-          onChange={handleTPocketTabWidthChange}
-          unit="mm"
-          value={editable.tPocketTabWidth}
-        />
-      </SectionGroup.SectionRowEditor>
-
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.tPocketTaper.tooltip}>
-        {t.project.editors.sections.components.pockets.tPocketTaper.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
-        <NumberInput
-          issue={issues.tPocketTaper}
-          onChange={handleTPocketTaperChange}
-          unit="mm"
-          value={editable.tPocketTaper}
         />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>

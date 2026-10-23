@@ -69,7 +69,11 @@ const findNestingLevel = (
     return level
   }
   for (const child of component.children) {
-    const childLevel = findNestingLevel(child, componentId, level + 1)
+    const childLevel = findNestingLevel(
+      child,
+      componentId,
+      component.type === 'computed-pocket-cluster' ? level : level + 1,
+    )
     if (isDefined(childLevel)) {
       return childLevel
     }
@@ -96,14 +100,27 @@ const getComponentBoundingRects = (
   const boundingRects = [padBoundingRect(component.boundingRect, borderPadding)]
 
   if (component.type === 'computed-pocket-cluster' && model.type === 'pocket-cluster') {
-    for (const pocket of [...component.tPockets, component.frontPocket]) {
+    for (const pocket of component.children) {
       boundingRects.push(padBoundingRect(pocket.boundingRect, borderPadding))
       if (context.isShowingCards && isDefined(pocket.card)) {
+        const owner = accessors.subProject(subProject).pocket(pocket.componentId)
         boundingRects.push(
-          padBoundingRect(pocket.card.boundingRect, (context.cardStyles.getStrokeThickness({ owner: model }) ?? 0) / 2),
+          padBoundingRect(pocket.card.boundingRect, (context.cardStyles.getStrokeThickness({ owner }) ?? 0) / 2),
         )
       }
     }
+  }
+  if (
+    (component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket') &&
+    model.type !== 'pocket-cluster' &&
+    model.type !== 'panel' &&
+    model.type !== 'root-panel' &&
+    context.isShowingCards &&
+    isDefined(component.card)
+  ) {
+    boundingRects.push(
+      padBoundingRect(component.card.boundingRect, (context.cardStyles.getStrokeThickness({ owner: model }) ?? 0) / 2),
+    )
   }
   return boundingRects
 }
@@ -152,7 +169,14 @@ const collectBoundingRects = (
 ): RectSchema[] => [
   ...getComponentBoundingRects(component, nestingLevel, params),
   ...getStitchLineBoundingRects(computedSubProject.stitchLines[component.componentId] ?? [], params),
-  ...component.children.flatMap((child) => collectBoundingRects(child, nestingLevel + 1, computedSubProject, params)),
+  ...component.children.flatMap((child) =>
+    collectBoundingRects(
+      child,
+      component.type === 'computed-pocket-cluster' ? nestingLevel : nestingLevel + 1,
+      computedSubProject,
+      params,
+    ),
+  ),
 ]
 
 const getBoundingRectUnion = (rects: readonly RectSchema[]): RectSchema => {

@@ -22,7 +22,9 @@ export const calculatePocketBoundingBox = (
     case 'down':
       return {
         x: rect.x,
-        y: rect.y.plus(new BigNumber(pocketCluster.pocketCount).minus(1).minus(index).times(pocketCluster.pocketStep)),
+        y: rect.y.plus(
+          new BigNumber(pocketCluster.children.length).minus(1).minus(index).times(pocketCluster.pocketStep),
+        ),
         width: rect.width,
         height: pocketDepth,
       }
@@ -35,7 +37,9 @@ export const calculatePocketBoundingBox = (
       }
     case 'right':
       return {
-        x: rect.x.plus(new BigNumber(pocketCluster.pocketCount).minus(1).minus(index).times(pocketCluster.pocketStep)),
+        x: rect.x.plus(
+          new BigNumber(pocketCluster.children.length).minus(1).minus(index).times(pocketCluster.pocketStep),
+        ),
         y: rect.y,
         width: pocketDepth,
         height: rect.height,

@@ -1,26 +1,32 @@
 import type { HasTypeSchema } from '../schemas/common'
-import type { ComponentSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  ComponentSchema,
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from '../schemas/components'
 import type {
   ComputedComponentSchema,
+  ComputedFrontPocketSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedRootPanelSchema,
+  ComputedTPocketSchema,
 } from '../schemas/computed'
 import type { HoleSchema } from '../schemas/hole'
 import type { IssueSchema } from '../schemas/issues'
 import type { ModelObjectSchema } from '../schemas/modelObject'
-import type {
-  ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
-  StitchLineSchema,
-} from '../schemas/stitching'
+import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
     // Component
     component: (input: ModelObjectSchema): input is ComponentSchema => {
-      return hasType(input, 'root-panel') || hasType(input, 'panel') || hasType(input, 'pocket-cluster')
+      return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')
     },
     rootPanel: (input: ModelObjectSchema): input is RootPanelSchema => {
       return hasType(input, 'root-panel')
@@ -30,6 +36,15 @@ export const narrowers = {
     },
     pocketCluster: (input: ModelObjectSchema): input is PocketClusterSchema => {
       return hasType(input, 'pocket-cluster')
+    },
+    pocket: (input: ModelObjectSchema): input is PocketSchema => {
+      return hasOneOfType(input, 'front-pocket', 't-pocket')
+    },
+    frontPocket: (input: ModelObjectSchema): input is FrontPocketSchema => {
+      return hasType(input, 'front-pocket')
+    },
+    tPocket: (input: ModelObjectSchema): input is TPocketSchema => {
+      return hasType(input, 't-pocket')
     },
     // Computed component
     computedRootPanel: (input: ComputedComponentSchema): input is ComputedRootPanelSchema => {
@@ -41,15 +56,21 @@ export const narrowers = {
     computedPocketCluster: (input: ComputedComponentSchema): input is ComputedPocketClusterSchema => {
       return hasType(input, 'computed-pocket-cluster')
     },
+    computedFrontPocket: (input: ComputedComponentSchema): input is ComputedFrontPocketSchema => {
+      return hasType(input, 'computed-front-pocket')
+    },
+    computedTPocket: (input: ComputedComponentSchema): input is ComputedTPocketSchema => {
+      return hasType(input, 'computed-t-pocket')
+    },
     // Stitch line
     stitchLine: (input: ModelObjectSchema): input is StitchLineSchema => {
-      return hasType(input, 'component-bounds-stitch-line') || hasType(input, 'pocket-cluster-stitch-line')
+      return hasOneOfType(input, 'component-bounds-stitch-line', 't-pocket-stitch-line')
     },
     componentBoundsStitchLine: (input: ModelObjectSchema): input is ComponentBoundsStitchLineSchema => {
       return hasType(input, 'component-bounds-stitch-line')
     },
-    pocketClusterStitchLine: (input: ModelObjectSchema): input is PocketClusterStitchLineSchema => {
-      return hasType(input, 'pocket-cluster-stitch-line')
+    tPocketStitchLine: (input: ModelObjectSchema): input is TPocketStitchLineSchema => {
+      return hasType(input, 't-pocket-stitch-line')
     },
     // Hole
     hole: (input: ModelObjectSchema): input is HoleSchema => {
@@ -75,6 +96,15 @@ export const narrowers = {
     pocketCluster: (input: ModelObjectSchema): PocketClusterSchema => {
       return assertType(input, 'pocket-cluster')
     },
+    pocket: (input: ModelObjectSchema): PocketSchema => {
+      return assertOneOf(input, 'front-pocket', 't-pocket')
+    },
+    frontPocket: (input: ModelObjectSchema): FrontPocketSchema => {
+      return assertType(input, 'front-pocket')
+    },
+    tPocket: (input: ModelObjectSchema): TPocketSchema => {
+      return assertType(input, 't-pocket')
+    },
     // Computed component
     computedRootPanel: (input: ComputedComponentSchema): ComputedRootPanelSchema => {
       return assertType(input, 'computed-root-panel')
@@ -85,12 +115,18 @@ export const narrowers = {
     computedPocketCluster: (input: ComputedComponentSchema): ComputedPocketClusterSchema => {
       return assertType(input, 'computed-pocket-cluster')
     },
+    computedFrontPocket: (input: ComputedComponentSchema): ComputedFrontPocketSchema => {
+      return assertType(input, 'computed-front-pocket')
+    },
+    computedTPocket: (input: ComputedComponentSchema): ComputedTPocketSchema => {
+      return assertType(input, 'computed-t-pocket')
+    },
     // Stitch line
     componentBoundsStitchLine: (input: ModelObjectSchema): ComponentBoundsStitchLineSchema => {
       return assertType(input, 'component-bounds-stitch-line')
     },
-    pocketClusterStitchLine: (input: ModelObjectSchema): PocketClusterStitchLineSchema => {
-      return assertType(input, 'pocket-cluster-stitch-line')
+    tPocketStitchLine: (input: ModelObjectSchema): TPocketStitchLineSchema => {
+      return assertType(input, 't-pocket-stitch-line')
     },
   },
 }
@@ -107,7 +143,24 @@ const assertType = <Data, CurrentType extends string, ExpectedType extends Curre
   expectedType: ExpectedType,
 ): Data & HasTypeSchema<ExpectedType> => {
   if (!hasType(input, expectedType)) {
-    throw new Error(`Excpected type='${expectedType}', but was '${input.type}'.`)
+    throw new Error(`Expected type='${expectedType}', but was '${input.type}'.`)
+  }
+  return input
+}
+
+const hasOneOfType = <Data, CurrentType extends string, ExpectedTypes extends readonly [CurrentType, ...CurrentType[]]>(
+  input: Data & HasTypeSchema<CurrentType>,
+  ...expectedTypes: ExpectedTypes
+): input is Data & HasTypeSchema<ExpectedTypes[number]> => {
+  return expectedTypes.some((expectedType) => input.type === expectedType)
+}
+
+const assertOneOf = <Data, CurrentType extends string, ExpectedTypes extends readonly [CurrentType, ...CurrentType[]]>(
+  input: Data & HasTypeSchema<CurrentType>,
+  ...expectedTypes: ExpectedTypes
+): Data & HasTypeSchema<ExpectedTypes[number]> => {
+  if (!hasOneOfType(input, ...expectedTypes)) {
+    throw new Error(`Expected type to be one of '${expectedTypes.join("', '")}', but was '${input.type}'.`)
   }
   return input
 }

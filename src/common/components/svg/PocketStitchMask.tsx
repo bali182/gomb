@@ -10,6 +10,7 @@ import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaCardStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 
 type PocketStitchMaskProps = {
@@ -22,20 +23,17 @@ export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, n
   const { cardStyles, componentStyles } = useDrawAreaContext()
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
   const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
-  const { computedSubProject } = useSubProject()
+  const { subProject, computedSubProject } = useSubProject()
+  const source = accessors.subProject(subProject)
   const x = computedSubProject.viewBox.x.minus(VIEWBOX_PADDING).toNumber()
   const y = computedSubProject.viewBox.y.minus(VIEWBOX_PADDING).toNumber()
   const width = computedSubProject.viewBox.width.plus(VIEWBOX_PADDING * 2).toNumber()
   const height = computedSubProject.viewBox.height.plus(VIEWBOX_PADDING * 2).toNumber()
-  const cardStyleParams: DrawAreaCardStyleParams = { owner: pocketCluster }
   const componentStyleParams: DrawAreaComponentStyleParams = { component: pocketCluster, nestingLevel }
-  const cardFill = cardStyles.getMaskFillColor(cardStyleParams)
-  const cardStroke = cardStyles.getMaskStrokeColor(cardStyleParams)
-  const cardStrokeWidth = cardStyles.getStrokeThickness(cardStyleParams)
   const pocketFill = componentStyles.getMaskFillColor(componentStyleParams)
   const pocketStroke = componentStyles.getMaskStrokeColor(componentStyleParams)
   const pocketStrokeWidth = componentStyles.getBorderThickness(componentStyleParams)
-  const pockets = [...computedPocketCluster.tPockets, computedPocketCluster.frontPocket]
+  const pockets = computedPocketCluster.children
 
   return (
     <mask
@@ -49,24 +47,29 @@ export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, n
       style={{ maskType: 'luminance' }}
     >
       <rect x={x} y={y} width={width} height={height} fill="white" />
-      {pockets.map((pocket) => (
-        <Fragment key={pocket.id}>
-          {isDefined(pocket.card) && (
+      {pockets.map((pocket) => {
+        const cardStyleParams: DrawAreaCardStyleParams = {
+          owner: source.pocket(pocket.componentId),
+        }
+        return (
+          <Fragment key={pocket.componentId}>
+            {isDefined(pocket.card) && (
+              <PocketStitchMaskPath
+                path={pocket.card.path}
+                fill={cardStyles.getMaskFillColor(cardStyleParams)}
+                stroke={cardStyles.getMaskStrokeColor(cardStyleParams)}
+                strokeWidth={cardStyles.getStrokeThickness(cardStyleParams)}
+              />
+            )}
             <PocketStitchMaskPath
-              path={pocket.card.path}
-              fill={cardFill}
-              stroke={cardStroke}
-              strokeWidth={cardStrokeWidth}
+              path={pocket.path}
+              fill={pocketFill}
+              stroke={pocketStroke}
+              strokeWidth={pocketStrokeWidth}
             />
-          )}
-          <PocketStitchMaskPath
-            path={pocket.path}
-            fill={pocketFill}
-            stroke={pocketStroke}
-            strokeWidth={pocketStrokeWidth}
-          />
-        </Fragment>
-      ))}
+          </Fragment>
+        )
+      })}
     </mask>
   )
 }

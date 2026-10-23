@@ -1,22 +1,26 @@
 import {
   defaultColorSettings,
   defaultComponentBoundsStitchLine,
+  defaultFrontPocket,
   defaultHole,
   defaultPanel,
   defaultPocketCluster,
-  defaultPocketClusterStitchLine,
   defaultRecessedPocketOpening,
   defaultRootPanel,
   defaultSlantedPocketOpening,
   defaultStitchingSettings,
+  defaultTPocket,
+  defaultTPocketStitchLine,
 } from '../defaultStates'
 import type {
+  FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   RootPanelSchema,
   SlantedPocketOpeningSchema,
+  TPocketSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectMigratorSchema } from '../schemas/migration'
@@ -24,8 +28,8 @@ import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
   ComponentBoundsStitchLineSchema,
-  PocketClusterStitchLineSchema,
   StitchLineCommonConfigSchema,
+  TPocketStitchLineSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import type { DeepPartialSchema } from '../schemas/utils'
@@ -77,38 +81,16 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
 
     return m.applyDefaults<PanelSchema>(panel, defaultPanel)
   },
-  pocketCluster: (input, { t }) => {
-    const pocketCluster = m.requireObject<PocketClusterSchema>(input)
-    m.requireString(pocketCluster, 'id')
-    m.requireString(pocketCluster, 'name')
-    m.requireValue(pocketCluster, 'type', 'pocket-cluster')
-
-    const defaultOpeningDefaults: PocketOpeningSchema = {
-      ...defaultPocketCluster.defaultOpening,
-      name: t.defaultNames.defaultPocketOpening,
-    }
-    const migrated = m.applyDefaults<PocketClusterSchema>(pocketCluster, {
-      ...defaultPocketCluster,
-      defaultOpening: defaultOpeningDefaults,
-    })
-    const defaultOpening = m.applyDefaults<PocketOpeningSchema>(
-      m.requireObjectField<PocketClusterSchema, PocketOpeningSchema>(migrated, 'defaultOpening'),
-      defaultOpeningDefaults,
-    )
-    m.requireValue(defaultOpening, 'id', 'own:default')
-    migrated.defaultOpening = migratePocketOpening(defaultOpening)
-    migrated.openings = m
-      .requireArray<PocketClusterSchema, PocketOpeningSchema>(migrated, 'openings')
-      .map(migratePocketOpening)
-    const mapping = m.requireObjectField<PocketClusterSchema, PocketClusterSchema['openingMapping']>(
-      migrated,
-      'openingMapping',
-    )
-    for (const key of Object.keys(mapping)) {
-      m.requireString(mapping, Number(key))
-    }
-
-    return migrated
+  pocketCluster: (input) => m.applyDefaults<PocketClusterSchema>(m.requireObject(input), defaultPocketCluster),
+  frontPocket: (input) => {
+    const pocket = m.applyDefaults<FrontPocketSchema>(m.requireObject(input), defaultFrontPocket)
+    pocket.opening = migratePocketOpening(pocket.opening ?? { type: 'straight' })
+    return pocket
+  },
+  tPocket: (input) => {
+    const pocket = m.applyDefaults<TPocketSchema>(m.requireObject(input), defaultTPocket)
+    pocket.opening = migratePocketOpening(pocket.opening ?? { type: 'straight' })
+    return pocket
   },
   hole: (input) => {
     const hole = m.requireObject<HoleSchema>(input)
@@ -129,15 +111,15 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
 
     return m.applyDefaults<ComponentBoundsStitchLineSchema>(stitchLine, defaultComponentBoundsStitchLine)
   },
-  pocketClusterStitchLine: (input) => {
-    const stitchLine = m.requireObject<PocketClusterStitchLineSchema>(input)
+  tPocketStitchLine: (input) => {
+    const stitchLine = m.requireObject<TPocketStitchLineSchema>(input)
     m.requireString(stitchLine, 'id')
     m.requireString(stitchLine, 'name')
     m.requireString(stitchLine, 'targetId')
     m.requireValue(stitchLine, 'targetType', 'component')
-    m.requireValue(stitchLine, 'type', 'pocket-cluster-stitch-line')
+    m.requireValue(stitchLine, 'type', 't-pocket-stitch-line')
 
-    return m.applyDefaults<PocketClusterStitchLineSchema>(stitchLine, defaultPocketClusterStitchLine)
+    return m.applyDefaults<TPocketStitchLineSchema>(stitchLine, defaultTPocketStitchLine)
   },
 }
 
@@ -145,13 +127,11 @@ const migratePocketOpening = (
   input: DeepPartialSchema<PocketOpeningSchema>,
 ): DeepPartialSchema<PocketOpeningSchema> => {
   const opening = m.requireObject<PocketOpeningSchema>(input)
-  const id = m.requireString(opening, 'id')
-  const name = m.requireString(opening, 'name')
   m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed', 'slanted'])
 
   switch (opening.type) {
     case 'straight':
-      return { id, name, type: 'straight' }
+      return { type: 'straight' }
     case 'recessed':
       return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
     case 'slanted':

@@ -2,8 +2,8 @@ import type BigNumber from 'bignumber.js'
 
 import type { TranslationSchema } from '../translations/translationSchema'
 import type { HasTypeSchema } from './common'
-import type { ComponentSchema, PocketClusterSchema } from './components'
-import type { ComputedStitchHoleSchema, ComputedTPocketSchema, ComputedTopPocketSchema } from './computed'
+import type { ComponentSchema, FrontPocketSchema, TPocketSchema } from './components'
+import type { ComputedFrontPocketSchema, ComputedStitchHoleSchema, ComputedTPocketSchema } from './computed'
 import type { DrawAreaContextValue } from './drawArea'
 import type { PathSchema, RectSchema, SizeSchema } from './geometry'
 import type { ResolvedStitchLineSchema } from './stitching'
@@ -30,8 +30,8 @@ export type ExportPanelSchema = HasTypeSchema<'export-panel'> & {
 export type ExportFrontPocketSchema = HasTypeSchema<'export-front-pocket'> & {
   id: string
   subProject: SubProjectSchema
-  ownerComponent: PocketClusterSchema
-  pocket: ComputedTopPocketSchema
+  component: FrontPocketSchema
+  pocket: ComputedFrontPocketSchema
   cutHelper?: PathSchema
   cutHelperBoundingRect?: RectSchema
   stitchLines: ExportStitchLineSchema[]
@@ -40,8 +40,7 @@ export type ExportFrontPocketSchema = HasTypeSchema<'export-front-pocket'> & {
 export type ExportTPocketSchema = HasTypeSchema<'export-t-pocket'> & {
   id: string
   subProject: SubProjectSchema
-  ownerComponent: PocketClusterSchema
-  pocketIndex: number
+  component: TPocketSchema
   pocket: ComputedTPocketSchema
   cutHelper?: PathSchema
   cutHelperBoundingRect?: RectSchema

@@ -17,8 +17,11 @@ export class SlantedPocketCalculator extends PocketCalculator<SlantedPocketOpeni
   }
 
   getTPocketPath(): PathSchema {
+    if (this.pocket.type !== 't-pocket') {
+      throw new Error('T-pocket path requires a T-pocket')
+    }
     const tabDepth = getTPocketTabDepth(this.pocketCluster, this.pocketRect)
-    const tabWidth = new BigNumber(this.pocketCluster.tPocketTabWidth)
+    const tabWidth = new BigNumber(this.pocket.tPocketTabWidth)
     const rightInnerX = this.width.minus(tabWidth)
     return this.transformPath({
       commands: [

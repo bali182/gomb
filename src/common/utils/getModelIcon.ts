@@ -16,6 +16,8 @@ export const getModelIcon = (
   switch (type) {
     case 'root-panel':
       return PiWalletDuotone
+    case 'front-pocket':
+    case 't-pocket':
     case 'panel':
       return PiRectangleDuotone
     case 'pocket-cluster':
@@ -24,7 +26,7 @@ export const getModelIcon = (
       return PiRectangleDashedDuotone
     case 'component-bounds-stitch-line':
       return PiNeedleDuotone
-    case 'pocket-cluster-stitch-line':
+    case 't-pocket-stitch-line':
       return PiNeedleDuotone
   }
 }

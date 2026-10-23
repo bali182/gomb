@@ -12,7 +12,7 @@ export const addAutoStitchLineRadii = (
   const accessor = accessors.computedSubProject(computedProject)
 
   for (const stitchLine of subProject.stitchLines) {
-    if (stitchLine.type === 'pocket-cluster-stitch-line' || !stitchLine.autoCornerRadius) {
+    if (stitchLine.type === 't-pocket-stitch-line' || !stitchLine.autoCornerRadius) {
       stitchLines.push(stitchLine)
       continue
     }

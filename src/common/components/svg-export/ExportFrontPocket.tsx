@@ -17,7 +17,7 @@ export const ExportFrontPocket: FC<ExportFrontPocketProps> = ({ element }) => {
   const { componentStyles, exportIdentifiers } = useExportDrawAreaContext()
   const pathData = usePath(element.pocket.path)
   const styleParams: DrawAreaComponentStyleParams = {
-    component: element.ownerComponent,
+    component: element.component,
     nestingLevel: 0,
   }
 

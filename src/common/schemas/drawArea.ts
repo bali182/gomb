@@ -1,5 +1,5 @@
 import { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
-import { ComponentSchema, PocketClusterSchema } from './components'
+import { ComponentSchema, PocketSchema } from './components'
 import type { ExportElementSchema } from './export'
 import { HoleSchema } from './hole'
 import { ResolvedStitchLineSchema, StitchLineSchema } from './stitching'
@@ -10,7 +10,7 @@ export type DrawAreaComponentStyleParams = {
 }
 
 export type DrawAreaCardStyleParams = {
-  owner: PocketClusterSchema
+  owner: PocketSchema
 }
 
 export type DrawAreaHoleStyleParams = {

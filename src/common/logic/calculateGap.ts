@@ -1,13 +1,13 @@
 import BigNumber from 'bignumber.js'
 import { ZERO } from '../constants/layout'
-import { ComponentSchema, PanelSchema, PocketClusterSchema } from '../schemas/components'
+import { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
 import { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
 
 export const calculateGap = (
   children: (PanelSchema | PocketClusterSchema)[],
   parentBoundingBox: RectSchema,
-  parent: ComponentSchema,
+  parent: RootPanelSchema | PanelSchema | FrontPocketSchema,
 ): BigNumber => {
   if (!parent.autoLayoutGap) {
     return new BigNumber(parent.layoutGap)
@@ -30,10 +30,16 @@ export const calculateGap = (
     : BigNumber.maximum(parentSpace.minus(fixedComponentSpace), ZERO).dividedBy(autoSizeCount)
 }
 
-const isMainAxisAuto = (child: PanelSchema | PocketClusterSchema, parent: ComponentSchema): boolean => {
+const isMainAxisAuto = (
+  child: PanelSchema | PocketClusterSchema,
+  parent: RootPanelSchema | PanelSchema | FrontPocketSchema,
+): boolean => {
   return parent.layoutOrientation === 'horizontal' ? child.autoWidth : child.autoHeight
 }
 
-const getMainAxisSize = (child: PanelSchema | PocketClusterSchema, parent: ComponentSchema): number => {
+const getMainAxisSize = (
+  child: PanelSchema | PocketClusterSchema,
+  parent: RootPanelSchema | PanelSchema | FrontPocketSchema,
+): number => {
   return parent.layoutOrientation === 'horizontal' ? child.width : child.height
 }

@@ -141,7 +141,7 @@ const getExportElementStrokeBoundingRect = (
   element: ExportElementSchema,
   context: DrawAreaContextValue,
 ): RectSchema => {
-  const component = element.type === 'export-panel' ? element.component : element.ownerComponent
+  const component = element.type === 'export-panel' ? element.component : element.component
   const borderThickness = context.componentStyles.getBorderThickness({ component, nestingLevel: 0 }) ?? 0
   const padding = new BigNumber(borderThickness).dividedBy(2)
   const boundingRect = getExportElementLayoutBoundingRect(element)
