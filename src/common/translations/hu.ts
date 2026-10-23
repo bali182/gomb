@@ -196,6 +196,7 @@ export const HU = {
           addStitching: 'Varrás hozzáadása',
           addPocketStitching: 'Zsebvarrás hozzáadása',
           exportToPng: 'Exportálás PNG-be',
+          copyPocketSettings: 'Beállítások másolása…',
           clone: 'Duplikálás',
           delete: 'Törlés',
         },
@@ -789,6 +790,37 @@ export const HU = {
     },
   },
   dialogs: {
+    pocketCopy: {
+      title: 'Zsebbeállítások másolása',
+      positiveAction: 'Másolás',
+      sourceHint: 'Ezt másolod',
+      selectAll: {
+        label: 'Összes',
+        tooltip: 'Minden alkalmazható beállítás kijelölése vagy törlése. Az összes kijelölése a meglévő varrások felülírását is bekapcsolja.',
+      },
+      columns: {
+        copyShape: {
+          label: 'Forma',
+          tooltip:
+            'A T-zseb fülszélességének és keskenyedésének másolása. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
+        },
+        copyOpening: {
+          label: 'Nyílás',
+          tooltip:
+            'A nyílás típusának és minden beállításának másolása. A fejlécre kattintva az összes célzseb kijelölése kapcsolható.',
+        },
+        copyStitching: {
+          label: 'Varrások',
+          tooltip:
+            'A forrászseb összes alsó varrásának másolása. A meglévő varrások megmaradnak, ha nincs felülírás kijelölve. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
+        },
+        overwriteStitching: {
+          label: 'Felülírás',
+          tooltip:
+            'A célzseb meglévő alsó varrásainak lecserélése a forrás másolataira. Akkor választható, ha a varrások másolása ki van jelölve, és a célzseben már van varrás. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
+        },
+      },
+    },
     globalSettings: {
       title: 'Beállítások',
       positiveAction: 'OK',

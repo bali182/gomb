@@ -1,5 +1,5 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
-import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, useState, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
@@ -20,10 +20,13 @@ import {
 import { portalRef } from '../../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
 import type { ComponentSchema } from '../../schemas/components'
+import type { PocketSettingsCopyTargetsSchema } from '../../schemas/pocketCopy'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
+import { PocketCopyDialog } from '../pocket-copy/PocketCopyDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
@@ -31,6 +34,7 @@ import {
   AddComponentStitchLineMenuItem,
   AddHoleMenuItem,
   CloneComponentMenuItem,
+  CopyPocketSettingsMenuItem,
   DeleteComponentMenuItem,
   ExportComponentPngMenuItem,
 } from './ComponentActionsMenuItems'
@@ -64,8 +68,16 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea(false)
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addPocketCluster, addHole, addStitchLineToComponent, cloneComponent, deleteComponent } =
-    useSubProjectOperations()
+  const {
+    addComponent,
+    addPocketCluster,
+    addHole,
+    addStitchLineToComponent,
+    cloneComponent,
+    deleteComponent,
+    copyPocketSettings,
+  } = useSubProjectOperations()
+  const [isPocketCopyOpen, setPocketCopyOpen] = useState<boolean>(false)
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -185,6 +197,16 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const canClone = component.type === 'root-panel' || canCloneComponent(component)
   const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
+  const handleOpenPocketCopy = useCallback((): void => {
+    setPocketCopyOpen(true)
+  }, [])
+  const handleCopyPocketSettings = useCallback(
+    (targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
+      copyPocketSettings(component.id, targets)
+      setPocketCopyOpen(false)
+    },
+    [component.id, copyPocketSettings],
+  )
   return (
     <Box onClick={handleActionsClick}>
       <Menu.Root>
@@ -197,9 +219,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           <Menu.Positioner>
             <Menu.Content>
               <ActionsMenuSection>
-                {!subProjectOnly && possibleChildTypes.map((type) => (
-                  <AddComponentMenuItem key={type} type={type} onSelect={handleAddChild} />
-                ))}
+                {!subProjectOnly &&
+                  possibleChildTypes.map((type) => (
+                    <AddComponentMenuItem key={type} type={type} onSelect={handleAddChild} />
+                  ))}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && canAddHole(component) && <AddHoleMenuItem onSelect={handleAddHole} />}
@@ -207,6 +230,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               <ActionsMenuSection>
                 {!subProjectOnly && isDefined(stitchLineType) && (
                   <AddComponentStitchLineMenuItem type={stitchLineType} onSelect={handleAddStitchLine} />
+                )}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {!subProjectOnly && narrowers.is.pocket(component) && (
+                  <CopyPocketSettingsMenuItem onSelect={handleOpenPocketCopy} />
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
@@ -220,6 +248,15 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
+      {!subProjectOnly && narrowers.is.pocket(component) && (
+        <PocketCopyDialog
+          subProject={subProject}
+          sourcePocketId={component.id}
+          isOpen={isPocketCopyOpen}
+          onOpenChange={setPocketCopyOpen}
+          onSubmit={handleCopyPocketSettings}
+        />
+      )}
     </Box>
   )
 }

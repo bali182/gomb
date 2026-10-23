@@ -4,6 +4,7 @@ export type DialogTranslationSchema = {
   positiveAction?: string
   negativeAction?: string
   errors?: Record<string, string>
+  [key: string]: unknown
 }
 
 export type NativeDialogTranslationSchema = {
