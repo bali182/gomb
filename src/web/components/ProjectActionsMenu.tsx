@@ -1,12 +1,13 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent } from 'react'
-import { PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
+import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useNavigate } from 'react-router'
 
-import { useTranslation } from '../../common/hooks/useTranslation'
+import { ActionsMenuSection } from '../../common/components/action-menus/ActionsMenuSection'
 import { portalRef } from '../../common/portalRef'
 import { useProjects } from '../hooks/useProjects'
 import { webAppRoutes } from '../webAppRoutes'
+import { DeleteProjectMenuItem } from './ProjectActionsMenuItems'
 
 type ProjectActionsMenuProps = {
   projectId: string
@@ -14,7 +15,6 @@ type ProjectActionsMenuProps = {
 }
 
 export const ProjectActionsMenu: FC<ProjectActionsMenuProps> = ({ size, projectId }) => {
-  const { t } = useTranslation()
   const { deleteProject } = useProjects()
   const navigate = useNavigate()
 
@@ -38,15 +38,9 @@ export const ProjectActionsMenu: FC<ProjectActionsMenuProps> = ({ size, projectI
         <Portal container={portalRef}>
           <Menu.Positioner>
             <Menu.Content>
-              <Menu.Item
-                onSelect={handleDelete}
-                value="delete"
-                color="fg.error"
-                _hover={{ bg: 'bg.error', color: 'fg.error' }}
-              >
-                <PiTrash />
-                <Menu.ItemText>{t.projects.actions.delete}</Menu.ItemText>
-              </Menu.Item>
+              <ActionsMenuSection>
+                <DeleteProjectMenuItem onSelect={handleDelete} />
+              </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
