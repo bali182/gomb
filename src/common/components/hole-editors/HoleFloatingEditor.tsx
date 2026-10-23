@@ -7,7 +7,7 @@ import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils
 import { getModelIcon } from '../../utils/getModelIcon'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
-import { HoleActionsMenu } from '../component-tree/HoleActionsMenu'
+import { HoleActionsMenu } from '../action-menus/HoleActionsMenu'
 import { HoleEditor } from './HoleEditor'
 
 type HoleFloatingEditorProps = {

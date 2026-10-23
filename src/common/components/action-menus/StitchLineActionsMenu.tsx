@@ -1,13 +1,13 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
-import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
-import { useTranslation } from '../hooks/useTranslation'
-import { flipComponentBoundsStitchLine } from '../logic/flipComponentBoundsStitchLine'
-import { portalRef } from '../portalRef'
-import type { ComponentSchema } from '../schemas/components'
-import type { StitchLineSchema } from '../schemas/stitching'
-import { noop } from '../utils/noop'
+import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import { useTranslation } from '../../hooks/useTranslation'
+import { flipComponentBoundsStitchLine } from '../../logic/flipComponentBoundsStitchLine'
+import { portalRef } from '../../portalRef'
+import type { ComponentSchema } from '../../schemas/components'
+import type { StitchLineSchema } from '../../schemas/stitching'
+import { noop } from '../../utils/noop'
 
 type StitchLineActionsMenuProps = {
   stitchLine: StitchLineSchema

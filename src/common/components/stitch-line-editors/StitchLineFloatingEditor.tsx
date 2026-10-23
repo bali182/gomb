@@ -6,7 +6,7 @@ import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils
 import { getModelIcon } from '../../utils/getModelIcon'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
-import { StitchLineActionsMenu } from '../StitchLineActionsMenu'
+import { StitchLineActionsMenu } from '../action-menus/StitchLineActionsMenu'
 import { StitchLineEditor } from './StitchLineEditor'
 import { StitchLineRenderTargetCombobox } from './StitchLineRenderTargetCombobox'
 

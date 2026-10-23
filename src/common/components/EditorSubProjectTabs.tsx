@@ -6,7 +6,7 @@ import { useEditorContext } from '../contexts/EditorContext'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { accessors } from '../utils/accessors'
-import { ComponentActionsMenu } from './ComponentActionsMenu'
+import { ComponentActionsMenu } from './action-menus/ComponentActionsMenu'
 
 export const EditorSubProjectTabs: FC = () => {
   const { project } = useProject()

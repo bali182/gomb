@@ -1,31 +1,31 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiCopy, PiDotsThreeVertical, PiImage, PiTrash } from 'react-icons/pi'
-import { useEditorContext } from '../contexts/EditorContext'
-import { useEditorDrawArea } from '../hooks/useEditorDrawArea'
-import { useGlobalSettings } from '../hooks/useGlobalSettings'
-import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
-import { useProject } from '../hooks/useProject'
-import { useProjectOperations } from '../hooks/useProjectOperations'
-import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
-import { useTranslation } from '../hooks/useTranslation'
-import { exportComponentPng } from '../logic/exports/exportComponentPng'
+import { useEditorContext } from '../../contexts/EditorContext'
+import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
+import { useGlobalSettings } from '../../hooks/useGlobalSettings'
+import { useOptionalSubProject } from '../../hooks/useOptionalSubProject'
+import { useProject } from '../../hooks/useProject'
+import { useProjectOperations } from '../../hooks/useProjectOperations'
+import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import { useTranslation } from '../../hooks/useTranslation'
+import { exportComponentPng } from '../../logic/exports/exportComponentPng'
 import {
   canAddChild,
   canAddHole,
   canCloneComponent,
   canDeleteComponent,
   getComponentStitchLineType,
-} from '../operations/subProject/utils/componentRules'
-import { portalRef } from '../portalRef'
-import type { HasComponentTargetSchema, HasTargetSchema } from '../schemas/common'
-import type { ComponentSchema } from '../schemas/components'
-import type { StitchLineSchema } from '../schemas/stitching'
-import { SubProjectSchema } from '../schemas/subProject'
-import { getModelIcon } from '../utils/getModelIcon'
-import { isDefined } from '../utils/isDefined'
-import { noop } from '../utils/noop'
-import { toaster } from './Toaster'
+} from '../../operations/subProject/utils/componentRules'
+import { portalRef } from '../../portalRef'
+import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
+import type { ComponentSchema } from '../../schemas/components'
+import type { StitchLineSchema } from '../../schemas/stitching'
+import { SubProjectSchema } from '../../schemas/subProject'
+import { getModelIcon } from '../../utils/getModelIcon'
+import { isDefined } from '../../utils/isDefined'
+import { noop } from '../../utils/noop'
+import { toaster } from '../Toaster'
 
 type ComponentActionsProps = {
   component: ComponentSchema

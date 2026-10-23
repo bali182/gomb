@@ -9,7 +9,7 @@ import type { ComponentSchema } from '../../schemas/components'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { FloatingEditor } from '../common/FloatingEditor'
-import { ComponentActionsMenu } from '../ComponentActionsMenu'
+import { ComponentActionsMenu } from '../action-menus/ComponentActionsMenu'
 import { ComponentEditor } from './ComponentEditor'
 import { ComponentFloatingEditorHeader } from './ComponentFloatingEditorHeader'
 
