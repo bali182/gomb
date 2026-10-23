@@ -2,7 +2,7 @@ import { Menu } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCopy, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
-import { getModelIcon } from '../../utils/getModelIcon'
+import { getModelIconByType } from '../../utils/getModelIcon'
 
 type HoleMenuItemProps = {
   onSelect: () => void
@@ -10,7 +10,7 @@ type HoleMenuItemProps = {
 
 export const AddHoleStitchLineMenuItem: FC<HoleMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
-  const Icon = getModelIcon('component-bounds-stitch-line')
+  const Icon = getModelIconByType('component-bounds-stitch-line')
   return (
     <Menu.Item value="stitch-line" onSelect={onSelect}>
       <Icon />

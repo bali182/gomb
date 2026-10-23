@@ -4,7 +4,7 @@ import { PiCopy, PiImage, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
-import { getModelIcon } from '../../utils/getModelIcon'
+import { getModelIconByType } from '../../utils/getModelIcon'
 
 type AddComponentMenuItemProps = {
   type: ComponentSchema['type']
@@ -26,7 +26,7 @@ type ExportComponentPngMenuItemProps = {
 
 export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, onSelect }) => {
   const { t } = useTranslation()
-  const Icon = getModelIcon(type)
+  const Icon = getModelIconByType(type)
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
     () => ({
       'front-pocket': t.project.editors.actions.components.addFrontPocket,
@@ -47,7 +47,7 @@ export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, onSe
 
 export const AddHoleMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
-  const Icon = getModelIcon('hole')
+  const Icon = getModelIconByType('hole')
   return (
     <Menu.Item value="hole" onSelect={onSelect}>
       <Icon />
@@ -58,7 +58,7 @@ export const AddHoleMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
 
 export const AddComponentStitchLineMenuItem: FC<AddComponentStitchLineMenuItemProps> = ({ type, onSelect }) => {
   const { t } = useTranslation()
-  const Icon = getModelIcon(type)
+  const Icon = getModelIconByType(type)
   return (
     <Menu.Item value={type} onSelect={() => onSelect(type)}>
       <Icon />

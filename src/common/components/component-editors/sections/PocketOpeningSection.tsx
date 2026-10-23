@@ -1,59 +1,51 @@
 import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
-import { useCallback, useMemo, type FC } from 'react'
+import { useCallback, type FC } from 'react'
+import type { IconType } from 'react-icons'
 import { PiCaretDown } from 'react-icons/pi'
 import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../../../defaultStates'
-import { useComputedComponent } from '../../../hooks/useComputedComponent'
-import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { getAdjustedPocketOpening } from '../../../logic/getAdjustedPocketOpening'
 import { portalRef } from '../../../portalRef'
 import type {
   PocketClusterSchema,
   PocketOpeningSchema,
-  PocketSchema,
   RecessedPocketOpeningSchema,
   SlantedPocketOpeningSchema,
 } from '../../../schemas/components'
-import type { ComputedPocketSchema } from '../../../schemas/computed'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { getEditableSchema } from '../../../utils/getEditableSchema'
 import { noIssues } from '../../../utils/issueUtils'
-import { PocketOpeningPreview } from '../../common/PocketOpeningPreview'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderButton } from '../../common/SectionHeaderButton'
+import { RecessedPocketOpeningIcon } from '../../icons/RecessedPocketOpeningIcon'
+import { SlantedPocketOpeningIcon } from '../../icons/SlantedPocketOpeningIcon'
+import { StraightPocketOpeningIcon } from '../../icons/StraightPocketOpeningIcon'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
 import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
 type PocketOpeningSectionProps = {
-  pocket: PocketSchema
   cluster: PocketClusterSchema
   editable: EditableSchema<PocketOpeningSchema>
   issues: IssuesSchema<PocketOpeningSchema> | undefined
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted']
+const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
+  straight: StraightPocketOpeningIcon,
+  recessed: RecessedPocketOpeningIcon,
+  slanted: SlantedPocketOpeningIcon,
+}
 
 export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
-  pocket,
   cluster,
   editable,
   issues: incomingIssues,
   onChange,
 }) => {
   const { t, language } = useTranslation()
-  const { computedSubProject } = useSubProject()
-  const computed = useComputedComponent<ComputedPocketSchema>(pocket.id)
   const issues = incomingIssues ?? noIssues<PocketOpeningSchema>()
-  const limits = computedSubProject.limits.components[pocket.id]
-  const adjustedOpening = useMemo<PocketOpeningSchema>(
-    () =>
-      limits?.type === 'front-pocket' || limits?.type === 't-pocket'
-        ? getAdjustedPocketOpening(pocket.opening, limits.opening)
-        : pocket.opening,
-    [pocket.opening, limits],
-  )
+  const OpeningIcon = openingIcons[editable.type]
   const handleTypeChange = useCallback(
     (details: MenuValueChangeDetails): void => {
       switch (details.value) {
@@ -82,15 +74,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
                 _hover={{ bg: 'bg.emphasized' }}
                 _expanded={{ bg: 'bg.emphasized' }}
               >
-                <PocketOpeningPreview
-                  pocket={pocket}
-                  pocketCluster={cluster}
-                  pocketRect={computed.boundingRect}
-                  cornerRadius={computed.cornerRadius}
-                  adjustedOpening={adjustedOpening}
-                  width={50}
-                  height={30}
-                />
+                <OpeningIcon />
                 {t.project.editors.enums.components.pocketOpening[editable.type]}
                 <PiCaretDown />
               </SectionHeaderButton>
@@ -99,12 +83,16 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
               <Menu.Positioner>
                 <Menu.Content width="max-content">
                   <Menu.RadioItemGroup value={editable.type} onValueChange={handleTypeChange}>
-                    {openingTypes.map((type) => (
-                      <Menu.RadioItem key={type} value={type}>
-                        <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
-                        <Menu.ItemIndicator />
-                      </Menu.RadioItem>
-                    ))}
+                    {openingTypes.map((type) => {
+                      const Icon = openingIcons[type]
+                      return (
+                        <Menu.RadioItem key={type} value={type}>
+                          <Icon />
+                          <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
+                          <Menu.ItemIndicator />
+                        </Menu.RadioItem>
+                      )
+                    })}
                   </Menu.RadioItemGroup>
                 </Menu.Content>
               </Menu.Positioner>

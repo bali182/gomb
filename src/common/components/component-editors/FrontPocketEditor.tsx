@@ -42,7 +42,6 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
       />
       <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
       <PocketOpeningSection
-        pocket={component}
         cluster={parent}
         editable={editable.opening}
         issues={issues.opening}

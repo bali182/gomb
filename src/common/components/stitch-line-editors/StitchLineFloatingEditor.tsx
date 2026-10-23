@@ -44,7 +44,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<StitchLineSchema>
         editable={editableStitchLine}
-        icon={getModelIcon(editedStitchLine.type)}
+        icon={getModelIcon(editedStitchLine)}
         issues={validationIssues}
         menu={<StitchLineActionsMenu size="xs" stitchLine={editedStitchLine} />}
         onChange={setStitchLine}

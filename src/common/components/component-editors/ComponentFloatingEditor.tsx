@@ -29,7 +29,6 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
   const { project } = useProject()
   const { subProject } = useSubProject()
 
-  const Icon = getModelIcon(component.type)
   const parent = getComponentParent(component.id, subProject)
 
   const {
@@ -39,6 +38,8 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
     setComponentImmediately,
     validationIssues,
   } = useEditableComponent(component.id)
+
+  const Icon = getModelIcon(editedComponent)
 
   const handleColorReset = useCallback((): void => {
     const updatedEditable = { ...editableComponent }

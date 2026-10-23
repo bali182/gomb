@@ -24,7 +24,7 @@ export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement,
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<HoleSchema>
         editable={editableHole}
-        icon={getModelIcon(editedHole.type)}
+        icon={getModelIcon(editedHole)}
         issues={validationIssues}
         menu={<HoleActionsMenu hole={editedHole} onAddStitchLine={onAdd} size="xs" />}
         onChange={setHole}

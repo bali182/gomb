@@ -106,7 +106,7 @@ export const StitchLineRenderTargetCombobox: FC<StitchLineRenderTargetComboboxPr
           <Combobox.Content width="max-content">
             <Combobox.List>
               {collection.items.map((component) => {
-                const ComponentIcon = getModelIcon(component.type)
+                const ComponentIcon = getModelIcon(component)
 
                 return (
                   <Combobox.Item item={component} key={component.id}>

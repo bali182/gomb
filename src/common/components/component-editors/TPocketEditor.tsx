@@ -13,7 +13,7 @@ type TPocketEditorProps = {
   parent: PocketClusterSchema
   onChange: (value: EditableSchema<TPocketSchema>) => void
 }
-export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
+export const TPocketEditor: FC<TPocketEditorProps> = ({ editable, issues, parent, onChange }) => {
   const { t } = useTranslation()
   const handleOpeningChange = useCallback(
     (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
@@ -55,7 +55,6 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
         </SectionGroup.SectionRowEditor>
       </SectionGroup.Section>
       <PocketOpeningSection
-        pocket={component}
         cluster={parent}
         editable={editable.opening}
         issues={issues.opening}
