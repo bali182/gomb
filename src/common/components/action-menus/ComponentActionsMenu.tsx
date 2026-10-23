@@ -1,6 +1,6 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
-import { PiCopy, PiDotsThreeVertical, PiImage, PiTrash } from 'react-icons/pi'
+import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
@@ -22,10 +22,18 @@ import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/co
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
-import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { noop } from '../../utils/noop'
 import { toaster } from '../Toaster'
+import { ActionsMenuSection } from './ActionsMenuSection'
+import {
+  AddComponentMenuItem,
+  AddComponentStitchLineMenuItem,
+  AddHoleMenuItem,
+  CloneComponentMenuItem,
+  DeleteComponentMenuItem,
+  ExportComponentPngMenuItem,
+} from './ComponentActionsMenuItems'
 
 type ComponentActionsProps = {
   component: ComponentSchema
@@ -37,6 +45,8 @@ type ComponentActionsProps = {
   onAddStitchLine?: (target: HasTargetSchema, type: StitchLineSchema['type']) => void
   onDelete?: (componentId: string) => void
 }
+
+const childTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster', 't-pocket', 'front-pocket']
 
 export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   component,
@@ -170,7 +180,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
   }, [project, subProject, component.id, settings, exportDrawAreaContext, t])
 
-  const HoleIcon = getModelIcon('hole')
+  const possibleChildTypes = childTypes.filter((type) => canAddChild(component, type, subProject))
+  const stitchLineType = getComponentStitchLineType(component)
 
   const canClone = component.type === 'root-panel' || canCloneComponent(component)
   const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
@@ -185,129 +196,30 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         <Portal container={portalRef}>
           <Menu.Positioner>
             <Menu.Content>
-              {!subProjectOnly && (
-                <>
-                  <AddChildComponentMenuSection
-                    subProject={subProject}
-                    component={component}
-                    onAddChild={handleAddChild}
-                  />
-                  {canAddHole(component) && (
-                    <>
-                      <Menu.Item value="hole" onSelect={handleAddHole}>
-                        <HoleIcon />
-                        <Menu.ItemText>{t.project.editors.actions.components.addHole}</Menu.ItemText>
-                      </Menu.Item>
-                      <Menu.Separator />
-                    </>
-                  )}
-
-                  <AddComponentStitchLineMenu component={component} onAddStitchLine={handleAddStitchLine} />
-                </>
-              )}
-              <Menu.Item value="export-png" onSelect={handleExportPng}>
-                <PiImage />
-                <Menu.ItemText>{t.project.editors.actions.components.exportToPng}</Menu.ItemText>
-              </Menu.Item>
-
-              {(canClone || canDelete) && <Menu.Separator />}
-              {canClone && (
-                <Menu.Item value="clone" onSelect={handleClone}>
-                  <PiCopy />
-                  <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
-                </Menu.Item>
-              )}
-              {canDelete && (
-                <Menu.Item
-                  onSelect={handleDelete}
-                  value="delete"
-                  color="fg.error"
-                  _hover={{ bg: 'bg.error', color: 'fg.error' }}
-                >
-                  <PiTrash />
-                  <Menu.ItemText>{t.project.editors.actions.components.delete}</Menu.ItemText>
-                </Menu.Item>
-              )}
+              <ActionsMenuSection>
+                {!subProjectOnly && possibleChildTypes.map((type) => (
+                  <AddComponentMenuItem key={type} type={type} onSelect={handleAddChild} />
+                ))}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {!subProjectOnly && canAddHole(component) && <AddHoleMenuItem onSelect={handleAddHole} />}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {!subProjectOnly && isDefined(stitchLineType) && (
+                  <AddComponentStitchLineMenuItem type={stitchLineType} onSelect={handleAddStitchLine} />
+                )}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {!subProjectOnly && <ExportComponentPngMenuItem onSelect={handleExportPng} />}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {canClone && <CloneComponentMenuItem onSelect={handleClone} />}
+                {canDelete && <DeleteComponentMenuItem onSelect={handleDelete} />}
+              </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
     </Box>
-  )
-}
-
-type AddChildComponentMenuProps = {
-  subProject: SubProjectSchema
-  onAddChild: (type: ComponentSchema['type']) => void
-  component: ComponentSchema
-}
-
-const childTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster', 't-pocket', 'front-pocket']
-
-const AddChildComponentMenuSection: FC<AddChildComponentMenuProps> = ({ onAddChild, component, subProject }) => {
-  const possibleChildTypes = childTypes.filter((type) => canAddChild(component, type, subProject))
-  const { t } = useTranslation()
-
-  const labels = useMemo<Record<ComponentSchema['type'], string>>(
-    () => ({
-      'front-pocket': t.project.editors.actions.components.addFrontPocket,
-      't-pocket': t.project.editors.actions.components.addTPocket,
-      panel: t.project.editors.actions.components.addPanel,
-      'root-panel': t.project.editors.actions.components.addRootPanel,
-      'pocket-cluster': t.project.editors.actions.components.addPocketCluster,
-    }),
-    [t],
-  )
-
-  return (
-    <>
-      {possibleChildTypes.map((type) => {
-        const Icon = getModelIcon(type)
-        return (
-          <Menu.Item key={type} value={type} onSelect={() => onAddChild(type)}>
-            <Icon />
-            <Menu.ItemText>{labels[type]}</Menu.ItemText>
-          </Menu.Item>
-        )
-      })}
-      {possibleChildTypes.length > 0 ? <Menu.Separator /> : null}
-    </>
-  )
-}
-
-type AddComponentStitchLineMenuProps = {
-  onAddStitchLine: (type: StitchLineSchema['type']) => void
-  component: ComponentSchema
-}
-
-export const AddComponentStitchLineMenu: FC<AddComponentStitchLineMenuProps> = ({ component, onAddStitchLine }) => {
-  const { t } = useTranslation()
-
-  const possibleTypes = useMemo<StitchLineSchema['type'][]>(() => {
-    const type = getComponentStitchLineType(component)
-    return isDefined(type) ? [type] : []
-  }, [component])
-
-  const labels = useMemo<Record<StitchLineSchema['type'], string>>(
-    () => ({
-      'component-bounds-stitch-line': t.project.editors.actions.components.addStitching,
-      't-pocket-stitch-line': t.project.editors.actions.components.addStitching,
-    }),
-    [t],
-  )
-
-  return (
-    <>
-      {possibleTypes.map((type) => {
-        const Icon = getModelIcon(type)
-        return (
-          <Menu.Item key={type} value={type} onSelect={() => onAddStitchLine(type)}>
-            <Icon />
-            <Menu.ItemText>{labels[type]}</Menu.ItemText>
-          </Menu.Item>
-        )
-      })}
-      {possibleTypes.length > 0 ? <Menu.Separator /> : null}
-    </>
   )
 }

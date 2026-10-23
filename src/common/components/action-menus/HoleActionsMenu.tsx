@@ -1,13 +1,13 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent } from 'react'
-import { PiCopy, PiDotsThreeVertical, PiTrash } from 'react-icons/pi'
+import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
-import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
-import { getModelIcon } from '../../utils/getModelIcon'
 import { noop } from '../../utils/noop'
+import { ActionsMenuSection } from './ActionsMenuSection'
+import { AddHoleStitchLineMenuItem, CloneHoleMenuItem, DeleteHoleMenuItem } from './HoleActionsMenuItems'
 
 type HoleActionsMenuProps = {
   hole: HoleSchema
@@ -17,7 +17,6 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
-  const { t } = useTranslation()
   const { addStitchLineToHole, cloneHole, deleteHole } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -38,8 +37,6 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     onDelete(hole.id)
   }, [deleteHole, hole.id, onDelete])
 
-  const StitchLineIcon = getModelIcon('component-bounds-stitch-line')
-
   return (
     <Box onClick={handleClick}>
       <Menu.Root>
@@ -51,24 +48,13 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
         <Portal container={portalRef}>
           <Menu.Positioner>
             <Menu.Content>
-              <Menu.Item onSelect={handleAddStitchLine} value="stitch-line">
-                <StitchLineIcon />
-                <Menu.ItemText>{t.project.editors.actions.holes.addStitching}</Menu.ItemText>
-              </Menu.Item>
-              <Menu.Separator />
-              <Menu.Item onSelect={handleClone} value="clone">
-                <PiCopy />
-                <Menu.ItemText>{t.project.editors.actions.holes.clone}</Menu.ItemText>
-              </Menu.Item>
-              <Menu.Item
-                onSelect={handleDelete}
-                value="delete"
-                color="fg.error"
-                _hover={{ bg: 'bg.error', color: 'fg.error' }}
-              >
-                <PiTrash />
-                <Menu.ItemText>{t.project.editors.actions.holes.delete}</Menu.ItemText>
-              </Menu.Item>
+              <ActionsMenuSection>
+                <AddHoleStitchLineMenuItem onSelect={handleAddStitchLine} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                <CloneHoleMenuItem onSelect={handleClone} />
+                <DeleteHoleMenuItem onSelect={handleDelete} />
+              </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
