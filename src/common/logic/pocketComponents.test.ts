@@ -211,7 +211,8 @@ describe('invalid pocket states and patchers', () => {
         d.hole({ id: 'zombie-hole', componentId: 'zombie' }),
       ],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'invalid', targetId: 'front', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'front-line', targetId: 'front', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'invalid', targetId: 'front', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'orphan', targetId: 'zombie', targetType: 'component' }),
       ],
     })
@@ -223,6 +224,7 @@ describe('invalid pocket states and patchers', () => {
     expect(patched.components.nested).toBeUndefined()
     expect(patched.components.t.children).toEqual([])
     expect(patched.holes).toEqual([])
-    expect(patched.stitchLines).toEqual([])
+    expect(patched.stitchLines.map((line) => line.id)).toEqual(['front-line'])
+    expect(computed.stitchLines.front[0].routes.length).toBeGreaterThan(0)
   })
 })

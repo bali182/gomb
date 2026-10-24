@@ -67,7 +67,7 @@ describe('deleteUnsupportedStitchLines', () => {
     const before = structuredClone(source)
     const computed = getComputedSubProject(source, defaultStitchingSettings)
     const result = deleteUnsupportedStitchLines(source, computed)
-    expect(result.stitchLines.map((line) => line.id)).toEqual(['cluster-line', 't-line'])
+    expect(result.stitchLines.map((line) => line.id)).toEqual(['cluster-line', 'front-line', 't-line'])
     expect(result.components).toBe(source.components)
     expect(deleteUnsupportedStitchLines(result, computed)).toBe(result)
     expect(source).toEqual(before)

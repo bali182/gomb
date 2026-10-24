@@ -42,9 +42,6 @@ export const canAddStitchLine = (component: ComponentSchema, subProject: SubProj
 }
 
 export const getComponentStitchLineType = (component: ComponentSchema): StitchLineSchema['type'] | undefined => {
-  if (component.type === 'front-pocket') {
-    return undefined
-  }
   return component.type === 't-pocket' ? 't-pocket-stitch-line' : 'component-bounds-stitch-line'
 }
 

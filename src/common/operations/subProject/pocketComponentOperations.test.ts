@@ -34,7 +34,7 @@ describe('pocket component operations', () => {
     expect(canAddStitchLine(empty, source)).toBe(false)
     expect(canAddStitchLine(withoutFront, source)).toBe(false)
     expect(canAddStitchLine(source.components.first, source)).toBe(true)
-    expect(canAddStitchLine(source.components['front-a'], source)).toBe(false)
+    expect(canAddStitchLine(source.components['front-a'], source)).toBe(true)
     expect(canAddStitchLine(source.components.a, source)).toBe(true)
     expect(canAddStitchLine(source.components.root, source)).toBe(true)
     expect(canAddStitchLine(source.components.child, source)).toBe(true)
@@ -50,12 +50,14 @@ describe('pocket component operations', () => {
       stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root', targetType: 'component' })],
     }
     const snapshot = structuredClone(source)
-    for (const targetId of ['empty', 'without-front', 'front-a', 'a']) {
+    for (const targetId of ['empty', 'without-front', 'a']) {
       expect(moveStitchLine(source, { stitchLineId: 'line', targetId, targetType: 'component' })).toBe(source)
     }
-    const moved = moveStitchLine(source, { stitchLineId: 'line', targetId: 'first', targetType: 'component' })
-    expect(moved.stitchLines[0]).toEqual({ ...source.stitchLines[0], targetId: 'first' })
-    expect(moved.components).toBe(source.components)
+    for (const targetId of ['first', 'front-a']) {
+      const moved = moveStitchLine(source, { stitchLineId: 'line', targetId, targetType: 'component' })
+      expect(moved.stitchLines[0]).toEqual({ ...source.stitchLines[0], targetId })
+      expect(moved.components).toBe(source.components)
+    }
     expect(source).toEqual(snapshot)
   })
 
