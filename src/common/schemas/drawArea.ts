@@ -55,6 +55,7 @@ export type DrawAreaExportIdentifiers = {
   getElementId: (element: ExportElementSchema) => string | undefined
   getStitchLineId: (element: ResolvedStitchLineSchema) => string | undefined
   getNameText: (element: ExportElementSchema) => string | undefined
+  getParentNameText: (element: ExportElementSchema) => string | undefined
 }
 
 export type DrawAreaExportTextStyles = {

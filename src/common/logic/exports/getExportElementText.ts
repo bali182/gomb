@@ -30,6 +30,12 @@ export const getExportElementText = (
       exportTextStyles.getNameTextFontSize(element),
     ),
     getExportTextLine(
+      exportIdentifiers.getParentNameText(element),
+      exportTextStyles.getDimensionsTextColor(element),
+      exportTextStyles.getDimensionsTextFontFamily(element),
+      exportTextStyles.getDimensionsTextFontSize(element),
+    ),
+    getExportTextLine(
       exportTextStyles.getDimensionsText(element),
       exportTextStyles.getDimensionsTextColor(element),
       exportTextStyles.getDimensionsTextFontFamily(element),

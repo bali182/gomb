@@ -61,6 +61,7 @@ const drawAreaExportIdentifiers: DrawAreaExportIdentifiers = {
   getElementId: produce(undefined),
   getStitchLineId: produce(undefined),
   getNameText: produce(undefined),
+  getParentNameText: produce(undefined),
 }
 
 const drawAreaDefaultMarkerStyles: DrawAreaMarkerStyles = {

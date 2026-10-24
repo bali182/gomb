@@ -54,6 +54,7 @@ const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): 
 const exportIdentifiers: DrawAreaExportIdentifiers = {
   getElementId: produce(undefined),
   getNameText: produce(undefined),
+  getParentNameText: produce(undefined),
   getStitchLineId: produce(undefined),
 }
 

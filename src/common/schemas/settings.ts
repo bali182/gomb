@@ -39,6 +39,7 @@ export type ExportContentSettingsSchema = {
   stitchLineMode: ExportStitchLineModeSchema
   showNames: boolean
   showDimensions: boolean
+  showParentNames: boolean
   childMarkers: boolean
   cutHelperDistance: number
 }

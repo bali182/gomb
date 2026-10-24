@@ -51,6 +51,7 @@ export const defaultExportParams: ExportSettingsSchema = {
   stitchLineMode: 'related-stitch-lines',
   showNames: true,
   showDimensions: true,
+  showParentNames: true,
   childMarkers: true,
   cutHelperDistance: 0,
   format: 'pdf',

@@ -755,9 +755,13 @@ export const EN = {
               label: 'Show dimensions',
               tooltip: 'Includes component dimensions in the exported file.',
             },
+            showParentNames: {
+              label: 'Show parent names',
+              tooltip: 'Includes the immediate parent’s name below each component’s other labels.',
+            },
             childMarkers: {
-              label: 'Show child markers',
-              tooltip: 'Adds markers for components placed inside other components.',
+              label: 'Show markers',
+              tooltip: 'Adds markers where component edges need to connect. Helpful for marking where to glue.',
             },
             cutHelperDistance: {
               label: 'Cut helper distance',

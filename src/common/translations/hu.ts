@@ -684,9 +684,14 @@ export const HU = {
               label: 'Méretek megjelenítése',
               tooltip: 'A komponensek méreteit is belefoglalja az exportált fájlba.',
             },
+            showParentNames: {
+              label: 'Szülőnevek megjelenítése',
+              tooltip: 'A komponens feliratai alatt megjeleníti a közvetlen szülő nevét.',
+            },
             childMarkers: {
-              label: 'Belső elemek jelölése',
-              tooltip: 'Jelölőket ad az egymásba helyezett komponensekhez.',
+              label: 'Jelölések megjelenítése',
+              tooltip:
+                'Megjelöli, hol kell illeszkedniük a komponensek éleinek. Segít a ragasztás helyének bejelölésében.',
             },
             cutHelperDistance: {
               label: 'Vágási segédvonal távolsága',

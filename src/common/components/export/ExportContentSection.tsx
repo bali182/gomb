@@ -78,6 +78,12 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
     },
     [editable, onChange],
   )
+  const handleShowParentNamesChange = useCallback(
+    (details: Switch.CheckedChangeDetails): void => {
+      onChange({ ...editable, showParentNames: details.checked })
+    },
+    [editable, onChange],
+  )
   const handleChildMarkersChange = useCallback(
     (details: Switch.CheckedChangeDetails): void => {
       onChange({ ...editable, childMarkers: details.checked })
@@ -147,6 +153,18 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showDimensions}>
         <Switch.Root checked={editable.showDimensions} onCheckedChange={handleShowDimensionsChange} size="sm">
+          <Switch.HiddenInput />
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch.Root>
+      </SectionGroup.SectionRowEditor>
+
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.showParentNames.tooltip}>
+        {t.project.editors.sections.export.content.showParentNames.label}
+      </SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowEditor issue={issues.showParentNames}>
+        <Switch.Root checked={editable.showParentNames} onCheckedChange={handleShowParentNamesChange} size="sm">
           <Switch.HiddenInput />
           <Switch.Control>
             <Switch.Thumb />
