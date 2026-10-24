@@ -31,6 +31,16 @@ export const canCloneComponent = (component: ComponentSchema): boolean =>
 
 export const canAddHole = (component: ComponentSchema): boolean => component.type !== 'pocket-cluster'
 
+export const canAddStitchLine = (component: ComponentSchema, subProject: SubProjectSchema): boolean => {
+  if (!isDefined(getComponentStitchLineType(component))) {
+    return false
+  }
+  if (component.type === 'pocket-cluster') {
+    return component.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+  }
+  return true
+}
+
 export const getComponentStitchLineType = (component: ComponentSchema): StitchLineSchema['type'] | undefined => {
   if (component.type === 'front-pocket') {
     return undefined

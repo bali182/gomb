@@ -13,6 +13,7 @@ import { exportComponentPng } from '../../logic/exports/exportComponentPng'
 import {
   canAddChild,
   canAddHole,
+  canAddStitchLine,
   canCloneComponent,
   canDeleteComponent,
   getComponentStitchLineType,
@@ -235,7 +236,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && isDefined(stitchLineType) && (
-                  <AddComponentStitchLineMenuItem type={stitchLineType} onSelect={handleAddStitchLine} />
+                  <AddComponentStitchLineMenuItem
+                    type={stitchLineType}
+                    disabled={!canAddStitchLine(component, subProject)}
+                    onSelect={handleAddStitchLine}
+                  />
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
@@ -244,7 +249,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {!subProjectOnly && <ExportComponentPngMenuItem onSelect={handleExportPng} />}
+                {!subProjectOnly && (
+                  <ExportComponentPngMenuItem
+                    disabled={narrowers.is.pocketCluster(component) && component.children.length === 0}
+                    onSelect={handleExportPng}
+                  />
+                )}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />}

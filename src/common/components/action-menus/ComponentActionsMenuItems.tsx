@@ -14,6 +14,7 @@ type AddComponentMenuItemProps = {
 
 type AddComponentStitchLineMenuItemProps = {
   type: StitchLineSchema['type']
+  disabled?: boolean
   onSelect: (type: StitchLineSchema['type']) => void
 }
 
@@ -22,6 +23,7 @@ type ComponentMenuItemProps = {
 }
 
 type ExportComponentPngMenuItemProps = {
+  disabled?: boolean
   onSelect: () => Promise<void>
 }
 
@@ -57,21 +59,25 @@ export const AddHoleMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
   )
 }
 
-export const AddComponentStitchLineMenuItem: FC<AddComponentStitchLineMenuItemProps> = ({ type, onSelect }) => {
+export const AddComponentStitchLineMenuItem: FC<AddComponentStitchLineMenuItemProps> = ({
+  type,
+  disabled,
+  onSelect,
+}) => {
   const { t } = useTranslation()
   const Icon = getModelIconByType(type)
   return (
-    <Menu.Item value={type} onSelect={() => onSelect(type)}>
+    <Menu.Item value={type} disabled={disabled} onSelect={() => onSelect(type)}>
       <Icon />
       <Menu.ItemText>{t.project.editors.actions.components.addStitching}</Menu.ItemText>
     </Menu.Item>
   )
 }
 
-export const ExportComponentPngMenuItem: FC<ExportComponentPngMenuItemProps> = ({ onSelect }) => {
+export const ExportComponentPngMenuItem: FC<ExportComponentPngMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="export-png" onSelect={onSelect}>
+    <Menu.Item value="export-png" disabled={disabled} onSelect={onSelect}>
       <PiImage />
       <Menu.ItemText>{t.project.editors.actions.components.exportToPng}</Menu.ItemText>
     </Menu.Item>

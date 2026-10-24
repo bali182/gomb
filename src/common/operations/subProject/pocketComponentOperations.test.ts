@@ -5,7 +5,8 @@ import { addComponent, type ComponentInsertionPositionSchema } from './addCompon
 import { cloneComponent } from './cloneComponent'
 import { deleteComponent } from './deleteComponent'
 import { moveComponent } from './moveComponent'
-import { canAddChild, canMoveComponent } from './utils/componentRules'
+import { moveStitchLine } from './moveStitchLine'
+import { canAddChild, canAddStitchLine, canMoveComponent } from './utils/componentRules'
 import { getUnusedName } from './utils/getUnusedName'
 
 const fixture = () => {
@@ -26,6 +27,38 @@ const fixture = () => {
   })
 }
 describe('pocket component operations', () => {
+  it('permits stitching only on supported components and clusters with a front pocket', () => {
+    const source = fixture()
+    const empty = d.pocketCluster({ id: 'empty' })
+    const withoutFront = d.pocketCluster({ id: 'without-front', children: ['a'] })
+    expect(canAddStitchLine(empty, source)).toBe(false)
+    expect(canAddStitchLine(withoutFront, source)).toBe(false)
+    expect(canAddStitchLine(source.components.first, source)).toBe(true)
+    expect(canAddStitchLine(source.components['front-a'], source)).toBe(false)
+    expect(canAddStitchLine(source.components.a, source)).toBe(true)
+    expect(canAddStitchLine(source.components.root, source)).toBe(true)
+    expect(canAddStitchLine(source.components.child, source)).toBe(true)
+  })
+
+  it('rejects moving stitching to a cluster without a front and permits a compatible populated cluster', () => {
+    const fixtureSource = fixture()
+    const empty = d.pocketCluster({ id: 'empty' })
+    const withoutFront = d.pocketCluster({ id: 'without-front', children: ['a'] })
+    const source: SubProjectSchema = {
+      ...fixtureSource,
+      components: { ...fixtureSource.components, empty, 'without-front': withoutFront },
+      stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root', targetType: 'component' })],
+    }
+    const snapshot = structuredClone(source)
+    for (const targetId of ['empty', 'without-front', 'front-a', 'a']) {
+      expect(moveStitchLine(source, { stitchLineId: 'line', targetId, targetType: 'component' })).toBe(source)
+    }
+    const moved = moveStitchLine(source, { stitchLineId: 'line', targetId: 'first', targetType: 'component' })
+    expect(moved.stitchLines[0]).toEqual({ ...source.stitchLines[0], targetId: 'first' })
+    expect(moved.components).toBe(source.components)
+    expect(source).toEqual(snapshot)
+  })
+
   it.each<{ position: ComponentInsertionPositionSchema; expected: string[] }>([
     { position: 'start', expected: ['new', 'first', 'second'] },
     { position: 'end', expected: ['first', 'second', 'new'] },
@@ -206,20 +239,22 @@ describe('pocket component operations', () => {
     expect(front.type).toBe('front-pocket')
     expect(front.children).toHaveLength(1)
   })
-  it('rejects cloning a pocket cluster without its children', () => {
+  it('clones a pocket cluster without its children as an empty sibling', () => {
     const source = fixture()
     const before = structuredClone(source)
     let next = 0
 
-    expect(() =>
-      cloneComponent(source, {
-        componentId: 'first',
-        settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
-        ids: { component: () => `copy-${next++}`, hole: () => `hole-${next++}`, stitchLine: () => `stitch-${next++}` },
-        names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
-      }),
-    ).toThrow('A pocket cluster cannot be cloned without its children')
+    const result = cloneComponent(source, {
+      componentId: 'first',
+      settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
+      ids: { component: () => `copy-${next++}`, hole: () => `hole-${next++}`, stitchLine: () => `stitch-${next++}` },
+      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+    })
+    expect(result.components.root.children).toEqual(['first', 'copy-0', 'second'])
+    expect(result.components['copy-0']).toMatchObject({ type: 'pocket-cluster', children: [] })
+    expect(Object.keys(result.components)).toEqual([...Object.keys(source.components), 'copy-0'])
+    expect(result.components.first).toBe(source.components.first)
     expect(source).toEqual(before)
-    expect(next).toBe(0)
+    expect(next).toBe(1)
   })
 })
