@@ -360,6 +360,10 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasAutoDimensionsSchema>,
           layout: {
             title: 'Layout',
+            mainAxisAnchor: {
+              label: 'Alignment',
+              tooltip: 'Aligns the whole group of children along the layout direction without changing their order.',
+            },
             layoutOrientation: {
               label: 'Orientation',
               tooltip: 'Arranges this component’s children in a horizontal row or vertical column.',
@@ -373,6 +377,21 @@ export const EN = {
             autoLayoutGap: {
               tooltip: 'Adjusts the gaps between child components so the panel is filled.',
             },
+            fillChild: {
+              label: 'A child fills the available space.',
+              tooltip:
+                'A child is set to Fill along the layout direction, so group alignment is unavailable. Set a fixed size for each child along this direction to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            fillGap: {
+              label: 'The gap fills the available space.',
+              tooltip:
+                'The gap is set to Fill, so group alignment is unavailable. Switch to a fixed gap to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            fillChildAndGap: {
+              label: 'A child and the gap fill the available space.',
+              tooltip:
+                'Both a child and the gap are set to Fill, so group alignment is unavailable. Set fixed child sizes along the layout direction and a fixed gap to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
           stretch: {
             title: 'Stretch',

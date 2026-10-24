@@ -20,6 +20,151 @@ import { getPathSegmentMidpoint } from './pathSegmentUtils'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
 
+describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('%s main-axis alignment', (layoutOrientation) => {
+  describe.each<AnchorSchema>(['start', 'middle', 'end'])('%s', (mainAxisAnchor) => {
+    const positionFactor = { start: 0, middle: 0.5, end: 1 }[mainAxisAnchor]
+
+    it.each(['root-panel', 'panel', 'front-pocket'] as const)('aligns children of a %s without reordering', (type) => {
+      const layout = { layoutOrientation, mainAxisAnchor, layoutGap: 10, children: ['a', 'b'] }
+      const a = d.panel({ id: 'a', width: 20, height: 20, autoWidth: false, autoHeight: false })
+      const b = d.panel({ id: 'b', width: 30, height: 30, autoWidth: false, autoHeight: false })
+      const root = d.rootPanel({
+        id: 'root',
+        width: 200,
+        height: 200,
+        mainAxisAnchor: 'end',
+        children: ['container'],
+      })
+      const panel = d.panel({
+        id: 'container',
+        width: 100,
+        height: 100,
+        autoWidth: false,
+        autoHeight: false,
+        offAxisAnchor: 'end',
+        ...layout,
+      })
+      const cluster = d.pocketCluster({
+        id: 'cluster',
+        width: 100,
+        height: 100,
+        autoWidth: false,
+        autoHeight: false,
+        orientation: 'up',
+        offAxisAnchor: 'end',
+        children: ['container'],
+      })
+      const front = d.frontPocket({ id: 'container', ...layout })
+      let original: SubProjectSchema
+      switch (type) {
+        case 'root-panel':
+          original = d.subProject({
+            id: 'sp',
+            root: d.rootPanel({ id: 'container', width: 100, height: 100, ...layout }),
+            components: [a, b],
+          })
+          break
+        case 'panel':
+          original = d.subProject({ id: 'sp', root, components: [panel, a, b] })
+          break
+        case 'front-pocket':
+          original = d.subProject({
+            id: 'sp',
+            root: { ...root, children: ['cluster'] },
+            components: [cluster, front, a, b],
+          })
+          break
+      }
+      const snapshot = structuredClone(original)
+      const computed = getComputedSubProject(original, defaultStitchingSettings)
+      const parent = computed.components.container.boundingRect
+      const axis = layoutOrientation === 'horizontal' ? 'x' : 'y'
+      expect(computed.components.a.boundingRect[axis].minus(parent[axis]).toNumber()).toBe(40 * positionFactor)
+      expect(computed.components.b.boundingRect[axis].minus(parent[axis]).toNumber()).toBe(40 * positionFactor + 30)
+      expect(original).toEqual(snapshot)
+    })
+
+    it.each([
+      { name: 'fixed overflow', sizes: [70, 50], autoGap: false, gap: 10, starts: [0, 80], remaining: -30 },
+      { name: 'fill child', sizes: [20, 'auto'], autoGap: false, gap: 10, starts: [0, 30], remaining: 0 },
+      { name: 'fill gap', sizes: [20, 30], autoGap: true, gap: 10, starts: [0, 70], remaining: 0 },
+      { name: 'fill child and gap', sizes: [20, 'auto'], autoGap: true, gap: 10, starts: [0, 60], remaining: 0 },
+      {
+        name: 'zero-sized fill child after overflow',
+        sizes: [120, 'auto'],
+        autoGap: false,
+        gap: 10,
+        starts: [0, 130],
+        remaining: -30,
+      },
+      { name: 'one fixed child with fill gap', sizes: [20], autoGap: true, gap: 10, starts: [0], remaining: 80 },
+      { name: 'one fixed child with fixed gap', sizes: [20], autoGap: false, gap: 10, starts: [0], remaining: 80 },
+      { name: 'no children', sizes: [], autoGap: true, gap: 10, starts: [], remaining: 100 },
+    ])('handles $name', ({ sizes, autoGap, gap, starts, remaining }) => {
+      const children = sizes.map((size, index) =>
+        d.panel({
+          id: `child-${index}`,
+          width: typeof size === 'number' ? size : 0,
+          height: typeof size === 'number' ? size : 0,
+          autoWidth: size === 'auto',
+          autoHeight: size === 'auto',
+        }),
+      )
+      const root = d.rootPanel({
+        id: 'root',
+        width: 100,
+        height: 100,
+        layoutOrientation,
+        mainAxisAnchor,
+        autoLayoutGap: autoGap,
+        layoutGap: gap,
+        children: children.map((child) => child.id),
+      })
+      const computed = getComputedSubProject(
+        d.subProject({ id: 'sp', root, components: children }),
+        defaultStitchingSettings,
+      )
+      const axis = layoutOrientation === 'horizontal' ? 'x' : 'y'
+      expect(children.map((child) => computed.components[child.id].boundingRect[axis].toNumber())).toEqual(
+        starts.map((start) => start + remaining * positionFactor),
+      )
+    })
+
+    it('applies stretch after aligning the layout boxes', () => {
+      const root = d.rootPanel({
+        id: 'root',
+        width: 100,
+        height: 100,
+        layoutOrientation,
+        mainAxisAnchor,
+        layoutGap: 10,
+        children: ['a', 'b'],
+      })
+      const a = d.panel({
+        id: 'a',
+        width: 20,
+        height: 20,
+        autoWidth: false,
+        autoHeight: false,
+        leftStretch: 5,
+        rightStretch: 7,
+        topStretch: 5,
+        bottomStretch: 7,
+      })
+      const b = d.panel({ id: 'b', width: 30, height: 30, autoWidth: false, autoHeight: false })
+      const computed = getComputedSubProject(
+        d.subProject({ id: 'sp', root, components: [a, b] }),
+        defaultStitchingSettings,
+      )
+      const axis = layoutOrientation === 'horizontal' ? 'x' : 'y'
+      const size = layoutOrientation === 'horizontal' ? 'width' : 'height'
+      expect(computed.components.a.boundingRect[axis].toNumber()).toBe(40 * positionFactor - 5)
+      expect(computed.components.a.boundingRect[size].toNumber()).toBe(32)
+      expect(computed.components.b.boundingRect[axis].toNumber()).toBe(40 * positionFactor + 30)
+    })
+  })
+})
+
 type FixedLayoutTestCase = {
   rootPanel: Partial<RootPanelSchema>
   firstPanel: Partial<PanelSchema>

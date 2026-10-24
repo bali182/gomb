@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 import { ZERO } from '../constants/layout'
+import type { AnchorSchema } from '../schemas/common'
 import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
@@ -36,7 +37,13 @@ const calculateHorizontalDefaultBoundingBoxes = ({
   boundingRect,
 }: CalculateLayoutBoundingBoxesParams): Record<string, LayoutBoundingBox> => {
   const widths = calculateMainAxisSizes(children, boundingRect, component, computedGap)
-  let nextLeft = boundingRect.x
+  let nextLeft = getMainAxisStart(
+    component.mainAxisAnchor,
+    boundingRect.x,
+    boundingRect.width,
+    Object.values(widths).reduce((sum, width) => sum.plus(width), ZERO),
+    computedGap.times(Math.max(children.length - 1, 0)),
+  )
   const boundingBoxes: Record<string, LayoutBoundingBox> = {}
 
   for (const child of children) {
@@ -69,7 +76,13 @@ const calculateVerticalDefaultBoundingBoxes = ({
   boundingRect,
 }: CalculateLayoutBoundingBoxesParams): Record<string, LayoutBoundingBox> => {
   const heights = calculateMainAxisSizes(children, boundingRect, component, computedGap)
-  let nextTop = boundingRect.y
+  let nextTop = getMainAxisStart(
+    component.mainAxisAnchor,
+    boundingRect.y,
+    boundingRect.height,
+    Object.values(heights).reduce((sum, height) => sum.plus(height), ZERO),
+    computedGap.times(Math.max(children.length - 1, 0)),
+  )
   const boundingBoxes: Record<string, LayoutBoundingBox> = {}
 
   for (const child of children) {
@@ -93,6 +106,24 @@ const calculateVerticalDefaultBoundingBoxes = ({
   }
 
   return boundingBoxes
+}
+
+const getMainAxisStart = (
+  anchor: AnchorSchema,
+  parentStart: BigNumber,
+  parentSize: BigNumber,
+  childrenSize: BigNumber,
+  gapSpace: BigNumber,
+): BigNumber => {
+  const remainingSpace = parentSize.minus(childrenSize).minus(gapSpace)
+  switch (anchor) {
+    case 'start':
+      return parentStart
+    case 'middle':
+      return parentStart.plus(remainingSpace.dividedBy(2))
+    case 'end':
+      return parentStart.plus(remainingSpace)
+  }
 }
 
 const calculateMainAxisSizes = (

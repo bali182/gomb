@@ -124,6 +124,8 @@ const flipComponent = (
         ...component,
         ...flipCornerRadii(component, axis),
         children: flipChildOrder(component, axis),
+        mainAxisAnchor:
+          component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
       }
       return flipped
     }
@@ -133,6 +135,8 @@ const flipComponent = (
         ...flipCornerRadii(component, axis),
         ...flipStretch(component, axis),
         children: flipChildOrder(component, axis),
+        mainAxisAnchor:
+          component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
         offAxisAnchor: flipOffAxisAnchor(component, subProject, axis, flippedComponentIds),
       }
       return flipped
@@ -158,6 +162,8 @@ const flipComponent = (
         ...component,
         ...flipCornerRadii(component, axis),
         children: flipChildOrder(component, axis),
+        mainAxisAnchor:
+          component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
         opening: flipPocketOpening(component.opening, cluster.orientation, flippedOrientation, axis),
       }
       return flipped

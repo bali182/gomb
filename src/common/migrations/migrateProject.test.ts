@@ -15,6 +15,48 @@ import { migrateProject } from './migrateProject'
 
 const context: ProjectMigrationContextSchema = { t: EN }
 
+describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: %s', (mainAxisAnchor) => {
+  it('fills missing alignment and preserves supplied alignment on all layout component types', () => {
+    const root = d.rootPanel({ id: 'root', children: ['panel'] })
+    const panel = d.panel({ id: 'panel', children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
+    const front = d.frontPocket({ id: 'front' })
+    const original = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sp', root, components: [panel, cluster, front] })],
+    })
+    const legacy: DeepPartialSchema<ProjectSchema> = structuredClone(original)
+    const components = legacy.subProjects?.[0]?.components
+    if (!isDefined(components)) {
+      throw new Error('Missing components')
+    }
+    for (const component of Object.values(components)) {
+      if (component?.type === 'root-panel' || component?.type === 'panel' || component?.type === 'front-pocket') {
+        delete component.mainAxisAnchor
+      }
+    }
+    const migrated = migrateProject(legacy, context)
+    for (const id of ['root', 'panel', 'front']) {
+      expect(migrated.subProjects?.[0]?.components?.[id]).toHaveProperty('mainAxisAnchor', 'start')
+    }
+    const configured = d.project({
+      id: 'project',
+      subProjects: [
+        d.subProject({
+          id: 'sp',
+          root: { ...root, mainAxisAnchor },
+          components: [{ ...panel, mainAxisAnchor }, cluster, { ...front, mainAxisAnchor }],
+        }),
+      ],
+    })
+    const preserved = migrateProject(configured, context)
+    for (const id of ['root', 'panel', 'front']) {
+      expect(preserved.subProjects?.[0]?.components?.[id]).toHaveProperty('mainAxisAnchor', mainAxisAnchor)
+    }
+    expect(typia.is<ProjectSchema>(preserved)).toBe(true)
+  })
+})
+
 const createProjectWithSubProject = (): ProjectSchema => {
   const project = createProject('Project')
   const subProject = createSubProject('Root', project.stitchingSettings)

@@ -2,7 +2,9 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
+import { defaultStitchingSettings } from '../../defaultStates'
 import { calculatePocketBoundingBox } from '../../logic/calculatePocketBoundingBox'
+import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
 import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusValuesSchema } from '../../schemas/common'
 import type { LayoutOrientationSchema, PocketOpeningSchema, PocketOrientationSchema } from '../../schemas/components'
@@ -14,6 +16,51 @@ import { accessors } from '../../utils/accessors'
 import { flip } from './flip'
 
 const axes: FlipAxisSchema[] = ['horizontal', 'vertical']
+
+describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layout alignment', (layoutOrientation) => {
+  describe.each<AnchorSchema>(['start', 'middle', 'end'])('%s', (mainAxisAnchor) => {
+    it.each(axes)('mirrors alignment at every layout depth along %s', (axis) => {
+      const root = d.rootPanel({ id: 'root', children: ['panel'], layoutOrientation, mainAxisAnchor })
+      const panel = d.panel({ id: 'panel', children: ['cluster'], layoutOrientation, mainAxisAnchor })
+      const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
+      const front = d.frontPocket({ id: 'front', layoutOrientation, mainAxisAnchor })
+      const original = d.subProject({ id: 'sp', root, components: [panel, cluster, front] })
+      const mirrored: Record<AnchorSchema, AnchorSchema> = { start: 'end', middle: 'middle', end: 'start' }
+      const result = accessors.subProject(flip(original, root, axis))
+      const expected = layoutOrientation === axis ? mirrored[mainAxisAnchor] : mainAxisAnchor
+      expect(result.rootPanel().mainAxisAnchor).toBe(expected)
+      expect(result.panel('panel').mainAxisAnchor).toBe(expected)
+      expect(result.frontPocket('front').mainAxisAnchor).toBe(expected)
+      expect(flip(flip(original, root, axis), root, axis)).toEqual(original)
+    })
+
+    it.each([30, 80])('reflects the computed positions of unequal children with second size %s', (secondSize) => {
+      const root = d.rootPanel({
+        id: 'root',
+        width: 100,
+        height: 100,
+        children: ['a', 'b'],
+        layoutOrientation,
+        mainAxisAnchor,
+        layoutGap: 10,
+      })
+      const a = d.panel({ id: 'a', width: 20, height: 20, autoWidth: false, autoHeight: false })
+      const b = d.panel({ id: 'b', width: secondSize, height: secondSize, autoWidth: false, autoHeight: false })
+      const original = d.subProject({ id: 'sp', root, components: [a, b] })
+      const before = getComputedSubProject(original, defaultStitchingSettings)
+      const after = getComputedSubProject(flip(original, root, layoutOrientation), defaultStitchingSettings)
+      const position = layoutOrientation === 'horizontal' ? 'x' : 'y'
+      const size = layoutOrientation === 'horizontal' ? 'width' : 'height'
+      for (const child of [a, b]) {
+        const bounds = before.components[child.id].boundingRect
+        expect(after.components[child.id].boundingRect[position].toNumber()).toBe(
+          100 - bounds[position].toNumber() - bounds[size].toNumber(),
+        )
+      }
+    })
+  })
+})
+
 const radii: HasCornerRadiusValuesSchema = {
   topLeftRadius: 1,
   topRightRadius: 2,
@@ -106,14 +153,23 @@ describe.each(axes)('flip: %s', (axis) => {
         ? { topStretch: -2, rightStretch: 7, bottomStretch: 5, leftStretch: 3 }
         : { topStretch: 5, rightStretch: 3, bottomStretch: -2, leftStretch: 7 }
     const result = flip(original, panel, axis)
-    expect(result.components.panel).toEqual({ ...panel, ...mirroredRadii[axis], ...expectedStretch })
+    expect(result.components.panel).toEqual({
+      ...panel,
+      ...mirroredRadii[axis],
+      ...expectedStretch,
+      mainAxisAnchor: axis === panel.layoutOrientation ? 'end' : 'start',
+    })
     expect(result.components.root).toBe(root)
   })
 
-  it('mirrors root-panel radii while preserving its dimensions and layout settings', () => {
+  it('mirrors root-panel radii and layout alignment while preserving its dimensions', () => {
     const root = d.rootPanel({ id: 'root', ...radii, individualRadii: true, width: 170, height: 110, layoutGap: 6 })
     const original = d.subProject({ id: 'sp', root })
-    expect(flip(original, root, axis).components.root).toEqual({ ...root, ...mirroredRadii[axis] })
+    expect(flip(original, root, axis).components.root).toEqual({
+      ...root,
+      ...mirroredRadii[axis],
+      mainAxisAnchor: axis === root.layoutOrientation ? 'end' : 'start',
+    })
   })
 
   it.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
@@ -438,6 +494,7 @@ describe.each(orientationCases)(
       expect(result.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
         ...mirroredRadii[axis],
+        mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', side: 'start', offset: 9 },
       })
       expect(result.component('outside')).toBe(original.components.outside)
@@ -459,6 +516,7 @@ describe.each(orientationCases)(
       expect(frontResult.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
         ...mirroredRadii[axis],
+        mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', offset: 9, side: swapsEnds ? 'start' : 'end' },
       })
       expect(frontResult.tPocket('t')).toBe(source.tPocket('t'))

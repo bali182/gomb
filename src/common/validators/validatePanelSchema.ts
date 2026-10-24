@@ -36,6 +36,12 @@ export const validatePanelSchema = (
     layoutOrientationValues,
     context,
   )
+  const mainAxisAnchorResult = validatePrimitiveUnion(
+    input.mainAxisAnchor,
+    currentValue.mainAxisAnchor,
+    { start: true, middle: true, end: true },
+    context,
+  )
   const layoutGapResult = validateNumber(input.layoutGap, currentValue.layoutGap, context, { min: 0 })
   const offAxisAnchorResult = validatePrimitiveUnion(
     input.offAxisAnchor,
@@ -72,6 +78,7 @@ export const validatePanelSchema = (
     individualStretch: undefined,
     layoutGap: layoutGapResult.issues,
     layoutOrientation: layoutOrientationResult.issues,
+    mainAxisAnchor: mainAxisAnchorResult.issues,
     name: nameResult.issues,
     topLeftRadius: topLeftRadiusResult.issues,
     topRightRadius: topRightRadiusResult.issues,
@@ -97,6 +104,7 @@ export const validatePanelSchema = (
     individualStretch: input.individualStretch,
     layoutGap: layoutGapResult.committedValue,
     layoutOrientation: layoutOrientationResult.committedValue,
+    mainAxisAnchor: mainAxisAnchorResult.committedValue,
     name: nameResult.committedValue,
     topLeftRadius: topLeftRadiusResult.committedValue,
     topRightRadius: topRightRadiusResult.committedValue,
@@ -118,6 +126,7 @@ export const validatePanelSchema = (
     !nameResult.isValid ||
     !colorResult.isValid ||
     !layoutOrientationResult.isValid ||
+    !mainAxisAnchorResult.isValid ||
     !layoutGapResult.isValid ||
     !offAxisAnchorResult.isValid ||
     !topLeftRadiusResult.isValid ||
@@ -146,6 +155,7 @@ export const validatePanelSchema = (
     individualStretch: input.individualStretch,
     layoutGap: layoutGapResult.value,
     layoutOrientation: layoutOrientationResult.value,
+    mainAxisAnchor: mainAxisAnchorResult.value,
     name: nameResult.value,
     topLeftRadius: topLeftRadiusResult.value,
     topRightRadius: topRightRadiusResult.value,
