@@ -323,6 +323,14 @@ export const EN = {
         components: {
           anchor: {
             title: 'Alignment',
+            heightFill: {
+              label: 'A filled height leaves nothing to align.',
+              tooltip: 'The component fills its parent’s height, so top, centre and bottom alignment would place it in the same position. Switch to a fixed height to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            widthFill: {
+              label: 'A filled width leaves nothing to align.',
+              tooltip: 'The component fills its parent’s width, so left, centre and right alignment would place it in the same position. Switch to a fixed width to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
             offAxisAnchor: {
               label: 'Alignment',
               tooltip: 'Sets whether the component sits at the start, centre, or end of its parent.',

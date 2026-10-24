@@ -1,4 +1,4 @@
-import { SegmentGroup } from '@chakra-ui/react'
+import { HStack, SegmentGroup, Text } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import {
   PiAlignBottomSimple,
@@ -7,6 +7,7 @@ import {
   PiAlignLeftSimple,
   PiAlignRightSimple,
   PiAlignTopSimple,
+  PiInfo,
 } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -14,7 +15,10 @@ import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
 import type { ComponentSchema, HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
+import type { EditorFieldTranslationSchema } from '../../../schemas/translation'
+import { narrowers } from '../../../utils/narrowers'
 import { SectionGroup } from '../../common/SectionGroup'
+import { Tooltip } from '../../common/Tooltip'
 
 type AnchorSectionProps<T> = {
   parent: ComponentSchema
@@ -32,13 +36,22 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   const { t } = useTranslation()
 
   const isOffAxisFill = useMemo<boolean>(() => {
-    if (parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket') {
+    if (narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)) {
       if (parent.layoutOrientation === 'vertical') {
         return editable.autoWidth
       }
     }
     return editable.autoHeight
   }, [parent, editable.autoHeight, editable.autoWidth])
+
+  const fillTranslation = useMemo<EditorFieldTranslationSchema>(() => {
+    if (narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)) {
+      if (parent.layoutOrientation === 'vertical') {
+        return t.project.editors.sections.components.anchor.widthFill
+      }
+    }
+    return t.project.editors.sections.components.anchor.heightFill
+  }, [parent, t])
 
   const handleOffAxisAnchorChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails) => {
@@ -49,7 +62,22 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.project.editors.sections.components.anchor.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader
+        rightAddon={
+          isOffAxisFill ? (
+            <Tooltip content={fillTranslation.tooltip}>
+              <HStack color="fg.info" gap="1">
+                <PiInfo />
+                <Text fontWeight="bold" textStyle="xs">
+                  {fillTranslation.label}
+                </Text>
+              </HStack>
+            </Tooltip>
+          ) : undefined
+        }
+      >
+        {t.project.editors.sections.components.anchor.title}
+      </SectionGroup.SectionHeader>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.anchor.offAxisAnchor.tooltip}>
         {t.project.editors.sections.components.anchor.offAxisAnchor.label}
       </SectionGroup.SectionRowTitle>
@@ -63,14 +91,14 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="start">
             <SegmentGroup.ItemHiddenInput />
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal' ? (
               <PiAlignTopSimple />
             ) : (
               <PiAlignLeftSimple />
             )}
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.start
@@ -78,14 +106,14 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
           </SegmentGroup.Item>
           <SegmentGroup.Item value="middle">
             <SegmentGroup.ItemHiddenInput />
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal' ? (
               <PiAlignCenterVerticalSimple />
             ) : (
               <PiAlignCenterHorizontalSimple />
             )}
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.middle
@@ -93,14 +121,14 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
           </SegmentGroup.Item>
           <SegmentGroup.Item value="end">
             <SegmentGroup.ItemHiddenInput />
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal' ? (
               <PiAlignBottomSimple />
             ) : (
               <PiAlignRightSimple />
             )}
-            {(parent.type === 'root-panel' || parent.type === 'panel' || parent.type === 'front-pocket'
+            {(narrowers.is.rootPanel(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)
               ? parent.layoutOrientation
               : 'horizontal') === 'horizontal'
               ? t.project.editors.enums.common.anchor.vertical.end

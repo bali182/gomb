@@ -265,6 +265,14 @@ export const HU = {
         components: {
           anchor: {
             title: 'Igazítás',
+            heightFill: {
+              label: 'Kitöltött magasságnál nincs mit igazítani.',
+              tooltip: 'A komponens kitölti a szülő magasságát, ezért a felső, középső és alsó igazítás ugyanoda helyezné. Az igazításhoz válts fix magasságra.',
+            },
+            widthFill: {
+              label: 'Kitöltött szélességnél nincs mit igazítani.',
+              tooltip: 'A komponens kitölti a szülő szélességét, ezért a bal, középső és jobb igazítás ugyanoda helyezné. Az igazításhoz válts fix szélességre.',
+            },
             offAxisAnchor: {
               label: 'Igazítás',
               tooltip: 'A komponens helyét állítja be a szülőkomponens elején, közepén vagy végén.',
