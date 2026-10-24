@@ -11,6 +11,7 @@ export const SELECTED_HOLE_FILL_COLOR = '#0f6cbd7b'
 export const SELECTED_HOLE_STROKE_COLOR = '#0f6cbd'
 
 export const STROKE_THICKNESS = 0.3
+export const EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY = '2 1'
 export const VIEWBOX_PADDING = 10
 
 export const COMPONENT_NAME_COLOR = '#000000'

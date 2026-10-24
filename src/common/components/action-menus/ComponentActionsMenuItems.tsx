@@ -8,6 +8,7 @@ import { getModelIconByType } from '../../utils/getModelIcon'
 
 type AddComponentMenuItemProps = {
   type: ComponentSchema['type']
+  disabled?: boolean
   onSelect: (type: ComponentSchema['type']) => void
 }
 
@@ -24,7 +25,7 @@ type ExportComponentPngMenuItemProps = {
   onSelect: () => Promise<void>
 }
 
-export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, onSelect }) => {
+export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, disabled, onSelect }) => {
   const { t } = useTranslation()
   const Icon = getModelIconByType(type)
   const labels = useMemo<Record<ComponentSchema['type'], string>>(
@@ -38,7 +39,7 @@ export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, onSe
     [t],
   )
   return (
-    <Menu.Item value={type} onSelect={() => onSelect(type)}>
+    <Menu.Item value={type} disabled={disabled} onSelect={() => onSelect(type)}>
       <Icon />
       <Menu.ItemText>{labels[type]}</Menu.ItemText>
     </Menu.Item>

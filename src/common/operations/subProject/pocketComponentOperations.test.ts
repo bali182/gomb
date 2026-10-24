@@ -5,7 +5,7 @@ import { addComponent, type ComponentInsertionPositionSchema } from './addCompon
 import { cloneComponent } from './cloneComponent'
 import { deleteComponent } from './deleteComponent'
 import { moveComponent } from './moveComponent'
-import { canAddChild } from './utils/componentRules'
+import { canAddChild, canMoveComponent } from './utils/componentRules'
 import { getUnusedName } from './utils/getUnusedName'
 
 const fixture = () => {
@@ -97,6 +97,47 @@ describe('pocket component operations', () => {
     expect(canAddChild(source.components.first, 'front-pocket', source)).toBe(false)
     expect(canAddChild(source.components.first, 'panel', source)).toBe(false)
     expect(canAddChild(source.components.a, 'panel', source)).toBe(false)
+  })
+  it('only permits adding the front pocket while a cluster has no front pocket', () => {
+    const source = fixture()
+    const cluster = d.pocketCluster({ id: 'empty' })
+    const withEmpty = addComponent(source, { parentId: 'root', component: cluster, position: 'end' })
+    expect(canAddChild(cluster, 't-pocket', withEmpty)).toBe(false)
+    expect(canAddChild(cluster, 'front-pocket', withEmpty)).toBe(true)
+    expect(canAddChild(cluster, 'panel', withEmpty)).toBe(false)
+    expect(
+      canMoveComponent(withEmpty, { componentId: 'a', targetParentId: cluster.id, beforeComponentId: undefined }),
+    ).toBe(false)
+
+    const withFront = addComponent(withEmpty, {
+      parentId: cluster.id,
+      component: d.frontPocket({ id: 'new-front' }),
+      position: 'end',
+    })
+    expect(canAddChild(withFront.components.empty, 't-pocket', withFront)).toBe(true)
+    expect(canAddChild(withFront.components.empty, 'front-pocket', withFront)).toBe(false)
+    expect(
+      canMoveComponent(withFront, { componentId: 'a', targetParentId: cluster.id, beforeComponentId: 'new-front' }),
+    ).toBe(true)
+  })
+
+  it('also rejects T-pockets when existing children contain no front pocket', () => {
+    const source = fixture()
+    source.components.first.children = ['a']
+    expect(canAddChild(source.components.first, 't-pocket', source)).toBe(false)
+    expect(canAddChild(source.components.first, 'front-pocket', source)).toBe(true)
+  })
+
+  it('inserts an empty cluster without creating any pockets', () => {
+    const source = fixture()
+    const before = structuredClone(source)
+    const cluster = d.pocketCluster({ id: 'empty' })
+    const result = addComponent(source, { parentId: 'root', component: cluster, position: 'end' })
+    expect(result.components.root.children).toEqual(['first', 'second', 'empty'])
+    expect(result.components.empty).toBe(cluster)
+    expect(result.components.empty.children).toEqual([])
+    expect(Object.keys(result.components)).toEqual([...Object.keys(source.components), 'empty'])
+    expect(source).toEqual(before)
   })
   it('builds a cluster through successive pure insertions without changing earlier results', () => {
     const source = fixture()

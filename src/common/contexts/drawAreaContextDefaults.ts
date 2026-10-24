@@ -35,6 +35,7 @@ const drawAreaDefaultComponentStyles: DrawAreaComponentStyles = {
   getMaskFillColor: produce(undefined),
   getMaskStrokeColor: produce(undefined),
   getBorderThickness: produce(undefined),
+  getBorderDasharray: produce(undefined),
   getFilter: produce(undefined),
 }
 

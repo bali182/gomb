@@ -23,6 +23,7 @@ export type DrawAreaComponentStyles = {
   getMaskFillColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getMaskStrokeColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getBorderThickness: (params: DrawAreaComponentStyleParams) => number | undefined
+  getBorderDasharray: (params: DrawAreaComponentStyleParams) => string | undefined
   getFilter: (params: DrawAreaComponentStyleParams) => string | undefined
 }
 

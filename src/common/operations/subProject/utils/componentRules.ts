@@ -14,11 +14,10 @@ export const canAddChild = (
   switch (parent.type) {
     case 't-pocket':
       return false
-    case 'pocket-cluster':
-      return (
-        type === 't-pocket' ||
-        (type === 'front-pocket' && !parent.children.some((id) => subProject.components[id]?.type === 'front-pocket'))
-      )
+    case 'pocket-cluster': {
+      const hasFrontPocket = parent.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+      return (type === 't-pocket' && hasFrontPocket) || (type === 'front-pocket' && !hasFrontPocket)
+    }
     default:
       return type === 'panel' || type === 'pocket-cluster'
   }

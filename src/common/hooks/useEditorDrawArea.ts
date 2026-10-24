@@ -1,5 +1,10 @@
 import { useLayoutEffect, useMemo } from 'react'
-import { STITCH_LINE_LABEL_BACKGROUND_COLOR, STITCH_LINE_LABEL_COLOR, STROKE_THICKNESS } from '../constants/drawing'
+import {
+  EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY,
+  STITCH_LINE_LABEL_BACKGROUND_COLOR,
+  STITCH_LINE_LABEL_COLOR,
+  STROKE_THICKNESS,
+} from '../constants/drawing'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { produce } from '../utils/produce'
@@ -102,6 +107,9 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
+      if (component.type === 'pocket-cluster' && component.children.length === 0) {
+        return 'transparent'
+      }
       const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
       if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
         return addAlpha(color)
@@ -127,6 +135,12 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
       },
       getBorderThickness: () => {
         return STROKE_THICKNESS
+      },
+      getBorderDasharray: ({ component }) => {
+        if (component.type === 'pocket-cluster' && component.children.length === 0) {
+          return EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY
+        }
+        return undefined
       },
       getFilter: ({ component }) => {
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined

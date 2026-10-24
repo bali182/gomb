@@ -372,15 +372,19 @@ const completePocketChildren = (
 /**
  * The cluster owns no material, so its selection contour is the union of its pockets.
  * Update its path after hole subtraction to include the pockets' finished cut contours.
+ * An empty cluster uses its rounded bounding rectangle as an editor-only placeholder.
  */
 const updatePocketClusterPaths = (computedComponents: Record<string, ComputedComponentSchema>): void => {
   for (const component of Object.values(computedComponents)) {
     if (component.type !== 'computed-pocket-cluster') {
       continue
     }
-    component.path = unionClosedPaths(
-      { commands: [] },
-      component.children.map((pocket) => pocket.path),
-    )
+    component.path =
+      component.children.length === 0
+        ? calculateRectPath(component.boundingRect, component.cornerRadius)
+        : unionClosedPaths(
+            { commands: [] },
+            component.children.map((pocket) => pocket.path),
+          )
   }
 }
