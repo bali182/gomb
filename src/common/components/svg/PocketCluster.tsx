@@ -8,6 +8,7 @@ import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
+import { PocketClusterSelectionLabel } from './PocketClusterSelectionLabel'
 import { PocketStitchMask } from './PocketStitchMask'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
@@ -58,6 +59,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
       <StitchLines componentId={componentId} maskId={isShowingCards ? maskId : undefined} />
+      <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )
 }

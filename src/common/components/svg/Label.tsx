@@ -1,5 +1,14 @@
 import BigNumber from 'bignumber.js'
-import { type CSSProperties, type FC, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  type FC,
+  type MouseEventHandler,
+  type PointerEventHandler,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
 import type { IconType } from 'react-icons'
 
@@ -13,6 +22,10 @@ type LabelCommonProps = {
   icon: IconType
   label: string
   portal?: boolean
+  rotation?: number
+  onClick?: MouseEventHandler<SVGGElement>
+  onPointerEnter?: PointerEventHandler<SVGGElement>
+  onPointerLeave?: PointerEventHandler<SVGGElement>
   // Space from the sides of it's bounding rect
   marginX?: number
   marginY?: number
@@ -50,6 +63,10 @@ export const Label: FC<LabelProps> = ({
   boundingRect,
   getPosition,
   portal = true,
+  rotation = 0,
+  onClick,
+  onPointerEnter,
+  onPointerLeave,
   marginX = DEFAULT_MARGIN_X,
   marginY = DEFAULT_MARGIN_Y,
   paddingX = DEFAULT_PADDING_X,
@@ -123,43 +140,58 @@ export const Label: FC<LabelProps> = ({
     return BigNumber.minimum(backgroundBounds.width, backgroundBounds.height).dividedBy(2)
   }, [backgroundBounds])
 
+  const rotationTransform = useMemo<string | undefined>(() => {
+    if (!isDefined(backgroundBounds) || rotation === 0) {
+      return undefined
+    }
+    const centerX = backgroundBounds.x.plus(backgroundBounds.width.dividedBy(2))
+    const centerY = backgroundBounds.y.plus(backgroundBounds.height.dividedBy(2))
+    return `rotate(${rotation} ${centerX.toNumber()} ${centerY.toNumber()})`
+  }, [backgroundBounds, rotation])
+
   const content = (
     <g
       opacity={isDefined(position) ? 1 : 0}
-      pointerEvents="none"
+      pointerEvents={isDefined(onClick) ? 'all' : 'none'}
+      cursor={isDefined(onClick) ? 'pointer' : undefined}
+      onClick={onClick}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
       transform={isDefined(position) ? `translate(${position.x.toNumber()} ${position.y.toNumber()})` : undefined}
     >
-      {isDefined(backgroundBounds) && isDefined(backgroundCornerRadius) && (
-        <rect
-          fill={backgroundColor}
-          height={backgroundBounds.height.toNumber()}
-          rx={backgroundCornerRadius.toNumber()}
-          width={backgroundBounds.width.toNumber()}
-          x={backgroundBounds.x.toNumber()}
-          y={backgroundBounds.y.toNumber()}
-        />
-      )}
-      {isDefined(textBounds) && isDefined(iconPosition) && (
-        <Icon
-          color={color}
-          size={textBounds.height.toNumber()}
-          x={iconPosition.x.toNumber()}
-          y={iconPosition.y.toNumber()}
-        />
-      )}
-      <text
-        ref={textRef}
-        alignmentBaseline="middle"
-        fill={color}
-        fontFamily={fontFamily}
-        fontSize={fontSize}
-        textAnchor="start"
-        x={0}
-        y={0}
-        style={textStyle}
-      >
-        {label}
-      </text>
+      <g transform={rotationTransform}>
+        {isDefined(backgroundBounds) && isDefined(backgroundCornerRadius) && (
+          <rect
+            fill={backgroundColor}
+            height={backgroundBounds.height.toNumber()}
+            rx={backgroundCornerRadius.toNumber()}
+            width={backgroundBounds.width.toNumber()}
+            x={backgroundBounds.x.toNumber()}
+            y={backgroundBounds.y.toNumber()}
+          />
+        )}
+        {isDefined(textBounds) && isDefined(iconPosition) && (
+          <Icon
+            color={color}
+            size={textBounds.height.toNumber()}
+            x={iconPosition.x.toNumber()}
+            y={iconPosition.y.toNumber()}
+          />
+        )}
+        <text
+          ref={textRef}
+          alignmentBaseline="middle"
+          fill={color}
+          fontFamily={fontFamily}
+          fontSize={fontSize}
+          textAnchor="start"
+          x={0}
+          y={0}
+          style={textStyle}
+        >
+          {label}
+        </text>
+      </g>
     </g>
   )
 

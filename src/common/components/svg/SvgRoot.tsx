@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react'
 import { VIEWBOX_PADDING } from '../../constants/drawing'
 import { useMeasurement } from '../../hooks/useMeasurement'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -5,6 +6,10 @@ import { getViewBox } from '../../utils/getViewBox'
 import { MeasurementOverlay } from './MeasurementOverlay'
 import { RootPanel } from './RootPanel'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
+
+const noOutline: CSSProperties = {
+  outline: 'none',
+}
 
 export const SvgRoot = () => {
   const { isMeasuring } = useMeasurement()
@@ -22,7 +27,7 @@ export const SvgRoot = () => {
       viewBox={viewBox}
     >
       <RootPanel componentId={computedProject.root} nestingLevel={0} />
-      <g ref={svgLabelsPortalRef} pointerEvents="none" />
+      <g ref={svgLabelsPortalRef} pointerEvents="none" style={noOutline} />
       {isMeasuring && <MeasurementOverlay />}
     </svg>
   )
