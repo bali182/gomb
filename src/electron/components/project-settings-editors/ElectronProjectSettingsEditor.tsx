@@ -1,5 +1,6 @@
 import { Tabs } from '@chakra-ui/react'
 import type { FC } from 'react'
+import { ProjectSettingsEditorTabs } from '../../../common/constants/editorTabs'
 
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { ColorSettingsSections } from '../../../common/components/project-settings-editors/ColorSettingsSections'
@@ -37,12 +38,14 @@ export const ElectronProjectSettingsEditor: FC<ElectronProjectSettingsEditorProp
   const { t } = useTranslation()
 
   return (
-    <Tabs.Root defaultValue="basic">
+    <Tabs.Root defaultValue={ProjectSettingsEditorTabs.basic}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value="basic">{t.project.editors.tabs.project.basic}</Tabs.Trigger>
-        <Tabs.Trigger value="stitching">{t.project.editors.tabs.project.stitching}</Tabs.Trigger>
+        <Tabs.Trigger value={ProjectSettingsEditorTabs.basic}>{t.project.editors.tabs.project.basic}</Tabs.Trigger>
+        <Tabs.Trigger value={ProjectSettingsEditorTabs.stitching}>
+          {t.project.editors.tabs.project.stitching}
+        </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="basic" pt={0}>
+      <Tabs.Content value={ProjectSettingsEditorTabs.basic} pt={0}>
         <SectionGroup.Root>
           <ElectronProjectBasicSection
             editable={editable}
@@ -58,7 +61,7 @@ export const ElectronProjectSettingsEditor: FC<ElectronProjectSettingsEditorProp
           <ColorSettingsSections editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value="stitching" pt={0}>
+      <Tabs.Content value={ProjectSettingsEditorTabs.stitching} pt={0}>
         <ProjectStitchingSection editable={editable} issues={issues} onChange={onChange} />
       </Tabs.Content>
     </Tabs.Root>

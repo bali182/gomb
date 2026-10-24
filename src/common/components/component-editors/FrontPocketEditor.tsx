@@ -1,5 +1,6 @@
 import { Tabs } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
+import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
@@ -18,16 +19,12 @@ type FrontPocketEditorProps = {
   parent: PocketClusterSchema
   onChange: (value: EditableSchema<FrontPocketSchema>) => void
 }
-const FrontPocketTabs = {
-  layout: 'layout',
-  contents: 'contents',
-}
 
 export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: component.id,
-    defaultTab: FrontPocketTabs.layout,
-    tabs: FrontPocketTabs,
+    defaultTab: PocketEditorTabs.layout,
+    tabs: PocketEditorTabs,
   })
   const { t } = useTranslation()
   const handleOpeningChange = useCallback(
@@ -49,10 +46,10 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={FrontPocketTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
-        <Tabs.Trigger value={FrontPocketTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
+        <Tabs.Trigger value={PocketEditorTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
+        <Tabs.Trigger value={PocketEditorTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value={FrontPocketTabs.layout} pt={0}>
+      <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
         <SectionGroup.Root>
           <CornerRadiusSection
             value={component}
@@ -70,7 +67,7 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
           />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value={FrontPocketTabs.contents} pt={0}>
+      <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
         <SectionGroup.Root>
           <ContentsSection<FrontPocketSchema> editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>

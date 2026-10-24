@@ -1,4 +1,5 @@
 import { type FC } from 'react'
+import { StitchLineEditorTabs } from '../../constants/editorTabs'
 
 import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
@@ -20,11 +21,6 @@ type ComponentBoundsStitchLineEditorProps = {
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<ComponentBoundsStitchLineSchema>
 }
 
-const ComponentBoundsStitchLineTabs = {
-  settings: 'settings',
-  overrides: 'overrides',
-}
-
 export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditorProps> = ({
   value,
   editable,
@@ -36,26 +32,24 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: value.id,
-    defaultTab: ComponentBoundsStitchLineTabs.settings,
-    tabs: ComponentBoundsStitchLineTabs,
+    defaultTab: StitchLineEditorTabs.settings,
+    tabs: StitchLineEditorTabs,
   })
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.settings}>
-          {t.project.editors.tabs.stitchLines.settings}
-        </Tabs.Trigger>
-        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.overrides}>
+        <Tabs.Trigger value={StitchLineEditorTabs.settings}>{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
+        <Tabs.Trigger value={StitchLineEditorTabs.overrides}>
           {t.project.editors.tabs.stitchLines.overrides}
         </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value={ComponentBoundsStitchLineTabs.settings} pt={0}>
+      <Tabs.Content value={StitchLineEditorTabs.settings} pt={0}>
         <SectionGroup.Root>
           <StitchSidesAndCornersSection editable={editable} issues={issues} onChange={onChange} />
           <CornerRadiusSection value={value} editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value={ComponentBoundsStitchLineTabs.overrides} pt={0}>
+      <Tabs.Content value={StitchLineEditorTabs.overrides} pt={0}>
         <SectionGroup.Root>
           <StitchingSettingsSection<ComponentBoundsStitchLineSchema>
             editable={editable}

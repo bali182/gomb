@@ -1,5 +1,6 @@
 import { Tabs } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
+import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { PocketClusterSchema, PocketOpeningSchema, TPocketSchema } from '../../schemas/components'
@@ -16,17 +17,13 @@ type TPocketEditorProps = {
   parent: PocketClusterSchema
   onChange: (value: EditableSchema<TPocketSchema>) => void
 }
-const TPocketTabs = {
-  layout: 'layout',
-  contents: 'contents',
-}
 
 export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: component.id,
-    defaultTab: TPocketTabs.layout,
-    tabs: TPocketTabs,
+    defaultTab: PocketEditorTabs.layout,
+    tabs: PocketEditorTabs,
   })
   const handleOpeningChange = useCallback(
     (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
@@ -43,10 +40,10 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={TPocketTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
-        <Tabs.Trigger value={TPocketTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
+        <Tabs.Trigger value={PocketEditorTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
+        <Tabs.Trigger value={PocketEditorTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value={TPocketTabs.layout} pt={0}>
+      <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
         <SectionGroup.Root>
           <SectionGroup.Section>
             <SectionGroup.SectionHeader>
@@ -85,7 +82,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
           />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value={TPocketTabs.contents} pt={0}>
+      <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
         <SectionGroup.Root>
           <ContentsSection<TPocketSchema> editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>

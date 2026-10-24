@@ -5,8 +5,10 @@ import {
   STITCH_LINE_LABEL_COLOR,
   STROKE_THICKNESS,
 } from '../constants/drawing'
+import { PocketEditorTabs } from '../constants/editorTabs'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
 import { produce } from '../utils/produce'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useProject } from './useProject'
@@ -75,13 +77,29 @@ const markerStyles: DrawAreaMarkerStyles = {
   getThickness: produce(undefined),
 }
 
-export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue => {
+type UseEditorDrawAreaParams = {
+  isInteractive: boolean
+  editorTabs?: Readonly<Partial<Record<string, string>>>
+}
+
+export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAreaParams): DrawAreaContextValue => {
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const { subProject } = useSubProject()
   const drawAreaSelection = useSubProjectSelection(subProject)
   const { hovered, isHovered, isSelected, selected } = drawAreaSelection
   const { clearSelection, clearHover } = drawAreaSelection
+
+  const isEditingPocketContents = useMemo<boolean>(() => {
+    return (
+      isInteractive &&
+      settings.view.pocketItemsVisible &&
+      isDefined(selected) &&
+      narrowers.is.pocket(selected) &&
+      isDefined(selected.pocketItemId) &&
+      editorTabs?.[selected.id] === PocketEditorTabs.contents
+    )
+  }, [isInteractive, settings.view.pocketItemsVisible, selected, editorTabs])
 
   useLayoutEffect(() => {
     if (!isInteractive) {
@@ -114,6 +132,9 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
         return 'transparent'
       }
       const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
+      if (isEditingPocketContents && isSelected(component) && narrowers.is.pocket(component)) {
+        return addAlpha(color)
+      }
       if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
         return addAlpha(color)
       }
@@ -149,7 +170,15 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds])
+  }, [
+    isHovered,
+    isSelected,
+    leatherColor,
+    selectionColor,
+    strokeColor,
+    selectionObstructingComponentIds,
+    isEditingPocketContents,
+  ])
 
   const cardStyles = useMemo<DrawAreaCardStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaCardStyleParams): string => {

@@ -1,4 +1,5 @@
 import { type FC } from 'react'
+import { StitchLineEditorTabs } from '../../constants/editorTabs'
 
 import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
@@ -18,11 +19,6 @@ type TPocketStitchLineEditorProps = {
   resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<TPocketStitchLineSchema>
 }
 
-const TPocketStitchLineTabs = {
-  settings: 'settings',
-  overrides: 'overrides',
-}
-
 export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
   editable,
   issues,
@@ -33,25 +29,23 @@ export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: editable.id,
-    defaultTab: TPocketStitchLineTabs.settings,
-    tabs: TPocketStitchLineTabs,
+    defaultTab: StitchLineEditorTabs.settings,
+    tabs: StitchLineEditorTabs,
   })
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={TPocketStitchLineTabs.settings}>
-          {t.project.editors.tabs.stitchLines.settings}
-        </Tabs.Trigger>
-        <Tabs.Trigger value={TPocketStitchLineTabs.overrides}>
+        <Tabs.Trigger value={StitchLineEditorTabs.settings}>{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
+        <Tabs.Trigger value={StitchLineEditorTabs.overrides}>
           {t.project.editors.tabs.stitchLines.overrides}
         </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value={TPocketStitchLineTabs.settings} pt={0}>
+      <Tabs.Content value={StitchLineEditorTabs.settings} pt={0}>
         <SectionGroup.Root>
           <PocketStitchingSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>
-      <Tabs.Content value={TPocketStitchLineTabs.overrides} pt={0}>
+      <Tabs.Content value={StitchLineEditorTabs.overrides} pt={0}>
         <SectionGroup.Root>
           <StitchingSettingsSection<TPocketStitchLineSchema>
             editable={editable}
