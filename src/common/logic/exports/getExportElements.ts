@@ -109,9 +109,7 @@ const getExportElement = (
     cutHelperBoundingRect: rect,
     stitchLines,
     path: computed.path,
-    childMarkerPaths: settings.childMarkers
-      ? getExportChildMarkerPaths(computed.children, computed.boundingRect)
-      : [],
+    childMarkerPaths: settings.childMarkers ? getExportChildMarkerPaths(computed.children, computed.boundingRect) : [],
   }
   return element
 }

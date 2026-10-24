@@ -244,6 +244,10 @@ export const EN = {
         },
       },
       actions: {
+        common: {
+          flipHorizontal: 'Flip horizontal',
+          flipVertical: 'Flip vertical',
+        },
         components: {
           addPanel: 'Add panel',
           addRootPanel: 'Add module',
@@ -259,8 +263,6 @@ export const EN = {
           delete: 'Delete',
         },
         stitchLines: {
-          flipHorizontal: 'Flip horizontal',
-          flipVertical: 'Flip vertical',
           clone: 'Clone',
           delete: 'Delete',
         },
@@ -321,6 +323,16 @@ export const EN = {
         components: {
           anchor: {
             title: 'Alignment',
+            heightFill: {
+              label: 'A filled height leaves nothing to align.',
+              tooltip:
+                'The component fills its parent’s height, so top, centre and bottom alignment would place it in the same position. Switch to a fixed height to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            widthFill: {
+              label: 'A filled width leaves nothing to align.',
+              tooltip:
+                'The component fills its parent’s width, so left, centre and right alignment would place it in the same position. Switch to a fixed width to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
             offAxisAnchor: {
               label: 'Alignment',
               tooltip: 'Sets whether the component sits at the start, centre, or end of its parent.',
@@ -348,6 +360,10 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasAutoDimensionsSchema>,
           layout: {
             title: 'Layout',
+            mainAxisAnchor: {
+              label: 'Alignment',
+              tooltip: 'Aligns the whole group of children along the layout direction without changing their order.',
+            },
             layoutOrientation: {
               label: 'Orientation',
               tooltip: 'Arranges this component’s children in a horizontal row or vertical column.',
@@ -361,6 +377,21 @@ export const EN = {
             autoLayoutGap: {
               tooltip: 'Adjusts the gaps between child components so the panel is filled.',
             },
+            fillChild: {
+              label: 'A child fills the available space.',
+              tooltip:
+                'A child is set to Fill along the layout direction, so group alignment is unavailable. Set a fixed size for each child along this direction to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            fillGap: {
+              label: 'The gap fills the available space.',
+              tooltip:
+                'The gap is set to Fill, so group alignment is unavailable. Switch to a fixed gap to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
+            fillChildAndGap: {
+              label: 'A child and the gap fill the available space.',
+              tooltip:
+                'Both a child and the gap are set to Fill, so group alignment is unavailable. Set fixed child sizes along the layout direction and a fixed gap to enable alignment.',
+            } satisfies EditorFieldTranslationSchema,
           } satisfies SectionTranslationSchema<HasLayoutSchema>,
           stretch: {
             title: 'Stretch',

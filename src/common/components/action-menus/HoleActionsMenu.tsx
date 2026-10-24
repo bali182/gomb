@@ -7,6 +7,7 @@ import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
+import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
 import { AddHoleStitchLineMenuItem, CloneHoleMenuItem, DeleteHoleMenuItem } from './HoleActionsMenuItems'
 
 type HoleActionsMenuProps = {
@@ -17,7 +18,7 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
-  const { addStitchLineToHole, cloneHole, deleteHole } = useSubProjectOperations()
+  const { addStitchLineToHole, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -37,6 +38,13 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     onDelete(hole.id)
   }, [deleteHole, hole.id, onDelete])
 
+  const handleFlipHorizontal = useCallback((): void => {
+    flip(hole, 'horizontal')
+  }, [hole, flip])
+  const handleFlipVertical = useCallback((): void => {
+    flip(hole, 'vertical')
+  }, [hole, flip])
+
   return (
     <Box onClick={handleClick}>
       <Menu.Root>
@@ -50,6 +58,10 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
             <Menu.Content>
               <ActionsMenuSection>
                 <AddHoleStitchLineMenuItem onSelect={handleAddStitchLine} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />
+                <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneHoleMenuItem onSelect={handleClone} />

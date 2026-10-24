@@ -1,4 +1,5 @@
 import {
+  AnchorSchema,
   HasCornerRadiusSchema,
   HasIdentitySchema,
   HasOffAxisAnchor,
@@ -20,6 +21,7 @@ export type HasChildrenSchema = {
 
 export type HasLayoutSchema = {
   layoutOrientation: LayoutOrientationSchema
+  mainAxisAnchor: AnchorSchema
   layoutGap: number
   autoLayoutGap: boolean
 }

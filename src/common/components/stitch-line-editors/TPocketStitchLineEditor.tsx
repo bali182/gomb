@@ -39,8 +39,12 @@ export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={TPocketStitchLineTabs.settings}>{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
-        <Tabs.Trigger value={TPocketStitchLineTabs.overrides}>{t.project.editors.tabs.stitchLines.overrides}</Tabs.Trigger>
+        <Tabs.Trigger value={TPocketStitchLineTabs.settings}>
+          {t.project.editors.tabs.stitchLines.settings}
+        </Tabs.Trigger>
+        <Tabs.Trigger value={TPocketStitchLineTabs.overrides}>
+          {t.project.editors.tabs.stitchLines.overrides}
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value={TPocketStitchLineTabs.settings} pt={0}>
         <SectionGroup.Root>

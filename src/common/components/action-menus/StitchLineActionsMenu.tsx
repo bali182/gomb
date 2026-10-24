@@ -2,18 +2,13 @@ import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
-import { flipComponentBoundsStitchLine } from '../../logic/flipComponentBoundsStitchLine'
 import { portalRef } from '../../portalRef'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import {
-  CloneStitchLineMenuItem,
-  DeleteStitchLineMenuItem,
-  FlipStitchLineHorizontalMenuItem,
-  FlipStitchLineVerticalMenuItem,
-} from './StitchLineActionsMenuItems'
+import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import { CloneStitchLineMenuItem, DeleteStitchLineMenuItem } from './StitchLineActionsMenuItems'
 
 type StitchLineActionsMenuProps = {
   stitchLine: StitchLineSchema
@@ -24,7 +19,7 @@ type StitchLineActionsMenuProps = {
 }
 
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
-  const { cloneStitchLine, deleteStitchLine, updateStitchLine } = useSubProjectOperations()
+  const { cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -40,20 +35,12 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
   }, [cloneStitchLine, stitchLine.id])
 
   const handleFlipHorizontal = useCallback((): void => {
-    if (stitchLine.type !== 'component-bounds-stitch-line') {
-      return
-    }
-
-    updateStitchLine(flipComponentBoundsStitchLine(stitchLine, 'horizontal'))
-  }, [stitchLine, updateStitchLine])
+    flip(stitchLine, 'horizontal')
+  }, [stitchLine, flip])
 
   const handleFlipVertical = useCallback((): void => {
-    if (stitchLine.type !== 'component-bounds-stitch-line') {
-      return
-    }
-
-    updateStitchLine(flipComponentBoundsStitchLine(stitchLine, 'vertical'))
-  }, [stitchLine, updateStitchLine])
+    flip(stitchLine, 'vertical')
+  }, [stitchLine, flip])
 
   return (
     <Box onClick={handleActionsClick}>
@@ -67,12 +54,8 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
           <Menu.Positioner>
             <Menu.Content>
               <ActionsMenuSection>
-                {stitchLine.type === 'component-bounds-stitch-line' && (
-                  <FlipStitchLineHorizontalMenuItem onSelect={handleFlipHorizontal} />
-                )}
-                {stitchLine.type === 'component-bounds-stitch-line' && (
-                  <FlipStitchLineVerticalMenuItem onSelect={handleFlipVertical} />
-                )}
+                <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />
+                <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneStitchLineMenuItem onSelect={handleClone} />

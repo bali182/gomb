@@ -48,7 +48,9 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
 
   return (
     <>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.recessedPocketOpening.outerInset.tooltip}>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.components.recessedPocketOpening.outerInset.tooltip}
+      >
         {t.project.editors.sections.components.recessedPocketOpening.outerInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerInset}>
@@ -59,7 +61,9 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.recessedPocketOpening.innerOffset.tooltip}>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.components.recessedPocketOpening.innerOffset.tooltip}
+      >
         {t.project.editors.sections.components.recessedPocketOpening.innerOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerOffset}>
@@ -76,7 +80,9 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.depth}>
         <NumberInput value={editable.depth} issue={issues.depth} onChange={handleDepthChange} unit="mm" />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.recessedPocketOpening.outerRadius.tooltip}>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.components.recessedPocketOpening.outerRadius.tooltip}
+      >
         {t.project.editors.sections.components.recessedPocketOpening.outerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.outerRadius}>
@@ -87,7 +93,9 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.recessedPocketOpening.innerRadius.tooltip}>
+      <SectionGroup.SectionRowTitle
+        tooltip={t.project.editors.sections.components.recessedPocketOpening.innerRadius.tooltip}
+      >
         {t.project.editors.sections.components.recessedPocketOpening.innerRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.innerRadius}>

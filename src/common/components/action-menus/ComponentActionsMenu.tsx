@@ -29,6 +29,7 @@ import { noop } from '../../utils/noop'
 import { PocketCopyDialog } from '../pocket-copy/PocketCopyDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
+import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
 import {
   AddComponentMenuItem,
   AddComponentStitchLineMenuItem,
@@ -76,6 +77,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     cloneComponent,
     deleteComponent,
     copyPocketSettings,
+    flip,
   } = useSubProjectOperations()
   const [isPocketCopyOpen, setPocketCopyOpen] = useState<boolean>(false)
   const { navigateToProject, navigateToSubProject } = useEditorContext()
@@ -207,6 +209,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     },
     [component.id, copyPocketSettings],
   )
+  const handleFlipHorizontal = useCallback((): void => {
+    flip(component, 'horizontal')
+  }, [component, flip])
+  const handleFlipVertical = useCallback((): void => {
+    flip(component, 'vertical')
+  }, [component, flip])
   return (
     <Box onClick={handleActionsClick}>
       <Menu.Root>
@@ -239,6 +247,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && <ExportComponentPngMenuItem onSelect={handleExportPng} />}
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                {!subProjectOnly && <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />}
+                {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {canClone && <CloneComponentMenuItem onSelect={handleClone} />}

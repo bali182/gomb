@@ -186,6 +186,10 @@ export const HU = {
         },
       },
       actions: {
+        common: {
+          flipHorizontal: 'Vízszintes tükrözés',
+          flipVertical: 'Függőleges tükrözés',
+        },
         components: {
           addPanel: 'Panel hozzáadása',
           addRootPanel: 'Modul hozzáadása',
@@ -201,8 +205,6 @@ export const HU = {
           delete: 'Törlés',
         },
         stitchLines: {
-          flipHorizontal: 'Vízszintes tükrözés',
-          flipVertical: 'Függőleges tükrözés',
           clone: 'Duplikálás',
           delete: 'Törlés',
         },
@@ -263,6 +265,16 @@ export const HU = {
         components: {
           anchor: {
             title: 'Igazítás',
+            heightFill: {
+              label: 'Kitöltött magasságnál nincs mit igazítani.',
+              tooltip:
+                'A komponens kitölti a szülő magasságát, ezért a felső, középső és alsó igazítás ugyanoda helyezné. Az igazításhoz válts fix magasságra.',
+            },
+            widthFill: {
+              label: 'Kitöltött szélességnél nincs mit igazítani.',
+              tooltip:
+                'A komponens kitölti a szülő szélességét, ezért a bal, középső és jobb igazítás ugyanoda helyezné. Az igazításhoz válts fix szélességre.',
+            },
             offAxisAnchor: {
               label: 'Igazítás',
               tooltip: 'A komponens helyét állítja be a szülőkomponens elején, közepén vagy végén.',
@@ -290,6 +302,11 @@ export const HU = {
           },
           layout: {
             title: 'Elrendezés',
+            mainAxisAnchor: {
+              label: 'Igazítás',
+              tooltip:
+                'A gyerekek teljes csoportját igazítja az elrendezés irányában, a sorrendjük megváltoztatása nélkül.',
+            },
             layoutOrientation: {
               label: 'Irány',
               tooltip: 'A gyermekkomponenseket vízszintes sorba vagy függőleges oszlopba rendezi.',
@@ -302,6 +319,21 @@ export const HU = {
             },
             autoLayoutGap: {
               tooltip: 'A gyermekkomponensek közötti távolságokat a panel kitöltéséhez igazítja.',
+            },
+            fillChild: {
+              label: 'Egy gyerek kitölti a fennmaradó helyet.',
+              tooltip:
+                'Egy gyerek az elrendezés irányában Kitöltésre van állítva, ezért a csoport igazítása nem állítható. Az igazításhoz állíts be minden gyereknek fix méretet ebben az irányban.',
+            },
+            fillGap: {
+              label: 'A köz kitölti a fennmaradó helyet.',
+              tooltip:
+                'A köz Kitöltésre van állítva, ezért a csoport igazítása nem állítható. Az igazításhoz válts fix közre.',
+            },
+            fillChildAndGap: {
+              label: 'Egy gyerek és a köz kitölti a fennmaradó helyet.',
+              tooltip:
+                'Egy gyerek és a köz is Kitöltésre van állítva, ezért a csoport igazítása nem állítható. Az igazításhoz adj a gyerekeknek fix méretet az elrendezés irányában, és válts fix közre.',
             },
           },
           stretch: {

@@ -27,6 +27,12 @@ export const validateFrontPocketSchema = (
     { horizontal: true, vertical: true },
     context,
   )
+  const mainAxisAnchorResult = validatePrimitiveUnion(
+    input.mainAxisAnchor,
+    currentValue.mainAxisAnchor,
+    { start: true, middle: true, end: true },
+    context,
+  )
   const layoutGapResult = validateNumber(input.layoutGap, currentValue.layoutGap, context, { min: 0 })
   const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context, { min: 0 })
   const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context, { min: 0 })
@@ -42,6 +48,7 @@ export const validateFrontPocketSchema = (
     name: nameResult.issues,
     color: colorResult.issues,
     layoutOrientation: layoutOrientationResult.issues,
+    mainAxisAnchor: mainAxisAnchorResult.issues,
     layoutGap: layoutGapResult.issues,
     topLeftRadius: topLeftRadiusResult.issues,
     topRightRadius: topRightRadiusResult.issues,
@@ -54,6 +61,7 @@ export const validateFrontPocketSchema = (
     name: nameResult.committedValue,
     color: colorResult.committedValue,
     layoutOrientation: layoutOrientationResult.committedValue,
+    mainAxisAnchor: mainAxisAnchorResult.committedValue,
     layoutGap: layoutGapResult.committedValue,
     topLeftRadius: topLeftRadiusResult.committedValue,
     topRightRadius: topRightRadiusResult.committedValue,
@@ -67,6 +75,7 @@ export const validateFrontPocketSchema = (
     !nameResult.isValid ||
     !colorResult.isValid ||
     !layoutOrientationResult.isValid ||
+    !mainAxisAnchorResult.isValid ||
     !layoutGapResult.isValid ||
     !topLeftRadiusResult.isValid ||
     !topRightRadiusResult.isValid ||

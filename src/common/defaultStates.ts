@@ -79,6 +79,7 @@ export const defaultHasCornerRadius: HasCornerRadiusSchema = {
 
 export const defaultHasLayout: HasLayoutSchema = {
   layoutOrientation: 'horizontal',
+  mainAxisAnchor: 'start',
   layoutGap: 0,
   autoLayoutGap: false,
 }

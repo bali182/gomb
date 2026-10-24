@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getComputedSubProject } from '../logic/getComputedSubProject'
+import type { AnchorSchema } from '../schemas/common'
 import type { PanelSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
@@ -34,6 +35,27 @@ const createFixture = (): ValidationFixture => {
 }
 
 describe('validatePanelSchema dimensions and stretch', () => {
+  it.each<AnchorSchema>(['start', 'middle', 'end'])('accepts %s main-axis alignment', (mainAxisAnchor) => {
+    const { component, input, context } = createFixture()
+    const result = validatePanelSchema({ ...input, mainAxisAnchor }, component, context)
+    expect(result.isValid).toBe(true)
+    expect(result.value?.mainAxisAnchor).toBe(mainAxisAnchor)
+    expect(result.committedValue.mainAxisAnchor).toBe(mainAxisAnchor)
+    expect(result.issues.mainAxisAnchor).toBeUndefined()
+  })
+
+  it('rejects invalid main-axis alignment while committing other valid changes', () => {
+    const { component, input, context } = createFixture()
+    const result = validatePanelSchema(
+      { ...input, mainAxisAnchor: 'invalid' as AnchorSchema, width: '80' },
+      component,
+      context,
+    )
+    expect(result.isValid).toBe(false)
+    expect(result.issues.mainAxisAnchor?.severity).toBe('error')
+    expect(result.committedValue.mainAxisAnchor).toBe(component.mainAxisAnchor)
+    expect(result.committedValue.width).toBe(80)
+  })
   describe.each(['width', 'height'] as const)('%s', (field) => {
     it.each([true, false])('accepts zero with auto sizing %s', (auto) => {
       const { component, input, context } = createFixture()
