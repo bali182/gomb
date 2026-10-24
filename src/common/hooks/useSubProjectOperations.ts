@@ -13,6 +13,7 @@ import { cloneStitchLine as cloneStitchLinePure } from '../operations/subProject
 import { deleteComponent as deleteComponentPure } from '../operations/subProject/deleteComponent'
 import { deleteHole as deleteHolePure } from '../operations/subProject/deleteHole'
 import { deleteStitchLine as deleteStitchLinePure } from '../operations/subProject/deleteStitchLine'
+import { flip as flipPure } from '../operations/subProject/flip'
 import { moveComponent as moveComponentPure } from '../operations/subProject/moveComponent'
 import { moveHole as moveHolePure } from '../operations/subProject/moveHole'
 import { moveStitchLine as moveStitchLinePure } from '../operations/subProject/moveStitchLine'
@@ -26,8 +27,10 @@ import { getUnusedComponentName } from '../operations/subProject/utils/getUnused
 import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
 import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
 import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
+import type { FlipAxisSchema } from '../schemas/common'
 import type { ComponentSchema, PocketClusterSchema, PocketSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
+import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { PocketSettingsCopySelectionSchema, PocketSettingsCopyTargetsSchema } from '../schemas/pocketCopy'
 import type { ProjectSchema } from '../schemas/project'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
@@ -55,6 +58,7 @@ export type UseSubProjectOperationsOutput = {
   cloneHole: (holeId: string) => void
   cloneStitchLine: (stitchLineId: string) => void
   copyPocketSettings: (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>) => void
+  flip: (model: ModelObjectSchema, axis: FlipAxisSchema) => void
   deleteComponent: (componentId: string) => void
   deleteHole: (holeId: string) => void
   deleteStitchLine: (stitchLineId: string) => void
@@ -335,6 +339,19 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [recordThrottledUpdate, setSubProject, subProject],
   )
 
+  const flip = useCallback(
+    (model: ModelObjectSchema, axis: FlipAxisSchema): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updatedSubProject = flipPure(currentSubProject, model, axis)
+      if (updatedSubProject === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updatedSubProject)
+    },
+    [recordChange, setSubProject, subProject],
+  )
+
   const copyPocketSettings = useCallback(
     (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
       const currentSubProject = ensureSubProject(subProject)
@@ -408,6 +425,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       cloneHole,
       cloneStitchLine,
       copyPocketSettings,
+      flip,
       deleteComponent,
       deleteHole,
       deleteStitchLine,
@@ -429,6 +447,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       cloneHole,
       cloneStitchLine,
       copyPocketSettings,
+      flip,
       deleteComponent,
       deleteHole,
       deleteStitchLine,

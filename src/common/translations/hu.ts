@@ -186,6 +186,10 @@ export const HU = {
         },
       },
       actions: {
+        common: {
+          flipHorizontal: 'Vízszintes tükrözés',
+          flipVertical: 'Függőleges tükrözés',
+        },
         components: {
           addPanel: 'Panel hozzáadása',
           addRootPanel: 'Modul hozzáadása',
@@ -201,8 +205,6 @@ export const HU = {
           delete: 'Törlés',
         },
         stitchLines: {
-          flipHorizontal: 'Vízszintes tükrözés',
-          flipVertical: 'Függőleges tükrözés',
           clone: 'Duplikálás',
           delete: 'Törlés',
         },

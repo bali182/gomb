@@ -49,7 +49,7 @@ describe('computedSubProject accessor', () => {
     const project = d.project({ id: 'project', subProjects: [subProject] })
     const accessor = accessors.computedSubProject(getComputedSubProject(subProject, project.stitchingSettings))
 
-    expect(() => accessor.panel(pocketCluster.id)).toThrow("Excpected type='computed-panel'")
-    expect(() => accessor.pocketCluster(panel.id)).toThrow("Excpected type='computed-pocket-cluster'")
+    expect(() => accessor.panel(pocketCluster.id)).toThrow("Expected type='computed-panel'")
+    expect(() => accessor.pocketCluster(panel.id)).toThrow("Expected type='computed-pocket-cluster'")
   })
 })

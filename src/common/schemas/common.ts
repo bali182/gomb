@@ -1,5 +1,7 @@
 export type AnchorSchema = 'start' | 'middle' | 'end'
 
+export type FlipAxisSchema = 'horizontal' | 'vertical'
+
 export type HasTypeSchema<T extends string> = {
   type: T
 }

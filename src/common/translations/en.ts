@@ -244,6 +244,10 @@ export const EN = {
         },
       },
       actions: {
+        common: {
+          flipHorizontal: 'Flip horizontal',
+          flipVertical: 'Flip vertical',
+        },
         components: {
           addPanel: 'Add panel',
           addRootPanel: 'Add module',
@@ -259,8 +263,6 @@ export const EN = {
           delete: 'Delete',
         },
         stitchLines: {
-          flipHorizontal: 'Flip horizontal',
-          flipVertical: 'Flip vertical',
           clone: 'Clone',
           delete: 'Delete',
         },
