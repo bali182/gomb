@@ -12,7 +12,14 @@ import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { Tooltip } from '../common/Tooltip'
 import { getPocketSettingsCopyRows } from './getPocketSettingsCopyRows'
-import { getGroupCell, getHeaderCell, getRowCell, getTargets, pocketCopyColumns, pocketCopyRowColumns } from './pocketCopyGridUtils'
+import {
+  getGroupCell,
+  getHeaderCell,
+  getRowCell,
+  getTargets,
+  pocketCopyColumns,
+  pocketCopyRowColumns,
+} from './pocketCopyGridUtils'
 
 export type PocketCopyGridProps = {
   subProject: SubProjectSchema

@@ -119,7 +119,15 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
           position === 'before' ? component.id : position === 'after' ? node.nextSiblingId : insideBeforeComponentId,
       })
     })
-  }, [component, nodeState.expanded, activeDragData, subProject, node.parentId, node.nextSiblingId, insideBeforeComponentId])
+  }, [
+    component,
+    nodeState.expanded,
+    activeDragData,
+    subProject,
+    node.parentId,
+    node.nextSiblingId,
+    insideBeforeComponentId,
+  ])
 
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({
     data: {

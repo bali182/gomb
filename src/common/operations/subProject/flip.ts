@@ -1,4 +1,9 @@
-import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusValuesSchema, HasStretchValuesSchema } from '../../schemas/common'
+import type {
+  AnchorSchema,
+  FlipAxisSchema,
+  HasCornerRadiusValuesSchema,
+  HasStretchValuesSchema,
+} from '../../schemas/common'
 import type {
   ComponentSchema,
   FrontPocketSchema,
@@ -49,7 +54,9 @@ export const flip = (
       }
     }
     case 'component-bounds-stitch-line': {
-      const stitchLine = subProject.stitchLines.filter(narrowers.is.componentBoundsStitchLine).find((candidate) => candidate.id === model.id)
+      const stitchLine = subProject.stitchLines
+        .filter(narrowers.is.componentBoundsStitchLine)
+        .find((candidate) => candidate.id === model.id)
       if (!isDefined(stitchLine)) {
         throw new Error(`Component bounds stitch line not found: ${model.id}`)
       }
@@ -61,7 +68,9 @@ export const flip = (
       }
     }
     case 't-pocket-stitch-line': {
-      const stitchLine = subProject.stitchLines.filter(narrowers.is.tPocketStitchLine).find((candidate) => candidate.id === model.id)
+      const stitchLine = subProject.stitchLines
+        .filter(narrowers.is.tPocketStitchLine)
+        .find((candidate) => candidate.id === model.id)
       if (!isDefined(stitchLine)) {
         throw new Error(`T-pocket stitch line not found: ${model.id}`)
       }
@@ -71,7 +80,7 @@ export const flip = (
       }
       return {
         ...subProject,
-        stitchLines: subProject.stitchLines.map((candidate) => candidate === stitchLine ? flipped : candidate),
+        stitchLines: subProject.stitchLines.map((candidate) => (candidate === stitchLine ? flipped : candidate)),
       }
     }
   }
@@ -87,15 +96,17 @@ const flipComponentSubtree = (
   const components = { ...subProject.components }
   for (const componentId of componentIds) {
     components[componentId] = flipComponent(
-      accessors.subProject(subProject).component(componentId), subProject, axis, componentIds,
+      accessors.subProject(subProject).component(componentId),
+      subProject,
+      axis,
+      componentIds,
     )
   }
   const holeIds = new Set(subProject.holes.filter((hole) => componentIds.has(hole.componentId)).map((hole) => hole.id))
-  const holes = subProject.holes.map((hole) => holeIds.has(hole.id) ? flipHole(hole, axis) : hole)
+  const holes = subProject.holes.map((hole) => (holeIds.has(hole.id) ? flipHole(hole, axis) : hole))
   const stitchLines = subProject.stitchLines.map((stitchLine) => {
-    const isIncluded = stitchLine.targetType === 'component'
-      ? componentIds.has(stitchLine.targetId)
-      : holeIds.has(stitchLine.targetId)
+    const isIncluded =
+      stitchLine.targetType === 'component' ? componentIds.has(stitchLine.targetId) : holeIds.has(stitchLine.targetId)
     return isIncluded ? flipStitchLine(stitchLine, subProject, axis) : stitchLine
   })
   return { ...subProject, components, holes, stitchLines }
@@ -209,7 +220,8 @@ const flipStitchLine = (
             bottomLeftCorner: stitchLine.bottomRightCorner,
             bottomRightCorner: stitchLine.bottomLeftCorner,
             bottomStartOffset: stitchLine.bottomEndOffset,
-            bottomStitchDirection: stitchLine.bottomStitchDirection === 'left-to-right' ? 'right-to-left' : 'left-to-right',
+            bottomStitchDirection:
+              stitchLine.bottomStitchDirection === 'left-to-right' ? 'right-to-left' : 'left-to-right',
             left: stitchLine.right,
             leftEndOffset: stitchLine.rightStartOffset,
             leftStartOffset: stitchLine.rightEndOffset,
@@ -243,7 +255,8 @@ const flipStitchLine = (
             leftStitchDirection: stitchLine.leftStitchDirection === 'top-to-bottom' ? 'bottom-to-top' : 'top-to-bottom',
             rightEndOffset: stitchLine.rightStartOffset,
             rightStartOffset: stitchLine.rightEndOffset,
-            rightStitchDirection: stitchLine.rightStitchDirection === 'top-to-bottom' ? 'bottom-to-top' : 'top-to-bottom',
+            rightStitchDirection:
+              stitchLine.rightStitchDirection === 'top-to-bottom' ? 'bottom-to-top' : 'top-to-bottom',
             top: stitchLine.bottom,
             topEndOffset: stitchLine.bottomStartOffset,
             topLeftCorner: stitchLine.bottomLeftCorner,
@@ -297,13 +310,26 @@ const flipCornerRadii = (value: HasCornerRadiusValuesSchema, axis: FlipAxisSchem
 const flipStretch = (value: HasStretchValuesSchema, axis: FlipAxisSchema): HasStretchValuesSchema => {
   switch (axis) {
     case 'horizontal':
-      return { topStretch: value.topStretch, bottomStretch: value.bottomStretch, leftStretch: value.rightStretch, rightStretch: value.leftStretch }
+      return {
+        topStretch: value.topStretch,
+        bottomStretch: value.bottomStretch,
+        leftStretch: value.rightStretch,
+        rightStretch: value.leftStretch,
+      }
     case 'vertical':
-      return { topStretch: value.bottomStretch, bottomStretch: value.topStretch, leftStretch: value.leftStretch, rightStretch: value.rightStretch }
+      return {
+        topStretch: value.bottomStretch,
+        bottomStretch: value.topStretch,
+        leftStretch: value.leftStretch,
+        rightStretch: value.rightStretch,
+      }
   }
 }
 
-const flipChildOrder = (component: RootPanelSchema | PanelSchema | FrontPocketSchema, axis: FlipAxisSchema): string[] => {
+const flipChildOrder = (
+  component: RootPanelSchema | PanelSchema | FrontPocketSchema,
+  axis: FlipAxisSchema,
+): string[] => {
   return component.layoutOrientation === axis ? [...component.children].reverse() : component.children
 }
 

@@ -42,8 +42,12 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
-        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.settings}>{t.project.editors.tabs.stitchLines.settings}</Tabs.Trigger>
-        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.overrides}>{t.project.editors.tabs.stitchLines.overrides}</Tabs.Trigger>
+        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.settings}>
+          {t.project.editors.tabs.stitchLines.settings}
+        </Tabs.Trigger>
+        <Tabs.Trigger value={ComponentBoundsStitchLineTabs.overrides}>
+          {t.project.editors.tabs.stitchLines.overrides}
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value={ComponentBoundsStitchLineTabs.settings} pt={0}>
         <SectionGroup.Root>

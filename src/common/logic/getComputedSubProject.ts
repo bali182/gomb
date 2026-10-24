@@ -67,12 +67,7 @@ export const getComputedSubProject = (
   }
   const root = computeRootPanel(rootComponent, rootBoundingRect, subProject, resolvedStitchLines, computedComponents)
   const holes = calculateHoles(subProject.holes, computedComponents)
-  const stitchLines = calculateStitchLines(
-    resolvedStitchLines,
-    subProject,
-    computedComponents,
-    holes,
-  )
+  const stitchLines = calculateStitchLines(resolvedStitchLines, subProject, computedComponents, holes)
   applyHolePathsToComputedComponents(computedComponents, holes)
 
   updatePocketClusterPaths(computedComponents)

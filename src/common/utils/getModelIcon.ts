@@ -1,10 +1,5 @@
 import type { IconType } from 'react-icons'
-import {
-  PiCardsThreeDuotone,
-  PiNeedleDuotone,
-  PiRectangleDuotone,
-  PiWalletDuotone,
-} from 'react-icons/pi'
+import { PiCardsThreeDuotone, PiNeedleDuotone, PiRectangleDuotone, PiWalletDuotone } from 'react-icons/pi'
 import { HoleIcon } from '../components/icons/HoleIcon'
 import { RecessedFrontPocketIcon } from '../components/icons/RecessedFrontPocketIcon'
 import { RecessedTPocketIcon } from '../components/icons/RecessedTPocketIcon'

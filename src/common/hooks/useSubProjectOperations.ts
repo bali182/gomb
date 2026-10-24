@@ -23,10 +23,10 @@ import { updateStitchLine as updateStitchLinePure } from '../operations/subProje
 import { createComponent } from '../operations/subProject/utils/createComponent'
 import { createHole } from '../operations/subProject/utils/createHole'
 import { createStitchLine } from '../operations/subProject/utils/createStitchLine'
+import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import { getUnusedComponentName } from '../operations/subProject/utils/getUnusedComponentName'
 import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
 import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
-import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import type { FlipAxisSchema } from '../schemas/common'
 import type { ComponentSchema, PocketClusterSchema, PocketSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
@@ -372,7 +372,8 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
 
         const target = accessors.subProject(current).pocket(pocketId)
         const updatedPocket = copyPocketFields(source, target, selection)
-        const withPocket = updatedPocket === target ? current : updateComponentPure(current, { component: updatedPocket })
+        const withPocket =
+          updatedPocket === target ? current : updateComponentPure(current, { component: updatedPocket })
         if (
           !selection.copyStitching ||
           !narrowers.is.tPocket(source) ||

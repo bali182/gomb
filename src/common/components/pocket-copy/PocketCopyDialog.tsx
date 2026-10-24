@@ -25,8 +25,11 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
   const { t } = useTranslation()
   const [targets, setTargets] = useState<Partial<PocketSettingsCopyTargetsSchema>>({})
   const canSubmit = useMemo<boolean>(
-    () => Object.values(targets).some((selection) =>
-      isDefined(selection) && (selection.copyShape || selection.copyOpening || selection.copyStitching)),
+    () =>
+      Object.values(targets).some(
+        (selection) =>
+          isDefined(selection) && (selection.copyShape || selection.copyOpening || selection.copyStitching),
+      ),
     [targets],
   )
   const resetTargets = useCallback((): void => {
@@ -48,7 +51,12 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
       size="xl"
     >
       <Box px="6">
-        <PocketCopyGrid subProject={subProject} sourcePocketId={sourcePocketId} targets={targets} onChange={setTargets} />
+        <PocketCopyGrid
+          subProject={subProject}
+          sourcePocketId={sourcePocketId}
+          targets={targets}
+          onChange={setTargets}
+        />
       </Box>
     </EditDialog>
   )

@@ -5,9 +5,9 @@ import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
 import { getModelIcon } from '../../utils/getModelIcon'
+import { HoleActionsMenu } from '../action-menus/HoleActionsMenu'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
-import { HoleActionsMenu } from '../action-menus/HoleActionsMenu'
 import { HoleEditor } from './HoleEditor'
 
 type HoleFloatingEditorProps = {

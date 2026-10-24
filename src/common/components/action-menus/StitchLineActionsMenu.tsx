@@ -8,10 +8,7 @@ import type { StitchLineSchema } from '../../schemas/stitching'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
-import {
-  CloneStitchLineMenuItem,
-  DeleteStitchLineMenuItem,
-} from './StitchLineActionsMenuItems'
+import { CloneStitchLineMenuItem, DeleteStitchLineMenuItem } from './StitchLineActionsMenuItems'
 
 type StitchLineActionsMenuProps = {
   stitchLine: StitchLineSchema
