@@ -119,6 +119,7 @@ export const HU = {
         components: {
           name: 'Komponensek',
           componentDimensionsVisible: 'Méretek láthatósága',
+          pocketItemsVisible: 'Zsebek tartalma',
         },
         scaling: {
           name: 'Méretarány',
@@ -172,7 +173,7 @@ export const HU = {
       tabs: {
         components: {
           layout: 'Elrendezés',
-          cards: 'Kártyák',
+          contents: 'Tartalom',
           pockets: 'Zsebek',
           pocketOpenings: 'Zsebnyílások',
         },
@@ -420,21 +421,31 @@ export const HU = {
               tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
             },
           },
-          cards: {
-            title: 'Kártyák',
-            cardId: {
-              label: 'Kártya',
-              tooltip: 'Kiválasztja az egyes zsebekben megjelenő kártyát.',
+          contents: {
+            title: 'Tartalom',
+            pocketItemId: {
+              label: 'Tárgy',
+              tooltip: 'Kiválasztja a zsebben megjelenő tárgyat.',
             },
-            cardCrossAxisOffset: {
+            pocketItemOrientation: {
+              label: 'Irány',
+              tooltip:
+                'A tárgy fektetett vagy állított megjelenését állítja a képernyőn, a zseb nyílásának irányától függetlenül.',
+            },
+            itemsHidden: {
+              label: 'A tartalom megjelenítése ki van kapcsolva.',
+              tooltip:
+                'A módosítások nem látszanak, amíg a tartalom rejtve van. A Nézet → Elemek menüben kapcsold be a Zsebek tartalma opciót.',
+            },
+            pocketItemCrossAxisOffset: {
               label: 'Oldaleltolás',
               tooltip:
-                'A zseb középvonalától tolja el a kártyát. Pozitív érték felső/alsó nyílásnál jobbra, bal/jobb oldali nyílásnál lefelé tol; negatív érték az ellenkező irányba.',
+                'A zseb középvonalától tolja el a tárgyat. Pozitív érték felső/alsó nyílásnál jobbra, bal/jobb oldali nyílásnál lefelé tol; negatív érték az ellenkező irányba.',
             },
-            cardOpeningOffset: {
+            pocketItemOpeningOffset: {
               label: 'Kiemelés',
               tooltip:
-                'A zseb zárt szélétől a nyílás felé tolja a kártyát. Nulla értéknél a kártya a zseb zárt széléhez igazodik.',
+                'A zseb zárt szélétől a nyílás felé tolja a tárgyat. Nulla értéknél a tárgy a zseb zárt széléhez igazodik.',
             },
           },
         },
@@ -766,6 +777,10 @@ export const HU = {
             left: 'Balra',
             right: 'Jobbra',
           },
+          pocketItemOrientation: {
+            landscape: 'Fektetett',
+            portrait: 'Állított',
+          },
           layoutOrientation: {
             horizontal: 'Vízszintes',
             vertical: 'Függőleges',
@@ -798,10 +813,9 @@ export const HU = {
         },
       },
       controls: {
-        cardPicker: {
+        cardCombobox: {
           noCard: 'Nincs',
-          landscape: 'Fekvő',
-          portrait: 'Álló',
+          noMatchingValues: 'Nincs egyező tárgy.',
         },
         colorSwatchPicker: {
           reset: 'Visszaállítás',
@@ -852,6 +866,11 @@ export const HU = {
           label: 'Nyílás',
           tooltip:
             'A nyílás típusának és minden beállításának másolása. A fejlécre kattintva az összes célzseb kijelölése kapcsolható.',
+        },
+        copyPocketItem: {
+          label: 'Tartalom',
+          tooltip:
+            'Átmásolja a kiválasztott tárgyat, az irányát és mindkét eltolást. Ha a forráson nincs tárgy, a célról is törli. A fejlécre kattintva az összes célzseb kijelölése kapcsolható.',
         },
         copyStitching: {
           label: 'Varrások',
@@ -972,20 +991,9 @@ export const HU = {
       transparent: 'Átlátszó',
     },
     cards: {
-      'ID-1-landscape': 'ID-1 (fekvő)',
-      'ID-2-landscape': 'ID-2 (fekvő)',
-      'ID-3-landscape': 'ID-3 (fekvő)',
-      'ID-1-portrait': 'ID-1 (álló)',
-      'ID-2-portrait': 'ID-2 (álló)',
-      'ID-3-portrait': 'ID-3 (álló)',
-    },
-    cardsSimple: {
-      'ID-1-landscape': 'ID-1',
-      'ID-2-landscape': 'ID-2',
-      'ID-3-landscape': 'ID-3',
-      'ID-1-portrait': 'ID-1',
-      'ID-2-portrait': 'ID-2',
-      'ID-3-portrait': 'ID-3',
+      'ID-1': 'Bankkártya',
+      'ID-2': 'Nagy igazolvány',
+      'ID-3': 'Útlevél',
     },
   },
   validation: {

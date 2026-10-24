@@ -7,7 +7,7 @@ import {
   HasStretchSchema,
   HasTypeSchema,
 } from './common'
-import { CardSchemaId } from './valuables'
+import { CardSchemaId, PocketItemOrientationSchema } from './valuables'
 
 export type HasColorSchema = {
   color?: string
@@ -88,11 +88,13 @@ export type FrontPocketSchema = HasTypeSchema<'front-pocket'> &
   HasChildrenSchema &
   HasLayoutSchema &
   HasCornerRadiusSchema &
-  HasPocketOpeningSchema
+  HasPocketOpeningSchema &
+  HasPocketItemSchema
 
 export type TPocketSchema = HasTypeSchema<'t-pocket'> &
   BaseComponentSchema &
   HasChildrenSchema &
+  HasPocketItemSchema &
   HasPocketOpeningSchema & {
     tPocketTabWidth: number
     tPocketTaper: number
@@ -106,13 +108,15 @@ export type PocketsSchema = {
   orientation: PocketOrientationSchema
 }
 
-export type HasCardsSchema = {
-  /** Id of the card shown in every pocket */
-  cardId?: CardSchemaId
+export type HasPocketItemSchema = {
+  /** Optional item shown in this pocket. Currently supports card formats. */
+  pocketItemId?: CardSchemaId
+  /** Orientation on screen, independent of the pocket opening direction. */
+  pocketItemOrientation: PocketItemOrientationSchema
   /** Signed offset from the pocket center across the opening direction, in mm. */
-  cardCrossAxisOffset: number
+  pocketItemCrossAxisOffset: number
   /** Offset from the closed pocket edge toward the opening, in mm (min 0). */
-  cardOpeningOffset: number
+  pocketItemOpeningOffset: number
 }
 
 /** Arranges physical pocket components. Its children are T-pockets followed by one front pocket. */
@@ -122,7 +126,6 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasOffAxisAnchor &
   HasAutoDimensionsSchema &
   HasStretchSchema &
-  PocketsSchema &
-  HasCardsSchema
+  PocketsSchema
 
 export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema | FrontPocketSchema | TPocketSchema

@@ -21,6 +21,7 @@ import type {
   FrontPocketSchema,
   HasAutoDimensionsSchema,
   HasLayoutSchema,
+  HasPocketItemSchema,
   PanelSchema,
   PocketClusterSchema,
   RecessedPocketOpeningSchema,
@@ -138,7 +139,14 @@ export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
   side: 'end',
 }
 
+export const defaultHasPocketItem: HasPocketItemSchema = {
+  pocketItemOrientation: 'landscape',
+  pocketItemCrossAxisOffset: 0,
+  pocketItemOpeningOffset: 0,
+}
+
 export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName> = {
+  ...defaultHasPocketItem,
   ...defaultHasLayout,
   ...defaultHasCornerRadius,
   type: 'front-pocket',
@@ -146,6 +154,7 @@ export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof Has
   opening: { type: 'straight' },
 }
 export const defaultTPocket: Omit<TPocketSchema, keyof HasId | keyof HasName> = {
+  ...defaultHasPocketItem,
   type: 't-pocket',
   children: [],
   opening: { type: 'straight' },
@@ -159,8 +168,6 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   type: 'pocket-cluster',
   children: [],
   orientation: 'up',
-  cardCrossAxisOffset: 0,
-  cardOpeningOffset: 0,
   pocketStep: 10,
 }
 

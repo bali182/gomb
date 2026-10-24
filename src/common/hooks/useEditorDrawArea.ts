@@ -8,6 +8,7 @@ import {
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { produce } from '../utils/produce'
+import { useGlobalSettings } from './useGlobalSettings'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 
@@ -76,6 +77,7 @@ const markerStyles: DrawAreaMarkerStyles = {
 
 export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue => {
   const { project } = useProject()
+  const { settings } = useGlobalSettings()
   const { subProject } = useSubProject()
   const drawAreaSelection = useSubProjectSelection(subProject)
   const { hovered, isHovered, isSelected, selected } = drawAreaSelection
@@ -253,7 +255,7 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
       isInteractive,
-      isShowingCards: true,
+      isShowingCards: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
       holeStyles,
       componentStyles,
@@ -264,7 +266,16 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
       exportIdentifiers,
       labelStyles,
     }),
-    [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles, isInteractive],
+    [
+      cardStyles,
+      componentStyles,
+      drawAreaSelection,
+      holeStyles,
+      labelStyles,
+      stitchLineStyles,
+      isInteractive,
+      settings.view.pocketItemsVisible,
+    ],
   )
 
   return drawAreaContextValue

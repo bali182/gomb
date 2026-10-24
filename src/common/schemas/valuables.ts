@@ -1,10 +1,7 @@
-export type CardSchemaId =
-  | 'ID-1-landscape'
-  | 'ID-2-landscape'
-  | 'ID-3-landscape'
-  | 'ID-1-portrait'
-  | 'ID-2-portrait'
-  | 'ID-3-portrait'
+export type CardSchemaId = 'ID-1' | 'ID-2' | 'ID-3'
+
+/** Orientation on screen: landscape is wider, portrait is taller. */
+export type PocketItemOrientationSchema = 'landscape' | 'portrait'
 
 export type CardSchema = {
   id: CardSchemaId

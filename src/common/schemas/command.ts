@@ -117,6 +117,7 @@ export type CommonCommandIdSchema =
   | 'measurement'
   // View menu - component visibility
   | 'component-dimensions-visibility'
+  | 'pocket-items-visibility'
   // View menu - stitching visibility
   | 'stitch-line-visibility'
   | 'stitch-hole-visibility'

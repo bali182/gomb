@@ -92,6 +92,32 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         }
       },
     )
+    it('computes each pocket item from that pocket’s own configuration', () => {
+      const { subProject } = fixture()
+      const source = accessors.subProject(subProject)
+      const changed = {
+        ...subProject,
+        components: {
+          ...subProject.components,
+          t1: { ...source.tPocket('t1'), pocketItemId: 'ID-1' as const, pocketItemCrossAxisOffset: 3 },
+          front: {
+            ...source.frontPocket('front'),
+            pocketItemId: 'ID-2' as const,
+            pocketItemOrientation: 'portrait' as const,
+            pocketItemOpeningOffset: 7,
+          },
+        },
+      }
+      const computed = accessors.computedSubProject(getComputedSubProject(changed, defaultStitchingSettings))
+      const t = computed.tPocket('t1')
+      const front = computed.frontPocket('front')
+      expect(t.card?.card.id).toBe('ID-1')
+      expect(computed.tPocket('t2').card).toBeUndefined()
+      expect(front.card?.card.id).toBe('ID-2')
+      expect(t.card?.boundingRect.width.toNumber()).toBe(85.6)
+      expect(front.card?.boundingRect.width.toNumber()).toBe(74)
+      expect(t.card?.boundingRect).not.toEqual(front.card?.boundingRect)
+    })
     it('stores independent opening bounds under each pocket component', () => {
       const { subProject } = fixture(1000)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)

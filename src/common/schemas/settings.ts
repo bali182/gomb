@@ -74,6 +74,7 @@ export type ViewSettingsSchema = {
   stitchCountVisible: boolean
   stitchHoleFootprintVisible: boolean
   componentDimensionsVisible: boolean
+  pocketItemsVisible: boolean
   scale: number
 }
 

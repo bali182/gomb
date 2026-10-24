@@ -21,6 +21,7 @@ export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSche
     view: {
       scale: 1,
       componentDimensionsVisible: false,
+      pocketItemsVisible: true,
       stitchCountVisible: false,
       stitchHolesVisible: true,
       stitchHoleFootprintVisible: false,

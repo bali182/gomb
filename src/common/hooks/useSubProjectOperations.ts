@@ -434,6 +434,15 @@ const copyPocketFields = (
   selection: PocketSettingsCopySelectionSchema,
 ): PocketSchema => {
   let updatedPocket = target
+  if (selection.copyPocketItem) {
+    updatedPocket = {
+      ...updatedPocket,
+      pocketItemId: source.pocketItemId,
+      pocketItemOrientation: source.pocketItemOrientation,
+      pocketItemCrossAxisOffset: source.pocketItemCrossAxisOffset,
+      pocketItemOpeningOffset: source.pocketItemOpeningOffset,
+    }
+  }
   if (selection.copyOpening) {
     updatedPocket = { ...updatedPocket, opening: { ...source.opening } }
   }

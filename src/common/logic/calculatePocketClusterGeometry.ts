@@ -31,7 +31,7 @@ export const calculatePocketClusterGeometry = (
         componentId: pocket.id,
         boundingRect,
         cornerRadius,
-        card: calculatePocketCard(cluster, boundingRect),
+        card: calculatePocketCard(pocket, cluster, boundingRect),
         children: [],
         path: { commands: [] },
         computedLayoutGap: ZERO,
@@ -53,7 +53,7 @@ export const calculatePocketClusterGeometry = (
       componentId: pocket.id,
       boundingRect,
       cornerRadius,
-      card: calculatePocketCard(cluster, boundingRect),
+      card: calculatePocketCard(pocket, cluster, boundingRect),
       children: [],
       path: { commands: [] },
     }

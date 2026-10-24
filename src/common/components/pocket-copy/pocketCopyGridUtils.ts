@@ -8,6 +8,7 @@ import type {
 export const pocketCopyColumns: readonly (keyof PocketSettingsCopySelectionSchema)[] = [
   'copyShape',
   'copyOpening',
+  'copyPocketItem',
   'copyStitching',
   'overwriteStitching',
 ]
@@ -40,6 +41,7 @@ export const getTargets = (
         {
           copyShape: targets[row.pocketId]?.copyShape ?? false,
           copyOpening: targets[row.pocketId]?.copyOpening ?? false,
+          copyPocketItem: targets[row.pocketId]?.copyPocketItem ?? false,
           copyStitching: targets[row.pocketId]?.copyStitching ?? false,
           overwriteStitching: targets[row.pocketId]?.overwriteStitching ?? true,
         } satisfies PocketSettingsCopySelectionSchema,

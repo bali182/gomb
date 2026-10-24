@@ -1,10 +1,13 @@
+import { Tabs } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
+import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { PocketClusterSchema, PocketOpeningSchema, TPocketSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
+import { ContentsSection } from './sections/ContentsSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
 type TPocketEditorProps = {
   component: TPocketSchema
@@ -13,8 +16,18 @@ type TPocketEditorProps = {
   parent: PocketClusterSchema
   onChange: (value: EditableSchema<TPocketSchema>) => void
 }
-export const TPocketEditor: FC<TPocketEditorProps> = ({ editable, issues, parent, onChange }) => {
+const TPocketTabs = {
+  layout: 'layout',
+  contents: 'contents',
+}
+
+export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
   const { t } = useTranslation()
+  const { activeTab, onTabChange } = useFloatingEditorTab({
+    modelId: component.id,
+    defaultTab: TPocketTabs.layout,
+    tabs: TPocketTabs,
+  })
   const handleOpeningChange = useCallback(
     (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
     [editable, onChange],
@@ -28,38 +41,55 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ editable, issues, parent
     [editable, onChange],
   )
   return (
-    <SectionGroup.Root>
-      <SectionGroup.Section>
-        <SectionGroup.SectionHeader>{t.project.editors.sections.components.tPocket.title}</SectionGroup.SectionHeader>
-        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.tPocket.tPocketTabWidth.tooltip}>
-          {t.project.editors.sections.components.tPocket.tPocketTabWidth.label}
-        </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
-          <NumberInput
-            unit="mm"
-            value={editable.tPocketTabWidth}
-            issue={issues.tPocketTabWidth}
-            onChange={handleTabWidthChange}
+    <Tabs.Root value={activeTab} onValueChange={onTabChange}>
+      <Tabs.List alignItems="center" pr="2">
+        <Tabs.Trigger value={TPocketTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
+        <Tabs.Trigger value={TPocketTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value={TPocketTabs.layout} pt={0}>
+        <SectionGroup.Root>
+          <SectionGroup.Section>
+            <SectionGroup.SectionHeader>
+              {t.project.editors.sections.components.tPocket.title}
+            </SectionGroup.SectionHeader>
+            <SectionGroup.SectionRowTitle
+              tooltip={t.project.editors.sections.components.tPocket.tPocketTabWidth.tooltip}
+            >
+              {t.project.editors.sections.components.tPocket.tPocketTabWidth.label}
+            </SectionGroup.SectionRowTitle>
+            <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
+              <NumberInput
+                unit="mm"
+                value={editable.tPocketTabWidth}
+                issue={issues.tPocketTabWidth}
+                onChange={handleTabWidthChange}
+              />
+            </SectionGroup.SectionRowEditor>
+            <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.tPocket.tPocketTaper.tooltip}>
+              {t.project.editors.sections.components.tPocket.tPocketTaper.label}
+            </SectionGroup.SectionRowTitle>
+            <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
+              <NumberInput
+                unit="mm"
+                value={editable.tPocketTaper}
+                issue={issues.tPocketTaper}
+                onChange={handleTaperChange}
+              />
+            </SectionGroup.SectionRowEditor>
+          </SectionGroup.Section>
+          <PocketOpeningSection
+            cluster={parent}
+            editable={editable.opening}
+            issues={issues.opening}
+            onChange={handleOpeningChange}
           />
-        </SectionGroup.SectionRowEditor>
-        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.tPocket.tPocketTaper.tooltip}>
-          {t.project.editors.sections.components.tPocket.tPocketTaper.label}
-        </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
-          <NumberInput
-            unit="mm"
-            value={editable.tPocketTaper}
-            issue={issues.tPocketTaper}
-            onChange={handleTaperChange}
-          />
-        </SectionGroup.SectionRowEditor>
-      </SectionGroup.Section>
-      <PocketOpeningSection
-        cluster={parent}
-        editable={editable.opening}
-        issues={issues.opening}
-        onChange={handleOpeningChange}
-      />
-    </SectionGroup.Root>
+        </SectionGroup.Root>
+      </Tabs.Content>
+      <Tabs.Content value={TPocketTabs.contents} pt={0}>
+        <SectionGroup.Root>
+          <ContentsSection<TPocketSchema> editable={editable} issues={issues} onChange={onChange} />
+        </SectionGroup.Root>
+      </Tabs.Content>
+    </Tabs.Root>
   )
 }

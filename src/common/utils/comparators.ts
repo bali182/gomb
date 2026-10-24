@@ -153,6 +153,10 @@ export const comparators = {
     a.bottomLeftRadius === b.bottomLeftRadius &&
     a.bottomRightRadius === b.bottomRightRadius &&
     areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+    a.pocketItemId === b.pocketItemId &&
+    a.pocketItemOrientation === b.pocketItemOrientation &&
+    a.pocketItemCrossAxisOffset === b.pocketItemCrossAxisOffset &&
+    a.pocketItemOpeningOffset === b.pocketItemOpeningOffset &&
     comparators.pocketOpening(a.opening, b.opening),
   tPocket: (a: TPocketSchema, b: TPocketSchema): boolean =>
     a.id === b.id &&
@@ -161,6 +165,10 @@ export const comparators = {
     a.tPocketTabWidth === b.tPocketTabWidth &&
     a.tPocketTaper === b.tPocketTaper &&
     areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+    a.pocketItemId === b.pocketItemId &&
+    a.pocketItemOrientation === b.pocketItemOrientation &&
+    a.pocketItemCrossAxisOffset === b.pocketItemCrossAxisOffset &&
+    a.pocketItemOpeningOffset === b.pocketItemOpeningOffset &&
     comparators.pocketOpening(a.opening, b.opening),
   pocketCluster: (a: PocketClusterSchema, b: PocketClusterSchema): boolean => {
     return (
@@ -179,10 +187,7 @@ export const comparators = {
       a.leftStretch === b.leftStretch &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.pocketStep === b.pocketStep &&
-      a.orientation === b.orientation &&
-      a.cardId === b.cardId &&
-      a.cardCrossAxisOffset === b.cardCrossAxisOffset &&
-      a.cardOpeningOffset === b.cardOpeningOffset
+      a.orientation === b.orientation
     )
   },
 

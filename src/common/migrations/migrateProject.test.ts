@@ -241,30 +241,6 @@ describe('migrateProject', () => {
     expect(migrateProject(project, context)).toEqual(project)
   })
 
-  it('adds missing card offsets with the current version while preserving existing values', () => {
-    const root = d.rootPanel({ id: 'root' })
-    const pocket = d.pocketCluster({ id: 'pocket', cardId: 'ID-1-landscape' })
-    const existingPocket = d.pocketCluster({ id: 'existing-pocket', cardCrossAxisOffset: -3, cardOpeningOffset: 7 })
-    const project = d.project({
-      id: 'project',
-      subProjects: [d.subProject({ id: 'sub-project', root, components: [pocket, existingPocket] })],
-    })
-    const input: DeepPartialSchema<ProjectSchema> = structuredClone(project)
-    const incompletePocket = input.subProjects?.[0]?.components?.[pocket.id]
-
-    if (!isDefined(incompletePocket) || incompletePocket.type !== 'pocket-cluster') {
-      throw new Error('Missing pocket cluster')
-    }
-
-    delete incompletePocket.cardCrossAxisOffset
-    delete incompletePocket.cardOpeningOffset
-
-    const migratedProject = migrateProject(input, context)
-
-    expect(migratedProject).toEqual(project)
-    expect(typia.is<ProjectSchema>(migratedProject)).toBe(true)
-  })
-
   it('migrates projects with a different version', () => {
     const project = createProjectWithSubProject()
     const [major] = VERSION.split('.')

@@ -104,16 +104,25 @@ const createClusterSubProject = (orientation: PocketOrientationSchema): SubProje
         rightStretch: 3,
         bottomStretch: 5,
         leftStretch: 7,
-        cardCrossAxisOffset: 9,
-        cardOpeningOffset: 13,
       }),
       d.tPocket({
         id: 't',
+        pocketItemId: 'ID-1',
+        pocketItemOrientation: 'portrait',
+        pocketItemCrossAxisOffset: 9,
+        pocketItemOpeningOffset: 13,
         tPocketTabWidth: 10,
         tPocketTaper: 25,
         opening: { type: 'slanted', side: 'start', offset: 15 },
       }),
-      d.frontPocket({ id: 'front', ...radii, opening: { type: 'slanted', side: 'end', offset: 9 } }),
+      d.frontPocket({
+        id: 'front',
+        ...radii,
+        pocketItemId: 'ID-2',
+        pocketItemCrossAxisOffset: -4,
+        pocketItemOpeningOffset: 7,
+        opening: { type: 'slanted', side: 'end', offset: 9 },
+      }),
       d.panel({ id: 'outside', ...radii }),
     ],
     stitchLines: [
@@ -481,18 +490,18 @@ describe.each(orientationCases)(
       expect(result.pocketCluster('cluster')).toMatchObject({
         orientation: expectedOrientation,
         children: ['t', 'front'],
-        cardCrossAxisOffset: swapsEnds ? -9 : 9,
-        cardOpeningOffset: 13,
         ...(axis === 'horizontal'
           ? { topStretch: -2, rightStretch: 7, bottomStretch: 5, leftStretch: 3 }
           : { topStretch: 5, rightStretch: 3, bottomStretch: -2, leftStretch: 7 }),
       })
       expect(result.tPocket('t')).toEqual({
         ...source.tPocket('t'),
+        pocketItemCrossAxisOffset: swapsEnds ? -9 : 9,
         opening: { type: 'slanted', side: 'end', offset: 15 },
       })
       expect(result.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
+        pocketItemCrossAxisOffset: swapsEnds ? 4 : -4,
         ...mirroredRadii[axis],
         mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', side: 'start', offset: 9 },
@@ -505,16 +514,39 @@ describe.each(orientationCases)(
       })
     })
 
+    it('preserves card width and height when flipping the cluster', () => {
+      const original = createClusterSubProject(orientation)
+      const cluster = accessors.subProject(original).pocketCluster('cluster')
+      const before = getComputedSubProject(original, defaultStitchingSettings)
+      const after = getComputedSubProject(flip(original, cluster, axis), defaultStitchingSettings)
+      const beforeSource = accessors.computedSubProject(before)
+      const afterSource = accessors.computedSubProject(after)
+      expect(afterSource.tPocket('t').card?.boundingRect.width).toEqual(
+        beforeSource.tPocket('t').card?.boundingRect.width,
+      )
+      expect(afterSource.tPocket('t').card?.boundingRect.height).toEqual(
+        beforeSource.tPocket('t').card?.boundingRect.height,
+      )
+      expect(afterSource.frontPocket('front').card?.boundingRect.width).toEqual(
+        beforeSource.frontPocket('front').card?.boundingRect.width,
+      )
+      expect(afterSource.frontPocket('front').card?.boundingRect.height).toEqual(
+        beforeSource.frontPocket('front').card?.boundingRect.height,
+      )
+    })
+
     it('only changes an independently selected pocket opening across its opening width', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)
       const tResult = accessors.subProject(flip(original, source.tPocket('t'), axis))
       expect(tResult.tPocket('t').opening).toEqual({ type: 'slanted', offset: 15, side: swapsEnds ? 'end' : 'start' })
+      expect(tResult.tPocket('t').pocketItemCrossAxisOffset).toBe(swapsEnds ? -9 : 9)
       expect(tResult.pocketCluster('cluster')).toBe(source.pocketCluster('cluster'))
       expect(tResult.frontPocket('front')).toBe(source.frontPocket('front'))
       const frontResult = accessors.subProject(flip(original, source.frontPocket('front'), axis))
       expect(frontResult.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
+        pocketItemCrossAxisOffset: swapsEnds ? 4 : -4,
         ...mirroredRadii[axis],
         mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', offset: 9, side: swapsEnds ? 'start' : 'end' },

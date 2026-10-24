@@ -42,6 +42,10 @@ export const getPocketSettingsCopyRows = (
         checked: copyStitching,
         disabled: isSource || !canCopyStitching,
       },
+      copyPocketItem: {
+        checked: isSource || selection?.copyPocketItem === true,
+        disabled: isSource,
+      },
       overwriteStitching: {
         checked: canOverwrite && (selection?.overwriteStitching ?? true),
         disabled: !canOverwrite,

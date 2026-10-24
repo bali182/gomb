@@ -38,24 +38,6 @@ export const validatePocketClusterSchema = (
     min: 0,
     minInclusive: false,
   })
-  const cardIdResult = validatePrimitiveUnion(
-    input.cardId,
-    currentValue.cardId,
-    {
-      'ID-1-landscape': true,
-      'ID-2-landscape': true,
-      'ID-3-landscape': true,
-      'ID-1-portrait': true,
-      'ID-2-portrait': true,
-      'ID-3-portrait': true,
-    },
-    context,
-    true,
-  )
-  const cardCrossAxisOffsetResult = validateNumber(input.cardCrossAxisOffset, currentValue.cardCrossAxisOffset, context)
-  const cardOpeningOffsetResult = validateNumber(input.cardOpeningOffset, currentValue.cardOpeningOffset, context, {
-    min: 0,
-  })
   const topStretchResult = validateNumber(input.topStretch, currentValue.topStretch, context)
   const rightStretchResult = validateNumber(input.rightStretch, currentValue.rightStretch, context)
   const bottomStretchResult = validateNumber(input.bottomStretch, currentValue.bottomStretch, context)
@@ -69,9 +51,6 @@ export const validatePocketClusterSchema = (
     offAxisAnchor: offAxisAnchorResult.issues,
     orientation: orientationResult.issues,
     pocketStep: pocketStepResult.issues,
-    cardId: cardIdResult.issues,
-    cardCrossAxisOffset: cardCrossAxisOffsetResult.issues,
-    cardOpeningOffset: cardOpeningOffsetResult.issues,
     topStretch: topStretchResult.issues,
     rightStretch: rightStretchResult.issues,
     bottomStretch: bottomStretchResult.issues,
@@ -86,9 +65,6 @@ export const validatePocketClusterSchema = (
     offAxisAnchor: offAxisAnchorResult.committedValue,
     orientation: orientationResult.committedValue,
     pocketStep: pocketStepResult.committedValue,
-    cardId: cardIdResult.committedValue,
-    cardCrossAxisOffset: cardCrossAxisOffsetResult.committedValue,
-    cardOpeningOffset: cardOpeningOffsetResult.committedValue,
     topStretch: topStretchResult.committedValue,
     rightStretch: rightStretchResult.committedValue,
     bottomStretch: bottomStretchResult.committedValue,
@@ -105,9 +81,6 @@ export const validatePocketClusterSchema = (
     !offAxisAnchorResult.isValid ||
     !orientationResult.isValid ||
     !pocketStepResult.isValid ||
-    !cardIdResult.isValid ||
-    !cardCrossAxisOffsetResult.isValid ||
-    !cardOpeningOffsetResult.isValid ||
     !topStretchResult.isValid ||
     !rightStretchResult.isValid ||
     !bottomStretchResult.isValid ||

@@ -65,6 +65,11 @@ export const useCommonCommands = ({
         shortcut: getShortcut('measurement'),
       },
       // View - component visibility
+      'pocket-items-visibility': {
+        id: 'pocket-items-visibility',
+        disabled: !hasOpenProject,
+        shortcut: getShortcut('pocket-items-visibility'),
+      },
       'component-dimensions-visibility': {
         id: 'component-dimensions-visibility',
         disabled: !hasOpenProject,
@@ -155,6 +160,7 @@ const DEFAULT_SHORTCUTS: CommonCommandShortcutMap = {
     mac: ['Command', 'Alt', 'Digit3'],
   },
   'component-dimensions-visibility': undefined,
+  'pocket-items-visibility': undefined,
   'stitch-line-visibility': undefined,
   'stitch-hole-visibility': undefined,
   'stitch-hole-footprint-visibility': undefined,

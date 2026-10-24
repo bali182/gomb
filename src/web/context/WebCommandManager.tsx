@@ -69,6 +69,8 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
           return setEditSettings({ step: EDITOR_STITCH_HOLE_DISTANCE_STEP })
         case 'component-dimensions-visibility':
           return setViewSettings({ componentDimensionsVisible: !settings.view.componentDimensionsVisible })
+        case 'pocket-items-visibility':
+          return setViewSettings({ pocketItemsVisible: !settings.view.pocketItemsVisible })
         case 'stitch-line-visibility':
           return setViewSettings({ stitchLinesVisible: !settings.view.stitchLinesVisible })
         case 'stitch-hole-visibility':

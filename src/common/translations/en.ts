@@ -12,8 +12,8 @@ import type {
 } from '../schemas/common'
 import type {
   HasAutoDimensionsSchema,
-  HasCardsSchema,
   HasLayoutSchema,
+  HasPocketItemSchema,
   LayoutOrientationSchema,
   PocketOpeningSchema,
   PocketOrientationSchema,
@@ -59,7 +59,7 @@ import type {
   NativeDialogTranslationSchema,
   SectionTranslationSchema,
 } from '../schemas/translation'
-import type { CardSchemaId } from '../schemas/valuables'
+import type { CardSchemaId, PocketItemOrientationSchema } from '../schemas/valuables'
 
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
@@ -177,6 +177,7 @@ export const EN = {
         components: {
           name: 'Components',
           componentDimensionsVisible: 'Dimension visibility',
+          pocketItemsVisible: 'Pocket contents',
         },
         scaling: {
           name: 'Scaling',
@@ -230,7 +231,7 @@ export const EN = {
       tabs: {
         components: {
           layout: 'Layout',
-          cards: 'Cards',
+          contents: 'Contents',
           pockets: 'Pockets',
           pocketOpenings: 'Pocket openings',
         },
@@ -480,23 +481,33 @@ export const EN = {
               tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
             },
           } satisfies EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
-          cards: {
-            title: 'Cards',
-            cardId: {
-              label: 'Card',
-              tooltip: 'Selects the card shown inside each pocket.',
+          contents: {
+            title: 'Contents',
+            pocketItemId: {
+              label: 'Item',
+              tooltip: 'Selects the item shown inside this pocket.',
             },
-            cardCrossAxisOffset: {
+            pocketItemOrientation: {
+              label: 'Orientation',
+              tooltip:
+                'Sets whether the item appears wider or taller on screen, independently of the pocket opening direction.',
+            },
+            itemsHidden: {
+              label: 'Contents are hidden.',
+              tooltip:
+                'Your changes will not be visible while contents are hidden. Enable Pocket contents in View → Components to show them.',
+            } satisfies EditorFieldTranslationSchema,
+            pocketItemCrossAxisOffset: {
               label: 'Offset',
               tooltip:
-                'Offsets the card from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
+                'Offsets the item from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
             },
-            cardOpeningOffset: {
+            pocketItemOpeningOffset: {
               label: 'Lift',
               tooltip:
-                'Moves the card from the closed pocket edge toward the opening. Zero rests against the closed edge.',
+                'Moves the item from the closed pocket edge toward the opening. Zero rests against the closed edge.',
             },
-          } satisfies SectionTranslationSchema<HasCardsSchema>,
+          } satisfies SectionTranslationSchema<HasPocketItemSchema>,
         },
         stitchLines: {
           settings: {
@@ -837,6 +848,10 @@ export const EN = {
             left: 'Left',
             right: 'Right',
           } satisfies EnumTranslationSchema<PocketOrientationSchema>,
+          pocketItemOrientation: {
+            landscape: 'Landscape',
+            portrait: 'Portrait',
+          } satisfies EnumTranslationSchema<PocketItemOrientationSchema>,
           layoutOrientation: {
             horizontal: 'Horizontal',
             vertical: 'Vertical',
@@ -869,10 +884,9 @@ export const EN = {
         },
       },
       controls: {
-        cardPicker: {
+        cardCombobox: {
           noCard: 'None',
-          landscape: 'Landscape',
-          portrait: 'Portrait',
+          noMatchingValues: 'No matching items.',
         },
         colorSwatchPicker: {
           reset: 'Reset',
@@ -921,6 +935,11 @@ export const EN = {
         copyOpening: {
           label: 'Opening',
           tooltip: 'Copy the opening type and all its settings. Click the header to toggle all target pockets.',
+        },
+        copyPocketItem: {
+          label: 'Contents',
+          tooltip:
+            'Copy the selected item, orientation and both offsets. An empty source clears the target item. Click the header to toggle all target pockets.',
         },
         copyStitching: {
           label: 'Stitching',
@@ -1041,20 +1060,9 @@ export const EN = {
       transparent: 'Transparent',
     } satisfies Record<ColorKey, string>,
     cards: {
-      'ID-1-landscape': 'ID-1 (landscape)',
-      'ID-2-landscape': 'ID-2 (landscape)',
-      'ID-3-landscape': 'ID-3 (landscape)',
-      'ID-1-portrait': 'ID-1 (portrait)',
-      'ID-2-portrait': 'ID-2 (portrait)',
-      'ID-3-portrait': 'ID-3 (portrait)',
-    } satisfies Record<CardSchemaId, string>,
-    cardsSimple: {
-      'ID-1-landscape': 'ID-1',
-      'ID-2-landscape': 'ID-2',
-      'ID-3-landscape': 'ID-3',
-      'ID-1-portrait': 'ID-1',
-      'ID-2-portrait': 'ID-2',
-      'ID-3-portrait': 'ID-3',
+      'ID-1': 'Bank card',
+      'ID-2': 'Large identity card',
+      'ID-3': 'Passport',
     } satisfies Record<CardSchemaId, string>,
   },
   validation: {
