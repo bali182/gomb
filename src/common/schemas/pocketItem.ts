@@ -1,3 +1,4 @@
+import { HasTypeSchema } from './common'
 import { CurrencyIdSchema } from './currency'
 
 export type CardSchemaId = 'ID-1' | 'ID-2' | 'ID-3'
@@ -11,9 +12,12 @@ export type BasePocketItemSchema<Id extends string> = {
   height: number
 }
 
-export type CardPocketItemSchema = BasePocketItemSchema<CardSchemaId> & {
-  thickness: number
-  radius: number
-}
+export type CardPocketItemSchema = HasTypeSchema<'card'> &
+  BasePocketItemSchema<CardSchemaId> & {
+    thickness: number
+    radius: number
+  }
 
-export type BankNotePocketItemSchema = BasePocketItemSchema<CurrencyIdSchema>
+export type BankNotePocketItemSchema = HasTypeSchema<'banknote'> & BasePocketItemSchema<CurrencyIdSchema>
+
+export type PocketItemSchema = CardPocketItemSchema | BankNotePocketItemSchema
