@@ -437,10 +437,10 @@ const copyPocketFields = (
   if (selection.copyPocketItem) {
     updatedPocket = {
       ...updatedPocket,
-      pocketItemId: source.pocketItemId,
-      pocketItemOrientation: source.pocketItemOrientation,
-      pocketItemCrossAxisOffset: source.pocketItemCrossAxisOffset,
-      pocketItemOpeningOffset: source.pocketItemOpeningOffset,
+      itemId: source.itemId,
+      itemOrientation: source.itemOrientation,
+      itemCrossAxisOffset: source.itemCrossAxisOffset,
+      itemOpeningOffset: source.itemOpeningOffset,
     }
   }
   if (selection.copyOpening) {

@@ -143,7 +143,7 @@ export const HU = {
           stitchLineColor: 'Varrásvonal színe',
           strokeColor: 'Körvonal színe',
           selectionColor: 'Kijelölés színe',
-          cardColor: 'Kártya színe',
+          pocketItemColor: 'Zsebtartalom színe',
           threadColor: 'Cérna színe',
         },
         stitching: {
@@ -371,7 +371,7 @@ export const HU = {
             title: 'Zsebek',
             orientation: {
               label: 'Nyílás',
-              tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártya behelyezéséhez.',
+              tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártyák vagy bankjegyek behelyezéséhez.',
             },
             pocketStep: {
               label: 'Zsebek eltolása',
@@ -423,11 +423,11 @@ export const HU = {
           },
           contents: {
             title: 'Tartalom',
-            pocketItemId: {
+            itemId: {
               label: 'Tárgy',
               tooltip: 'Kiválasztja a zsebben megjelenő tárgyat.',
             },
-            pocketItemOrientation: {
+            itemOrientation: {
               label: 'Irány',
               tooltip:
                 'A tárgy fektetett vagy állított megjelenését állítja a képernyőn, a zseb nyílásának irányától függetlenül.',
@@ -437,12 +437,12 @@ export const HU = {
               tooltip:
                 'A módosítások nem látszanak, amíg a tartalom rejtve van. A Nézet → Elemek menüben kapcsold be a Zsebek tartalma opciót.',
             },
-            pocketItemCrossAxisOffset: {
+            itemCrossAxisOffset: {
               label: 'Oldaleltolás',
               tooltip:
                 'A zseb középvonalától tolja el a tárgyat. Pozitív érték felső/alsó nyílásnál jobbra, bal/jobb oldali nyílásnál lefelé tol; negatív érték az ellenkező irányba.',
             },
-            pocketItemOpeningOffset: {
+            itemOpeningOffset: {
               label: 'Kiemelés',
               tooltip:
                 'A zseb zárt szélétől a nyílás felé tolja a tárgyat. Nulla értéknél a tárgy a zseb zárt széléhez igazodik.',
@@ -641,9 +641,9 @@ export const HU = {
               label: 'Körvonal színe',
               tooltip: 'A bőrkomponensek körvonalának színét állítja be.',
             },
-            cardColor: {
-              label: 'Kártya színe',
-              tooltip: 'A zsebekben megjelenő kártyák színét állítja be.',
+            pocketItemColor: {
+              label: 'Zsebtartalom színe',
+              tooltip: 'A zsebekben megjelenő kártyák és bankjegyek színét állítja be.',
             },
           },
           stitching: {
@@ -777,7 +777,7 @@ export const HU = {
             left: 'Balra',
             right: 'Jobbra',
           },
-          pocketItemOrientation: {
+          itemOrientation: {
             landscape: 'Fektetett',
             portrait: 'Állított',
           },
@@ -813,8 +813,8 @@ export const HU = {
         },
       },
       controls: {
-        cardCombobox: {
-          noCard: 'Nincs',
+        pocketItemCombobox: {
+          noItem: 'Nincs',
           noMatchingValues: 'Nincs egyező tárgy.',
         },
         colorSwatchPicker: {
@@ -957,6 +957,10 @@ export const HU = {
     hole: 'Lyuk',
   },
   data: {
+    pocketItemGroups: {
+      cards: 'Kártyák',
+      banknotes: 'Bankjegyek',
+    },
     colors: {
       black: 'Fekete',
       darkGray: 'Sötétszürke',

@@ -11,7 +11,7 @@ export type NumberEditorStepSchema = number | 'stitch-hole-distance'
 export type ComponentColorSettingsSchema = {
   leatherColor: string
   strokeColor: string
-  cardColor: string
+  pocketItemColor: string
 }
 
 export type StitchingColorSettingsSchema = {

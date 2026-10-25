@@ -1,7 +1,7 @@
 import { STROKE_THICKNESS } from './constants/drawing'
 import {
-  cardColors,
   leatherColors,
+  pocketItemColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
@@ -67,7 +67,7 @@ export const defaultColorSettings: ColorSettingsSchema = {
   stitchLineColor: stitchLineColors.black,
   strokeColor: strokeColors.black,
   selectionColor: selectionColors.selectionBlue,
-  cardColor: cardColors.mediumGreen,
+  pocketItemColor: pocketItemColors.mediumGreen,
   threadColor: threadColors.white,
 }
 
@@ -140,9 +140,9 @@ export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
 }
 
 export const defaultHasPocketItem: HasPocketItemSchema = {
-  pocketItemOrientation: 'landscape',
-  pocketItemCrossAxisOffset: 0,
-  pocketItemOpeningOffset: 0,
+  itemOrientation: 'landscape',
+  itemCrossAxisOffset: 0,
+  itemOpeningOffset: 0,
 }
 
 export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName> = {

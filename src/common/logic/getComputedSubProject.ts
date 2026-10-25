@@ -11,10 +11,10 @@ import type {
   RootPanelSchema,
 } from '../schemas/components'
 import type {
-  ComputedCardSchema,
   ComputedComponentSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
+  ComputedPocketItemSchema,
   ComputedPocketSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
@@ -307,10 +307,10 @@ const getSubProjectViewBox = (
   components: ComputedComponentSchema[],
   stitchLines: ComputedStitchLineSchema[],
 ): RectSchema => {
-  const cards = components
+  const items = components
     .filter((component) => component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket')
-    .flatMap((pocket): ComputedCardSchema[] => (isDefined(pocket.card) ? [pocket.card] : []))
-  const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...cards]
+    .flatMap((pocket): ComputedPocketItemSchema[] => (isDefined(pocket.item) ? [pocket.item] : []))
+  const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...items]
   const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
 
   const firstBoundingRect = boundingRects[0]

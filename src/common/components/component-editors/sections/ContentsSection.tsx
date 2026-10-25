@@ -1,6 +1,6 @@
 import { HStack, SegmentGroup, Text } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
-import { PiCreditCard, PiInfo } from 'react-icons/pi'
+import { PiInfo, PiRectangle } from 'react-icons/pi'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
 import { Tooltip } from '../../common/Tooltip'
 
@@ -8,10 +8,10 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasPocketItemSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
-import type { CardSchemaId } from '../../../schemas/pocketItem'
+import type { PocketItemIdSchema } from '../../../schemas/pocketItem'
 import { isDefined } from '../../../utils/isDefined'
-import { CardCombobox } from '../../common/CardCombobox'
 import { NumberInput } from '../../common/NumberInput'
+import { PocketItemCombobox } from '../../common/PocketItemCombobox'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type ContentsSectionProps<T extends HasPocketItemSchema> = {
@@ -27,42 +27,42 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
 }: ContentsSectionProps<T>): ReactNode => {
   const { t } = useTranslation()
   const { settings } = useGlobalSettings()
-  const hasCard = isDefined(editable.pocketItemId)
+  const hasItem = isDefined(editable.itemId)
 
-  const handleCardIdChange = useCallback(
-    (pocketItemId: CardSchemaId): void => {
-      onChange({ ...editable, pocketItemId })
+  const handleItemIdChange = useCallback(
+    (itemId: PocketItemIdSchema): void => {
+      onChange({ ...editable, itemId })
     },
     [editable, onChange],
   )
 
-  const handleCardIdReset = useCallback((): void => {
+  const handleItemIdReset = useCallback((): void => {
     onChange({
       ...editable,
-      pocketItemId: undefined,
-      pocketItemOrientation: 'landscape',
-      pocketItemCrossAxisOffset: '0',
-      pocketItemOpeningOffset: '0',
+      itemId: undefined,
+      itemOrientation: 'landscape',
+      itemCrossAxisOffset: '0',
+      itemOpeningOffset: '0',
     })
   }, [editable, onChange])
 
   const handleCardCrossAxisOffsetChange = useCallback(
-    (pocketItemCrossAxisOffset: string): void => {
-      onChange({ ...editable, pocketItemCrossAxisOffset })
+    (itemCrossAxisOffset: string): void => {
+      onChange({ ...editable, itemCrossAxisOffset })
     },
     [editable, onChange],
   )
 
   const handleCardOpeningOffsetChange = useCallback(
-    (pocketItemOpeningOffset: string): void => {
-      onChange({ ...editable, pocketItemOpeningOffset })
+    (itemOpeningOffset: string): void => {
+      onChange({ ...editable, itemOpeningOffset })
     },
     [editable, onChange],
   )
 
   const handleOrientationChange = useCallback(
     (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, pocketItemOrientation: details.value })
+      onChange({ ...editable, itemOrientation: details.value })
     },
     [editable, onChange],
   )
@@ -83,72 +83,68 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
       >
         {t.project.editors.sections.components.contents.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.contents.pocketItemId.tooltip}>
-        {t.project.editors.sections.components.contents.pocketItemId.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.contents.itemId.tooltip}>
+        {t.project.editors.sections.components.contents.itemId.label}
       </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.pocketItemId}>
-        <CardCombobox
-          isResetEnabled={hasCard}
-          issue={issues.pocketItemId}
-          onChange={handleCardIdChange}
-          onReset={handleCardIdReset}
-          value={editable.pocketItemId}
+      <SectionGroup.SectionRowEditor issue={issues.itemId}>
+        <PocketItemCombobox
+          isResetEnabled={hasItem}
+          issue={issues.itemId}
+          onChange={handleItemIdChange}
+          onReset={handleItemIdReset}
+          value={editable.itemId}
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle
-        tooltip={t.project.editors.sections.components.contents.pocketItemOrientation.tooltip}
-      >
-        {t.project.editors.sections.components.contents.pocketItemOrientation.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.contents.itemOrientation.tooltip}>
+        {t.project.editors.sections.components.contents.itemOrientation.label}
       </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.pocketItemOrientation}>
+      <SectionGroup.SectionRowEditor issue={issues.itemOrientation}>
         <SegmentGroup.Root
-          disabled={!hasCard}
+          disabled={!hasItem}
           onValueChange={handleOrientationChange}
           size="sm"
-          value={editable.pocketItemOrientation}
+          value={editable.itemOrientation}
         >
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="landscape">
             <SegmentGroup.ItemHiddenInput />
-            <PiCreditCard />
-            {t.project.editors.enums.components.pocketItemOrientation.landscape}
+            <PiRectangle />
+            {t.project.editors.enums.components.itemOrientation.landscape}
           </SegmentGroup.Item>
           <SegmentGroup.Item value="portrait">
             <SegmentGroup.ItemHiddenInput />
-            <PiCreditCard style={{ transform: 'rotate(90deg)' }} />
-            {t.project.editors.enums.components.pocketItemOrientation.portrait}
+            <PiRectangle style={{ transform: 'rotate(90deg)' }} />
+            {t.project.editors.enums.components.itemOrientation.portrait}
           </SegmentGroup.Item>
         </SegmentGroup.Root>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle
-        tooltip={t.project.editors.sections.components.contents.pocketItemCrossAxisOffset.tooltip}
+        tooltip={t.project.editors.sections.components.contents.itemCrossAxisOffset.tooltip}
       >
-        {t.project.editors.sections.components.contents.pocketItemCrossAxisOffset.label}
+        {t.project.editors.sections.components.contents.itemCrossAxisOffset.label}
       </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.pocketItemCrossAxisOffset}>
+      <SectionGroup.SectionRowEditor issue={issues.itemCrossAxisOffset}>
         <NumberInput
-          disabled={!hasCard}
-          issue={issues.pocketItemCrossAxisOffset}
+          disabled={!hasItem}
+          issue={issues.itemCrossAxisOffset}
           onChange={handleCardCrossAxisOffsetChange}
           unit="mm"
-          value={editable.pocketItemCrossAxisOffset}
+          value={editable.itemCrossAxisOffset}
         />
       </SectionGroup.SectionRowEditor>
 
-      <SectionGroup.SectionRowTitle
-        tooltip={t.project.editors.sections.components.contents.pocketItemOpeningOffset.tooltip}
-      >
-        {t.project.editors.sections.components.contents.pocketItemOpeningOffset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.contents.itemOpeningOffset.tooltip}>
+        {t.project.editors.sections.components.contents.itemOpeningOffset.label}
       </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.pocketItemOpeningOffset}>
+      <SectionGroup.SectionRowEditor issue={issues.itemOpeningOffset}>
         <NumberInput
-          disabled={!hasCard}
-          issue={issues.pocketItemOpeningOffset}
+          disabled={!hasItem}
+          issue={issues.itemOpeningOffset}
           onChange={handleCardOpeningOffsetChange}
           unit="mm"
-          value={editable.pocketItemOpeningOffset}
+          value={editable.itemOpeningOffset}
         />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>

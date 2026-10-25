@@ -131,11 +131,11 @@ export const useExportDrawArea = (
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
       isInteractive: false,
-      isShowingCards: false,
+      isShowingPocketItems: false,
       selection: defaultSubProjectSelection,
       holeStyles,
       componentStyles,
-      cardStyles: defaultDrawAreaContext.cardStyles,
+      pocketItemStyles: defaultDrawAreaContext.pocketItemStyles,
       stitchLineStyles,
       exportTextStyles,
       markerStyles,

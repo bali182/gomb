@@ -45,7 +45,7 @@ export const comparators = {
       a.stitchLineColor === b.stitchLineColor &&
       a.strokeColor === b.strokeColor &&
       a.selectionColor === b.selectionColor &&
-      a.cardColor === b.cardColor &&
+      a.pocketItemColor === b.pocketItemColor &&
       a.threadColor === b.threadColor
     )
   },
@@ -153,10 +153,10 @@ export const comparators = {
     a.bottomLeftRadius === b.bottomLeftRadius &&
     a.bottomRightRadius === b.bottomRightRadius &&
     areArraysEqual(a.children, b.children, (first, second) => first === second) &&
-    a.pocketItemId === b.pocketItemId &&
-    a.pocketItemOrientation === b.pocketItemOrientation &&
-    a.pocketItemCrossAxisOffset === b.pocketItemCrossAxisOffset &&
-    a.pocketItemOpeningOffset === b.pocketItemOpeningOffset &&
+    a.itemId === b.itemId &&
+    a.itemOrientation === b.itemOrientation &&
+    a.itemCrossAxisOffset === b.itemCrossAxisOffset &&
+    a.itemOpeningOffset === b.itemOpeningOffset &&
     comparators.pocketOpening(a.opening, b.opening),
   tPocket: (a: TPocketSchema, b: TPocketSchema): boolean =>
     a.id === b.id &&
@@ -165,10 +165,10 @@ export const comparators = {
     a.tPocketTabWidth === b.tPocketTabWidth &&
     a.tPocketTaper === b.tPocketTaper &&
     areArraysEqual(a.children, b.children, (first, second) => first === second) &&
-    a.pocketItemId === b.pocketItemId &&
-    a.pocketItemOrientation === b.pocketItemOrientation &&
-    a.pocketItemCrossAxisOffset === b.pocketItemCrossAxisOffset &&
-    a.pocketItemOpeningOffset === b.pocketItemOpeningOffset &&
+    a.itemId === b.itemId &&
+    a.itemOrientation === b.itemOrientation &&
+    a.itemCrossAxisOffset === b.itemCrossAxisOffset &&
+    a.itemOpeningOffset === b.itemOpeningOffset &&
     comparators.pocketOpening(a.opening, b.opening),
   pocketCluster: (a: PocketClusterSchema, b: PocketClusterSchema): boolean => {
     return (

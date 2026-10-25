@@ -1,3 +1,4 @@
+import { pocketItems } from '../data/pocketItems'
 import type { HasPocketItemSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
@@ -11,38 +12,28 @@ export const validatePocketItemSchema = (
   currentValue: HasPocketItemSchema,
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<HasPocketItemSchema> => {
-  const id = validatePrimitiveUnion(
-    input.pocketItemId,
-    currentValue.pocketItemId,
-    { 'ID-1': true, 'ID-2': true, 'ID-3': true },
-    context,
-    true,
-  )
+  const id = validatePrimitiveUnion(input.itemId, currentValue.itemId, pocketItems, context, true)
   const orientation = validatePrimitiveUnion(
-    input.pocketItemOrientation,
-    currentValue.pocketItemOrientation,
+    input.itemOrientation,
+    currentValue.itemOrientation,
     { landscape: true, portrait: true },
     context,
   )
-  const crossAxisOffset = validateNumber(
-    input.pocketItemCrossAxisOffset,
-    currentValue.pocketItemCrossAxisOffset,
-    context,
-  )
-  const openingOffset = validateNumber(input.pocketItemOpeningOffset, currentValue.pocketItemOpeningOffset, context, {
+  const crossAxisOffset = validateNumber(input.itemCrossAxisOffset, currentValue.itemCrossAxisOffset, context)
+  const openingOffset = validateNumber(input.itemOpeningOffset, currentValue.itemOpeningOffset, context, {
     min: 0,
   })
   const issues: IssuesSchema<HasPocketItemSchema> = {
-    pocketItemId: id.issues,
-    pocketItemOrientation: orientation.issues,
-    pocketItemCrossAxisOffset: crossAxisOffset.issues,
-    pocketItemOpeningOffset: openingOffset.issues,
+    itemId: id.issues,
+    itemOrientation: orientation.issues,
+    itemCrossAxisOffset: crossAxisOffset.issues,
+    itemOpeningOffset: openingOffset.issues,
   }
   const committedValue: HasPocketItemSchema = {
-    pocketItemId: id.committedValue,
-    pocketItemOrientation: orientation.committedValue,
-    pocketItemCrossAxisOffset: crossAxisOffset.committedValue,
-    pocketItemOpeningOffset: openingOffset.committedValue,
+    itemId: id.committedValue,
+    itemOrientation: orientation.committedValue,
+    itemCrossAxisOffset: crossAxisOffset.committedValue,
+    itemOpeningOffset: openingOffset.committedValue,
   }
   if (!id.isValid || !orientation.isValid || !crossAxisOffset.isValid || !openingOffset.isValid) {
     return createInvalidValidationResult(issues, committedValue)

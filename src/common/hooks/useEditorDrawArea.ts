@@ -17,8 +17,6 @@ import { useSubProject } from './useSubProject'
 import { formatHex8, parse } from 'culori'
 import { getSelectionObstructingComponentIds } from '../logic/getSelectionObstructingComponentIds'
 import type {
-  DrawAreaCardStyleParams,
-  DrawAreaCardStyles,
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -27,6 +25,8 @@ import type {
   DrawAreaHoleStyles,
   DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
+  DrawAreaPocketItemStyleParams,
+  DrawAreaPocketItemStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { StitchLineSchema } from '../schemas/stitching'
@@ -96,7 +96,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       settings.view.pocketItemsVisible &&
       isDefined(selected) &&
       narrowers.is.pocket(selected) &&
-      isDefined(selected.pocketItemId) &&
+      isDefined(selected.itemId) &&
       editorTabs?.[selected.id] === PocketEditorTabs.contents
     )
   }, [isInteractive, settings.view.pocketItemsVisible, selected, editorTabs])
@@ -110,7 +110,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const {
     colorSettings: {
-      cardColor,
+      pocketItemColor,
       leatherColor,
       selectionColor,
       stitchHoleColor,
@@ -180,11 +180,11 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     isEditingPocketContents,
   ])
 
-  const cardStyles = useMemo<DrawAreaCardStyles>(() => {
-    const getBackgroundColor = ({ owner }: DrawAreaCardStyleParams): string => {
-      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(cardColor) : cardColor
+  const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
+    const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
+      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(pocketItemColor) : pocketItemColor
     }
-    const getStrokeColor = ({ owner }: DrawAreaCardStyleParams): string => {
+    const getStrokeColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
       return selectionObstructingComponentIds.has(owner.id) ? addAlpha(strokeColor) : strokeColor
     }
 
@@ -201,7 +201,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return STROKE_THICKNESS
       },
     }
-  }, [cardColor, strokeColor, selectionObstructingComponentIds])
+  }, [pocketItemColor, strokeColor, selectionObstructingComponentIds])
 
   const holeStyles = useMemo<DrawAreaHoleStyles>(
     () => ({
@@ -284,11 +284,11 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
       isInteractive,
-      isShowingCards: settings.view.pocketItemsVisible,
+      isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
       holeStyles,
       componentStyles,
-      cardStyles,
+      pocketItemStyles,
       stitchLineStyles,
       exportTextStyles,
       markerStyles,
@@ -296,7 +296,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       labelStyles,
     }),
     [
-      cardStyles,
+      pocketItemStyles,
       componentStyles,
       drawAreaSelection,
       holeStyles,

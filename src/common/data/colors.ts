@@ -97,7 +97,7 @@ export const selectionColors = {
   selectionWhite,
 } as const
 
-export const cardColors = {
+export const pocketItemColors = {
   mediumBlue,
   mediumGreen,
   red,

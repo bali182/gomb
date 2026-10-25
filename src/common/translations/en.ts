@@ -39,7 +39,11 @@ import type {
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
 
-import type { CardSchemaId, PocketItemOrientationSchema } from '../schemas/pocketItem'
+import type {
+  CardSchemaId,
+  PocketItemOrientationSchema,
+  TranslatedPocketItemGroupIdSchema,
+} from '../schemas/pocketItem'
 import type {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
@@ -202,7 +206,7 @@ export const EN = {
           stitchLineColor: 'Stitch line colour',
           strokeColor: 'Stroke colour',
           selectionColor: 'Selection colour',
-          cardColor: 'Card colour',
+          pocketItemColor: 'Pocket contents colour',
           threadColor: 'Thread colour',
         },
         stitching: {
@@ -431,7 +435,7 @@ export const EN = {
             title: 'Pockets',
             orientation: {
               label: 'Opening',
-              tooltip: 'Chooses which edge of the pocket stays open for inserting a card.',
+              tooltip: 'Chooses which edge of the pocket stays open for inserting cards or banknotes.',
             },
             pocketStep: {
               label: 'Spacing',
@@ -484,11 +488,11 @@ export const EN = {
           } satisfies EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
           contents: {
             title: 'Contents',
-            pocketItemId: {
+            itemId: {
               label: 'Item',
               tooltip: 'Selects the item shown inside this pocket.',
             },
-            pocketItemOrientation: {
+            itemOrientation: {
               label: 'Orientation',
               tooltip:
                 'Sets whether the item appears wider or taller on screen, independently of the pocket opening direction.',
@@ -498,12 +502,12 @@ export const EN = {
               tooltip:
                 'Your changes will not be visible while contents are hidden. Enable Pocket contents in View → Components to show them.',
             } satisfies EditorFieldTranslationSchema,
-            pocketItemCrossAxisOffset: {
+            itemCrossAxisOffset: {
               label: 'Offset',
               tooltip:
                 'Offsets the item from the pocket center. Positive values move right for top/bottom openings and down for left/right openings. Negative values move in the opposite direction.',
             },
-            pocketItemOpeningOffset: {
+            itemOpeningOffset: {
               label: 'Lift',
               tooltip:
                 'Moves the item from the closed pocket edge toward the opening. Zero rests against the closed edge.',
@@ -713,9 +717,9 @@ export const EN = {
               label: 'Outline colour',
               tooltip: 'Sets the outline colour used around leather components.',
             },
-            cardColor: {
-              label: 'Card colour',
-              tooltip: 'Sets the colour used for cards shown inside pockets.',
+            pocketItemColor: {
+              label: 'Pocket contents colour',
+              tooltip: 'Sets the colour used for cards and banknotes shown inside pockets.',
             },
           } satisfies SectionTranslationSchema<ComponentColorSettingsSchema>,
           stitching: {
@@ -849,7 +853,7 @@ export const EN = {
             left: 'Left',
             right: 'Right',
           } satisfies EnumTranslationSchema<PocketOrientationSchema>,
-          pocketItemOrientation: {
+          itemOrientation: {
             landscape: 'Landscape',
             portrait: 'Portrait',
           } satisfies EnumTranslationSchema<PocketItemOrientationSchema>,
@@ -885,8 +889,8 @@ export const EN = {
         },
       },
       controls: {
-        cardCombobox: {
-          noCard: 'None',
+        pocketItemCombobox: {
+          noItem: 'None',
           noMatchingValues: 'No matching items.',
         },
         colorSwatchPicker: {
@@ -1027,6 +1031,10 @@ export const EN = {
     hole: 'Hole',
   },
   data: {
+    pocketItemGroups: {
+      cards: 'Cards',
+      banknotes: 'Banknotes',
+    } satisfies Record<TranslatedPocketItemGroupIdSchema, string>,
     colors: {
       black: 'Black',
       darkGray: 'Dark grey',

@@ -1,5 +1,4 @@
 import type {
-  DrawAreaCardStyles,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
   DrawAreaExportIdentifiers,
@@ -7,6 +6,7 @@ import type {
   DrawAreaHoleStyles,
   DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
+  DrawAreaPocketItemStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { produce } from '../utils/produce'
@@ -39,7 +39,7 @@ const drawAreaDefaultComponentStyles: DrawAreaComponentStyles = {
   getFilter: produce(undefined),
 }
 
-const drawAreaDefaultCardStyles: DrawAreaCardStyles = {
+const drawAreaDefaultPocketItemStyles: DrawAreaPocketItemStyles = {
   getBackgroundColor: produce(undefined),
   getStrokeColor: produce(undefined),
   getMaskFillColor: produce(undefined),
@@ -78,12 +78,12 @@ const labelStyles: DrawAreaLabelStyles = {
 
 export const defaultDrawAreaContext: DrawAreaContextValue = {
   isInteractive: false,
-  isShowingCards: false,
+  isShowingPocketItems: false,
   selection: defaultSubProjectSelection,
   holeStyles: drawAreaDefaultHoleStyles,
   stitchLineStyles: drawAreaDefaultStitchLineStyles,
   componentStyles: drawAreaDefaultComponentStyles,
-  cardStyles: drawAreaDefaultCardStyles,
+  pocketItemStyles: drawAreaDefaultPocketItemStyles,
   exportTextStyles: drawAreaDefaultExportTextStyles,
   markerStyles: drawAreaDefaultMarkerStyles,
   exportIdentifiers: drawAreaExportIdentifiers,

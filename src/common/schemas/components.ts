@@ -7,7 +7,7 @@ import {
   HasStretchSchema,
   HasTypeSchema,
 } from './common'
-import { CardSchemaId, PocketItemOrientationSchema } from './pocketItem'
+import { PocketItemIdSchema, PocketItemOrientationSchema } from './pocketItem'
 
 export type HasColorSchema = {
   color?: string
@@ -109,14 +109,14 @@ export type PocketsSchema = {
 }
 
 export type HasPocketItemSchema = {
-  /** Optional item shown in this pocket. Currently supports card formats. */
-  pocketItemId?: CardSchemaId
+  /** Optional card or banknote shown in this pocket. */
+  itemId?: PocketItemIdSchema
   /** Orientation on screen, independent of the pocket opening direction. */
-  pocketItemOrientation: PocketItemOrientationSchema
+  itemOrientation: PocketItemOrientationSchema
   /** Signed offset from the pocket center across the opening direction, in mm. */
-  pocketItemCrossAxisOffset: number
+  itemCrossAxisOffset: number
   /** Offset from the closed pocket edge toward the opening, in mm (min 0). */
-  pocketItemOpeningOffset: number
+  itemOpeningOffset: number
 }
 
 /** Arranges physical pocket components. Its children are T-pockets followed by one front pocket. */

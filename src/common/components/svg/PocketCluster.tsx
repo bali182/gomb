@@ -20,7 +20,7 @@ type PocketClusterProps = {
 
 export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLevel }) => {
   const maskId = useId()
-  const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
+  const { componentStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
 
   const cluster = useComponent<PocketClusterSchema>(componentId)
@@ -49,7 +49,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
 
   return (
     <>
-      {isShowingCards && <PocketStitchMask id={maskId} componentId={componentId} nestingLevel={nestingLevel} />}
+      {isShowingPocketItems && <PocketStitchMask id={maskId} componentId={componentId} nestingLevel={nestingLevel} />}
       <g data-component-id={componentId} onClick={isInteractive ? onClick : undefined}>
         {(isEmpty ? isInteractive : active) && (
           <path
@@ -70,7 +70,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <StitchLines componentId={componentId} maskId={isShowingCards ? maskId : undefined} />
+      <StitchLines componentId={componentId} maskId={isShowingPocketItems ? maskId : undefined} />
       <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )
