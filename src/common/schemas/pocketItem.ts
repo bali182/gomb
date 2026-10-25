@@ -5,7 +5,14 @@ export type CardSchemaId = 'ID-1' | 'ID-2' | 'ID-3'
 
 export type PocketItemIdSchema = CardSchemaId | CurrencyIdSchema
 
-export type TranslatedPocketItemGroupIdSchema = 'cards' | 'banknotes'
+export type TranslatedPocketItemGroupIdSchema =
+  | 'cards'
+  | 'african-banknotes'
+  | 'asian-banknotes'
+  | 'european-banknotes'
+  | 'north-american-banknotes'
+  | 'oceanian-banknotes'
+  | 'south-american-banknotes'
 
 /** Orientation on screen: landscape is wider, portrait is taller. */
 export type PocketItemOrientationSchema = 'landscape' | 'portrait'

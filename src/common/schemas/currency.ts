@@ -139,7 +139,6 @@ export type CurrencyIdSchema =
   | 'USD'
   | 'UYU'
   | 'UZS'
-  | 'VED'
   | 'VES'
   | 'VND'
   | 'VUV'

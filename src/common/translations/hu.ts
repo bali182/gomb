@@ -959,7 +959,12 @@ export const HU = {
   data: {
     pocketItemGroups: {
       cards: 'Kártyák',
-      banknotes: 'Bankjegyek',
+      'african-banknotes': 'Bankjegyek – Afrika',
+      'asian-banknotes': 'Bankjegyek – Ázsia',
+      'european-banknotes': 'Bankjegyek – Európa',
+      'north-american-banknotes': 'Bankjegyek – Észak-Amerika',
+      'oceanian-banknotes': 'Bankjegyek – Ausztrália és Óceánia',
+      'south-american-banknotes': 'Bankjegyek – Dél-Amerika',
     },
     colors: {
       black: 'Fekete',
@@ -1009,7 +1014,7 @@ export const HU = {
       AUD: 'Ausztrál dollár',
       AWG: 'Arubai florin',
       AZN: 'Azerbajdzsáni manat',
-      BAM: 'Bosznia-hercegovinai konvertibilis márka',
+      BAM: 'Bosznia-hercegovinai márka',
       BBD: 'Barbadosi dollár',
       BDT: 'Bangladesi taka',
       BHD: 'Bahreini dinár',
@@ -1139,7 +1144,6 @@ export const HU = {
       USD: 'Amerikai dollár',
       UYU: 'Uruguayi peso',
       UZS: 'Üzbegisztáni szom',
-      VED: 'Venezuelai bolívar soberano',
       VES: 'Venezuelai bolívar',
       VND: 'Vietnámi dong',
       VUV: 'Vanuatui vatu',

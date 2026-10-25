@@ -1033,7 +1033,12 @@ export const EN = {
   data: {
     pocketItemGroups: {
       cards: 'Cards',
-      banknotes: 'Banknotes',
+      'african-banknotes': 'Banknotes – Africa',
+      'asian-banknotes': 'Banknotes – Asia',
+      'european-banknotes': 'Banknotes – Europe',
+      'north-american-banknotes': 'Banknotes – North America',
+      'oceanian-banknotes': 'Banknotes – Australia and Oceania',
+      'south-american-banknotes': 'Banknotes – South America',
     } satisfies Record<TranslatedPocketItemGroupIdSchema, string>,
     colors: {
       black: 'Black',
@@ -1083,7 +1088,7 @@ export const EN = {
       AUD: 'Australian Dollar',
       AWG: 'Aruban Florin',
       AZN: 'Azerbaijani Manat',
-      BAM: 'Bosnia-Herzegovina Convertible Mark',
+      BAM: 'Bosnia-Herzegovina Mark',
       BBD: 'Barbadian Dollar',
       BDT: 'Bangladeshi Taka',
       BHD: 'Bahraini Dinar',
@@ -1213,7 +1218,6 @@ export const EN = {
       USD: 'US Dollar',
       UYU: 'Uruguayan Peso',
       UZS: 'Uzbekistani Som',
-      VED: 'Venezuelan Bolívar Soberano',
       VES: 'Venezuelan Bolívar',
       VND: 'Vietnamese Dong',
       VUV: 'Vanuatu Vatu',

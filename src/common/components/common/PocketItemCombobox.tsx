@@ -6,6 +6,7 @@ import {
   InputGroup,
   Portal,
   Text,
+  VStack,
   createListCollection,
   useFilter,
   type ComboboxValueChangeDetails,
@@ -146,14 +147,17 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
                   <Combobox.ItemGroupLabel>{group.name}</Combobox.ItemGroupLabel>
                   {group.items.map((item) => (
                     <Combobox.Item item={item} key={item.id}>
-                      <Icon as={itemIcons[item.type]} />
-                      <Combobox.ItemText flex="1" minWidth="0">
-                        <HStack justifyContent="space-between">
-                          <Text whiteSpace="nowrap">
+                      <Icon as={itemIcons[item.type]} flexShrink="0" />
+                      <VStack flex="1" minWidth="0" align="stretch" gap="0">
+                        <HStack justifyContent="space-between" gap="2" minWidth="0">
+                          <Combobox.ItemText flex="1" minWidth="0" truncate>
                             {item.name}
-                            <Text as="span" display="block" color="fg.muted" fontSize="2xs">
-                              {item.id}
-                            </Text>
+                          </Combobox.ItemText>
+                          <Combobox.ItemIndicator flexShrink="0" />
+                        </HStack>
+                        <HStack justifyContent="space-between" gap="2">
+                          <Text color="fg.muted" fontSize="2xs" whiteSpace="nowrap">
+                            {item.id}
                           </Text>
                           <Text color="fg.muted" fontSize="2xs" textAlign="right" whiteSpace="nowrap" flexShrink="0">
                             {t.formatters.dimensions(
@@ -162,8 +166,7 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
                             )}
                           </Text>
                         </HStack>
-                      </Combobox.ItemText>
-                      <Combobox.ItemIndicator />
+                      </VStack>
                     </Combobox.Item>
                   ))}
                 </Combobox.ItemGroup>
