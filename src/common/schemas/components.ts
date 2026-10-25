@@ -7,7 +7,7 @@ import {
   HasStretchSchema,
   HasTypeSchema,
 } from './common'
-import { CardSchemaId, PocketItemOrientationSchema } from './valuables'
+import { CardSchemaId, PocketItemOrientationSchema } from './pocketItem'
 
 export type HasColorSchema = {
   color?: string

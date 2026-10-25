@@ -39,6 +39,7 @@ import type {
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
 
+import type { CardSchemaId, PocketItemOrientationSchema } from '../schemas/pocketItem'
 import type {
   HasDirectionalOffsetsSchema,
   HasHorizontalDirectionsSchema,
@@ -59,7 +60,6 @@ import type {
   NativeDialogTranslationSchema,
   SectionTranslationSchema,
 } from '../schemas/translation'
-import type { CardSchemaId, PocketItemOrientationSchema } from '../schemas/valuables'
 
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'

@@ -2,8 +2,8 @@ import type BigNumber from 'bignumber.js'
 
 import { HasComponentReferenceSchema, HasTargetSchema, HasTypeSchema } from './common'
 import { CornerRadiusSchema, LineSchema, PathSchema, PointSchema, RectSchema } from './geometry'
+import { CardPocketItemSchema } from './pocketItem'
 import { StitchCornerSchema, StitchLineSchema, StitchSideSchema } from './stitching'
-import { CardSchema } from './valuables'
 
 export type ComputedStitchHoleSchema = {
   center: PointSchema
@@ -81,7 +81,7 @@ export type ComputedCardSchema = HasTypeSchema<'computed-card'> &
   HasPathSchema &
   HasComputedCornerRadiusSchema &
   HasBoundingRectSchema & {
-    card: CardSchema
+    card: CardPocketItemSchema
   }
 
 export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster'> &

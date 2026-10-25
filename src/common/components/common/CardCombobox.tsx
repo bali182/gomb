@@ -16,7 +16,7 @@ import { cards } from '../../data/cards'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { IssueSchema } from '../../schemas/issues'
-import type { CardSchema, CardSchemaId } from '../../schemas/valuables'
+import type { CardPocketItemSchema, CardSchemaId } from '../../schemas/pocketItem'
 import { isDefined } from '../../utils/isDefined'
 
 type CardComboboxProps = {
@@ -32,9 +32,9 @@ export const CardCombobox: FC<CardComboboxProps> = ({ isResetEnabled, issue, onC
   const [searchValue, setSearchValue] = useState<string>('')
   const { contains } = useFilter({ sensitivity: 'base' })
   const isInvalid = isDefined(issue) && issue.severity === 'error'
-  const collection = useMemo<ListCollection<CardSchema>>(
+  const collection = useMemo<ListCollection<CardPocketItemSchema>>(
     () =>
-      createListCollection<CardSchema>({
+      createListCollection<CardPocketItemSchema>({
         itemToString: (item) => t.data.cards[item.id],
         itemToValue: (item) => item.id,
         items: cards.filter((card) => {
@@ -52,7 +52,7 @@ export const CardCombobox: FC<CardComboboxProps> = ({ isResetEnabled, issue, onC
     [contains, searchValue, t],
   )
   const handleValueChange = useCallback(
-    (details: ComboboxValueChangeDetails<CardSchema>): void => {
+    (details: ComboboxValueChangeDetails<CardPocketItemSchema>): void => {
       const card = details.items[0]
       if (isDefined(card)) onChange(card.id)
     },

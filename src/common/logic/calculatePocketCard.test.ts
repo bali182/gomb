@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import type { PocketOrientationSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
-import type { PocketItemOrientationSchema } from '../schemas/valuables'
+import type { PocketItemOrientationSchema } from '../schemas/pocketItem'
 import { d } from '../testData'
 import { calculatePocketCard } from './calculatePocketCard'
 

@@ -4,7 +4,7 @@ import { cards } from '../data/cards'
 import type { PocketClusterSchema, PocketSchema } from '../schemas/components'
 import type { ComputedCardSchema } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
-import type { CardSchema } from '../schemas/valuables'
+import type { CardPocketItemSchema } from '../schemas/pocketItem'
 import { isDefined } from '../utils/isDefined'
 import { calculateRectPath } from './calculateRectPath'
 
@@ -42,7 +42,7 @@ export const calculatePocketCard = (
 }
 
 const getCardBoundingRect = (
-  card: CardSchema,
+  card: CardPocketItemSchema,
   pocket: PocketSchema,
   pocketCluster: PocketClusterSchema,
   pocketBoundingRect: RectSchema,
