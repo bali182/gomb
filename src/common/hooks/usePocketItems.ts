@@ -34,8 +34,8 @@ export const usePocketItems = (filter: (item: TranslatedPocketItemSchema) => boo
       name: translation.t.data.pocketItemGroups.cards,
       items: cards.map((item) => ({ ...item, name: translation.t.data.cards[item.id] })),
     }
-    return [
-      cardsGroup,
+
+    const banknoteGroups = [
       createBanknoteGroup('african-banknotes', africanBanknotes, translation),
       createBanknoteGroup('asian-banknotes', asianBanknotes, translation),
       createBanknoteGroup('european-banknotes', europeanBanknotes, translation),
@@ -43,6 +43,7 @@ export const usePocketItems = (filter: (item: TranslatedPocketItemSchema) => boo
       createBanknoteGroup('oceanian-banknotes', oceanianBanknotes, translation),
       createBanknoteGroup('south-american-banknotes', southAmericanBanknotes, translation),
     ].sort((first, second) => first.name.localeCompare(second.name, translation.language))
+    return [cardsGroup, ...banknoteGroups]
   }, [translation])
 
   return useMemo<UsePocketItemsResultSchema>(
