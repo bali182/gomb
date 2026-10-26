@@ -9,7 +9,7 @@ export type DrawAreaComponentStyleParams = {
   nestingLevel: number
 }
 
-export type DrawAreaCardStyleParams = {
+export type DrawAreaPocketItemStyleParams = {
   owner: PocketSchema
 }
 
@@ -23,15 +23,16 @@ export type DrawAreaComponentStyles = {
   getMaskFillColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getMaskStrokeColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getBorderThickness: (params: DrawAreaComponentStyleParams) => number | undefined
+  getBorderDasharray: (params: DrawAreaComponentStyleParams) => string | undefined
   getFilter: (params: DrawAreaComponentStyleParams) => string | undefined
 }
 
-export type DrawAreaCardStyles = {
-  getBackgroundColor: (params: DrawAreaCardStyleParams) => string | undefined
-  getStrokeColor: (params: DrawAreaCardStyleParams) => string | undefined
-  getMaskFillColor: (params: DrawAreaCardStyleParams) => string | undefined
-  getMaskStrokeColor: (params: DrawAreaCardStyleParams) => string | undefined
-  getStrokeThickness: (params: DrawAreaCardStyleParams) => number | undefined
+export type DrawAreaPocketItemStyles = {
+  getBackgroundColor: (params: DrawAreaPocketItemStyleParams) => string | undefined
+  getStrokeColor: (params: DrawAreaPocketItemStyleParams) => string | undefined
+  getMaskFillColor: (params: DrawAreaPocketItemStyleParams) => string | undefined
+  getMaskStrokeColor: (params: DrawAreaPocketItemStyleParams) => string | undefined
+  getStrokeThickness: (params: DrawAreaPocketItemStyleParams) => number | undefined
 }
 
 export type DrawAreaStitchLineStyles = {
@@ -54,6 +55,7 @@ export type DrawAreaExportIdentifiers = {
   getElementId: (element: ExportElementSchema) => string | undefined
   getStitchLineId: (element: ResolvedStitchLineSchema) => string | undefined
   getNameText: (element: ExportElementSchema) => string | undefined
+  getParentNameText: (element: ExportElementSchema) => string | undefined
 }
 
 export type DrawAreaExportTextStyles = {
@@ -81,12 +83,12 @@ export type DrawAreaMarkerStyles = {
 
 export type DrawAreaContextValue = {
   isInteractive: boolean
-  isShowingCards: boolean
+  isShowingPocketItems: boolean
   selection: SubProjectSelectionContextValue
   holeStyles: DrawAreaHoleStyles
   stitchLineStyles: DrawAreaStitchLineStyles
   componentStyles: DrawAreaComponentStyles
-  cardStyles: DrawAreaCardStyles
+  pocketItemStyles: DrawAreaPocketItemStyles
   exportTextStyles: DrawAreaExportTextStyles
   exportIdentifiers: DrawAreaExportIdentifiers
   markerStyles: DrawAreaMarkerStyles

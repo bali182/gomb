@@ -38,6 +38,7 @@ export const PocketCopyGrid: FC<PocketCopyGridProps> = ({ subProject, sourcePock
     () => ({
       copyShape: getHeaderCell(rows, 'copyShape'),
       copyOpening: getHeaderCell(rows, 'copyOpening'),
+      copyPocketItem: getHeaderCell(rows, 'copyPocketItem'),
       copyStitching: getHeaderCell(rows, 'copyStitching'),
       overwriteStitching: getHeaderCell(rows, 'overwriteStitching'),
     }),

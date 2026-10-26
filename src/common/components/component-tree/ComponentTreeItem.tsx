@@ -7,6 +7,7 @@ import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectio
 import { useSubProject } from '../../hooks/useSubProject'
 import {
   canAddHole,
+  canAddStitchLine,
   canMoveComponent,
   getComponentStitchLineType,
 } from '../../operations/subProject/utils/componentRules'
@@ -70,9 +71,12 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'hole':
         return canAddHole(component)
       case 'stitch-line':
-        return getComponentStitchLineType(component) === activeDragData.stitchLineType
+        return (
+          canAddStitchLine(component, subProject) &&
+          getComponentStitchLineType(component) === activeDragData.stitchLineType
+        )
     }
-  }, [activeDragData, component, hasDragAndDrop])
+  }, [activeDragData, component, hasDragAndDrop, subProject])
 
   const isDisabledForActiveDrag = useMemo<boolean>(() => {
     if (!isDefined(activeDragData) || isActiveComponent) {
@@ -84,9 +88,12 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'hole':
         return false
       case 'stitch-line':
-        return getComponentStitchLineType(component) !== activeDragData.stitchLineType
+        return (
+          !canAddStitchLine(component, subProject) ||
+          getComponentStitchLineType(component) !== activeDragData.stitchLineType
+        )
     }
-  }, [activeDragData, component, isActiveComponent])
+  }, [activeDragData, component, isActiveComponent, subProject])
 
   const insideBeforeComponentId = useMemo<string | undefined>(() => {
     if (component.type !== 'pocket-cluster') {

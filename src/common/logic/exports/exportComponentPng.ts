@@ -102,10 +102,10 @@ const getComponentBoundingRects = (
   if (component.type === 'computed-pocket-cluster' && model.type === 'pocket-cluster') {
     for (const pocket of component.children) {
       boundingRects.push(padBoundingRect(pocket.boundingRect, borderPadding))
-      if (context.isShowingCards && isDefined(pocket.card)) {
+      if (context.isShowingPocketItems && isDefined(pocket.item)) {
         const owner = accessors.subProject(subProject).pocket(pocket.componentId)
         boundingRects.push(
-          padBoundingRect(pocket.card.boundingRect, (context.cardStyles.getStrokeThickness({ owner }) ?? 0) / 2),
+          padBoundingRect(pocket.item.boundingRect, (context.pocketItemStyles.getStrokeThickness({ owner }) ?? 0) / 2),
         )
       }
     }
@@ -115,11 +115,14 @@ const getComponentBoundingRects = (
     model.type !== 'pocket-cluster' &&
     model.type !== 'panel' &&
     model.type !== 'root-panel' &&
-    context.isShowingCards &&
-    isDefined(component.card)
+    context.isShowingPocketItems &&
+    isDefined(component.item)
   ) {
     boundingRects.push(
-      padBoundingRect(component.card.boundingRect, (context.cardStyles.getStrokeThickness({ owner: model }) ?? 0) / 2),
+      padBoundingRect(
+        component.item.boundingRect,
+        (context.pocketItemStyles.getStrokeThickness({ owner: model }) ?? 0) / 2,
+      ),
     )
   }
   return boundingRects

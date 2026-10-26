@@ -5,6 +5,39 @@ import { cloneComponentTree } from './cloneComponentTree'
 import { getUnusedName } from './utils/getUnusedName'
 
 describe('cloneComponentTree', () => {
+  it.each([false, true])('clones a cluster without children when it originally has pockets: %s', (hasPockets) => {
+    const cluster = d.pocketCluster({ id: 'cluster', children: hasPockets ? ['t', 'front'] : [] })
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: [cluster.id] }),
+      components: [cluster, d.tPocket({ id: 't' }), d.frontPocket({ id: 'front' })],
+      holes: [d.hole({ id: 'front-hole', componentId: 'front' })],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 't-line', targetId: 't', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'front-hole', targetType: 'hole' }),
+      ],
+    })
+    const snapshot = structuredClone(source)
+    let componentCount = 0
+    const result = cloneComponentTree({
+      subProject: source,
+      componentId: cluster.id,
+      settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
+      ids: {
+        component: () => `component-copy-${++componentCount}`,
+        hole: () => 'hole-copy',
+        stitchLine: () => 'stitch-copy',
+      },
+      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+    })
+    expect(result?.clonedRootId).toBe('component-copy-1')
+    expect(Object.keys(result?.clonedComponents ?? {})).toEqual(['component-copy-1'])
+    expect(result?.clonedComponents['component-copy-1']).toMatchObject({ type: 'pocket-cluster', children: [] })
+    expect(result?.clonedHoles).toEqual([])
+    expect(result?.clonedStitchLines).toEqual([])
+    expect(source).toEqual(snapshot)
+  })
+
   it('clones a root tree with its holes and stitch lines', () => {
     const root = d.rootPanel({ id: 'root', children: ['pocket-cluster'], name: 'Root' })
     const pocketCluster = d.pocketCluster({ id: 'pocket-cluster', children: ['panel'], name: 'Pocket cluster' })

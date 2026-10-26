@@ -1,8 +1,8 @@
 import { useCallback, type FC } from 'react'
 
 import {
-  cardColors,
   leatherColors,
+  pocketItemColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
@@ -31,7 +31,7 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
   const stitchLineColorValues = useColors(stitchLineColors)
   const strokeColorValues = useColors(strokeColors)
   const selectionColorValues = useColors(selectionColors)
-  const cardColorValues = useColors(cardColors)
+  const pocketItemColorValues = useColors(pocketItemColors)
 
   const handleLeatherColorChange = useCallback(
     (baseColor: string): void => {
@@ -111,13 +111,13 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
     [editable, onChange],
   )
 
-  const handleCardColorChange = useCallback(
-    (cardColor: string): void => {
+  const handlePocketItemColorChange = useCallback(
+    (pocketItemColor: string): void => {
       onChange({
         ...editable,
         colorSettings: {
           ...editable.colorSettings,
-          cardColor,
+          pocketItemColor,
         },
       })
     },
@@ -154,15 +154,15 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           />
         </SectionGroup.SectionRowEditor>
 
-        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.cardColor.tooltip}>
-          {t.project.editors.sections.project.components.cardColor.label}
+        <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.project.components.pocketItemColor.tooltip}>
+          {t.project.editors.sections.project.components.pocketItemColor.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.cardColor}>
+        <SectionGroup.SectionRowEditor issue={issues.colorSettings?.pocketItemColor}>
           <ColorInput
-            colors={cardColorValues}
-            issue={issues.colorSettings?.cardColor}
-            onChange={handleCardColorChange}
-            value={editable.colorSettings.cardColor}
+            colors={pocketItemColorValues}
+            issue={issues.colorSettings?.pocketItemColor}
+            onChange={handlePocketItemColorChange}
+            value={editable.colorSettings.pocketItemColor}
           />
         </SectionGroup.SectionRowEditor>
       </SectionGroup.Section>

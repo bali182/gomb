@@ -1,5 +1,7 @@
+import { useAtomValue } from 'jotai'
 import { useEffect, type FC } from 'react'
 import { useParams } from 'react-router'
+import { floatingEditorTabsAtom } from '../../../common/state/floatingEditorTabsAtom'
 
 import { DrawAreaContext } from '../../../common/contexts/DrawAreaContext'
 import { useEditorDrawArea } from '../../../common/hooks/useEditorDrawArea'
@@ -37,7 +39,8 @@ type ExistingWebSubProjectRouteProps = {
 
 const ExistingWebSubProjectRoute: FC<ExistingWebSubProjectRouteProps> = ({ subProjectId }) => {
   const { isMeasuring } = useMeasurement()
-  const drawAreaContext = useEditorDrawArea(!isMeasuring)
+  const editorTabs = useAtomValue(floatingEditorTabsAtom)
+  const drawAreaContext = useEditorDrawArea({ isInteractive: !isMeasuring, editorTabs })
 
   return (
     <DrawAreaContext.Provider value={drawAreaContext}>

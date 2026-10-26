@@ -6,6 +6,7 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
+import { validatePocketItemSchema } from './validatePocketItemSchema'
 import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 export const validateFrontPocketSchema = (
@@ -42,9 +43,11 @@ export const validateFrontPocketSchema = (
   const bottomRightRadiusResult = validateNumber(input.bottomRightRadius, currentValue.bottomRightRadius, context, {
     min: 0,
   })
+  const pocketItemResult = validatePocketItemSchema(input, currentValue, context)
   const openingResult = validatePocketOpeningSchema(input.opening, currentValue.opening, context)
 
   const issues: IssuesSchema<FrontPocketSchema> = {
+    ...pocketItemResult.issues,
     name: nameResult.issues,
     color: colorResult.issues,
     layoutOrientation: layoutOrientationResult.issues,
@@ -58,6 +61,7 @@ export const validateFrontPocketSchema = (
   }
   const committedValue: FrontPocketSchema = {
     ...currentValue,
+    ...pocketItemResult.committedValue,
     name: nameResult.committedValue,
     color: colorResult.committedValue,
     layoutOrientation: layoutOrientationResult.committedValue,
@@ -81,6 +85,7 @@ export const validateFrontPocketSchema = (
     !topRightRadiusResult.isValid ||
     !bottomLeftRadiusResult.isValid ||
     !bottomRightRadiusResult.isValid ||
+    !pocketItemResult.isValid ||
     !openingResult.isValid
   ) {
     return createInvalidValidationResult(issues, committedValue)

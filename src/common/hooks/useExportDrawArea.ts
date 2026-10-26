@@ -3,6 +3,7 @@ import { COMPONENT_DIMENSIONS_COLOR, COMPONENT_NAME_COLOR, STROKE_COLOR, STROKE_
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { defaultSubProjectSelection } from '../contexts/SubProjectSelectionContext'
 import { getExportElementBoundingRect } from '../logic/exports/exportGeometryUtils'
+import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import type {
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -30,6 +31,7 @@ export const useExportDrawArea = (
       getMaskFillColor: produce(undefined),
       getMaskStrokeColor: produce(undefined),
       getBorderThickness: produce(STROKE_THICKNESS),
+      getBorderDasharray: produce(undefined),
       getFilter: produce(undefined),
     }),
     [],
@@ -70,6 +72,12 @@ export const useExportDrawArea = (
       getStitchLineId: (stitchLine) => {
         return stitchLine.id
       },
+      getParentNameText: (element) => {
+        if (!settings.showParentNames) {
+          return undefined
+        }
+        return getComponentParent(element.component.id, element.subProject)?.name
+      },
       getNameText: (element) => {
         if (!settings.showNames) {
           return undefined
@@ -85,7 +93,7 @@ export const useExportDrawArea = (
         }
       },
     }),
-    [settings.showNames],
+    [settings.showNames, settings.showParentNames],
   )
 
   const exportTextStyles = useMemo<DrawAreaExportTextStyles>(
@@ -123,11 +131,11 @@ export const useExportDrawArea = (
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
       isInteractive: false,
-      isShowingCards: false,
+      isShowingPocketItems: false,
       selection: defaultSubProjectSelection,
       holeStyles,
       componentStyles,
-      cardStyles: defaultDrawAreaContext.cardStyles,
+      pocketItemStyles: defaultDrawAreaContext.pocketItemStyles,
       stitchLineStyles,
       exportTextStyles,
       markerStyles,

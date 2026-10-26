@@ -8,10 +8,10 @@ import type { PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
-import { Card } from './Card'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
+import { PocketItem } from './PocketItem'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { TPocketStitchLines } from './TPocketStitchLines'
@@ -22,7 +22,7 @@ type PocketProps = {
 }
 
 export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
-  const { componentStyles, isInteractive, isShowingCards, selection } = useDrawAreaContext()
+  const { componentStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const pocket = useComponent<PocketSchema>(componentId)
   const computed = useComputedComponent<ComputedPocketSchema>(componentId)
@@ -48,7 +48,7 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
 
   return (
     <>
-      {isShowingCards && isDefined(computed.card) && <Card owner={pocket} path={computed.card.path} />}
+      {isShowingPocketItems && isDefined(computed.item) && <PocketItem owner={pocket} path={computed.item.path} />}
       <path
         d={pathData}
         data-component-id={componentId}

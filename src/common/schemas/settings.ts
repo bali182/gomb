@@ -11,7 +11,7 @@ export type NumberEditorStepSchema = number | 'stitch-hole-distance'
 export type ComponentColorSettingsSchema = {
   leatherColor: string
   strokeColor: string
-  cardColor: string
+  pocketItemColor: string
 }
 
 export type StitchingColorSettingsSchema = {
@@ -39,6 +39,7 @@ export type ExportContentSettingsSchema = {
   stitchLineMode: ExportStitchLineModeSchema
   showNames: boolean
   showDimensions: boolean
+  showParentNames: boolean
   childMarkers: boolean
   cutHelperDistance: number
 }
@@ -73,6 +74,7 @@ export type ViewSettingsSchema = {
   stitchCountVisible: boolean
   stitchHoleFootprintVisible: boolean
   componentDimensionsVisible: boolean
+  pocketItemsVisible: boolean
   scale: number
 }
 

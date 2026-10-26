@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest'
 
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { AnchorSchema } from '../schemas/common'
-import type { LayoutOrientationSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
+import type {
+  LayoutOrientationSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  PocketOrientationSchema,
+  RootPanelSchema,
+} from '../schemas/components'
 import type { ComputedComponentSchema } from '../schemas/computed'
 import type { PathSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
@@ -19,6 +25,100 @@ import { getClosedPathLoops, getPathSegments } from './pathSegments'
 import { getPathSegmentMidpoint } from './pathSegmentUtils'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
+
+describe('empty pocket cluster placeholder', () => {
+  it.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
+    'uses the rounded cluster bounds with a %s opening',
+    (orientation) => {
+      const root = d.rootPanel({
+        id: 'root',
+        width: 100,
+        height: 80,
+        children: ['cluster'],
+        topLeftRadius: 10,
+        topRightRadius: 10,
+        bottomLeftRadius: 10,
+        bottomRightRadius: 10,
+      })
+      const cluster = d.pocketCluster({ id: 'cluster', orientation })
+      const original = d.subProject({ id: 'sp', root, components: [cluster] })
+      const snapshot = structuredClone(original)
+      const computed = accessors
+        .computedSubProject(getComputedSubProject(original, defaultStitchingSettings))
+        .pocketCluster(cluster.id)
+      expect(computed.children).toEqual([])
+      expectBoundingRect(computed, [0, 0, 100, 80])
+      expect(computed.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(2)
+      expect(getClosedPathArea(computed.path)).toBeCloseTo(8000 - 2 * (100 - Math.PI * 25), 7)
+      expect(original).toEqual(snapshot)
+    },
+  )
+
+  it('replaces the placeholder with the actual pocket contour when a pocket is added', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 80, children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster' })
+    const original = d.subProject({ id: 'sp', root, components: [cluster] })
+    const empty = getComputedSubProject(original, defaultStitchingSettings)
+    expect(getClosedPathArea(empty.components.cluster.path)).toBeCloseTo(8000, 7)
+    const front = d.frontPocket({
+      id: 'front',
+      opening: { type: 'recessed', outerInset: 10, innerOffset: 15, depth: 12, outerRadius: 0, innerRadius: 0 },
+    })
+    const populated: SubProjectSchema = {
+      ...original,
+      components: { ...original.components, cluster: { ...cluster, children: [front.id] }, [front.id]: front },
+    }
+    const computed = getComputedSubProject(populated, defaultStitchingSettings)
+    expect(getClosedPathArea(computed.components.cluster.path)).toBeCloseTo(
+      getClosedPathArea(computed.components.front.path),
+      7,
+    )
+    expect(getClosedPathArea(computed.components.cluster.path)).toBeLessThan(8000)
+    expect(isPointInClosedPath({ x: new BigNumber(50), y: new BigNumber(1) }, computed.components.cluster.path)).toBe(
+      false,
+    )
+  })
+
+  it('does not use the placeholder when a real pocket is entirely cut away', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 80, children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
+    const front = d.frontPocket({ id: 'front' })
+    const hole: HoleSchema = {
+      ...d.hole({ id: 'hole', componentId: front.id }),
+      xAnchor: 'start',
+      yAnchor: 'start',
+      xOffset: -10,
+      yOffset: -10,
+      width: 120,
+      height: 100,
+    }
+    const original = d.subProject({ id: 'sp', root, components: [cluster, front], holes: [hole] })
+    const computed = getComputedSubProject(original, defaultStitchingSettings)
+    expect(computed.components.front.path.commands).toEqual([])
+    expect(computed.components.cluster.children).toHaveLength(1)
+    expect(computed.components.cluster.path.commands).toEqual([])
+  })
+
+  it('exports neither the empty cluster nor marker lines for its placeholder', () => {
+    const root = d.rootPanel({ id: 'root', width: 100, height: 80, children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster', width: 60, height: 40, autoWidth: false, autoHeight: false })
+    const original = d.subProject({ id: 'sp', root, components: [cluster] })
+    const computed = getComputedSubProject(original, defaultStitchingSettings)
+    expect(computed.components.cluster.path.commands.length).toBeGreaterThan(0)
+    const settings = { ...defaultExportParams, childMarkers: true }
+    expect(getExportElementsForComponent(original, computed, cluster.id, settings, defaultStitchingSettings)).toEqual(
+      [],
+    )
+    const exported = getExportElementsForComponent(original, computed, root.id, settings, defaultStitchingSettings)
+    expect(exported.map((element) => element.id)).toEqual([root.id])
+    const exportedRoot = exported[0]
+    if (exportedRoot.type !== 'export-panel') {
+      throw new Error('Expected the root panel in export')
+    }
+    expect(exportedRoot.childMarkerPaths).toEqual([])
+    expect(exportedRoot.path).toEqual(computed.components.root.path)
+  })
+})
 
 describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('%s main-axis alignment', (layoutOrientation) => {
   describe.each<AnchorSchema>(['start', 'middle', 'end'])('%s', (mainAxisAnchor) => {

@@ -11,10 +11,10 @@ import type {
   RootPanelSchema,
 } from '../schemas/components'
 import type {
-  ComputedCardSchema,
   ComputedComponentSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
+  ComputedPocketItemSchema,
   ComputedPocketSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
@@ -307,10 +307,10 @@ const getSubProjectViewBox = (
   components: ComputedComponentSchema[],
   stitchLines: ComputedStitchLineSchema[],
 ): RectSchema => {
-  const cards = components
+  const items = components
     .filter((component) => component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket')
-    .flatMap((pocket): ComputedCardSchema[] => (isDefined(pocket.card) ? [pocket.card] : []))
-  const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...cards]
+    .flatMap((pocket): ComputedPocketItemSchema[] => (isDefined(pocket.item) ? [pocket.item] : []))
+  const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...items]
   const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
 
   const firstBoundingRect = boundingRects[0]
@@ -372,15 +372,19 @@ const completePocketChildren = (
 /**
  * The cluster owns no material, so its selection contour is the union of its pockets.
  * Update its path after hole subtraction to include the pockets' finished cut contours.
+ * An empty cluster uses its rounded bounding rectangle as an editor-only placeholder.
  */
 const updatePocketClusterPaths = (computedComponents: Record<string, ComputedComponentSchema>): void => {
   for (const component of Object.values(computedComponents)) {
     if (component.type !== 'computed-pocket-cluster') {
       continue
     }
-    component.path = unionClosedPaths(
-      { commands: [] },
-      component.children.map((pocket) => pocket.path),
-    )
+    component.path =
+      component.children.length === 0
+        ? calculateRectPath(component.boundingRect, component.cornerRadius)
+        : unionClosedPaths(
+            { commands: [] },
+            component.children.map((pocket) => pocket.path),
+          )
   }
 }

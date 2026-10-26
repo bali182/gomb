@@ -92,6 +92,35 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         }
       },
     )
+    it.each(['ID-2', 'HUF'] as const)(
+      'computes each pocket item from its own configuration with %s in front',
+      (itemId) => {
+        const { subProject } = fixture()
+        const source = accessors.subProject(subProject)
+        const changed = {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            t1: { ...source.tPocket('t1'), itemId: 'ID-1' as const, itemCrossAxisOffset: 3 },
+            front: {
+              ...source.frontPocket('front'),
+              itemId,
+              itemOrientation: 'portrait' as const,
+              itemOpeningOffset: 7,
+            },
+          },
+        }
+        const computed = accessors.computedSubProject(getComputedSubProject(changed, defaultStitchingSettings))
+        const t = computed.tPocket('t1')
+        const front = computed.frontPocket('front')
+        expect(t.item?.item.id).toBe('ID-1')
+        expect(computed.tPocket('t2').item).toBeUndefined()
+        expect(front.item?.item.id).toBe(itemId)
+        expect(t.item?.boundingRect.width.toNumber()).toBe(85.6)
+        expect(front.item?.boundingRect.width.toNumber()).toBe(itemId === 'HUF' ? 70 : 74)
+        expect(t.item?.boundingRect).not.toEqual(front.item?.boundingRect)
+      },
+    )
     it('stores independent opening bounds under each pocket component', () => {
       const { subProject } = fixture(1000)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
@@ -211,7 +240,8 @@ describe('invalid pocket states and patchers', () => {
         d.hole({ id: 'zombie-hole', componentId: 'zombie' }),
       ],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'invalid', targetId: 'front', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'front-line', targetId: 'front', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'invalid', targetId: 'front', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'orphan', targetId: 'zombie', targetType: 'component' }),
       ],
     })
@@ -223,6 +253,7 @@ describe('invalid pocket states and patchers', () => {
     expect(patched.components.nested).toBeUndefined()
     expect(patched.components.t.children).toEqual([])
     expect(patched.holes).toEqual([])
-    expect(patched.stitchLines).toEqual([])
+    expect(patched.stitchLines.map((line) => line.id)).toEqual(['front-line'])
+    expect(computed.stitchLines.front[0].routes.length).toBeGreaterThan(0)
   })
 })

@@ -20,6 +20,12 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
   )
   const popover = usePopover({
     open: true,
+    onPointerDownOutside: (event) => {
+      if (event.detail.originalEvent.pointerType !== 'mouse') {
+        return
+      }
+      event.preventDefault()
+    },
     onOpenChange: ({ open }) => {
       if (!open) {
         onClose()
@@ -35,6 +41,15 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
       strategy: 'fixed',
     },
   })
+
+  useEffect(() => {
+    const ownerDocument = anchorElement.contextElement.ownerDocument
+    ownerDocument.addEventListener('mouseup', onClose)
+
+    return (): void => {
+      ownerDocument.removeEventListener('mouseup', onClose)
+    }
+  }, [anchorElement.contextElement, onClose])
 
   useEffect(() => {
     const editorElement = anchorElement.contextElement.ownerSVGElement?.parentElement
@@ -54,14 +69,14 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
     }
   }, [anchorElement.contextElement, popover])
 
-  const captureClick = useCallback((event: MouseEvent) => {
+  const stopPropagation = useCallback((event: MouseEvent): void => {
     event.stopPropagation()
   }, [])
 
   return (
     <Popover.RootProvider value={popover}>
       <Popover.Positioner>
-        <Popover.Content onClick={captureClick} width="450px" zIndex="popover">
+        <Popover.Content onClick={stopPropagation} onMouseUp={stopPropagation} width="450px" zIndex="popover">
           <Popover.Arrow />
           {children}
         </Popover.Content>

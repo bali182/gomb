@@ -1,9 +1,14 @@
+import { Tabs } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
+import { PocketEditorTabs } from '../../constants/editorTabs'
+import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
+import { useTranslation } from '../../hooks/useTranslation'
 import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
 import type { FrontPocketSchema, PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
+import { ContentsSection } from './sections/ContentsSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
@@ -14,7 +19,14 @@ type FrontPocketEditorProps = {
   parent: PocketClusterSchema
   onChange: (value: EditableSchema<FrontPocketSchema>) => void
 }
+
 export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
+  const { activeTab, onTabChange } = useFloatingEditorTab({
+    modelId: component.id,
+    defaultTab: PocketEditorTabs.layout,
+    tabs: PocketEditorTabs,
+  })
+  const { t } = useTranslation()
   const handleOpeningChange = useCallback(
     (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
     [editable, onChange],
@@ -32,21 +44,34 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
     }
   }, [parent.orientation])
   return (
-    <SectionGroup.Root>
-      <CornerRadiusSection
-        value={component}
-        editable={editable}
-        issues={issues}
-        onChange={onChange}
-        disabledFields={disabledFields}
-      />
-      <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
-      <PocketOpeningSection
-        cluster={parent}
-        editable={editable.opening}
-        issues={issues.opening}
-        onChange={handleOpeningChange}
-      />
-    </SectionGroup.Root>
+    <Tabs.Root value={activeTab} onValueChange={onTabChange}>
+      <Tabs.List alignItems="center" pr="2">
+        <Tabs.Trigger value={PocketEditorTabs.layout}>{t.project.editors.tabs.components.layout}</Tabs.Trigger>
+        <Tabs.Trigger value={PocketEditorTabs.contents}>{t.project.editors.tabs.components.contents}</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
+        <SectionGroup.Root>
+          <CornerRadiusSection
+            value={component}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+            disabledFields={disabledFields}
+          />
+          <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
+          <PocketOpeningSection
+            cluster={parent}
+            editable={editable.opening}
+            issues={issues.opening}
+            onChange={handleOpeningChange}
+          />
+        </SectionGroup.Root>
+      </Tabs.Content>
+      <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
+        <SectionGroup.Root>
+          <ContentsSection<FrontPocketSchema> editable={editable} issues={issues} onChange={onChange} />
+        </SectionGroup.Root>
+      </Tabs.Content>
+    </Tabs.Root>
   )
 }

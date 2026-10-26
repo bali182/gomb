@@ -14,11 +14,10 @@ export const canAddChild = (
   switch (parent.type) {
     case 't-pocket':
       return false
-    case 'pocket-cluster':
-      return (
-        type === 't-pocket' ||
-        (type === 'front-pocket' && !parent.children.some((id) => subProject.components[id]?.type === 'front-pocket'))
-      )
+    case 'pocket-cluster': {
+      const hasFrontPocket = parent.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+      return (type === 't-pocket' && hasFrontPocket) || (type === 'front-pocket' && !hasFrontPocket)
+    }
     default:
       return type === 'panel' || type === 'pocket-cluster'
   }
@@ -32,10 +31,17 @@ export const canCloneComponent = (component: ComponentSchema): boolean =>
 
 export const canAddHole = (component: ComponentSchema): boolean => component.type !== 'pocket-cluster'
 
-export const getComponentStitchLineType = (component: ComponentSchema): StitchLineSchema['type'] | undefined => {
-  if (component.type === 'front-pocket') {
-    return undefined
+export const canAddStitchLine = (component: ComponentSchema, subProject: SubProjectSchema): boolean => {
+  if (!isDefined(getComponentStitchLineType(component))) {
+    return false
   }
+  if (component.type === 'pocket-cluster') {
+    return component.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+  }
+  return true
+}
+
+export const getComponentStitchLineType = (component: ComponentSchema): StitchLineSchema['type'] | undefined => {
   return component.type === 't-pocket' ? 't-pocket-stitch-line' : 'component-bounds-stitch-line'
 }
 

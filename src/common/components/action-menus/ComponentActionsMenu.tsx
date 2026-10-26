@@ -13,6 +13,7 @@ import { exportComponentPng } from '../../logic/exports/exportComponentPng'
 import {
   canAddChild,
   canAddHole,
+  canAddStitchLine,
   canCloneComponent,
   canDeleteComponent,
   getComponentStitchLineType,
@@ -66,19 +67,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
-  const exportDrawAreaContext = useEditorDrawArea(false)
+  const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const {
-    addComponent,
-    addPocketCluster,
-    addHole,
-    addStitchLineToComponent,
-    cloneComponent,
-    deleteComponent,
-    copyPocketSettings,
-    flip,
-  } = useSubProjectOperations()
+  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, copyPocketSettings, flip } =
+    useSubProjectOperations()
   const [isPocketCopyOpen, setPocketCopyOpen] = useState<boolean>(false)
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
@@ -124,14 +117,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const handleAddChild = useCallback(
     (type: ComponentSchema['type']): void => {
-      if (type === 'pocket-cluster') {
-        addPocketCluster(component.id, 'end')
-      } else {
-        addComponent(component.id, type, type === 't-pocket' ? 'start' : 'end')
-      }
+      addComponent(component.id, type, type === 't-pocket' ? 'start' : 'end')
       onAddChild({ targetId: component.id, targetType: 'component' }, type)
     },
-    [addComponent, addPocketCluster, component.id, onAddChild],
+    [addComponent, component.id, onAddChild],
   )
 
   const handleDelete = useCallback((): void => {
@@ -194,7 +183,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
   }, [project, subProject, component.id, settings, exportDrawAreaContext, t])
 
-  const possibleChildTypes = childTypes.filter((type) => canAddChild(component, type, subProject))
+  const possibleChildTypes = childTypes.filter((type) => {
+    if (narrowers.is.pocketCluster(component)) {
+      return type === 't-pocket' || type === 'front-pocket'
+    }
+    return canAddChild(component, type, subProject)
+  })
   const stitchLineType = getComponentStitchLineType(component)
 
   const canClone = component.type === 'root-panel' || canCloneComponent(component)
@@ -229,7 +223,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               <ActionsMenuSection>
                 {!subProjectOnly &&
                   possibleChildTypes.map((type) => (
-                    <AddComponentMenuItem key={type} type={type} onSelect={handleAddChild} />
+                    <AddComponentMenuItem
+                      key={type}
+                      type={type}
+                      disabled={!canAddChild(component, type, subProject)}
+                      onSelect={handleAddChild}
+                    />
                   ))}
               </ActionsMenuSection>
               <ActionsMenuSection>
@@ -237,7 +236,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && isDefined(stitchLineType) && (
-                  <AddComponentStitchLineMenuItem type={stitchLineType} onSelect={handleAddStitchLine} />
+                  <AddComponentStitchLineMenuItem
+                    type={stitchLineType}
+                    disabled={!canAddStitchLine(component, subProject)}
+                    onSelect={handleAddStitchLine}
+                  />
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
@@ -246,7 +249,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {!subProjectOnly && <ExportComponentPngMenuItem onSelect={handleExportPng} />}
+                {!subProjectOnly && (
+                  <ExportComponentPngMenuItem
+                    disabled={narrowers.is.pocketCluster(component) && component.children.length === 0}
+                    onSelect={handleExportPng}
+                  />
+                )}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />}

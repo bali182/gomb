@@ -6,7 +6,7 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 export function validatePrimitiveUnion<T extends string>(
   value: string | undefined,
   currentValue: T,
-  allowedValues: Record<T, boolean>,
+  allowedValues: Record<T, unknown>,
   context: BaseValidationContextSchema,
   allowUndefined?: false,
 ): ValidationResultSchema<T>
@@ -14,7 +14,7 @@ export function validatePrimitiveUnion<T extends string>(
 export function validatePrimitiveUnion<T extends string>(
   value: string | undefined,
   currentValue: T | undefined,
-  allowedValues: Record<T, boolean>,
+  allowedValues: Record<T, unknown>,
   context: BaseValidationContextSchema,
   allowUndefined: true,
 ): ValidationResultSchema<T | undefined>
@@ -22,7 +22,7 @@ export function validatePrimitiveUnion<T extends string>(
 export function validatePrimitiveUnion<T extends string>(
   value: string | undefined,
   currentValue: T | undefined,
-  allowedValues: Record<T, boolean>,
+  allowedValues: Record<T, unknown>,
   context: BaseValidationContextSchema,
   allowUndefined = false,
 ): ValidationResultSchema<T | undefined> {
@@ -55,7 +55,7 @@ export function validatePrimitiveUnion<T extends string>(
 
 const isAllowedPrimitiveUnionValue = <T extends string>(
   value: string,
-  allowedValues: Record<T, boolean>,
+  allowedValues: Record<T, unknown>,
 ): value is T => {
   return Object.keys(allowedValues).includes(value)
 }

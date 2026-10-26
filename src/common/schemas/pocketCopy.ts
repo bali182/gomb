@@ -2,6 +2,7 @@
 export type PocketSettingsCopySelectionSchema = {
   copyShape: boolean
   copyOpening: boolean
+  copyPocketItem: boolean
   copyStitching: boolean
   overwriteStitching: boolean
 }
@@ -20,6 +21,7 @@ export type PocketSettingsCopyRowSchema = {
   pocketId: string
   copyShape: PocketSettingsCopyCellSchema
   copyOpening: PocketSettingsCopyCellSchema
+  copyPocketItem: PocketSettingsCopyCellSchema
   copyStitching: PocketSettingsCopyCellSchema
   overwriteStitching: PocketSettingsCopyCellSchema
 }

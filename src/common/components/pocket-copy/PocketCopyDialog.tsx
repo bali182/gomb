@@ -28,7 +28,8 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
     () =>
       Object.values(targets).some(
         (selection) =>
-          isDefined(selection) && (selection.copyShape || selection.copyOpening || selection.copyStitching),
+          isDefined(selection) &&
+          (selection.copyShape || selection.copyOpening || selection.copyPocketItem || selection.copyStitching),
       ),
     [targets],
   )

@@ -1,7 +1,7 @@
 import { STROKE_THICKNESS } from './constants/drawing'
 import {
-  cardColors,
   leatherColors,
+  pocketItemColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
@@ -21,6 +21,7 @@ import type {
   FrontPocketSchema,
   HasAutoDimensionsSchema,
   HasLayoutSchema,
+  HasPocketItemSchema,
   PanelSchema,
   PocketClusterSchema,
   RecessedPocketOpeningSchema,
@@ -51,6 +52,7 @@ export const defaultExportParams: ExportSettingsSchema = {
   stitchLineMode: 'related-stitch-lines',
   showNames: true,
   showDimensions: true,
+  showParentNames: true,
   childMarkers: true,
   cutHelperDistance: 0,
   format: 'pdf',
@@ -65,7 +67,7 @@ export const defaultColorSettings: ColorSettingsSchema = {
   stitchLineColor: stitchLineColors.black,
   strokeColor: strokeColors.black,
   selectionColor: selectionColors.selectionBlue,
-  cardColor: cardColors.mediumGreen,
+  pocketItemColor: pocketItemColors.mediumGreen,
   threadColor: threadColors.white,
 }
 
@@ -137,7 +139,14 @@ export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
   side: 'end',
 }
 
+export const defaultHasPocketItem: HasPocketItemSchema = {
+  itemOrientation: 'landscape',
+  itemCrossAxisOffset: 0,
+  itemOpeningOffset: 0,
+}
+
 export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName> = {
+  ...defaultHasPocketItem,
   ...defaultHasLayout,
   ...defaultHasCornerRadius,
   type: 'front-pocket',
@@ -145,6 +154,7 @@ export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof Has
   opening: { type: 'straight' },
 }
 export const defaultTPocket: Omit<TPocketSchema, keyof HasId | keyof HasName> = {
+  ...defaultHasPocketItem,
   type: 't-pocket',
   children: [],
   opening: { type: 'straight' },
@@ -158,8 +168,6 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   type: 'pocket-cluster',
   children: [],
   orientation: 'up',
-  cardCrossAxisOffset: 0,
-  cardOpeningOffset: 0,
   pocketStep: 10,
 }
 

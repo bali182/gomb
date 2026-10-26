@@ -8,7 +8,7 @@ import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
-import type { DrawAreaCardStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { DrawAreaComponentStyleParams, DrawAreaPocketItemStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -20,7 +20,7 @@ type PocketStitchMaskProps = {
 }
 
 export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, nestingLevel }) => {
-  const { cardStyles, componentStyles } = useDrawAreaContext()
+  const { pocketItemStyles, componentStyles } = useDrawAreaContext()
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
   const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
   const { subProject, computedSubProject } = useSubProject()
@@ -48,17 +48,17 @@ export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, n
     >
       <rect x={x} y={y} width={width} height={height} fill="white" />
       {pockets.map((pocket) => {
-        const cardStyleParams: DrawAreaCardStyleParams = {
+        const cardStyleParams: DrawAreaPocketItemStyleParams = {
           owner: source.pocket(pocket.componentId),
         }
         return (
           <Fragment key={pocket.componentId}>
-            {isDefined(pocket.card) && (
+            {isDefined(pocket.item) && (
               <PocketStitchMaskPath
-                path={pocket.card.path}
-                fill={cardStyles.getMaskFillColor(cardStyleParams)}
-                stroke={cardStyles.getMaskStrokeColor(cardStyleParams)}
-                strokeWidth={cardStyles.getStrokeThickness(cardStyleParams)}
+                path={pocket.item.path}
+                fill={pocketItemStyles.getMaskFillColor(cardStyleParams)}
+                stroke={pocketItemStyles.getMaskStrokeColor(cardStyleParams)}
+                strokeWidth={pocketItemStyles.getStrokeThickness(cardStyleParams)}
               />
             )}
             <PocketStitchMaskPath

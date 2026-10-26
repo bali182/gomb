@@ -4,7 +4,7 @@ import type { ComputedFrontPocketSchema, ComputedPocketSchema, ComputedTPocketSc
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
-import { calculatePocketCard } from './calculatePocketCard'
+import { calculatePocketItem } from './calculatePocketItem'
 import { getCornerRadius } from './cornerRadiusUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
@@ -31,7 +31,7 @@ export const calculatePocketClusterGeometry = (
         componentId: pocket.id,
         boundingRect,
         cornerRadius,
-        card: calculatePocketCard(cluster, boundingRect),
+        item: calculatePocketItem(pocket, cluster, boundingRect),
         children: [],
         path: { commands: [] },
         computedLayoutGap: ZERO,
@@ -53,7 +53,7 @@ export const calculatePocketClusterGeometry = (
       componentId: pocket.id,
       boundingRect,
       cornerRadius,
-      card: calculatePocketCard(cluster, boundingRect),
+      item: calculatePocketItem(pocket, cluster, boundingRect),
       children: [],
       path: { commands: [] },
     }

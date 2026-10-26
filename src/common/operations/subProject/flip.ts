@@ -147,9 +147,6 @@ const flipComponent = (
         ...flipStretch(component, axis),
         orientation: flipOrientation(component.orientation, axis),
         offAxisAnchor: flipOffAxisAnchor(component, subProject, axis, flippedComponentIds),
-        cardCrossAxisOffset: isCrossAxisFlip(component.orientation, axis)
-          ? -component.cardCrossAxisOffset
-          : component.cardCrossAxisOffset,
       }
       return flipped
     }
@@ -165,6 +162,9 @@ const flipComponent = (
         mainAxisAnchor:
           component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
         opening: flipPocketOpening(component.opening, cluster.orientation, flippedOrientation, axis),
+        itemCrossAxisOffset: isCrossAxisFlip(cluster.orientation, axis)
+          ? 0 - component.itemCrossAxisOffset
+          : component.itemCrossAxisOffset,
       }
       return flipped
     }
@@ -174,7 +174,12 @@ const flipComponent = (
         ? flipOrientation(cluster.orientation, axis)
         : cluster.orientation
       const opening = flipPocketOpening(component.opening, cluster.orientation, flippedOrientation, axis)
-      return opening === component.opening ? component : { ...component, opening }
+      const itemCrossAxisOffset = isCrossAxisFlip(cluster.orientation, axis)
+        ? 0 - component.itemCrossAxisOffset
+        : component.itemCrossAxisOffset
+      return opening === component.opening && itemCrossAxisOffset === component.itemCrossAxisOffset
+        ? component
+        : { ...component, opening, itemCrossAxisOffset }
     }
   }
 }

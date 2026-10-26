@@ -1,16 +1,22 @@
 import { useLayoutEffect, useMemo } from 'react'
-import { STITCH_LINE_LABEL_BACKGROUND_COLOR, STITCH_LINE_LABEL_COLOR, STROKE_THICKNESS } from '../constants/drawing'
+import {
+  EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY,
+  STITCH_LINE_LABEL_BACKGROUND_COLOR,
+  STITCH_LINE_LABEL_COLOR,
+  STROKE_THICKNESS,
+} from '../constants/drawing'
+import { PocketEditorTabs } from '../constants/editorTabs'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
 import { produce } from '../utils/produce'
+import { useGlobalSettings } from './useGlobalSettings'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 
 import { formatHex8, parse } from 'culori'
-import { getSelectionObstructingComponentIds } from '../logic/getSelectionObstructingComponentIds'
+import { getSelectionOpacities, type SelectionOpacitiesSchema } from '../logic/getSelectionOpacities'
 import type {
-  DrawAreaCardStyleParams,
-  DrawAreaCardStyles,
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -19,17 +25,22 @@ import type {
   DrawAreaHoleStyles,
   DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
+  DrawAreaPocketItemStyleParams,
+  DrawAreaPocketItemStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { StitchLineSchema } from '../schemas/stitching'
 import { useSubProjectSelection } from './useSubProjectSelection'
 
-const addAlpha = (color: string): string => {
+const applyOpacity = (color: string, opacity: number): string => {
+  if (opacity === 1) {
+    return color
+  }
   const parsed = parse(color)
   if (!isDefined(parsed)) {
     return color
   }
-  return formatHex8({ ...parsed, alpha: Math.min(parsed.alpha ?? 1, 0.3) })
+  return formatHex8({ ...parsed, alpha: (parsed.alpha ?? 1) * opacity })
 }
 
 const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): string | undefined => {
@@ -49,6 +60,7 @@ const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): 
 const exportIdentifiers: DrawAreaExportIdentifiers = {
   getElementId: produce(undefined),
   getNameText: produce(undefined),
+  getParentNameText: produce(undefined),
   getStitchLineId: produce(undefined),
 }
 
@@ -68,12 +80,29 @@ const markerStyles: DrawAreaMarkerStyles = {
   getThickness: produce(undefined),
 }
 
-export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue => {
+type UseEditorDrawAreaParams = {
+  isInteractive: boolean
+  editorTabs?: Readonly<Partial<Record<string, string>>>
+}
+
+export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAreaParams): DrawAreaContextValue => {
   const { project } = useProject()
+  const { settings } = useGlobalSettings()
   const { subProject } = useSubProject()
   const drawAreaSelection = useSubProjectSelection(subProject)
-  const { hovered, isHovered, isSelected, selected } = drawAreaSelection
+  const { isHovered, isSelected, selected } = drawAreaSelection
   const { clearSelection, clearHover } = drawAreaSelection
+
+  const isEditingPocketContents = useMemo<boolean>(() => {
+    return (
+      isInteractive &&
+      settings.view.pocketItemsVisible &&
+      isDefined(selected) &&
+      narrowers.is.pocket(selected) &&
+      isDefined(selected.itemId) &&
+      editorTabs?.[selected.id] === PocketEditorTabs.contents
+    )
+  }, [isInteractive, settings.view.pocketItemsVisible, selected, editorTabs])
 
   useLayoutEffect(() => {
     if (!isInteractive) {
@@ -84,7 +113,7 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
 
   const {
     colorSettings: {
-      cardColor,
+      pocketItemColor,
       leatherColor,
       selectionColor,
       stitchHoleColor,
@@ -95,25 +124,27 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
     stitchingSettings: { stitchHoleLength, stitchHoleThickness, stitchLineThickness },
   } = project
 
-  const selectionObstructingComponentIds = useMemo<ReadonlySet<string>>(
-    () => getSelectionObstructingComponentIds(hovered ?? selected, subProject),
-    [hovered, selected, subProject],
+  const selectionOpacities = useMemo<SelectionOpacitiesSchema>(
+    () => getSelectionOpacities(selected, subProject, isEditingPocketContents),
+    [selected, subProject, isEditingPocketContents],
   )
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
-      const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
-      if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
-        return addAlpha(color)
+      if (component.type === 'pocket-cluster' && component.children.length === 0) {
+        return 'transparent'
       }
-      return selectionObstructingComponentIds.has(component.id) ? addAlpha(color) : color
+      return applyOpacity(
+        component.color ?? getComponentColor(leatherColor, nestingLevel),
+        selectionOpacities.components[component.id].fill,
+      )
     }
 
     const getBorderColor = ({ component }: DrawAreaComponentStyleParams): string => {
       if (isSelected(component) || isHovered(component)) {
-        return selectionColor
+        return applyOpacity(selectionColor, selectionOpacities.components[component.id].stroke)
       }
-      return selectionObstructingComponentIds.has(component.id) ? addAlpha(strokeColor) : strokeColor
+      return applyOpacity(strokeColor, selectionOpacities.components[component.id].stroke)
     }
 
     return {
@@ -128,18 +159,24 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
       getBorderThickness: () => {
         return STROKE_THICKNESS
       },
+      getBorderDasharray: ({ component }) => {
+        if (component.type === 'pocket-cluster' && component.children.length === 0) {
+          return EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY
+        }
+        return undefined
+      },
       getFilter: ({ component }) => {
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds])
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities])
 
-  const cardStyles = useMemo<DrawAreaCardStyles>(() => {
-    const getBackgroundColor = ({ owner }: DrawAreaCardStyleParams): string => {
-      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(cardColor) : cardColor
+  const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
+    const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
+      return applyOpacity(pocketItemColor, selectionOpacities.pocketItems[owner.id].fill)
     }
-    const getStrokeColor = ({ owner }: DrawAreaCardStyleParams): string => {
-      return selectionObstructingComponentIds.has(owner.id) ? addAlpha(strokeColor) : strokeColor
+    const getStrokeColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
+      return applyOpacity(strokeColor, selectionOpacities.pocketItems[owner.id].stroke)
     }
 
     return {
@@ -155,12 +192,12 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
         return STROKE_THICKNESS
       },
     }
-  }, [cardColor, strokeColor, selectionObstructingComponentIds])
+  }, [pocketItemColor, strokeColor, selectionOpacities])
 
   const holeStyles = useMemo<DrawAreaHoleStyles>(
     () => ({
       getFillColor: ({ hole }) => {
-        return isSelected(hole) || isHovered(hole) ? addAlpha(selectionColor) : 'transparent'
+        return isSelected(hole) ? applyOpacity(selectionColor, 0.3) : 'transparent'
       },
       getStrokeColor: ({ hole }) => {
         return isSelected(hole) || isHovered(hole) ? selectionColor : 'transparent'
@@ -174,20 +211,23 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
 
   const stitchLineStyles = useMemo<DrawAreaStitchLineStyles>(() => {
     const getLineColor = (stitchLine: StitchLineSchema): string => {
-      if (isSelected(stitchLine) || isHovered(stitchLine)) {
-        return selectionColor
-      }
-      return stitchLineColor
+      return applyOpacity(
+        isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchLineColor,
+        selectionOpacities.stitchLines[stitchLine.id].stroke,
+      )
     }
     return {
       getLineColor,
       getStitchHoleFootprintColor: (stitchLine) => {
-        const color = getLineColor(stitchLine)
+        const color = isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchLineColor
         const parsed = parse(color)
         if (!isDefined(parsed)) {
           return undefined
         }
-        return formatHex8({ ...parsed, alpha: 0.2 })
+        return applyOpacity(
+          formatHex8({ ...parsed, alpha: 0.2 }),
+          selectionOpacities.stitchLines[stitchLine.id].stroke,
+        )
       },
       getStitchHoleFootprintThickness: (stitchLine) => {
         const length = stitchLine.stitchHoleLength ?? stitchHoleLength
@@ -198,16 +238,16 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
         return stitchLine.stitchLineThickness ?? stitchLineThickness
       },
       getStitchHoleColor: (stitchLine) => {
-        if (isSelected(stitchLine) || isHovered(stitchLine)) {
-          return selectionColor
-        }
-        return stitchHoleColor
+        return applyOpacity(
+          isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchHoleColor,
+          selectionOpacities.stitchLines[stitchLine.id].stroke,
+        )
       },
       getStitchHoleThickness: (stitchLine) => {
         return stitchLine.stitchHoleThickness ?? stitchHoleThickness
       },
-      getThreadColor: () => {
-        return threadColor
+      getThreadColor: (stitchLine) => {
+        return applyOpacity(threadColor, selectionOpacities.stitchLines[stitchLine.id].stroke)
       },
       getThreadThickness: () => {
         return 0.5
@@ -223,6 +263,7 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
     stitchHoleThickness,
     stitchHoleLength,
     threadColor,
+    selectionOpacities,
   ])
 
   const labelStyles = useMemo<DrawAreaLabelStyles>(
@@ -238,18 +279,27 @@ export const useEditorDrawArea = (isInteractive: boolean): DrawAreaContextValue 
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
       isInteractive,
-      isShowingCards: true,
+      isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
       holeStyles,
       componentStyles,
-      cardStyles,
+      pocketItemStyles,
       stitchLineStyles,
       exportTextStyles,
       markerStyles,
       exportIdentifiers,
       labelStyles,
     }),
-    [cardStyles, componentStyles, drawAreaSelection, holeStyles, labelStyles, stitchLineStyles, isInteractive],
+    [
+      pocketItemStyles,
+      componentStyles,
+      drawAreaSelection,
+      holeStyles,
+      labelStyles,
+      stitchLineStyles,
+      isInteractive,
+      settings.view.pocketItemsVisible,
+    ],
   )
 
   return drawAreaContextValue

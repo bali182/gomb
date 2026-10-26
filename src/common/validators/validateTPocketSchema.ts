@@ -6,6 +6,7 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
+import { validatePocketItemSchema } from './validatePocketItemSchema'
 import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
 export const validateTPocketSchema = (
   input: EditableSchema<TPocketSchema>,
@@ -28,9 +29,11 @@ export const validateTPocketSchema = (
     min: 0,
     minInclusive: false,
   })
+  const pocketItemResult = validatePocketItemSchema(input, currentValue, context)
   const openingResult = validatePocketOpeningSchema(input.opening, currentValue.opening, context)
 
   const issues: IssuesSchema<TPocketSchema> = {
+    ...pocketItemResult.issues,
     name: nameResult.issues,
     color: colorResult.issues,
     tPocketTabWidth: tPocketTabWidthResult.issues,
@@ -39,6 +42,7 @@ export const validateTPocketSchema = (
   }
   const committedValue: TPocketSchema = {
     ...currentValue,
+    ...pocketItemResult.committedValue,
     name: nameResult.committedValue,
     color: colorResult.committedValue,
     tPocketTabWidth: tPocketTabWidthResult.committedValue,
@@ -50,6 +54,7 @@ export const validateTPocketSchema = (
     !colorResult.isValid ||
     !tPocketTabWidthResult.isValid ||
     !tPocketTaperResult.isValid ||
+    !pocketItemResult.isValid ||
     !openingResult.isValid
   ) {
     return createInvalidValidationResult(issues, committedValue)

@@ -104,16 +104,25 @@ const createClusterSubProject = (orientation: PocketOrientationSchema): SubProje
         rightStretch: 3,
         bottomStretch: 5,
         leftStretch: 7,
-        cardCrossAxisOffset: 9,
-        cardOpeningOffset: 13,
       }),
       d.tPocket({
         id: 't',
+        itemId: 'ID-1',
+        itemOrientation: 'portrait',
+        itemCrossAxisOffset: 9,
+        itemOpeningOffset: 13,
         tPocketTabWidth: 10,
         tPocketTaper: 25,
         opening: { type: 'slanted', side: 'start', offset: 15 },
       }),
-      d.frontPocket({ id: 'front', ...radii, opening: { type: 'slanted', side: 'end', offset: 9 } }),
+      d.frontPocket({
+        id: 'front',
+        ...radii,
+        itemId: 'ID-2',
+        itemCrossAxisOffset: -4,
+        itemOpeningOffset: 7,
+        opening: { type: 'slanted', side: 'end', offset: 9 },
+      }),
       d.panel({ id: 'outside', ...radii }),
     ],
     stitchLines: [
@@ -474,25 +483,25 @@ describe.each(axes)('flip: %s', (axis) => {
 describe.each(orientationCases)(
   'flip: $orientation opening, $axis flip',
   ({ orientation, axis, expectedOrientation, swapsEnds }) => {
-    it('mirrors the cluster orientation, stretch, cards and both contained openings without reversing pocket order', () => {
+    it('mirrors the cluster orientation, stretch, contents and both contained openings without reversing pocket order', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)
       const result = accessors.subProject(flip(original, source.pocketCluster('cluster'), axis))
       expect(result.pocketCluster('cluster')).toMatchObject({
         orientation: expectedOrientation,
         children: ['t', 'front'],
-        cardCrossAxisOffset: swapsEnds ? -9 : 9,
-        cardOpeningOffset: 13,
         ...(axis === 'horizontal'
           ? { topStretch: -2, rightStretch: 7, bottomStretch: 5, leftStretch: 3 }
           : { topStretch: 5, rightStretch: 3, bottomStretch: -2, leftStretch: 7 }),
       })
       expect(result.tPocket('t')).toEqual({
         ...source.tPocket('t'),
+        itemCrossAxisOffset: swapsEnds ? -9 : 9,
         opening: { type: 'slanted', side: 'end', offset: 15 },
       })
       expect(result.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
+        itemCrossAxisOffset: swapsEnds ? 4 : -4,
         ...mirroredRadii[axis],
         mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', side: 'start', offset: 9 },
@@ -505,16 +514,60 @@ describe.each(orientationCases)(
       })
     })
 
+    it.each(['ID-1', 'HUF'] as const)(
+      'preserves %s selection, orientation and dimensions when flipping the cluster',
+      (itemId) => {
+        const fixture = createClusterSubProject(orientation)
+        const source = accessors.subProject(fixture)
+        const original: SubProjectSchema = {
+          ...fixture,
+          components: {
+            ...fixture.components,
+            t: { ...source.tPocket('t'), itemId },
+            front: { ...source.frontPocket('front'), itemId },
+          },
+        }
+        const cluster = accessors.subProject(original).pocketCluster('cluster')
+        const before = getComputedSubProject(original, defaultStitchingSettings)
+        const flipped = flip(original, cluster, axis)
+        const after = getComputedSubProject(flipped, defaultStitchingSettings)
+        const beforeSource = accessors.computedSubProject(before)
+        const afterSource = accessors.computedSubProject(after)
+        expect(afterSource.tPocket('t').item?.item.id).toBe(itemId)
+        expect(afterSource.frontPocket('front').item?.item.id).toBe(itemId)
+        expect(accessors.subProject(flipped).tPocket('t')).toMatchObject({
+          itemId,
+          itemOrientation: 'portrait',
+          itemCrossAxisOffset: swapsEnds ? -9 : 9,
+          itemOpeningOffset: 13,
+        })
+        expect(afterSource.tPocket('t').item?.boundingRect.width).toEqual(
+          beforeSource.tPocket('t').item?.boundingRect.width,
+        )
+        expect(afterSource.tPocket('t').item?.boundingRect.height).toEqual(
+          beforeSource.tPocket('t').item?.boundingRect.height,
+        )
+        expect(afterSource.frontPocket('front').item?.boundingRect.width).toEqual(
+          beforeSource.frontPocket('front').item?.boundingRect.width,
+        )
+        expect(afterSource.frontPocket('front').item?.boundingRect.height).toEqual(
+          beforeSource.frontPocket('front').item?.boundingRect.height,
+        )
+      },
+    )
+
     it('only changes an independently selected pocket opening across its opening width', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)
       const tResult = accessors.subProject(flip(original, source.tPocket('t'), axis))
       expect(tResult.tPocket('t').opening).toEqual({ type: 'slanted', offset: 15, side: swapsEnds ? 'end' : 'start' })
+      expect(tResult.tPocket('t').itemCrossAxisOffset).toBe(swapsEnds ? -9 : 9)
       expect(tResult.pocketCluster('cluster')).toBe(source.pocketCluster('cluster'))
       expect(tResult.frontPocket('front')).toBe(source.frontPocket('front'))
       const frontResult = accessors.subProject(flip(original, source.frontPocket('front'), axis))
       expect(frontResult.frontPocket('front')).toEqual({
         ...source.frontPocket('front'),
+        itemCrossAxisOffset: swapsEnds ? 4 : -4,
         ...mirroredRadii[axis],
         mainAxisAnchor: axis === 'horizontal' ? 'end' : 'start',
         opening: { type: 'slanted', offset: 9, side: swapsEnds ? 'start' : 'end' },

@@ -1,8 +1,8 @@
 import { Menu } from '@chakra-ui/react'
 import { FC } from 'react'
 import {
-  cardColors,
   leatherColors,
+  pocketItemColors,
   selectionColors,
   stitchHoleColors,
   stitchLineColors,
@@ -25,7 +25,7 @@ export const ColorsMenuGroup: FC = () => {
   const stitchLineColorValues = useColors(stitchLineColors)
   const strokeColorValues = useColors(strokeColors)
   const selectionColorValues = useColors(selectionColors)
-  const cardColorValues = useColors(cardColors)
+  const pocketItemColorValues = useColors(pocketItemColors)
 
   return (
     <Menu.ItemGroup>
@@ -45,11 +45,11 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.strokeColor}
       />
       <ColorPickerMenuItem
-        colors={cardColorValues}
-        field="cardColor"
-        label={t.project.menus.project.colors.cardColor}
+        colors={pocketItemColorValues}
+        field="pocketItemColor"
+        label={t.project.menus.project.colors.pocketItemColor}
         onChange={updateColorSettings}
-        value={project.colorSettings.cardColor}
+        value={project.colorSettings.pocketItemColor}
       />
       <ColorPickerMenuItem
         colors={stitchHoleColorValues}

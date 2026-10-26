@@ -50,10 +50,6 @@ export const cloneComponentTree = ({
     return undefined
   }
 
-  if (sourceComponent.type === 'pocket-cluster' && !settings.cloneComponentTree) {
-    throw new Error('A pocket cluster cannot be cloned without its children')
-  }
-
   const componentsToClone: ComponentSchema[] = []
   const isValidTree = settings.cloneComponentTree
     ? collectClonedComponents(subProject, sourceComponent, componentsToClone, new Set<string>())
