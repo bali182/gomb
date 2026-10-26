@@ -1,5 +1,5 @@
-// Known currency ISO ids in alphabetical order.
-export type CurrencyIdSchema =
+// Currency ISO ids in alphabetical order.
+export type CurrencySchema =
   | 'AED'
   | 'AFN'
   | 'ALL'

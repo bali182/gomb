@@ -14,12 +14,13 @@ const EmptySet: ReadonlySet<string> = new Set<string>()
 export const getSelectionObstructingComponentIds = (
   selection: ModelObjectSchema | undefined,
   subProject: SubProjectSchema,
+  isEditingPocketContents: boolean,
 ): ReadonlySet<string> => {
   if (!isDefined(selection)) {
     return EmptySet
   }
   if (narrowers.is.component(selection)) {
-    return getComponentObstructingComponentIds(selection, subProject)
+    return getComponentObstructingComponentIds(selection, subProject, isEditingPocketContents)
   }
   if (narrowers.is.stitchLine(selection)) {
     return getStitchLineObstructingComponentIds(selection, subProject)
@@ -33,6 +34,7 @@ export const getSelectionObstructingComponentIds = (
 const getComponentObstructingComponentIds = (
   component: ComponentSchema,
   subProject: SubProjectSchema,
+  isEditingPocketContents: boolean,
 ): ReadonlySet<string> => {
   switch (component.type) {
     case 'pocket-cluster': {
@@ -54,7 +56,9 @@ const getComponentObstructingComponentIds = (
       }
 
       const accessor = accessors.subProject(subProject)
-      const obstructingComponentIds = new Set<string>()
+      const obstructingComponentIds = new Set<string>(
+        isEditingPocketContents ? getComponentDescendants(component, subProject) : [],
+      )
       for (const siblingId of parent.children.slice(index + 1)) {
         const sibling = accessor.component(siblingId)
         for (const descendantId of getComponentDescendants(sibling, subProject)) {
@@ -79,7 +83,7 @@ const getStitchLineObstructingComponentIds = (
   }
 
   if (stitchLine.type === 't-pocket-stitch-line') {
-    return getComponentObstructingComponentIds(underlyingComponent, subProject)
+    return getComponentObstructingComponentIds(underlyingComponent, subProject, false)
   }
 
   const coveredComponentIds = new Set(getComponentDescendants(underlyingComponent, subProject))

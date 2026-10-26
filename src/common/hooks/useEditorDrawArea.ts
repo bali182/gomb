@@ -122,8 +122,13 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   } = project
 
   const selectionObstructingComponentIds = useMemo<ReadonlySet<string>>(
-    () => getSelectionObstructingComponentIds(hovered ?? selected, subProject),
-    [hovered, selected, subProject],
+    () =>
+      getSelectionObstructingComponentIds(
+        isEditingPocketContents ? selected : (hovered ?? selected),
+        subProject,
+        isEditingPocketContents,
+      ),
+    [hovered, selected, subProject, isEditingPocketContents],
   )
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
@@ -132,9 +137,6 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return 'transparent'
       }
       const color = component.color ?? getComponentColor(leatherColor, nestingLevel)
-      if (isEditingPocketContents && isSelected(component) && narrowers.is.pocket(component)) {
-        return addAlpha(color)
-      }
       if (component.type === 'pocket-cluster' && (isSelected(component) || isHovered(component))) {
         return addAlpha(color)
       }
@@ -170,15 +172,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [
-    isHovered,
-    isSelected,
-    leatherColor,
-    selectionColor,
-    strokeColor,
-    selectionObstructingComponentIds,
-    isEditingPocketContents,
-  ])
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionObstructingComponentIds])
 
   const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
