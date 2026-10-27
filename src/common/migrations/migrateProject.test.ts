@@ -1,5 +1,6 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
+import { defaultOpticalIllusionPocketOpening } from '../defaultStates'
 
 import { VERSION } from '../../version'
 import type { HasStretchSchema } from '../schemas/common'
@@ -250,5 +251,36 @@ describe('migrateProject', () => {
     }
 
     expect(migrateProject(newerProject, context).version).toBe(VERSION)
+  })
+})
+
+describe('optical illusion opening migration', () => {
+  it('fills opening defaults and preserves custom configuration on a second migration', () => {
+    const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
+    const t = d.tPocket({
+      id: 't',
+      opening: {
+        ...defaultOpticalIllusionPocketOpening,
+        direction: 'start',
+        startInset: 17,
+        endInset: 23,
+        leadingRadius: 4,
+        trailingRadius: 9,
+      },
+    })
+    const front = d.frontPocket({ id: 'front', opening: defaultOpticalIllusionPocketOpening })
+    const project: DeepPartialSchema<ProjectSchema> = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sub', root, components: [cluster, t, front] })],
+    })
+    const frontInput = project.subProjects?.[0]?.components?.front
+    if (!isDefined(frontInput) || frontInput.type !== 'front-pocket') throw new Error('Missing front')
+    frontInput.opening = { type: 'optical-illusion' }
+    const migrated = migrateProject(project, context)
+    expect(migrated.subProjects?.[0]?.components?.front).toHaveProperty('opening', defaultOpticalIllusionPocketOpening)
+    expect(migrated.subProjects?.[0]?.components?.t).toHaveProperty('opening', t.opening)
+    expect(migrateProject(migrated, context)).toEqual(migrated)
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
   })
 })

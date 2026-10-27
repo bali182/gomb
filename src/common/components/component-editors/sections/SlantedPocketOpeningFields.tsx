@@ -3,9 +3,9 @@ import { useCallback, useMemo, type FC } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type {
+  PocketOpeningSideSchema,
   PocketOrientationSchema,
   SlantedPocketOpeningSchema,
-  SlantedPocketOpeningSideSchema,
 } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
@@ -20,7 +20,7 @@ type SlantedPocketOpeningFieldsProps = {
   onChange: (updated: EditableSchema<SlantedPocketOpeningSchema>) => void
 }
 
-const sides: SlantedPocketOpeningSideSchema[] = ['start', 'end']
+const sides: PocketOpeningSideSchema[] = ['start', 'end']
 
 export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = ({
   editable,
@@ -29,9 +29,9 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
   onChange,
 }) => {
   const { t } = useTranslation()
-  const collection = useMemo<ListCollection<SlantedPocketOpeningSideSchema>>(
+  const collection = useMemo<ListCollection<PocketOpeningSideSchema>>(
     () =>
-      createListCollection<SlantedPocketOpeningSideSchema>({
+      createListCollection<PocketOpeningSideSchema>({
         items: sides,
         itemToValue: (side) => side,
         itemToString: (side) => t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side],
@@ -46,7 +46,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
     [editable, onChange],
   )
   const handleSideChange = useCallback(
-    (details: SelectValueChangeDetails<SlantedPocketOpeningSideSchema>): void => {
+    (details: SelectValueChangeDetails<PocketOpeningSideSchema>): void => {
       const side = details.items[0]
       if (isDefined(side)) {
         onChange({ ...editable, side })

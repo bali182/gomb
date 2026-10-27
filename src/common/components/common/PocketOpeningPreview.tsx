@@ -48,6 +48,8 @@ export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
 
   const depth = useMemo<BigNumber>(() => {
     switch (adjustedOpening.type) {
+      case 'optical-illusion':
+        return BigNumber.minimum(pocketCluster.pocketStep, normalizedRect.height)
       case 'straight':
         return ZERO
       case 'slanted':
@@ -58,7 +60,7 @@ export const PocketOpeningPreview: FC<PocketOpeningPreviewProps> = ({
         }
         return ZERO
     }
-  }, [adjustedOpening, normalizedRect.width])
+  }, [adjustedOpening, normalizedRect.width, normalizedRect.height, pocketCluster.pocketStep])
 
   const viewBox = useMemo<string>(() => {
     const bounds: RectSchema = { x: ZERO, y: ZERO, width: normalizedRect.width, height: depth }

@@ -123,6 +123,15 @@ export const comparators = {
     )
   },
   pocketOpening: (a: PocketOpeningSchema, b: PocketOpeningSchema): boolean => {
+    if (a.type === 'optical-illusion' && b.type === 'optical-illusion') {
+      return (
+        a.direction === b.direction &&
+        a.startInset === b.startInset &&
+        a.endInset === b.endInset &&
+        a.leadingRadius === b.leadingRadius &&
+        a.trailingRadius === b.trailingRadius
+      )
+    }
     if (a.type === 'straight' && b.type === 'straight') {
       return true
     }

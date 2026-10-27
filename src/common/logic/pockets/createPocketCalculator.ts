@@ -1,5 +1,6 @@
 import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, RectSchema } from '../../schemas/geometry'
+import { OpticalIllusionPocketCalculator } from './OpticalIllusionPocketCalculator'
 import type { PocketCalculator } from './PocketCalculator'
 import { RecessedPocketCalculator } from './RecessedPocketCalculator'
 import { SlantedPocketCalculator } from './SlantedPocketCalculator'
@@ -13,6 +14,8 @@ export const createPocketCalculator = (
   cornerRadius: CornerRadiusSchema,
 ): PocketCalculator<PocketOpeningSchema> => {
   switch (adjustedOpening.type) {
+    case 'optical-illusion':
+      return new OpticalIllusionPocketCalculator(pocket, pocketCluster, adjustedOpening, pocketRect, cornerRadius)
     case 'straight':
       return new StraightPocketCalculator(pocket, pocketCluster, adjustedOpening, pocketRect, cornerRadius)
     case 'recessed':

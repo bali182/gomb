@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defaultOpticalIllusionPocketOpening } from '../../defaultStates'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
@@ -259,4 +260,33 @@ describe('pocket component operations', () => {
     expect(source).toEqual(before)
     expect(next).toBe(1)
   })
+})
+
+it('clones every optical illusion setting', () => {
+  const original = fixture()
+  const a = original.components.a
+  if (a.type !== 't-pocket') throw new Error('Missing pocket')
+  const opening = {
+    ...defaultOpticalIllusionPocketOpening,
+    startInset: 12,
+    endInset: 23,
+    leadingRadius: 7,
+    trailingRadius: 3,
+  }
+  const source = { ...original, components: { ...original.components, a: { ...a, opening } } }
+  let next = 0
+  const cloned = cloneComponent(source, {
+    componentId: 'first',
+    settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+    ids: {
+      component: () => `optical-copy-${next++}`,
+      hole: () => `hole-${next++}`,
+      stitchLine: () => `stitch-${next++}`,
+    },
+    names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+  })
+  const copiedCluster = cloned.components[cloned.components.root.children[1]]
+  const copiedPocket = cloned.components[copiedCluster.children[0]]
+  if (copiedPocket.type !== 't-pocket') throw new Error('Missing copied pocket')
+  expect(copiedPocket.opening).toEqual(opening)
 })

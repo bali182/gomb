@@ -2,6 +2,7 @@ import type BigNumber from 'bignumber.js'
 import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
 import type {
   FrontPocketSchema,
+  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketsSchema,
@@ -52,7 +53,18 @@ export type PocketClusterLimitReasonSchema =
   /** Bottom taper extends inward from both sides and cannot exceed half the pocket width. */
   | 't-pocket-taper-exceeds-half-width'
 
+export type OpticalIllusionPocketOpeningLimitsReasonSchema =
+  /** The cluster diagonal's endpoint insets share the opening width. An inset exceeding half the width yields to the opposite inset up to halfway. */
+  | 'optical-illusion-pocket-opening-insets-share-width'
+  /** The leading radius is limited so its tangent point remains on the straight section before the diagonal. */
+  | 'optical-illusion-pocket-opening-radius-exceeds-leading-length'
+  /** The trailing radius is limited so its tangent point remains on the straight section after the diagonal. */
+  | 'optical-illusion-pocket-opening-radius-exceeds-trailing-length'
+  /** Both rounded transitions consume the diagonal's length. A transition consuming more than half yields to the other up to halfway, preventing overlap. */
+  | 'optical-illusion-pocket-opening-radii-share-slanted-length'
+
 export type LimitReasonSchema =
+  | OpticalIllusionPocketOpeningLimitsReasonSchema
   | CornerRadiusLimitReasonSchema
   | RecessedPocketOpeningLimitsReasonSchema
   | StretchLimitReasonSchema
@@ -78,7 +90,9 @@ export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
 export type StraightPocketOpeningLimitsSchema = NumericLimitsSchema<StraightPocketOpeningSchema>
 export type RecessedPocketOpeningLimitsSchema = NumericLimitsSchema<RecessedPocketOpeningSchema>
 export type SlantedPocketOpeningLimitsSchema = NumericLimitsSchema<SlantedPocketOpeningSchema>
+export type OpticalIllusionPocketOpeningLimitsSchema = NumericLimitsSchema<OpticalIllusionPocketOpeningSchema>
 export type PocketOpeningLimitsSchema =
+  | OpticalIllusionPocketOpeningLimitsSchema
   | StraightPocketOpeningLimitsSchema
   | RecessedPocketOpeningLimitsSchema
   | SlantedPocketOpeningLimitsSchema

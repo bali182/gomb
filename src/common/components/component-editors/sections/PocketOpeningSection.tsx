@@ -2,10 +2,15 @@ import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiCaretDown } from 'react-icons/pi'
-import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../../../defaultStates'
+import {
+  defaultOpticalIllusionPocketOpening,
+  defaultRecessedPocketOpening,
+  defaultSlantedPocketOpening,
+} from '../../../defaultStates'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
 import type {
+  OpticalIllusionPocketOpeningSchema,
   PocketClusterSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
@@ -17,9 +22,11 @@ import { getEditableSchema } from '../../../utils/getEditableSchema'
 import { noIssues } from '../../../utils/issueUtils'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderButton } from '../../common/SectionHeaderButton'
+import { OpticalIllusionPocketOpeningIcon } from '../../icons/OpticalIllusionPocketOpeningIcon'
 import { RecessedPocketOpeningIcon } from '../../icons/RecessedPocketOpeningIcon'
 import { SlantedPocketOpeningIcon } from '../../icons/SlantedPocketOpeningIcon'
 import { StraightPocketOpeningIcon } from '../../icons/StraightPocketOpeningIcon'
+import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
 import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
@@ -30,8 +37,9 @@ type PocketOpeningSectionProps = {
   issues: IssuesSchema<PocketOpeningSchema> | undefined
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
-const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted']
+const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted', 'optical-illusion']
 const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
+  'optical-illusion': OpticalIllusionPocketOpeningIcon,
   straight: StraightPocketOpeningIcon,
   recessed: RecessedPocketOpeningIcon,
   slanted: SlantedPocketOpeningIcon,
@@ -49,6 +57,9 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
   const handleTypeChange = useCallback(
     (details: MenuValueChangeDetails): void => {
       switch (details.value) {
+        case 'optical-illusion':
+          onChange(getEditableSchema(defaultOpticalIllusionPocketOpening, { language }))
+          break
         case 'straight':
           onChange({ type: 'straight' })
           break
@@ -103,6 +114,14 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
         {t.project.editors.sections.components.pocketOpening.title}
       </SectionGroup.SectionHeader>
 
+      {editable.type === 'optical-illusion' && (
+        <OpticalIllusionPocketOpeningFields
+          editable={editable}
+          issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
+          orientation={cluster.orientation}
+          onChange={onChange}
+        />
+      )}
       {editable.type === 'straight' && (
         <StraightPocketOpeningFields
           editable={editable}
