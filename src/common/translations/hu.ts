@@ -411,6 +411,33 @@ export const HU = {
             },
             innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
           },
+          opticalIllusionPocketOpeningCredit: {
+            designBy: 'Tervező:',
+          },
+          opticalIllusionPocketOpening: {
+            direction: {
+              label: 'Alacsonyabb oldal',
+              tooltip: 'A nyílás alacsonyabb végét választja ki; a forma a clusterrel együtt fordul.',
+            },
+            startInset: {
+              label: 'Kezdő betolás',
+              tooltip:
+                'Az átló kezdetének távolsága az alacsonyabb oldali széltől a front pocketnél, mm-ben. A teljes clusterre vonatkozik.',
+            },
+            endInset: {
+              label: 'Záró betolás',
+              tooltip:
+                'Az átló végének távolsága a magasabb oldali széltől a leghátsó pocketnél, mm-ben. A teljes clusterre vonatkozik.',
+            },
+            leadingRadius: {
+              label: 'Kezdő sugár',
+              tooltip: 'A kezdő egyenesből a ferde szakaszba vezető átmenet sugara, mm-ben.',
+            },
+            trailingRadius: {
+              label: 'Záró sugár',
+              tooltip: 'A ferde szakaszból a záró egyenesbe vezető átmenet sugara, mm-ben.',
+            },
+          },
           slantedPocketOpening: {
             offset: {
               label: 'Eltérés',
@@ -764,6 +791,7 @@ export const HU = {
             straight: 'Egyenes',
             recessed: 'Ívelt',
             slanted: 'Ferde',
+            'optical-illusion': 'Optikai illúzió',
           },
           slantedPocketOpeningSide: {
             up: { start: 'Bal', end: 'Jobb' },
@@ -1208,6 +1236,14 @@ export const HU = {
       'pocket-opening-boundary': (value: string): string => `A zseb körvonala miatt az érték legfeljebb ${value} mm.`,
       'pocket-opening-depth': (value: string): string =>
         `A zseb mélysége miatt a kivágás legfeljebb ${value} mm mély lehet.`,
+      'optical-illusion-pocket-opening-insets-share-width': (value: string): string =>
+        `A nyílás szélessége és a szemközti betolás miatt ez a betolás legfeljebb ${value} mm.`,
+      'optical-illusion-pocket-opening-radius-exceeds-leading-length': (value: string): string =>
+        `A kezdő egyenes szakasz miatt a sugár legfeljebb ${value} mm.`,
+      'optical-illusion-pocket-opening-radius-exceeds-trailing-length': (value: string): string =>
+        `A záró egyenes szakasz miatt a sugár legfeljebb ${value} mm.`,
+      'optical-illusion-pocket-opening-radii-share-slanted-length': (value: string): string =>
+        `A két lekerekítés a ferde szakaszon osztozik, ezért ez a sugár legfeljebb ${value} mm.`,
       'slanted-pocket-opening-offset-exceeds-pocket': (value: string): string =>
         `A zseb alakja miatt az eltérés legfeljebb ${value} mm.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,

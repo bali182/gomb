@@ -1,7 +1,11 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
-import type { RecessedPocketOpeningSchema, SlantedPocketOpeningSchema } from '../schemas/components'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+} from '../schemas/components'
 import type { RecessedPocketOpeningLimitsSchema } from '../schemas/limits'
 import { getAdjustedPocketOpening } from './getAdjustedPocketOpening'
 
@@ -98,4 +102,32 @@ describe('getAdjustedPocketOpening', () => {
     expect(getAdjustedPocketOpening(slanted, { type: 'straight' })).toBe(slanted)
     expect(slanted.offset).toBe(90)
   })
+})
+
+it('bounds optical illusion fields without changing its type or requested values', () => {
+  const requested: OpticalIllusionPocketOpeningSchema = {
+    type: 'optical-illusion',
+    direction: 'start',
+    startInset: 70,
+    endInset: 80,
+    leadingRadius: 99,
+    trailingRadius: 99,
+  }
+  const bound = {
+    value: new BigNumber(50),
+    reason: 'optical-illusion-pocket-opening-insets-share-width',
+    severity: 'warning',
+  } as const
+  const snapshot = { ...requested }
+  expect(
+    getAdjustedPocketOpening(requested, {
+      type: 'optical-illusion',
+      startInset: { max: bound },
+      endInset: { max: bound },
+      leadingRadius: { max: { ...bound, value: new BigNumber(4) } },
+      trailingRadius: { max: { ...bound, value: new BigNumber(7) } },
+    }),
+  ).toEqual({ ...requested, startInset: 50, endInset: 50, leadingRadius: 4, trailingRadius: 7 })
+  expect(requested).toEqual(snapshot)
+  expect(getAdjustedPocketOpening(requested, { type: 'straight' })).toBe(requested)
 })

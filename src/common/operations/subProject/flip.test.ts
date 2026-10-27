@@ -7,7 +7,13 @@ import { calculatePocketBoundingBox } from '../../logic/calculatePocketBoundingB
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
 import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusValuesSchema } from '../../schemas/common'
-import type { LayoutOrientationSchema, PocketOpeningSchema, PocketOrientationSchema } from '../../schemas/components'
+import type {
+  LayoutOrientationSchema,
+  OpticalIllusionPocketOpeningSchema,
+  PocketOpeningSchema,
+  PocketOpeningSideSchema,
+  PocketOrientationSchema,
+} from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
 import type { HoleSchema } from '../../schemas/hole'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -683,3 +689,33 @@ const getVertices = (path: PathSchema): number[][] => {
     command.type === 'close' ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
   )
 }
+
+describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical illusion flip: %s', (orientation) => {
+  describe.each<PocketOpeningSideSchema>(['start', 'end'])('direction: %s', (direction) => {
+    it.each(axes)('mirrors direction and preserves semantic inset/radius values along %s', (axis) => {
+      const opening: OpticalIllusionPocketOpeningSchema = {
+        type: 'optical-illusion',
+        direction,
+        startInset: 12,
+        endInset: 25,
+        leadingRadius: 3,
+        trailingRadius: 7,
+      }
+      const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+      const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'], orientation })
+      const t = d.tPocket({ id: 't', opening })
+      const front = d.frontPocket({ id: 'front', opening })
+      const source = d.subProject({ id: 'sub', root, components: [cluster, t, front] })
+      const crossAxis = orientation === 'up' || orientation === 'down' ? 'horizontal' : 'vertical'
+      const flippedDirection = direction === 'start' ? 'end' : 'start'
+      const mirrored = accessors.subProject(flip(source, t, axis)).tPocket('t')
+      expect(mirrored.opening).toEqual({ ...opening, direction: axis === crossAxis ? flippedDirection : direction })
+      const clusterFlip = flip(source, cluster, axis)
+      expect(accessors.subProject(clusterFlip).tPocket('t').opening).toEqual({
+        ...opening,
+        direction: flippedDirection,
+      })
+      expect(flip(clusterFlip, accessors.subProject(clusterFlip).pocketCluster('cluster'), axis)).toEqual(source)
+    })
+  })
+})

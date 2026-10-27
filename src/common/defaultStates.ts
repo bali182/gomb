@@ -22,6 +22,7 @@ import type {
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
+  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
   RecessedPocketOpeningSchema,
@@ -133,10 +134,19 @@ export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   innerRadius: 10,
 }
 
+export const defaultOpticalIllusionPocketOpening: OpticalIllusionPocketOpeningSchema = {
+  type: 'optical-illusion',
+  direction: 'start',
+  startInset: 10,
+  endInset: 10,
+  leadingRadius: 0,
+  trailingRadius: 0,
+}
+
 export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
   type: 'slanted',
   offset: 15,
-  side: 'end',
+  side: 'start',
 }
 
 export const defaultHasPocketItem: HasPocketItemSchema = {

@@ -15,12 +15,13 @@ import type {
   HasLayoutSchema,
   HasPocketItemSchema,
   LayoutOrientationSchema,
+  OpticalIllusionPocketOpeningOwnSchema,
   PocketOpeningSchema,
+  PocketOpeningSideSchema,
   PocketOrientationSchema,
   PocketsSchema,
   RecessedPocketOpeningOwnSchema,
   SlantedPocketOpeningOwnSchema,
-  SlantedPocketOpeningSideSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
@@ -479,6 +480,33 @@ export const EN = {
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
           } satisfies EditorFieldTranslations<keyof RecessedPocketOpeningOwnSchema>,
+          opticalIllusionPocketOpeningCredit: {
+            designBy: 'Design by',
+          },
+          opticalIllusionPocketOpening: {
+            direction: {
+              label: 'Lower side',
+              tooltip: 'Selects the lower end of the opening; the shape rotates with the cluster.',
+            },
+            startInset: {
+              label: 'Start inset',
+              tooltip:
+                'Distance from the lower-side edge to the start of the diagonal at the front pocket, in mm. Uses the whole cluster.',
+            },
+            endInset: {
+              label: 'End inset',
+              tooltip:
+                'Distance from the upper-side edge to the end of the diagonal at the back pocket, in mm. Uses the whole cluster.',
+            },
+            leadingRadius: {
+              label: 'Leading radius',
+              tooltip: 'Radius where the leading straight section turns into the diagonal, in mm.',
+            },
+            trailingRadius: {
+              label: 'Trailing radius',
+              tooltip: 'Radius where the diagonal turns into the trailing straight section, in mm.',
+            },
+          } satisfies EditorFieldTranslations<keyof OpticalIllusionPocketOpeningOwnSchema>,
           slantedPocketOpening: {
             offset: { label: 'Offset', tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.' },
             side: {
@@ -840,13 +868,14 @@ export const EN = {
             straight: 'Straight',
             recessed: 'Recessed',
             slanted: 'Slanted',
+            'optical-illusion': 'Optical illusion',
           } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
           slantedPocketOpeningSide: {
             up: { start: 'Left', end: 'Right' },
             right: { start: 'Top', end: 'Bottom' },
             down: { start: 'Right', end: 'Left' },
             left: { start: 'Bottom', end: 'Top' },
-          } satisfies Record<PocketOrientationSchema, EnumTranslationSchema<SlantedPocketOpeningSideSchema>>,
+          } satisfies Record<PocketOrientationSchema, EnumTranslationSchema<PocketOpeningSideSchema>>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',
@@ -1280,6 +1309,14 @@ export const EN = {
         `The available opening width limits this value to ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `The pocket outline limits this value to ${value} mm.`,
       'pocket-opening-depth': (value: string): string => `The pocket depth limits the recess depth to ${value} mm.`,
+      'optical-illusion-pocket-opening-insets-share-width': (value: string): string =>
+        `The opening width and the opposite inset limit this inset to ${value} mm.`,
+      'optical-illusion-pocket-opening-radius-exceeds-leading-length': (value: string): string =>
+        `The leading straight section limits the radius to ${value} mm.`,
+      'optical-illusion-pocket-opening-radius-exceeds-trailing-length': (value: string): string =>
+        `The trailing straight section limits the radius to ${value} mm.`,
+      'optical-illusion-pocket-opening-radii-share-slanted-length': (value: string): string =>
+        `The two rounded transitions share the diagonal and limit this radius to ${value} mm.`,
       'slanted-pocket-opening-offset-exceeds-pocket': (value: string): string =>
         `The pocket shape limits the offset to ${value} mm.`,
     } satisfies Record<LimitReasonSchema, (value: string) => string>,

@@ -3,6 +3,7 @@ import {
   defaultComponentBoundsStitchLine,
   defaultFrontPocket,
   defaultHole,
+  defaultOpticalIllusionPocketOpening,
   defaultPanel,
   defaultPocketCluster,
   defaultRecessedPocketOpening,
@@ -14,6 +15,7 @@ import {
 } from '../defaultStates'
 import type {
   FrontPocketSchema,
+  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketOpeningSchema,
@@ -127,9 +129,11 @@ const migratePocketOpening = (
   input: DeepPartialSchema<PocketOpeningSchema>,
 ): DeepPartialSchema<PocketOpeningSchema> => {
   const opening = m.requireObject<PocketOpeningSchema>(input)
-  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed', 'slanted'])
+  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed', 'slanted', 'optical-illusion'])
 
   switch (opening.type) {
+    case 'optical-illusion':
+      return m.applyDefaults<OpticalIllusionPocketOpeningSchema>(opening, defaultOpticalIllusionPocketOpening)
     case 'straight':
       return { type: 'straight' }
     case 'recessed':

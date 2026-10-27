@@ -289,14 +289,19 @@ const flipPocketOpening = (
   flippedOrientation: PocketOrientationSchema,
   axis: FlipAxisSchema,
 ): PocketOpeningSchema => {
-  if (opening.type !== 'slanted') {
-    return opening
-  }
   // Reversing the cluster's opening direction also reverses its local start/end convention.
   if (originalOrientation === flippedOrientation && !isCrossAxisFlip(originalOrientation, axis)) {
     return opening
   }
-  return { ...opening, side: opening.side === 'start' ? 'end' : 'start' }
+  switch (opening.type) {
+    case 'straight':
+    case 'recessed':
+      return opening
+    case 'slanted':
+      return { ...opening, side: opening.side === 'start' ? 'end' : 'start' }
+    case 'optical-illusion':
+      return { ...opening, direction: opening.direction === 'start' ? 'end' : 'start' }
+  }
 }
 
 const flipCornerRadii = (value: HasCornerRadiusValuesSchema, axis: FlipAxisSchema): HasCornerRadiusValuesSchema => {

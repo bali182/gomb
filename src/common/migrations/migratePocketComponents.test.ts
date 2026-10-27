@@ -1,5 +1,6 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
+import { defaultSlantedPocketOpening } from '../defaultStates'
 import type { ProjectSchema } from '../schemas/project'
 import { d } from '../testData'
 import { EN } from '../translations/en'
@@ -69,7 +70,7 @@ describe('physical pocket component migration', () => {
     expect(children[0]).toMatchObject({
       tPocketTabWidth: 12,
       tPocketTaper: 25,
-      opening: { type: 'slanted', offset: 15, side: 'end' },
+      opening: defaultSlantedPocketOpening,
     })
     expect(children[1]).toMatchObject({ opening: { type: 'slanted', offset: 23, side: 'start' } })
     expect(children[2]).toMatchObject({

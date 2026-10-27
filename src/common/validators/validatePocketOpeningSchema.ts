@@ -1,5 +1,10 @@
-import { defaultRecessedPocketOpening, defaultSlantedPocketOpening } from '../defaultStates'
+import {
+  defaultOpticalIllusionPocketOpening,
+  defaultRecessedPocketOpening,
+  defaultSlantedPocketOpening,
+} from '../defaultStates'
 import type {
+  OpticalIllusionPocketOpeningSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   SlantedPocketOpeningSchema,
@@ -25,7 +30,7 @@ const validatePocketOpeningByType = (
   const typeResult = validatePrimitiveUnion(
     input.type,
     currentValue.type,
-    { straight: true, recessed: true, slanted: true },
+    { straight: true, recessed: true, slanted: true, 'optical-illusion': true },
     context,
   )
 
@@ -34,6 +39,13 @@ const validatePocketOpeningByType = (
   }
 
   switch (input.type) {
+    case 'optical-illusion':
+      return validateOpticalIllusionPocketOpeningSchema(
+        input,
+        currentValue.type === 'optical-illusion' ? currentValue : defaultOpticalIllusionPocketOpening,
+        context,
+      )
+
     case 'straight':
       return createValidValidationResult<PocketOpeningSchema>({ type: undefined }, { type: 'straight' })
     case 'recessed':
@@ -116,6 +128,55 @@ const validateRecessedPocketOpeningSchema = (
       depth: depth.value,
       outerRadius: outerRadius.value,
       innerRadius: innerRadius.value,
+    },
+    committedValue,
+  )
+}
+
+const validateOpticalIllusionPocketOpeningSchema = (
+  input: EditableSchema<OpticalIllusionPocketOpeningSchema>,
+  currentValue: OpticalIllusionPocketOpeningSchema,
+  context: BaseValidationContextSchema,
+): ValidationResultSchema<OpticalIllusionPocketOpeningSchema> => {
+  const direction = validatePrimitiveUnion(input.direction, currentValue.direction, { start: true, end: true }, context)
+  const startInset = validateNumber(input.startInset, currentValue.startInset, context, { min: 0 })
+  const endInset = validateNumber(input.endInset, currentValue.endInset, context, { min: 0 })
+  const leadingRadius = validateNumber(input.leadingRadius, currentValue.leadingRadius, context, { min: 0 })
+  const trailingRadius = validateNumber(input.trailingRadius, currentValue.trailingRadius, context, { min: 0 })
+  const issues: IssuesSchema<OpticalIllusionPocketOpeningSchema> = {
+    type: undefined,
+    direction: direction.issues,
+    startInset: startInset.issues,
+    endInset: endInset.issues,
+    leadingRadius: leadingRadius.issues,
+    trailingRadius: trailingRadius.issues,
+  }
+  const committedValue: OpticalIllusionPocketOpeningSchema = {
+    ...currentValue,
+    direction: direction.committedValue,
+    startInset: startInset.committedValue,
+    endInset: endInset.committedValue,
+    leadingRadius: leadingRadius.committedValue,
+    trailingRadius: trailingRadius.committedValue,
+  }
+  if (
+    !direction.isValid ||
+    !startInset.isValid ||
+    !endInset.isValid ||
+    !leadingRadius.isValid ||
+    !trailingRadius.isValid
+  ) {
+    return createInvalidValidationResult(issues, committedValue)
+  }
+  return createValidValidationResult(
+    issues,
+    {
+      ...currentValue,
+      direction: direction.value,
+      startInset: startInset.value,
+      endInset: endInset.value,
+      leadingRadius: leadingRadius.value,
+      trailingRadius: trailingRadius.value,
     },
     committedValue,
   )

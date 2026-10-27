@@ -52,7 +52,7 @@ export type PanelSchema = HasTypeSchema<'panel'> &
   HasStretchSchema
 
 export type PocketOrientationSchema = 'up' | 'down' | 'left' | 'right'
-export type SlantedPocketOpeningSideSchema = 'start' | 'end'
+export type PocketOpeningSideSchema = 'start' | 'end'
 
 export type StraightPocketOpeningSchema = HasTypeSchema<'straight'>
 
@@ -72,12 +72,27 @@ export type SlantedPocketOpeningOwnSchema = {
   /** Inward displacement of the selected opening endpoint, in mm. */
   offset: number
   /** Endpoint in the opening's traversal direction, rotating with the cluster. */
-  side: SlantedPocketOpeningSideSchema
+  side: PocketOpeningSideSchema
 }
 
 export type SlantedPocketOpeningSchema = HasTypeSchema<'slanted'> & SlantedPocketOpeningOwnSchema
 
-export type PocketOpeningSchema = StraightPocketOpeningSchema | RecessedPocketOpeningSchema | SlantedPocketOpeningSchema
+export type OpticalIllusionPocketOpeningOwnSchema = {
+  direction: PocketOpeningSideSchema
+  startInset: number
+  endInset: number
+  leadingRadius: number
+  trailingRadius: number
+}
+
+export type OpticalIllusionPocketOpeningSchema = HasTypeSchema<'optical-illusion'> &
+  OpticalIllusionPocketOpeningOwnSchema
+
+export type PocketOpeningSchema =
+  | StraightPocketOpeningSchema
+  | RecessedPocketOpeningSchema
+  | SlantedPocketOpeningSchema
+  | OpticalIllusionPocketOpeningSchema
 
 export type HasPocketOpeningSchema = {
   opening: PocketOpeningSchema

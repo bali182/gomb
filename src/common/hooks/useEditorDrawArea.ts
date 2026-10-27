@@ -224,10 +224,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         if (!isDefined(parsed)) {
           return undefined
         }
-        return applyOpacity(
-          formatHex8({ ...parsed, alpha: 0.2 }),
-          selectionOpacities.stitchLines[stitchLine.id].stroke,
-        )
+        return applyOpacity(formatHex8({ ...parsed, alpha: 0.2 }), selectionOpacities.stitchLines[stitchLine.id].stroke)
       },
       getStitchHoleFootprintThickness: (stitchLine) => {
         const length = stitchLine.stitchHoleLength ?? stitchHoleLength

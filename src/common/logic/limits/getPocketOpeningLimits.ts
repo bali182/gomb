@@ -1,6 +1,7 @@
 import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { PocketOpeningLimitsSchema } from '../../schemas/limits'
+import { getOpticalIllusionPocketOpeningLimits } from './getOpticalIllusionPocketOpeningLimits'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 import { getSlantedPocketOpeningLimits } from './getSlantedPocketOpeningLimits'
 import { getStraightPocketOpeningLimits } from './getStraightPocketOpeningLimits'
@@ -12,6 +13,8 @@ export const getPocketOpeningLimits = (
 ): PocketOpeningLimitsSchema => {
   const opening = pocket.opening
   switch (opening.type) {
+    case 'optical-illusion':
+      return getOpticalIllusionPocketOpeningLimits(opening, pocket, cluster, computed)
     case 'straight':
       return getStraightPocketOpeningLimits(opening, pocket, cluster, computed)
     case 'recessed':
