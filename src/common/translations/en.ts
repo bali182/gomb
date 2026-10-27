@@ -480,6 +480,9 @@ export const EN = {
               tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
             },
           } satisfies EditorFieldTranslations<keyof RecessedPocketOpeningOwnSchema>,
+          opticalIllusionPocketOpeningCredit: {
+            designBy: 'Design by',
+          },
           opticalIllusionPocketOpening: {
             direction: {
               label: 'Lower side',

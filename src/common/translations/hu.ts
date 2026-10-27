@@ -411,6 +411,9 @@ export const HU = {
             },
             innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
           },
+          opticalIllusionPocketOpeningCredit: {
+            designBy: 'Tervező:',
+          },
           opticalIllusionPocketOpening: {
             direction: {
               label: 'Alacsonyabb oldal',

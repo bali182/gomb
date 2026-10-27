@@ -1,5 +1,14 @@
-import { Select, createListCollection, type ListCollection, type SelectValueChangeDetails } from '@chakra-ui/react'
+import {
+  HStack,
+  Link,
+  Select,
+  Text,
+  createListCollection,
+  type ListCollection,
+  type SelectValueChangeDetails,
+} from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
+import { PiYoutubeLogoFill } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type {
@@ -159,6 +168,27 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
           unit="mm"
         />
       </SectionGroup.SectionRowEditor>
+      <SectionGroup.SectionFullWidthContent>
+        <HStack justifyContent="center" flexWrap="wrap" gap="1.5" py="1" textStyle="xs" color="fg.muted">
+          <HStack gap="1">
+            <Text>{t.project.editors.sections.components.opticalIllusionPocketOpeningCredit.designBy}</Text>
+            <Link href="https://corterleather.com/" target="_blank" rel="noopener noreferrer" fontWeight="bold">
+              Corter Leather
+            </Link>
+          </HStack>
+          <Text>•</Text>
+          <HStack gap="1">
+            <Link
+              href="https://www.youtube.com/watch?v=_ujdI7Grl20"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="YouTube"
+            >
+              <PiYoutubeLogoFill /> YouTube
+            </Link>
+          </HStack>
+        </HStack>
+      </SectionGroup.SectionFullWidthContent>
     </>
   )
 }
