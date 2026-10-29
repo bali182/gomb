@@ -16,6 +16,37 @@ import { migrateProject } from './migrateProject'
 
 const context: ProjectMigrationContextSchema = { t: EN }
 
+describe('subproject lock migration', () => {
+  it('initializes missing lock data and preserves existing memberships without mutating input', () => {
+    const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+    const source = d.subProject({
+      id: 'sp',
+      root,
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['a', 'b'] }),
+        d.tPocket({ id: 'a' }),
+        d.tPocket({ id: 'b' }),
+      ],
+    })
+    const project: DeepPartialSchema<ProjectSchema> = structuredClone(
+      d.project({ id: 'project', subProjects: [source] }),
+    )
+    const legacySubProject = project.subProjects?.[0]
+    if (!isDefined(legacySubProject)) {
+      throw new Error('Missing fixture subproject')
+    }
+    delete legacySubProject.locks
+    const snapshot = structuredClone(project)
+    const migrated = migrateProject(project, context)
+    expect(migrated.subProjects?.[0]?.locks).toEqual({ components: {} })
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
+    expect(project).toEqual(snapshot)
+    source.locks.components = { a: { 'pocket-opening': '2' }, b: { 'pocket-opening': '2' } }
+    const configured = d.project({ id: 'configured', subProjects: [source] })
+    expect(migrateProject(configured, context).subProjects?.[0]?.locks).toEqual(source.locks)
+  })
+})
+
 describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: %s', (mainAxisAnchor) => {
   it('fills missing alignment and preserves supplied alignment on all layout component types', () => {
     const root = d.rootPanel({ id: 'root', children: ['panel'] })

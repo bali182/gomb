@@ -91,6 +91,18 @@ const subProject = (subProject: SubProjectSchema) => {
     return narrowers.assert.tPocketStitchLine(stitchLine(id))
   }
 
+  const tPocketStitchLines = (componentId?: string): TPocketStitchLineSchema[] => {
+    return subProject.stitchLines
+      .filter(narrowers.is.tPocketStitchLine)
+      .filter((line) => !isDefined(componentId) || (line.targetType === 'component' && line.targetId === componentId))
+  }
+
+  const componentBoundsStitchLines = (componentId?: string): ComponentBoundsStitchLineSchema[] => {
+    return subProject.stitchLines
+      .filter(narrowers.is.componentBoundsStitchLine)
+      .filter((line) => !isDefined(componentId) || (line.targetType === 'component' && line.targetId === componentId))
+  }
+
   return {
     optional,
     component,
@@ -104,6 +116,8 @@ const subProject = (subProject: SubProjectSchema) => {
     tPocket,
     componentBoundsStitchLine,
     tPocketStitchLine,
+    componentBoundsStitchLines,
+    tPocketStitchLines,
   }
 }
 

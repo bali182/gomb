@@ -3,6 +3,7 @@ import { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema }
 import { RectSchema } from './geometry'
 import { HoleSchema } from './hole'
 import type { SubProjectLimitsSchema } from './limits'
+import type { SubProjectLocksSchema } from './lock'
 import { StitchLineSchema } from './stitching'
 
 export type SubProjectSchema = {
@@ -11,6 +12,7 @@ export type SubProjectSchema = {
   components: Record<string, ComponentSchema>
   holes: HoleSchema[]
   stitchLines: StitchLineSchema[]
+  locks: SubProjectLocksSchema
 }
 
 export type ComputedSubProjectGeometrySchema = {

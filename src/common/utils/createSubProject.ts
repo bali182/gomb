@@ -22,5 +22,6 @@ export const createSubProject = (
     },
     holes: [],
     stitchLines: [],
+    locks: { components: {} },
   }
 }

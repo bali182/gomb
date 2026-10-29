@@ -69,6 +69,7 @@ export const cloneSubProject = (
         id: getUnusedId(),
         root: cloneResult.clonedRootId,
         stitchLines: cloneResult.clonedStitchLines,
+        locks: { components: {} },
       },
     ],
   }

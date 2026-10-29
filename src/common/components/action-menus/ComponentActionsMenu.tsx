@@ -21,13 +21,13 @@ import {
 import { portalRef } from '../../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
 import type { ComponentSchema } from '../../schemas/components'
-import type { PocketSettingsCopyTargetsSchema } from '../../schemas/pocketCopy'
+import type { PocketLocksDraftSchema } from '../../schemas/lock'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
-import { PocketCopyDialog } from '../pocket-copy/PocketCopyDialog'
+import { PocketLocksDialog } from '../pocket-locks/PocketLocksDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
@@ -36,9 +36,9 @@ import {
   AddComponentStitchLineMenuItem,
   AddHoleMenuItem,
   CloneComponentMenuItem,
-  CopyPocketSettingsMenuItem,
   DeleteComponentMenuItem,
   ExportComponentPngMenuItem,
+  PocketLocksMenuItem,
 } from './ComponentActionsMenuItems'
 
 type ComponentActionsProps = {
@@ -70,9 +70,9 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, copyPocketSettings, flip } =
+  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, updatePocketLocks, flip } =
     useSubProjectOperations()
-  const [isPocketCopyOpen, setPocketCopyOpen] = useState<boolean>(false)
+  const [isPocketLocksOpen, setPocketLocksOpen] = useState<boolean>(false)
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -183,6 +183,26 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
   }, [project, subProject, component.id, settings, exportDrawAreaContext, t])
 
+  const handleOpenPocketLocks = useCallback((): void => {
+    setPocketLocksOpen(true)
+  }, [])
+
+  const handleUpdatePocketLocks = useCallback(
+    (draft: PocketLocksDraftSchema): void => {
+      updatePocketLocks(draft)
+      setPocketLocksOpen(false)
+    },
+    [updatePocketLocks],
+  )
+
+  const handleFlipHorizontal = useCallback((): void => {
+    flip(component, 'horizontal')
+  }, [component, flip])
+
+  const handleFlipVertical = useCallback((): void => {
+    flip(component, 'vertical')
+  }, [component, flip])
+
   const possibleChildTypes = childTypes.filter((type) => {
     if (narrowers.is.pocketCluster(component)) {
       return type === 't-pocket' || type === 'front-pocket'
@@ -193,22 +213,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const canClone = component.type === 'root-panel' || canCloneComponent(component)
   const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
-  const handleOpenPocketCopy = useCallback((): void => {
-    setPocketCopyOpen(true)
-  }, [])
-  const handleCopyPocketSettings = useCallback(
-    (targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
-      copyPocketSettings(component.id, targets)
-      setPocketCopyOpen(false)
-    },
-    [component.id, copyPocketSettings],
-  )
-  const handleFlipHorizontal = useCallback((): void => {
-    flip(component, 'horizontal')
-  }, [component, flip])
-  const handleFlipVertical = useCallback((): void => {
-    flip(component, 'vertical')
-  }, [component, flip])
+
   return (
     <Box onClick={handleActionsClick}>
       <Menu.Root>
@@ -245,7 +250,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && narrowers.is.pocket(component) && (
-                  <CopyPocketSettingsMenuItem onSelect={handleOpenPocketCopy} />
+                  <PocketLocksMenuItem onSelect={handleOpenPocketLocks} />
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
@@ -268,13 +273,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      {!subProjectOnly && narrowers.is.pocket(component) && (
-        <PocketCopyDialog
+      {!subProjectOnly && narrowers.is.pocket(component) && isPocketLocksOpen && (
+        <PocketLocksDialog
           subProject={subProject}
-          sourcePocketId={component.id}
-          isOpen={isPocketCopyOpen}
-          onOpenChange={setPocketCopyOpen}
-          onSubmit={handleCopyPocketSettings}
+          isOpen={isPocketLocksOpen}
+          onOpenChange={setPocketLocksOpen}
+          onSubmit={handleUpdatePocketLocks}
         />
       )}
     </Box>

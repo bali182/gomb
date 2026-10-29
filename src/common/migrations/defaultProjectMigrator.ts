@@ -59,6 +59,7 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     return m.applyDefaults<SubProjectSchema>(subProject, {
       holes: [],
       stitchLines: [],
+      locks: { components: {} },
     })
   },
   colorSettings: (input) => {

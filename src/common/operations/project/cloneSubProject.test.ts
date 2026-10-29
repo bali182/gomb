@@ -4,6 +4,25 @@ import { d } from '../../testData'
 import { cloneSubProject } from './cloneSubProject'
 
 describe('cloneSubProject', () => {
+  it('does not copy source lock memberships to cloned components', () => {
+    const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+    const source = d.subProject({
+      id: 'sp',
+      root,
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['a', 'b'] }),
+        d.tPocket({ id: 'a' }),
+        d.tPocket({ id: 'b' }),
+      ],
+    })
+    source.locks.components = { a: { 'pocket-opening': '1' }, b: { 'pocket-opening': '1' } }
+    let nextId = 0
+    const project = d.project({ id: 'project', subProjects: [source] })
+    const result = cloneSubProject(project, { subProject: source, getUnusedId: () => `clone-${++nextId}` })
+    expect(result.subProjects[1].locks).toEqual({ components: {} })
+    expect(result.subProjects[0].locks).toEqual(source.locks)
+  })
+
   it('builds a complete cloned subproject from the component tree result', () => {
     const root = d.rootPanel({ id: 'root', children: ['panel'], name: 'Wallet' })
     const panel = d.panel({ id: 'panel', name: 'Panel' })

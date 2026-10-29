@@ -27,7 +27,7 @@ import type {
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
-import type { PocketSettingsCopySelectionSchema } from '../schemas/pocketCopy'
+import type { PocketLockPropertiesSchema } from '../schemas/lock'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,
@@ -265,7 +265,7 @@ export const EN = {
           addStitching: 'Add stitching',
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
-          copyPocketSettings: 'Copy settings…',
+          linkPocketSettings: 'Link settings…',
           clone: 'Clone',
           delete: 'Delete',
         },
@@ -952,40 +952,22 @@ export const EN = {
     },
   },
   dialogs: {
-    pocketCopy: {
-      title: 'Copy pocket settings',
-      positiveAction: 'Copy',
-      sourceHint: 'Copying this',
-      selectAll: {
-        label: 'All',
-        tooltip:
-          'Select or deselect all applicable settings. Selecting all also enables overwriting existing stitching.',
-      } satisfies EditorFieldTranslationSchema,
+    pocketLocks: {
+      title: 'Link pocket settings',
+      positiveAction: 'Apply',
+      pocket: 'Pocket / cluster',
+      all: 'All pockets',
+      group: 'Group',
+      groups: 'Groups',
+      sample: 'Source',
+      useAsSample: 'Use as source',
+      adjustedTitle: 'Links adjusted the result of the operation.',
       columns: {
-        copyShape: {
-          label: 'Shape',
-          tooltip: 'Copy the T-pocket tab width and taper. Click the header to toggle all applicable target pockets.',
-        },
-        copyOpening: {
-          label: 'Opening',
-          tooltip: 'Copy the opening type and all its settings. Click the header to toggle all target pockets.',
-        },
-        copyPocketItem: {
-          label: 'Contents',
-          tooltip:
-            'Copy the selected item, orientation and both offsets. An empty source clears the target item. Click the header to toggle all target pockets.',
-        },
-        copyStitching: {
-          label: 'Stitching',
-          tooltip:
-            'Copy all bottom stitch lines from the source pocket. Existing stitch lines are kept unless overwrite is selected. Click the header to toggle all applicable target pockets.',
-        },
-        overwriteStitching: {
-          label: 'Overwrite',
-          tooltip:
-            'Replace the target pocket’s existing bottom stitch lines with copies from the source. Available when stitching is selected and the target already has stitching. Click the header to toggle all applicable target pockets.',
-        },
-      } satisfies EditorFieldTranslations<keyof PocketSettingsCopySelectionSchema>,
+        'pocket-contents': 'Contents',
+        'pocket-shape': 'T-pocket shape',
+        'pocket-opening': 'Opening',
+        'pocket-stitching': 'Stitching',
+      } satisfies Record<PocketLockPropertiesSchema, string>,
     },
     globalSettings: {
       title: 'Settings',

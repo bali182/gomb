@@ -94,12 +94,12 @@ export const CloneComponentMenuItem: FC<ComponentMenuItemProps> = ({ onSelect })
   )
 }
 
-export const CopyPocketSettingsMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
+export const PocketLocksMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="copy-pocket-settings" onSelect={onSelect}>
+    <Menu.Item value="pocket-locks" onSelect={onSelect}>
       <PiPaintBrushBroad />
-      <Menu.ItemText>{t.project.editors.actions.components.copyPocketSettings}</Menu.ItemText>
+      <Menu.ItemText>{t.project.editors.actions.components.linkPocketSettings}</Menu.ItemText>
     </Menu.Item>
   )
 }
