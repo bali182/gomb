@@ -108,14 +108,15 @@ export type ComputedStitchRouteDisconnectedCornerSchema = {
   hole: ComputedStitchHoleSchema
 }
 
-export type ComputedStitchRouteSchema = HasBoundingRectSchema & {
-  path: PathSchema
-  holes: ComputedStitchHoleSchema[]
-  isClosed: boolean
-  stitches: ComputedStitchSchema[]
-  labelPosition: StitchSideSchema
-  disconnectedCorners: Record<StitchCornerSchema, ComputedStitchRouteDisconnectedCornerSchema | undefined>
-}
+export type ComputedStitchRouteSchema = HasTargetSchema &
+  HasBoundingRectSchema & {
+    path: PathSchema
+    holes: ComputedStitchHoleSchema[]
+    isClosed: boolean
+    stitches: ComputedStitchSchema[]
+    labelPosition: StitchSideSchema
+    disconnectedCorners: Record<StitchCornerSchema, ComputedStitchRouteDisconnectedCornerSchema | undefined>
+  }
 
 export type ComputedStitchLineSchema = HasTargetSchema &
   HasBoundingRectSchema & {

@@ -15,7 +15,7 @@ import type {
   TPocketSchema,
 } from '../schemas/components'
 import type { ProjectMigration } from '../schemas/migration'
-import type { StitchLineSchema } from '../schemas/stitching'
+import type { StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import type { DeepPartialSchema } from '../schemas/utils'
 import type { TranslationSchema } from '../translations/translationSchema'
@@ -88,22 +88,9 @@ type LegacyPocketClusterSchema = {
   openingMapping: Partial<Record<number, string>>
 }
 
-type LegacyPocketClusterStitchLineSchema = {
+type LegacyPocketClusterStitchLineSchema = Omit<TPocketStitchLineSchema, 'type'> & {
   type: 'pocket-cluster-stitch-line'
-  id: string
-  name: string
-  targetType: 'component'
-  targetId: string
-  startOffset: number
-  endOffset: number
-  stitchDirection: 'start-to-end' | 'end-to-start'
-  stitchMargin?: number
-  stitchHoleLength?: number
-  stitchHoleDistance?: number
-  stitchHoleThickness?: number
-  stitchLineThickness?: number
 }
-type MigratableStitchLineSchema = StitchLineSchema | LegacyPocketClusterStitchLineSchema
 
 type PocketClusterMigrationResultSchema = {
   cluster: DeepPartialSchema<PocketClusterSchema>
@@ -126,7 +113,6 @@ const migrateSubProjectPocketComponents = (
   const names = new Set(
     Object.values(components).flatMap((component) => (isDefined(component?.name) ? [component.name] : [])),
   )
-  const migratedTPockets = new Map<string, string[]>()
   for (const [clusterId, component] of Object.entries(subProject.components)) {
     if (component?.type !== 'pocket-cluster') {
       continue
@@ -140,15 +126,11 @@ const migrateSubProjectPocketComponents = (
     for (const pocket of migrated.pockets) {
       components[pocket.id] = pocket
     }
-    migratedTPockets.set(
-      clusterId,
-      migrated.pockets.filter((pocket) => pocket.type === 't-pocket').map((pocket) => pocket.id),
-    )
   }
   return {
     ...subProject,
     components,
-    stitchLines: migratePocketStitchLines(subProject.stitchLines, migratedTPockets, translation),
+    stitchLines: migratePocketClusterStitchLines(subProject.stitchLines),
   }
 }
 
@@ -231,33 +213,15 @@ const createMigratedTPocket = (
   tPocketTaper: cluster.tPocketTaper ?? defaultTPocket.tPocketTaper,
 })
 
-const migratePocketStitchLines = (
+const migratePocketClusterStitchLines = (
   stitchLines: DeepPartialSchema<StitchLineSchema>[] | undefined,
-  migratedTPockets: ReadonlyMap<string, readonly string[]>,
-  translation: TranslationSchema,
 ): DeepPartialSchema<StitchLineSchema>[] | undefined => {
-  const names = new Set(stitchLines?.flatMap((line) => (isDefined(line?.name) ? [line.name] : [])) ?? [])
-  return stitchLines?.flatMap((input) => {
-    const line = m.requireObject<MigratableStitchLineSchema>(input)
+  return stitchLines?.map((input): DeepPartialSchema<StitchLineSchema> => {
+    const line = m.requireObject<StitchLineSchema | LegacyPocketClusterStitchLineSchema>(input)
     if (line.type !== 'pocket-cluster-stitch-line') {
-      return [input]
+      return input
     }
-    const pockets = migratedTPockets.get(line.targetId ?? '') ?? []
-    return pockets.map((targetId, index): DeepPartialSchema<StitchLineSchema> => {
-      const name =
-        index === 0 ? line.name : getUnusedName(line.name ?? translation.defaultNames.tPocketStitchLine, names)
-      if (isDefined(name)) {
-        names.add(name)
-      }
-      return {
-        ...line,
-        type: 't-pocket-stitch-line',
-        id: index === 0 ? line.id : id(),
-        name,
-        targetType: 'component',
-        targetId,
-      }
-    })
+    return { ...line, type: 't-pocket-stitch-line' }
   })
 }
 

@@ -1,21 +1,42 @@
-import type { FC } from 'react'
+import { useMemo, type FC } from 'react'
 
 import { useProject } from '../../hooks/useProject'
 import { useSubProject } from '../../hooks/useSubProject'
+import type { ComputedStitchRouteSchema } from '../../schemas/computed'
+import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
 import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { StitchLine } from './StitchLine'
+import { StitchLineRoute } from './StitchLineRoute'
 
 type TPocketStitchLinesProps = {
   componentId: string
+}
+
+type PocketStitchRoute = {
+  route: ComputedStitchRouteSchema
+  stitchLine: ResolvedStitchLineSchema
 }
 
 export const TPocketStitchLines: FC<TPocketStitchLinesProps> = ({ componentId }) => {
   const { project } = useProject()
   const { subProject, computedSubProject } = useSubProject()
   const accessor = accessors.subProject(subProject)
-  const computedStitchLines = computedSubProject.stitchLines[componentId] ?? []
+  const computedStitchLines = accessors.computedSubProject(computedSubProject).stitchLines(componentId)
+  const parentRoutes = useMemo<PocketStitchRoute[]>(() => {
+    const source = accessors.subProject(subProject)
+    const computed = accessors.computedSubProject(computedSubProject)
+    const parent = source.optional.parent(componentId)
+    if (!isDefined(parent)) {
+      return []
+    }
+    return source.tPocketStitchLines(parent.id).flatMap((stitchLine): PocketStitchRoute[] => {
+      const routes = computed.stitchLine(stitchLine.id).routes.filter((route) => route.targetId === componentId)
+      const resolvedStitchLine = getResolvedStitchLine(stitchLine, project.stitchingSettings)
+      return routes.map((route): PocketStitchRoute => ({ route, stitchLine: resolvedStitchLine }))
+    })
+  }, [componentId, subProject, computedSubProject, project.stitchingSettings])
 
   return (
     <>
@@ -31,6 +52,9 @@ export const TPocketStitchLines: FC<TPocketStitchLinesProps> = ({ componentId })
           <StitchLine key={stitchLine.id} computedStitchLine={computedStitchLine} stitchLine={resolvedStitchLine} />
         )
       })}
+      {parentRoutes.map(({ route, stitchLine }, index) => (
+        <StitchLineRoute key={`${stitchLine.id}-${index}`} route={route} stitchLine={stitchLine} />
+      ))}
     </>
   )
 }

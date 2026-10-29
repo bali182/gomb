@@ -7,6 +7,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { ComputedStitchLineSchema } from '../schemas/computed'
 import type { HoleSchema } from '../schemas/hole'
 import type {
   ComponentLimitsSchema,
@@ -20,14 +21,27 @@ import { isDefined } from './isDefined'
 import { narrowers } from './narrowers'
 
 const optionalSubProject = (subProject: SubProjectSchema) => {
-  const component = (id: string | undefined): ComponentSchema | undefined =>
-    isDefined(id) ? subProject.components[id] : undefined
-  const stitchLine = (id: string | undefined): StitchLineSchema | undefined =>
-    isDefined(id) ? subProject.stitchLines.find((s) => s.id === id) : undefined
-  const hole = (id: string | undefined): HoleSchema | undefined =>
-    isDefined(id) ? subProject.holes.find((s) => s.id === id) : undefined
+  const component = (id: string | undefined): ComponentSchema | undefined => {
+    return isDefined(id) ? subProject.components[id] : undefined
+  }
+
+  const parent = (componentId: string | undefined): ComponentSchema | undefined => {
+    return isDefined(componentId)
+      ? Object.values(subProject.components).find((component) => component.children.includes(componentId))
+      : undefined
+  }
+
+  const stitchLine = (id: string | undefined): StitchLineSchema | undefined => {
+    return isDefined(id) ? subProject.stitchLines.find((s) => s.id === id) : undefined
+  }
+
+  const hole = (id: string | undefined): HoleSchema | undefined => {
+    return isDefined(id) ? subProject.holes.find((s) => s.id === id) : undefined
+  }
+
   return {
     component,
+    parent,
     stitchLine,
     hole,
   }
@@ -41,6 +55,14 @@ const subProject = (subProject: SubProjectSchema) => {
       throw new Error(createMissingErrorMessage('component', 'sub-project', subProject.id))
     }
     return anyComponent
+  }
+
+  const parent = (componentId: string): ComponentSchema => {
+    const parentComponent = optional.parent(componentId)
+    if (!isDefined(parentComponent)) {
+      throw new Error(createMissingErrorMessage('parent', 'sub-project', subProject.id))
+    }
+    return parentComponent
   }
 
   const stitchLine = (id: string): StitchLineSchema => {
@@ -91,9 +113,16 @@ const subProject = (subProject: SubProjectSchema) => {
     return narrowers.assert.tPocketStitchLine(stitchLine(id))
   }
 
+  const tPocketStitchLines = (componentId: string): TPocketStitchLineSchema[] => {
+    return subProject.stitchLines.filter(
+      (line): line is TPocketStitchLineSchema => line.type === 't-pocket-stitch-line' && line.targetId === componentId,
+    )
+  }
+
   return {
     optional,
     component,
+    parent,
     stitchLine,
     hole,
     rootPanel,
@@ -104,6 +133,7 @@ const subProject = (subProject: SubProjectSchema) => {
     tPocket,
     componentBoundsStitchLine,
     tPocketStitchLine,
+    tPocketStitchLines,
   }
 }
 
@@ -126,6 +156,10 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
     }
 
     throw new Error(createMissingErrorMessage('stitch line', 'computed sub-project', computedSubProject.id))
+  }
+
+  const stitchLines = (componentId: string): ComputedStitchLineSchema[] => {
+    return computedSubProject.stitchLines[componentId] ?? []
   }
 
   const hole = (id: string) => {
@@ -159,6 +193,7 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
   return {
     component,
     stitchLine,
+    stitchLines,
     hole,
     rootPanel,
     panel,

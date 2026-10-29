@@ -23,6 +23,7 @@ import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops, getPathSegments } from './pathSegments'
 import { getPathSegmentMidpoint } from './pathSegmentUtils'
+import { calculateStitchLine } from './stitching/calculateStitchLine'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
 
@@ -1567,5 +1568,95 @@ describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (t
       topStretch: { min: { value: new BigNumber(-30) } },
       bottomStretch: { min: { value: new BigNumber(-30) } },
     })
+  })
+})
+
+describe('cluster T-pocket stitch routes', () => {
+  const fixture = () =>
+    d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 120, children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['a', 'b', 'front'], pocketStep: 15 }),
+        d.tPocket({ id: 'a' }),
+        d.tPocket({ id: 'b' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+      holes: [d.hole({ id: 'hole', componentId: 'front', width: 10, height: 10 })],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local', targetId: 'a', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'bounds', targetId: 'cluster', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'hole', targetType: 'hole' }),
+      ],
+    })
+
+  it('keeps one computed object per source and identifies every route by its actual target', () => {
+    const source = fixture()
+    const snapshot = structuredClone(source)
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const accessor = accessors.computedSubProject(computed)
+    const shared = accessor.stitchLine('shared')
+    expect(
+      Object.values(computed.stitchLines)
+        .flat()
+        .filter((line) => line.stitchLineId === 'shared'),
+    ).toEqual([shared])
+    expect(shared).toMatchObject({ targetId: 'cluster', componentId: 'cluster', onTop: 'cluster' })
+    expect(shared.routes.map(({ targetType, targetId }) => ({ targetType, targetId }))).toEqual([
+      { targetType: 'component', targetId: 'a' },
+      { targetType: 'component', targetId: 'b' },
+    ])
+    expect(accessor.stitchLine('local').routes).toHaveLength(1)
+    expect(accessor.stitchLine('local').routes[0]).toMatchObject({ targetType: 'component', targetId: 'a' })
+    for (const [id, targetType, targetId] of [
+      ['bounds', 'component', 'cluster'],
+      ['hole-line', 'hole', 'hole'],
+    ]) {
+      const routes = accessor.stitchLine(id).routes
+      expect(routes.length).toBeGreaterThan(0)
+      for (const route of routes) {
+        expect(route).toMatchObject({ targetType, targetId })
+      }
+    }
+    for (const { boundingRect } of shared.routes) {
+      expect(shared.boundingRect.x.lte(boundingRect.x)).toBe(true)
+      expect(shared.boundingRect.y.lte(boundingRect.y)).toBe(true)
+      expect(shared.boundingRect.x.plus(shared.boundingRect.width).gte(boundingRect.x.plus(boundingRect.width))).toBe(
+        true,
+      )
+      expect(shared.boundingRect.y.plus(shared.boundingRect.height).gte(boundingRect.y.plus(boundingRect.height))).toBe(
+        true,
+      )
+    }
+    expect(source).toEqual(snapshot)
+  })
+
+  it.each([['b', 'a', 'front'], ['b', 'front'], ['front']])(
+    'follows current children without duplicating the source: %j',
+    (...children) => {
+      const source = fixture()
+      const cluster = accessors.subProject(source).pocketCluster('cluster')
+      const changed = { ...source, components: { ...source.components, cluster: { ...cluster, children } } }
+      const computed = accessors
+        .computedSubProject(getComputedSubProject(changed, defaultStitchingSettings))
+        .stitchLine('shared')
+      expect(computed.routes.map((route) => route.targetId)).toEqual(children.filter((id) => id !== 'front'))
+      expect(changed.stitchLines).toBe(source.stitchLines)
+    },
+  )
+
+  it('does not assign a later route to the first pocket when its geometry is absent', () => {
+    const source = fixture()
+    const geometry = getComputedSubProject(source, defaultStitchingSettings)
+    const accessor = accessors.computedSubProject(geometry)
+    const cluster = accessor.pocketCluster('cluster')
+    const withoutFirstPath = { ...accessor.tPocket('a'), path: { commands: [] } }
+    const computed = calculateStitchLine({ ...defaultStitchingSettings, ...source.stitchLines[0] }, source, {
+      ...geometry.components,
+      cluster: { ...cluster, children: [withoutFirstPath, accessor.tPocket('b'), accessor.frontPocket('front')] },
+    })
+    expect(computed).toBeDefined()
+    expect(computed?.routes.map((route) => route.targetId)).toEqual(['b'])
   })
 })

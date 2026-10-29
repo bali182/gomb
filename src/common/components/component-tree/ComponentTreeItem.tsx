@@ -5,12 +5,7 @@ import { PiDotsSixVertical } from 'react-icons/pi'
 
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { useSubProject } from '../../hooks/useSubProject'
-import {
-  canAddHole,
-  canAddStitchLine,
-  canMoveComponent,
-  getComponentStitchLineType,
-} from '../../operations/subProject/utils/componentRules'
+import { canAddHole, canAddStitchLine, canMoveComponent } from '../../operations/subProject/utils/componentRules'
 import { isDefined } from '../../utils/isDefined'
 import { DropInsideIndicator, ReorderDropIndicator } from './ComponentTreeDropIndicators'
 import { TreeItemVisual } from './TreeItemVisual'
@@ -71,10 +66,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'hole':
         return canAddHole(component)
       case 'stitch-line':
-        return (
-          canAddStitchLine(component, subProject) &&
-          getComponentStitchLineType(component) === activeDragData.stitchLineType
-        )
+        return canAddStitchLine(component, subProject, activeDragData.stitchLineType)
     }
   }, [activeDragData, component, hasDragAndDrop, subProject])
 
@@ -88,10 +80,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       case 'hole':
         return false
       case 'stitch-line':
-        return (
-          !canAddStitchLine(component, subProject) ||
-          getComponentStitchLineType(component) !== activeDragData.stitchLineType
-        )
+        return !canAddStitchLine(component, subProject, activeDragData.stitchLineType)
     }
   }, [activeDragData, component, isActiveComponent, subProject])
 

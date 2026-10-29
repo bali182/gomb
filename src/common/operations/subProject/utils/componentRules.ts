@@ -31,18 +31,30 @@ export const canCloneComponent = (component: ComponentSchema): boolean =>
 
 export const canAddHole = (component: ComponentSchema): boolean => component.type !== 'pocket-cluster'
 
-export const canAddStitchLine = (component: ComponentSchema, subProject: SubProjectSchema): boolean => {
-  if (!isDefined(getComponentStitchLineType(component))) {
+const componentStitchLineTypes: Record<ComponentSchema['type'], readonly StitchLineSchema['type'][]> = {
+  'root-panel': ['component-bounds-stitch-line'],
+  panel: ['component-bounds-stitch-line'],
+  'front-pocket': ['component-bounds-stitch-line'],
+  't-pocket': ['t-pocket-stitch-line'],
+  'pocket-cluster': ['component-bounds-stitch-line', 't-pocket-stitch-line'],
+}
+
+export const getComponentStitchLineTypes = (component: ComponentSchema): readonly StitchLineSchema['type'][] => {
+  return componentStitchLineTypes[component.type]
+}
+
+export const canAddStitchLine = (
+  component: ComponentSchema,
+  subProject: SubProjectSchema,
+  type: StitchLineSchema['type'],
+): boolean => {
+  if (!getComponentStitchLineTypes(component).includes(type)) {
     return false
   }
   if (component.type === 'pocket-cluster') {
     return component.children.some((id) => subProject.components[id]?.type === 'front-pocket')
   }
   return true
-}
-
-export const getComponentStitchLineType = (component: ComponentSchema): StitchLineSchema['type'] | undefined => {
-  return component.type === 't-pocket' ? 't-pocket-stitch-line' : 'component-bounds-stitch-line'
 }
 
 export const canMoveComponent = (subProject: SubProjectSchema, params: MoveComponentParams): boolean => {

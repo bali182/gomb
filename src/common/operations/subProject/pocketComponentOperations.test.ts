@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { defaultOpticalIllusionPocketOpening } from '../../defaultStates'
+import { getPatchedSubProject } from '../../component-patches/getPatchedSubProject'
+import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../../defaultStates'
+import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
@@ -32,13 +34,13 @@ describe('pocket component operations', () => {
     const source = fixture()
     const empty = d.pocketCluster({ id: 'empty' })
     const withoutFront = d.pocketCluster({ id: 'without-front', children: ['a'] })
-    expect(canAddStitchLine(empty, source)).toBe(false)
-    expect(canAddStitchLine(withoutFront, source)).toBe(false)
-    expect(canAddStitchLine(source.components.first, source)).toBe(true)
-    expect(canAddStitchLine(source.components['front-a'], source)).toBe(true)
-    expect(canAddStitchLine(source.components.a, source)).toBe(true)
-    expect(canAddStitchLine(source.components.root, source)).toBe(true)
-    expect(canAddStitchLine(source.components.child, source)).toBe(true)
+    expect(canAddStitchLine(empty, source, 'component-bounds-stitch-line')).toBe(false)
+    expect(canAddStitchLine(withoutFront, source, 'component-bounds-stitch-line')).toBe(false)
+    expect(canAddStitchLine(source.components.first, source, 'component-bounds-stitch-line')).toBe(true)
+    expect(canAddStitchLine(source.components['front-a'], source, 'component-bounds-stitch-line')).toBe(true)
+    expect(canAddStitchLine(source.components.a, source, 't-pocket-stitch-line')).toBe(true)
+    expect(canAddStitchLine(source.components.root, source, 'component-bounds-stitch-line')).toBe(true)
+    expect(canAddStitchLine(source.components.child, source, 'component-bounds-stitch-line')).toBe(true)
   })
 
   it('rejects moving stitching to a cluster without a front and permits a compatible populated cluster', () => {
@@ -289,4 +291,44 @@ it('clones every optical illusion setting', () => {
   const copiedPocket = cloned.components[copiedCluster.children[0]]
   if (copiedPocket.type !== 't-pocket') throw new Error('Missing copied pocket')
   expect(copiedPocket.opening).toEqual(opening)
+})
+
+describe('cluster T-pocket stitching ownership', () => {
+  it('permits both cluster stitch types and moves pocket stitching between compatible owners', () => {
+    const source = {
+      ...fixture(),
+      stitchLines: [d.tPocketStitchLine({ id: 'line', targetId: 'a', targetType: 'component' })],
+    }
+    expect(canAddStitchLine(source.components.first, source, 't-pocket-stitch-line')).toBe(true)
+    expect(canAddStitchLine(source.components.first, source, 'component-bounds-stitch-line')).toBe(true)
+    const snapshot = structuredClone(source)
+    const moved = moveStitchLine(source, { stitchLineId: 'line', targetId: 'first', targetType: 'component' })
+    expect(moved.stitchLines[0].targetId).toBe('first')
+    const returned = moveStitchLine(moved, { stitchLineId: 'line', targetId: 'b', targetType: 'component' })
+    expect(returned.stitchLines[0].targetId).toBe('b')
+    for (const targetId of ['front-a', 'root', 'child']) {
+      expect(moveStitchLine(moved, { stitchLineId: 'line', targetId, targetType: 'component' })).toBe(moved)
+    }
+    expect(source).toEqual(snapshot)
+  })
+
+  it('keeps the source after the last T-pocket is deleted and removes it with its cluster', () => {
+    const source = {
+      ...fixture(),
+      stitchLines: [d.tPocketStitchLine({ id: 'line', targetId: 'first', targetType: 'component' })],
+    }
+    const snapshot = structuredClone(source)
+    const deletedPocket = deleteComponent(source, { componentId: 'a' })
+    const pocketComputed = getComputedSubProject(deletedPocket, defaultStitchingSettings)
+    const patchedPocket = getPatchedSubProject(deletedPocket, pocketComputed)
+    expect(patchedPocket.stitchLines).toEqual(source.stitchLines)
+    expect(pocketComputed.stitchLines.first[0].routes).toEqual([])
+    const deletedCluster = deleteComponent(source, { componentId: 'first' })
+    const patchedCluster = getPatchedSubProject(
+      deletedCluster,
+      getComputedSubProject(deletedCluster, defaultStitchingSettings),
+    )
+    expect(patchedCluster.stitchLines).toEqual([])
+    expect(source).toEqual(snapshot)
+  })
 })

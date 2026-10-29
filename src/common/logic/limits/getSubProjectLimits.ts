@@ -120,7 +120,7 @@ const getStitchLineLimits = (
     }
     case 't-pocket-stitch-line': {
       const cluster = computedSubProject.components[stitchLine.targetId]
-      if (!isDefined(cluster) || cluster.type !== 'computed-t-pocket') {
+      if (!isDefined(cluster) || (cluster.type !== 'computed-t-pocket' && cluster.type !== 'computed-pocket-cluster')) {
         return undefined
       }
       return getTPocketStitchLineLimits(stitchLine, computed, cluster)

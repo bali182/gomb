@@ -19,6 +19,7 @@ import type { HoleSchema } from '../../schemas/hole'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
+import { isDefined } from '../../utils/isDefined'
 import { flip } from './flip'
 
 const axes: FlipAxisSchema[] = ['horizontal', 'vertical']
@@ -489,6 +490,76 @@ describe.each(axes)('flip: %s', (axis) => {
 describe.each(orientationCases)(
   'flip: $orientation opening, $axis flip',
   ({ orientation, axis, expectedOrientation, swapsEnds }) => {
+    it('flips cluster stitching once with its owner and keeps it unchanged when only a pocket is flipped', () => {
+      const fixture = createClusterSubProject(orientation)
+      const shared = {
+        ...accessors.subProject(fixture).tPocketStitchLine('t-stitch'),
+        id: 'shared',
+        targetId: 'cluster',
+      }
+      const unrelated = { ...shared, id: 'unrelated', targetId: 'outside' }
+      const original = {
+        ...fixture,
+        components: {
+          ...fixture.components,
+          cluster: { ...accessors.subProject(fixture).pocketCluster('cluster'), children: ['t', 'second', 'front'] },
+          second: { ...accessors.subProject(fixture).tPocket('t'), id: 'second' },
+        },
+        stitchLines: [...fixture.stitchLines, shared, unrelated],
+      }
+      const snapshot = structuredClone(original)
+      const source = accessors.subProject(original)
+      const clusterResult = flip(original, source.pocketCluster('cluster'), axis)
+      const accessor = accessors.subProject(clusterResult)
+      expect(accessor.tPocketStitchLine('shared')).toMatchObject({
+        targetId: 'cluster',
+        startOffset: swapsEnds ? 7 : 2,
+        endOffset: swapsEnds ? 2 : 7,
+        stitchDirection: swapsEnds ? 'end-to-start' : 'start-to-end',
+      })
+      expect(accessor.tPocketStitchLine('shared')).toEqual({
+        ...accessor.tPocketStitchLine('t-stitch'),
+        id: 'shared',
+        targetId: 'cluster',
+      })
+      expect(accessor.tPocketStitchLine('unrelated')).toBe(unrelated)
+      const pocketResult = accessors.subProject(flip(original, source.tPocket('t'), axis))
+      expect(pocketResult.tPocketStitchLine('shared')).toBe(shared)
+      const beforeGeometry = accessors.computedSubProject(getComputedSubProject(original, defaultStitchingSettings))
+      const afterGeometry = accessors.computedSubProject(getComputedSubProject(clusterResult, defaultStitchingSettings))
+      const before = beforeGeometry.stitchLine('shared')
+      const after = afterGeometry.stitchLine('shared')
+      expect(before.routes).toHaveLength(2)
+      expect(after.routes).toHaveLength(2)
+      const beforeRect = beforeGeometry.pocketCluster('cluster').boundingRect
+      const afterRect = afterGeometry.pocketCluster('cluster').boundingRect
+      for (const route of before.routes) {
+        const mirrored = after.routes.find(
+          (candidate) => candidate.targetType === route.targetType && candidate.targetId === route.targetId,
+        )
+        expect(mirrored).toBeDefined()
+        if (!isDefined(mirrored)) {
+          throw new Error('Expected the same pocket route after flipping')
+        }
+        const vertices = getVertices(mirrored.path)
+        for (const [x, y] of getVertices(route.path)) {
+          const relativeX = x - beforeRect.x.toNumber()
+          const relativeY = y - beforeRect.y.toNumber()
+          const expectedX =
+            afterRect.x.toNumber() + (axis === 'horizontal' ? beforeRect.width.toNumber() - relativeX : relativeX)
+          const expectedY =
+            afterRect.y.toNumber() + (axis === 'vertical' ? beforeRect.height.toNumber() - relativeY : relativeY)
+          expect(
+            vertices.some(
+              ([actualX, actualY]) => Math.abs(actualX - expectedX) < 1e-7 && Math.abs(actualY - expectedY) < 1e-7,
+            ),
+          ).toBe(true)
+        }
+      }
+      expect(flip(clusterResult, accessor.pocketCluster('cluster'), axis)).toEqual(original)
+      expect(original).toEqual(snapshot)
+    })
+
     it('mirrors the cluster orientation, stretch, contents and both contained openings without reversing pocket order', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)

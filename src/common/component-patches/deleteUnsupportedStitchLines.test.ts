@@ -21,6 +21,7 @@ describe('deleteUnsupportedStitchLines', () => {
       holes: [d.hole({ id: 'hole', componentId: 'panel' })],
       stitchLines: [
         d.componentBoundsStitchLine({ id: 'cluster-line', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'panel-line', targetId: 'panel', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'root-line', targetId: 'root', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'hole', targetType: 'hole' }),
@@ -32,7 +33,7 @@ describe('deleteUnsupportedStitchLines', () => {
     const computed = getComputedSubProject(source, defaultStitchingSettings)
     const result = deleteUnsupportedStitchLines(source, computed)
     expect(result.stitchLines.map((line) => line.id)).toEqual([
-      ...(keepsClusterLine ? ['cluster-line'] : []),
+      ...(keepsClusterLine ? ['cluster-line', 'shared'] : []),
       'panel-line',
       'root-line',
       'hole-line',
@@ -59,6 +60,7 @@ describe('deleteUnsupportedStitchLines', () => {
       ],
       stitchLines: [
         d.componentBoundsStitchLine({ id: 'cluster-line', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'front-line', targetId: 'front', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'wrong-t-line', targetId: 't', targetType: 'component' }),
         d.tPocketStitchLine({ id: 't-line', targetId: 't', targetType: 'component' }),
@@ -67,7 +69,7 @@ describe('deleteUnsupportedStitchLines', () => {
     const before = structuredClone(source)
     const computed = getComputedSubProject(source, defaultStitchingSettings)
     const result = deleteUnsupportedStitchLines(source, computed)
-    expect(result.stitchLines.map((line) => line.id)).toEqual(['cluster-line', 'front-line', 't-line'])
+    expect(result.stitchLines.map((line) => line.id)).toEqual(['cluster-line', 'shared', 'front-line', 't-line'])
     expect(result.components).toBe(source.components)
     expect(deleteUnsupportedStitchLines(result, computed)).toBe(result)
     expect(source).toEqual(before)

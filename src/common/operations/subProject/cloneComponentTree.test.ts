@@ -100,4 +100,39 @@ describe('cloneComponentTree', () => {
       { targetId: 'hole-clone-1', targetType: 'hole' },
     ])
   })
+  it('clones each cluster and pocket stitch once and remaps their separate owners', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
+        d.tPocket({ id: 't' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
+      ],
+    })
+    const snapshot = structuredClone(source)
+    let componentCount = 0
+    let lineCount = 0
+    const result = cloneComponentTree({
+      subProject: source,
+      componentId: 'cluster',
+      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+      ids: {
+        component: () => `component-${++componentCount}`,
+        hole: () => 'hole',
+        stitchLine: () => `line-${++lineCount}`,
+      },
+      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+    })
+    expect(result?.clonedStitchLines).toHaveLength(2)
+    expect(result?.clonedStitchLines).toMatchObject([
+      { id: 'line-1', targetId: 'component-1', targetType: 'component' },
+      { id: 'line-2', targetId: 'component-2', targetType: 'component' },
+    ])
+    expect(source).toEqual(snapshot)
+  })
 })

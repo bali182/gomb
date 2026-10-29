@@ -1,6 +1,10 @@
 import { getComponentDescendants } from '../../operations/subProject/utils/getComponentDescendants'
 import { getComponentParent } from '../../operations/subProject/utils/getComponentParent'
-import type { ComputedComponentSchema, ComputedStitchLineSchema } from '../../schemas/computed'
+import type {
+  ComputedComponentSchema,
+  ComputedStitchLineSchema,
+  ComputedStitchRouteSchema,
+} from '../../schemas/computed'
 import type { ExportStitchLineSchema } from '../../schemas/export'
 import type { PathSchema } from '../../schemas/geometry'
 import type { ExportStitchLineModeSchema } from '../../schemas/settings'
@@ -9,6 +13,7 @@ import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/s
 import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { clipPathToClosedPath } from '../clipPathToClosedPath'
 import { isPointInClosedPath } from '../isPointInClosedPath'
 
@@ -27,7 +32,8 @@ export const getExportStitchLines = (
     if (!isDefined(stitchLine)) {
       return []
     }
-    const exportStitchLine = getExportStitchLine(stitchLine, computedStitchLine, stitchingSettings, target.path)
+    const routes = getExportStitchRoutes(computedStitchLine, target, stitchLineMode)
+    const exportStitchLine = getExportStitchLine(stitchLine, routes, stitchingSettings, target.path)
     return isDefined(exportStitchLine) ? [exportStitchLine] : []
   })
 }
@@ -60,9 +66,7 @@ const getOwnStitchLines = (
   }
 
   // The cluster owns no material. Its shared stitching is exported on the physical pockets.
-  const clusterStitchLines = (computedSubProject.stitchLines[parent.id] ?? []).filter(
-    (stitchLine) => stitchLine.type === 'component-bounds-stitch-line',
-  )
+  const clusterStitchLines = computedSubProject.stitchLines[parent.id] ?? []
   return [...ownStitchLines, ...clusterStitchLines]
 }
 
@@ -71,7 +75,7 @@ const getRelatedStitchLines = (
   computedSubProject: ComputedSubProjectSchema,
   target: ComputedComponentSchema,
 ): ComputedStitchLineSchema[] => {
-  const source = subProject.components[target.componentId]
+  const source = accessors.subProject(subProject).optional.component(target.componentId)
   if (!isDefined(source)) {
     return []
   }
@@ -87,18 +91,7 @@ const getRelatedStitchLines = (
 
   return Object.values(computedSubProject.stitchLines)
     .flat()
-    .filter((stitchLine) => {
-      if (!componentIds.has(stitchLine.componentId)) {
-        return false
-      }
-      if (target.type === 'computed-front-pocket' || target.type === 'computed-t-pocket') {
-        // A T-pocket's bottom stitching belongs only to that physical pocket.
-        if (stitchLine.type === 't-pocket-stitch-line' && stitchLine.componentId !== target.componentId) {
-          return false
-        }
-      }
-      return true
-    })
+    .filter((stitchLine) => componentIds.has(stitchLine.componentId))
 }
 
 const getFollowingSiblingSubtreeIds = (componentId: string, subProject: SubProjectSchema): string[] => {
@@ -113,16 +106,29 @@ const getFollowingSiblingSubtreeIds = (componentId: string, subProject: SubProje
   return componentIds
 }
 
+const getExportStitchRoutes = (
+  stitchLine: ComputedStitchLineSchema,
+  target: ComputedComponentSchema,
+  mode: ExportStitchLineModeSchema,
+): readonly ComputedStitchRouteSchema[] => {
+  if (
+    mode === 'all-stitch-lines' ||
+    stitchLine.type !== 't-pocket-stitch-line' ||
+    (narrowers.is.computedTPocket(target) && narrowers.is.computedFrontPocket(target))
+  ) {
+    return stitchLine.routes
+  }
+  return stitchLine.routes.filter((route) => route.targetType === 'component' && route.targetId === target.componentId)
+}
+
 const getExportStitchLine = (
   stitchLine: StitchLineSchema,
-  computedStitchLine: ComputedStitchLineSchema,
+  routes: readonly ComputedStitchRouteSchema[],
   stitchingSettings: StitchLineCommonConfigSchema,
   clippingPath: PathSchema,
 ): ExportStitchLineSchema | undefined => {
-  const paths = computedStitchLine.routes.flatMap((route) => clipPathToClosedPath(route.path, clippingPath))
-  const holes = computedStitchLine.routes.flatMap((route) =>
-    route.holes.filter((hole) => isPointInClosedPath(hole.center, clippingPath)),
-  )
+  const paths = routes.flatMap((route) => clipPathToClosedPath(route.path, clippingPath))
+  const holes = routes.flatMap((route) => route.holes.filter((hole) => isPointInClosedPath(hole.center, clippingPath)))
   if (paths.length === 0 && holes.length === 0) {
     return undefined
   }
