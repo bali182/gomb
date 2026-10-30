@@ -5,9 +5,11 @@ import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
+import { useSubProject } from '../../hooks/useSubProject'
 import type { PanelSchema } from '../../schemas/components'
 import type { ComputedPanelSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import { accessors } from '../../utils/accessors'
 import { HoleHighlights } from './HoleHighlights'
 import { PocketCluster } from './PocketCluster'
 import { SizeLabel } from './SizeLabel'
@@ -23,6 +25,8 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
   const { settings } = useGlobalSettings()
   const panel = useComponent<PanelSchema>(componentId)
   const computedPanel = useComputedComponent<ComputedPanelSchema>(componentId)
+  const { computedSubProject } = useSubProject()
+  const accessor = accessors.computedSubProject(computedSubProject)
   const pathData = usePath(computedPanel.path)
   const isActive = selection.isSelected(panel) || selection.isHovered(panel)
   const styleParams: DrawAreaComponentStyleParams = {
@@ -65,7 +69,7 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
       <StitchLines componentId={panel.id} />
 
       <HoleHighlights componentId={panel.id} />
-      {computedPanel.children.map((component) => {
+      {accessor.component.children(componentId).map((component) => {
         switch (component.type) {
           case 'computed-panel':
             return (

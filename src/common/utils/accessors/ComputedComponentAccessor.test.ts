@@ -4,6 +4,40 @@ import { d } from '../../testData'
 import { accessors } from './index'
 
 describe('ComputedComponentAccessor', () => {
+  it('resolves children in source order and handles missing references according to strictness', () => {
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['second', 'first'] }),
+      components: [d.panel({ id: 'first' }), d.panel({ id: 'second' })],
+    })
+    const project = d.project({ id: 'project', subProjects: [subProject] })
+    const computed = getComputedSubProject(subProject, project.stitchingSettings)
+    const snapshot = structuredClone(computed)
+    const accessor = accessors.computedSubProject(computed)
+    const children = accessor.component.children
+    const optionalChildren = accessor.optional.component.children
+    const first = accessor.component.panel('first')
+    const second = accessor.component.panel('second')
+
+    expect(children('root')).toEqual([second, first])
+    expect(children('root')[0]).toBe(second)
+    expect(children('first')).toEqual([])
+    expect(optionalChildren('root')).toEqual([second, first])
+    expect(optionalChildren('missing')).toEqual([])
+    expect(() => children('missing')).toThrow('Missing component')
+
+    const incomplete = accessors.computedSubProject({
+      ...computed,
+      components: {
+        ...computed.components,
+        root: { ...accessor.component.rootPanel(), children: ['second', 'missing', 'first'] },
+      },
+    })
+    expect(incomplete.optional.component.children('root')).toEqual([second, first])
+    expect(() => incomplete.component.children('root')).toThrow('Missing component')
+    expect(computed).toEqual(snapshot)
+  })
+
   it('indexes parents and supports every typed component lookup', () => {
     const subProject = d.subProject({
       id: 'sub',
@@ -19,6 +53,11 @@ describe('ComputedComponentAccessor', () => {
     const computed = getComputedSubProject(subProject, project.stitchingSettings)
     const snapshot = structuredClone(computed)
     const accessor = accessors.computedSubProject(computed)
+    expect(accessor.component.rootPanel().children).toEqual(['panel'])
+    expect(accessor.component.panel('panel').children).toEqual(['cluster'])
+    expect(accessor.component.pocketCluster('cluster').children).toEqual(['t', 'front'])
+    expect(accessor.component.tPocket('t').children).toEqual([])
+    expect(accessor.component.frontPocket('front').children).toEqual([])
     expect(accessor.component.rootPanel()).toBe(computed.components.root)
     expect(accessor.component.rootPanel('root')).toBe(computed.components.root)
     for (const [id, getter, optionalGetter, wrongId] of [

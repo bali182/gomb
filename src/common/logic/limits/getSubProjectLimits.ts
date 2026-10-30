@@ -42,8 +42,8 @@ const collectComponentLimits = (
   const limits: Record<string, ComponentLimitsSchema> = {}
   const parents: Record<string, ComputedComponentSchema> = {}
   for (const parent of Object.values(computedSubProject.components)) {
-    for (const child of parent.children) {
-      parents[child.componentId] = parent
+    for (const childId of parent.children) {
+      parents[childId] = parent
     }
   }
   for (const computed of Object.values(computedSubProject.components)) {

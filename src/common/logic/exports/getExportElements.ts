@@ -43,8 +43,8 @@ export const getExportElementsForComponent = (
   if (!isDefined(component) || !isDefined(computed)) {
     return []
   }
-  const children = computed.children.flatMap((child) =>
-    getExportElementsForComponent(subProject, computedSubProject, child.componentId, settings, stitchingSettings),
+  const children = computed.children.flatMap((childId) =>
+    getExportElementsForComponent(subProject, computedSubProject, childId, settings, stitchingSettings),
   )
   if (narrowers.is.pocketCluster(component)) {
     return children
@@ -109,7 +109,7 @@ const getExportElement = (
     cutHelperBoundingRect: rect,
     stitchLines,
     path: computed.path,
-    childMarkerPaths: settings.childMarkers ? getExportChildMarkerPaths(computed.children, computed.boundingRect) : [],
+    childMarkerPaths: settings.childMarkers ? getExportChildMarkerPaths(computed, computedSubProject) : [],
   }
   return element
 }

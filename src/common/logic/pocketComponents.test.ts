@@ -48,10 +48,12 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const { cluster, subProject } = fixture()
       const before = structuredClone(subProject)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-      const result = accessors.computedSubProject(computed).component.pocketCluster(cluster.id)
-      expect(result.children.map((pocket) => pocket.componentId)).toEqual(['t1', 't2', 'front'])
-      result.children.forEach((pocket, index) => {
-        expect(computed.components[pocket.componentId]).toBe(pocket)
+      const accessor = accessors.computedSubProject(computed)
+      const result = accessor.component.pocketCluster(cluster.id)
+      expect(result.children).toEqual(['t1', 't2', 'front'])
+      result.children.forEach((pocketId, index) => {
+        const pocket = accessor.component.pocket(pocketId)
+        expect(pocket.componentId).toBe(pocketId)
         expect((vertical ? pocket.boundingRect.height : pocket.boundingRect.width).toNumber()).toBe(90)
         expect((vertical ? pocket.boundingRect.y : pocket.boundingRect.x).toNumber()).toBe(
           (orientation === 'up' || orientation === 'left' ? index : 2 - index) * 20,
@@ -132,8 +134,10 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         type: 'front-pocket',
         opening: { type: 'slanted', offset: { max: { value: new BigNumber(90) } } },
       })
-      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
-      for (const pocket of cluster.children) {
+      const accessor = accessors.computedSubProject(computed)
+      const cluster = accessor.component.pocketCluster('cluster')
+      for (const pocketId of cluster.children) {
+        const pocket = accessor.component.pocket(pocketId)
         for (const segment of getPathSegments(pocket.path)) {
           expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
         }
@@ -196,7 +200,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const computed = getComputedSubProject(changed, defaultStitchingSettings)
       const parent = accessors.computedSubProject(computed).component.frontPocket('front')
       expect(computed.components.child.boundingRect).toEqual(parent.boundingRect)
-      expect(parent.children.map((child) => child.componentId)).toEqual(['child'])
+      expect(parent.children).toEqual(['child'])
     })
   },
 )

@@ -25,13 +25,7 @@ const findComponentNestingLevel = (
   }
 
   const accessor = accessors.subProject(subProject)
-  for (const childId of component.children) {
-    const child = accessor.optional.component.byId(childId)
-
-    if (!isDefined(child)) {
-      continue
-    }
-
+  for (const child of accessor.optional.component.children(component.id)) {
     const childNestingLevel = findComponentNestingLevel(
       componentId,
       child,

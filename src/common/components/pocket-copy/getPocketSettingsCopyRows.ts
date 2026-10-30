@@ -9,8 +9,9 @@ export const getPocketSettingsCopyRows = (
   sourcePocketId: string,
   targets: Partial<PocketSettingsCopyTargetsSchema>,
 ): PocketSettingsCopyRowSchema[] => {
-  const source = accessors.subProject(subProject).component.pocket(sourcePocketId)
-  const cluster = accessors.subProject(subProject).optional.component.parent(sourcePocketId)
+  const accessor = accessors.subProject(subProject)
+  const source = accessor.component.pocket(sourcePocketId)
+  const cluster = accessor.optional.component.parent(sourcePocketId)
   if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
     return []
   }
@@ -18,8 +19,9 @@ export const getPocketSettingsCopyRows = (
   const stitchedPocketIds = new Set(
     subProject.stitchLines.filter(narrowers.is.tPocketStitchLine).map((stitchLine) => stitchLine.targetId),
   )
-  return cluster.children.map((pocketId): PocketSettingsCopyRowSchema => {
-    const pocket = accessors.subProject(subProject).component.pocket(pocketId)
+  return accessor.component.children(cluster.id).map((child): PocketSettingsCopyRowSchema => {
+    const pocket = narrowers.assert.pocket(child)
+    const pocketId = pocket.id
     const isSource = pocketId === sourcePocketId
     const selection = targets[pocketId]
     const canCopyShape = narrowers.is.tPocket(source) && narrowers.is.tPocket(pocket)

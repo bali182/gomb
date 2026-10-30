@@ -41,7 +41,7 @@ export const calculateStitchLine = (
     case 'component-bounds-stitch-line':
       return calculateStandardStitchLine(stitchLine, computed, computedComponents)
     case 't-pocket-stitch-line':
-      return calculateComputedTPocketStitchLine(stitchLine, component, computed, subProject)
+      return calculateComputedTPocketStitchLine(stitchLine, component, computed, subProject, computedComponents)
   }
 }
 
@@ -62,6 +62,7 @@ const calculateComputedTPocketStitchLine = (
   component: ComponentSchema,
   computed: ComputedComponentSchema,
   subProject: SubProjectSchema,
+  computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedStitchLineSchema | undefined => {
   const cluster = narrowers.is.pocketCluster(component)
     ? component
@@ -73,7 +74,7 @@ const calculateComputedTPocketStitchLine = (
     return undefined
   }
   const pockets = narrowers.is.computedPocketCluster(computed)
-    ? computed.children.filter(narrowers.is.computedTPocket)
+    ? computed.children.map((pocketId) => computedComponents[pocketId]).filter(narrowers.is.computedTPocket)
     : [computed]
   const routes = pockets.flatMap((pocket) => {
     const route = calculatePocketStitchRoute(stitchLine, cluster, pocket)

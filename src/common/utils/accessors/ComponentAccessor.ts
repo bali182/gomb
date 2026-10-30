@@ -17,6 +17,7 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
   ) {
     super(owner)
     this.byId = this.byId.bind(this)
+    this.children = this.children.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -28,6 +29,10 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
 
   byId(id: string): ComponentSchema {
     return this.requireResult(this.optional.byId(id), 'component')
+  }
+
+  children(id: string): ComponentSchema[] {
+    return this.byId(id).children.map(this.byId)
   }
 
   pocket(id: string): PocketSchema {

@@ -1,6 +1,7 @@
 import type BigNumber from 'bignumber.js'
 
 import { HasComponentReferenceSchema, HasTargetSchema, HasTypeSchema } from './common'
+import type { HasChildrenSchema } from './components'
 import { CornerRadiusSchema, LineSchema, PathSchema, PointSchema, RectSchema } from './geometry'
 import { PocketItemSchema } from './pocketItem'
 import { StitchCornerSchema, StitchLineSchema, StitchSideSchema } from './stitching'
@@ -31,14 +32,6 @@ export type HasComputedCornerRadiusSchema = {
   cornerRadius: CornerRadiusSchema
 }
 
-export type HasComputedChildrenSchema = {
-  children: ComputedComponentSchema[]
-}
-
-export type HasComputedPocketsSchema = {
-  children: ComputedPocketSchema[]
-}
-
 export type HasComputedLayoutGapSchema = {
   computedLayoutGap: BigNumber
 }
@@ -53,26 +46,26 @@ export type ComputedRootPanelSchema = HasTypeSchema<'computed-root-panel'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
-  HasComputedChildrenSchema
+  HasChildrenSchema
 
 export type ComputedPanelSchema = HasTypeSchema<'computed-panel'> &
   BaseComputedSchema &
   HasLayoutBoundingRectSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
-  HasComputedChildrenSchema
+  HasChildrenSchema
 
 export type ComputedFrontPocketSchema = HasTypeSchema<'computed-front-pocket'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
-  HasComputedChildrenSchema &
+  HasChildrenSchema &
   HasComputedLayoutGapSchema &
   HasComputedPocketItemSchema
 
 export type ComputedTPocketSchema = HasTypeSchema<'computed-t-pocket'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
-  HasComputedChildrenSchema &
+  HasChildrenSchema &
   HasComputedPocketItemSchema
 
 export type ComputedPocketSchema = ComputedFrontPocketSchema | ComputedTPocketSchema
@@ -88,7 +81,7 @@ export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster
   BaseComputedSchema &
   HasLayoutBoundingRectSchema &
   HasComputedCornerRadiusSchema &
-  HasComputedPocketsSchema
+  HasChildrenSchema
 
 export type ComputedComponentSchema =
   | ComputedRootPanelSchema

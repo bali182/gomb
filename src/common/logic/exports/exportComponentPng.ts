@@ -41,7 +41,7 @@ export const exportComponentPng = async (params: ExportComponentPngParams): Prom
   const computedRoot = computedAccessor.component.rootPanel()
   const computedComponent = computedAccessor.component.byId(componentId)
 
-  const nestingLevel = findNestingLevel(computedRoot, componentId)
+  const nestingLevel = findNestingLevel(computedRoot, componentId, computedSubProject)
   if (!isDefined(nestingLevel)) {
     throw new Error(`Component not found in tree: ${componentId}`)
   }
@@ -64,15 +64,18 @@ export const exportComponentPng = async (params: ExportComponentPngParams): Prom
 const findNestingLevel = (
   component: ComputedComponentSchema,
   componentId: string,
+  computedSubProject: ComputedSubProjectSchema,
   level: number = 0,
 ): number | undefined => {
   if (component.componentId === componentId) {
     return level
   }
-  for (const child of component.children) {
+  const accessor = accessors.computedSubProject(computedSubProject)
+  for (const child of accessor.component.children(component.componentId)) {
     const childLevel = findNestingLevel(
       child,
       componentId,
+      computedSubProject,
       narrowers.is.computedPocketCluster(component) ? level : level + 1,
     )
     if (isDefined(childLevel)) {
@@ -92,6 +95,7 @@ const padBoundingRect = (rect: RectSchema, padding: number): RectSchema => ({
 const getComponentBoundingRects = (
   component: ComputedComponentSchema,
   nestingLevel: number,
+  computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
 ): RectSchema[] => {
   const { subProject, context } = params
@@ -101,9 +105,14 @@ const getComponentBoundingRects = (
   const boundingRects = [padBoundingRect(component.boundingRect, borderPadding)]
 
   if (narrowers.is.computedPocketCluster(component) && narrowers.is.pocketCluster(model)) {
-    for (const pocket of component.children) {
+    const computedAccessor = accessors.computedSubProject(computedSubProject)
+    for (const pocket of computedAccessor.component.children(component.componentId)) {
       boundingRects.push(padBoundingRect(pocket.boundingRect, borderPadding))
-      if (context.isShowingPocketItems && isDefined(pocket.item)) {
+      if (
+        context.isShowingPocketItems &&
+        (narrowers.is.computedFrontPocket(pocket) || narrowers.is.computedTPocket(pocket)) &&
+        isDefined(pocket.item)
+      ) {
         const owner = accessors.subProject(subProject).component.pocket(pocket.componentId)
         boundingRects.push(
           padBoundingRect(pocket.item.boundingRect, (context.pocketItemStyles.getStrokeThickness({ owner }) ?? 0) / 2),
@@ -171,19 +180,22 @@ const collectBoundingRects = (
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
 ): RectSchema[] => [
-  ...getComponentBoundingRects(component, nestingLevel, params),
+  ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
   ...getStitchLineBoundingRects(
     accessors.computedSubProject(computedSubProject).stitchLine.byOnTop(component.componentId),
     params,
   ),
-  ...component.children.flatMap((child) =>
-    collectBoundingRects(
-      child,
-      narrowers.is.computedPocketCluster(component) ? nestingLevel : nestingLevel + 1,
-      computedSubProject,
-      params,
+  ...accessors
+    .computedSubProject(computedSubProject)
+    .component.children(component.componentId)
+    .flatMap((child) =>
+      collectBoundingRects(
+        child,
+        narrowers.is.computedPocketCluster(component) ? nestingLevel : nestingLevel + 1,
+        computedSubProject,
+        params,
+      ),
     ),
-  ),
 ]
 
 const getBoundingRectUnion = (rects: readonly RectSchema[]): RectSchema => {

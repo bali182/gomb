@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js'
 import { ZERO_CORNER_RADIUS } from '../constants/layout'
 import { accessors } from '../utils/accessors'
 
-import { getComponentChildren } from '../operations/subProject/utils/getComponentChildren'
 import type {
   ComponentSchema,
   FrontPocketSchema,
@@ -134,7 +133,7 @@ const computeRootPanel = (
     getCornerRadiusLimits({ boundingRect, cornerRadius: requestedRadius }),
   )
   const path = calculateRectPath(boundingRect, cornerRadius)
-  const layoutChildren = assertLayoutChildren(getComponentChildren(rootPanel, subProject))
+  const layoutChildren = assertLayoutChildren(accessors.subProject(subProject).component.children(rootPanel.id))
   const computedLayoutGap = calculateGap(layoutChildren, boundingRect, rootPanel)
   const children = computeLayoutChildren(
     rootPanel,
@@ -183,7 +182,7 @@ const computePanel = (
     }),
   )
   const path = calculateRectPath(boundingRect, cornerRadius)
-  const layoutChildren = assertLayoutChildren(getComponentChildren(panel, subProject))
+  const layoutChildren = assertLayoutChildren(accessors.subProject(subProject).component.children(panel.id))
   const computedLayoutGap = calculateGap(layoutChildren, boundingRect, panel)
   const children = computeLayoutChildren(
     panel,
@@ -232,7 +231,7 @@ const computePocketCluster = (
       parentCornerRadius,
     }),
   )
-  const pockets = getComponentChildren(pocketCluster, subProject).filter(narrowers.is.pocket)
+  const pockets = accessors.subProject(subProject).component.children(pocketCluster.id).filter(narrowers.is.pocket)
   const normalizedPocketCluster = normalizePocketCluster(
     { ...pocketCluster, children: pockets.map((pocket) => pocket.id) },
     boundingRect,
@@ -247,7 +246,7 @@ const computePocketCluster = (
     // Filled by updatePocketClusterPaths after hole subtraction.
     path: { commands: [] },
     cornerRadius,
-    children: geometry.children,
+    children: geometry.children.map((pocket) => pocket.componentId),
   }
 
   computedComponents[pocketCluster.id] = computed
@@ -265,7 +264,7 @@ const computeLayoutChildren = (
   subProject: SubProjectSchema,
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedComponentSchema[] => {
+): string[] => {
   const boundingBoxes = calculateLayoutBoundingBoxes({
     component,
     children,
@@ -273,17 +272,18 @@ const computeLayoutChildren = (
     boundingRect: layoutBoundingRect,
   })
 
-  return children.map((child) =>
-    computeComponent(
-      child,
-      boundingBoxes[child.id].boundingRect,
-      boundingBoxes[child.id].layoutBoundingRect,
-      parentBoundingRect,
-      parentCornerRadius,
-      subProject,
-      resolvedStitchLines,
-      computedComponents,
-    ),
+  return children.map(
+    (child) =>
+      computeComponent(
+        child,
+        boundingBoxes[child.id].boundingRect,
+        boundingBoxes[child.id].layoutBoundingRect,
+        parentBoundingRect,
+        parentCornerRadius,
+        subProject,
+        resolvedStitchLines,
+        computedComponents,
+      ).componentId,
   )
 }
 
@@ -334,7 +334,7 @@ const getSubProjectViewBox = (
 
 /**
  * Pocket geometry is calculated before the front pocket's normal child layout.
- * Complete the pockets in place so the cluster's children and the component map share the same instances.
+ * Complete each pocket's child IDs before registering it in the component map.
  */
 const completePocketChildren = (
   pockets: readonly ComputedPocketSchema[],
@@ -346,7 +346,7 @@ const completePocketChildren = (
   for (const computedPocket of pockets) {
     if (narrowers.is.computedFrontPocket(computedPocket)) {
       const source = accessor.component.frontPocket(computedPocket.componentId)
-      const layoutChildren = assertLayoutChildren(getComponentChildren(source, subProject))
+      const layoutChildren = assertLayoutChildren(accessor.component.children(source.id))
       computedPocket.computedLayoutGap = calculateGap(layoutChildren, computedPocket.boundingRect, source)
       computedPocket.children = computeLayoutChildren(
         source,
@@ -379,7 +379,7 @@ const updatePocketClusterPaths = (computedComponents: Record<string, ComputedCom
         ? calculateRectPath(component.boundingRect, component.cornerRadius)
         : unionClosedPaths(
             { commands: [] },
-            component.children.map((pocket) => pocket.path),
+            component.children.map((pocketId) => computedComponents[pocketId].path),
           )
   }
 }

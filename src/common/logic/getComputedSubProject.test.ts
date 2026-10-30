@@ -802,7 +802,7 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.component.rootPanel().children.map((child) => child.componentId)).toEqual(['zeta', 'alpha'])
+    expect(computed.component.rootPanel().children).toEqual(['zeta', 'alpha'])
     expectBoundingRect(computed.component.panel(zeta.id), [0, 0, 30, 40])
     expectBoundingRect(computed.component.pocketCluster(alpha.id), [40, 0, 20, 40])
   })
@@ -1655,14 +1655,10 @@ describe('cluster T-pocket stitch routes', () => {
     const source = fixture()
     const geometry = getComputedSubProject(source, defaultStitchingSettings)
     const accessor = accessors.computedSubProject(geometry)
-    const cluster = accessor.component.pocketCluster('cluster')
     const withoutFirstPath = { ...accessor.component.tPocket('a'), path: { commands: [] } }
     const computed = calculateStitchLine({ ...defaultStitchingSettings, ...source.stitchLines[0] }, source, {
       ...geometry.components,
-      cluster: {
-        ...cluster,
-        children: [withoutFirstPath, accessor.component.tPocket('b'), accessor.component.frontPocket('front')],
-      },
+      a: withoutFirstPath,
     })
     expect(computed).toBeDefined()
     expect(computed?.routes.map((route) => route.targetId)).toEqual(['b'])

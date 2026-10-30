@@ -17,11 +17,11 @@ import {
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { getComponentChildren } from '../../../operations/subProject/utils/getComponentChildren'
 import type { ComponentSchema, HasLayoutSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { EditorFieldTranslationSchema } from '../../../schemas/translation'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
@@ -44,9 +44,10 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
   const { t } = useTranslation()
   const { subProject } = useSubProject()
   const fillTranslation = useMemo<EditorFieldTranslationSchema | undefined>(() => {
-    const children = getComponentChildren(component, subProject).filter(
-      (child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child),
-    )
+    const children = accessors
+      .subProject(subProject)
+      .component.children(component.id)
+      .filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child))
     const hasFillChild = children.some((child) =>
       editable.layoutOrientation === 'horizontal' ? child.autoWidth : child.autoHeight,
     )

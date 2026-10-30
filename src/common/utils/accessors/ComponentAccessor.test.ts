@@ -3,6 +3,32 @@ import { d } from '../../testData'
 import { accessors } from './index'
 
 describe('ComponentAccessor', () => {
+  it('resolves children in source order and handles missing references according to strictness', () => {
+    const root = d.rootPanel({ id: 'root', children: ['second', 'first'] })
+    const first = d.panel({ id: 'first' })
+    const second = d.panel({ id: 'second' })
+    const subProject = d.subProject({ id: 'sub', root, components: [first, second] })
+    const snapshot = structuredClone(subProject)
+    const accessor = accessors.subProject(subProject)
+    const children = accessor.component.children
+    const optionalChildren = accessor.optional.component.children
+
+    expect(children('root')).toEqual([second, first])
+    expect(children('root')[0]).toBe(second)
+    expect(children('first')).toEqual([])
+    expect(optionalChildren('root')).toEqual([second, first])
+    expect(optionalChildren('missing')).toEqual([])
+    expect(() => children('missing')).toThrow('Missing component')
+
+    const incomplete = accessors.subProject({
+      ...subProject,
+      components: { ...subProject.components, root: { ...root, children: ['second', 'missing', 'first'] } },
+    })
+    expect(incomplete.optional.component.children('root')).toEqual([second, first])
+    expect(() => incomplete.component.children('root')).toThrow('Missing component')
+    expect(subProject).toEqual(snapshot)
+  })
+
   it('returns the immediate parent and leaves absent parents undefined', () => {
     const root = d.rootPanel({ id: 'root', children: ['cluster'] })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
