@@ -17,9 +17,8 @@ export const addAutoStitchLineRadii = (
       stitchLines.push(stitchLine)
       continue
     }
-    const { bottomLeft, bottomRight, topLeft, topRight } = accessor.stitchLine(
+    const { bottomLeft, bottomRight, topLeft, topRight } = accessor.stitchLine.byId(
       stitchLine.id,
-      stitchLine.onTop,
     ).autoComputedCornerRadius
 
     const radius: HasCornerRadiusValuesSchema = {

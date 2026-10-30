@@ -47,7 +47,7 @@ const collectComponentLimits = (
     }
   }
   for (const computed of Object.values(computedSubProject.components)) {
-    const component = accessor.optional.component(computed.componentId)
+    const component = accessor.optional.component.byId(computed.componentId)
     if (!isDefined(component)) {
       continue
     }
@@ -64,11 +64,10 @@ const collectHoleLimits = (
   computedSubProject: ComputedSubProjectGeometrySchema,
 ): Record<string, HoleLimitsSchema> => {
   const accessor = accessors.subProject(subProject)
-  const computedAccessor = accessors.computedSubProject(computedSubProject)
   const limits: Record<string, HoleLimitsSchema> = {}
-  for (const computed of computedSubProject.holes) {
-    const hole = accessor.optional.hole(computed.holeId)
-    const owner = computedAccessor.optional.component(computed.componentId)
+  for (const computed of Object.values(computedSubProject.holes)) {
+    const hole = accessor.optional.hole.byId(computed.holeId)
+    const owner = computedSubProject.components[computed.componentId]
     if (isDefined(hole) && isDefined(owner)) {
       limits[hole.id] = getHoleLimits(hole, computed, owner)
     }
@@ -82,13 +81,8 @@ const collectStitchLineLimits = (
   stitchingSettings: StitchLineCommonConfigSchema,
 ): Record<string, StitchLineLimitsSchema> => {
   const limits: Record<string, StitchLineLimitsSchema> = {}
-  const computedStitchLines = new Map(
-    Object.values(computedSubProject.stitchLines)
-      .flat()
-      .map((line) => [line.stitchLineId, line]),
-  )
   for (const source of subProject.stitchLines) {
-    const computed = computedStitchLines.get(source.id)
+    const computed = computedSubProject.stitchLines[source.id]
     if (!isDefined(computed)) {
       continue
     }
@@ -106,13 +100,12 @@ const getStitchLineLimits = (
   computed: ComputedStitchLineSchema,
   computedSubProject: ComputedSubProjectGeometrySchema,
 ): StitchLineLimitsSchema | undefined => {
-  const accessor = accessors.computedSubProject(computedSubProject)
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line': {
       const computedTarget =
         stitchLine.targetType === 'hole'
-          ? accessor.optional.hole(stitchLine.targetId)
-          : accessor.optional.component(stitchLine.targetId)
+          ? computedSubProject.holes[stitchLine.targetId]
+          : computedSubProject.components[stitchLine.targetId]
       if (!isDefined(computedTarget)) {
         return undefined
       }
@@ -124,7 +117,7 @@ const getStitchLineLimits = (
       return getComponentBoundsStitchLineLimits(stitchLine, computed, target)
     }
     case 't-pocket-stitch-line': {
-      const cluster = accessor.optional.component(stitchLine.targetId)
+      const cluster = computedSubProject.components[stitchLine.targetId]
       if (
         !isDefined(cluster) ||
         (!narrowers.is.computedTPocket(cluster) && !narrowers.is.computedPocketCluster(cluster))
@@ -154,7 +147,7 @@ const getComponentLimits = (
       if (!isDefined(parent) || !narrowers.is.computedPocketCluster(parent)) {
         return undefined
       }
-      const cluster = accessors.subProject(subProject).optional.pocketCluster(parent.componentId)
+      const cluster = accessors.subProject(subProject).optional.component.pocketCluster(parent.componentId)
       if (!isDefined(cluster)) {
         return undefined
       }
@@ -169,7 +162,7 @@ const getComponentLimits = (
       if (!isDefined(parent) || !narrowers.is.computedPocketCluster(parent)) {
         return undefined
       }
-      const cluster = accessors.subProject(subProject).optional.pocketCluster(parent.componentId)
+      const cluster = accessors.subProject(subProject).optional.component.pocketCluster(parent.componentId)
       if (!isDefined(cluster)) {
         return undefined
       }

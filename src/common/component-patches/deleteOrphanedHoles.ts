@@ -7,7 +7,7 @@ export const deleteOrphanedHoles = (
   _computedProject: ComputedSubProjectSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const holes = subProject.holes.filter((hole) => isDefined(accessor.optional.component(hole.componentId)))
+  const holes = subProject.holes.filter((hole) => isDefined(accessor.optional.component.byId(hole.componentId)))
 
   if (holes.length === subProject.holes.length) {
     return subProject

@@ -323,7 +323,7 @@ describe('cluster T-pocket stitching ownership', () => {
     const pocketComputed = getComputedSubProject(deletedPocket, defaultStitchingSettings)
     const patchedPocket = getPatchedSubProject(deletedPocket, pocketComputed)
     expect(patchedPocket.stitchLines).toEqual(source.stitchLines)
-    expect(pocketComputed.stitchLines.first[0].routes).toEqual([])
+    expect(pocketComputed.stitchLines.line.routes).toEqual([])
     const deletedCluster = deleteComponent(source, { componentId: 'first' })
     const patchedCluster = getPatchedSubProject(
       deletedCluster,

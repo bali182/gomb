@@ -4,5 +4,5 @@ import { useSubProject } from './useSubProject'
 
 export const useComputedComponent = <T extends ComputedComponentSchema = ComputedComponentSchema>(id: string): T => {
   const { computedSubProject: computedProject } = useSubProject()
-  return accessors.computedSubProject(computedProject).component(id) as T
+  return accessors.computedSubProject(computedProject).component.byId(id) as T
 }

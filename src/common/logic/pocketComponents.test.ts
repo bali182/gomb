@@ -48,7 +48,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const { cluster, subProject } = fixture()
       const before = structuredClone(subProject)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-      const result = accessors.computedSubProject(computed).pocketCluster(cluster.id)
+      const result = accessors.computedSubProject(computed).component.pocketCluster(cluster.id)
       expect(result.children.map((pocket) => pocket.componentId)).toEqual(['t1', 't2', 'front'])
       result.children.forEach((pocket, index) => {
         expect(computed.components[pocket.componentId]).toBe(pocket)
@@ -58,8 +58,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         )
         expect(getClosedPathLoops(pocket.path)).toHaveLength(1)
       })
-      expect(computed.stitchLines.t1[0].routes).toHaveLength(1)
-      expect(computed.stitchLines.cluster[0].type).toBe('component-bounds-stitch-line')
+      expect(computed.stitchLines.bottom.routes).toHaveLength(1)
+      expect(computed.stitchLines.border.type).toBe('component-bounds-stitch-line')
       const elements = getExportElementsForComponent(
         subProject,
         computed,
@@ -101,9 +101,9 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
           ...subProject,
           components: {
             ...subProject.components,
-            t1: { ...source.tPocket('t1'), itemId: 'ID-1' as const, itemCrossAxisOffset: 3 },
+            t1: { ...source.component.tPocket('t1'), itemId: 'ID-1' as const, itemCrossAxisOffset: 3 },
             front: {
-              ...source.frontPocket('front'),
+              ...source.component.frontPocket('front'),
               itemId,
               itemOrientation: 'portrait' as const,
               itemOpeningOffset: 7,
@@ -111,10 +111,10 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
           },
         }
         const computed = accessors.computedSubProject(getComputedSubProject(changed, defaultStitchingSettings))
-        const t = computed.tPocket('t1')
-        const front = computed.frontPocket('front')
+        const t = computed.component.tPocket('t1')
+        const front = computed.component.frontPocket('front')
         expect(t.item?.item.id).toBe('ID-1')
-        expect(computed.tPocket('t2').item).toBeUndefined()
+        expect(computed.component.tPocket('t2').item).toBeUndefined()
         expect(front.item?.item.id).toBe(itemId)
         expect(t.item?.boundingRect.width.toNumber()).toBe(85.6)
         expect(front.item?.boundingRect.width.toNumber()).toBe(itemId === 'HUF' ? 70 : 74)
@@ -132,7 +132,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         type: 'front-pocket',
         opening: { type: 'slanted', offset: { max: { value: new BigNumber(90) } } },
       })
-      const cluster = accessors.computedSubProject(computed).pocketCluster('cluster')
+      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
       for (const pocket of cluster.children) {
         for (const segment of getPathSegments(pocket.path)) {
           expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
@@ -146,8 +146,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         ...subProject,
         components: {
           ...subProject.components,
-          cluster: { ...source.pocketCluster('cluster'), pocketStep: 500 },
-          t1: { ...source.tPocket('t1'), tPocketTabWidth: 500, tPocketTaper: 500 },
+          cluster: { ...source.component.pocketCluster('cluster'), pocketStep: 500 },
+          t1: { ...source.component.tPocket('t1'), tPocketTabWidth: 500, tPocketTaper: 500 },
         },
       }
       const computed = getComputedSubProject(changed, defaultStitchingSettings)
@@ -161,7 +161,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     })
     it('inherits closed corner radii through the cluster and front pocket', () => {
       const { subProject } = fixture(1)
-      const root = accessors.subProject(subProject).rootPanel()
+      const root = accessors.subProject(subProject).component.rootPanel()
       const changed = {
         ...subProject,
         components: {
@@ -170,8 +170,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         },
       }
       const computed = getComputedSubProject(changed, defaultStitchingSettings)
-      const cluster = accessors.computedSubProject(computed).pocketCluster('cluster')
-      const front = accessors.computedSubProject(computed).frontPocket('front')
+      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
+      const front = accessors.computedSubProject(computed).component.frontPocket('front')
       const expected =
         orientation === 'up'
           ? ['bottomLeft', 'bottomRight']
@@ -187,14 +187,14 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     })
     it('lays out normal children inside the front pocket', () => {
       const { subProject } = fixture()
-      const front = accessors.subProject(subProject).frontPocket('front')
+      const front = accessors.subProject(subProject).component.frontPocket('front')
       const child = d.panel({ id: 'child' })
       const changed = {
         ...subProject,
         components: { ...subProject.components, front: { ...front, children: [child.id] }, child },
       }
       const computed = getComputedSubProject(changed, defaultStitchingSettings)
-      const parent = accessors.computedSubProject(computed).frontPocket('front')
+      const parent = accessors.computedSubProject(computed).component.frontPocket('front')
       expect(computed.components.child.boundingRect).toEqual(parent.boundingRect)
       expect(parent.children.map((child) => child.componentId)).toEqual(['child'])
     })
@@ -223,7 +223,9 @@ describe('invalid pocket states and patchers', () => {
         components: [cluster, d.tPocket({ id: 't' })],
       })
       const computed = getComputedSubProject(source, defaultStitchingSettings)
-      expect(accessors.computedSubProject(computed).pocketCluster('cluster').children.length).toBe(children.length)
+      expect(accessors.computedSubProject(computed).component.pocketCluster('cluster').children.length).toBe(
+        children.length,
+      )
     }
   })
   it('removes forbidden T-pocket descendants, cluster holes and unsupported stitching separately', () => {
@@ -247,13 +249,13 @@ describe('invalid pocket states and patchers', () => {
     })
     const computed = getComputedSubProject(source, defaultStitchingSettings)
     expect(computed.components.zombie).toBeUndefined()
-    expect(computed.holes).toEqual([])
+    expect(computed.holes).toEqual({})
     const patched = getPatchedSubProject(source, computed)
     expect(patched.components.zombie).toBeUndefined()
     expect(patched.components.nested).toBeUndefined()
     expect(patched.components.t.children).toEqual([])
     expect(patched.holes).toEqual([])
     expect(patched.stitchLines.map((line) => line.id)).toEqual(['front-line'])
-    expect(computed.stitchLines.front[0].routes.length).toBeGreaterThan(0)
+    expect(computed.stitchLines['front-line'].routes.length).toBeGreaterThan(0)
   })
 })

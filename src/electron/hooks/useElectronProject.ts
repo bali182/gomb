@@ -125,7 +125,9 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
 
   const navigateToProject = useCallback(
     (filePath: string, project: ProjectSchema, preferredSubProjectId?: string): void => {
-      const selectedSubProject = accessors.project(project).optional.subProject(preferredSubProjectId)
+      const selectedSubProject = isDefined(preferredSubProjectId)
+        ? accessors.project(project).optional.subProject(preferredSubProjectId)
+        : undefined
       const fallbackSubProject = project.subProjects[0]
       const targetSubProject = isDefined(selectedSubProject) ? selectedSubProject : fallbackSubProject
 

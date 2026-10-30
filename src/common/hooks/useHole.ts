@@ -4,5 +4,5 @@ import { useSubProject } from './useSubProject'
 
 export const useHole = (id: string): HoleSchema => {
   const { subProject } = useSubProject()
-  return accessors.subProject(subProject).hole(id)
+  return accessors.subProject(subProject).hole.byId(id)
 }

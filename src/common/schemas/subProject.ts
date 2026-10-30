@@ -17,9 +17,8 @@ export type ComputedSubProjectGeometrySchema = {
   id: string
   root: string
   components: Record<string, ComputedComponentSchema>
-  holes: ComputedHoleSchema[]
-  /** Mapping between the component the stitchlines are drawn on top, and the stitchline itself. */
-  stitchLines: Record<string, ComputedStitchLineSchema[]>
+  holes: Record<string, ComputedHoleSchema>
+  stitchLines: Record<string, ComputedStitchLineSchema>
   viewBox: RectSchema
 }
 

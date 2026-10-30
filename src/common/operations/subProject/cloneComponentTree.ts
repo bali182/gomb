@@ -46,7 +46,7 @@ export const cloneComponentTree = ({
   ids,
   names,
 }: CloneComponentTreeParams): CloneComponentTreeResult | undefined => {
-  const sourceComponent = accessors.subProject(subProject).optional.component(componentId)
+  const sourceComponent = accessors.subProject(subProject).optional.component.byId(componentId)
 
   if (!isDefined(sourceComponent)) {
     return undefined
@@ -114,7 +114,7 @@ const collectClonedComponents = (
 
   const accessor = accessors.subProject(subProject)
   for (const childId of component.children) {
-    const child = accessor.optional.component(childId)
+    const child = accessor.optional.component.byId(childId)
 
     if (!isDefined(child) || !collectClonedComponents(subProject, child, collectedComponents, visitedComponentIds)) {
       return false

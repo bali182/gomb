@@ -12,7 +12,7 @@ export const updateProjectComponents = (
   let components = subProject.components
 
   for (const [id, component] of Object.entries(subProject.components)) {
-    const updatedComponent = mapper(id, component, accessor.component(id))
+    const updatedComponent = mapper(id, component, accessor.component.byId(id))
 
     if (updatedComponent === component) {
       continue

@@ -29,7 +29,7 @@ export const EditorSubProjectTabs: FC = () => {
     <Tabs.Root size="sm" value={subProject?.id} variant="subtle" width="100%">
       <Tabs.List _before={{ borderBottomColor: 'bg.panel' }} alignItems="center">
         {project.subProjects.map((subProject) => {
-          const rootPanel = accessors.subProject(subProject).rootPanel()
+          const rootPanel = accessors.subProject(subProject).component.rootPanel()
           return (
             <HStack gap="0" key={subProject.id}>
               <Tabs.Trigger

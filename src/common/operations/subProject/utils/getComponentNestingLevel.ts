@@ -5,7 +5,7 @@ import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 
 export const getComponentNestingLevel = (componentId: string, subProject: SubProjectSchema): number => {
-  const rootComponent = accessors.subProject(subProject).optional.rootPanel()
+  const rootComponent = accessors.subProject(subProject).optional.component.rootPanel()
 
   if (!isDefined(rootComponent)) {
     return 0
@@ -26,7 +26,7 @@ const findComponentNestingLevel = (
 
   const accessor = accessors.subProject(subProject)
   for (const childId of component.children) {
-    const child = accessor.optional.component(childId)
+    const child = accessor.optional.component.byId(childId)
 
     if (!isDefined(child)) {
       continue

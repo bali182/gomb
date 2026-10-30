@@ -31,17 +31,17 @@ export const flip = (
   const accessor = accessors.subProject(subProject)
   switch (model.type) {
     case 'root-panel':
-      return flipComponentSubtree(subProject, narrowers.assert.rootPanel(accessor.component(model.id)), axis)
+      return flipComponentSubtree(subProject, narrowers.assert.rootPanel(accessor.component.byId(model.id)), axis)
     case 'panel':
-      return flipComponentSubtree(subProject, accessor.panel(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.panel(model.id), axis)
     case 'pocket-cluster':
-      return flipComponentSubtree(subProject, accessor.pocketCluster(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.pocketCluster(model.id), axis)
     case 'front-pocket':
-      return flipComponentSubtree(subProject, accessor.frontPocket(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.frontPocket(model.id), axis)
     case 't-pocket':
-      return flipComponentSubtree(subProject, accessor.tPocket(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.tPocket(model.id), axis)
     case 'hole': {
-      const hole = accessor.hole(model.id)
+      const hole = accessor.hole.byId(model.id)
       const updated = updateHole(subProject, { hole: flipHole(hole, axis) })
       return {
         ...updated,
@@ -53,7 +53,7 @@ export const flip = (
       }
     }
     case 'component-bounds-stitch-line': {
-      const stitchLine = accessor.componentBoundsStitchLine(model.id)
+      const stitchLine = accessor.stitchLine.bounds(model.id)
       return {
         ...subProject,
         stitchLines: subProject.stitchLines.map((candidate) =>
@@ -62,7 +62,7 @@ export const flip = (
       }
     }
     case 't-pocket-stitch-line': {
-      const stitchLine = accessor.tPocketStitchLine(model.id)
+      const stitchLine = accessor.stitchLine.tPocket(model.id)
       const flipped = flipStitchLine(stitchLine, subProject, axis)
       if (flipped === stitchLine) {
         return subProject
@@ -85,7 +85,7 @@ const flipComponentSubtree = (
   const components = { ...subProject.components }
   for (const componentId of componentIds) {
     components[componentId] = flipComponent(
-      accessors.subProject(subProject).component(componentId),
+      accessors.subProject(subProject).component.byId(componentId),
       subProject,
       axis,
       componentIds,
@@ -141,7 +141,7 @@ const flipComponent = (
       return flipped
     }
     case 'front-pocket': {
-      const cluster = narrowers.assert.pocketCluster(accessor.parent(component.id))
+      const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
       const flippedOrientation = flippedComponentIds.has(cluster.id)
         ? flipOrientation(cluster.orientation, axis)
         : cluster.orientation
@@ -159,7 +159,7 @@ const flipComponent = (
       return flipped
     }
     case 't-pocket': {
-      const cluster = narrowers.assert.pocketCluster(accessor.parent(component.id))
+      const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
       const flippedOrientation = flippedComponentIds.has(cluster.id)
         ? flipOrientation(cluster.orientation, axis)
         : cluster.orientation
@@ -201,10 +201,10 @@ const flipStitchLine = (
   switch (stitchLine.type) {
     case 't-pocket-stitch-line': {
       const accessor = accessors.subProject(subProject)
-      const target = accessor.component(stitchLine.targetId)
+      const target = accessor.component.byId(stitchLine.targetId)
       const cluster = narrowers.is.pocketCluster(target)
         ? target
-        : narrowers.assert.pocketCluster(accessor.parent(target.id))
+        : narrowers.assert.pocketCluster(accessor.component.parent(target.id))
       if (!isCrossAxisFlip(cluster.orientation, axis)) {
         return stitchLine
       }
@@ -349,7 +349,7 @@ const flipOffAxisAnchor = (
   axis: FlipAxisSchema,
   flippedComponentIds: ReadonlySet<string>,
 ): AnchorSchema => {
-  const parent = accessors.subProject(subProject).optional.parent(component.id)
+  const parent = accessors.subProject(subProject).optional.component.parent(component.id)
   if (!isDefined(parent) || !flippedComponentIds.has(parent.id)) {
     return component.offAxisAnchor
   }

@@ -81,7 +81,7 @@ const getRelatedComponentIds = (
   if (selection.targetType === 'component') {
     return new Set([selection.targetId])
   }
-  const hole = source.optional.hole(selection.targetId)
+  const hole = source.optional.hole.byId(selection.targetId)
   return new Set(isDefined(hole) ? [hole.componentId] : [])
 }
 
@@ -105,7 +105,7 @@ const isRelatedStitchLine = (
   if (stitchLine.targetType === 'component') {
     return relatedComponentIds.has(stitchLine.targetId)
   }
-  const hole = accessors.subProject(subProject).optional.hole(stitchLine.targetId)
+  const hole = accessors.subProject(subProject).optional.hole.byId(stitchLine.targetId)
   return isDefined(hole) && relatedComponentIds.has(hole.componentId)
 }
 

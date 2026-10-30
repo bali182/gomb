@@ -4,5 +4,5 @@ import { useSubProject } from './useSubProject'
 
 export const useComponent = <T extends ComponentSchema = ComponentSchema>(id: string): T => {
   const { subProject } = useSubProject()
-  return accessors.subProject(subProject).component(id) as T
+  return accessors.subProject(subProject).component.byId(id) as T
 }

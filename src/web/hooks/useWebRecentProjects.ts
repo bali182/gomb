@@ -19,7 +19,9 @@ export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
       .filter((project): boolean => isDefined(settings.recentProjects[project.id]))
       .map((project): RecentProjectVisualisationSchema => {
         const recentProject = settings.recentProjects[project.id]
-        const lastOpenedSubProject = accessors.project(project).optional.subProject(recentProject?.lastSubProjectId)
+        const lastOpenedSubProject = isDefined(recentProject.lastSubProjectId)
+          ? accessors.project(project).optional.subProject(recentProject.lastSubProjectId)
+          : undefined
         const subProject = isDefined(lastOpenedSubProject) ? lastOpenedSubProject : project.subProjects[0]
 
         return {

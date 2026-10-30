@@ -21,13 +21,13 @@ export const cloneComponent = (
   { componentId, ids, names, settings }: CloneComponentParams,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const sourceComponent = accessor.optional.component(componentId)
+  const sourceComponent = accessor.optional.component.byId(componentId)
 
   if (!isDefined(sourceComponent) || !canCloneComponent(sourceComponent)) {
     return subProject
   }
 
-  const sourceParent = accessor.optional.parent(componentId)
+  const sourceParent = accessor.optional.component.parent(componentId)
 
   if (!isDefined(sourceParent)) {
     return subProject

@@ -63,13 +63,13 @@ describe('cloneSubProject', () => {
     const result = cloneSubProject(project, { subProject: source, getUnusedId: () => `copy-${++count}` })
     const cloned = result.subProjects[1]
     const accessor = accessors.subProject(cloned)
-    const clusterId = accessor.rootPanel().children[0]
-    const pocketId = accessor.pocketCluster(clusterId).children[0]
+    const clusterId = accessor.component.rootPanel().children[0]
+    const pocketId = accessor.component.pocketCluster(clusterId).children[0]
     expect(cloned.stitchLines).toHaveLength(2)
     expect(cloned.stitchLines.map((line) => line.targetId)).toEqual([clusterId, pocketId])
     const computed = getComputedSubProject(cloned, defaultStitchingSettings)
     expect(Object.values(computed.stitchLines).flat()).toHaveLength(2)
-    expect(accessors.computedSubProject(computed).stitchLine(cloned.stitchLines[0].id).routes[0].targetId).toBe(
+    expect(accessors.computedSubProject(computed).stitchLine.byId(cloned.stitchLines[0].id).routes[0].targetId).toBe(
       pocketId,
     )
     expect(project).toEqual(snapshot)

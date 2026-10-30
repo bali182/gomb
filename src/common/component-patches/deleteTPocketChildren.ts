@@ -18,7 +18,7 @@ export const deleteTPocketChildren = (
     }
     parents.add(component.id)
     for (const childId of component.children) {
-      const child = accessor.optional.component(childId)
+      const child = accessor.optional.component.byId(childId)
       deleted.add(childId)
       if (isDefined(child)) {
         getComponentDescendants(child, subProject).forEach((id) => deleted.add(id))

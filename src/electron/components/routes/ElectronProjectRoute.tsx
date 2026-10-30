@@ -118,7 +118,9 @@ const getTargetPath = (
     return undefined
   }
 
-  const selectedSubProject = accessors.project(electronProject.project).optional.subProject(subProjectId)
+  const selectedSubProject = isDefined(subProjectId)
+    ? accessors.project(electronProject.project).optional.subProject(subProjectId)
+    : undefined
 
   if (isDefined(selectedSubProject)) {
     return undefined

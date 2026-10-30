@@ -13,7 +13,7 @@ export const deleteUnsupportedStitchLines = (
     if (line.targetType === 'hole') {
       return narrowers.is.componentBoundsStitchLine(line)
     }
-    const component = accessor.optional.component(line.targetId)
+    const component = accessor.optional.component.byId(line.targetId)
     return !isDefined(component) || canAddStitchLine(component, subProject, line.type)
   })
   return stitchLines.length === subProject.stitchLines.length ? subProject : { ...subProject, stitchLines }

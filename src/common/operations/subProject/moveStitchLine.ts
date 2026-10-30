@@ -18,7 +18,7 @@ export type MoveStitchLineParams = MoveStitchLineToHoleParams | MoveStitchLineTo
 
 export const moveStitchLine = (subProject: SubProjectSchema, params: MoveStitchLineParams): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const stitchLine = accessor.optional.stitchLine(params.stitchLineId)
+  const stitchLine = accessor.optional.stitchLine.byId(params.stitchLineId)
 
   if (!isDefined(stitchLine)) {
     return subProject
@@ -26,14 +26,14 @@ export const moveStitchLine = (subProject: SubProjectSchema, params: MoveStitchL
 
   switch (params.targetType) {
     case 'hole': {
-      const targetHole = accessor.optional.hole(params.targetId)
+      const targetHole = accessor.optional.hole.byId(params.targetId)
       if (!narrowers.is.componentBoundsStitchLine(stitchLine) || !isDefined(targetHole)) {
         return subProject
       }
       return updateStitchLine(subProject, { ...stitchLine, targetType: params.targetType, targetId: params.targetId })
     }
     case 'component': {
-      const targetComponent = accessor.optional.component(params.targetId)
+      const targetComponent = accessor.optional.component.byId(params.targetId)
       if (!isDefined(targetComponent)) {
         return subProject
       }

@@ -18,7 +18,7 @@ export const canAddChild = (
     case 'pocket-cluster': {
       const accessor = accessors.subProject(subProject)
       const hasFrontPocket = parent.children.some((id) => {
-        return isDefined(accessor.optional.frontPocket(id))
+        return isDefined(accessor.optional.component.frontPocket(id))
       })
       return (type === 't-pocket' && hasFrontPocket) || (type === 'front-pocket' && !hasFrontPocket)
     }
@@ -58,7 +58,7 @@ export const canAddStitchLine = (
   if (narrowers.is.pocketCluster(component)) {
     const accessor = accessors.subProject(subProject)
     return component.children.some((id) => {
-      return isDefined(accessor.optional.frontPocket(id))
+      return isDefined(accessor.optional.component.frontPocket(id))
     })
   }
   return true
@@ -66,12 +66,15 @@ export const canAddStitchLine = (
 
 export const canMoveComponent = (subProject: SubProjectSchema, params: MoveComponentParams): boolean => {
   const accessor = accessors.subProject(subProject)
-  const component = accessor.optional.component(params.componentId)
-  const parent = accessor.optional.component(params.targetParentId)
+  const component = accessor.optional.component.byId(params.componentId)
+  const parent = accessor.optional.component.byId(params.targetParentId)
   if (!isDefined(component) || !isDefined(parent) || !canDeleteComponent(component) || component.id === parent.id) {
     return false
   }
-  if (!canAddChild(parent, component.type, subProject) || !isDefined(accessor.optional.parent(component.id))) {
+  if (
+    !canAddChild(parent, component.type, subProject) ||
+    !isDefined(accessor.optional.component.parent(component.id))
+  ) {
     return false
   }
   if (getComponentDescendants(component, subProject).includes(parent.id)) {
@@ -83,7 +86,7 @@ export const canMoveComponent = (subProject: SubProjectSchema, params: MoveCompo
   }
   if (narrowers.is.pocketCluster(parent)) {
     const frontIndex = children.findIndex((id) => {
-      return isDefined(accessor.optional.frontPocket(id))
+      return isDefined(accessor.optional.component.frontPocket(id))
     })
     if (!isDefined(params.beforeComponentId)) {
       return frontIndex === -1

@@ -25,7 +25,7 @@ export const HoleHighlights: FC<HoleHighlightsProps> = ({ componentId }) => {
   return (
     <>
       {holes.map((hole) => {
-        const computedHole = accessor.hole(hole.id)
+        const computedHole = accessor.hole.byId(hole.id)
 
         return <HoleHighlight computedHole={computedHole} hole={hole} key={hole.id} />
       })}

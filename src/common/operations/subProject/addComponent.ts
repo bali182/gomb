@@ -12,7 +12,7 @@ export type AddComponentParams = {
 }
 
 export const addComponent = (subProject: SubProjectSchema, params: AddComponentParams): SubProjectSchema => {
-  const parent = accessors.subProject(subProject).optional.component(params.parentId)
+  const parent = accessors.subProject(subProject).optional.component.byId(params.parentId)
 
   if (!isDefined(parent)) {
     throw new Error('Missing parent')

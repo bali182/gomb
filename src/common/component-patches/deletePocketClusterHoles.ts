@@ -7,7 +7,7 @@ export const deletePocketClusterHoles = (
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   const holes = subProject.holes.filter((hole) => {
-    return !isDefined(accessor.optional.pocketCluster(hole.componentId))
+    return !isDefined(accessor.optional.component.pocketCluster(hole.componentId))
   })
   return holes.length === subProject.holes.length ? subProject : { ...subProject, holes }
 }

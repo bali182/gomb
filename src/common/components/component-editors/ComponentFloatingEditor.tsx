@@ -29,7 +29,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
   const { project } = useProject()
   const { subProject } = useSubProject()
 
-  const parent = accessors.subProject(subProject).optional.parent(component.id)
+  const parent = accessors.subProject(subProject).optional.component.parent(component.id)
 
   const {
     component: editedComponent,

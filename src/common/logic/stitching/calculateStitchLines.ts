@@ -10,15 +10,15 @@ export const calculateStitchLines = (
   stitchLines: ResolvedStitchLineSchema[],
   subProject: SubProjectSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
-  computedHoles: readonly ComputedHoleSchema[],
-): Record<string, ComputedStitchLineSchema[]> => {
-  const computedStitchLines: ComputedStitchLineSchema[] = []
+  computedHoles: Record<string, ComputedHoleSchema>,
+): Record<string, ComputedStitchLineSchema> => {
+  const computedStitchLines: Record<string, ComputedStitchLineSchema> = {}
   const accessor = accessors.subProject(subProject)
 
   for (const stitchLine of stitchLines) {
     if (stitchLine.targetType === 'hole') {
-      const hole = accessor.optional.hole(stitchLine.targetId)
-      const computedHole = computedHoles.find((candidate) => candidate.holeId === stitchLine.targetId)
+      const hole = accessor.optional.hole.byId(stitchLine.targetId)
+      const computedHole = computedHoles[stitchLine.targetId]
 
       if (!isDefined(hole) || !isDefined(computedHole)) {
         continue
@@ -33,33 +33,16 @@ export const calculateStitchLines = (
         },
         computedComponents,
       )
-      computedStitchLines.push(computedStitchLine)
+      computedStitchLines[computedStitchLine.stitchLineId] = computedStitchLine
 
       continue
     }
 
     const computedStitchLine = calculateStitchLine(stitchLine, subProject, computedComponents)
     if (isDefined(computedStitchLine)) {
-      computedStitchLines.push(computedStitchLine)
+      computedStitchLines[computedStitchLine.stitchLineId] = computedStitchLine
     }
   }
 
-  return groupByTarget(computedStitchLines)
-}
-
-const groupByTarget = (computedStitchLines: ComputedStitchLineSchema[]): Record<string, ComputedStitchLineSchema[]> => {
-  const stitchLinesByComponentId: Record<string, ComputedStitchLineSchema[]> = {}
-
-  for (const computedStitchLine of computedStitchLines) {
-    const componentId = computedStitchLine.onTop
-    const stitchLines = stitchLinesByComponentId[componentId]
-
-    if (isDefined(stitchLines)) {
-      stitchLines.push(computedStitchLine)
-    } else {
-      stitchLinesByComponentId[componentId] = [computedStitchLine]
-    }
-  }
-
-  return stitchLinesByComponentId
+  return computedStitchLines
 }

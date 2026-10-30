@@ -59,7 +59,7 @@ export const comparators = {
       a.root === b.root &&
       Object.keys(a.components).length === Object.keys(b.components).length &&
       Object.entries(a.components).every(
-        ([id, component]) => id in b.components && comparators.component(component, accessor.component(id)),
+        ([id, component]) => id in b.components && comparators.component(component, accessor.component.byId(id)),
       ) &&
       areArraysEqual(a.holes, b.holes, comparators.hole) &&
       areArraysEqual(a.stitchLines, b.stitchLines, comparators.stitchLine)

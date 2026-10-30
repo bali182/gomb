@@ -7,7 +7,7 @@ const collectDescendantIds = (component: ComponentSchema, subProject: SubProject
   const accessor = accessors.subProject(subProject)
   component.children.forEach((childId) => {
     ids.add(childId)
-    const child = accessor.optional.component(childId)
+    const child = accessor.optional.component.byId(childId)
     if (isDefined(child)) {
       collectDescendantIds(child, subProject, ids)
     }

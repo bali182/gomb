@@ -27,7 +27,7 @@ export const getExportStitchLines = (
   const accessor = accessors.subProject(subProject)
 
   return candidates.flatMap((computedStitchLine) => {
-    const stitchLine = accessor.optional.stitchLine(computedStitchLine.stitchLineId)
+    const stitchLine = accessor.optional.stitchLine.byId(computedStitchLine.stitchLineId)
     if (!isDefined(stitchLine)) {
       return []
     }
@@ -45,7 +45,7 @@ const getCandidateStitchLines = (
 ): ComputedStitchLineSchema[] => {
   switch (stitchLineMode) {
     case 'all-stitch-lines':
-      return Object.values(computedSubProject.stitchLines).flat()
+      return Object.values(computedSubProject.stitchLines)
     case 'own-stitch-lines':
       return getOwnStitchLines(subProject, computedSubProject, target.componentId)
     case 'related-stitch-lines':
@@ -59,14 +59,14 @@ const getOwnStitchLines = (
   componentId: string,
 ): ComputedStitchLineSchema[] => {
   const accessor = accessors.computedSubProject(computedSubProject)
-  const ownStitchLines = accessor.stitchLines(componentId)
-  const parent = accessors.subProject(subProject).optional.parent(componentId)
+  const ownStitchLines = accessor.stitchLine.byOnTop(componentId)
+  const parent = accessors.subProject(subProject).optional.component.parent(componentId)
   if (!isDefined(parent) || !narrowers.is.pocketCluster(parent)) {
     return ownStitchLines
   }
 
   // The cluster owns no material. Its shared stitching is exported on the physical pockets.
-  const clusterStitchLines = accessor.stitchLines(parent.id)
+  const clusterStitchLines = accessor.stitchLine.byOnTop(parent.id)
   return [...ownStitchLines, ...clusterStitchLines]
 }
 
@@ -76,7 +76,7 @@ const getRelatedStitchLines = (
   target: ComputedComponentSchema,
 ): ComputedStitchLineSchema[] => {
   const accessor = accessors.subProject(subProject)
-  const source = accessor.optional.component(target.componentId)
+  const source = accessor.optional.component.byId(target.componentId)
   if (!isDefined(source)) {
     return []
   }
@@ -84,23 +84,21 @@ const getRelatedStitchLines = (
     ...getComponentDescendants(source, subProject),
     ...getFollowingSiblingSubtreeIds(source.id, subProject),
   ])
-  let parent = accessor.optional.parent(source.id)
+  let parent = accessor.optional.component.parent(source.id)
   while (isDefined(parent) && narrowers.is.pocketCluster(parent)) {
     componentIds.add(parent.id)
-    parent = accessor.optional.parent(parent.id)
+    parent = accessor.optional.component.parent(parent.id)
   }
 
-  return Object.values(computedSubProject.stitchLines)
-    .flat()
-    .filter((stitchLine) => componentIds.has(stitchLine.componentId))
+  return Object.values(computedSubProject.stitchLines).filter((stitchLine) => componentIds.has(stitchLine.componentId))
 }
 
 const getFollowingSiblingSubtreeIds = (componentId: string, subProject: SubProjectSchema): string[] => {
   const accessor = accessors.subProject(subProject)
-  const siblings = accessor.optional.parent(componentId)?.children ?? []
+  const siblings = accessor.optional.component.parent(componentId)?.children ?? []
   const componentIds: string[] = []
   for (const siblingId of siblings.slice(siblings.indexOf(componentId) + 1)) {
-    const sibling = accessor.optional.component(siblingId)
+    const sibling = accessor.optional.component.byId(siblingId)
     if (isDefined(sibling)) {
       componentIds.push(...getComponentDescendants(sibling, subProject))
     }

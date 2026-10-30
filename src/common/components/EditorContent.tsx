@@ -57,7 +57,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
   const subProject = useMemo<SubProjectSchema | undefined>(
-    () => accessors.project(project).optional.subProject(subProjectId),
+    () => (isDefined(subProjectId) ? accessors.project(project).optional.subProject(subProjectId) : undefined),
     [project, subProjectId],
   )
   const handleResizeEnd = useCallback(

@@ -35,11 +35,11 @@ type ExportComponentPngParams = {
 
 export const exportComponentPng = async (params: ExportComponentPngParams): Promise<void> => {
   const { project, subProject, componentId, settings, context } = params
-  const component = accessors.subProject(subProject).component(componentId)
+  const component = accessors.subProject(subProject).component.byId(componentId)
   const computedSubProject = getComputedSubProject(subProject, project.stitchingSettings)
   const computedAccessor = accessors.computedSubProject(computedSubProject)
-  const computedRoot = computedAccessor.rootPanel()
-  const computedComponent = computedAccessor.component(componentId)
+  const computedRoot = computedAccessor.component.rootPanel()
+  const computedComponent = computedAccessor.component.byId(componentId)
 
   const nestingLevel = findNestingLevel(computedRoot, componentId)
   if (!isDefined(nestingLevel)) {
@@ -95,7 +95,7 @@ const getComponentBoundingRects = (
   params: ExportComponentPngParams,
 ): RectSchema[] => {
   const { subProject, context } = params
-  const model = accessors.subProject(subProject).component(component.componentId)
+  const model = accessors.subProject(subProject).component.byId(component.componentId)
   const styleParams = { component: model, nestingLevel }
   const borderPadding = (context.componentStyles.getBorderThickness(styleParams) ?? 0) / 2
   const boundingRects = [padBoundingRect(component.boundingRect, borderPadding)]
@@ -104,7 +104,7 @@ const getComponentBoundingRects = (
     for (const pocket of component.children) {
       boundingRects.push(padBoundingRect(pocket.boundingRect, borderPadding))
       if (context.isShowingPocketItems && isDefined(pocket.item)) {
-        const owner = accessors.subProject(subProject).pocket(pocket.componentId)
+        const owner = accessors.subProject(subProject).component.pocket(pocket.componentId)
         boundingRects.push(
           padBoundingRect(pocket.item.boundingRect, (context.pocketItemStyles.getStrokeThickness({ owner }) ?? 0) / 2),
         )
@@ -145,7 +145,7 @@ const getStitchLineBoundingRects = (
   const boundingRects: RectSchema[] = []
   const accessor = accessors.subProject(subProject)
   for (const computedStitchLine of stitchLines) {
-    const stitchLine = accessor.optional.stitchLine(computedStitchLine.stitchLineId)
+    const stitchLine = accessor.optional.stitchLine.byId(computedStitchLine.stitchLineId)
     if (!isDefined(stitchLine)) {
       continue
     }
@@ -173,7 +173,7 @@ const collectBoundingRects = (
 ): RectSchema[] => [
   ...getComponentBoundingRects(component, nestingLevel, params),
   ...getStitchLineBoundingRects(
-    accessors.computedSubProject(computedSubProject).stitchLines(component.componentId),
+    accessors.computedSubProject(computedSubProject).stitchLine.byOnTop(component.componentId),
     params,
   ),
   ...component.children.flatMap((child) =>

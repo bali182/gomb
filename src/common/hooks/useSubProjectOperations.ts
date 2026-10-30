@@ -306,20 +306,20 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
       const currentSubProject = ensureSubProject(subProject)
       const accessor = accessors.subProject(currentSubProject)
-      const source = accessor.pocket(sourcePocketId)
-      const cluster = accessor.optional.parent(sourcePocketId)
+      const source = accessor.component.pocket(sourcePocketId)
+      const cluster = accessor.optional.component.parent(sourcePocketId)
       if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
         return
       }
 
-      const sourceStitchLines = accessor.tPocketStitchLines(sourcePocketId)
+      const sourceStitchLines = accessor.stitchLine.byOwner(sourcePocketId).filter(narrowers.is.tPocketStitchLine)
       const updatedSubProject = cluster.children.reduce<SubProjectSchema>((current, pocketId) => {
         const selection = targets[pocketId]
         if (pocketId === sourcePocketId || !isDefined(selection)) {
           return current
         }
 
-        const target = accessors.subProject(current).pocket(pocketId)
+        const target = accessors.subProject(current).component.pocket(pocketId)
         const updatedPocket = copyPocketFields(source, target, selection)
         const withPocket =
           updatedPocket === target ? current : updateComponentPure(current, { component: updatedPocket })
@@ -460,7 +460,10 @@ const copyPocketStitchLines = (
   targetPocketId: string,
   overwrite: boolean,
 ): SubProjectSchema => {
-  const existingStitchLines = accessors.subProject(subProject).tPocketStitchLines(targetPocketId)
+  const existingStitchLines = accessors
+    .subProject(subProject)
+    .stitchLine.byOwner(targetPocketId)
+    .filter(narrowers.is.tPocketStitchLine)
   const withoutExisting = overwrite
     ? existingStitchLines.reduce<SubProjectSchema>(
         (current, stitchLine) => deleteStitchLinePure(current, { stitchLineId: stitchLine.id }),

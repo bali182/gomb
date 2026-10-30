@@ -36,7 +36,7 @@ const getNextExpandedIdsForStitchLine = (
   subProject: SubProjectSchema,
   expandedIds: string[],
 ): string[] => {
-  const stitchLine = accessors.subProject(subProject).optional.stitchLine(stitchLineId)
+  const stitchLine = accessors.subProject(subProject).optional.stitchLine.byId(stitchLineId)
   if (!isDefined(stitchLine)) {
     return expandedIds
   }
@@ -46,7 +46,7 @@ const getNextExpandedIdsForStitchLine = (
       return uniqueExpandedIds(expandedIds, getComponentRelatedIds(stitchLine.targetId, subProject, true))
     }
     case 'hole': {
-      const hole = accessors.subProject(subProject).optional.hole(stitchLine.targetId)
+      const hole = accessors.subProject(subProject).optional.hole.byId(stitchLine.targetId)
       if (!isDefined(hole)) {
         return expandedIds
       }
@@ -62,7 +62,7 @@ const getNextExpandedIdsForStitchLine = (
 }
 
 const getNextExpandedIdsForHole = (holeId: string, subProject: SubProjectSchema, expandedIds: string[]): string[] => {
-  const hole = accessors.subProject(subProject).optional.hole(holeId)
+  const hole = accessors.subProject(subProject).optional.hole.byId(holeId)
 
   if (!isDefined(hole)) {
     return expandedIds

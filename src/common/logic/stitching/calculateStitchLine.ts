@@ -29,7 +29,7 @@ export const calculateStitchLine = (
   subProject: SubProjectSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedStitchLineSchema | undefined => {
-  const component = accessors.subProject(subProject).optional.component(stitchLine.targetId)
+  const component = accessors.subProject(subProject).optional.component.byId(stitchLine.targetId)
   const computed = computedComponents[stitchLine.targetId]
   if (!isDefined(component) || !isDefined(computed)) {
     return undefined
@@ -65,7 +65,7 @@ const calculateComputedTPocketStitchLine = (
 ): ComputedStitchLineSchema | undefined => {
   const cluster = narrowers.is.pocketCluster(component)
     ? component
-    : accessors.subProject(subProject).optional.parent(component.id)
+    : accessors.subProject(subProject).optional.component.parent(component.id)
   if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
     return undefined
   }

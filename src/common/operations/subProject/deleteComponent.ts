@@ -12,7 +12,7 @@ export const deleteComponent = (
   subProject: SubProjectSchema,
   { componentId }: DeleteComponentParams,
 ): SubProjectSchema => {
-  const component = accessors.subProject(subProject).optional.component(componentId)
+  const component = accessors.subProject(subProject).optional.component.byId(componentId)
 
   if (!isDefined(component) || !canDeleteComponent(component)) {
     return subProject

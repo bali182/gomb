@@ -8,7 +8,7 @@ export type AddHoleParams = {
 }
 
 export const addHole = (subProject: SubProjectSchema, params: AddHoleParams): SubProjectSchema => {
-  const cluster = accessors.subProject(subProject).optional.pocketCluster(params.hole.componentId)
+  const cluster = accessors.subProject(subProject).optional.component.pocketCluster(params.hole.componentId)
   if (isDefined(cluster)) {
     return subProject
   }

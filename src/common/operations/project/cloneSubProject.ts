@@ -14,7 +14,7 @@ export const cloneSubProject = (
   project: ProjectSchema,
   { getUnusedId, subProject: sourceSubProject }: CloneSubProjectParams,
 ): ProjectSchema => {
-  const sourceRootPanel = accessors.subProject(sourceSubProject).optional.rootPanel()
+  const sourceRootPanel = accessors.subProject(sourceSubProject).optional.component.rootPanel()
 
   if (!isDefined(sourceRootPanel)) {
     return project
@@ -48,7 +48,7 @@ export const cloneSubProject = (
 
   const usedRootNames = new Set(
     project.subProjects
-      .map((subProject) => accessors.subProject(subProject).optional.rootPanel())
+      .map((subProject) => accessors.subProject(subProject).optional.component.rootPanel())
       .filter(isDefined)
       .map((root) => root.name),
   )

@@ -36,7 +36,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   const { addComponent } = useSubProjectOperations()
   const accessor = accessors.subProject(subProject)
   const hasFront = component.children.some((id) => {
-    return isDefined(accessor.optional.frontPocket(id))
+    return isDefined(accessor.optional.component.frontPocket(id))
   })
   if (!hasFront) {
     return (

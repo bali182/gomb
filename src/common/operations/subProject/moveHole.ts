@@ -14,8 +14,8 @@ export const moveHole = (
   { holeId, targetComponentId }: MoveHoleParams,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const hole = accessor.optional.hole(holeId)
-  const target = accessor.optional.component(targetComponentId)
+  const hole = accessor.optional.hole.byId(holeId)
+  const target = accessor.optional.component.byId(targetComponentId)
 
   if (!isDefined(hole) || !isDefined(target) || hole.componentId === targetComponentId) {
     return subProject

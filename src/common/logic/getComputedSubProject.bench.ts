@@ -183,12 +183,14 @@ const expectEquivalentSubProject = (current: ComputedSubProjectSchema, previous:
   expect(Object.keys(current.components)).toEqual(Object.keys(previous.components))
   const accessor = accessors.computedSubProject(previous)
   for (const [id, component] of Object.entries(current.components)) {
-    const previousComponent = accessor.component(id)
+    const previousComponent = accessor.component.byId(id)
     expect(component.type).toBe(previousComponent.type)
     expectEquivalentPath(component.path, previousComponent.path)
   }
-  expect(current.holes).toHaveLength(previous.holes.length)
-  current.holes.forEach((hole, index) => expectEquivalentPath(hole.highlightPath, previous.holes[index].highlightPath))
+  expect(Object.keys(current.holes)).toEqual(Object.keys(previous.holes))
+  Object.values(current.holes).forEach((hole) =>
+    expectEquivalentPath(hole.highlightPath, previous.holes[hole.holeId].highlightPath),
+  )
   expect(current.stitchLines).toEqual(previous.stitchLines)
 }
 

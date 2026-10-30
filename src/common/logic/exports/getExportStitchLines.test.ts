@@ -134,7 +134,7 @@ describe('cluster T-pocket stitching export', () => {
       const source = fixture()
       const snapshot = structuredClone(source)
       const computed = getComputedSubProject(source, defaultStitchingSettings)
-      const shared = computed.stitchLines.cluster[0]
+      const shared = computed.stitchLines.shared
       expect(shared.routes).toHaveLength(2)
       expect(shared.routes[0].path).toEqual(shared.routes[1].path)
       for (const id of ['a', 'b']) {

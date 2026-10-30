@@ -76,7 +76,7 @@ export const useExportDrawArea = (
         if (!settings.showParentNames) {
           return undefined
         }
-        return accessors.subProject(element.subProject).optional.parent(element.component.id)?.name
+        return accessors.subProject(element.subProject).optional.component.parent(element.component.id)?.name
       },
       getNameText: (element) => {
         if (!settings.showNames) {

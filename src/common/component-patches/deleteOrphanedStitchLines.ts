@@ -15,8 +15,8 @@ export const deleteOrphanedStitchLines = (
   for (const stitchLine of subProject.stitchLines) {
     const hasTarget =
       stitchLine.targetType === 'hole'
-        ? isDefined(accessor.optional.hole(stitchLine.targetId))
-        : isDefined(accessor.optional.component(stitchLine.targetId))
+        ? isDefined(accessor.optional.hole.byId(stitchLine.targetId))
+        : isDefined(accessor.optional.component.byId(stitchLine.targetId))
 
     // The target of the stitchline has been removed
     if (!hasTarget) {
@@ -28,7 +28,7 @@ export const deleteOrphanedStitchLines = (
     if (
       narrowers.is.componentBoundsStitchLine(stitchLine) &&
       isDefined(stitchLine.onTop) &&
-      !isDefined(accessor.optional.component(stitchLine.onTop))
+      !isDefined(accessor.optional.component.byId(stitchLine.onTop))
     ) {
       // Reset onTop to undefined -> is drawn on top of targetId.
       stitchLines.push({ ...stitchLine, onTop: undefined })

@@ -38,8 +38,8 @@ export const getExportElementsForComponent = (
   settings: ExportSettingsSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
 ): ExportElementSchema[] => {
-  const component = accessors.subProject(subProject).optional.component(componentId)
-  const computed = accessors.computedSubProject(computedSubProject).optional.component(componentId)
+  const component = accessors.subProject(subProject).optional.component.byId(componentId)
+  const computed = accessors.computedSubProject(computedSubProject).optional.component.byId(componentId)
   if (!isDefined(component) || !isDefined(computed)) {
     return []
   }

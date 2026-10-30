@@ -15,13 +15,13 @@ export const createComponentTreeNode = (
   showHoles: boolean,
 ): ComponentTreeNode => {
   const accessor = accessors.subProject(subProject)
-  const parent = accessor.optional.parent(component.id)
+  const parent = accessor.optional.component.parent(component.id)
   const siblingIds = isDefined(parent) ? parent.children : []
   const componentIndex = siblingIds.indexOf(component.id)
   const nextSiblingId = componentIndex < 0 ? undefined : siblingIds[componentIndex + 1]
 
   const childComponentNodes = component.children
-    .map((childId) => accessor.optional.component(childId))
+    .map((childId) => accessor.optional.component.byId(childId))
     .filter(isDefined)
     .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
 
@@ -82,7 +82,7 @@ export const createTreeRootNode = (
   showStitchLines: boolean,
   showHoles: boolean,
 ): ComponentTreeNode => {
-  const rootComponent = accessors.subProject(subProject).component(subProject.root)
+  const rootComponent = accessors.subProject(subProject).component.byId(subProject.root)
 
   return {
     children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles)],

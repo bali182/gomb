@@ -22,7 +22,7 @@ export const validateRootPanelSchema = (
 ): ValidationResultSchema<RootPanelSchema> => {
   const otherRootPanels = context.project.subProjects
     .filter((subProject) => subProject.id !== context.subProject.id)
-    .map((subProject) => accessors.subProject(subProject).optional.rootPanel())
+    .map((subProject) => accessors.subProject(subProject).optional.component.rootPanel())
     .filter(isDefined)
   const nameResult = validateName(
     input.name,

@@ -4,5 +4,5 @@ import { useSubProject } from './useSubProject'
 
 export const useStitchLine = (id: string): StitchLineSchema => {
   const { subProject } = useSubProject()
-  return accessors.subProject(subProject).stitchLine(id)
+  return accessors.subProject(subProject).stitchLine.byId(id)
 }

@@ -49,7 +49,7 @@ export const getComputedSubProject = (
   subProject: SubProjectSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
 ): ComputedSubProjectSchema => {
-  const rootComponent = accessors.subProject(subProject).rootPanel()
+  const rootComponent = accessors.subProject(subProject).component.rootPanel()
 
   const computedComponents: Record<string, ComputedComponentSchema> = {}
   const resolvedStitchLines = subProject.stitchLines.map((stitchLine) =>
@@ -64,7 +64,7 @@ export const getComputedSubProject = (
   const root = computeRootPanel(rootComponent, rootBoundingRect, subProject, resolvedStitchLines, computedComponents)
   const holes = calculateHoles(subProject.holes, computedComponents)
   const stitchLines = calculateStitchLines(resolvedStitchLines, subProject, computedComponents, holes)
-  applyHolePathsToComputedComponents(computedComponents, holes)
+  applyHolePathsToComputedComponents(computedComponents, Object.values(holes))
 
   updatePocketClusterPaths(computedComponents)
 
@@ -74,7 +74,7 @@ export const getComputedSubProject = (
     components: computedComponents,
     holes,
     stitchLines,
-    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines).flat()),
+    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines)),
   }
   return { ...geometry, limits: getSubProjectLimits(subProject, geometry, stitchingSettings) }
 }
@@ -345,7 +345,7 @@ const completePocketChildren = (
   const accessor = accessors.subProject(subProject)
   for (const computedPocket of pockets) {
     if (narrowers.is.computedFrontPocket(computedPocket)) {
-      const source = accessor.frontPocket(computedPocket.componentId)
+      const source = accessor.component.frontPocket(computedPocket.componentId)
       const layoutChildren = assertLayoutChildren(getComponentChildren(source, subProject))
       computedPocket.computedLayoutGap = calculateGap(layoutChildren, computedPocket.boundingRect, source)
       computedPocket.children = computeLayoutChildren(

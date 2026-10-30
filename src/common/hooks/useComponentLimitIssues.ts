@@ -12,7 +12,7 @@ import { useTranslation } from './useTranslation'
 export const useComponentLimitIssues = (component: ComponentSchema): IssuesSchema<ComponentSchema> => {
   const { computedSubProject } = useSubProject()
   const translation = useTranslation()
-  const limits = accessors.subProjectLimits(computedSubProject.limits).optional.component(component.id)
+  const limits = accessors.computedSubProject(computedSubProject).optional.limits.component(component.id)
   return useMemo<IssuesSchema<ComponentSchema>>(() => {
     if (!isDefined(limits) || limits.type !== component.type) {
       return noIssues<ComponentSchema>()

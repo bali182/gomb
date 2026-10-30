@@ -19,8 +19,8 @@ export const moveComponent = (
     return subProject
   }
   const accessor = accessors.subProject(subProject)
-  const movedComponent = accessor.optional.component(componentId)
-  const targetParent = accessor.optional.component(targetParentId)
+  const movedComponent = accessor.optional.component.byId(componentId)
+  const targetParent = accessor.optional.component.byId(targetParentId)
 
   if (!isDefined(movedComponent) || narrowers.is.rootPanel(movedComponent) || !isDefined(targetParent)) {
     return subProject
@@ -30,7 +30,7 @@ export const moveComponent = (
     return subProject
   }
 
-  const sourceParent = accessor.optional.parent(componentId)
+  const sourceParent = accessor.optional.component.parent(componentId)
 
   if (!isDefined(sourceParent)) {
     return subProject

@@ -39,7 +39,7 @@ export const renderSvgComponentToString = ({
   nestingLevel,
   boundingRect,
 }: RenderSvgComponentToStringParams): string => {
-  const component = accessors.subProject(editorValues.subProject).component(componentId)
+  const component = accessors.subProject(editorValues.subProject).component.byId(componentId)
 
   let content: ReactNode
   switch (component.type) {

@@ -15,14 +15,16 @@ import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 export const calculateHoles = (
   holes: HoleSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedHoleSchema[] => {
-  return holes.flatMap((hole): ComputedHoleSchema[] => {
+): Record<string, ComputedHoleSchema> => {
+  const computedHoles: Record<string, ComputedHoleSchema> = {}
+  for (const hole of holes) {
     const ownerComponent = computedComponents[hole.componentId]
     if (!isDefined(ownerComponent) || narrowers.is.computedPocketCluster(ownerComponent)) {
-      return []
+      continue
     }
-    return [calculateHole(hole, ownerComponent)]
-  })
+    computedHoles[hole.id] = calculateHole(hole, ownerComponent)
+  }
+  return computedHoles
 }
 
 const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema): ComputedHoleSchema => {

@@ -152,7 +152,7 @@ const ExportFailureAlert: FC<ExportFailureAlertProps> = ({ failure, onDismiss })
           {failure.type === 'unplaceable' && (
             <Alert.Description as="ul" mt="2" ps="4">
               {failure.layout.unplaceables.map((panel) => {
-                const root = accessors.subProject(panel.subProject).optional.rootPanel()
+                const root = accessors.subProject(panel.subProject).optional.component.rootPanel()
                 const text = isDefined(root) ? `${root.name} → ${panel.component.name}` : panel.component.name
                 return <li key={`${panel.subProject.id}:${panel.component.id}`}>{text}</li>
               })}

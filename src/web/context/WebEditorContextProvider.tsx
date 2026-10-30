@@ -31,7 +31,9 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   }, [clearSubProjectHistory, project?.id])
 
   const subProject = useMemo<SubProjectSchema | undefined>(() => {
-    return isDefined(project) ? accessors.project(project).optional.subProject(subProjectId) : undefined
+    return isDefined(project) && isDefined(subProjectId)
+      ? accessors.project(project).optional.subProject(subProjectId)
+      : undefined
   }, [project, subProjectId])
 
   const computedSubProject = useMemo<ComputedSubProjectSchema | undefined>(() => {

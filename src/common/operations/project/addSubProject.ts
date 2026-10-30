@@ -20,7 +20,7 @@ export const addSubProject = (
 ): AddSubProjectResult => {
   const usedRootNames = new Set(
     project.subProjects
-      .map((subProject) => accessors.subProject(subProject).optional.rootPanel())
+      .map((subProject) => accessors.subProject(subProject).optional.component.rootPanel())
       .filter(isDefined)
       .map((rootPanel) => rootPanel.name),
   )
