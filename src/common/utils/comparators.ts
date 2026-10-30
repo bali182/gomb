@@ -17,7 +17,9 @@ import type {
   TPocketStitchLineSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from './accessors'
 import { isDefined } from './isDefined'
+import { narrowers } from './narrowers'
 
 export const comparators = {
   project: (a: ProjectSchema, b: ProjectSchema): boolean => {
@@ -51,12 +53,13 @@ export const comparators = {
   },
 
   subProject: (a: SubProjectSchema, b: SubProjectSchema): boolean => {
+    const accessor = accessors.subProject(b)
     return (
       a.id === b.id &&
       a.root === b.root &&
       Object.keys(a.components).length === Object.keys(b.components).length &&
       Object.entries(a.components).every(
-        ([id, component]) => id in b.components && comparators.component(component, b.components[id]),
+        ([id, component]) => id in b.components && comparators.component(component, accessor.component(id)),
       ) &&
       areArraysEqual(a.holes, b.holes, comparators.hole) &&
       areArraysEqual(a.stitchLines, b.stitchLines, comparators.stitchLine)
@@ -68,22 +71,22 @@ export const comparators = {
       return false
     }
 
-    if (a.type === 'root-panel' && b.type === 'root-panel') {
+    if (narrowers.is.rootPanel(a) && narrowers.is.rootPanel(b)) {
       return comparators.rootPanel(a, b)
     }
 
-    if (a.type === 'panel' && b.type === 'panel') {
+    if (narrowers.is.panel(a) && narrowers.is.panel(b)) {
       return comparators.panel(a, b)
     }
 
-    if (a.type === 'pocket-cluster' && b.type === 'pocket-cluster') {
+    if (narrowers.is.pocketCluster(a) && narrowers.is.pocketCluster(b)) {
       return comparators.pocketCluster(a, b)
     }
 
-    if (a.type === 'front-pocket' && b.type === 'front-pocket') {
+    if (narrowers.is.frontPocket(a) && narrowers.is.frontPocket(b)) {
       return comparators.frontPocket(a, b)
     }
-    if (a.type === 't-pocket' && b.type === 't-pocket') {
+    if (narrowers.is.tPocket(a) && narrowers.is.tPocket(b)) {
       return comparators.tPocket(a, b)
     }
     return false
@@ -123,7 +126,7 @@ export const comparators = {
     )
   },
   pocketOpening: (a: PocketOpeningSchema, b: PocketOpeningSchema): boolean => {
-    if (a.type === 'optical-illusion' && b.type === 'optical-illusion') {
+    if (narrowers.is.opticalIllusionPocketOpening(a) && narrowers.is.opticalIllusionPocketOpening(b)) {
       return (
         a.direction === b.direction &&
         a.startInset === b.startInset &&
@@ -132,13 +135,13 @@ export const comparators = {
         a.trailingRadius === b.trailingRadius
       )
     }
-    if (a.type === 'straight' && b.type === 'straight') {
+    if (narrowers.is.straightPocketOpening(a) && narrowers.is.straightPocketOpening(b)) {
       return true
     }
-    if (a.type === 'slanted' && b.type === 'slanted') {
+    if (narrowers.is.slantedPocketOpening(a) && narrowers.is.slantedPocketOpening(b)) {
       return a.offset === b.offset && a.side === b.side
     }
-    if (a.type === 'recessed' && b.type === 'recessed') {
+    if (narrowers.is.recessedPocketOpening(a) && narrowers.is.recessedPocketOpening(b)) {
       return (
         a.outerInset === b.outerInset &&
         a.innerOffset === b.innerOffset &&
@@ -220,11 +223,11 @@ export const comparators = {
       return false
     }
 
-    if (a.type === 'component-bounds-stitch-line' && b.type === 'component-bounds-stitch-line') {
+    if (narrowers.is.componentBoundsStitchLine(a) && narrowers.is.componentBoundsStitchLine(b)) {
       return comparators.componentBoundsStitchLine(a, b)
     }
 
-    if (a.type === 't-pocket-stitch-line' && b.type === 't-pocket-stitch-line') {
+    if (narrowers.is.tPocketStitchLine(a) && narrowers.is.tPocketStitchLine(b)) {
       return comparators.tPocketStitchLine(a, b)
     }
 

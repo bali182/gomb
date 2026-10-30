@@ -131,7 +131,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
-      if (component.type === 'pocket-cluster' && component.children.length === 0) {
+      if (narrowers.is.pocketCluster(component) && component.children.length === 0) {
         return 'transparent'
       }
       return applyOpacity(
@@ -160,7 +160,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return STROKE_THICKNESS
       },
       getBorderDasharray: ({ component }) => {
-        if (component.type === 'pocket-cluster' && component.children.length === 0) {
+        if (narrowers.is.pocketCluster(component) && component.children.length === 0) {
           return EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY
         }
         return undefined

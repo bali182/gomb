@@ -2,6 +2,7 @@ import { HasCornerRadiusValuesSchema } from '../schemas/common'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
+import { narrowers } from '../utils/narrowers'
 
 export const addAutoStitchLineRadii = (
   subProject: SubProjectSchema,
@@ -12,11 +13,14 @@ export const addAutoStitchLineRadii = (
   const accessor = accessors.computedSubProject(computedProject)
 
   for (const stitchLine of subProject.stitchLines) {
-    if (stitchLine.type === 't-pocket-stitch-line' || !stitchLine.autoCornerRadius) {
+    if (narrowers.is.tPocketStitchLine(stitchLine) || !stitchLine.autoCornerRadius) {
       stitchLines.push(stitchLine)
       continue
     }
-    const { bottomLeft, bottomRight, topLeft, topRight } = accessor.stitchLine(stitchLine.id).autoComputedCornerRadius
+    const { bottomLeft, bottomRight, topLeft, topRight } = accessor.stitchLine(
+      stitchLine.id,
+      stitchLine.onTop,
+    ).autoComputedCornerRadius
 
     const radius: HasCornerRadiusValuesSchema = {
       bottomLeftRadius: bottomLeft.toNumber(),

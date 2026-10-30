@@ -1,4 +1,3 @@
-import { getComponentParent } from '../../operations/subProject/utils/getComponentParent'
 import type { PocketSettingsCopyRowSchema, PocketSettingsCopyTargetsSchema } from '../../schemas/pocketCopy'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -11,7 +10,7 @@ export const getPocketSettingsCopyRows = (
   targets: Partial<PocketSettingsCopyTargetsSchema>,
 ): PocketSettingsCopyRowSchema[] => {
   const source = accessors.subProject(subProject).pocket(sourcePocketId)
-  const cluster = getComponentParent(sourcePocketId, subProject)
+  const cluster = accessors.subProject(subProject).optional.parent(sourcePocketId)
   if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
     return []
   }

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../utils/narrowers'
 
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { AnchorSchema } from '../schemas/common'
@@ -49,7 +50,7 @@ describe('empty pocket cluster placeholder', () => {
         .pocketCluster(cluster.id)
       expect(computed.children).toEqual([])
       expectBoundingRect(computed, [0, 0, 100, 80])
-      expect(computed.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(2)
+      expect(computed.path.commands.filter((command) => narrowers.path.is.arcTo(command))).toHaveLength(2)
       expect(getClosedPathArea(computed.path)).toBeCloseTo(8000 - 2 * (100 - Math.PI * 25), 7)
       expect(original).toEqual(snapshot)
     },
@@ -327,7 +328,7 @@ const getClosedPathArea = (path: PathSchema): number => {
   return getClosedPathLoops(path)
     .flat()
     .reduce((area, segment) => {
-      if (segment.type === 'line') {
+      if (narrowers.path.is.lineSegment(segment)) {
         return area + segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y)).toNumber() / 2
       }
       return (

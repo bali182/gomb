@@ -3,6 +3,7 @@ import type { PocketClusterSchema, PocketSchema, TPocketSchema } from '../schema
 import type { ComputedFrontPocketSchema, ComputedPocketSchema, ComputedTPocketSchema } from '../schemas/computed'
 import type { CornerRadiusSchema, RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
+import { narrowers } from '../utils/narrowers'
 import { calculatePocketBoundingBox } from './calculatePocketBoundingBox'
 import { calculatePocketItem } from './calculatePocketItem'
 import { getCornerRadius } from './cornerRadiusUtils'
@@ -25,7 +26,7 @@ export const calculatePocketClusterGeometry = (
     const boundingRect = calculatePocketBoundingBox(cluster, rect, index)
     const cornerRadius = getPocketCornerRadius(pocket, boundingRect, rect, radius, cluster)
 
-    if (pocket.type === 'front-pocket') {
+    if (narrowers.is.frontPocket(pocket)) {
       const computed: ComputedFrontPocketSchema = {
         type: 'computed-front-pocket',
         componentId: pocket.id,
@@ -82,7 +83,7 @@ const getPocketCornerRadius = (
   radius: CornerRadiusSchema,
   cluster: PocketClusterSchema,
 ): CornerRadiusSchema => {
-  if (pocket.type !== 'front-pocket') {
+  if (!narrowers.is.frontPocket(pocket)) {
     return ZERO_CORNER_RADIUS
   }
   const limits = getFrontPocketCornerRadiusLimits(

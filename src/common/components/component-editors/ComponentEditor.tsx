@@ -1,6 +1,7 @@
 import type { FC } from 'react'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
+import { narrowers } from '../../utils/narrowers'
 
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import type {
@@ -35,7 +36,7 @@ export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
 
   switch (props.editable.type) {
     case 'front-pocket':
-      if (props.parent?.type !== 'pocket-cluster') {
+      if (!isDefined(props.parent) || !narrowers.is.pocketCluster(props.parent)) {
         return undefined
       }
       return (
@@ -48,7 +49,7 @@ export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
         />
       )
     case 't-pocket': {
-      if (props.parent?.type !== 'pocket-cluster') {
+      if (!isDefined(props.parent) || !narrowers.is.pocketCluster(props.parent)) {
         return undefined
       }
       return (

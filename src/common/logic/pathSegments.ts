@@ -1,6 +1,7 @@
 import type { PathCommand, PathSchema, PointSchema } from '../schemas/geometry'
 import { arePointsEqual } from '../utils/arePointsEqual'
 import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
 import type { PathSegment } from './pathSegmentTypes'
 import { createArcPathSegment } from './pathSegmentUtils'
 
@@ -11,13 +12,13 @@ export const getPathSegments = (path: PathSchema, requireClosed = false): PathSe
   let hasClose = false
 
   for (const command of path.commands) {
-    if (command.type === 'moveTo') {
+    if (narrowers.path.is.moveTo(command)) {
       currentPoint = command.point
       subpathStart = command.point
       continue
     }
 
-    if (command.type === 'close') {
+    if (narrowers.path.is.close(command)) {
       if (!isDefined(currentPoint) || !isDefined(subpathStart)) {
         throw new Error('Path close command has no subpath start')
       }
@@ -32,7 +33,7 @@ export const getPathSegments = (path: PathSchema, requireClosed = false): PathSe
       throw new Error(`Path ${command.type} command has no start point`)
     }
 
-    if (command.type === 'lineTo') {
+    if (narrowers.path.is.lineTo(command)) {
       addLineSegment(segments, currentPoint, command.point)
       currentPoint = command.point
       continue
@@ -56,7 +57,7 @@ export const getClosedPathLoops = (path: PathSchema): PathSegment[][] => {
   let segments: PathSegment[] = []
 
   for (const command of path.commands) {
-    if (command.type === 'moveTo') {
+    if (narrowers.path.is.moveTo(command)) {
       if (isDefined(currentPoint)) {
         throw new Error('Closed path contains an unclosed contour')
       }
@@ -71,7 +72,7 @@ export const getClosedPathLoops = (path: PathSchema): PathSegment[][] => {
       throw new Error(`Path ${command.type} command has no start point`)
     }
 
-    if (command.type === 'close') {
+    if (narrowers.path.is.close(command)) {
       if (!isDefined(subpathStart)) {
         throw new Error('Path close command has no subpath start')
       }
@@ -83,7 +84,7 @@ export const getClosedPathLoops = (path: PathSchema): PathSegment[][] => {
       continue
     }
 
-    if (command.type === 'lineTo') {
+    if (narrowers.path.is.lineTo(command)) {
       addLineSegment(segments, currentPoint, command.point)
       currentPoint = command.point
       continue
@@ -132,7 +133,7 @@ export const createPathFromConnectedSegments = (segments: PathSegment[]): PathSc
   const commands: PathCommand[] = [{ type: 'moveTo', point: segments[0].start }]
 
   for (const segment of segments) {
-    if (segment.type === 'line') {
+    if (narrowers.path.is.lineSegment(segment)) {
       commands.push({ type: 'lineTo', point: segment.end })
       continue
     }

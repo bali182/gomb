@@ -1,11 +1,13 @@
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 
 export const deleteOrphanedHoles = (
   subProject: SubProjectSchema,
   _computedProject: ComputedSubProjectSchema,
 ): SubProjectSchema => {
-  const holes = subProject.holes.filter((hole) => isDefined(subProject.components[hole.componentId]))
+  const accessor = accessors.subProject(subProject)
+  const holes = subProject.holes.filter((hole) => isDefined(accessor.optional.component(hole.componentId)))
 
   if (holes.length === subProject.holes.length) {
     return subProject

@@ -1,4 +1,5 @@
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import {
   cloneComponentTree,
@@ -7,7 +8,6 @@ import {
   type CloneComponentSettings,
 } from './cloneComponentTree'
 import { canCloneComponent } from './utils/componentRules'
-import { getComponentParent } from './utils/getComponentParent'
 
 export type CloneComponentParams = {
   componentId: string
@@ -20,13 +20,14 @@ export const cloneComponent = (
   subProject: SubProjectSchema,
   { componentId, ids, names, settings }: CloneComponentParams,
 ): SubProjectSchema => {
-  const sourceComponent = subProject.components[componentId]
+  const accessor = accessors.subProject(subProject)
+  const sourceComponent = accessor.optional.component(componentId)
 
   if (!isDefined(sourceComponent) || !canCloneComponent(sourceComponent)) {
     return subProject
   }
 
-  const sourceParent = getComponentParent(componentId, subProject)
+  const sourceParent = accessor.optional.parent(componentId)
 
   if (!isDefined(sourceParent)) {
     return subProject

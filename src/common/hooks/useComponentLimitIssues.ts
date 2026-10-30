@@ -5,6 +5,7 @@ import { accessors } from '../utils/accessors'
 import { getLimitIssues } from '../utils/getLimitIssues'
 import { isDefined } from '../utils/isDefined'
 import { noIssues } from '../utils/issueUtils'
+import { narrowers } from '../utils/narrowers'
 import { useSubProject } from './useSubProject'
 import { useTranslation } from './useTranslation'
 
@@ -16,13 +17,13 @@ export const useComponentLimitIssues = (component: ComponentSchema): IssuesSchem
     if (!isDefined(limits) || limits.type !== component.type) {
       return noIssues<ComponentSchema>()
     }
-    if (component.type === 'front-pocket' && limits.type === 'front-pocket') {
+    if (narrowers.is.frontPocket(component) && limits.type === 'front-pocket') {
       return {
         ...getLimitIssues(component, limits, translation),
         opening: getLimitIssues(component.opening, limits.opening, translation),
       }
     }
-    if (component.type === 't-pocket' && limits.type === 't-pocket') {
+    if (narrowers.is.tPocket(component) && limits.type === 't-pocket') {
       return {
         ...getLimitIssues(component, limits, translation),
         opening: getLimitIssues(component.opening, limits.opening, translation),

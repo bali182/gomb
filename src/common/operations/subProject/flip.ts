@@ -53,12 +53,7 @@ export const flip = (
       }
     }
     case 'component-bounds-stitch-line': {
-      const stitchLine = subProject.stitchLines
-        .filter(narrowers.is.componentBoundsStitchLine)
-        .find((candidate) => candidate.id === model.id)
-      if (!isDefined(stitchLine)) {
-        throw new Error(`Component bounds stitch line not found: ${model.id}`)
-      }
+      const stitchLine = accessor.componentBoundsStitchLine(model.id)
       return {
         ...subProject,
         stitchLines: subProject.stitchLines.map((candidate) =>
@@ -67,12 +62,7 @@ export const flip = (
       }
     }
     case 't-pocket-stitch-line': {
-      const stitchLine = subProject.stitchLines
-        .filter(narrowers.is.tPocketStitchLine)
-        .find((candidate) => candidate.id === model.id)
-      if (!isDefined(stitchLine)) {
-        throw new Error(`T-pocket stitch line not found: ${model.id}`)
-      }
+      const stitchLine = accessor.tPocketStitchLine(model.id)
       const flipped = flipStitchLine(stitchLine, subProject, axis)
       if (flipped === stitchLine) {
         return subProject

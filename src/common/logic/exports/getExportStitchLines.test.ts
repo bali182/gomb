@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { defaultStitchingSettings } from '../../defaultStates'
 import type { ExportStitchLineModeSchema } from '../../schemas/settings'
@@ -67,7 +68,7 @@ describe.each<StitchLineModeTestCase>([
     const computed = getComputedSubProject(subProject, defaultStitchingSettings)
     const target = computed.components['panel']
 
-    if (target.type !== 'computed-panel') {
+    if (!narrowers.is.computedPanel(target)) {
       throw new Error('Expected a computed panel')
     }
 

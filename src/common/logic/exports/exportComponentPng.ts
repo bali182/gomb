@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { PNG_EXTENSION } from '../../constants/fileExtensions'
 import {
@@ -72,7 +73,7 @@ const findNestingLevel = (
     const childLevel = findNestingLevel(
       child,
       componentId,
-      component.type === 'computed-pocket-cluster' ? level : level + 1,
+      narrowers.is.computedPocketCluster(component) ? level : level + 1,
     )
     if (isDefined(childLevel)) {
       return childLevel
@@ -99,7 +100,7 @@ const getComponentBoundingRects = (
   const borderPadding = (context.componentStyles.getBorderThickness(styleParams) ?? 0) / 2
   const boundingRects = [padBoundingRect(component.boundingRect, borderPadding)]
 
-  if (component.type === 'computed-pocket-cluster' && model.type === 'pocket-cluster') {
+  if (narrowers.is.computedPocketCluster(component) && narrowers.is.pocketCluster(model)) {
     for (const pocket of component.children) {
       boundingRects.push(padBoundingRect(pocket.boundingRect, borderPadding))
       if (context.isShowingPocketItems && isDefined(pocket.item)) {
@@ -111,10 +112,10 @@ const getComponentBoundingRects = (
     }
   }
   if (
-    (component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket') &&
-    model.type !== 'pocket-cluster' &&
-    model.type !== 'panel' &&
-    model.type !== 'root-panel' &&
+    (narrowers.is.computedFrontPocket(component) || narrowers.is.computedTPocket(component)) &&
+    !narrowers.is.pocketCluster(model) &&
+    !narrowers.is.panel(model) &&
+    !narrowers.is.rootPanel(model) &&
     context.isShowingPocketItems &&
     isDefined(component.item)
   ) {
@@ -171,11 +172,14 @@ const collectBoundingRects = (
   params: ExportComponentPngParams,
 ): RectSchema[] => [
   ...getComponentBoundingRects(component, nestingLevel, params),
-  ...getStitchLineBoundingRects(computedSubProject.stitchLines[component.componentId] ?? [], params),
+  ...getStitchLineBoundingRects(
+    accessors.computedSubProject(computedSubProject).stitchLines(component.componentId),
+    params,
+  ),
   ...component.children.flatMap((child) =>
     collectBoundingRects(
       child,
-      component.type === 'computed-pocket-cluster' ? nestingLevel : nestingLevel + 1,
+      narrowers.is.computedPocketCluster(component) ? nestingLevel : nestingLevel + 1,
       computedSubProject,
       params,
     ),

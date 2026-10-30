@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../utils/narrowers'
 
 import { POSITION_EPSILON, TWO, ZERO } from '../constants/layout'
 import type { PathArcToSchema, PointSchema } from '../schemas/geometry'
@@ -59,16 +60,12 @@ export const createArcPathSegment = (start: PointSchema, command: PathArcToSchem
   }
 }
 
-export const isLinePathSegment = (segment: PathSegment): segment is LinePathSegment => {
-  return segment.type === 'line'
-}
-
 export const getPathSegmentMidpoint = (segment: PathSegment): PointSchema => {
   return getPointOnPathSegment(segment, new BigNumber(0.5))
 }
 
 export const getPointOnPathSegment = (segment: PathSegment, progress: BigNumber): PointSchema => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     return {
       x: segment.start.x.plus(segment.end.x.minus(segment.start.x).times(progress)),
       y: segment.start.y.plus(segment.end.y.minus(segment.start.y).times(progress)),
@@ -84,7 +81,7 @@ export const getPointOnPathSegment = (segment: PathSegment, progress: BigNumber)
 }
 
 export const getPathSegmentTangent = (segment: PathSegment, point: PointSchema): PointSchema => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     return {
       x: segment.end.x.minus(segment.start.x),
       y: segment.end.y.minus(segment.start.y),
@@ -115,7 +112,7 @@ export const splitPathSegment = (segment: PathSegment, progresses: BigNumber[]):
 }
 
 export const isPointOnPathSegment = (point: PointSchema, segment: PathSegment): boolean => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     const dx = segment.end.x.minus(segment.start.x)
     const dy = segment.end.y.minus(segment.start.y)
     const pointDx = point.x.minus(segment.start.x)
@@ -206,7 +203,7 @@ const getPathSegmentRange = (segment: PathSegment, startProgress: BigNumber, end
   const start = getPointOnPathSegment(segment, startProgress)
   const end = getPointOnPathSegment(segment, endProgress)
 
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     return { type: 'line', start, end }
   }
 

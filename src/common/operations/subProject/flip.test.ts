@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultStitchingSettings } from '../../defaultStates'
@@ -706,9 +707,10 @@ describe.each(orientationCases)(
           calculatePocketBoundingBox(flippedCluster, rect, index),
           ZERO_CORNER_RADIUS,
         )
-        const before = pocket.type === 't-pocket' ? calculator.getTPocketPath() : calculator.getFrontPocketPath()
-        const after =
-          pocket.type === 't-pocket' ? flippedCalculator.getTPocketPath() : flippedCalculator.getFrontPocketPath()
+        const before = narrowers.is.tPocket(pocket) ? calculator.getTPocketPath() : calculator.getFrontPocketPath()
+        const after = narrowers.is.tPocket(pocket)
+          ? flippedCalculator.getTPocketPath()
+          : flippedCalculator.getFrontPocketPath()
         const mirroredVertices = getVertices(before).map(([x, y]) =>
           axis === 'horizontal' ? [122 - x, y] : [x, 154 - y],
         )
@@ -757,7 +759,7 @@ describe.each(orientationCases)(
 
 const getVertices = (path: PathSchema): number[][] => {
   return path.commands.flatMap((command) =>
-    command.type === 'close' ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
+    narrowers.path.is.close(command) ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
   )
 }
 

@@ -25,14 +25,16 @@ export const TPocketStitchLines: FC<TPocketStitchLinesProps> = ({ componentId })
   const accessor = accessors.subProject(subProject)
   const computedStitchLines = accessors.computedSubProject(computedSubProject).stitchLines(componentId)
   const parentRoutes = useMemo<PocketStitchRoute[]>(() => {
-    const source = accessors.subProject(subProject)
-    const computed = accessors.computedSubProject(computedSubProject)
-    const parent = source.optional.parent(componentId)
+    const accessor = accessors.subProject(subProject)
+    const computedAccessor = accessors.computedSubProject(computedSubProject)
+    const parent = accessor.optional.parent(componentId)
     if (!isDefined(parent)) {
       return []
     }
-    return source.tPocketStitchLines(parent.id).flatMap((stitchLine): PocketStitchRoute[] => {
-      const routes = computed.stitchLine(stitchLine.id).routes.filter((route) => route.targetId === componentId)
+    return accessor.tPocketStitchLines(parent.id).flatMap((stitchLine): PocketStitchRoute[] => {
+      const routes = computedAccessor
+        .stitchLine(stitchLine.id, stitchLine.targetId)
+        .routes.filter((route) => route.targetId === componentId)
       const resolvedStitchLine = getResolvedStitchLine(stitchLine, project.stitchingSettings)
       return routes.map((route): PocketStitchRoute => ({ route, stitchLine: resolvedStitchLine }))
     })
@@ -41,9 +43,9 @@ export const TPocketStitchLines: FC<TPocketStitchLinesProps> = ({ componentId })
   return (
     <>
       {computedStitchLines.map((computedStitchLine) => {
-        const stitchLine = accessor.optional.stitchLine(computedStitchLine.stitchLineId)
+        const stitchLine = accessor.optional.tPocketStitchLine(computedStitchLine.stitchLineId)
 
-        if (!isDefined(stitchLine) || stitchLine.type !== 't-pocket-stitch-line') {
+        if (!isDefined(stitchLine)) {
           return null
         }
 

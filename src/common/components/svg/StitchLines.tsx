@@ -16,14 +16,14 @@ export const StitchLines: FC<StitchLinesProps> = ({ componentId, maskId }) => {
   const { project } = useProject()
   const { subProject, computedSubProject } = useSubProject()
   const accessor = accessors.subProject(subProject)
-  const computedStitchLines = computedSubProject.stitchLines[componentId] ?? []
+  const computedStitchLines = accessors.computedSubProject(computedSubProject).stitchLines(componentId)
 
   return (
     <>
       {computedStitchLines.map((computedStitchLine) => {
-        const stitchLine = accessor.optional.stitchLine(computedStitchLine.stitchLineId)
+        const stitchLine = accessor.optional.componentBoundsStitchLine(computedStitchLine.stitchLineId)
 
-        if (!isDefined(stitchLine) || stitchLine.type !== 'component-bounds-stitch-line') {
+        if (!isDefined(stitchLine)) {
           return null
         }
 

@@ -1,9 +1,11 @@
 import type { ComponentSchema } from '../../../schemas/components'
 import type { SubProjectSchema } from '../../../schemas/subProject'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
+import { narrowers } from '../../../utils/narrowers'
 
 export const getComponentNestingLevel = (componentId: string, subProject: SubProjectSchema): number => {
-  const rootComponent = subProject.components[subProject.root]
+  const rootComponent = accessors.subProject(subProject).optional.rootPanel()
 
   if (!isDefined(rootComponent)) {
     return 0
@@ -22,8 +24,9 @@ const findComponentNestingLevel = (
     return currentNestingLevel
   }
 
+  const accessor = accessors.subProject(subProject)
   for (const childId of component.children) {
-    const child = subProject.components[childId]
+    const child = accessor.optional.component(childId)
 
     if (!isDefined(child)) {
       continue
@@ -33,7 +36,7 @@ const findComponentNestingLevel = (
       componentId,
       child,
       subProject,
-      component.type === 'pocket-cluster' ? currentNestingLevel : currentNestingLevel + 1,
+      narrowers.is.pocketCluster(component) ? currentNestingLevel : currentNestingLevel + 1,
     )
 
     if (isDefined(childNestingLevel)) {

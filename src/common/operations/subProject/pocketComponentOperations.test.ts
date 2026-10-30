@@ -4,6 +4,7 @@ import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '.
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
+import { narrowers } from '../../utils/narrowers'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
 import { cloneComponent } from './cloneComponent'
 import { deleteComponent } from './deleteComponent'
@@ -267,7 +268,7 @@ describe('pocket component operations', () => {
 it('clones every optical illusion setting', () => {
   const original = fixture()
   const a = original.components.a
-  if (a.type !== 't-pocket') throw new Error('Missing pocket')
+  if (!narrowers.is.tPocket(a)) throw new Error('Missing pocket')
   const opening = {
     ...defaultOpticalIllusionPocketOpening,
     startInset: 12,
@@ -289,7 +290,7 @@ it('clones every optical illusion setting', () => {
   })
   const copiedCluster = cloned.components[cloned.components.root.children[1]]
   const copiedPocket = cloned.components[copiedCluster.children[0]]
-  if (copiedPocket.type !== 't-pocket') throw new Error('Missing copied pocket')
+  if (!narrowers.is.tPocket(copiedPocket)) throw new Error('Missing copied pocket')
   expect(copiedPocket.opening).toEqual(opening)
 })
 

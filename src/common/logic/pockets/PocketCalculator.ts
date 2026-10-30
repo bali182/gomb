@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
 import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
@@ -54,7 +55,7 @@ export abstract class PocketCalculator<T extends PocketOpeningSchema> {
   }
 
   protected getTPocketBottomCommands(): PathCommand[] {
-    if (this.pocket.type !== 't-pocket') {
+    if (!narrowers.is.tPocket(this.pocket)) {
       throw new Error('T-pocket bottom requires a T-pocket')
     }
     const taper = new BigNumber(this.pocket.tPocketTaper)
@@ -68,7 +69,7 @@ export abstract class PocketCalculator<T extends PocketOpeningSchema> {
     return {
       commands: path.commands.map(
         (command: PathCommand): PathCommand =>
-          command.type === 'close' ? command : { ...command, point: this.transformPoint(command.point) },
+          narrowers.path.is.close(command) ? command : { ...command, point: this.transformPoint(command.point) },
       ),
     }
   }

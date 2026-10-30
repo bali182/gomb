@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
+import { accessors } from '../../utils/accessors'
 
 import { Panel } from '../../components/svg/Panel'
 import { Pocket } from '../../components/svg/Pocket'
@@ -20,7 +21,6 @@ import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
 import type { GlobalSettingsSchema } from '../../schemas/settings'
 import { getViewBox } from '../../utils/getViewBox'
-import { isDefined } from '../../utils/isDefined'
 
 type RenderSvgComponentToStringParams = {
   editorValues: Required<EditorContextValues>
@@ -39,10 +39,7 @@ export const renderSvgComponentToString = ({
   nestingLevel,
   boundingRect,
 }: RenderSvgComponentToStringParams): string => {
-  const component = editorValues.subProject.components[componentId]
-  if (!isDefined(component)) {
-    throw new Error(`Component not found: ${componentId}`)
-  }
+  const component = accessors.subProject(editorValues.subProject).component(componentId)
 
   let content: ReactNode
   switch (component.type) {

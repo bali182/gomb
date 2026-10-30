@@ -23,7 +23,6 @@ import { updateStitchLine as updateStitchLinePure } from '../operations/subProje
 import { createComponent } from '../operations/subProject/utils/createComponent'
 import { createHole } from '../operations/subProject/utils/createHole'
 import { createStitchLine } from '../operations/subProject/utils/createStitchLine'
-import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import { getUnusedComponentName } from '../operations/subProject/utils/getUnusedComponentName'
 import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
 import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
@@ -306,15 +305,14 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const copyPocketSettings = useCallback(
     (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const source = accessors.subProject(currentSubProject).pocket(sourcePocketId)
-      const cluster = getComponentParent(sourcePocketId, currentSubProject)
+      const accessor = accessors.subProject(currentSubProject)
+      const source = accessor.pocket(sourcePocketId)
+      const cluster = accessor.optional.parent(sourcePocketId)
       if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
         return
       }
 
-      const sourceStitchLines = currentSubProject.stitchLines
-        .filter(narrowers.is.tPocketStitchLine)
-        .filter((stitchLine) => stitchLine.targetId === sourcePocketId)
+      const sourceStitchLines = accessor.tPocketStitchLines(sourcePocketId)
       const updatedSubProject = cluster.children.reduce<SubProjectSchema>((current, pocketId) => {
         const selection = targets[pocketId]
         if (pocketId === sourcePocketId || !isDefined(selection)) {
@@ -462,9 +460,7 @@ const copyPocketStitchLines = (
   targetPocketId: string,
   overwrite: boolean,
 ): SubProjectSchema => {
-  const existingStitchLines = subProject.stitchLines
-    .filter(narrowers.is.tPocketStitchLine)
-    .filter((stitchLine) => stitchLine.targetId === targetPocketId)
+  const existingStitchLines = accessors.subProject(subProject).tPocketStitchLines(targetPocketId)
   const withoutExisting = overwrite
     ? existingStitchLines.reduce<SubProjectSchema>(
         (current, stitchLine) => deleteStitchLinePure(current, { stitchLineId: stitchLine.id }),

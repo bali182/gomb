@@ -2,6 +2,7 @@ import type { LayoutOrientationSchema, RootPanelSchema } from '../schemas/compon
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
@@ -21,8 +22,8 @@ export const validateRootPanelSchema = (
 ): ValidationResultSchema<RootPanelSchema> => {
   const otherRootPanels = context.project.subProjects
     .filter((subProject) => subProject.id !== context.subProject.id)
-    .map((subProject) => subProject.components[subProject.root])
-    .filter((component): component is RootPanelSchema => isDefined(component) && component.type === 'root-panel')
+    .map((subProject) => accessors.subProject(subProject).optional.rootPanel())
+    .filter(isDefined)
   const nameResult = validateName(
     input.name,
     currentValue.name,

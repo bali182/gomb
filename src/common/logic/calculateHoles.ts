@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../utils/narrowers'
 
 import type { AnchorSchema } from '../schemas/common'
 import type { ComputedComponentSchema, ComputedHoleSchema } from '../schemas/computed'
@@ -17,7 +18,7 @@ export const calculateHoles = (
 ): ComputedHoleSchema[] => {
   return holes.flatMap((hole): ComputedHoleSchema[] => {
     const ownerComponent = computedComponents[hole.componentId]
-    if (!isDefined(ownerComponent) || ownerComponent.type === 'computed-pocket-cluster') {
+    if (!isDefined(ownerComponent) || narrowers.is.computedPocketCluster(ownerComponent)) {
       return []
     }
     return [calculateHole(hole, ownerComponent)]

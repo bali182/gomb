@@ -110,3 +110,118 @@ describe('subProject relationship accessors', () => {
     expect(source).toEqual(snapshot)
   })
 })
+
+describe('typed optional subproject accessors', () => {
+  it('returns the supported component types and leaves wrong, missing and undefined IDs unmatched', () => {
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
+      components: [
+        d.panel({ id: 'panel' }),
+        d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
+        d.tPocket({ id: 't' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+    })
+    const snapshot = structuredClone(subProject)
+    const optional = accessors.subProject(subProject).optional
+    expect(optional.rootPanel()).toBe(subProject.components.root)
+    expect(accessors.subProject({ ...subProject, root: 'missing' }).optional.rootPanel()).toBeUndefined()
+    expect(accessors.subProject({ ...subProject, root: 'panel' }).optional.rootPanel()).toBeUndefined()
+    for (const [id, getter, wrongId] of [
+      ['panel', optional.panel, 'cluster'],
+      ['cluster', optional.pocketCluster, 'panel'],
+      ['front', optional.frontPocket, 'panel'],
+      ['t', optional.tPocket, 'front'],
+      ['front', optional.pocket, 'panel'],
+      ['t', optional.pocket, 'panel'],
+    ] as const) {
+      expect(getter(id)).toBe(subProject.components[id])
+      expect(getter(wrongId)).toBeUndefined()
+      expect(getter('missing')).toBeUndefined()
+      expect(getter(undefined)).toBeUndefined()
+    }
+    expect(subProject).toEqual(snapshot)
+  })
+
+  it.each([false, true])('matches stitch type and ID together regardless of array order: %s', (reverse) => {
+    const bounds = d.componentBoundsStitchLine({ id: 'shared', targetId: 'root', targetType: 'component' })
+    const pocket = d.tPocketStitchLine({ id: 'shared', targetId: 't', targetType: 'component' })
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root' }),
+      stitchLines: reverse ? [pocket, bounds] : [bounds, pocket],
+    })
+    const snapshot = structuredClone(subProject)
+    const accessor = accessors.subProject(subProject)
+    expect(accessor.optional.componentBoundsStitchLine('shared')).toBe(bounds)
+    expect(accessor.optional.tPocketStitchLine('shared')).toBe(pocket)
+    expect(accessor.componentBoundsStitchLine('shared')).toBe(bounds)
+    expect(accessor.tPocketStitchLine('shared')).toBe(pocket)
+    expect(accessor.optional.componentBoundsStitchLine(undefined)).toBeUndefined()
+    expect(accessor.optional.tPocketStitchLine(undefined)).toBeUndefined()
+    expect(accessor.optional.componentBoundsStitchLine('missing')).toBeUndefined()
+    expect(accessor.optional.tPocketStitchLine('missing')).toBeUndefined()
+    expect(() => accessor.componentBoundsStitchLine('missing')).toThrow('Missing component bounds stitch line')
+    expect(() => accessor.tPocketStitchLine('missing')).toThrow('Missing T-pocket stitch line')
+    expect(subProject).toEqual(snapshot)
+  })
+
+  it('does not return a different stitch type when only its ID matches', () => {
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root' }),
+      stitchLines: [
+        d.componentBoundsStitchLine({ id: 'bounds', targetId: 'root', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'pocket', targetId: 't', targetType: 'component' }),
+      ],
+    })
+    const accessor = accessors.subProject(subProject)
+    expect(accessor.optional.tPocketStitchLine('bounds')).toBeUndefined()
+    expect(accessor.optional.componentBoundsStitchLine('pocket')).toBeUndefined()
+    expect(() => accessor.tPocketStitchLine('bounds')).toThrow('Missing T-pocket stitch line')
+    expect(() => accessor.componentBoundsStitchLine('pocket')).toThrow('Missing component bounds stitch line')
+  })
+})
+
+describe('optional computed accessors', () => {
+  it('finds components, holes and source stitch IDs even when stitching is drawn on another component', () => {
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      components: [d.panel({ id: 'panel' })],
+      holes: [d.hole({ id: 'hole', componentId: 'panel' })],
+      stitchLines: [
+        d.componentBoundsStitchLine({ id: 'line', targetId: 'panel', targetType: 'component', onTop: 'root' }),
+      ],
+    })
+    const project = d.project({ id: 'project', subProjects: [subProject] })
+    const computed = getComputedSubProject(subProject, project.stitchingSettings)
+    const accessor = accessors.computedSubProject(computed)
+    expect(accessor.optional.component('panel')).toBe(computed.components.panel)
+    expect(accessor.optional.hole('hole')).toBe(computed.holes[0])
+    expect(accessor.optional.stitchLine('line')).toBe(computed.stitchLines.root[0])
+    expect(accessor.stitchLine('line')).toBe(accessor.optional.stitchLine('line'))
+    for (const getter of [accessor.optional.component, accessor.optional.hole, accessor.optional.stitchLine]) {
+      expect(getter(undefined)).toBeUndefined()
+      expect(getter('missing')).toBeUndefined()
+    }
+  })
+})
+
+describe('project subproject accessors', () => {
+  it('keeps source lookups optional and computed lookups mandatory', () => {
+    const subProject = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) })
+    const project = d.project({ id: 'project', subProjects: [subProject] })
+    const snapshot = structuredClone(project)
+    const computed = getComputedSubProject(subProject, project.stitchingSettings)
+    const accessor = accessors.project(project)
+    const computedAccessor = accessors.computedProject({ id: project.id, name: project.name, subProjects: [computed] })
+    expect(accessor.optional.subProject(subProject.id)).toBe(subProject)
+    expect(accessor.optional.subProject('missing')).toBeUndefined()
+    expect(accessor.optional.subProject(undefined)).toBeUndefined()
+    expect(computedAccessor.subProject(subProject.id)).toBe(computed)
+    expect(() => computedAccessor.subProject('missing')).toThrow('Missing sub-project from computed project')
+    expect(project).toEqual(snapshot)
+  })
+})

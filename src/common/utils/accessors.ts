@@ -7,7 +7,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ComputedStitchLineSchema } from '../schemas/computed'
+import type { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from '../schemas/computed'
 import type { HoleSchema } from '../schemas/hole'
 import type {
   ComponentLimitsSchema,
@@ -15,8 +15,13 @@ import type {
   StitchLineLimitsSchema,
   SubProjectLimitsSchema,
 } from '../schemas/limits'
+import type { ComputedProjectSchema, ProjectSchema } from '../schemas/project'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
-import type { ComputedSubProjectGeometrySchema, SubProjectSchema } from '../schemas/subProject'
+import type {
+  ComputedSubProjectGeometrySchema,
+  ComputedSubProjectSchema,
+  SubProjectSchema,
+} from '../schemas/subProject'
 import { isDefined } from './isDefined'
 import { narrowers } from './narrowers'
 
@@ -39,11 +44,67 @@ const optionalSubProject = (subProject: SubProjectSchema) => {
     return isDefined(id) ? subProject.holes.find((s) => s.id === id) : undefined
   }
 
+  const rootPanel = (): RootPanelSchema | undefined => {
+    const value = component(subProject.root)
+    return isDefined(value) && narrowers.is.rootPanel(value) ? value : undefined
+  }
+
+  const panel = (id: string | undefined): PanelSchema | undefined => {
+    const value = component(id)
+    return isDefined(value) && narrowers.is.panel(value) ? value : undefined
+  }
+
+  const pocketCluster = (id: string | undefined): PocketClusterSchema | undefined => {
+    const value = component(id)
+    return isDefined(value) && narrowers.is.pocketCluster(value) ? value : undefined
+  }
+
+  const pocket = (id: string | undefined): PocketSchema | undefined => {
+    const value = component(id)
+    return isDefined(value) && narrowers.is.pocket(value) ? value : undefined
+  }
+
+  const frontPocket = (id: string | undefined): FrontPocketSchema | undefined => {
+    const value = component(id)
+    return isDefined(value) && narrowers.is.frontPocket(value) ? value : undefined
+  }
+
+  const tPocket = (id: string | undefined): TPocketSchema | undefined => {
+    const value = component(id)
+    return isDefined(value) && narrowers.is.tPocket(value) ? value : undefined
+  }
+
+  const componentBoundsStitchLine = (id: string | undefined): ComponentBoundsStitchLineSchema | undefined => {
+    if (!isDefined(id)) {
+      return undefined
+    }
+    return subProject.stitchLines.find(
+      (line): line is ComponentBoundsStitchLineSchema => line.id === id && narrowers.is.componentBoundsStitchLine(line),
+    )
+  }
+
+  const tPocketStitchLine = (id: string | undefined): TPocketStitchLineSchema | undefined => {
+    if (!isDefined(id)) {
+      return undefined
+    }
+    return subProject.stitchLines.find(
+      (line): line is TPocketStitchLineSchema => line.id === id && narrowers.is.tPocketStitchLine(line),
+    )
+  }
+
   return {
     component,
     parent,
     stitchLine,
     hole,
+    rootPanel,
+    panel,
+    pocketCluster,
+    pocket,
+    frontPocket,
+    tPocket,
+    componentBoundsStitchLine,
+    tPocketStitchLine,
   }
 }
 
@@ -106,16 +167,24 @@ const subProject = (subProject: SubProjectSchema) => {
   }
 
   const componentBoundsStitchLine = (id: string): ComponentBoundsStitchLineSchema => {
-    return narrowers.assert.componentBoundsStitchLine(stitchLine(id))
+    const value = optional.componentBoundsStitchLine(id)
+    if (!isDefined(value)) {
+      throw new Error(createMissingErrorMessage('component bounds stitch line', 'sub-project', subProject.id))
+    }
+    return value
   }
 
   const tPocketStitchLine = (id: string): TPocketStitchLineSchema => {
-    return narrowers.assert.tPocketStitchLine(stitchLine(id))
+    const value = optional.tPocketStitchLine(id)
+    if (!isDefined(value)) {
+      throw new Error(createMissingErrorMessage('T-pocket stitch line', 'sub-project', subProject.id))
+    }
+    return value
   }
 
   const tPocketStitchLines = (componentId: string): TPocketStitchLineSchema[] => {
     return subProject.stitchLines.filter(
-      (line): line is TPocketStitchLineSchema => line.type === 't-pocket-stitch-line' && line.targetId === componentId,
+      (line): line is TPocketStitchLineSchema => narrowers.is.tPocketStitchLine(line) && line.targetId === componentId,
     )
   }
 
@@ -137,37 +206,68 @@ const subProject = (subProject: SubProjectSchema) => {
   }
 }
 
-const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema) => {
-  const component = (id: string) => {
-    const anyComponent = computedSubProject.components[id]
-    if (!isDefined(anyComponent)) {
-      throw new Error(createMissingErrorMessage('component', 'computed sub-project', computedSubProject.id))
-    }
-    return anyComponent
+const optionalComputedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema) => {
+  const component = (id: string | undefined): ComputedComponentSchema | undefined => {
+    return isDefined(id) ? computedSubProject.components[id] : undefined
   }
 
-  const stitchLine = (id: string) => {
+  const stitchLine = (id: string | undefined, componentId?: string): ComputedStitchLineSchema | undefined => {
+    if (!isDefined(id)) {
+      return undefined
+    }
+    const preferredStitchLines = isDefined(componentId) ? computedSubProject.stitchLines[componentId] : undefined
+    const preferredStitchLine = preferredStitchLines?.find((value) => value.stitchLineId === id)
+    if (isDefined(preferredStitchLine)) {
+      return preferredStitchLine
+    }
     for (const stitchLines of Object.values(computedSubProject.stitchLines)) {
-      for (const stitchLine of stitchLines) {
-        if (stitchLine.stitchLineId === id) {
-          return stitchLine
+      if (stitchLines === preferredStitchLines) {
+        continue
+      }
+      for (const value of stitchLines) {
+        if (value.stitchLineId === id) {
+          return value
         }
       }
     }
+    return undefined
+  }
 
-    throw new Error(createMissingErrorMessage('stitch line', 'computed sub-project', computedSubProject.id))
+  const hole = (id: string | undefined): ComputedHoleSchema | undefined => {
+    return isDefined(id) ? computedSubProject.holes.find((value) => value.holeId === id) : undefined
+  }
+
+  return { component, stitchLine, hole }
+}
+
+const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema) => {
+  const optional = optionalComputedSubProject(computedSubProject)
+  const component = (id: string): ComputedComponentSchema => {
+    const value = optional.component(id)
+    if (!isDefined(value)) {
+      throw new Error(createMissingErrorMessage('component', 'computed sub-project', computedSubProject.id))
+    }
+    return value
+  }
+
+  const stitchLine = (id: string, componentId?: string): ComputedStitchLineSchema => {
+    const value = optional.stitchLine(id, componentId)
+    if (!isDefined(value)) {
+      throw new Error(createMissingErrorMessage('stitch line', 'computed sub-project', computedSubProject.id))
+    }
+    return value
   }
 
   const stitchLines = (componentId: string): ComputedStitchLineSchema[] => {
     return computedSubProject.stitchLines[componentId] ?? []
   }
 
-  const hole = (id: string) => {
-    const anyHole = computedSubProject.holes.find((h) => h.holeId === id)
-    if (!isDefined(anyHole)) {
+  const hole = (id: string): ComputedHoleSchema => {
+    const value = optional.hole(id)
+    if (!isDefined(value)) {
       throw new Error(createMissingErrorMessage('hole', 'computed sub-project', computedSubProject.id))
     }
-    return anyHole
+    return value
   }
 
   const rootPanel = () => {
@@ -191,6 +291,7 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
   }
 
   return {
+    optional,
     component,
     stitchLine,
     stitchLines,
@@ -203,6 +304,24 @@ const computedSubProject = (computedSubProject: ComputedSubProjectGeometrySchema
   }
 }
 
+const project = (project: ProjectSchema) => {
+  const subProject = (id: string | undefined): SubProjectSchema | undefined => {
+    return isDefined(id) ? project.subProjects.find((value) => value.id === id) : undefined
+  }
+  return { optional: { subProject } }
+}
+
+const computedProject = (project: ComputedProjectSchema) => {
+  const subProject = (id: string): ComputedSubProjectSchema => {
+    const value = project.subProjects.find((value) => value.id === id)
+    if (!isDefined(value)) {
+      throw new Error(createMissingErrorMessage('sub-project', 'computed project', project.id))
+    }
+    return value
+  }
+  return { subProject }
+}
+
 const subProjectLimits = (limits: SubProjectLimitsSchema) => ({
   optional: {
     component: (id: string): ComponentLimitsSchema | undefined => limits.components[id],
@@ -212,6 +331,8 @@ const subProjectLimits = (limits: SubProjectLimitsSchema) => ({
 })
 
 export const accessors = {
+  project,
+  computedProject,
   subProject,
   computedSubProject,
   subProjectLimits,

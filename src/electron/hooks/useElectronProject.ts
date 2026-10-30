@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai'
 import { useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
+import { accessors } from '../../common/utils/accessors'
 
 import { toaster } from '../../common/components/Toaster'
 import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
@@ -124,9 +125,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
 
   const navigateToProject = useCallback(
     (filePath: string, project: ProjectSchema, preferredSubProjectId?: string): void => {
-      const selectedSubProject = isDefined(preferredSubProjectId)
-        ? project.subProjects.find((candidate) => candidate.id === preferredSubProjectId)
-        : undefined
+      const selectedSubProject = accessors.project(project).optional.subProject(preferredSubProjectId)
       const fallbackSubProject = project.subProjects[0]
       const targetSubProject = isDefined(selectedSubProject) ? selectedSubProject : fallbackSubProject
 

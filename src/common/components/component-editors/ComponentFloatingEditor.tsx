@@ -1,9 +1,9 @@
 import { useCallback, type FC } from 'react'
+import { accessors } from '../../utils/accessors'
 
 import { useEditableComponent } from '../../hooks/useEditableComponent'
 import { useProject } from '../../hooks/useProject'
 import { useSubProject } from '../../hooks/useSubProject'
-import { getComponentParent } from '../../operations/subProject/utils/getComponentParent'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { ComponentSchema } from '../../schemas/components'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
@@ -29,7 +29,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
   const { project } = useProject()
   const { subProject } = useSubProject()
 
-  const parent = getComponentParent(component.id, subProject)
+  const parent = accessors.subProject(subProject).optional.parent(component.id)
 
   const {
     component: editedComponent,

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../utils/narrowers'
 
 import type { PocketOrientationSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
@@ -50,7 +51,9 @@ describe.each(items)('calculatePocketItem: $id', ({ id, width, height, radius })
           radius,
           radius,
         ])
-        expect(item?.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(radius === 0 ? 0 : 4)
+        expect(item?.path.commands.filter((command) => narrowers.path.is.arcTo(command))).toHaveLength(
+          radius === 0 ? 0 : 4,
+        )
       })
     })
   })

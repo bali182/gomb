@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type { PocketOrientationSchema, RecessedPocketOpeningSchema } from '../../schemas/components'
@@ -41,7 +42,9 @@ const createOpeningPath = (
   ).getPocketOpeningPath()
 
 const getArcs = (path: PathSchema): ArcPathSegment[] =>
-  getPathSegments(path).filter((segment: PathSegment): segment is ArcPathSegment => segment.type === 'arc')
+  getPathSegments(path).filter((segment: PathSegment): segment is ArcPathSegment =>
+    narrowers.path.is.arcSegment(segment),
+  )
 
 const expectPoint = (point: PointSchema, x: number, y: number): void => {
   expect(point.x.toNumber()).toBeCloseTo(x, 8)
@@ -102,7 +105,7 @@ describe('RecessedPocketCalculator', () => {
   ])('joins R$outerRadius and R5 with $expectedSlopes sloping straight segments', ({ outerRadius, expectedSlopes }) => {
     const path = createOpeningPath(createOpening({ outerRadius }), rect, 'up')
     const slopes = getPathSegments(path).filter(
-      (segment) => segment.type === 'line' && !segment.start.y.isEqualTo(segment.end.y),
+      (segment) => narrowers.path.is.lineSegment(segment) && !segment.start.y.isEqualTo(segment.end.y),
     )
 
     expect(slopes).toHaveLength(expectedSlopes)

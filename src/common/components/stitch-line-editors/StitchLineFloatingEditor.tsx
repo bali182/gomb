@@ -1,4 +1,5 @@
 import { useCallback, type FC } from 'react'
+import { narrowers } from '../../utils/narrowers'
 
 import { useEditableStitchLine } from '../../hooks/useEditableStitchLine'
 import type { StitchLineSchema } from '../../schemas/stitching'
@@ -49,7 +50,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
         menu={<StitchLineActionsMenu size="xs" stitchLine={editedStitchLine} />}
         onChange={setStitchLine}
         rightAddon={
-          editedStitchLine.type === 'component-bounds-stitch-line' && (
+          narrowers.is.componentBoundsStitchLine(editedStitchLine) && (
             <StitchLineRenderTargetCombobox
               onChange={handleRenderTargetChange}
               onReset={handleRenderTargetReset}

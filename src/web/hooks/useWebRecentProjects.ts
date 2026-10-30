@@ -1,5 +1,6 @@
 import { useAtomValue } from 'jotai'
 import { useMemo } from 'react'
+import { accessors } from '../../common/utils/accessors'
 
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
 import { useTranslation } from '../../common/hooks/useTranslation'
@@ -18,9 +19,7 @@ export const useWebRecentProjects = (): RecentProjectVisualisationSchema[] => {
       .filter((project): boolean => isDefined(settings.recentProjects[project.id]))
       .map((project): RecentProjectVisualisationSchema => {
         const recentProject = settings.recentProjects[project.id]
-        const lastOpenedSubProject = isDefined(recentProject?.lastSubProjectId)
-          ? project.subProjects.find((subProject) => subProject.id === recentProject.lastSubProjectId)
-          : undefined
+        const lastOpenedSubProject = accessors.project(project).optional.subProject(recentProject?.lastSubProjectId)
         const subProject = isDefined(lastOpenedSubProject) ? lastOpenedSubProject : project.subProjects[0]
 
         return {

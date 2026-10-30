@@ -1,10 +1,11 @@
 import type { ComponentSchema } from '../../../schemas/components'
 import type { StitchLineSchema } from '../../../schemas/stitching'
 import type { SubProjectSchema } from '../../../schemas/subProject'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
+import { narrowers } from '../../../utils/narrowers'
 import type { MoveComponentParams } from '../moveComponent'
 import { getComponentDescendants } from './getComponentDescendants'
-import { getComponentParent } from './getComponentParent'
 
 export const canAddChild = (
   parent: ComponentSchema,
@@ -15,7 +16,10 @@ export const canAddChild = (
     case 't-pocket':
       return false
     case 'pocket-cluster': {
-      const hasFrontPocket = parent.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+      const accessor = accessors.subProject(subProject)
+      const hasFrontPocket = parent.children.some((id) => {
+        return isDefined(accessor.optional.frontPocket(id))
+      })
       return (type === 't-pocket' && hasFrontPocket) || (type === 'front-pocket' && !hasFrontPocket)
     }
     default:
@@ -24,12 +28,12 @@ export const canAddChild = (
 }
 
 export const canDeleteComponent = (component: ComponentSchema): boolean =>
-  component.type !== 'root-panel' && component.type !== 'front-pocket'
+  !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
 
 export const canCloneComponent = (component: ComponentSchema): boolean =>
-  component.type !== 'root-panel' && component.type !== 'front-pocket'
+  !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
 
-export const canAddHole = (component: ComponentSchema): boolean => component.type !== 'pocket-cluster'
+export const canAddHole = (component: ComponentSchema): boolean => !narrowers.is.pocketCluster(component)
 
 const componentStitchLineTypes: Record<ComponentSchema['type'], readonly StitchLineSchema['type'][]> = {
   'root-panel': ['component-bounds-stitch-line'],
@@ -51,19 +55,23 @@ export const canAddStitchLine = (
   if (!getComponentStitchLineTypes(component).includes(type)) {
     return false
   }
-  if (component.type === 'pocket-cluster') {
-    return component.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+  if (narrowers.is.pocketCluster(component)) {
+    const accessor = accessors.subProject(subProject)
+    return component.children.some((id) => {
+      return isDefined(accessor.optional.frontPocket(id))
+    })
   }
   return true
 }
 
 export const canMoveComponent = (subProject: SubProjectSchema, params: MoveComponentParams): boolean => {
-  const component = subProject.components[params.componentId]
-  const parent = subProject.components[params.targetParentId]
+  const accessor = accessors.subProject(subProject)
+  const component = accessor.optional.component(params.componentId)
+  const parent = accessor.optional.component(params.targetParentId)
   if (!isDefined(component) || !isDefined(parent) || !canDeleteComponent(component) || component.id === parent.id) {
     return false
   }
-  if (!canAddChild(parent, component.type, subProject) || !isDefined(getComponentParent(component.id, subProject))) {
+  if (!canAddChild(parent, component.type, subProject) || !isDefined(accessor.optional.parent(component.id))) {
     return false
   }
   if (getComponentDescendants(component, subProject).includes(parent.id)) {
@@ -73,8 +81,10 @@ export const canMoveComponent = (subProject: SubProjectSchema, params: MoveCompo
   if (isDefined(params.beforeComponentId) && !children.includes(params.beforeComponentId)) {
     return false
   }
-  if (parent.type === 'pocket-cluster') {
-    const frontIndex = children.findIndex((id) => subProject.components[id]?.type === 'front-pocket')
+  if (narrowers.is.pocketCluster(parent)) {
+    const frontIndex = children.findIndex((id) => {
+      return isDefined(accessor.optional.frontPocket(id))
+    })
     if (!isDefined(params.beforeComponentId)) {
       return frontIndex === -1
     }

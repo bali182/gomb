@@ -9,6 +9,7 @@ import {
   segSplitAtPoint,
   segTangentVector,
 } from 'cavalier-contours-js'
+import { narrowers } from '../utils/narrowers'
 
 import { AREA_EPSILON, POSITION_EPSILON } from '../constants/layout'
 import type { PathCommand, PathSchema, PointSchema } from '../schemas/geometry'
@@ -448,7 +449,7 @@ const toPolylineVertex = (segment: PathSegment): PlineVertex => {
   return new PlineVertex(
     segment.start.x.toNumber(),
     segment.start.y.toNumber(),
-    segment.type === 'arc' ? Math.tan(segment.sweepAngle / 4) : 0,
+    narrowers.path.is.arcSegment(segment) ? Math.tan(segment.sweepAngle / 4) : 0,
   )
 }
 

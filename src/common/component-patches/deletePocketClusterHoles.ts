@@ -1,8 +1,13 @@
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
+import { isDefined } from '../utils/isDefined'
 export const deletePocketClusterHoles = (
   subProject: SubProjectSchema,
   _computed: ComputedSubProjectSchema,
 ): SubProjectSchema => {
-  const holes = subProject.holes.filter((hole) => subProject.components[hole.componentId]?.type !== 'pocket-cluster')
+  const accessor = accessors.subProject(subProject)
+  const holes = subProject.holes.filter((hole) => {
+    return !isDefined(accessor.optional.pocketCluster(hole.componentId))
+  })
   return holes.length === subProject.holes.length ? subProject : { ...subProject, holes }
 }

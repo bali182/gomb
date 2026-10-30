@@ -191,8 +191,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   })
   const stitchLineTypes = getComponentStitchLineTypes(component)
 
-  const canClone = component.type === 'root-panel' || canCloneComponent(component)
-  const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
+  const canClone = narrowers.is.rootPanel(component) || canCloneComponent(component)
+  const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component)
   const handleOpenPocketCopy = useCallback((): void => {
     setPocketCopyOpen(true)
   }, [])

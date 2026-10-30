@@ -1,6 +1,7 @@
 import type { ComputedStitchHoleSchema, ComputedStitchRouteDisconnectedCornerSchema } from '../../schemas/computed'
 import type { ResolvedComponentBoundsStitchLineSchema, StitchCornerSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import type { CalculatedStitchLinePath, StitchSidePathFragment } from './calculateStitchLinePaths'
 import { isCanonicalDirection } from './stitchLinePathUtils'
 
@@ -36,7 +37,7 @@ const appendDisconnectedCorner = (
   fragment: CalculatedStitchLinePath['fragments'][number] | undefined,
   endpoint: 'start' | 'end',
 ): void => {
-  if (!isDefined(fragment) || fragment.type !== 'side') {
+  if (!isDefined(fragment) || !narrowers.path.is.sideFragment(fragment)) {
     return
   }
 

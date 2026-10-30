@@ -23,6 +23,7 @@ import { SubProjectSchema } from './schemas/subProject'
 import { createProject } from './utils/createProject'
 import { createSubProject } from './utils/createSubProject'
 import { isDefined } from './utils/isDefined'
+import { narrowers } from './utils/narrowers'
 
 type HasStitchingSettings = {
   stitchingSettings?: StitchLineCommonConfigSchema
@@ -132,12 +133,9 @@ export const d = {
     targetType,
     ...rest
   }: CreateComponentBoundsStitchLineConfig): ComponentBoundsStitchLineSchema => {
-    const stitchLine = createStitchLine(
-      'component-bounds-stitch-line',
-      { targetId, targetType },
-      id,
-      id,
-    ) as ComponentBoundsStitchLineSchema
+    const stitchLine = narrowers.assert.componentBoundsStitchLine(
+      createStitchLine('component-bounds-stitch-line', { targetId, targetType }, id, id),
+    )
     return { ...stitchLine, ...rest }
   },
 
@@ -147,12 +145,9 @@ export const d = {
     targetType,
     ...rest
   }: CreateTPocketStitchLineConfig): TPocketStitchLineSchema => {
-    const stitchLine = createStitchLine(
-      't-pocket-stitch-line',
-      { targetId, targetType },
-      id,
-      id,
-    ) as TPocketStitchLineSchema
+    const stitchLine = narrowers.assert.tPocketStitchLine(
+      createStitchLine('t-pocket-stitch-line', { targetId, targetType }, id, id),
+    )
     return { ...stitchLine, ...rest }
   },
 }

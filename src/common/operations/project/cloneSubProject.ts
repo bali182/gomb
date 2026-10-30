@@ -1,5 +1,6 @@
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { cloneComponentTree } from '../subProject/cloneComponentTree'
 import { getUnusedName } from '../subProject/utils/getUnusedName'
@@ -13,9 +14,9 @@ export const cloneSubProject = (
   project: ProjectSchema,
   { getUnusedId, subProject: sourceSubProject }: CloneSubProjectParams,
 ): ProjectSchema => {
-  const sourceRootPanel = sourceSubProject.components[sourceSubProject.root]
+  const sourceRootPanel = accessors.subProject(sourceSubProject).optional.rootPanel()
 
-  if (!isDefined(sourceRootPanel) || sourceRootPanel.type !== 'root-panel') {
+  if (!isDefined(sourceRootPanel)) {
     return project
   }
 
@@ -47,7 +48,7 @@ export const cloneSubProject = (
 
   const usedRootNames = new Set(
     project.subProjects
-      .map((subProject) => subProject.components[subProject.root])
+      .map((subProject) => accessors.subProject(subProject).optional.rootPanel())
       .filter(isDefined)
       .map((root) => root.name),
   )

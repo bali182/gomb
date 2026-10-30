@@ -2,6 +2,7 @@ import { Box, IconButton, TreeView, type TreeViewNodeState } from '@chakra-ui/re
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
+import { narrowers } from '../../utils/narrowers'
 
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -40,7 +41,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   const { subProject } = useSubProject()
   const { component } = node
   const isActiveComponent = activeDragData?.kind === 'component' && activeDragData.componentId === component.id
-  const isDraggable = hasDragAndDrop && component.type !== 'root-panel' && component.type !== 'front-pocket'
+  const isDraggable = hasDragAndDrop && !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
   const canReorder = hasDragAndDrop && (!isDefined(activeDragData) || activeDragData.kind === 'component')
   const isExpandable = node.children.length > 0
 
@@ -85,7 +86,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   }, [activeDragData, component, isActiveComponent, subProject])
 
   const insideBeforeComponentId = useMemo<string | undefined>(() => {
-    if (component.type !== 'pocket-cluster') {
+    if (!narrowers.is.pocketCluster(component)) {
       return undefined
     }
     if (activeDragData?.kind === 'component') {
@@ -95,7 +96,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   }, [component, activeDragData])
 
   const dropPositions = useMemo<ComponentTreeDropPosition[]>(() => {
-    if (component.type === 'root-panel') {
+    if (narrowers.is.rootPanel(component)) {
       return ['inside']
     }
     const positions: ComponentTreeDropPosition[] = nodeState.expanded
@@ -105,7 +106,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       if (activeDragData?.kind !== 'component') {
         return true
       }
-      if (position === 'after' && component.type === 'front-pocket') {
+      if (position === 'after' && narrowers.is.frontPocket(component)) {
         return false
       }
       return canMoveComponent(subProject, {

@@ -1,5 +1,6 @@
 import Flatten from '@flatten-js/core'
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../utils/narrowers'
 
 import type { PathCommand, PathSchema, PointSchema } from '../schemas/geometry'
 import { getClosedPathLoops } from './pathSegments'
@@ -46,7 +47,7 @@ const toFlattenPolygon = (path: PathSchema): Flatten.Polygon => {
 }
 
 const toFlattenShape = (segment: PathSegment): Flatten.Segment | Flatten.Arc => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     return new Flatten.Segment(toFlattenPoint(segment.start), toFlattenPoint(segment.end))
   }
 
@@ -82,7 +83,7 @@ const getPathCommandsFromFace = (face: Flatten.Face): PathCommand[] => {
   // Flatten considers endpoints equal within its tolerance, but our path processing uses exact equality.
   // Reuse the start point when the final endpoint is equivalent so closing the contour does not add a tiny line.
   if (
-    (lastCommand.type === 'lineTo' || lastCommand.type === 'arcTo') &&
+    (narrowers.path.is.lineTo(lastCommand) || narrowers.path.is.arcTo(lastCommand)) &&
     Flatten.Utils.EQ(lastCommand.point.x.toNumber(), startPoint.x.toNumber()) &&
     Flatten.Utils.EQ(lastCommand.point.y.toNumber(), startPoint.y.toNumber())
   ) {
