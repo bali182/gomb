@@ -6,6 +6,7 @@ import type { ComponentSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
+import { optionalComparators } from '../utils/comparators'
 import { validateComponentSchema } from '../validators/validateComponentSchema'
 import { useComponent } from './useComponent'
 import { ImmediateUpdater, useEditableModel } from './useEditableModel'
@@ -44,6 +45,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
   const { editableValue, setValue, setValueImmediately, validationIssues } = useEditableModel({
     commit,
     context,
+    isEqual: optionalComparators.component,
     validate: validateComponentSchema,
     value: component,
     throttle: HOT_EDITOR_THROTTLE,

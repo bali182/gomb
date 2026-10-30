@@ -6,6 +6,7 @@ import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { StitchLineCommonConfigSchema, StitchLineSchema } from '../schemas/stitching'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
+import { optionalComparators } from '../utils/comparators'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { validateStitchLineSchema } from '../validators/validateStitchLineSchema'
 import { useEditableModel } from './useEditableModel'
@@ -45,6 +46,7 @@ export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLi
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit,
     context,
+    isEqual: optionalComparators.stitchLine,
     validate: validateStitchLineSchema,
     value: stitchLine,
     throttle: HOT_EDITOR_THROTTLE,

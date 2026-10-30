@@ -56,8 +56,9 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
   }, [blocker, isWindowCloseRequested])
 
   const saveAndProceed = useCallback(async (): Promise<void> => {
-    await saveProject()
-    proceed()
+    if (await saveProject()) {
+      proceed()
+    }
   }, [proceed, saveProject])
 
   const handleOpenChange = useCallback(

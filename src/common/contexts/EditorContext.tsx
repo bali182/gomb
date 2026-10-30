@@ -1,4 +1,6 @@
 import { createContext, SetStateAction, useContext } from 'react'
+import { Loadable } from '../loadable'
+import type { EditorComputationStateSchema } from '../schemas/editorComputation'
 import { ProjectSchema } from '../schemas/project'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { notImplemented } from '../utils/notImplemented'
@@ -18,6 +20,7 @@ export type EditorContextOperations = {
 }
 
 export type EditorContextValues = {
+  computation: EditorComputationStateSchema
   project?: ProjectSchema
   subProject?: SubProjectSchema
   computedSubProject?: ComputedSubProjectSchema
@@ -34,6 +37,7 @@ export const EditorContextDefaultOperations: EditorContextOperations = {
 }
 
 export const EditorContextDefaultValues: EditorContextValues = {
+  computation: { requestId: 0, result: Loadable.uninitialized() },
   project: undefined,
   subProject: undefined,
   computedSubProject: undefined,

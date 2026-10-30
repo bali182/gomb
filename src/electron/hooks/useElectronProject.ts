@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai'
+import { useAtom, useStore } from 'jotai'
 import { useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { accessors } from '../../common/utils/accessors'
@@ -7,6 +7,7 @@ import { toaster } from '../../common/components/Toaster'
 import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
+import type { EditorComputationControlSchema } from '../../common/schemas/editorComputation'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -17,18 +18,27 @@ import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
 import type { ElectronSubProjectRouteParamsSchema } from '../schemas/electronRouteParams'
+import { electronComputationAtom } from '../state/electronComputationAtom'
 import { electronProjectAtom } from '../state/electronProjectAtom'
+
+type PreparedProjectSave = {
+  source: ElectronProjectSchema
+  target: ElectronProjectSchema
+  control: EditorComputationControlSchema | undefined
+  requestId: number | undefined
+}
 
 type UseElectronProjectSchema = {
   electronProject: LoadableSchema<ElectronProjectSchema>
   loadProject: () => Promise<void>
   openProject: () => Promise<void>
-  saveProject: () => Promise<void>
+  saveProject: () => Promise<boolean>
   saveProjectAs: () => Promise<void>
 }
 
 export const useElectronProject = (filePath?: string): UseElectronProjectSchema => {
   const [electronProject, setElectronProject] = useAtom(electronProjectAtom)
+  const store = useStore()
   const requestIdRef = useRef(0)
   const navigate = useNavigate()
   const { subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
@@ -59,8 +69,37 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     })
   }, [t.project.toast.saveSucceeded])
 
+  const prepareSave = useCallback(async (): Promise<PreparedProjectSave | undefined> => {
+    const source = Loadable.get(store.get(electronProjectAtom))
+    if (!isDefined(source)) {
+      return undefined
+    }
+    const control = store.get(electronComputationAtom)
+    try {
+      const result = isDefined(control) ? await control.waitUntilIdle() : undefined
+      const current = Loadable.get(store.get(electronProjectAtom))
+      if (
+        !isDefined(current) ||
+        current.filePath !== source.filePath ||
+        current.project.id !== source.project.id ||
+        store.get(electronComputationAtom) !== control
+      ) {
+        return undefined
+      }
+      return {
+        source,
+        target: { ...source, isDirty: false, project: isDefined(result) ? result.project : source.project },
+        control,
+        requestId: result?.requestId,
+      }
+    } catch {
+      showSaveFailedToast()
+      return undefined
+    }
+  }, [showSaveFailedToast, store])
+
   const writeProject = useCallback(
-    async (target: ElectronProjectSchema): Promise<boolean> => {
+    async ({ source, target, control, requestId }: PreparedProjectSave): Promise<boolean> => {
       const response = await electronApi.write({
         contents: JSON.stringify(target.project, null, 2),
         filePath: target.filePath,
@@ -72,11 +111,26 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
         return false
       }
 
-      setElectronProject(Loadable.loaded(target))
+      let adopted = false
+      setElectronProject((current) =>
+        Loadable.map(current, (loaded) => {
+          if (
+            loaded.filePath !== source.filePath ||
+            loaded.project.id !== source.project.id ||
+            store.get(electronComputationAtom) !== control ||
+            (isDefined(control) && control.getRequestId() !== requestId) ||
+            (!isDefined(control) && loaded.project !== source.project && loaded.project !== target.project)
+          ) {
+            return loaded
+          }
+          adopted = true
+          return target
+        }),
+      )
 
-      return true
+      return adopted
     },
-    [setElectronProject, showSaveFailedToast],
+    [setElectronProject, showSaveFailedToast, store],
   )
 
   const loadProject = useCallback(async (): Promise<void> => {
@@ -171,22 +225,22 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
     t.nativeDialogs.openProjectPath.title,
   ])
 
-  const saveProject = useCallback(async (): Promise<void> => {
-    const loadedElectronProject = Loadable.get(electronProject)
-
-    if (!isDefined(loadedElectronProject)) {
-      return
+  const saveProject = useCallback(async (): Promise<boolean> => {
+    const prepared = await prepareSave()
+    if (!isDefined(prepared)) {
+      return false
     }
 
-    const hasSaved = await writeProject({ ...loadedElectronProject, isDirty: false })
+    const hasSaved = await writeProject(prepared)
 
     if (hasSaved) {
       showSaveSucceededToast()
     }
-  }, [electronProject, showSaveSucceededToast, writeProject])
+    return hasSaved
+  }, [prepareSave, showSaveSucceededToast, writeProject])
 
   const saveProjectAs = useCallback(async (): Promise<void> => {
-    const loadedElectronProject = Loadable.get(electronProject)
+    const loadedElectronProject = Loadable.get(store.get(electronProjectAtom))
 
     if (!isDefined(loadedElectronProject)) {
       return
@@ -211,16 +265,24 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       return
     }
 
+    const prepared = await prepareSave()
+    if (
+      !isDefined(prepared) ||
+      prepared.source.project.id !== loadedElectronProject.project.id ||
+      prepared.source.filePath !== loadedElectronProject.filePath
+    ) {
+      return
+    }
     const target: ElectronProjectSchema = {
       filePath: response.filePath,
       isDirty: false,
       project: {
-        ...loadedElectronProject.project,
+        ...prepared.target.project,
         id: id(),
       },
     }
 
-    const hasSaved = await writeProject(target)
+    const hasSaved = await writeProject({ ...prepared, target })
 
     if (!hasSaved) {
       return
@@ -228,10 +290,11 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
 
     navigateToProject(target.filePath, target.project, subProjectId)
   }, [
-    electronProject,
     navigateToProject,
+    prepareSave,
     showSaveFailedToast,
     subProjectId,
+    store,
     t.nativeDialogs.saveProjectAsPath.extensionName,
     t.nativeDialogs.saveProjectAsPath.positiveAction,
     t.nativeDialogs.saveProjectAsPath.title,

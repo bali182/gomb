@@ -15,15 +15,21 @@ import {
   PNG_SHADOW_OPACITY,
 } from '../../constants/pngExport'
 import { DrawAreaContext } from '../../contexts/DrawAreaContext'
-import { EditorContext, EditorContextDefaultOperations, type EditorContextValues } from '../../contexts/EditorContext'
+import { EditorContext, EditorContextDefaultOperations, EditorContextDefaultValues } from '../../contexts/EditorContext'
 import { DefaultGlobalSettingsOperations, GlobalSettingsContext } from '../../contexts/GlobalSettingsContext'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
+import type { ProjectSchema } from '../../schemas/project'
 import type { GlobalSettingsSchema } from '../../schemas/settings'
+import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/subProject'
 import { getViewBox } from '../../utils/getViewBox'
 
 type RenderSvgComponentToStringParams = {
-  editorValues: Required<EditorContextValues>
+  editorValues: {
+    project: ProjectSchema
+    subProject: SubProjectSchema
+    computedSubProject: ComputedSubProjectSchema
+  }
   settings: GlobalSettingsSchema
   context: DrawAreaContextValue
   componentId: string
@@ -61,7 +67,9 @@ export const renderSvgComponentToString = ({
   const millimetersPerPixel = MILLIMETERS_PER_INCH / PNG_DPI
 
   return renderToString(
-    <EditorContext.Provider value={{ ...EditorContextDefaultOperations, ...editorValues }}>
+    <EditorContext.Provider
+      value={{ ...EditorContextDefaultValues, ...EditorContextDefaultOperations, ...editorValues }}
+    >
       <GlobalSettingsContext.Provider value={{ ...DefaultGlobalSettingsOperations, settings }}>
         <DrawAreaContext.Provider value={context}>
           <svg
