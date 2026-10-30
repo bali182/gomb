@@ -183,6 +183,8 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
         sensors={sensors}
       >
         <TreeView.Root
+          lazyMount
+          unmountOnExit
           collection={collection}
           expandedValue={expandedNodeIds}
           expandOnClick={false}

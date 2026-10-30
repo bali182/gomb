@@ -80,5 +80,9 @@ const getComponentRelatedIds = (
   return includeComponent ? [...ancestorNodeIds, getComponentNodeId(componentId)] : ancestorNodeIds
 }
 
-export const uniqueExpandedIds = (expandedIds: string[], newExpandedIds: string[]) =>
-  Array.from(new Set([...expandedIds, ...newExpandedIds]))
+export const uniqueExpandedIds = (expandedIds: string[], newExpandedIds: string[]): string[] => {
+  const nextExpandedIds = Array.from(new Set([...expandedIds, ...newExpandedIds]))
+  return nextExpandedIds.length === expandedIds.length && nextExpandedIds.every((id, index) => id === expandedIds[index])
+    ? expandedIds
+    : nextExpandedIds
+}
