@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import type { RecessedPocketOpeningSchema } from '../../schemas/components'
 import type { PathCommand, PathSchema, PointSchema } from '../../schemas/geometry'
@@ -127,7 +128,7 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
           const mirroredPoint: PointSchema = { x: width.minus(previousPoint.x), y: previousPoint.y }
           // Reflection and reversing traversal cancel each other's change of arc direction.
           rightTransition.unshift(
-            command.type === 'arcTo'
+            narrowers.path.is.arcTo(command)
               ? { type: 'arcTo', point: mirroredPoint, radius: command.radius, reversed: command.reversed }
               : { type: 'lineTo', point: mirroredPoint },
           )
@@ -152,12 +153,12 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
     let currentPoint: PointSchema | undefined
 
     for (const command of commands) {
-      if (command.type === 'close') {
+      if (narrowers.path.is.close(command)) {
         result.push(command)
         continue
       }
       if (
-        command.type === 'lineTo' &&
+        narrowers.path.is.lineTo(command) &&
         currentPoint?.x.isEqualTo(command.point.x) === true &&
         currentPoint?.y.isEqualTo(command.point.y) === true
       ) {

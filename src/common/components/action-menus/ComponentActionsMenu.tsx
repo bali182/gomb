@@ -16,7 +16,7 @@ import {
   canAddStitchLine,
   canCloneComponent,
   canDeleteComponent,
-  getComponentStitchLineType,
+  getComponentStitchLineTypes,
 } from '../../operations/subProject/utils/componentRules'
 import { portalRef } from '../../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
@@ -189,10 +189,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
     return canAddChild(component, type, subProject)
   })
-  const stitchLineType = getComponentStitchLineType(component)
+  const stitchLineTypes = getComponentStitchLineTypes(component)
 
-  const canClone = component.type === 'root-panel' || canCloneComponent(component)
-  const canDelete = component.type === 'root-panel' || canDeleteComponent(component)
+  const canClone = narrowers.is.rootPanel(component) || canCloneComponent(component)
+  const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component)
   const handleOpenPocketCopy = useCallback((): void => {
     setPocketCopyOpen(true)
   }, [])
@@ -235,13 +235,15 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && canAddHole(component) && <AddHoleMenuItem onSelect={handleAddHole} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {!subProjectOnly && isDefined(stitchLineType) && (
-                  <AddComponentStitchLineMenuItem
-                    type={stitchLineType}
-                    disabled={!canAddStitchLine(component, subProject)}
-                    onSelect={handleAddStitchLine}
-                  />
-                )}
+                {!subProjectOnly &&
+                  stitchLineTypes.map((type) => (
+                    <AddComponentStitchLineMenuItem
+                      key={type}
+                      type={type}
+                      disabled={!canAddStitchLine(component, subProject, type)}
+                      onSelect={handleAddStitchLine}
+                    />
+                  ))}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 {!subProjectOnly && narrowers.is.pocket(component) && (

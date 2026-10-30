@@ -1,9 +1,10 @@
-import { getComponentParent } from '../../../operations/subProject/utils/getComponentParent'
 import { ComponentSchema } from '../../../schemas/components'
 import { HoleSchema } from '../../../schemas/hole'
 import { StitchLineSchema } from '../../../schemas/stitching'
 import { SubProjectSchema } from '../../../schemas/subProject'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
+import { narrowers } from '../../../utils/narrowers'
 import { ComponentTreeNode, HoleTreeNode, StitchLineTreeNode } from '../types/nodeTypes'
 import { getComponentNodeId, getHoleNodeId, getStitchLineNodeId } from './treeNodeIds'
 
@@ -13,13 +14,14 @@ export const createComponentTreeNode = (
   showStitchLines: boolean,
   showHoles: boolean,
 ): ComponentTreeNode => {
-  const parent = getComponentParent(component.id, subProject)
+  const accessor = accessors.subProject(subProject)
+  const parent = accessor.optional.component.parent(component.id)
   const siblingIds = isDefined(parent) ? parent.children : []
   const componentIndex = siblingIds.indexOf(component.id)
   const nextSiblingId = componentIndex < 0 ? undefined : siblingIds[componentIndex + 1]
 
   const childComponentNodes = component.children
-    .map((childId) => subProject.components[childId])
+    .map((childId) => accessor.optional.component.byId(childId))
     .filter(isDefined)
     .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
 
@@ -49,7 +51,7 @@ export const createHoleTreeNode = (subProject: SubProjectSchema, hole: HoleSchem
   const stitchLineNodes = subProject.stitchLines
     .filter(
       (stitchLine) =>
-        stitchLine.type === 'component-bounds-stitch-line' &&
+        narrowers.is.componentBoundsStitchLine(stitchLine) &&
         stitchLine.targetType === 'hole' &&
         stitchLine.targetId === hole.id,
     )
@@ -80,11 +82,7 @@ export const createTreeRootNode = (
   showStitchLines: boolean,
   showHoles: boolean,
 ): ComponentTreeNode => {
-  const rootComponent = subProject.components[subProject.root]
-
-  if (!isDefined(rootComponent)) {
-    throw new Error(`Root component not found: ${subProject.root}`)
-  }
+  const rootComponent = accessors.subProject(subProject).component.byId(subProject.root)
 
   return {
     children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles)],

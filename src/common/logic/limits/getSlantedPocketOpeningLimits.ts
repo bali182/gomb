@@ -3,6 +3,7 @@ import { ZERO } from '../../constants/layout'
 import type { PocketClusterSchema, PocketSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { SlantedPocketOpeningLimitsSchema } from '../../schemas/limits'
+import { narrowers } from '../../utils/narrowers'
 import { getTPocketTabDepth } from '../pocketUtils'
 
 export const getSlantedPocketOpeningLimits = (
@@ -33,7 +34,7 @@ const getReservedDepth = (
   cluster: PocketClusterSchema,
   computed: ComputedPocketSchema,
 ): BigNumber => {
-  if (pocket.type === 't-pocket') {
+  if (narrowers.is.tPocket(pocket)) {
     return getTPocketTabDepth(cluster, computed.boundingRect)
   }
   const radius = computed.cornerRadius

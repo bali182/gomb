@@ -1,4 +1,5 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { accessors } from '../../utils/accessors'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -6,7 +7,6 @@ import { useSubProject } from '../../hooks/useSubProject'
 import type { ComputedHoleSchema } from '../../schemas/computed'
 import type { DrawAreaHoleStyleParams } from '../../schemas/drawArea'
 import type { HoleSchema } from '../../schemas/hole'
-import { isDefined } from '../../utils/isDefined'
 
 type HoleHighlightsProps = {
   componentId: string
@@ -20,15 +20,12 @@ type HoleHighlightProps = {
 export const HoleHighlights: FC<HoleHighlightsProps> = ({ componentId }) => {
   const { computedSubProject: computedProject, subProject } = useSubProject()
   const holes = subProject.holes.filter((hole) => hole.componentId === componentId)
+  const accessor = accessors.computedSubProject(computedProject)
 
   return (
     <>
       {holes.map((hole) => {
-        const computedHole = computedProject.holes.find((candidate) => candidate.holeId === hole.id)
-
-        if (!isDefined(computedHole)) {
-          throw new Error(`Computed hole not found: ${hole.id}`)
-        }
+        const computedHole = accessor.hole.byId(hole.id)
 
         return <HoleHighlight computedHole={computedHole} hole={hole} key={hole.id} />
       })}

@@ -3,7 +3,6 @@ import { COMPONENT_DIMENSIONS_COLOR, COMPONENT_NAME_COLOR, STROKE_COLOR, STROKE_
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { defaultSubProjectSelection } from '../contexts/SubProjectSelectionContext'
 import { getExportElementBoundingRect } from '../logic/exports/exportGeometryUtils'
-import { getComponentParent } from '../operations/subProject/utils/getComponentParent'
 import type {
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -15,6 +14,7 @@ import type {
 } from '../schemas/drawArea'
 import { ExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
+import { accessors } from '../utils/accessors'
 import { produce } from '../utils/produce'
 import { useTranslation } from './useTranslation'
 
@@ -76,7 +76,7 @@ export const useExportDrawArea = (
         if (!settings.showParentNames) {
           return undefined
         }
-        return getComponentParent(element.component.id, element.subProject)?.name
+        return accessors.subProject(element.subProject).optional.component.parent(element.component.id)?.name
       },
       getNameText: (element) => {
         if (!settings.showNames) {

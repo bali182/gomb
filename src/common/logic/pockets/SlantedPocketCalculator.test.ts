@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
+import type { ArcPathSegment } from '../pathSegmentTypes'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type { PocketOrientationSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
@@ -22,7 +24,7 @@ const rect: RectSchema = {
 }
 const points = (path: PathSchema): number[][] =>
   path.commands.flatMap((command) =>
-    command.type === 'close' ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
+    narrowers.path.is.close(command) ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
   )
 
 describe('SlantedPocketCalculator', () => {
@@ -131,7 +133,9 @@ describe('SlantedPocketCalculator', () => {
         [0, 0],
         [100, 15],
       ])
-      const arcs = getPathSegments(calculator.getFrontPocketPath()).filter((segment) => segment.type === 'arc')
+      const arcs = getPathSegments(calculator.getFrontPocketPath()).filter((segment): segment is ArcPathSegment =>
+        narrowers.path.is.arcSegment(segment),
+      )
       expect(arcs.map((arc) => arc.radius.toNumber())).toEqual([5, 5])
       for (const path of [calculator.getFrontPocketPath(), calculator.getTPocketPath()]) {
         for (const [x, y] of points(path)) {

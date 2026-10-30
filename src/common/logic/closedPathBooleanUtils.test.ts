@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../utils/narrowers'
 
 import type { RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
@@ -35,7 +36,7 @@ const getArea = (path: PathSchema): number => {
   return getClosedPathLoops(path)
     .flat()
     .reduce((area, segment) => {
-      if (segment.type === 'line') {
+      if (narrowers.path.is.lineSegment(segment)) {
         return area + segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y)).toNumber() / 2
       }
       return (
@@ -212,7 +213,7 @@ describe('self-intersecting closed paths', () => {
       expect(isPointInClosedPath(point(5, 0.3), normalized)).toBe(true)
       for (const segment of getClosedPathLoops(normalized).flat()) {
         expect(segment.type).toBe('arc')
-        if (segment.type === 'arc') {
+        if (narrowers.path.is.arcSegment(segment)) {
           expect(segment.radius.toNumber()).toBeCloseTo(5, 8)
         }
       }
@@ -429,9 +430,7 @@ describe('circular boundaries', () => {
     const lens =
       2 * radius ** 2 * Math.acos(distance / (2 * radius)) - (distance * Math.sqrt(4 * radius ** 2 - distance ** 2)) / 2
     expect(getArea(result)).toBeCloseTo(10000 - (2 * Math.PI * radius ** 2 - lens), 7)
-    const arcs = getClosedPathLoops(result)
-      .flat()
-      .filter((segment) => segment.type === 'arc')
+    const arcs = getClosedPathLoops(result).flat().filter(narrowers.path.is.arcSegment)
     expect(arcs.length).toBeGreaterThan(0)
     arcs.forEach((arc) => expect(arc.radius.toNumber()).toBeCloseTo(radius, 10))
   })

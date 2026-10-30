@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultOpticalIllusionPocketOpening } from '../../defaultStates'
@@ -52,7 +53,7 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
     expect(limits.leadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
     expect(limits.trailingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
     expect(limits.leadingRadius?.max?.reason).toBe('optical-illusion-pocket-opening-radii-share-slanted-length')
-    if (adjusted.type !== 'optical-illusion') throw new Error('Wrong opening')
+    if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) throw new Error('Wrong opening')
     const path = new OpticalIllusionPocketCalculator(
       pocket,
       cluster,
@@ -61,8 +62,10 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
       ZERO_CORNER_RADIUS,
     ).getPocketOpeningPath()
     const segments = getPathSegments(path)
-    expect(segments.filter((segment) => segment.type === 'arc')).toHaveLength(2)
-    expect(segments.some((segment) => segment.type === 'line' && !segment.start.y.eq(segment.end.y))).toBe(false)
+    expect(segments.filter(narrowers.path.is.arcSegment)).toHaveLength(2)
+    expect(
+      segments.some((segment) => narrowers.path.is.lineSegment(segment) && !segment.start.y.eq(segment.end.y)),
+    ).toBe(false)
   })
 
   it('preserves the smaller rounding when only the other one must yield', () => {

@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { POSITION_EPSILON, STITCH_HOLE_ENDPOINT_EPSILON_MM, TWO, ZERO } from '../../constants/layout'
 import type { PointSchema } from '../../schemas/geometry'
@@ -36,7 +37,7 @@ type StitchHoleIntersection = {
 
 export const createStitchHoleSegments = (fragments: StitchPathFragment[]): StitchHoleSegment[] => {
   return fragments.flatMap<StitchHoleSegment>((fragment): StitchHoleSegment[] => {
-    if (fragment.type === 'side') {
+    if (narrowers.path.is.sideFragment(fragment)) {
       return [{ type: 'line', start: fragment.start, end: fragment.end }]
     }
 
@@ -64,15 +65,14 @@ export const findNextStitchHole = (
 ): StitchHoleIntersection | undefined => {
   for (let segmentIndex = cursor.segmentIndex; segmentIndex < segments.length; segmentIndex += 1) {
     const segment = segments[segmentIndex]
-    const segmentLength =
-      segment.type === 'line'
-        ? getPointDistance(segment.start, segment.end)
-        : segment.radius.times(
-            getClockwiseAngleDifference(
-              getPointAngle(segment.center, segment.start),
-              getPointAngle(segment.center, segment.end),
-            ),
-          )
+    const segmentLength = narrowers.path.is.stitchHoleLineSegment(segment)
+      ? getPointDistance(segment.start, segment.end)
+      : segment.radius.times(
+          getClockwiseAngleDifference(
+            getPointAngle(segment.center, segment.start),
+            getPointAngle(segment.center, segment.end),
+          ),
+        )
     if (segmentLength.isZero()) {
       continue
     }
@@ -120,7 +120,7 @@ export const getStitchHoleRotation = (previousCenter: PointSchema, currentCenter
 }
 
 export const getSegmentTangentRotation = (segment: StitchHoleSegment, point: PointSchema): number => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.stitchHoleLineSegment(segment)) {
     return getRotationFromVector(segment.end.x.minus(segment.start.x), segment.end.y.minus(segment.start.y))
   }
 
@@ -235,7 +235,7 @@ const getArcCircleIntersections = (
 }
 
 const getSegmentProgress = (segment: StitchHoleSegment, point: PointSchema): BigNumber => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.stitchHoleLineSegment(segment)) {
     const deltaX = segment.end.x.minus(segment.start.x)
     if (!deltaX.isZero()) {
       return point.x.minus(segment.start.x).div(deltaX)

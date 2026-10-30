@@ -8,6 +8,7 @@ import type { PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
@@ -60,13 +61,13 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
         onPointerLeave={isInteractive ? leave : undefined}
         onClick={isInteractive ? click : undefined}
       />
-      {pocket.type === 't-pocket' && <TPocketStitchLines componentId={componentId} />}
+      {narrowers.is.tPocket(pocket) && <TPocketStitchLines componentId={componentId} />}
       <StitchLines componentId={componentId} />
       <HoleHighlights componentId={componentId} />
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      {computed.type === 'computed-front-pocket' &&
+      {narrowers.is.computedFrontPocket(computed) &&
         computed.children.map((child) => {
           switch (child.type) {
             case 'computed-panel':

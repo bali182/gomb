@@ -1,11 +1,23 @@
+import type { ArcPathSegment, LinePathSegment, PathSegment } from '../logic/pathSegmentTypes'
+import type {
+  StitchCornerPathFragment,
+  StitchPathFragment,
+  StitchSidePathFragment,
+} from '../logic/stitching/calculateStitchLinePaths'
+import type { StitchHoleLineSegment, StitchHoleSegment } from '../logic/stitching/stitchHoleGeometry'
 import type { HasTypeSchema } from '../schemas/common'
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
+  PocketOpeningSchema,
   PocketSchema,
+  RecessedPocketOpeningSchema,
   RootPanelSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type {
@@ -16,6 +28,13 @@ import type {
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
 } from '../schemas/computed'
+import type {
+  PathArcToSchema,
+  PathCloseSchema,
+  PathCommand,
+  PathLineToSchema,
+  PathMoveToSchema,
+} from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
 import type { IssueSchema } from '../schemas/issues'
 import type { ModelObjectSchema } from '../schemas/modelObject'
@@ -45,6 +64,18 @@ export const narrowers = {
     },
     tPocket: (input: ModelObjectSchema): input is TPocketSchema => {
       return hasType(input, 't-pocket')
+    },
+    straightPocketOpening: (input: PocketOpeningSchema): input is StraightPocketOpeningSchema => {
+      return hasType(input, 'straight')
+    },
+    slantedPocketOpening: (input: PocketOpeningSchema): input is SlantedPocketOpeningSchema => {
+      return hasType(input, 'slanted')
+    },
+    recessedPocketOpening: (input: PocketOpeningSchema): input is RecessedPocketOpeningSchema => {
+      return hasType(input, 'recessed')
+    },
+    opticalIllusionPocketOpening: (input: PocketOpeningSchema): input is OpticalIllusionPocketOpeningSchema => {
+      return hasType(input, 'optical-illusion')
     },
     // Computed component
     computedRootPanel: (input: ComputedComponentSchema): input is ComputedRootPanelSchema => {
@@ -83,6 +114,37 @@ export const narrowers = {
         typeof input.message === 'string' &&
         (input.severity === 'error' || input.severity === 'warning' || input.severity === 'info')
       )
+    },
+  },
+  path: {
+    is: {
+      moveTo: (input: PathCommand): input is PathMoveToSchema => {
+        return hasType(input, 'moveTo')
+      },
+      lineTo: (input: PathCommand): input is PathLineToSchema => {
+        return hasType(input, 'lineTo')
+      },
+      arcTo: (input: PathCommand): input is PathArcToSchema => {
+        return hasType(input, 'arcTo')
+      },
+      close: (input: PathCommand): input is PathCloseSchema => {
+        return hasType(input, 'close')
+      },
+      lineSegment: (input: PathSegment): input is LinePathSegment => {
+        return hasType(input, 'line')
+      },
+      arcSegment: (input: PathSegment): input is ArcPathSegment => {
+        return hasType(input, 'arc')
+      },
+      stitchHoleLineSegment: (input: StitchHoleSegment): input is StitchHoleLineSegment => {
+        return hasType(input, 'line')
+      },
+      sideFragment: <T extends StitchPathFragment>(input: T): input is T & StitchSidePathFragment => {
+        return hasType(input, 'side')
+      },
+      cornerFragment: <T extends StitchPathFragment>(input: T): input is T & StitchCornerPathFragment => {
+        return hasType(input, 'corner')
+      },
     },
   },
   assert: {

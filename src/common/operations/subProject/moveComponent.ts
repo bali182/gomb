@@ -1,8 +1,9 @@
 import { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { canMoveComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
-import { getComponentParent } from './utils/getComponentParent'
 
 export type MoveComponentParams = {
   componentId: string
@@ -17,10 +18,11 @@ export const moveComponent = (
   if (!canMoveComponent(subProject, { beforeComponentId, componentId, targetParentId })) {
     return subProject
   }
-  const movedComponent = subProject.components[componentId]
-  const targetParent = subProject.components[targetParentId]
+  const accessor = accessors.subProject(subProject)
+  const movedComponent = accessor.optional.component.byId(componentId)
+  const targetParent = accessor.optional.component.byId(targetParentId)
 
-  if (!isDefined(movedComponent) || movedComponent.type === 'root-panel' || !isDefined(targetParent)) {
+  if (!isDefined(movedComponent) || narrowers.is.rootPanel(movedComponent) || !isDefined(targetParent)) {
     return subProject
   }
 
@@ -28,7 +30,7 @@ export const moveComponent = (
     return subProject
   }
 
-  const sourceParent = getComponentParent(componentId, subProject)
+  const sourceParent = accessor.optional.component.parent(componentId)
 
   if (!isDefined(sourceParent)) {
     return subProject

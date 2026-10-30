@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { ZERO_CORNER_RADIUS } from '../constants/layout'
+import { accessors } from '../utils/accessors'
 
 import { getComponentChildren } from '../operations/subProject/utils/getComponentChildren'
 import type {
@@ -7,7 +8,6 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketSchema,
   RootPanelSchema,
 } from '../schemas/components'
 import type {
@@ -49,11 +49,7 @@ export const getComputedSubProject = (
   subProject: SubProjectSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
 ): ComputedSubProjectSchema => {
-  const rootComponent = subProject.components[subProject.root]
-
-  if (!isDefined(rootComponent) || rootComponent.type !== 'root-panel') {
-    throw new Error(`Root component not found: ${subProject.root}`)
-  }
+  const rootComponent = accessors.subProject(subProject).component.rootPanel()
 
   const computedComponents: Record<string, ComputedComponentSchema> = {}
   const resolvedStitchLines = subProject.stitchLines.map((stitchLine) =>
@@ -68,7 +64,7 @@ export const getComputedSubProject = (
   const root = computeRootPanel(rootComponent, rootBoundingRect, subProject, resolvedStitchLines, computedComponents)
   const holes = calculateHoles(subProject.holes, computedComponents)
   const stitchLines = calculateStitchLines(resolvedStitchLines, subProject, computedComponents, holes)
-  applyHolePathsToComputedComponents(computedComponents, holes)
+  applyHolePathsToComputedComponents(computedComponents, Object.values(holes))
 
   updatePocketClusterPaths(computedComponents)
 
@@ -78,7 +74,7 @@ export const getComputedSubProject = (
     components: computedComponents,
     holes,
     stitchLines,
-    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines).flat()),
+    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines)),
   }
   return { ...geometry, limits: getSubProjectLimits(subProject, geometry, stitchingSettings) }
 }
@@ -93,7 +89,7 @@ const computeComponent = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedComponentSchema => {
-  if (component.type === 'root-panel' || !isDefined(parentBoundingRect) || !isDefined(parentCornerRadius)) {
+  if (narrowers.is.rootPanel(component) || !isDefined(parentBoundingRect) || !isDefined(parentCornerRadius)) {
     throw new Error('Unexpected parameters')
   }
   switch (component.type) {
@@ -236,9 +232,7 @@ const computePocketCluster = (
       parentCornerRadius,
     }),
   )
-  const pockets = getComponentChildren(pocketCluster, subProject).filter(
-    (child): child is PocketSchema => child.type === 'front-pocket' || child.type === 't-pocket',
-  )
+  const pockets = getComponentChildren(pocketCluster, subProject).filter(narrowers.is.pocket)
   const normalizedPocketCluster = normalizePocketCluster(
     { ...pocketCluster, children: pockets.map((pocket) => pocket.id) },
     boundingRect,
@@ -295,7 +289,7 @@ const computeLayoutChildren = (
 
 const assertLayoutChildren = (children: ComponentSchema[]): (PanelSchema | PocketClusterSchema)[] => {
   return children.map((child) => {
-    if (child.type !== 'panel' && child.type !== 'pocket-cluster') {
+    if (!narrowers.is.panel(child) && !narrowers.is.pocketCluster(child)) {
       throw new Error(`Unsupported child component type: ${child.type}`)
     }
 
@@ -308,7 +302,7 @@ const getSubProjectViewBox = (
   stitchLines: ComputedStitchLineSchema[],
 ): RectSchema => {
   const items = components
-    .filter((component) => component.type === 'computed-front-pocket' || component.type === 'computed-t-pocket')
+    .filter((component) => narrowers.is.computedFrontPocket(component) || narrowers.is.computedTPocket(component))
     .flatMap((pocket): ComputedPocketItemSchema[] => (isDefined(pocket.item) ? [pocket.item] : []))
   const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...items]
   const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
@@ -348,9 +342,10 @@ const completePocketChildren = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): void => {
+  const accessor = accessors.subProject(subProject)
   for (const computedPocket of pockets) {
-    if (computedPocket.type === 'computed-front-pocket') {
-      const source = narrowers.assert.frontPocket(subProject.components[computedPocket.componentId])
+    if (narrowers.is.computedFrontPocket(computedPocket)) {
+      const source = accessor.component.frontPocket(computedPocket.componentId)
       const layoutChildren = assertLayoutChildren(getComponentChildren(source, subProject))
       computedPocket.computedLayoutGap = calculateGap(layoutChildren, computedPocket.boundingRect, source)
       computedPocket.children = computeLayoutChildren(
@@ -376,7 +371,7 @@ const completePocketChildren = (
  */
 const updatePocketClusterPaths = (computedComponents: Record<string, ComputedComponentSchema>): void => {
   for (const component of Object.values(computedComponents)) {
-    if (component.type !== 'computed-pocket-cluster') {
+    if (!narrowers.is.computedPocketCluster(component)) {
       continue
     }
     component.path =

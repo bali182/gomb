@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
 import type { SlantedPocketOpeningSchema } from '../../schemas/components'
@@ -17,7 +18,7 @@ export class SlantedPocketCalculator extends PocketCalculator<SlantedPocketOpeni
   }
 
   getTPocketPath(): PathSchema {
-    if (this.pocket.type !== 't-pocket') {
+    if (!narrowers.is.tPocket(this.pocket)) {
       throw new Error('T-pocket path requires a T-pocket')
     }
     const tabDepth = getTPocketTabDepth(this.pocketCluster, this.pocketRect)

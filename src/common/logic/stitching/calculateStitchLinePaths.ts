@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
 import type { PathCommand, PathSchema, PointSchema } from '../../schemas/geometry'
@@ -65,7 +66,7 @@ const calculateStitchRouteLabelPosition = (fragments: StitchPathFragment[], isCl
     return 'top'
   }
 
-  const sideFragments = fragments.filter((fragment): fragment is StitchSidePathFragment => fragment.type === 'side')
+  const sideFragments = fragments.filter(narrowers.path.is.sideFragment)
 
   switch (sideFragments.length) {
     case 1:
@@ -268,7 +269,7 @@ const createPathFromFragments = (fragments: StitchPathFragment[]): PathSchema =>
   const commands: PathCommand[] = [{ type: 'moveTo', point: fragments[0].start }]
 
   for (const fragment of fragments) {
-    if (fragment.type === 'side') {
+    if (narrowers.path.is.sideFragment(fragment)) {
       commands.push({ type: 'lineTo', point: fragment.end })
       continue
     }

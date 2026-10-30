@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it, vi, type BenchCompareOptions } from 'vitest'
+import { accessors } from '../utils/accessors'
+import { narrowers } from '../utils/narrowers'
 
 import { defaultStitchingSettings } from '../defaultStates'
 import type { PocketOpeningSchema } from '../schemas/components'
@@ -145,7 +147,7 @@ const getArea = (path: PathSchema): number => {
     .flat()
     .reduce((area, segment) => {
       const chordArea = segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y)).toNumber() / 2
-      if (segment.type === 'line') {
+      if (narrowers.path.is.lineSegment(segment)) {
         return area + chordArea
       }
       return (
@@ -179,13 +181,16 @@ const expectEquivalentPath = (current: PathSchema, previous: PathSchema): void =
 
 const expectEquivalentSubProject = (current: ComputedSubProjectSchema, previous: ComputedSubProjectSchema): void => {
   expect(Object.keys(current.components)).toEqual(Object.keys(previous.components))
+  const accessor = accessors.computedSubProject(previous)
   for (const [id, component] of Object.entries(current.components)) {
-    const previousComponent = previous.components[id]
+    const previousComponent = accessor.component.byId(id)
     expect(component.type).toBe(previousComponent.type)
     expectEquivalentPath(component.path, previousComponent.path)
   }
-  expect(current.holes).toHaveLength(previous.holes.length)
-  current.holes.forEach((hole, index) => expectEquivalentPath(hole.highlightPath, previous.holes[index].highlightPath))
+  expect(Object.keys(current.holes)).toEqual(Object.keys(previous.holes))
+  Object.values(current.holes).forEach((hole) =>
+    expectEquivalentPath(hole.highlightPath, previous.holes[hole.holeId].highlightPath),
+  )
   expect(current.stitchLines).toEqual(previous.stitchLines)
 }
 

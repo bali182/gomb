@@ -1,4 +1,5 @@
 import { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { canDeleteComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
@@ -11,7 +12,7 @@ export const deleteComponent = (
   subProject: SubProjectSchema,
   { componentId }: DeleteComponentParams,
 ): SubProjectSchema => {
-  const component = subProject.components[componentId]
+  const component = accessors.subProject(subProject).optional.component.byId(componentId)
 
   if (!isDefined(component) || !canDeleteComponent(component)) {
     return subProject

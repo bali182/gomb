@@ -49,7 +49,7 @@ export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, n
       <rect x={x} y={y} width={width} height={height} fill="white" />
       {pockets.map((pocket) => {
         const cardStyleParams: DrawAreaPocketItemStyleParams = {
-          owner: source.pocket(pocket.componentId),
+          owner: source.component.pocket(pocket.componentId),
         }
         return (
           <Fragment key={pocket.componentId}>

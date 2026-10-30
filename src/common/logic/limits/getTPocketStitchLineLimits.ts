@@ -1,4 +1,8 @@
-import type { ComputedStitchLineSchema, ComputedTPocketSchema } from '../../schemas/computed'
+import type {
+  ComputedPocketClusterSchema,
+  ComputedStitchLineSchema,
+  ComputedTPocketSchema,
+} from '../../schemas/computed'
 import type { TPocketStitchLineLimitsSchema } from '../../schemas/limits'
 import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 
@@ -6,5 +10,5 @@ import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 export const getTPocketStitchLineLimits = (
   stitchLine: ResolvedTPocketStitchLineSchema,
   _computed: ComputedStitchLineSchema,
-  _pocketCluster: ComputedTPocketSchema,
+  _target: ComputedTPocketSchema | ComputedPocketClusterSchema,
 ): TPocketStitchLineLimitsSchema => ({ type: stitchLine.type })

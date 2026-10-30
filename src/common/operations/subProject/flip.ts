@@ -22,27 +22,26 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { updateHole } from './updateHole'
 import { getComponentDescendants } from './utils/getComponentDescendants'
-import { getComponentParent } from './utils/getComponentParent'
 
 export const flip = (
   subProject: SubProjectSchema,
   model: ModelObjectSchema,
   axis: FlipAxisSchema,
 ): SubProjectSchema => {
-  const source = accessors.subProject(subProject)
+  const accessor = accessors.subProject(subProject)
   switch (model.type) {
     case 'root-panel':
-      return flipComponentSubtree(subProject, narrowers.assert.rootPanel(source.component(model.id)), axis)
+      return flipComponentSubtree(subProject, narrowers.assert.rootPanel(accessor.component.byId(model.id)), axis)
     case 'panel':
-      return flipComponentSubtree(subProject, source.panel(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.panel(model.id), axis)
     case 'pocket-cluster':
-      return flipComponentSubtree(subProject, source.pocketCluster(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.pocketCluster(model.id), axis)
     case 'front-pocket':
-      return flipComponentSubtree(subProject, source.frontPocket(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.frontPocket(model.id), axis)
     case 't-pocket':
-      return flipComponentSubtree(subProject, source.tPocket(model.id), axis)
+      return flipComponentSubtree(subProject, accessor.component.tPocket(model.id), axis)
     case 'hole': {
-      const hole = source.hole(model.id)
+      const hole = accessor.hole.byId(model.id)
       const updated = updateHole(subProject, { hole: flipHole(hole, axis) })
       return {
         ...updated,
@@ -54,12 +53,7 @@ export const flip = (
       }
     }
     case 'component-bounds-stitch-line': {
-      const stitchLine = subProject.stitchLines
-        .filter(narrowers.is.componentBoundsStitchLine)
-        .find((candidate) => candidate.id === model.id)
-      if (!isDefined(stitchLine)) {
-        throw new Error(`Component bounds stitch line not found: ${model.id}`)
-      }
+      const stitchLine = accessor.stitchLine.bounds(model.id)
       return {
         ...subProject,
         stitchLines: subProject.stitchLines.map((candidate) =>
@@ -68,12 +62,7 @@ export const flip = (
       }
     }
     case 't-pocket-stitch-line': {
-      const stitchLine = subProject.stitchLines
-        .filter(narrowers.is.tPocketStitchLine)
-        .find((candidate) => candidate.id === model.id)
-      if (!isDefined(stitchLine)) {
-        throw new Error(`T-pocket stitch line not found: ${model.id}`)
-      }
+      const stitchLine = accessor.stitchLine.tPocket(model.id)
       const flipped = flipStitchLine(stitchLine, subProject, axis)
       if (flipped === stitchLine) {
         return subProject
@@ -96,7 +85,7 @@ const flipComponentSubtree = (
   const components = { ...subProject.components }
   for (const componentId of componentIds) {
     components[componentId] = flipComponent(
-      accessors.subProject(subProject).component(componentId),
+      accessors.subProject(subProject).component.byId(componentId),
       subProject,
       axis,
       componentIds,
@@ -118,6 +107,7 @@ const flipComponent = (
   axis: FlipAxisSchema,
   flippedComponentIds: ReadonlySet<string>,
 ): ComponentSchema => {
+  const accessor = accessors.subProject(subProject)
   switch (component.type) {
     case 'root-panel': {
       const flipped: RootPanelSchema = {
@@ -151,7 +141,7 @@ const flipComponent = (
       return flipped
     }
     case 'front-pocket': {
-      const cluster = getPocketCluster(component.id, subProject)
+      const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
       const flippedOrientation = flippedComponentIds.has(cluster.id)
         ? flipOrientation(cluster.orientation, axis)
         : cluster.orientation
@@ -169,7 +159,7 @@ const flipComponent = (
       return flipped
     }
     case 't-pocket': {
-      const cluster = getPocketCluster(component.id, subProject)
+      const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
       const flippedOrientation = flippedComponentIds.has(cluster.id)
         ? flipOrientation(cluster.orientation, axis)
         : cluster.orientation
@@ -210,7 +200,11 @@ const flipStitchLine = (
 ): StitchLineSchema => {
   switch (stitchLine.type) {
     case 't-pocket-stitch-line': {
-      const cluster = getPocketCluster(stitchLine.targetId, subProject)
+      const accessor = accessors.subProject(subProject)
+      const target = accessor.component.byId(stitchLine.targetId)
+      const cluster = narrowers.is.pocketCluster(target)
+        ? target
+        : narrowers.assert.pocketCluster(accessor.component.parent(target.id))
       if (!isCrossAxisFlip(cluster.orientation, axis)) {
         return stitchLine
       }
@@ -355,7 +349,7 @@ const flipOffAxisAnchor = (
   axis: FlipAxisSchema,
   flippedComponentIds: ReadonlySet<string>,
 ): AnchorSchema => {
-  const parent = getComponentParent(component.id, subProject)
+  const parent = accessors.subProject(subProject).optional.component.parent(component.id)
   if (!isDefined(parent) || !flippedComponentIds.has(parent.id)) {
     return component.offAxisAnchor
   }
@@ -399,12 +393,4 @@ const flipOrientation = (orientation: PocketOrientationSchema, axis: FlipAxisSch
 const isCrossAxisFlip = (orientation: PocketOrientationSchema, axis: FlipAxisSchema): boolean => {
   const hasHorizontalOpening = orientation === 'up' || orientation === 'down'
   return hasHorizontalOpening ? axis === 'horizontal' : axis === 'vertical'
-}
-
-const getPocketCluster = (pocketId: string, subProject: SubProjectSchema): PocketClusterSchema => {
-  const parent = getComponentParent(pocketId, subProject)
-  if (!isDefined(parent)) {
-    throw new Error(`Pocket parent not found: ${pocketId}`)
-  }
-  return narrowers.assert.pocketCluster(parent)
 }

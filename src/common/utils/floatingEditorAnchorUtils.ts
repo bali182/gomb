@@ -47,7 +47,7 @@ export const getStitchLineAnchor = (
 }
 
 export const getHoleAnchor = (model: HoleSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
-  const component = accessors.subProject(subProject).component(model.componentId)
+  const component = accessors.subProject(subProject).component.byId(model.componentId)
 
   const componentAnchor = getComponentAnchor(component, subProject)
 
@@ -63,10 +63,10 @@ const getTargetAnchor = (target: HasTargetSchema, subProject: SubProjectSchema):
 
   switch (target.targetType) {
     case 'component': {
-      return getComponentAnchor(accessor.component(target.targetId), subProject)
+      return getComponentAnchor(accessor.component.byId(target.targetId), subProject)
     }
     case 'hole': {
-      return getHoleAnchor(accessor.hole(target.targetId), subProject)
+      return getHoleAnchor(accessor.hole.byId(target.targetId), subProject)
     }
   }
 }

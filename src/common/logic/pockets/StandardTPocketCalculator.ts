@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
 import type { PocketOpeningSchema } from '../../schemas/components'
@@ -9,7 +10,7 @@ import { PocketCalculator } from './PocketCalculator'
 /** Openings opting into the conventional horizontal T-pocket shoulders. */
 export abstract class StandardTPocketCalculator<T extends PocketOpeningSchema> extends PocketCalculator<T> {
   getTPocketPath(): PathSchema {
-    if (this.pocket.type !== 't-pocket') {
+    if (!narrowers.is.tPocket(this.pocket)) {
       throw new Error('T-pocket path requires a T-pocket')
     }
     const tabDepth = getTPocketTabDepth(this.pocketCluster, this.pocketRect)

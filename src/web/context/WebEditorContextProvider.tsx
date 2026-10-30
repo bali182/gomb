@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, type FC, type PropsWithChildren, type SetStateAction } from 'react'
 import { useNavigate, useParams } from 'react-router'
+import { accessors } from '../../common/utils/accessors'
 
 import { getPatchedProject } from '../../common/component-patches/getPatchedProject'
 import { getPatchedSubProject } from '../../common/component-patches/getPatchedSubProject'
@@ -30,8 +31,10 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   }, [clearSubProjectHistory, project?.id])
 
   const subProject = useMemo<SubProjectSchema | undefined>(() => {
-    return project?.subProjects.find((candidate) => candidate.id === subProjectId)
-  }, [project?.subProjects, subProjectId])
+    return isDefined(project) && isDefined(subProjectId)
+      ? accessors.project(project).optional.subProject(subProjectId)
+      : undefined
+  }, [project, subProjectId])
 
   const computedSubProject = useMemo<ComputedSubProjectSchema | undefined>(() => {
     if (!isDefined(project) || !isDefined(subProject)) {

@@ -43,14 +43,14 @@ export const StitchLineRenderTargetCombobox: FC<StitchLineRenderTargetComboboxPr
     const subProjectAccessors = accessors.subProject(subProject)
 
     if (isDefined(stitchLine.onTop)) {
-      return subProjectAccessors.component(stitchLine.onTop)
+      return subProjectAccessors.component.byId(stitchLine.onTop)
     }
 
     if (stitchLine.targetType === 'component') {
-      return subProjectAccessors.component(stitchLine.targetId)
+      return subProjectAccessors.component.byId(stitchLine.targetId)
     }
 
-    return subProjectAccessors.component(subProjectAccessors.hole(stitchLine.targetId).componentId)
+    return subProjectAccessors.component.byId(subProjectAccessors.hole.byId(stitchLine.targetId).componentId)
   }, [stitchLine.onTop, stitchLine.targetId, stitchLine.targetType, subProject])
   const selectedValue = useMemo<string[]>(() => [displayedTarget.id], [displayedTarget.id])
 

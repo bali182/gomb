@@ -11,7 +11,9 @@ import type { ComputedProjectSchema, ProjectSchema } from '../../schemas/project
 import type { ExportSettingsSchema } from '../../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { calculateRectPath } from '../calculateRectPath'
 import { getExportCutHelperBoundingRect } from './exportGeometryUtils'
 import { getExportChildMarkerPaths } from './getExportChildMarkerPaths'
@@ -22,11 +24,9 @@ export const getExportElements = (
   computedProject: ComputedProjectSchema,
   settings: ExportSettingsSchema,
 ): ExportElementSchema[] => {
+  const accessor = accessors.computedProject(computedProject)
   return project.subProjects.flatMap((subProject) => {
-    const computed = computedProject.subProjects.find((candidate) => candidate.id === subProject.id)
-    if (!isDefined(computed)) {
-      throw new Error('Computed subproject not found')
-    }
+    const computed = accessor.subProject(subProject.id)
     return getExportElementsForComponent(subProject, computed, subProject.root, settings, project.stitchingSettings)
   })
 }
@@ -38,18 +38,18 @@ export const getExportElementsForComponent = (
   settings: ExportSettingsSchema,
   stitchingSettings: StitchLineCommonConfigSchema,
 ): ExportElementSchema[] => {
-  const component = subProject.components[componentId]
-  const computed = computedSubProject.components[componentId]
+  const component = accessors.subProject(subProject).optional.component.byId(componentId)
+  const computed = accessors.computedSubProject(computedSubProject).optional.component.byId(componentId)
   if (!isDefined(component) || !isDefined(computed)) {
     return []
   }
   const children = computed.children.flatMap((child) =>
     getExportElementsForComponent(subProject, computedSubProject, child.componentId, settings, stitchingSettings),
   )
-  if (component.type === 'pocket-cluster') {
+  if (narrowers.is.pocketCluster(component)) {
     return children
   }
-  if (computed.type === 'computed-pocket-cluster') {
+  if (narrowers.is.computedPocketCluster(computed)) {
     return []
   }
   const element = getExportElement(component, computed, subProject, computedSubProject, settings, stitchingSettings)
@@ -73,7 +73,7 @@ const getExportElement = (
     settings.stitchLineMode,
     stitchingSettings,
   )
-  if (component.type === 'front-pocket' && computed.type === 'computed-front-pocket') {
+  if (narrowers.is.frontPocket(component) && narrowers.is.computedFrontPocket(computed)) {
     const element: ExportFrontPocketSchema = {
       type: 'export-front-pocket',
       id: component.id,
@@ -86,7 +86,7 @@ const getExportElement = (
     }
     return element
   }
-  if (component.type === 't-pocket' && computed.type === 'computed-t-pocket') {
+  if (narrowers.is.tPocket(component) && narrowers.is.computedTPocket(computed)) {
     const element: ExportTPocketSchema = {
       type: 'export-t-pocket',
       id: component.id,

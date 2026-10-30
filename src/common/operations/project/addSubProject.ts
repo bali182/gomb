@@ -1,5 +1,6 @@
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { createSubProject } from '../../utils/createSubProject'
 import { isDefined } from '../../utils/isDefined'
 import { getUnusedName } from '../subProject/utils/getUnusedName'
@@ -19,7 +20,7 @@ export const addSubProject = (
 ): AddSubProjectResult => {
   const usedRootNames = new Set(
     project.subProjects
-      .map((subProject) => subProject.components[subProject.root])
+      .map((subProject) => accessors.subProject(subProject).optional.component.rootPanel())
       .filter(isDefined)
       .map((rootPanel) => rootPanel.name),
   )

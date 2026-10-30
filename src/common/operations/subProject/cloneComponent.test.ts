@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { defaultStitchingSettings } from '../../defaultStates'
+import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
+import { accessors } from '../../utils/accessors'
 import { cloneComponent } from './cloneComponent'
 import type {
   CloneComponentIdGenerators,
@@ -223,5 +226,29 @@ describe('cloneComponent', () => {
     expect(
       cloneComponent(subProject, { componentId: 'panel', ids, names: cloneComponentNames, settings: fullSettings }),
     ).toBe(subProject)
+  })
+  it('adds a cluster route for a cloned pocket without copying the cluster-owned source', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
+        d.tPocket({ id: 't' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
+      ],
+    })
+    const snapshot = structuredClone(source)
+    const result = cloneComponent(source, { componentId: 't', ids, names: cloneComponentNames, settings: fullSettings })
+    expect(result.stitchLines).toHaveLength(3)
+    expect(result.stitchLines[0]).toBe(source.stitchLines[0])
+    expect(result.stitchLines[2]).toMatchObject({ id: 'stitch-line-clone-1', targetId: 'component-clone-1' })
+    const computed = accessors.computedSubProject(getComputedSubProject(result, defaultStitchingSettings))
+    expect(computed.stitchLine.byId('shared').routes.map((route) => route.targetId)).toEqual(['t', 'component-clone-1'])
+    expect(computed.stitchLine.byId('stitch-line-clone-1').routes[0].targetId).toBe('component-clone-1')
+    expect(source).toEqual(snapshot)
   })
 })

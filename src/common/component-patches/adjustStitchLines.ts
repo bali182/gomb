@@ -1,5 +1,6 @@
 import type { ComponentBoundsStitchLineSchema } from '../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { narrowers } from '../utils/narrowers'
 
 export const adjustStitchLines = (
   subProject: SubProjectSchema,
@@ -8,7 +9,7 @@ export const adjustStitchLines = (
   let stitchLines = subProject.stitchLines
 
   subProject.stitchLines.forEach((stitchLine, index) => {
-    if (stitchLine.type !== 'component-bounds-stitch-line') {
+    if (!narrowers.is.componentBoundsStitchLine(stitchLine)) {
       return
     }
 

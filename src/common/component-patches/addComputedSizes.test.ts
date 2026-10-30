@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../utils/narrowers'
 
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
@@ -52,7 +53,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
       expect(patched.components[child.id]).toMatchObject(
         layoutOrientation === 'horizontal' ? { width: 0, height: 100 } : { width: 100, height: 0 },
       )
-      expect(accessors.subProject(patched).rootPanel().layoutGap).toBe(0)
+      expect(accessors.subProject(patched).component.rootPanel().layoutGap).toBe(0)
       expect(subProject).toEqual(snapshot)
     },
   )
@@ -79,7 +80,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
     })
     const patched = addComputedSizes(source, getComputedSubProject(source, defaultStitchingSettings))
     const stored = patched.components[child.id]
-    if (stored.type === 'root-panel') {
+    if (narrowers.is.rootPanel(stored)) {
       throw new Error('Expected a layout child')
     }
     const fixedChild = { ...stored, autoWidth: false, autoHeight: false }

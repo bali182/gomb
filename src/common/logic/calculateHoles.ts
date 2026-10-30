@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../utils/narrowers'
 
 import type { AnchorSchema } from '../schemas/common'
 import type { ComputedComponentSchema, ComputedHoleSchema } from '../schemas/computed'
@@ -14,14 +15,16 @@ import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 export const calculateHoles = (
   holes: HoleSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedHoleSchema[] => {
-  return holes.flatMap((hole): ComputedHoleSchema[] => {
+): Record<string, ComputedHoleSchema> => {
+  const computedHoles: Record<string, ComputedHoleSchema> = {}
+  for (const hole of holes) {
     const ownerComponent = computedComponents[hole.componentId]
-    if (!isDefined(ownerComponent) || ownerComponent.type === 'computed-pocket-cluster') {
-      return []
+    if (!isDefined(ownerComponent) || narrowers.is.computedPocketCluster(ownerComponent)) {
+      continue
     }
-    return [calculateHole(hole, ownerComponent)]
-  })
+    computedHoles[hole.id] = calculateHole(hole, ownerComponent)
+  }
+  return computedHoles
 }
 
 const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema): ComputedHoleSchema => {

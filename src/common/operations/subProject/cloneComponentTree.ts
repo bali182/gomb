@@ -2,7 +2,9 @@ import type { ComponentSchema } from '../../schemas/components'
 import type { HoleSchema } from '../../schemas/hole'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 
 export type CloneComponentSettings = {
   cloneComponentTree: boolean
@@ -44,7 +46,7 @@ export const cloneComponentTree = ({
   ids,
   names,
 }: CloneComponentTreeParams): CloneComponentTreeResult | undefined => {
-  const sourceComponent = subProject.components[componentId]
+  const sourceComponent = accessors.subProject(subProject).optional.component.byId(componentId)
 
   if (!isDefined(sourceComponent)) {
     return undefined
@@ -110,8 +112,9 @@ const collectClonedComponents = (
   visitedComponentIds.add(component.id)
   collectedComponents.push(component)
 
+  const accessor = accessors.subProject(subProject)
   for (const childId of component.children) {
-    const child = subProject.components[childId]
+    const child = accessor.optional.component.byId(childId)
 
     if (!isDefined(child) || !collectClonedComponents(subProject, child, collectedComponents, visitedComponentIds)) {
       return false
@@ -224,7 +227,7 @@ const cloneStitchLines = (
 
     const name = names.stitchLine(sourceStitchLine.name, usedNames)
     usedNames.add(name)
-    if (sourceStitchLine.type === 'component-bounds-stitch-line') {
+    if (narrowers.is.componentBoundsStitchLine(sourceStitchLine)) {
       const onTop = isDefined(sourceStitchLine.onTop)
         ? clonedComponentIdBySourceComponentId[sourceStitchLine.onTop]
         : undefined

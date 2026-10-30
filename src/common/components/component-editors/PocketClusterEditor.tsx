@@ -7,6 +7,8 @@ import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
+import { accessors } from '../../utils/accessors'
+import { isDefined } from '../../utils/isDefined'
 import { CommonEmptyState } from '../common/CommonEmptyState'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
@@ -32,7 +34,10 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   const { t } = useTranslation()
   const { subProject } = useSubProject()
   const { addComponent } = useSubProjectOperations()
-  const hasFront = component.children.some((id) => subProject.components[id]?.type === 'front-pocket')
+  const accessor = accessors.subProject(subProject)
+  const hasFront = component.children.some((id) => {
+    return isDefined(accessor.optional.component.frontPocket(id))
+  })
   if (!hasFront) {
     return (
       <CommonEmptyState

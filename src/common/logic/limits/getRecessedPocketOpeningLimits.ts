@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { OUTER_RADIUS_SEARCH_PRECISION } from '../../constants/layout'
 import type {
@@ -45,9 +46,9 @@ export const getRecessedPocketOpeningLimits = (
   adjusted.outerInset = clamp(opening.outerInset, 0, outerInsetMaximum.value).toNumber()
 
   let depthMaximum: NumericBoundSchema
-  if (computedPocket.type === 'computed-front-pocket') {
+  if (narrowers.is.computedFrontPocket(computedPocket)) {
     depthMaximum = getFrontPocketDepthMaximum(adjusted, computedPocket, pocketCluster.orientation)
-  } else if (sourcePocket.type === 't-pocket') {
+  } else if (narrowers.is.tPocket(sourcePocket)) {
     depthMaximum = getTPocketDepthMaximum(adjusted, computedPocket, pocketCluster, sourcePocket)
   } else {
     depthMaximum = { value: new BigNumber(0), reason: 'pocket-opening-boundary', severity: 'warning' }
@@ -197,7 +198,7 @@ const getOuterRadiusMaximum = (
   }
   upperBound = BigNumber.maximum(upperBound, 0)
   const maximum: NumericBoundSchema = { value: upperBound, reason: 'pocket-opening-width', severity: 'warning' }
-  if (pocket.type === 'computed-front-pocket' || sourcePocket.type !== 't-pocket') {
+  if (narrowers.is.computedFrontPocket(pocket) || !narrowers.is.tPocket(sourcePocket)) {
     return maximum
   }
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)

@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { ComputedStitchHoleSchema } from '../../schemas/computed'
 import { PointSchema } from '../../schemas/geometry'
@@ -80,12 +81,12 @@ const orientFragments = (
   stitchLine: ResolvedComponentBoundsStitchLineSchema,
   fragments: StitchPathFragment[],
 ): StitchPathFragment[] => {
-  if (fragments.some((fragment) => fragment.type === 'corner')) {
+  if (fragments.some((fragment) => narrowers.path.is.cornerFragment(fragment))) {
     return fragments
   }
 
   const side = fragments[0]
-  if (side.type !== 'side' || isCanonicalDirection(stitchLine, side)) {
+  if (!narrowers.path.is.sideFragment(side) || isCanonicalDirection(stitchLine, side)) {
     return fragments
   }
 
@@ -199,7 +200,7 @@ const isHoleTooCloseToEndpoint = (
 }
 
 const isSharpCorner = (fragment: StitchPathFragment): boolean => {
-  return fragment.type === 'corner' && fragment.radius.isZero()
+  return narrowers.path.is.cornerFragment(fragment) && fragment.radius.isZero()
 }
 
 const hasSharpCorner = (fragments: StitchPathFragment[]): boolean => {

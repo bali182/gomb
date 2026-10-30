@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultExportParams, defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../../defaultStates'
@@ -45,7 +46,7 @@ const calculator = (input: OpticalIllusionPocketOpeningSchema = opening, depth =
 }
 const points = (path: PathSchema): number[][] =>
   path.commands.flatMap((command) =>
-    command.type === 'close' ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
+    narrowers.path.is.close(command) ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
   )
 
 describe('OpticalIllusionPocketCalculator', () => {
@@ -86,7 +87,7 @@ describe('OpticalIllusionPocketCalculator', () => {
     const segments = getPathSegments(path)
     expect(
       segments
-        .filter((segment) => segment.type === 'arc')
+        .filter(narrowers.path.is.arcSegment)
         .map((segment) => segment.radius.toNumber())
         .sort(),
     ).toEqual([4, 7])

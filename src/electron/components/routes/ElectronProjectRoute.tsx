@@ -2,6 +2,7 @@ import { Box, Button, Code, Spinner, Stack } from '@chakra-ui/react'
 import { useEffect, useEffectEvent, useMemo, type FC } from 'react'
 import { PiWarningCircle } from 'react-icons/pi'
 import { useNavigate, useParams } from 'react-router'
+import { accessors } from '../../../common/utils/accessors'
 
 import { CommonEmptyState } from '../../../common/components/common/CommonEmptyState'
 import { useTranslation } from '../../../common/hooks/useTranslation'
@@ -118,7 +119,7 @@ const getTargetPath = (
   }
 
   const selectedSubProject = isDefined(subProjectId)
-    ? electronProject.project.subProjects.find((candidate) => candidate.id === subProjectId)
+    ? accessors.project(electronProject.project).optional.subProject(subProjectId)
     : undefined
 
   if (isDefined(selectedSubProject)) {

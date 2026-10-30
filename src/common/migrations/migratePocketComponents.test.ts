@@ -52,12 +52,17 @@ describe('physical pocket component migration', () => {
             startOffset: 2,
             endOffset: 3,
             stitchDirection: 'start-to-end',
+            stitchMargin: 4,
+            stitchHoleLength: 1.2,
+            stitchHoleDistance: 3.5,
+            stitchHoleThickness: 0.4,
+            stitchLineThickness: 0.2,
           },
         ],
       })),
     }
   }
-  it('moves pocket geometry, openings, nested children and individual stitch targets', () => {
+  it('moves pocket geometry, openings and nested children while keeping one cluster-owned stitch line', () => {
     const input = fixture()
     const before = structuredClone(input)
     const result = migrateProject(input, { t: EN })
@@ -79,10 +84,86 @@ describe('physical pocket component migration', () => {
       layoutGap: 5,
       bottomLeftRadius: 8,
     })
-    expect(result.subProjects?.[0]?.stitchLines?.map((line) => line?.targetId)).toEqual(cluster?.children?.slice(0, 2))
+    expect(result.subProjects?.[0]?.stitchLines).toEqual([
+      { ...input.subProjects[0].stitchLines[0], type: 't-pocket-stitch-line' },
+    ])
     expect(input).toEqual(before)
     expect(migrateProject(result, { t: EN })).toEqual(result)
   })
+  it('keeps cluster stitching when the migrated cluster contains only a front pocket', () => {
+    const fixtureInput = fixture()
+    const input = {
+      ...fixtureInput,
+      subProjects: fixtureInput.subProjects.map((subProject) => ({
+        ...subProject,
+        components: {
+          ...subProject.components,
+          cluster: { ...subProject.components.cluster, pocketCount: 1 },
+        },
+      })),
+    }
+    const before = structuredClone(input)
+    const result = migrateProject(input, { t: EN })
+    const components = result.subProjects?.[0]?.components ?? {}
+    expect(components.cluster?.children).toHaveLength(1)
+    expect(components.cluster?.children?.map((id) => components[id]?.type)).toEqual(['front-pocket'])
+    expect(result.subProjects?.[0]?.stitchLines).toEqual([
+      { ...input.subProjects[0].stitchLines[0], type: 't-pocket-stitch-line' },
+    ])
+    expect(typia.is<ProjectSchema>(result)).toBe(true)
+    expect(input).toEqual(before)
+    expect(migrateProject(result, { t: EN })).toEqual(result)
+  })
+
+  it('preserves separate legacy cluster stitch lines and their order', () => {
+    const fixtureInput = fixture()
+    const second = {
+      ...fixtureInput.subProjects[0].stitchLines[0],
+      id: 'second',
+      name: 'Second',
+      startOffset: 7,
+      endOffset: 8,
+      stitchDirection: 'end-to-start',
+    }
+    const input = {
+      ...fixtureInput,
+      subProjects: fixtureInput.subProjects.map((subProject) => ({
+        ...subProject,
+        stitchLines: [...subProject.stitchLines, second],
+      })),
+    }
+    const before = structuredClone(input)
+    const result = migrateProject(input, { t: EN })
+    expect(result.subProjects?.[0]?.stitchLines).toEqual([
+      { ...input.subProjects[0].stitchLines[0], type: 't-pocket-stitch-line' },
+      { ...second, type: 't-pocket-stitch-line' },
+    ])
+    expect(input).toEqual(before)
+    expect(migrateProject(result, { t: EN })).toEqual(result)
+  })
+
+  it('leaves existing T-pocket and component-bounds stitch lines unchanged', () => {
+    const fixtureInput = fixture()
+    const existing = d.tPocketStitchLine({ id: 'existing', targetId: 'cluster', targetType: 'component' })
+    const bounds = d.componentBoundsStitchLine({ id: 'bounds', targetId: 'root', targetType: 'component' })
+    const input = {
+      ...fixtureInput,
+      subProjects: fixtureInput.subProjects.map((subProject) => ({
+        ...subProject,
+        stitchLines: [existing, ...subProject.stitchLines, bounds],
+      })),
+    }
+    const before = structuredClone(input)
+    const result = migrateProject(input, { t: EN })
+    expect(result.subProjects?.[0]?.stitchLines).toEqual([
+      existing,
+      { ...fixtureInput.subProjects[0].stitchLines[0], type: 't-pocket-stitch-line' },
+      bounds,
+    ])
+    expect(input).toEqual(before)
+    expect(migrateProject(result, { t: EN })).toEqual(result)
+  })
+
   it('supports legacy clusters without opening infrastructure', () => {
     const input = fixture()
     const source = input.subProjects[0].components.cluster

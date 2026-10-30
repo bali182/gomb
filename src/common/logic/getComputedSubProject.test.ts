@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../utils/narrowers'
 
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { AnchorSchema } from '../schemas/common'
@@ -23,6 +24,7 @@ import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops, getPathSegments } from './pathSegments'
 import { getPathSegmentMidpoint } from './pathSegmentUtils'
+import { calculateStitchLine } from './stitching/calculateStitchLine'
 
 type ExpectedBoundingRect = readonly [number, number, number, number]
 
@@ -45,10 +47,10 @@ describe('empty pocket cluster placeholder', () => {
       const snapshot = structuredClone(original)
       const computed = accessors
         .computedSubProject(getComputedSubProject(original, defaultStitchingSettings))
-        .pocketCluster(cluster.id)
+        .component.pocketCluster(cluster.id)
       expect(computed.children).toEqual([])
       expectBoundingRect(computed, [0, 0, 100, 80])
-      expect(computed.path.commands.filter((command) => command.type === 'arcTo')).toHaveLength(2)
+      expect(computed.path.commands.filter((command) => narrowers.path.is.arcTo(command))).toHaveLength(2)
       expect(getClosedPathArea(computed.path)).toBeCloseTo(8000 - 2 * (100 - Math.PI * 25), 7)
       expect(original).toEqual(snapshot)
     },
@@ -326,7 +328,7 @@ const getClosedPathArea = (path: PathSchema): number => {
   return getClosedPathLoops(path)
     .flat()
     .reduce((area, segment) => {
-      if (segment.type === 'line') {
+      if (narrowers.path.is.lineSegment(segment)) {
         return area + segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y)).toNumber() / 2
       }
       return (
@@ -443,7 +445,7 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
     expect(owner.boundingRect.height.toNumber()).toBe(height)
     expect(getClosedPathArea(owner.path)).toBeCloseTo(area - testCase.removedArea, 7)
     expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
-    computed.holes.forEach((hole, index) => {
+    Object.values(computed.holes).forEach((hole, index) => {
       expect(getClosedPathArea(hole.highlightPath)).toBeCloseTo(testCase.highlightAreas[index], 7)
     })
   })
@@ -463,7 +465,7 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
     expect(isPointInClosedPath(islandCenter, owner.path)).toBe(true)
     expect(isPointInClosedPath({ x: owner.boundingRect.x.plus(20), y: islandCenter.y }, owner.path)).toBe(false)
     expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
-    computed.holes.forEach((hole) => expect(getClosedPathArea(hole.highlightPath)).toBeCloseTo(1600, 7))
+    Object.values(computed.holes).forEach((hole) => expect(getClosedPathArea(hole.highlightPath)).toBeCloseTo(1600, 7))
   })
 
   it('keeps both pieces when a hole splits the whole component', () => {
@@ -491,7 +493,7 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
       defaultStitchingSettings,
     )
     const quarterCircle = (Math.PI * 100) / 4
-    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(quarterCircle, 7)
+    expect(getClosedPathArea(computed.holes.corner.highlightPath)).toBeCloseTo(quarterCircle, 7)
     expect(getClosedPathArea(computed.components[ownerId].path)).toBeCloseTo(
       area - (4 - Math.PI) * 100 - quarterCircle,
       7,
@@ -505,7 +507,7 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
       defaultStitchingSettings,
     )
     expect(computed.components[ownerId].path.commands).toEqual([])
-    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(area, 7)
+    expect(getClosedPathArea(computed.holes.cover.highlightPath)).toBeCloseTo(area, 7)
     expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
   })
 
@@ -514,10 +516,10 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
     const computed = getComputedSubProject(createFixture([hole]), defaultStitchingSettings)
     const owner = computed.components[ownerId]
     const localX = xAnchor === 'start' ? 10 : xAnchor === 'middle' ? width / 2 : width - 30
-    expect(computed.holes[0].boundingRect.x.toNumber()).toBe(owner.boundingRect.x.plus(localX).toNumber())
-    expect(computed.holes[0].boundingRect.y.toNumber()).toBe(owner.boundingRect.y.plus(height - 20).toNumber())
+    expect(computed.holes.anchored.boundingRect.x.toNumber()).toBe(owner.boundingRect.x.plus(localX).toNumber())
+    expect(computed.holes.anchored.boundingRect.y.toNumber()).toBe(owner.boundingRect.y.plus(height - 20).toNumber())
     expect(getClosedPathArea(owner.path)).toBeCloseTo(area - 200, 7)
-    expect(getClosedPathArea(computed.holes[0].highlightPath)).toBeCloseTo(200, 7)
+    expect(getClosedPathArea(computed.holes.anchored.highlightPath)).toBeCloseTo(200, 7)
   })
 
   it.each(['svg', 'pdf', 'png'] as const)('passes the cut contour and clipped stitches to %s export', (format) => {
@@ -596,9 +598,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(10)
-    expectBoundingRect(computed.panel(first.id), testCase.expectedFirstPanelBoundingRect)
-    expectBoundingRect(computed.panel(second.id), testCase.expectedSecondPanelBoundingRect)
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(10)
+    expectBoundingRect(computed.component.panel(first.id), testCase.expectedFirstPanelBoundingRect)
+    expectBoundingRect(computed.component.panel(second.id), testCase.expectedSecondPanelBoundingRect)
   })
 
   it.each<FixedLayoutTestCase>([
@@ -632,9 +634,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(60)
-    expectBoundingRect(computed.panel(first.id), testCase.expectedFirstPanelBoundingRect)
-    expectBoundingRect(computed.panel(second.id), testCase.expectedSecondPanelBoundingRect)
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(60)
+    expectBoundingRect(computed.component.panel(first.id), testCase.expectedFirstPanelBoundingRect)
+    expectBoundingRect(computed.component.panel(second.id), testCase.expectedSecondPanelBoundingRect)
   })
 
   it('shares automatic space between a gap and an auto-sized child', () => {
@@ -654,9 +656,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(40)
-    expectBoundingRect(computed.panel(fixed.id), [0, 0, 20, 40])
-    expectBoundingRect(computed.panel(auto.id), [60, 0, 40, 40])
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(40)
+    expectBoundingRect(computed.component.panel(fixed.id), [0, 0, 20, 40])
+    expectBoundingRect(computed.component.panel(auto.id), [60, 0, 40, 40])
   })
 
   it('shares automatic space between auto-sized children and their gap', () => {
@@ -676,9 +678,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(30)
-    expectBoundingRect(computed.panel(first.id), [0, 0, 30, 40])
-    expectBoundingRect(computed.panel(second.id), [60, 0, 30, 40])
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(30)
+    expectBoundingRect(computed.component.panel(first.id), [0, 0, 30, 40])
+    expectBoundingRect(computed.component.panel(second.id), [60, 0, 30, 40])
   })
 
   it('uses the manual gap when sizing an auto-sized child', () => {
@@ -698,8 +700,8 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(fixed.id), [0, 0, 20, 40])
-    expectBoundingRect(computed.panel(auto.id), [30, 0, 70, 40])
+    expectBoundingRect(computed.component.panel(fixed.id), [0, 0, 20, 40])
+    expectBoundingRect(computed.component.panel(auto.id), [30, 0, 70, 40])
   })
 
   it('does not allocate negative size when a manual gap uses all remaining space', () => {
@@ -719,7 +721,7 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(auto.id), [100, 0, 0, 40])
+    expectBoundingRect(computed.component.panel(auto.id), [100, 0, 0, 40])
   })
 
   it('preserves fixed main-axis and cross-axis sizes beyond the parent bounds', () => {
@@ -752,8 +754,8 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(wide.id), [0, 0, 200, 20])
-    expectBoundingRect(computed.panel(tall.id), [200, -40, 20, 100])
+    expectBoundingRect(computed.component.panel(wide.id), [0, 0, 200, 20])
+    expectBoundingRect(computed.component.panel(tall.id), [200, -40, 20, 100])
   })
 
   it.each<LayoutGapTestCase>([
@@ -765,8 +767,8 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root }), defaultStitchingSettings),
     )
 
-    expect(computed.rootPanel().children).toEqual([])
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(testCase.expectedComputedLayoutGap)
+    expect(computed.component.rootPanel().children).toEqual([])
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(testCase.expectedComputedLayoutGap)
   })
 
   it.each<LayoutGapTestCase>([
@@ -779,8 +781,8 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expect(computed.rootPanel().computedLayoutGap.toNumber()).toBe(testCase.expectedComputedLayoutGap)
-    expectBoundingRect(computed.panel(child.id), [0, 0, 100, 40])
+    expect(computed.component.rootPanel().computedLayoutGap.toNumber()).toBe(testCase.expectedComputedLayoutGap)
+    expectBoundingRect(computed.component.panel(child.id), [0, 0, 100, 40])
   })
 
   it('retains source order and associates bounding boxes with component IDs', () => {
@@ -800,9 +802,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.rootPanel().children.map((child) => child.componentId)).toEqual(['zeta', 'alpha'])
-    expectBoundingRect(computed.panel(zeta.id), [0, 0, 30, 40])
-    expectBoundingRect(computed.pocketCluster(alpha.id), [40, 0, 20, 40])
+    expect(computed.component.rootPanel().children.map((child) => child.componentId)).toEqual(['zeta', 'alpha'])
+    expectBoundingRect(computed.component.panel(zeta.id), [0, 0, 30, 40])
+    expectBoundingRect(computed.component.pocketCluster(alpha.id), [40, 0, 20, 40])
   })
 
   it('uses a nested panel layout instead of its parent layout', () => {
@@ -824,10 +826,10 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expect(computed.panel(container.id).computedLayoutGap.toNumber()).toBe(5)
-    expectBoundingRect(computed.panel(container.id), [0, 0, 100, 100])
-    expectBoundingRect(computed.panel(top.id), [0, 0, 100, 20])
-    expectBoundingRect(computed.panel(bottom.id), [0, 25, 100, 30])
+    expect(computed.component.panel(container.id).computedLayoutGap.toNumber()).toBe(5)
+    expectBoundingRect(computed.component.panel(container.id), [0, 0, 100, 100])
+    expectBoundingRect(computed.component.panel(top.id), [0, 0, 100, 20])
+    expectBoundingRect(computed.component.panel(bottom.id), [0, 25, 100, 30])
   })
 
   it('uses each panel layout when layouts are nested multiple levels deep', () => {
@@ -857,9 +859,9 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(inner.id), [0, 0, 100, 50])
-    expectBoundingRect(computed.panel(left.id), [0, 0, 20, 50])
-    expectBoundingRect(computed.panel(right.id), [25, 0, 30, 50])
+    expectBoundingRect(computed.component.panel(inner.id), [0, 0, 100, 50])
+    expectBoundingRect(computed.component.panel(left.id), [0, 0, 20, 50])
+    expectBoundingRect(computed.component.panel(right.id), [25, 0, 30, 50])
   })
 
   it('rejects a root panel as a layout child', () => {
@@ -886,7 +888,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, testCase.expectedCrossAxisPosition, 100, 60])
+    expectBoundingRect(computed.component.panel(child.id), [0, testCase.expectedCrossAxisPosition, 100, 60])
   })
 
   it.each<OffAxisAnchorTestCase>([
@@ -906,7 +908,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [testCase.expectedCrossAxisPosition, 0, 60, 100])
+    expectBoundingRect(computed.component.panel(child.id), [testCase.expectedCrossAxisPosition, 0, 60, 100])
   })
 
   it.each<OffAxisAnchorTestCase>([
@@ -925,7 +927,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, testCase.expectedCrossAxisPosition, 100, 100])
+    expectBoundingRect(computed.component.panel(child.id), [0, testCase.expectedCrossAxisPosition, 100, 100])
   })
 
   it('uses a nested panel off-axis anchor', () => {
@@ -944,7 +946,7 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, 40, 100, 60])
+    expectBoundingRect(computed.component.panel(child.id), [0, 40, 100, 60])
   })
 
   it('uses the full cross-axis size to position an oversized fixed child', () => {
@@ -959,7 +961,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, -40, 100, 100])
+    expectBoundingRect(computed.component.panel(child.id), [0, -40, 100, 100])
   })
 
   it.each<PocketClusterOffAxisAnchorTestCase>([
@@ -973,7 +975,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [cluster] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.pocketCluster(cluster.id), [0, testCase.expectedCrossAxisPosition, 100, 60])
+    expectBoundingRect(computed.component.pocketCluster(cluster.id), [0, testCase.expectedCrossAxisPosition, 100, 60])
   })
 
   it.each<InwardStretchTestCase>([
@@ -996,7 +998,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), testCase.expectedBoundingRect)
+    expectBoundingRect(computed.component.panel(child.id), testCase.expectedBoundingRect)
   })
 
   it('allows opposing negative stretch to reduce the component to zero', () => {
@@ -1017,7 +1019,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [30, 30, 0, 0])
+    expectBoundingRect(computed.component.panel(child.id), [30, 30, 0, 0])
   })
 
   it('allows positive vertical stretch beyond the parent bounds', () => {
@@ -1036,7 +1038,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [0, -80, 60, 260])
+    expectBoundingRect(computed.component.panel(child.id), [0, -80, 60, 260])
   })
 
   it('allows positive horizontal stretch beyond the parent bounds', () => {
@@ -1061,7 +1063,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [child] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.panel(child.id), [-80, 0, 260, 60])
+    expectBoundingRect(computed.component.panel(child.id), [-80, 0, 260, 60])
   })
 
   it('does not use a stretched bounding box to position the next sibling', () => {
@@ -1081,8 +1083,8 @@ describe('getComputedSubProject layout', () => {
       ),
     )
 
-    expectBoundingRect(computed.panel(first.id), [0, 0, 120, 40])
-    expectBoundingRect(computed.panel(second.id), [30, 0, 20, 40])
+    expectBoundingRect(computed.component.panel(first.id), [0, 0, 120, 40])
+    expectBoundingRect(computed.component.panel(second.id), [30, 0, 20, 40])
   })
 
   it('applies stretch to pocket clusters', () => {
@@ -1099,7 +1101,7 @@ describe('getComputedSubProject layout', () => {
       getComputedSubProject(d.subProject({ id: 'sub-project', root, components: [cluster] }), defaultStitchingSettings),
     )
 
-    expectBoundingRect(computed.pocketCluster(cluster.id), [0, 30, 100, 30])
+    expectBoundingRect(computed.component.pocketCluster(cluster.id), [0, 30, 100, 30])
   })
 })
 
@@ -1245,7 +1247,9 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
         const source = d.subProject({ id: 'sub-project', root, components: children })
         const snapshot = structuredClone(source)
         const computed = getComputedSubProject(source, defaultStitchingSettings)
-        expect(accessors.computedSubProject(computed).rootPanel().computedLayoutGap.toNumber()).toBe(expectedGap)
+        expect(accessors.computedSubProject(computed).component.rootPanel().computedLayoutGap.toNumber()).toBe(
+          expectedGap,
+        )
         let position = 0
         for (const [index, child] of children.entries()) {
           const size = index < fixed.length ? fixedSizes[index] : expectedAutoSize
@@ -1324,8 +1328,11 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
         )
         expectBoundingRect(computed.components[child.id], [inset, inset, expectedSize, expectedSize])
         const computedAccessor = accessors.computedSubProject(computed)
-        const bounds = (type === 'panel' ? computedAccessor.panel(child.id) : computedAccessor.pocketCluster(child.id))
-          .layoutBoundingRect
+        const bounds = (
+          type === 'panel'
+            ? computedAccessor.component.panel(child.id)
+            : computedAccessor.component.pocketCluster(child.id)
+        ).layoutBoundingRect
         expect(bounds.width.toNumber()).toBe(size)
         expect(bounds.height.toNumber()).toBe(size)
       })
@@ -1515,7 +1522,10 @@ describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (t
         const snapshot = structuredClone(source)
         const computed = getComputedSubProject(source, defaultStitchingSettings)
         const computedAccessor = accessors.computedSubProject(computed)
-        const result = type === 'panel' ? computedAccessor.panel(child.id) : computedAccessor.pocketCluster(child.id)
+        const result =
+          type === 'panel'
+            ? computedAccessor.component.panel(child.id)
+            : computedAccessor.component.pocketCluster(child.id)
         expectBoundingRect(
           result,
           horizontal ? [-adjustedFirst, 0, expectedSize, 60] : [0, -adjustedFirst, 60, expectedSize],
@@ -1567,5 +1577,94 @@ describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (t
       topStretch: { min: { value: new BigNumber(-30) } },
       bottomStretch: { min: { value: new BigNumber(-30) } },
     })
+  })
+})
+
+describe('cluster T-pocket stitch routes', () => {
+  const fixture = () =>
+    d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 120, children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['a', 'b', 'front'], pocketStep: 15 }),
+        d.tPocket({ id: 'a' }),
+        d.tPocket({ id: 'b' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+      holes: [d.hole({ id: 'hole', componentId: 'front', width: 10, height: 10 })],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local', targetId: 'a', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'bounds', targetId: 'cluster', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'hole', targetType: 'hole' }),
+      ],
+    })
+
+  it('keeps one computed object per source and identifies every route by its actual target', () => {
+    const source = fixture()
+    const snapshot = structuredClone(source)
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const accessor = accessors.computedSubProject(computed)
+    const shared = accessor.stitchLine.byId('shared')
+    expect(Object.values(computed.stitchLines).filter((line) => line.stitchLineId === 'shared')).toEqual([shared])
+    expect(shared).toMatchObject({ targetId: 'cluster', componentId: 'cluster', onTop: 'cluster' })
+    expect(shared.routes.map(({ targetType, targetId }) => ({ targetType, targetId }))).toEqual([
+      { targetType: 'component', targetId: 'a' },
+      { targetType: 'component', targetId: 'b' },
+    ])
+    expect(accessor.stitchLine.byId('local').routes).toHaveLength(1)
+    expect(accessor.stitchLine.byId('local').routes[0]).toMatchObject({ targetType: 'component', targetId: 'a' })
+    for (const [id, targetType, targetId] of [
+      ['bounds', 'component', 'cluster'],
+      ['hole-line', 'hole', 'hole'],
+    ]) {
+      const routes = accessor.stitchLine.byId(id).routes
+      expect(routes.length).toBeGreaterThan(0)
+      for (const route of routes) {
+        expect(route).toMatchObject({ targetType, targetId })
+      }
+    }
+    for (const { boundingRect } of shared.routes) {
+      expect(shared.boundingRect.x.lte(boundingRect.x)).toBe(true)
+      expect(shared.boundingRect.y.lte(boundingRect.y)).toBe(true)
+      expect(shared.boundingRect.x.plus(shared.boundingRect.width).gte(boundingRect.x.plus(boundingRect.width))).toBe(
+        true,
+      )
+      expect(shared.boundingRect.y.plus(shared.boundingRect.height).gte(boundingRect.y.plus(boundingRect.height))).toBe(
+        true,
+      )
+    }
+    expect(source).toEqual(snapshot)
+  })
+
+  it.each([['b', 'a', 'front'], ['b', 'front'], ['front']])(
+    'follows current children without duplicating the source: %j',
+    (...children) => {
+      const source = fixture()
+      const cluster = accessors.subProject(source).component.pocketCluster('cluster')
+      const changed = { ...source, components: { ...source.components, cluster: { ...cluster, children } } }
+      const computed = accessors
+        .computedSubProject(getComputedSubProject(changed, defaultStitchingSettings))
+        .stitchLine.byId('shared')
+      expect(computed.routes.map((route) => route.targetId)).toEqual(children.filter((id) => id !== 'front'))
+      expect(changed.stitchLines).toBe(source.stitchLines)
+    },
+  )
+
+  it('does not assign a later route to the first pocket when its geometry is absent', () => {
+    const source = fixture()
+    const geometry = getComputedSubProject(source, defaultStitchingSettings)
+    const accessor = accessors.computedSubProject(geometry)
+    const cluster = accessor.component.pocketCluster('cluster')
+    const withoutFirstPath = { ...accessor.component.tPocket('a'), path: { commands: [] } }
+    const computed = calculateStitchLine({ ...defaultStitchingSettings, ...source.stitchLines[0] }, source, {
+      ...geometry.components,
+      cluster: {
+        ...cluster,
+        children: [withoutFirstPath, accessor.component.tPocket('b'), accessor.component.frontPocket('front')],
+      },
+    })
+    expect(computed).toBeDefined()
+    expect(computed?.routes.map((route) => route.targetId)).toEqual(['b'])
   })
 })

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { narrowers } from '../../utils/narrowers'
 
 import { defaultStitchingSettings } from '../../defaultStates'
 import type { ExportStitchLineModeSchema } from '../../schemas/settings'
@@ -67,7 +68,7 @@ describe.each<StitchLineModeTestCase>([
     const computed = getComputedSubProject(subProject, defaultStitchingSettings)
     const target = computed.components['panel']
 
-    if (target.type !== 'computed-panel') {
+    if (!narrowers.is.computedPanel(target)) {
       throw new Error('Expected a computed panel')
     }
 
@@ -106,5 +107,69 @@ describe.each<StitchLineModeTestCase>([
         }
       }
     }
+  })
+})
+
+describe('cluster T-pocket stitching export', () => {
+  const fixture = () =>
+    d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 120, children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['a', 'b', 'front'], pocketStep: 0 }),
+        d.tPocket({ id: 'a' }),
+        d.tPocket({ id: 'b' }),
+        d.frontPocket({ id: 'front' }),
+      ],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local-a', targetId: 'a', targetType: 'component' }),
+        d.tPocketStitchLine({ id: 'local-b', targetId: 'b', targetType: 'component' }),
+      ],
+    })
+
+  it.each<ExportStitchLineModeSchema>(['own-stitch-lines', 'related-stitch-lines'])(
+    'exports only the matching pocket route even when the other route overlaps: %s',
+    (mode) => {
+      const source = fixture()
+      const snapshot = structuredClone(source)
+      const computed = getComputedSubProject(source, defaultStitchingSettings)
+      const shared = computed.stitchLines.shared
+      expect(shared.routes).toHaveLength(2)
+      expect(shared.routes[0].path).toEqual(shared.routes[1].path)
+      for (const id of ['a', 'b']) {
+        const exported = getExportStitchLines(source, computed, computed.components[id], mode, defaultStitchingSettings)
+        expect(exported.map(({ stitchLine }) => stitchLine.id).sort()).toEqual([`local-${id}`, 'shared'])
+        const sharedExport = exported.find(({ stitchLine }) => stitchLine.id === 'shared')
+        expect(sharedExport?.paths).toHaveLength(1)
+        expect(sharedExport?.holes).toHaveLength(shared.routes[0].holes.length)
+      }
+      expect(getExportStitchLines(source, computed, computed.components.front, mode, defaultStitchingSettings)).toEqual(
+        [],
+      )
+      expect(source).toEqual(snapshot)
+    },
+  )
+
+  it('preserves all-route clipping in all mode and includes every route when exporting the root', () => {
+    const source = fixture()
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const all = getExportStitchLines(
+      source,
+      computed,
+      computed.components.a,
+      'all-stitch-lines',
+      defaultStitchingSettings,
+    )
+    expect(all.map(({ stitchLine }) => stitchLine.id).sort()).toEqual(['local-a', 'local-b', 'shared'])
+    expect(all.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
+    const related = getExportStitchLines(
+      source,
+      computed,
+      computed.components.root,
+      'related-stitch-lines',
+      defaultStitchingSettings,
+    )
+    expect(related.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
   })
 })

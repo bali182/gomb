@@ -8,6 +8,7 @@ import type {
 } from '../../schemas/limits'
 import type { ResolvedStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import type { ComputedSubProjectGeometrySchema, SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -37,6 +38,7 @@ const collectComponentLimits = (
   subProject: SubProjectSchema,
   computedSubProject: ComputedSubProjectGeometrySchema,
 ): Record<string, ComponentLimitsSchema> => {
+  const accessor = accessors.subProject(subProject)
   const limits: Record<string, ComponentLimitsSchema> = {}
   const parents: Record<string, ComputedComponentSchema> = {}
   for (const parent of Object.values(computedSubProject.components)) {
@@ -45,7 +47,7 @@ const collectComponentLimits = (
     }
   }
   for (const computed of Object.values(computedSubProject.components)) {
-    const component = subProject.components[computed.componentId]
+    const component = accessor.optional.component.byId(computed.componentId)
     if (!isDefined(component)) {
       continue
     }
@@ -61,9 +63,10 @@ const collectHoleLimits = (
   subProject: SubProjectSchema,
   computedSubProject: ComputedSubProjectGeometrySchema,
 ): Record<string, HoleLimitsSchema> => {
+  const accessor = accessors.subProject(subProject)
   const limits: Record<string, HoleLimitsSchema> = {}
-  for (const computed of computedSubProject.holes) {
-    const hole = subProject.holes.find((candidate) => candidate.id === computed.holeId)
+  for (const computed of Object.values(computedSubProject.holes)) {
+    const hole = accessor.optional.hole.byId(computed.holeId)
     const owner = computedSubProject.components[computed.componentId]
     if (isDefined(hole) && isDefined(owner)) {
       limits[hole.id] = getHoleLimits(hole, computed, owner)
@@ -78,13 +81,8 @@ const collectStitchLineLimits = (
   stitchingSettings: StitchLineCommonConfigSchema,
 ): Record<string, StitchLineLimitsSchema> => {
   const limits: Record<string, StitchLineLimitsSchema> = {}
-  const computedStitchLines = new Map(
-    Object.values(computedSubProject.stitchLines)
-      .flat()
-      .map((line) => [line.stitchLineId, line]),
-  )
   for (const source of subProject.stitchLines) {
-    const computed = computedStitchLines.get(source.id)
+    const computed = computedSubProject.stitchLines[source.id]
     if (!isDefined(computed)) {
       continue
     }
@@ -106,7 +104,7 @@ const getStitchLineLimits = (
     case 'component-bounds-stitch-line': {
       const computedTarget =
         stitchLine.targetType === 'hole'
-          ? computedSubProject.holes.find((hole) => hole.holeId === stitchLine.targetId)
+          ? computedSubProject.holes[stitchLine.targetId]
           : computedSubProject.components[stitchLine.targetId]
       if (!isDefined(computedTarget)) {
         return undefined
@@ -120,7 +118,10 @@ const getStitchLineLimits = (
     }
     case 't-pocket-stitch-line': {
       const cluster = computedSubProject.components[stitchLine.targetId]
-      if (!isDefined(cluster) || cluster.type !== 'computed-t-pocket') {
+      if (
+        !isDefined(cluster) ||
+        (!narrowers.is.computedTPocket(cluster) && !narrowers.is.computedPocketCluster(cluster))
+      ) {
         return undefined
       }
       return getTPocketStitchLineLimits(stitchLine, computed, cluster)
@@ -143,11 +144,11 @@ const getComponentLimits = (
       }
       return getPanelLimits(component, narrowers.assert.computedPanel(computed), parent)
     case 'front-pocket': {
-      if (!isDefined(parent) || parent.type !== 'computed-pocket-cluster') {
+      if (!isDefined(parent) || !narrowers.is.computedPocketCluster(parent)) {
         return undefined
       }
-      const cluster = subProject.components[parent.componentId]
-      if (!isDefined(cluster) || cluster.type !== 'pocket-cluster') {
+      const cluster = accessors.subProject(subProject).optional.component.pocketCluster(parent.componentId)
+      if (!isDefined(cluster)) {
         return undefined
       }
       return getFrontPocketLimits(
@@ -158,11 +159,11 @@ const getComponentLimits = (
       )
     }
     case 't-pocket': {
-      if (!isDefined(parent) || parent.type !== 'computed-pocket-cluster') {
+      if (!isDefined(parent) || !narrowers.is.computedPocketCluster(parent)) {
         return undefined
       }
-      const cluster = subProject.components[parent.componentId]
-      if (!isDefined(cluster) || cluster.type !== 'pocket-cluster') {
+      const cluster = accessors.subProject(subProject).optional.component.pocketCluster(parent.componentId)
+      if (!isDefined(cluster)) {
         return undefined
       }
       return getTPocketLimits(

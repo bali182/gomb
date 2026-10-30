@@ -1,5 +1,6 @@
 import { Alert, Box, CloseButton } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type FC } from 'react'
+import { accessors } from '../utils/accessors'
 
 import { LANGUAGE } from '../constants/language'
 import { useExportDrawArea } from '../hooks/useExportDrawArea'
@@ -151,7 +152,7 @@ const ExportFailureAlert: FC<ExportFailureAlertProps> = ({ failure, onDismiss })
           {failure.type === 'unplaceable' && (
             <Alert.Description as="ul" mt="2" ps="4">
               {failure.layout.unplaceables.map((panel) => {
-                const root = panel.subProject.components[panel.subProject.root]
+                const root = accessors.subProject(panel.subProject).optional.component.rootPanel()
                 const text = isDefined(root) ? `${root.name} → ${panel.component.name}` : panel.component.name
                 return <li key={`${panel.subProject.id}:${panel.component.id}`}>{text}</li>
               })}

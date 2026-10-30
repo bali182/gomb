@@ -1,5 +1,6 @@
 import { POSITION_EPSILON } from '../constants/layout'
 import type { PathSchema, PointSchema } from '../schemas/geometry'
+import { narrowers } from '../utils/narrowers'
 import { getPathSegments } from './pathSegments'
 import type { ArcPathSegment, PathSegment } from './pathSegmentTypes'
 import { isPointOnPathSegment } from './pathSegmentUtils'
@@ -18,7 +19,7 @@ export const isPointInClosedPath = (point: PointSchema, path: PathSchema): boole
 
 const getHorizontalRayIntersections = (point: PointSchema, segments: PathSegment[]): PointSchema[] => {
   const intersections = segments.flatMap((segment) => {
-    if (segment.type === 'line') {
+    if (narrowers.path.is.lineSegment(segment)) {
       return getLineRayIntersections(point, segment.start, segment.end)
     }
 

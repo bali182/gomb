@@ -179,7 +179,7 @@ export const PocketCopyGrid: FC<PocketCopyGridProps> = ({ subProject, sourcePock
         </Table.Header>
         <Table.Body>
           {rows.map((row) => {
-            const pocket = accessors.subProject(subProject).pocket(row.pocketId)
+            const pocket = accessors.subProject(subProject).component.pocket(row.pocketId)
             const isSource = row.pocketId === sourcePocketId
             const rowCell = getRowCell(row, isSource)
             return (

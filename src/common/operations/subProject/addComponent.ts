@@ -1,5 +1,6 @@
 import { ComponentSchema } from '../../schemas/components'
 import { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 
 export type ComponentInsertionPositionSchema = 'start' | 'end' | number
@@ -11,7 +12,7 @@ export type AddComponentParams = {
 }
 
 export const addComponent = (subProject: SubProjectSchema, params: AddComponentParams): SubProjectSchema => {
-  const parent = subProject.components[params.parentId]
+  const parent = accessors.subProject(subProject).optional.component.byId(params.parentId)
 
   if (!isDefined(parent)) {
     throw new Error('Missing parent')

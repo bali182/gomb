@@ -1,4 +1,5 @@
 import type { ComputedComponentSchema } from '../../schemas/computed'
+import { narrowers } from '../../utils/narrowers'
 
 import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
 import { createPathFromConnectedSegments } from '../pathSegments'
@@ -11,7 +12,7 @@ export const getExportChildMarkerPaths = (
 ): PathSchema[] => {
   const parentMarkerLines = getBoundingRectMarkerLines(parentBoundingRect)
   const boundingRects = children.flatMap((child) =>
-    child.type === 'computed-pocket-cluster'
+    narrowers.is.computedPocketCluster(child)
       ? child.children.map((pocket) => pocket.boundingRect)
       : [child.boundingRect],
   )

@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../utils/narrowers'
 
 import { TWO } from '../constants/layout'
 import type { PointSchema } from '../schemas/geometry'
@@ -12,15 +13,15 @@ import {
 } from './pathSegmentUtils'
 
 export const getPathSegmentIntersections = (first: PathSegment, second: PathSegment): PathSegmentIntersection[] => {
-  if (first.type === 'line' && second.type === 'line') {
+  if (narrowers.path.is.lineSegment(first) && narrowers.path.is.lineSegment(second)) {
     return getLineLineIntersections(first, second)
   }
 
-  if (first.type === 'line' && second.type === 'arc') {
+  if (narrowers.path.is.lineSegment(first) && narrowers.path.is.arcSegment(second)) {
     return getLineArcIntersections(first, second)
   }
 
-  if (first.type === 'arc' && second.type === 'line') {
+  if (narrowers.path.is.arcSegment(first) && narrowers.path.is.lineSegment(second)) {
     return getLineArcIntersections(second, first).map((intersection) => ({
       firstProgress: intersection.secondProgress,
       secondProgress: intersection.firstProgress,
@@ -28,7 +29,7 @@ export const getPathSegmentIntersections = (first: PathSegment, second: PathSegm
     }))
   }
 
-  if (first.type === 'arc' && second.type === 'arc') {
+  if (narrowers.path.is.arcSegment(first) && narrowers.path.is.arcSegment(second)) {
     return getArcArcIntersections(first, second)
   }
 
@@ -46,7 +47,7 @@ export const getRayPathSegmentIntersections = (
   direction: PointSchema,
   segment: PathSegment,
 ): RayPathSegmentIntersection[] => {
-  if (segment.type === 'line') {
+  if (narrowers.path.is.lineSegment(segment)) {
     return getRayLineIntersections(origin, direction, segment)
   }
 

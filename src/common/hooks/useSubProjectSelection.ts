@@ -96,10 +96,10 @@ const getModelObject = (
 
   switch (selection.type) {
     case 'component':
-      return optional.component(selection.componentId)
+      return optional.component.byId(selection.componentId)
     case 'stitch-line':
-      return optional.stitchLine(selection.stitchLineId)
+      return optional.stitchLine.byId(selection.stitchLineId)
     case 'hole':
-      return optional.hole(selection.holeId)
+      return optional.hole.byId(selection.holeId)
   }
 }

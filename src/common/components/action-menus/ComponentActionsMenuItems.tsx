@@ -1,5 +1,5 @@
 import { Menu } from '@chakra-ui/react'
-import { useMemo, type FC } from 'react'
+import { useCallback, useMemo, type FC } from 'react'
 import { PiCopy, PiImage, PiPaintBrushBroad, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema } from '../../schemas/components'
@@ -66,10 +66,19 @@ export const AddComponentStitchLineMenuItem: FC<AddComponentStitchLineMenuItemPr
 }) => {
   const { t } = useTranslation()
   const Icon = getModelIconByType(type)
+
+  const handleSelect = useCallback((): void => {
+    onSelect(type)
+  }, [onSelect, type])
+
   return (
-    <Menu.Item value={type} disabled={disabled} onSelect={() => onSelect(type)}>
+    <Menu.Item value={type} disabled={disabled} onSelect={handleSelect}>
       <Icon />
-      <Menu.ItemText>{t.project.editors.actions.components.addStitching}</Menu.ItemText>
+      <Menu.ItemText>
+        {type === 't-pocket-stitch-line'
+          ? t.project.editors.actions.components.addPocketStitching
+          : t.project.editors.actions.components.addStitching}
+      </Menu.ItemText>
     </Menu.Item>
   )
 }

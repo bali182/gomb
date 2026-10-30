@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { narrowers } from '../../utils/narrowers'
 
 import { POSITION_EPSILON, ZERO } from '../../constants/layout'
 import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/components'
@@ -69,7 +70,7 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
   }
 
   getTPocketPath(): PathSchema {
-    if (this.pocket.type !== 't-pocket') {
+    if (!narrowers.is.tPocket(this.pocket)) {
       throw new Error('T-pocket path requires a T-pocket')
     }
     const opening = this.getPocketOpeningPath()
@@ -87,7 +88,7 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
     const previous = commands[commands.length - 1]
     if (
       isDefined(previous) &&
-      previous.type !== 'close' &&
+      !narrowers.path.is.close(previous) &&
       previous.point.x.minus(point.x).abs().lte(POSITION_EPSILON) &&
       previous.point.y.minus(point.y).abs().lte(POSITION_EPSILON)
     ) {
@@ -128,7 +129,7 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
     const reversed: PathSegment[] = pieces.reverse().map((segment): PathSegment => {
       const startPoint = { x: segment.end.x, y: segment.end.y.plus(offset) }
       const endPoint = { x: segment.start.x, y: segment.start.y.plus(offset) }
-      return segment.type === 'line'
+      return narrowers.path.is.lineSegment(segment)
         ? { type: 'line', start: startPoint, end: endPoint }
         : { ...segment, start: startPoint, end: endPoint, reversed: !segment.reversed }
     })
@@ -136,7 +137,8 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
       return []
     }
     return createPathFromConnectedSegments(reversed).commands.map(
-      (command): PathCommand => (command.type === 'moveTo' ? { type: 'lineTo', point: command.point } : command),
+      (command): PathCommand =>
+        narrowers.path.is.moveTo(command) ? { type: 'lineTo', point: command.point } : command,
     )
   }
 }

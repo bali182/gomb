@@ -11,7 +11,7 @@ import { useTranslation } from './useTranslation'
 export const useHoleLimitIssues = (hole: HoleSchema): IssuesSchema<HoleSchema> => {
   const { computedSubProject } = useSubProject()
   const translation = useTranslation()
-  const limits = accessors.subProjectLimits(computedSubProject.limits).optional.hole(hole.id)
+  const limits = accessors.computedSubProject(computedSubProject).optional.limits.hole(hole.id)
   return useMemo<IssuesSchema<HoleSchema>>(
     () => (isDefined(limits) ? getLimitIssues(hole, limits, translation) : noIssues<HoleSchema>()),
     [hole, limits, translation],

@@ -1,12 +1,13 @@
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
-import { getComponentStitchLineType } from '../../operations/subProject/utils/componentRules'
-import { getComponentParent } from '../../operations/subProject/utils/getComponentParent'
-import type { ComponentSchema } from '../../schemas/components'
+import { getComponentStitchLineTypes } from '../../operations/subProject/utils/componentRules'
+import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type {
   ComputedComponentSchema,
   ComputedStitchLineSchema,
   ComputedStitchRouteSchema,
+  ComputedTPocketSchema,
 } from '../../schemas/computed'
+import type { PointSchema } from '../../schemas/geometry'
 import type {
   ResolvedComponentBoundsStitchLineSchema,
   ResolvedStitchLineSchema,
@@ -28,19 +29,19 @@ export const calculateStitchLine = (
   subProject: SubProjectSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedStitchLineSchema | undefined => {
-  const component = accessors.subProject(subProject).optional.component(stitchLine.targetId)
+  const component = accessors.subProject(subProject).optional.component.byId(stitchLine.targetId)
   const computed = computedComponents[stitchLine.targetId]
   if (!isDefined(component) || !isDefined(computed)) {
     return undefined
   }
-  if (getComponentStitchLineType(component) !== stitchLine.type) {
+  if (!getComponentStitchLineTypes(component).includes(stitchLine.type)) {
     return undefined
   }
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line':
       return calculateStandardStitchLine(stitchLine, computed, computedComponents)
     case 't-pocket-stitch-line':
-      return calculatePocketBottomStitchLine(stitchLine, component, computed, subProject)
+      return calculateComputedTPocketStitchLine(stitchLine, component, computed, subProject)
   }
 }
 
@@ -56,43 +57,34 @@ const calculateStandardStitchLine = (
   )
 }
 
-const calculatePocketBottomStitchLine = (
+const calculateComputedTPocketStitchLine = (
   stitchLine: ResolvedTPocketStitchLineSchema,
   component: ComponentSchema,
   computed: ComputedComponentSchema,
   subProject: SubProjectSchema,
 ): ComputedStitchLineSchema | undefined => {
-  if (computed.type !== 'computed-t-pocket') {
-    return undefined
-  }
-  const cluster = getComponentParent(component.id, subProject)
+  const cluster = narrowers.is.pocketCluster(component)
+    ? component
+    : accessors.subProject(subProject).optional.component.parent(component.id)
   if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
     return undefined
   }
-  const calculated = calculateTPocketStitchLine(stitchLine, cluster, computed)
-  const labelPosition: StitchSideSchema =
-    cluster.orientation === 'up' ? 'top' : cluster.orientation === 'down' ? 'bottom' : cluster.orientation
-  const holes = isDefined(calculated) ? calculateTPocketStitchHoles(stitchLine, calculated.line) : []
+  if (!narrowers.is.computedPocketCluster(computed) && !narrowers.is.computedTPocket(computed)) {
+    return undefined
+  }
+  const pockets = narrowers.is.computedPocketCluster(computed)
+    ? computed.children.filter(narrowers.is.computedTPocket)
+    : [computed]
+  const routes = pockets.flatMap((pocket) => {
+    const route = calculatePocketStitchRoute(stitchLine, cluster, pocket)
+    return isDefined(route) ? [route] : []
+  })
   const boundingRect = calculateStitchLineBoundingRect(
-    isDefined(calculated) ? [calculated.line.start, calculated.line.end] : [],
+    routes.flatMap(({ boundingRect }): PointSchema[] => [
+      { x: boundingRect.x, y: boundingRect.y },
+      { x: boundingRect.x.plus(boundingRect.width), y: boundingRect.y.plus(boundingRect.height) },
+    ]),
   )
-  const route: ComputedStitchRouteSchema | undefined = isDefined(calculated)
-    ? {
-        boundingRect,
-        path: calculated.path,
-        holes,
-        isClosed: false,
-        stitches: calculateRouteStitches(holes, false),
-        labelPosition,
-        disconnectedCorners: {
-          'top-left': undefined,
-          'top-right': undefined,
-          'bottom-right': undefined,
-          'bottom-left': undefined,
-        },
-      }
-    : undefined
-
   return {
     stitchLineId: stitchLine.id,
     type: stitchLine.type,
@@ -103,6 +95,36 @@ const calculatePocketBottomStitchLine = (
     autoComputedCornerRadius: ZERO_CORNER_RADIUS,
     boundingRect,
     connectingStitches: [],
-    routes: isDefined(route) ? [route] : [],
+    routes,
+  }
+}
+
+const calculatePocketStitchRoute = (
+  stitchLine: ResolvedTPocketStitchLineSchema,
+  cluster: PocketClusterSchema,
+  pocket: ComputedTPocketSchema,
+): ComputedStitchRouteSchema | undefined => {
+  const calculated = calculateTPocketStitchLine(stitchLine, cluster, pocket)
+  if (!isDefined(calculated)) {
+    return undefined
+  }
+  const labelPosition: StitchSideSchema =
+    cluster.orientation === 'up' ? 'top' : cluster.orientation === 'down' ? 'bottom' : cluster.orientation
+  const holes = calculateTPocketStitchHoles(stitchLine, calculated.line)
+  return {
+    targetType: 'component',
+    targetId: pocket.componentId,
+    boundingRect: calculateStitchLineBoundingRect([calculated.line.start, calculated.line.end]),
+    path: calculated.path,
+    holes,
+    isClosed: false,
+    stitches: calculateRouteStitches(holes, false),
+    labelPosition,
+    disconnectedCorners: {
+      'top-left': undefined,
+      'top-right': undefined,
+      'bottom-right': undefined,
+      'bottom-left': undefined,
+    },
   }
 }

@@ -14,7 +14,7 @@ export const useStitchLineLimitIssues = (stitchLine: StitchLineSchema): IssuesSc
   const { computedSubProject } = useSubProject()
   const { project } = useProject()
   const translation = useTranslation()
-  const limits = accessors.subProjectLimits(computedSubProject.limits).optional.stitchLine(stitchLine.id)
+  const limits = accessors.computedSubProject(computedSubProject).optional.limits.stitchLine(stitchLine.id)
   return useMemo<IssuesSchema<StitchLineSchema>>(() => {
     if (!isDefined(limits) || limits.type !== stitchLine.type) {
       return noIssues<StitchLineSchema>()

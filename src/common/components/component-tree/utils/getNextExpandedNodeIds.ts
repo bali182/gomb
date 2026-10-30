@@ -1,6 +1,7 @@
 import { getComponentAncestorIds } from '../../../operations/subProject/utils/getComponentAncestorIds'
 import type { ModelObjectSchema } from '../../../schemas/modelObject'
 import type { SubProjectSchema } from '../../../schemas/subProject'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { getComponentNodeId, getHoleNodeId } from './treeNodeIds'
@@ -35,7 +36,7 @@ const getNextExpandedIdsForStitchLine = (
   subProject: SubProjectSchema,
   expandedIds: string[],
 ): string[] => {
-  const stitchLine = subProject.stitchLines.find((candidate) => candidate.id === stitchLineId)
+  const stitchLine = accessors.subProject(subProject).optional.stitchLine.byId(stitchLineId)
   if (!isDefined(stitchLine)) {
     return expandedIds
   }
@@ -45,7 +46,7 @@ const getNextExpandedIdsForStitchLine = (
       return uniqueExpandedIds(expandedIds, getComponentRelatedIds(stitchLine.targetId, subProject, true))
     }
     case 'hole': {
-      const hole = subProject.holes.find((candidate) => candidate.id === stitchLine.targetId)
+      const hole = accessors.subProject(subProject).optional.hole.byId(stitchLine.targetId)
       if (!isDefined(hole)) {
         return expandedIds
       }
@@ -61,7 +62,7 @@ const getNextExpandedIdsForStitchLine = (
 }
 
 const getNextExpandedIdsForHole = (holeId: string, subProject: SubProjectSchema, expandedIds: string[]): string[] => {
-  const hole = subProject.holes.find((candidate) => candidate.id === holeId)
+  const hole = accessors.subProject(subProject).optional.hole.byId(holeId)
 
   if (!isDefined(hole)) {
     return expandedIds
@@ -79,5 +80,9 @@ const getComponentRelatedIds = (
   return includeComponent ? [...ancestorNodeIds, getComponentNodeId(componentId)] : ancestorNodeIds
 }
 
-export const uniqueExpandedIds = (expandedIds: string[], newExpandedIds: string[]) =>
-  Array.from(new Set([...expandedIds, ...newExpandedIds]))
+export const uniqueExpandedIds = (expandedIds: string[], newExpandedIds: string[]): string[] => {
+  const nextExpandedIds = Array.from(new Set([...expandedIds, ...newExpandedIds]))
+  return nextExpandedIds.length === expandedIds.length && nextExpandedIds.every((id, index) => id === expandedIds[index])
+    ? expandedIds
+    : nextExpandedIds
+}

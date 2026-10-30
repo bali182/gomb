@@ -28,6 +28,8 @@ export const calculateComponentBoundsStitchLine = (
     const routePoints = calculatedPath.fragments.flatMap((fragment) => [fragment.start, fragment.end])
 
     return {
+      targetType: stitchLine.targetType,
+      targetId: stitchLine.targetId,
       boundingRect: calculateStitchLineBoundingRect(routePoints),
       path: calculatedPath.path,
       holes,

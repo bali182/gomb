@@ -12,6 +12,7 @@ import type {
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+import { narrowers } from '../utils/narrowers'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
@@ -42,7 +43,7 @@ const validatePocketOpeningByType = (
     case 'optical-illusion':
       return validateOpticalIllusionPocketOpeningSchema(
         input,
-        currentValue.type === 'optical-illusion' ? currentValue : defaultOpticalIllusionPocketOpening,
+        narrowers.is.opticalIllusionPocketOpening(currentValue) ? currentValue : defaultOpticalIllusionPocketOpening,
         context,
       )
 
@@ -51,13 +52,13 @@ const validatePocketOpeningByType = (
     case 'recessed':
       return validateRecessedPocketOpeningSchema(
         input,
-        currentValue.type === 'recessed' ? currentValue : defaultRecessedPocketOpening,
+        narrowers.is.recessedPocketOpening(currentValue) ? currentValue : defaultRecessedPocketOpening,
         context,
       )
     case 'slanted':
       return validateSlantedPocketOpeningSchema(
         input,
-        currentValue.type === 'slanted' ? currentValue : defaultSlantedPocketOpening,
+        narrowers.is.slantedPocketOpening(currentValue) ? currentValue : defaultSlantedPocketOpening,
         context,
       )
   }

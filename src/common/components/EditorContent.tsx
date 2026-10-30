@@ -21,6 +21,8 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import type { HasTargetSchema } from '../schemas/common'
 import type { ProjectSchema } from '../schemas/project'
+import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import { EditorComponentTree, type EditorComponentTreeHandle } from './component-tree/EditorComponentTree'
@@ -54,9 +56,9 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   }, [selected, stopMeasuring])
 
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
-  const subProject = useMemo(
-    () => project.subProjects.find((candidate) => candidate.id === subProjectId),
-    [project.subProjects, subProjectId],
+  const subProject = useMemo<SubProjectSchema | undefined>(
+    () => (isDefined(subProjectId) ? accessors.project(project).optional.subProject(subProjectId) : undefined),
+    [project, subProjectId],
   )
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
