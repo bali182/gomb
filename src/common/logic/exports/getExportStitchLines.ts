@@ -114,7 +114,7 @@ const getExportStitchRoutes = (
   if (
     mode === 'all-stitch-lines' ||
     stitchLine.type !== 't-pocket-stitch-line' ||
-    (narrowers.is.computedTPocket(target) && narrowers.is.computedFrontPocket(target))
+    (!narrowers.is.computedTPocket(target) && !narrowers.is.computedFrontPocket(target))
   ) {
     return stitchLine.routes
   }
