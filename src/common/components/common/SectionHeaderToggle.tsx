@@ -2,7 +2,7 @@ import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 
 import { useEditorContext } from '../../contexts/EditorContext'
-import { SectionHeaderButton } from './SectionHeaderButton'
+import { MiniButton } from './MiniButton'
 
 type SectionHeaderToggleProps = {
   value: boolean
@@ -28,7 +28,7 @@ export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
   }, [onChange, setEditingInputId, value])
 
   return (
-    <SectionHeaderButton
+    <MiniButton
       readOnly={isComputing}
       onClick={handleClick}
       background={value ? 'bg.emphasized' : undefined}
@@ -36,6 +36,6 @@ export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
     >
       {value ? <OnIcon /> : <OffIcon />}
       {value ? onLabel : offLabel}
-    </SectionHeaderButton>
+    </MiniButton>
   )
 }

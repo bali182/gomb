@@ -21,8 +21,8 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { getEditableSchema } from '../../../utils/getEditableSchema'
 import { noIssues } from '../../../utils/issueUtils'
+import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
-import { SectionHeaderButton } from '../../common/SectionHeaderButton'
 import { OpticalIllusionPocketOpeningIcon } from '../../icons/OpticalIllusionPocketOpeningIcon'
 import { RecessedPocketOpeningIcon } from '../../icons/RecessedPocketOpeningIcon'
 import { SlantedPocketOpeningIcon } from '../../icons/SlantedPocketOpeningIcon'
@@ -84,7 +84,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
         rightAddon={
           <Menu.Root size="sm">
             <Menu.Trigger asChild>
-              <SectionHeaderButton
+              <MiniButton
                 readOnly={isComputing}
                 size="xs"
                 variant="ghost"
@@ -94,7 +94,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
                 <OpeningIcon />
                 {t.project.editors.enums.components.pocketOpening[editable.type]}
                 <PiCaretDown />
-              </SectionHeaderButton>
+              </MiniButton>
             </Menu.Trigger>
             <Portal container={portalRef}>
               <Menu.Positioner>

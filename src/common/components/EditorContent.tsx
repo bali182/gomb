@@ -31,6 +31,7 @@ import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
 import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
+import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
 const panels: SplitterPanelData[] = [
   { id: 'draw-area', collapsible: false },
@@ -105,6 +106,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
             </Box>
 
             {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
+            <SubProjectComputationFeedback />
           </Box>
         </Splitter.Panel>
 

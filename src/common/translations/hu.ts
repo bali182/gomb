@@ -61,6 +61,7 @@ export const HU = {
     },
   },
   project: {
+    computing: 'Számítás folyamatban…',
     tree: {
       title: 'Elemek',
       noModuleSelected: {

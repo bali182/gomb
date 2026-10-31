@@ -125,6 +125,7 @@ export const EN = {
     },
   },
   project: {
+    computing: 'Computing…',
     tree: {
       title: 'Components',
       noModuleSelected: {

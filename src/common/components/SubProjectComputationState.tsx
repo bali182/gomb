@@ -17,7 +17,6 @@ export const SubProjectComputationState: FC<PropsWithChildren> = ({ children }) 
   }
 
   if (isDefined(subProject) && Loadable.hasValue(computedSubProject) && computedSubProject.data.id === subProject.id) {
-    // TODO: Handle editing computation failures without unmounting the editor.
     return children
   }
 

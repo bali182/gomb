@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import { EditorButton, type EditorButtonProps } from './EditorButton'
 
-export const SectionHeaderButton: FC<EditorButtonProps> = ({ ref, ...props }) => {
+export const MiniButton: FC<EditorButtonProps> = ({ ref, ...props }) => {
   return (
     <EditorButton
       ref={ref}

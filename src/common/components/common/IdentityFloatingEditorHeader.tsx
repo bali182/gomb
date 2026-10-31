@@ -7,6 +7,7 @@ import type { HasIdentitySchema } from '../../schemas/common'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
+import { SubProjectComputationIcon } from '../SubProjectComputationFeedback'
 
 type IdentityFloatingEditorHeaderProps<T> = {
   editable: EditableSchema<T>
@@ -38,7 +39,9 @@ export function IdentityFloatingEditorHeader<T extends HasIdentitySchema>({
     <Popover.Header p="0">
       <HStack justify="space-between" px="4" py="2">
         <HStack gap="1">
-          <Icon />
+          <SubProjectComputationIcon>
+            <Icon />
+          </SubProjectComputationIcon>
           <EditorTextInput
             modelId={editable.id}
             field="name"
