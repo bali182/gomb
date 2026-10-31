@@ -20,6 +20,7 @@ type AddComponentStitchLineMenuItemProps = {
 }
 
 type ComponentMenuItemProps = {
+  disabled?: boolean
   onSelect: () => void
 }
 
@@ -49,11 +50,11 @@ export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, disa
   )
 }
 
-export const AddHoleMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
+export const AddHoleMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   const Icon = getModelIconByType('hole')
   return (
-    <EditorActionMenuItem value="hole" onSelect={onSelect}>
+    <EditorActionMenuItem value="hole" disabled={disabled} onSelect={onSelect}>
       <Icon />
       <Menu.ItemText>{t.project.editors.actions.components.addHole}</Menu.ItemText>
     </EditorActionMenuItem>
@@ -94,31 +95,32 @@ export const ExportComponentPngMenuItem: FC<ExportComponentPngMenuItemProps> = (
   )
 }
 
-export const CloneComponentMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
+export const CloneComponentMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
-    <EditorActionMenuItem value="clone" onSelect={onSelect}>
+    <EditorActionMenuItem value="clone" disabled={disabled} onSelect={onSelect}>
       <PiCopy />
       <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }
 
-export const CopyPocketSettingsMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
+export const CopyPocketSettingsMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
-    <EditorActionMenuItem value="copy-pocket-settings" onSelect={onSelect}>
+    <EditorActionMenuItem value="copy-pocket-settings" disabled={disabled} onSelect={onSelect}>
       <PiPaintBrushBroad />
       <Menu.ItemText>{t.project.editors.actions.components.copyPocketSettings}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }
 
-export const DeleteComponentMenuItem: FC<ComponentMenuItemProps> = ({ onSelect }) => {
+export const DeleteComponentMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
     <EditorActionMenuItem
       value="delete"
+      disabled={disabled}
       onSelect={onSelect}
       color="fg.error"
       _hover={{ bg: 'bg.error', color: 'fg.error' }}

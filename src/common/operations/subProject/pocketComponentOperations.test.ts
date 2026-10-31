@@ -4,13 +4,20 @@ import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '.
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
+import { accessors } from '../../utils/accessors'
 import { narrowers } from '../../utils/narrowers'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
 import { cloneComponent } from './cloneComponent'
 import { deleteComponent } from './deleteComponent'
 import { moveComponent } from './moveComponent'
 import { moveStitchLine } from './moveStitchLine'
-import { canAddChild, canAddStitchLine, canMoveComponent } from './utils/componentRules'
+import {
+  canAddChild,
+  canAddStitchLine,
+  canCloneComponent,
+  canDeleteComponent,
+  canMoveComponent,
+} from './utils/componentRules'
 import { getUnusedName } from './utils/getUnusedName'
 
 const fixture = () => {
@@ -206,6 +213,7 @@ describe('pocket component operations', () => {
   })
   it('protects fronts and rejects invalid parents without modifying the project', () => {
     const source = fixture()
+    expect(canDeleteComponent(accessors.subProject(source).component.frontPocket('front-a'), source)).toBe(false)
     expect(deleteComponent(source, { componentId: 'front-a' })).toBe(source)
     expect(
       moveComponent(source, { componentId: 'front-a', targetParentId: 'second', beforeComponentId: undefined }),
@@ -216,6 +224,46 @@ describe('pocket component operations', () => {
     const deleted = deleteComponent(source, { componentId: 'first' })
     expect(deleted.components['front-a']).toBeUndefined()
     expect(deleted.components.child).toBeUndefined()
+  })
+  it('deletes a front pocket and its descendants when no T-pockets remain in its cluster', () => {
+    const source = fixture()
+    const alone = deleteComponent(source, { componentId: 'a' })
+    const before = structuredClone(alone)
+    const front = accessors.subProject(alone).component.frontPocket('front-a')
+    expect(canDeleteComponent(front, alone)).toBe(true)
+
+    const result = deleteComponent(alone, { componentId: front.id })
+    expect(result.components['front-a']).toBeUndefined()
+    expect(result.components.child).toBeUndefined()
+    expect(accessors.subProject(result).component.pocketCluster('first').children).toEqual([])
+    expect(result.components.second).toBe(alone.components.second)
+    expect(alone).toEqual(before)
+  })
+
+  it('keeps a lone front pocket uncloneable and immovable even though it can be deleted', () => {
+    const alone = deleteComponent(fixture(), { componentId: 'a' })
+    const source = addComponent(alone, {
+      parentId: 'root',
+      component: d.pocketCluster({ id: 'empty' }),
+      position: 'end',
+    })
+    const before = structuredClone(source)
+    const front = accessors.subProject(source).component.frontPocket('front-a')
+    expect(canDeleteComponent(front, source)).toBe(true)
+    expect(canCloneComponent(front)).toBe(false)
+    expect(
+      cloneComponent(source, {
+        componentId: front.id,
+        settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+        ids: { component: () => 'copy', hole: () => 'copy-hole', stitchLine: () => 'copy-stitch' },
+        names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+      }),
+    ).toBe(source)
+    const move = { componentId: front.id, targetParentId: 'empty', beforeComponentId: undefined }
+    expect(canMoveComponent(source, move)).toBe(false)
+    expect(moveComponent(source, move)).toBe(source)
+    expect(canMoveComponent(source, { ...move, componentId: source.root })).toBe(false)
+    expect(source).toEqual(before)
   })
   it('adds a front pocket at the end of an empty cluster', () => {
     const source = fixture()
