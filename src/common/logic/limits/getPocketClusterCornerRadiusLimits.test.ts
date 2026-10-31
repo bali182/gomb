@@ -109,5 +109,38 @@ describe.each<PocketOrientationSchema>(['up', 'down', 'left', 'right'])(
         })
       }
     })
+
+    it('allows closed-side radii above the inherited minimum without changing the requested values', () => {
+      const radius: CornerRadiusSchema = {
+        topLeft: new BigNumber(30),
+        topRight: new BigNumber(30),
+        bottomLeft: new BigNumber(30),
+        bottomRight: new BigNumber(30),
+      }
+      const parentRadius: CornerRadiusSchema = {
+        topLeft: new BigNumber(10),
+        topRight: new BigNumber(10),
+        bottomLeft: new BigNumber(10),
+        bottomRight: new BigNumber(10),
+      }
+      const before = JSON.stringify(radius)
+      const limits = getPocketClusterCornerRadiusLimits({
+        pocketCluster,
+        boundingRect,
+        cornerRadius: radius,
+        parentBoundingRect: boundingRect,
+        parentCornerRadius: parentRadius,
+      })
+      const adjusted = getAdjustedCornerRadius(radius, limits)
+      for (const corner of Object.keys(radiusFields) as (keyof CornerRadiusSchema)[]) {
+        if (openingCorners[orientation].includes(corner)) {
+          expect(adjusted[corner].isZero()).toBe(true)
+        } else {
+          expect(limits[radiusFields[corner]]?.min?.value.eq(10)).toBe(true)
+          expect(adjusted[corner].eq(30)).toBe(true)
+        }
+      }
+      expect(JSON.stringify(radius)).toBe(before)
+    })
   },
 )

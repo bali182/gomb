@@ -164,11 +164,6 @@ const migratePocketCluster = (
     layoutOrientation: _layoutOrientation,
     layoutGap: _layoutGap,
     autoLayoutGap: _autoLayoutGap,
-    individualRadii: _individualRadii,
-    topLeftRadius: _topLeftRadius,
-    topRightRadius: _topRightRadius,
-    bottomLeftRadius: _bottomLeftRadius,
-    bottomRightRadius: _bottomRightRadius,
     ...remaining
   } = cluster
   return {

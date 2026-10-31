@@ -197,6 +197,11 @@ export const comparators = {
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
+      a.individualRadii === b.individualRadii &&
+      a.topLeftRadius === b.topLeftRadius &&
+      a.topRightRadius === b.topRightRadius &&
+      a.bottomLeftRadius === b.bottomLeftRadius &&
+      a.bottomRightRadius === b.bottomRightRadius &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.pocketStep === b.pocketStep &&
       a.orientation === b.orientation

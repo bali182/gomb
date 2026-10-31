@@ -202,32 +202,73 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         tPocketTaper: { max: { value: new BigNumber(50).minus(POSITION_EPSILON) } },
       })
     })
-    it('inherits closed corner radii through the cluster and front pocket', () => {
-      const { subProject } = fixture(1)
-      const root = accessors.subProject(subProject).component.rootPanel()
-      const changed = {
-        ...subProject,
-        components: {
-          ...subProject.components,
-          root: { ...root, topLeftRadius: 12, topRightRadius: 12, bottomLeftRadius: 12, bottomRightRadius: 12 },
-        },
-      }
-      const computed = getComputedSubProject(changed, defaultStitchingSettings)
-      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
-      const front = accessors.computedSubProject(computed).component.frontPocket('front')
-      const expected =
-        orientation === 'up'
-          ? ['bottomLeft', 'bottomRight']
-          : orientation === 'down'
-            ? ['topLeft', 'topRight']
-            : orientation === 'left'
-              ? ['topRight', 'bottomRight']
-              : ['topLeft', 'bottomLeft']
-      for (const [corner, radius] of Object.entries(front.cornerRadius)) {
-        expect(radius.toNumber()).toBe(expected.includes(corner) ? 12 : 0)
-      }
-      expect(Object.values(cluster.cornerRadius).some((radius) => radius.toNumber() === 12)).toBe(true)
-    })
+    it.each([
+      { parentRadius: 12, clusterRadius: 0, frontRadius: 0, expectedCluster: 12, expectedFront: 12 },
+      { parentRadius: 12, clusterRadius: 20, frontRadius: 0, expectedCluster: 20, expectedFront: 20 },
+      { parentRadius: 12, clusterRadius: 20, frontRadius: 30, expectedCluster: 20, expectedFront: 30 },
+      { parentRadius: 0, clusterRadius: 20, frontRadius: 0, expectedCluster: 20, expectedFront: 20 },
+    ])(
+      'inherits radii from parent $parentRadius through cluster $clusterRadius to front $frontRadius',
+      ({ parentRadius, clusterRadius, frontRadius, expectedCluster, expectedFront }) => {
+        const { subProject } = fixture(1)
+        const source = accessors.subProject(subProject)
+        const root = source.component.rootPanel()
+        const changed = {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            root: {
+              ...root,
+              topLeftRadius: parentRadius,
+              topRightRadius: parentRadius,
+              bottomLeftRadius: parentRadius,
+              bottomRightRadius: parentRadius,
+            },
+            cluster: {
+              ...source.component.pocketCluster('cluster'),
+              topLeftRadius: clusterRadius,
+              topRightRadius: clusterRadius,
+              bottomLeftRadius: clusterRadius,
+              bottomRightRadius: clusterRadius,
+            },
+            front: {
+              ...source.component.frontPocket('front'),
+              topLeftRadius: frontRadius,
+              topRightRadius: frontRadius,
+              bottomLeftRadius: frontRadius,
+              bottomRightRadius: frontRadius,
+            },
+          },
+          stitchLines: subProject.stitchLines.map((stitchLine) =>
+            stitchLine.id === 'border' ? { ...stitchLine, stitchMargin: 2, autoCornerRadius: true } : stitchLine,
+          ),
+        }
+        const before = structuredClone(changed)
+        const computed = getComputedSubProject(changed, defaultStitchingSettings)
+        const accessor = accessors.computedSubProject(computed)
+        const cluster = accessor.component.pocketCluster('cluster')
+        const front = accessor.component.frontPocket('front')
+        const border = accessor.stitchLine.bounds('border')
+        const expected =
+          orientation === 'up'
+            ? ['bottomLeft', 'bottomRight']
+            : orientation === 'down'
+              ? ['topLeft', 'topRight']
+              : orientation === 'left'
+                ? ['topRight', 'bottomRight']
+                : ['topLeft', 'bottomLeft']
+        for (const [corner, radius] of Object.entries(front.cornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedFront : 0)
+        }
+        for (const [corner, radius] of Object.entries(cluster.cornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedCluster : 0)
+        }
+        for (const [corner, radius] of Object.entries(border.autoComputedCornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedCluster - 2 : 0)
+        }
+        expect(changed).toEqual(before)
+      },
+    )
     it('lays out normal children inside the front pocket', () => {
       const { subProject } = fixture()
       const front = accessors.subProject(subProject).component.frontPocket('front')

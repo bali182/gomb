@@ -134,6 +134,7 @@ const flipComponent = (
     case 'pocket-cluster': {
       const flipped: PocketClusterSchema = {
         ...component,
+        ...flipCornerRadii(component, axis),
         ...flipStretch(component, axis),
         orientation: flipOrientation(component.orientation, axis),
         offAxisAnchor: flipOffAxisAnchor(component, subProject, axis, flippedComponentIds),

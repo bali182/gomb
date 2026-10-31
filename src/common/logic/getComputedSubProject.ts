@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../constants/layout'
+import { POSITION_EPSILON } from '../constants/layout'
 import { accessors } from '../utils/accessors'
 
 import type {
@@ -221,12 +221,13 @@ const computePocketCluster = (
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedPocketClusterSchema => {
+  const requestedRadius = getCornerRadius(pocketCluster)
   const cornerRadius = getAdjustedCornerRadius(
-    ZERO_CORNER_RADIUS,
+    requestedRadius,
     getPocketClusterCornerRadiusLimits({
       pocketCluster,
       boundingRect,
-      cornerRadius: ZERO_CORNER_RADIUS,
+      cornerRadius: requestedRadius,
       parentBoundingRect,
       parentCornerRadius,
     }),

@@ -175,6 +175,7 @@ export const defaultPocketCluster: Omit<PocketClusterSchema, keyof HasId | keyof
   ...defaultHasFillableSize,
   ...defaultHasOffAxisAnchor,
   ...defaultHasStretch,
+  ...defaultHasCornerRadius,
   type: 'pocket-cluster',
   children: [],
   orientation: 'up',
