@@ -7,6 +7,7 @@ import { noop } from '../utils/noop'
 import { notImplemented } from '../utils/notImplemented'
 
 export type EditorContextOperations = {
+  retryComputation: () => void
   setEditingInputId: (inputId: string | undefined) => void
   /** Overwrites the data model of the selected project. */
   setProject: (project: SetStateAction<ProjectSchema>) => void
@@ -33,6 +34,7 @@ export type EditorContextValues = {
 export type EditorContextType = EditorContextOperations & EditorContextValues
 
 export const EditorContextDefaultOperations: EditorContextOperations = {
+  retryComputation: notImplemented(),
   setEditingInputId: noop,
   setProject: notImplemented(),
   setSubProject: notImplemented(),

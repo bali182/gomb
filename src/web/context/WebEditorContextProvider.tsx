@@ -26,6 +26,7 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   )
   const {
     state,
+    retryComputation,
     setProject: computeProject,
     setSubProject: computeSubProject,
   } = useEditorComputation({ project: storedProject, subProjectId })
@@ -116,6 +117,7 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   const value = useMemo<EditorContextType>(
     () => ({
       computation: state,
+      retryComputation,
       computedSubProject,
       editingInputId,
       isComputing,
@@ -129,6 +131,7 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
       subProject,
     }),
     [
+      retryComputation,
       computedSubProject,
       editingInputId,
       isComputing,

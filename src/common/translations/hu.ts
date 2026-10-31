@@ -868,6 +868,12 @@ export const HU = {
         title: 'A modul nem található',
         description: 'A megnyitni kívánt modul nem létezik.',
       },
+      computationFailed: {
+        title: 'A modul kiszámítása nem sikerült',
+        description: 'A számítás hibával leállt. Újrapróbálhatod ugyanazt a műveletet.',
+        retry: 'Újrapróbálás',
+        back: 'Vissza a projektekhez',
+      },
       noModules: {
         title: 'Még nincs modulod',
         description: 'Hozz létre egy új modult a szerkesztés megkezdéséhez.',

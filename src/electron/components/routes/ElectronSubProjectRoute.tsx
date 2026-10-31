@@ -1,7 +1,7 @@
-import { Box, Spinner } from '@chakra-ui/react'
 import { useAtomValue } from 'jotai'
 import { useEffect, type FC } from 'react'
 import { useParams } from 'react-router'
+import { SubProjectComputationState } from '../../../common/components/SubProjectComputationState'
 import { floatingEditorTabsAtom } from '../../../common/state/floatingEditorTabsAtom'
 
 import { DrawAreaContext } from '../../../common/contexts/DrawAreaContext'
@@ -17,7 +17,7 @@ import { ElectronEditorContent } from '../ElectronEditorContent'
 export const ElectronSubProjectRoute: FC = () => {
   const { filePath, subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
   const { project } = useOptionalProject()
-  const { subProject, computedSubProject } = useOptionalSubProject()
+  const { subProject } = useOptionalSubProject()
   const { markOpened } = useRecentProjectOperations()
   const subProjectExists = isDefined(subProject)
 
@@ -29,19 +29,11 @@ export const ElectronSubProjectRoute: FC = () => {
     markOpened(filePath, subProjectId)
   }, [filePath, markOpened, project, subProjectExists, subProjectId])
 
-  if (!subProjectExists) {
-    return <ElectronEditorContent subProjectId={subProjectId} />
-  }
-
-  if (!isDefined(computedSubProject)) {
-    return (
-      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-        <Spinner />
-      </Box>
-    )
-  }
-
-  return <ExistingElectronSubProjectRoute subProjectId={subProjectId} />
+  return (
+    <SubProjectComputationState>
+      <ExistingElectronSubProjectRoute subProjectId={subProjectId} />
+    </SubProjectComputationState>
+  )
 }
 
 type ExistingElectronSubProjectRouteProps = {

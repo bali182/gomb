@@ -29,6 +29,7 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
   const storedProject = loadedElectronProject?.project
   const {
     state,
+    retryComputation,
     setProject: computeProject,
     setSubProject: computeSubProject,
     getRequestId,
@@ -150,6 +151,7 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
   const value = useMemo<EditorContextType>(
     () => ({
       computation: state,
+      retryComputation,
       computedSubProject,
       editingInputId,
       isComputing,
@@ -163,6 +165,7 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
       subProject,
     }),
     [
+      retryComputation,
       computedSubProject,
       editingInputId,
       isComputing,

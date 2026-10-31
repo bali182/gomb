@@ -20,6 +20,7 @@ type UseEditorComputationOptions = {
 
 type UseEditorComputationOutput = EditorComputationControlSchema & {
   state: EditorComputationStateSchema
+  retryComputation: () => void
   setProject: (update: SetStateAction<ProjectSchema>) => number
   setSubProject: (update: SetStateAction<SubProjectSchema>) => number
 }
@@ -35,6 +36,7 @@ type ComputationRuntime = {
   requestId: number
   running: EditorComputationRequestSchema | undefined
   pending: EditorComputationRequestSchema | undefined
+  failedRequest: EditorComputationRequestSchema | undefined
   lastResult: EditorComputationResultSchema | undefined
   error: unknown
   worker: ReturnType<typeof createEditorComputationWorker> | undefined
@@ -56,6 +58,7 @@ export const useEditorComputation = ({
     requestId: 0,
     running: undefined,
     pending: undefined,
+    failedRequest: undefined,
     lastResult: undefined,
     error: undefined,
     worker: undefined,
@@ -108,8 +111,14 @@ export const useEditorComputation = ({
           return
         }
         if (current.requestId === runtime.requestId) {
+          runtime.failedRequest = current
           runtime.error = error
-          setState({ requestId: current.requestId, result: Loadable.failed(error) })
+          setState({
+            requestId: current.requestId,
+            result: isDefined(runtime.lastResult)
+              ? Loadable.failedWith(runtime.lastResult, error)
+              : Loadable.failed(error),
+          })
           const waiters = runtime.waiters
           runtime.waiters = []
           for (const waiter of waiters) {
@@ -136,6 +145,7 @@ export const useEditorComputation = ({
         subProjectId: selectedSubProjectId,
       }
       runtime.error = undefined
+      runtime.failedRequest = undefined
       const lastResult = runtime.lastResult
       setState((current) => {
         if (
@@ -159,6 +169,14 @@ export const useEditorComputation = ({
     [run],
   )
 
+  const retryComputation = useCallback((): void => {
+    const failedRequest = runtimeRef.current.failedRequest
+    if (!isDefined(failedRequest)) {
+      return
+    }
+    enqueue(failedRequest.project, failedRequest.subProjectId)
+  }, [enqueue])
+
   useLayoutEffect(() => {
     const runtime = runtimeRef.current
     const sourceChanged =
@@ -166,6 +184,10 @@ export const useEditorComputation = ({
     const selectionChanged = subProjectId !== runtime.subProjectId
     runtime.sourceProject = project
     runtime.subProjectId = subProjectId
+
+    if (sourceChanged || selectionChanged) {
+      runtime.failedRequest = undefined
+    }
 
     if (sourceChanged) {
       cancel()
@@ -275,5 +297,5 @@ export const useEditorComputation = ({
     return Promise.reject(new Error('No completed editor computation is available'))
   }, [])
 
-  return { state, setProject, setSubProject, getRequestId, waitUntilIdle }
+  return { state, retryComputation, setProject, setSubProject, getRequestId, waitUntilIdle }
 }

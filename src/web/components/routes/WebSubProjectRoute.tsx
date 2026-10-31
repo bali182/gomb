@@ -1,7 +1,7 @@
-import { Box, Spinner } from '@chakra-ui/react'
 import { useAtomValue } from 'jotai'
 import { useEffect, type FC } from 'react'
 import { useParams } from 'react-router'
+import { SubProjectComputationState } from '../../../common/components/SubProjectComputationState'
 import { floatingEditorTabsAtom } from '../../../common/state/floatingEditorTabsAtom'
 
 import { DrawAreaContext } from '../../../common/contexts/DrawAreaContext'
@@ -15,7 +15,7 @@ import { WebEditorContent } from '../WebEditorContent'
 
 export const WebSubProjectRoute: FC = () => {
   const { projectId, subProjectId } = useParams<WebSubProjectRouteParamsSchema>()
-  const { subProject, computedSubProject } = useOptionalSubProject()
+  const { subProject } = useOptionalSubProject()
   const { markOpened } = useRecentProjectOperations()
   const subProjectExists = isDefined(subProject)
 
@@ -27,19 +27,11 @@ export const WebSubProjectRoute: FC = () => {
     markOpened(projectId, subProjectId)
   }, [subProjectExists, markOpened, projectId, subProjectId])
 
-  if (!subProjectExists) {
-    return <WebEditorContent subProjectId={subProjectId} />
-  }
-
-  if (!isDefined(computedSubProject)) {
-    return (
-      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-        <Spinner />
-      </Box>
-    )
-  }
-
-  return <ExistingWebSubProjectRoute subProjectId={subProjectId} />
+  return (
+    <SubProjectComputationState>
+      <ExistingWebSubProjectRoute subProjectId={subProjectId} />
+    </SubProjectComputationState>
+  )
 }
 
 type ExistingWebSubProjectRouteProps = {

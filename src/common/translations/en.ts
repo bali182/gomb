@@ -945,6 +945,12 @@ export const EN = {
         title: 'Module not found',
         description: 'The module you want to open does not exist.',
       },
+      computationFailed: {
+        title: 'Unable to compute the module',
+        description: 'The computation failed. You can retry the same operation.',
+        retry: 'Retry',
+        back: 'Back to projects',
+      },
       noModules: {
         title: 'No modules yet',
         description: 'Create a new module to start editing.',
