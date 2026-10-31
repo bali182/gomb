@@ -8,11 +8,12 @@ import type { HasAutoDimensionsSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { getLabeledIssues } from '../../../utils/issueUtils'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
 
 type StretchSectionProps<T> = {
+  modelId: string
   component: T
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
@@ -20,6 +21,7 @@ type StretchSectionProps<T> = {
 }
 
 export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSchema>({
+  modelId,
   component,
   editable,
   issues,
@@ -107,14 +109,18 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={verticalIssues}>
         <HStack gap="3">
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="topStretch"
             issue={issues.topStretch}
             onChange={handleStretchChange('topStretch')}
             startAddon={<PiArrowLineUp />}
             unit="mm"
             value={editable.topStretch}
           />
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="bottomStretch"
             issue={issues.bottomStretch}
             onChange={handleStretchChange('bottomStretch')}
             startAddon={<PiArrowLineDown />}
@@ -129,14 +135,18 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={horizontalIssues}>
         <HStack gap="3">
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="leftStretch"
             issue={issues.leftStretch}
             onChange={handleStretchChange('leftStretch')}
             startAddon={<PiArrowLineLeft />}
             unit="mm"
             value={editable.leftStretch}
           />
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="rightStretch"
             issue={issues.rightStretch}
             onChange={handleStretchChange('rightStretch')}
             startAddon={<PiArrowLineRight />}

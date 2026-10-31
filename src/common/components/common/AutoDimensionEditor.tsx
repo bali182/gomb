@@ -2,10 +2,13 @@ import { Box, HStack, Switch } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import type { IssueSchema } from '../../schemas/issues'
-import { NumberInput } from './NumberInput'
+import { EditorNumberInput } from './EditorNumberInput'
 
 type AutoDimensionEditorProps = {
+  modelId: string
+  field: string
   auto: boolean
   autoIcon: IconType
   placeholder: string
@@ -19,6 +22,8 @@ type AutoDimensionEditorProps = {
 }
 
 export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
+  modelId,
+  field,
   auto,
   placeholder,
   issue,
@@ -29,16 +34,21 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   onAutoChange,
   onValueChange,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const handleCheckedChange = useCallback(
     (details: Switch.CheckedChangeDetails): void => {
+      if (isComputing) {
+        return
+      }
+      setEditingInputId(undefined)
       onAutoChange(!details.checked)
     },
-    [onAutoChange],
+    [isComputing, onAutoChange, setEditingInputId],
   )
 
   return (
     <HStack gap="2">
-      <Switch.Root checked={!auto} onCheckedChange={handleCheckedChange} size="md">
+      <Switch.Root readOnly={isComputing} checked={!auto} onCheckedChange={handleCheckedChange} size="md">
         <Switch.HiddenInput />
         <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
           <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
@@ -49,7 +59,9 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
         </Switch.Control>
       </Switch.Root>
       <Box flex="1" minWidth="0">
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={field}
           disabled={auto}
           issue={issue}
           onChange={onValueChange}

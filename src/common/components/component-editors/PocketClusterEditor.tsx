@@ -1,6 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiWarningCircle } from 'react-icons/pi'
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -32,6 +33,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   parent,
 }) => {
   const { t } = useTranslation()
+  const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
   const { addComponent } = useSubProjectOperations()
   const accessor = accessors.subProject(subProject)
@@ -45,7 +47,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         title={t.project.editors.emptyStates.missingFrontPocket.title}
         description={t.project.editors.emptyStates.missingFrontPocket.description}
         content={
-          <Button size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
+          <Button disabled={isComputing} size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
             {t.project.editors.emptyStates.missingFrontPocket.action}
           </Button>
         }
@@ -55,9 +57,21 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   return (
     <SectionGroup.Root>
       <PocketsSection component={component} editable={editable} issues={issues} onChange={onChange} />
-      <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <AutoSizeSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
       <AnchorSection<PocketClusterSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <StretchSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <StretchSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
     </SectionGroup.Root>
   )
 }

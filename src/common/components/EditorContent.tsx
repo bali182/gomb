@@ -172,17 +172,18 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 const EmptyProjectState: FC = () => {
   const { t } = useTranslation()
   const { createSubProject } = useProjectOperations()
-  const { navigateToSubProject } = useEditorContext()
+  const { navigateToSubProject, isComputing, setEditingInputId } = useEditorContext()
 
   const handleCreateSubProject = useCallback((): void => {
+    setEditingInputId(undefined)
     const subProject = createSubProject()
     navigateToSubProject(subProject.id)
-  }, [createSubProject, navigateToSubProject])
+  }, [createSubProject, navigateToSubProject, setEditingInputId])
 
   return (
     <CommonEmptyState
       content={
-        <Button onClick={handleCreateSubProject} variant="solid">
+        <Button disabled={isComputing} onClick={handleCreateSubProject} variant="solid">
           <PiPlus />
           {t.project.editors.actions.components.addRootPanel}
         </Button>

@@ -1,7 +1,8 @@
-import { Menu } from '@chakra-ui/react'
+import { Menu, SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCopy, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
+import { EditorActionMenuItem } from '../common/EditorActionMenuItem'
 
 type StitchLineMenuItemProps = {
   onSelect: () => void
@@ -10,19 +11,21 @@ type StitchLineMenuItemProps = {
 export const CloneStitchLineMenuItem: FC<StitchLineMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="clone" onSelect={onSelect}>
+    <EditorActionMenuItem value="clone" onSelect={onSelect}>
       <PiCopy />
       <Menu.ItemText>{t.project.editors.actions.stitchLines.clone}</Menu.ItemText>
-    </Menu.Item>
+    </EditorActionMenuItem>
   )
 }
+
+const deleteHoverStyle: SystemStyleObject = { bg: 'bg.error', color: 'fg.error' }
 
 export const DeleteStitchLineMenuItem: FC<StitchLineMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="delete" onSelect={onSelect} color="fg.error" _hover={{ bg: 'bg.error', color: 'fg.error' }}>
+    <EditorActionMenuItem value="delete" onSelect={onSelect} color="fg.error" _hover={deleteHoverStyle}>
       <PiTrash />
       <Menu.ItemText>{t.project.editors.actions.stitchLines.delete}</Menu.ItemText>
-    </Menu.Item>
+    </EditorActionMenuItem>
   )
 }

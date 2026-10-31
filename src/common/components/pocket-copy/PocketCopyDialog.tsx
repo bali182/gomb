@@ -1,5 +1,6 @@
 import { Box } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type FC } from 'react'
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { PocketSettingsCopyTargetsSchema } from '../../schemas/pocketCopy'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -22,6 +23,7 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
   onOpenChange,
   onSubmit,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
   const [targets, setTargets] = useState<Partial<PocketSettingsCopyTargetsSchema>>({})
   const canSubmit = useMemo<boolean>(
@@ -37,8 +39,12 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
     setTargets({})
   }, [])
   const handleSubmit = useCallback((): void => {
+    if (isComputing) {
+      return
+    }
+    setEditingInputId(undefined)
     onSubmit(targets)
-  }, [onSubmit, targets])
+  }, [isComputing, onSubmit, setEditingInputId, targets])
 
   return (
     <EditDialog
@@ -46,7 +52,7 @@ export const PocketCopyDialog: FC<PocketCopyDialogProps> = ({
       onOpenChange={onOpenChange}
       onResetData={resetTargets}
       onSubmit={handleSubmit}
-      canSubmit={canSubmit}
+      canSubmit={canSubmit && !isComputing}
       title={t.dialogs.pocketCopy.title}
       submit={t.dialogs.pocketCopy.positiveAction}
       size="xl"

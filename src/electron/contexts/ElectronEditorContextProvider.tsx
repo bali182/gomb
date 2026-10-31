@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom, useStore } from 'jotai'
-import { useCallback, useEffect, useMemo, type FC, type PropsWithChildren, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FC, type PropsWithChildren, type SetStateAction } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { EditorContext, type EditorContextType } from '../../common/contexts/EditorContext'
@@ -34,6 +34,18 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
     getRequestId,
     waitUntilIdle,
   } = useEditorComputation({ project: storedProject, subProjectId })
+  const [editingInputId, setEditingInputId] = useState<string | undefined>(undefined)
+  const isComputing = state.result.type === 'loading' || state.result.type === 'loading-with-value'
+
+  useEffect(() => {
+    if (state.result.type === 'loaded') {
+      setEditingInputId(undefined)
+    }
+  }, [state.result])
+
+  useEffect(() => {
+    setEditingInputId(undefined)
+  }, [storedProject?.id, subProjectId])
   const result = Loadable.get(state.result)
   const project = result?.project ?? storedProject
   const computedSubProject = result?.computedSubProject
@@ -139,6 +151,9 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
     () => ({
       computation: state,
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,
@@ -149,6 +164,9 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
     }),
     [
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,

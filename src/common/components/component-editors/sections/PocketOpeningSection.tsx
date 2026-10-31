@@ -2,6 +2,7 @@ import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiCaretDown } from 'react-icons/pi'
+import { useEditorContext } from '../../../contexts/EditorContext'
 import {
   defaultOpticalIllusionPocketOpening,
   defaultRecessedPocketOpening,
@@ -32,6 +33,7 @@ import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
 import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
 type PocketOpeningSectionProps = {
+  modelId: string
   cluster: PocketClusterSchema
   editable: EditableSchema<PocketOpeningSchema>
   issues: IssuesSchema<PocketOpeningSchema> | undefined
@@ -46,16 +48,19 @@ const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
 }
 
 export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
+  modelId,
   cluster,
   editable,
   issues: incomingIssues,
   onChange,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const { t, language } = useTranslation()
   const issues = incomingIssues ?? noIssues<PocketOpeningSchema>()
   const OpeningIcon = openingIcons[editable.type]
   const handleTypeChange = useCallback(
     (details: MenuValueChangeDetails): void => {
+      setEditingInputId(undefined)
       switch (details.value) {
         case 'optical-illusion':
           onChange(getEditableSchema(defaultOpticalIllusionPocketOpening, { language }))
@@ -71,7 +76,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
           break
       }
     },
-    [language, onChange],
+    [language, onChange, setEditingInputId],
   )
   return (
     <SectionGroup.Section>
@@ -80,6 +85,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
           <Menu.Root size="sm">
             <Menu.Trigger asChild>
               <SectionHeaderButton
+                readOnly={isComputing}
                 size="xs"
                 variant="ghost"
                 _hover={{ bg: 'bg.emphasized' }}
@@ -97,7 +103,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
                     {openingTypes.map((type) => {
                       const Icon = openingIcons[type]
                       return (
-                        <Menu.RadioItem key={type} value={type}>
+                        <Menu.RadioItem disabled={isComputing} key={type} value={type}>
                           <Icon />
                           <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
                           <Menu.ItemIndicator />
@@ -116,6 +122,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
 
       {editable.type === 'optical-illusion' && (
         <OpticalIllusionPocketOpeningFields
+          modelId={modelId}
           editable={editable}
           issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
           orientation={cluster.orientation}
@@ -131,6 +138,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       )}
       {editable.type === 'recessed' && (
         <RecessedPocketOpeningFields
+          modelId={modelId}
           editable={editable}
           issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
           onChange={onChange}
@@ -138,6 +146,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       )}
       {editable.type === 'slanted' && (
         <SlantedPocketOpeningFields
+          modelId={modelId}
           editable={editable}
           issues={issues as IssuesSchema<SlantedPocketOpeningSchema>}
           orientation={cluster.orientation}

@@ -3,9 +3,11 @@ import { Loadable } from '../loadable'
 import type { EditorComputationStateSchema } from '../schemas/editorComputation'
 import { ProjectSchema } from '../schemas/project'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { noop } from '../utils/noop'
 import { notImplemented } from '../utils/notImplemented'
 
 export type EditorContextOperations = {
+  setEditingInputId: (inputId: string | undefined) => void
   /** Overwrites the data model of the selected project. */
   setProject: (project: SetStateAction<ProjectSchema>) => void
   /** Overwrites the data model of the selected sub-project. */
@@ -20,6 +22,8 @@ export type EditorContextOperations = {
 }
 
 export type EditorContextValues = {
+  editingInputId: string | undefined
+  isComputing: boolean
   computation: EditorComputationStateSchema
   project?: ProjectSchema
   subProject?: SubProjectSchema
@@ -29,6 +33,7 @@ export type EditorContextValues = {
 export type EditorContextType = EditorContextOperations & EditorContextValues
 
 export const EditorContextDefaultOperations: EditorContextOperations = {
+  setEditingInputId: noop,
   setProject: notImplemented(),
   setSubProject: notImplemented(),
   navigateToProjects: notImplemented(),
@@ -37,6 +42,8 @@ export const EditorContextDefaultOperations: EditorContextOperations = {
 }
 
 export const EditorContextDefaultValues: EditorContextValues = {
+  editingInputId: undefined,
+  isComputing: false,
   computation: { requestId: 0, result: Loadable.uninitialized() },
   project: undefined,
   subProject: undefined,

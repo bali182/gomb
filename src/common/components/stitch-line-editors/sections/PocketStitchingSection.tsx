@@ -1,12 +1,13 @@
 import { Switch } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
+import { EditorSwitch } from '../../common/EditorSwitch'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { TPocketStitchLineSchema } from '../../../schemas/stitching'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketStitchingSectionProps = {
@@ -47,7 +48,9 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
         {t.project.editors.sections.stitchLines.pocketStitching.startOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.startOffset}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={editable.id}
+          field="startOffset"
           issue={issues.startOffset}
           onChange={handleStartOffsetChange}
           unit="mm"
@@ -59,7 +62,14 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
         {t.project.editors.sections.stitchLines.pocketStitching.endOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.endOffset}>
-        <NumberInput issue={issues.endOffset} onChange={handleEndOffsetChange} unit="mm" value={editable.endOffset} />
+        <EditorNumberInput
+          modelId={editable.id}
+          field="endOffset"
+          issue={issues.endOffset}
+          onChange={handleEndOffsetChange}
+          unit="mm"
+          value={editable.endOffset}
+        />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle
@@ -68,7 +78,7 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
         {t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchDirection}>
-        <Switch.Root
+        <EditorSwitch
           checked={editable.stitchDirection === 'start-to-end'}
           onCheckedChange={handleStitchDirectionChange}
           size="md"
@@ -81,7 +91,7 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
               </Switch.ThumbIndicator>
             </Switch.Thumb>
           </Switch.Control>
-        </Switch.Root>
+        </EditorSwitch>
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )

@@ -1,7 +1,6 @@
 import {
   Combobox,
   HStack,
-  IconButton,
   InputGroup,
   Portal,
   createListCollection,
@@ -10,6 +9,7 @@ import {
 import { useCallback, useMemo, type FC } from 'react'
 import { PiArrowCounterClockwise, PiTarget } from 'react-icons/pi'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { portalRef } from '../../portalRef'
 import type { ComponentSchema } from '../../schemas/components'
@@ -17,6 +17,7 @@ import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { accessors } from '../../utils/accessors'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
+import { EditorIconButton } from '../common/EditorIconButton'
 
 type StitchLineRenderTargetComboboxProps = {
   stitchLine: ComponentBoundsStitchLineSchema
@@ -29,6 +30,7 @@ export const StitchLineRenderTargetCombobox: FC<StitchLineRenderTargetComboboxPr
   onReset,
   stitchLine,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const { subProject } = useSubProject()
   const collection = useMemo(
     () =>
@@ -59,14 +61,21 @@ export const StitchLineRenderTargetCombobox: FC<StitchLineRenderTargetComboboxPr
       const componentId = details.value[0]
 
       if (isDefined(componentId)) {
+        setEditingInputId(undefined)
         onChange(componentId)
       }
     },
-    [onChange],
+    [onChange, setEditingInputId],
   )
+
+  const handleReset = useCallback(() => {
+    setEditingInputId(undefined)
+    onReset()
+  }, [onReset, setEditingInputId])
 
   return (
     <Combobox.Root
+      readOnly={isComputing}
       collection={collection}
       onValueChange={handleValueChange}
       openOnClick
@@ -76,17 +85,18 @@ export const StitchLineRenderTargetCombobox: FC<StitchLineRenderTargetComboboxPr
       <InputGroup
         endAddon={
           <HStack alignSelf="stretch" gap="0" height="100%">
-            <IconButton
+            <EditorIconButton
               alignSelf="stretch"
               borderRadius="0"
               disabled={!isDefined(stitchLine.onTop)}
+              readOnly={isComputing}
               height="auto"
-              onClick={onReset}
+              onClick={handleReset}
               size="xs"
               variant="plain"
             >
               <PiArrowCounterClockwise />
-            </IconButton>
+            </EditorIconButton>
           </HStack>
         }
         endAddonProps={{ px: 0 }}

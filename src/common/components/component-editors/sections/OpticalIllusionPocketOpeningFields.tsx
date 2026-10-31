@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PiYoutubeLogoFill } from 'react-icons/pi'
+import { EditorSelect } from '../../common/EditorSelect'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type {
@@ -19,10 +20,11 @@ import type {
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { isDefined } from '../../../utils/isDefined'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type OpticalIllusionPocketOpeningFieldsProps = {
+  modelId: string
   editable: EditableSchema<OpticalIllusionPocketOpeningSchema>
   issues: IssuesSchema<OpticalIllusionPocketOpeningSchema>
   orientation: PocketOrientationSchema
@@ -32,6 +34,7 @@ type OpticalIllusionPocketOpeningFieldsProps = {
 const sides: PocketOpeningSideSchema[] = ['start', 'end']
 
 export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpeningFieldsProps> = ({
+  modelId,
   editable,
   issues,
   orientation,
@@ -90,7 +93,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.direction.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.direction}>
-        <Select.Root
+        <EditorSelect
           collection={collection}
           value={selectedValue}
           onValueChange={handleDirectionChange}
@@ -119,7 +122,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
               ))}
             </Select.Content>
           </Select.Positioner>
-        </Select.Root>
+        </EditorSelect>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle
         tooltip={t.project.editors.sections.components.opticalIllusionPocketOpening.startInset.tooltip}
@@ -127,7 +130,9 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.startInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.startInset}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field="opening.startInset"
           value={editable.startInset}
           issue={issues.startInset}
           onChange={handleStartInsetChange}
@@ -140,7 +145,14 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.endInset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.endInset}>
-        <NumberInput value={editable.endInset} issue={issues.endInset} onChange={handleEndInsetChange} unit="mm" />
+        <EditorNumberInput
+          modelId={modelId}
+          field="opening.endInset"
+          value={editable.endInset}
+          issue={issues.endInset}
+          onChange={handleEndInsetChange}
+          unit="mm"
+        />
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle
         tooltip={t.project.editors.sections.components.opticalIllusionPocketOpening.leadingRadius.tooltip}
@@ -148,7 +160,9 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.leadingRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.leadingRadius}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field="opening.leadingRadius"
           value={editable.leadingRadius}
           issue={issues.leadingRadius}
           onChange={handleLeadingRadiusChange}
@@ -161,7 +175,9 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.trailingRadius.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.trailingRadius}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field="opening.trailingRadius"
           value={editable.trailingRadius}
           issue={issues.trailingRadius}
           onChange={handleTrailingRadiusChange}

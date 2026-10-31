@@ -4,6 +4,7 @@ import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from '
 import { PiDotsSixVertical } from 'react-icons/pi'
 import { narrowers } from '../../utils/narrowers'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { canAddHole, canAddStitchLine, canMoveComponent } from '../../operations/subProject/utils/componentRules'
@@ -38,6 +39,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   renderMenu,
 }) => {
   const selection = useSubProjectSelectionContext()
+  const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
   const { component } = node
   const isActiveComponent = activeDragData?.kind === 'component' && activeDragData.componentId === component.id
@@ -133,7 +135,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       kind: 'component',
       node,
     },
-    disabled: !isDraggable,
+    disabled: !isDraggable || isComputing,
     id: node.id,
   })
 
@@ -210,7 +212,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       {...attributes}
       {...listeners}
       cursor={isDragging ? 'grabbing' : 'grab'}
-      disabled={!isDraggable}
+      disabled={!isDraggable || isComputing}
       onClick={handleDragHandleClick}
       ref={setActivatorNodeRef}
       size="2xs"

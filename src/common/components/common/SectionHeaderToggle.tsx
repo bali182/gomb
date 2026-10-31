@@ -1,6 +1,7 @@
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { SectionHeaderButton } from './SectionHeaderButton'
 
 type SectionHeaderToggleProps = {
@@ -20,12 +21,15 @@ export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
   offLabel,
   onChange,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const handleClick = useCallback(() => {
+    setEditingInputId(undefined)
     onChange(!value)
-  }, [onChange, value])
+  }, [onChange, setEditingInputId, value])
 
   return (
     <SectionHeaderButton
+      readOnly={isComputing}
       onClick={handleClick}
       background={value ? 'bg.emphasized' : undefined}
       variant={value ? 'ghost' : 'subtle'}

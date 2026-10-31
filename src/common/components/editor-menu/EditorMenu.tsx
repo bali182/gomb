@@ -1,10 +1,11 @@
-import { Card, HStack, IconButton, Input, Separator } from '@chakra-ui/react'
+import { Card, HStack, IconButton, Separator } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type FC, type ReactElement } from 'react'
 import { PiCaretLeft, PiWalletDuotone } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditableProject } from '../../hooks/useEditableProject'
 import type { ProjectSchema } from '../../schemas/project'
 import { isDefined } from '../../utils/isDefined'
+import { EditorTextInput } from '../common/EditorTextInput'
 
 type EditorMenuProps = {
   menu: ReactElement
@@ -36,7 +37,9 @@ export const EditorMenu: FC<EditorMenuProps> = ({ menu, projects }) => {
           </IconButton>
           <HStack gap="1">
             <PiWalletDuotone />
-            <Input
+            <EditorTextInput
+              modelId={editableProject.id}
+              field="name"
               aria-invalid={hasNameError}
               _invalid={{ borderColor: 'border.error', focusRingColor: 'border.error' }}
               borderColor="transparent"

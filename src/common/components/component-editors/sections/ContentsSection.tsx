@@ -2,6 +2,7 @@ import { HStack, SegmentGroup, Text } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiInfo, PiRectangle } from 'react-icons/pi'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
+import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 import { Tooltip } from '../../common/Tooltip'
 
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -10,17 +11,19 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { PocketItemIdSchema } from '../../../schemas/pocketItem'
 import { isDefined } from '../../../utils/isDefined'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { PocketItemCombobox } from '../../common/PocketItemCombobox'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type ContentsSectionProps<T extends HasPocketItemSchema> = {
+  modelId: string
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
 export const ContentsSection = <T extends HasPocketItemSchema>({
+  modelId,
   editable,
   issues,
   onChange,
@@ -100,7 +103,7 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         {t.project.editors.sections.components.contents.itemOrientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.itemOrientation}>
-        <SegmentGroup.Root
+        <EditorSegmentGroup
           disabled={!hasItem}
           onValueChange={handleOrientationChange}
           size="sm"
@@ -117,7 +120,7 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
             <PiRectangle style={{ transform: 'rotate(90deg)' }} />
             {t.project.editors.enums.components.itemOrientation.portrait}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle
@@ -126,7 +129,9 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         {t.project.editors.sections.components.contents.itemCrossAxisOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.itemCrossAxisOffset}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field="itemCrossAxisOffset"
           disabled={!hasItem}
           issue={issues.itemCrossAxisOffset}
           onChange={handleCardCrossAxisOffsetChange}
@@ -139,7 +144,9 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         {t.project.editors.sections.components.contents.itemOpeningOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.itemOpeningOffset}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field="itemOpeningOffset"
           disabled={!hasItem}
           issue={issues.itemOpeningOffset}
           onChange={handleCardOpeningOffsetChange}

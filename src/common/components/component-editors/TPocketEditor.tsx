@@ -6,7 +6,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 import type { PocketClusterSchema, PocketOpeningSchema, TPocketSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
-import { NumberInput } from '../common/NumberInput'
+import { EditorNumberInput } from '../common/EditorNumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 import { ContentsSection } from './sections/ContentsSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
@@ -55,7 +55,9 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
               {t.project.editors.sections.components.tPocket.tPocketTabWidth.label}
             </SectionGroup.SectionRowTitle>
             <SectionGroup.SectionRowEditor issue={issues.tPocketTabWidth}>
-              <NumberInput
+              <EditorNumberInput
+                modelId={editable.id}
+                field="tPocketTabWidth"
                 unit="mm"
                 value={editable.tPocketTabWidth}
                 issue={issues.tPocketTabWidth}
@@ -66,7 +68,9 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
               {t.project.editors.sections.components.tPocket.tPocketTaper.label}
             </SectionGroup.SectionRowTitle>
             <SectionGroup.SectionRowEditor issue={issues.tPocketTaper}>
-              <NumberInput
+              <EditorNumberInput
+                modelId={editable.id}
+                field="tPocketTaper"
                 unit="mm"
                 value={editable.tPocketTaper}
                 issue={issues.tPocketTaper}
@@ -75,6 +79,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
             </SectionGroup.SectionRowEditor>
           </SectionGroup.Section>
           <PocketOpeningSection
+            modelId={editable.id}
             cluster={parent}
             editable={editable.opening}
             issues={issues.opening}
@@ -84,7 +89,12 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
       </Tabs.Content>
       <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
         <SectionGroup.Root>
-          <ContentsSection<TPocketSchema> editable={editable} issues={issues} onChange={onChange} />
+          <ContentsSection<TPocketSchema>
+            modelId={editable.id}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+          />
         </SectionGroup.Root>
       </Tabs.Content>
     </Tabs.Root>

@@ -1,13 +1,9 @@
-import { Button, type ButtonProps } from '@chakra-ui/react'
-import type { FC, Ref } from 'react'
+import type { FC } from 'react'
+import { EditorButton, type EditorButtonProps } from './EditorButton'
 
-type SectionHeaderButtonProps = ButtonProps & {
-  ref?: Ref<HTMLButtonElement>
-}
-
-export const SectionHeaderButton: FC<SectionHeaderButtonProps> = ({ ref, ...props }) => {
+export const SectionHeaderButton: FC<EditorButtonProps> = ({ ref, ...props }) => {
   return (
-    <Button
+    <EditorButton
       ref={ref}
       size="2xs"
       height="5"

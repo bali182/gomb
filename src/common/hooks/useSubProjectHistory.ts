@@ -26,7 +26,7 @@ export type UseSubProjectHistoryOutput = {
 }
 
 export const useSubProjectHistory = (): UseSubProjectHistoryOutput => {
-  const { setSubProject, subProject } = useEditorContext()
+  const { setSubProject, subProject, isComputing, setEditingInputId } = useEditorContext()
   const [historyState, setHistoryState] = useAtom(subProjectHistoryAtom)
 
   const recordChange = useCallback(
@@ -52,7 +52,7 @@ export const useSubProjectHistory = (): UseSubProjectHistoryOutput => {
   )
 
   const undo = useCallback((): void => {
-    if (!isDefined(subProject)) {
+    if (isComputing || !isDefined(subProject)) {
       return
     }
 
@@ -62,12 +62,13 @@ export const useSubProjectHistory = (): UseSubProjectHistoryOutput => {
       return
     }
 
+    setEditingInputId(undefined)
     setHistoryState((currentState) => moveHistorySnapshot(currentState, subProject, 'undo'))
     setSubProject(targetSubProject)
-  }, [historyState, setHistoryState, setSubProject, subProject])
+  }, [historyState, isComputing, setEditingInputId, setHistoryState, setSubProject, subProject])
 
   const redo = useCallback((): void => {
-    if (!isDefined(subProject)) {
+    if (isComputing || !isDefined(subProject)) {
       return
     }
 
@@ -77,9 +78,10 @@ export const useSubProjectHistory = (): UseSubProjectHistoryOutput => {
       return
     }
 
+    setEditingInputId(undefined)
     setHistoryState((currentState) => moveHistorySnapshot(currentState, subProject, 'redo'))
     setSubProject(targetSubProject)
-  }, [historyState, setHistoryState, setSubProject, subProject])
+  }, [historyState, isComputing, setEditingInputId, setHistoryState, setSubProject, subProject])
 
   const canUndo = hasHistoryEntry(historyState, subProject?.id, 'undo')
   const canRedo = hasHistoryEntry(historyState, subProject?.id, 'redo')

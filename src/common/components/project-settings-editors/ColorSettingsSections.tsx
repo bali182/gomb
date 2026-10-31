@@ -14,7 +14,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { ProjectSchema } from '../../schemas/project'
-import { ColorInput } from '../common/ColorInput'
+import { EditorColorInput } from '../common/EditorColorInput'
 import { SectionGroup } from '../common/SectionGroup'
 
 type ProjectComponentSettingsSectionProps = {
@@ -134,7 +134,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.components.leatherColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.leatherColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.leatherColor"
             colors={leatherColorValues}
             issue={issues.colorSettings?.leatherColor}
             onChange={handleLeatherColorChange}
@@ -146,7 +148,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.components.strokeColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.strokeColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.strokeColor"
             colors={strokeColorValues}
             issue={issues.colorSettings?.strokeColor}
             onChange={handleStrokeColorChange}
@@ -158,7 +162,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.components.pocketItemColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.pocketItemColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.pocketItemColor"
             colors={pocketItemColorValues}
             issue={issues.colorSettings?.pocketItemColor}
             onChange={handlePocketItemColorChange}
@@ -175,7 +181,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.stitching.stitchHoleColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.stitchHoleColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.stitchHoleColor"
             colors={stitchHoleColorValues}
             issue={issues.colorSettings?.stitchHoleColor}
             onChange={handleStitchHoleColorChange}
@@ -186,7 +194,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.stitching.stitchLineColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.stitchLineColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.stitchLineColor"
             colors={stitchLineColorValues}
             issue={issues.colorSettings?.stitchLineColor}
             onChange={handleStitchLineColorChange}
@@ -197,7 +207,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.stitching.threadColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.threadColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.threadColor"
             colors={threadColorValues}
             issue={issues.colorSettings?.threadColor}
             onChange={handleThreadColorChange}
@@ -214,7 +226,9 @@ export const ColorSettingsSections: FC<ProjectComponentSettingsSectionProps> = (
           {t.project.editors.sections.project.selection.selectionColor.label}
         </SectionGroup.SectionRowTitle>
         <SectionGroup.SectionRowEditor issue={issues.colorSettings?.selectionColor}>
-          <ColorInput
+          <EditorColorInput
+            modelId={editable.id}
+            field="colorSettings.selectionColor"
             colors={selectionColorValues}
             issue={issues.colorSettings?.selectionColor}
             onChange={handleSelectionColorChange}

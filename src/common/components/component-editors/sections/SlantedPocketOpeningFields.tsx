@@ -1,5 +1,6 @@
 import { Select, createListCollection, type ListCollection, type SelectValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
+import { EditorSelect } from '../../common/EditorSelect'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type {
@@ -10,10 +11,11 @@ import type {
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { isDefined } from '../../../utils/isDefined'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type SlantedPocketOpeningFieldsProps = {
+  modelId: string
   editable: EditableSchema<SlantedPocketOpeningSchema>
   issues: IssuesSchema<SlantedPocketOpeningSchema>
   orientation: PocketOrientationSchema
@@ -23,6 +25,7 @@ type SlantedPocketOpeningFieldsProps = {
 const sides: PocketOpeningSideSchema[] = ['start', 'end']
 
 export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = ({
+  modelId,
   editable,
   issues,
   orientation,
@@ -61,7 +64,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
         {t.project.editors.sections.components.slantedPocketOpening.side.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.side}>
-        <Select.Root
+        <EditorSelect
           collection={collection}
           value={selectedValue}
           onValueChange={handleSideChange}
@@ -90,13 +93,20 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
               ))}
             </Select.Content>
           </Select.Positioner>
-        </Select.Root>
+        </EditorSelect>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.slantedPocketOpening.offset.tooltip}>
         {t.project.editors.sections.components.slantedPocketOpening.offset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.offset}>
-        <NumberInput value={editable.offset} issue={issues.offset} onChange={handleOffsetChange} unit="mm" />
+        <EditorNumberInput
+          modelId={modelId}
+          field="opening.offset"
+          value={editable.offset}
+          issue={issues.offset}
+          onChange={handleOffsetChange}
+          unit="mm"
+        />
       </SectionGroup.SectionRowEditor>
     </>
   )

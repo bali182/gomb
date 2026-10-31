@@ -2,6 +2,7 @@ import { Menu } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiSquareSplitHorizontal, PiSquareSplitVertical } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
+import { EditorActionMenuItem } from '../common/EditorActionMenuItem'
 
 type CommonMenuItemProps = {
   onSelect: () => void
@@ -10,19 +11,19 @@ type CommonMenuItemProps = {
 export const FlipHorizontalMenuItem: FC<CommonMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="flip-horizontal" onSelect={onSelect}>
+    <EditorActionMenuItem value="flip-horizontal" onSelect={onSelect}>
       <PiSquareSplitHorizontal />
       <Menu.ItemText>{t.project.editors.actions.common.flipHorizontal}</Menu.ItemText>
-    </Menu.Item>
+    </EditorActionMenuItem>
   )
 }
 
 export const FlipVerticalMenuItem: FC<CommonMenuItemProps> = ({ onSelect }) => {
   const { t } = useTranslation()
   return (
-    <Menu.Item value="flip-vertical" onSelect={onSelect}>
+    <EditorActionMenuItem value="flip-vertical" onSelect={onSelect}>
       <PiSquareSplitVertical />
       <Menu.ItemText>{t.project.editors.actions.common.flipVertical}</Menu.ItemText>
-    </Menu.Item>
+    </EditorActionMenuItem>
   )
 }

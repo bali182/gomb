@@ -1,4 +1,4 @@
-import { ColorSwatch, IconButton, Input, InputGroup, type PopoverRootProps } from '@chakra-ui/react'
+import { ColorSwatch, Input, InputGroup, type PopoverRootProps } from '@chakra-ui/react'
 import { useCallback, useMemo, useRef, type FC } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
@@ -6,8 +6,10 @@ import type { ColorValue } from '../../hooks/useColors'
 import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { ColorSwatchPicker } from './ColorSwatchPicker'
+import { EditorIconButton } from './EditorIconButton'
 
-type ColorInputProps = {
+export type ColorInputProps = {
+  readOnly?: boolean
   isResetEnabled?: boolean
   issue: IssueSchema | undefined
   onChange: (value: string) => void
@@ -16,7 +18,15 @@ type ColorInputProps = {
   colors: ColorValue[]
 }
 
-export const ColorInput: FC<ColorInputProps> = ({ isResetEnabled, issue, onChange, onReset, value, colors }) => {
+export const ColorInput: FC<ColorInputProps> = ({
+  isResetEnabled,
+  issue,
+  onChange,
+  onReset,
+  value,
+  colors,
+  readOnly,
+}) => {
   const inputGroupRef = useRef<HTMLDivElement>(null)
   const positioning = useMemo<PopoverRootProps['positioning']>(
     () => ({
@@ -40,29 +50,32 @@ export const ColorInput: FC<ColorInputProps> = ({ isResetEnabled, issue, onChang
       ref={inputGroupRef}
       endAddon={
         isDefined(onReset) ? (
-          <IconButton
+          <EditorIconButton
             alignSelf="stretch"
             borderRadius="0"
             disabled={!isResetEnabled}
+            readOnly={readOnly}
             height="auto"
             onClick={onReset}
             size="xs"
             variant="plain"
           >
             <PiArrowCounterClockwise />
-          </IconButton>
+          </EditorIconButton>
         ) : undefined
       }
       endAddonProps={{ px: 0, size: 'xs' }}
       startAddon={
         <ColorSwatchPicker
+          readOnly={readOnly}
           canReset={false}
           value={value}
           onChange={handlePopoverChange}
           positioning={positioning}
           colors={colors}
           trigger={
-            <IconButton
+            <EditorIconButton
+              readOnly={readOnly}
               alignItems="center"
               alignSelf="stretch"
               border="0"
@@ -74,13 +87,14 @@ export const ColorInput: FC<ColorInputProps> = ({ isResetEnabled, issue, onChang
               unstyled
             >
               <ColorSwatch value={value} />
-            </IconButton>
+            </EditorIconButton>
           }
         />
       }
       startAddonProps={{ px: '1.5', size: 'xs' }}
     >
       <Input
+        readOnly={readOnly}
         aria-invalid={isInvalid}
         onChange={(event) => onChange(event.currentTarget.value)}
         size="xs"

@@ -2,7 +2,6 @@ import {
   Combobox,
   HStack,
   Icon,
-  IconButton,
   InputGroup,
   Portal,
   Text,
@@ -16,6 +15,7 @@ import { useCallback, useMemo, useState, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiArrowCounterClockwise, PiCreditCard, PiMoney, PiRectangle } from 'react-icons/pi'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { pocketItems } from '../../data/pocketItems'
 import { usePocketItems } from '../../hooks/usePocketItems'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -23,6 +23,7 @@ import { portalRef } from '../../portalRef'
 import type { IssueSchema } from '../../schemas/issues'
 import type { PocketItemIdSchema, PocketItemSchema, TranslatedPocketItemSchema } from '../../schemas/pocketItem'
 import { isDefined } from '../../utils/isDefined'
+import { EditorIconButton } from './EditorIconButton'
 
 type PocketItemComboboxProps = {
   value: PocketItemIdSchema | undefined
@@ -44,6 +45,7 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
   onReset,
   value,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
   const [searchValue, setSearchValue] = useState<string>('')
   const { contains } = useFilter({ sensitivity: 'base' })
@@ -76,11 +78,12 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
   const handleValueChange = useCallback(
     (details: ComboboxValueChangeDetails<TranslatedPocketItemSchema>): void => {
       const item = details.items[0]
-      if (isDefined(item)) {
+      if (isDefined(item) && !isComputing) {
+        setEditingInputId(undefined)
         onChange(item.id)
       }
     },
-    [onChange],
+    [isComputing, onChange, setEditingInputId],
   )
   const handleInputValueChange = useCallback((details: Combobox.InputValueChangeDetails): void => {
     if (details.reason === 'input-change') {
@@ -95,6 +98,7 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
 
   return (
     <Combobox.Root
+      readOnly={isComputing}
       collection={collection}
       onInputValueChange={handleInputValueChange}
       onOpenChange={handleOpenChange}
@@ -109,17 +113,21 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
         startAddonProps={{ px: '1.5' }}
         endAddon={
           isDefined(onReset) ? (
-            <IconButton
+            <EditorIconButton
               alignSelf="stretch"
               borderRadius="0"
               disabled={!isResetEnabled}
+              readOnly={isComputing}
               height="auto"
-              onClick={onReset}
+              onClick={() => {
+                setEditingInputId(undefined)
+                onReset?.()
+              }}
               size="xs"
               variant="plain"
             >
               <PiArrowCounterClockwise />
-            </IconButton>
+            </EditorIconButton>
           ) : undefined
         }
         endAddonProps={{ px: 0, size: 'xs' }}

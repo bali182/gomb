@@ -1,12 +1,16 @@
-import { Button, ColorSwatch, IconButton, Popover, Portal, type PopoverRootProps } from '@chakra-ui/react'
-import type { ReactElement } from 'react'
+import { ColorSwatch, Popover, Portal, type PopoverRootProps } from '@chakra-ui/react'
+import { useCallback, type ReactElement } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 import type { ColorValue } from '../../hooks/useColors'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
+import { EditorButton } from './EditorButton'
+import { EditorIconButton } from './EditorIconButton'
 import { ButtonSwatchItem, SelectableColorSwatch } from './SelectableColorSwatch'
 
 type ColorSwatchPickerProps = {
+  disabled?: boolean
+  readOnly?: boolean
   value: string | undefined
   colors: ColorValue[]
   onChange: (color: string | undefined) => void
@@ -16,6 +20,8 @@ type ColorSwatchPickerProps = {
 }
 
 export const ColorSwatchPicker = ({
+  disabled,
+  readOnly,
   canReset,
   value: v,
   colors,
@@ -26,19 +32,25 @@ export const ColorSwatchPicker = ({
   const { t } = useTranslation()
   const value = v?.toLowerCase()
 
+  const handleReset = useCallback(() => {
+    onChange(undefined)
+  }, [onChange])
+
   return (
     <Popover.Root positioning={positioning}>
       <Popover.Trigger asChild>
         {trigger ?? (
-          <IconButton size="xs" variant="outline">
+          <EditorIconButton disabled={disabled} readOnly={readOnly} size="xs" variant="outline">
             <ColorSwatch size="md" value={value ?? 'transparent'} />
-          </IconButton>
+          </EditorIconButton>
         )}
       </Popover.Trigger>
       <Portal container={portalRef}>
         <Popover.Positioner>
           <Popover.Content p="3" width="fit-content">
             <SelectableColorSwatch
+              disabled={disabled}
+              readOnly={readOnly}
               colors={colors}
               onChange={onChange}
               value={value}
@@ -46,10 +58,18 @@ export const ColorSwatchPicker = ({
               Item={ButtonSwatchItem}
             />
             {canReset && (
-              <Button marginTop="3" onClick={() => onChange(undefined)} size="xs" width="full" variant="outline">
+              <EditorButton
+                disabled={disabled}
+                readOnly={readOnly}
+                marginTop="3"
+                onClick={handleReset}
+                size="xs"
+                width="full"
+                variant="outline"
+              >
                 <PiArrowCounterClockwise />
                 {t.project.editors.controls.colorSwatchPicker.reset}
-              </Button>
+              </EditorButton>
             )}
           </Popover.Content>
         </Popover.Positioner>
