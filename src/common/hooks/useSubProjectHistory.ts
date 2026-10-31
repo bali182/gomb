@@ -117,9 +117,14 @@ const recordHistorySnapshot = (
   activeThrottle: ActiveSubProjectHistoryThrottleSchema | undefined,
 ): SubProjectHistoryStateSchema => {
   const currentHistory = currentState.histories.get(subProject.id) ?? { redo: [], undo: [] }
+  const duplicate = currentHistory.undo[currentHistory.undo.length - 1] === subProject
+  if (duplicate && currentHistory.redo.length === 0) {
+    return currentState.activeThrottle === activeThrottle ? currentState : { ...currentState, activeThrottle }
+  }
+
   const nextHistory: SubProjectHistorySchema = {
     redo: [],
-    undo: [...currentHistory.undo, subProject].slice(-MAX_HISTORY_ENTRIES),
+    undo: duplicate ? currentHistory.undo : [...currentHistory.undo, subProject].slice(-MAX_HISTORY_ENTRIES),
   }
 
   return {

@@ -77,6 +77,7 @@ export const createEditorComputationWorker = (): {
           throw new Error('Unexpected editor computation response')
       }
     } catch (error) {
+      console.error('[worker]', error)
       fail(error)
     }
   }
@@ -84,13 +85,16 @@ export const createEditorComputationWorker = (): {
   const handleError = (event: ErrorEvent): void => {
     if (event.currentTarget === worker) {
       event.preventDefault()
+      console.error('[worker]', event.error ?? event.message)
       fail(new Error(event.message))
     }
   }
 
   const handleMessageError = (event: MessageEvent): void => {
     if (event.currentTarget === worker) {
-      fail(new Error('Unable to receive editor computation response'))
+      const error = new Error('Unable to receive editor computation response')
+      console.error('[worker]', error)
+      fail(error)
     }
   }
 
@@ -115,6 +119,7 @@ export const createEditorComputationWorker = (): {
         }
         worker.postMessage(serializeEditorComputation(request))
       } catch (error) {
+        console.error('[worker]', error)
         fail(error)
       }
     })
