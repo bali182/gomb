@@ -5,8 +5,11 @@ import { useNavigate, useParams } from 'react-router'
 import { accessors } from '../../../common/utils/accessors'
 
 import { CommonEmptyState } from '../../../common/components/common/CommonEmptyState'
+import { useEditorContext } from '../../../common/contexts/EditorContext'
+import { useProject } from '../../../common/hooks/useProject'
 import { useTranslation } from '../../../common/hooks/useTranslation'
 import { Loadable } from '../../../common/loadable'
+import type { ProjectSchema } from '../../../common/schemas/project'
 import { isDefined } from '../../../common/utils/isDefined'
 import { ElectronEditorContextProvider } from '../../contexts/ElectronEditorContextProvider'
 import { electronAppRoutes } from '../../electronAppRoutes'
@@ -16,9 +19,8 @@ import type { ElectronSubProjectRouteParamsSchema } from '../../schemas/electron
 import { ElectronEditor } from '../ElectronEditor'
 
 export const ElectronProjectRoute: FC = () => {
-  const { filePath, subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
+  const { filePath } = useParams<ElectronSubProjectRouteParamsSchema>()
   const { electronProject, loadProject } = useElectronProject(filePath)
-  const navigate = useNavigate()
   const isCurrentFilePath = useMemo<boolean>(
     () =>
       Loadable.get(
@@ -30,15 +32,6 @@ export const ElectronProjectRoute: FC = () => {
       ),
     [electronProject, filePath],
   )
-  const targetPath = useMemo<string | undefined>(
-    () =>
-      Loadable.get(
-        Loadable.map(electronProject, (loadedElectronProject: ElectronProjectSchema): string | undefined =>
-          getTargetPath(loadedElectronProject, filePath, subProjectId),
-        ),
-      ),
-    [electronProject, filePath, subProjectId],
-  )
   const loadProjectInEffect = useEffectEvent((): Promise<void> => {
     return loadProject()
   })
@@ -46,6 +39,31 @@ export const ElectronProjectRoute: FC = () => {
   useEffect(() => {
     loadProjectInEffect()
   }, [filePath])
+
+  if (electronProject.type === 'failed') {
+    return <ElectronProjectLoadFailed filePath={filePath ?? ''} />
+  }
+
+  if (!Loadable.hasValue(electronProject) || isCurrentFilePath === false) {
+    return <ElectronProjectLoading />
+  }
+
+  return (
+    <ElectronEditorContextProvider>
+      <ElectronProjectRouteContent />
+    </ElectronEditorContextProvider>
+  )
+}
+
+const ElectronProjectRouteContent: FC = () => {
+  const { filePath, subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
+  const { project } = useProject()
+  const { computedSubProject } = useEditorContext()
+  const navigate = useNavigate()
+  const targetPath = useMemo<string | undefined>(
+    () => (computedSubProject.type === 'uninitialized' ? getTargetPath(project, filePath, subProjectId) : undefined),
+    [computedSubProject.type, filePath, project, subProjectId],
+  )
 
   useEffect(() => {
     if (!isDefined(targetPath)) {
@@ -55,19 +73,7 @@ export const ElectronProjectRoute: FC = () => {
     navigate(targetPath, { replace: true })
   }, [navigate, targetPath])
 
-  if (electronProject.type === 'failed') {
-    return <ElectronProjectLoadFailed filePath={filePath ?? ''} />
-  }
-
-  if (!Loadable.hasValue(electronProject) || isCurrentFilePath === false || isDefined(targetPath)) {
-    return <ElectronProjectLoading />
-  }
-
-  return (
-    <ElectronEditorContextProvider>
-      <ElectronEditor />
-    </ElectronEditorContextProvider>
-  )
+  return isDefined(targetPath) ? <ElectronProjectLoading /> : <ElectronEditor />
 }
 
 const ElectronProjectLoading: FC = () => {
@@ -110,24 +116,26 @@ const ElectronProjectLoadFailed: FC<ElectronProjectLoadFailedProps> = ({ filePat
 }
 
 const getTargetPath = (
-  electronProject: ElectronProjectSchema,
+  project: ProjectSchema,
   filePath: string | undefined,
   subProjectId: string | undefined,
 ): string | undefined => {
-  if (!isDefined(filePath) || electronProject.filePath !== filePath) {
+  if (!isDefined(filePath)) {
     return undefined
   }
 
   const selectedSubProject = isDefined(subProjectId)
-    ? accessors.project(electronProject.project).optional.subProject(subProjectId)
+    ? accessors.project(project).optional.subProject(subProjectId)
     : undefined
 
   if (isDefined(selectedSubProject)) {
     return undefined
   }
 
-  const firstSubProject = electronProject.project.subProjects[0]
-  return isDefined(firstSubProject)
-    ? electronAppRoutes.subProject(filePath, firstSubProject.id)
-    : electronAppRoutes.project(filePath)
+  const firstSubProject = project.subProjects[0]
+  if (isDefined(firstSubProject)) {
+    return electronAppRoutes.subProject(filePath, firstSubProject.id)
+  }
+
+  return isDefined(subProjectId) ? electronAppRoutes.project(filePath) : undefined
 }

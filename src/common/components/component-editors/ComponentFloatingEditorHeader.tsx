@@ -1,7 +1,8 @@
-import { Button, ColorSwatch, HStack, Input, type PopoverRootProps } from '@chakra-ui/react'
+import { ColorSwatch, HStack, type PopoverRootProps } from '@chakra-ui/react'
 import { useCallback, useMemo, useRef, type ReactElement } from 'react'
 import type { IconType } from 'react-icons'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { leatherColors } from '../../data/colors'
 import { useColors } from '../../hooks/useColors'
 import type { BaseComponentSchema } from '../../schemas/components'
@@ -9,6 +10,8 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { ColorSwatchPicker } from '../common/ColorSwatchPicker'
+import { EditorButton } from '../common/EditorButton'
+import { EditorTextInput } from '../common/EditorTextInput'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
 
 type ComponentFloatingEditorHeaderProps<T extends BaseComponentSchema> = {
@@ -48,6 +51,7 @@ export const ComponentFloatingEditorHeader = <T extends BaseComponentSchema>({
       onChange={onChange}
       rightAddon={
         <HeaderColorInput
+          modelId={editable.id}
           isResetEnabled={isDefined(editable.color)}
           issue={issues.color}
           onChange={handleColorChange}
@@ -60,6 +64,7 @@ export const ComponentFloatingEditorHeader = <T extends BaseComponentSchema>({
 }
 
 type HeaderColorInputProps = {
+  modelId: string
   isResetEnabled: boolean
   issue: IssueSchema | undefined
   onChange: (value: string) => void
@@ -67,7 +72,10 @@ type HeaderColorInputProps = {
   value: string
 }
 
-const HeaderColorInput = ({ isResetEnabled, issue, onChange, onReset, value }: HeaderColorInputProps) => {
+const HeaderColorInput = ({ modelId, isResetEnabled, issue, onChange, onReset, value }: HeaderColorInputProps) => {
+  const { isComputing, editingInputId, setEditingInputId } = useEditorContext()
+  const inputId = `${modelId}:color`
+  const readOnly = isComputing && editingInputId !== inputId
   const inputRef = useRef<HTMLDivElement>(null)
   const positioning = useMemo<PopoverRootProps['positioning']>(
     () => ({
@@ -78,13 +86,14 @@ const HeaderColorInput = ({ isResetEnabled, issue, onChange, onReset, value }: H
   )
   const handlePopoverChange = useCallback(
     (color: string | undefined): void => {
+      setEditingInputId(inputId)
       if (isDefined(color)) {
         onChange(color)
       } else {
         onReset()
       }
     },
-    [onChange, onReset],
+    [onChange, onReset, setEditingInputId, inputId],
   )
   const popoverLeatherColors = useColors(leatherColors)
   const isInvalid = isDefined(issue) && issue.severity === 'error'
@@ -92,13 +101,15 @@ const HeaderColorInput = ({ isResetEnabled, issue, onChange, onReset, value }: H
   return (
     <HStack gap="1" ref={inputRef}>
       <ColorSwatchPicker
+        readOnly={readOnly}
         canReset={isResetEnabled}
         value={value}
         colors={popoverLeatherColors}
         onChange={handlePopoverChange}
         positioning={positioning}
         trigger={
-          <Button
+          <EditorButton
+            readOnly={readOnly}
             alignItems="center"
             aria-invalid={isInvalid}
             border="0"
@@ -108,10 +119,12 @@ const HeaderColorInput = ({ isResetEnabled, issue, onChange, onReset, value }: H
             unstyled
           >
             <ColorSwatch value={value} />
-          </Button>
+          </EditorButton>
         }
       />
-      <Input
+      <EditorTextInput
+        modelId={modelId}
+        field="color"
         aria-invalid={isInvalid}
         _invalid={{ borderColor: 'border.error', focusRingColor: 'border.error' }}
         borderColor="transparent"

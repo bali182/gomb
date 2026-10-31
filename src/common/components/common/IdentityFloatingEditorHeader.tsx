@@ -1,11 +1,13 @@
-import { HStack, Input, Popover } from '@chakra-ui/react'
+import { HStack, Popover } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type ReactElement, type ReactNode } from 'react'
 import type { IconType } from 'react-icons'
+import { EditorTextInput } from './EditorTextInput'
 
 import type { HasIdentitySchema } from '../../schemas/common'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
+import { SubProjectComputationIcon } from '../SubProjectComputationFeedback'
 
 type IdentityFloatingEditorHeaderProps<T> = {
   editable: EditableSchema<T>
@@ -37,8 +39,12 @@ export function IdentityFloatingEditorHeader<T extends HasIdentitySchema>({
     <Popover.Header p="0">
       <HStack justify="space-between" px="4" py="2">
         <HStack gap="1">
-          <Icon />
-          <Input
+          <SubProjectComputationIcon>
+            <Icon />
+          </SubProjectComputationIcon>
+          <EditorTextInput
+            modelId={editable.id}
+            field="name"
             aria-invalid={hasNameError}
             _invalid={{ borderColor: 'border.error', focusRingColor: 'border.error' }}
             borderColor="transparent"

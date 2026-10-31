@@ -4,9 +4,11 @@ import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
+import { useSubProject } from '../../hooks/useSubProject'
 import type { PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { HoleHighlights } from './HoleHighlights'
@@ -27,6 +29,8 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const { settings } = useGlobalSettings()
   const pocket = useComponent<PocketSchema>(componentId)
   const computed = useComputedComponent<ComputedPocketSchema>(componentId)
+  const { computedSubProject } = useSubProject()
+  const accessor = accessors.computedSubProject(computedSubProject)
   const pathData = usePath(computed.path)
 
   const style: DrawAreaComponentStyleParams = {
@@ -68,7 +72,7 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
       {narrowers.is.computedFrontPocket(computed) &&
-        computed.children.map((child) => {
+        accessor.component.children(componentId).map((child) => {
           switch (child.type) {
             case 'computed-panel':
               return <Panel key={child.componentId} componentId={child.componentId} nestingLevel={nestingLevel + 1} />

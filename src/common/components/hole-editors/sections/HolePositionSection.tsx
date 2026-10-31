@@ -8,22 +8,25 @@ import {
   PiAlignRightSimple,
   PiAlignTopSimple,
 } from 'react-icons/pi'
+import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { HasAnchorsSchema } from '../../../schemas/hole'
 import type { IssuesSchema } from '../../../schemas/issues'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type HolePositionSectionProps<T> = {
+  modelId: string
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
 export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSchema>({
+  modelId,
   editable,
   issues,
   onChange,
@@ -61,7 +64,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
         {t.project.editors.sections.holes.position.xAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xAnchor}>
-        <SegmentGroup.Root onValueChange={handleXAnchorChange} size="sm" value={editable.xAnchor}>
+        <EditorSegmentGroup onValueChange={handleXAnchorChange} size="sm" value={editable.xAnchor}>
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="start">
             <SegmentGroup.ItemHiddenInput />
@@ -75,19 +78,26 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
             <SegmentGroup.ItemHiddenInput />
             <PiAlignRightSimple /> {t.project.editors.enums.common.anchor.horizontal.end}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xOffset.tooltip}>
         {t.project.editors.sections.holes.position.xOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xOffset}>
-        <NumberInput issue={issues.xOffset} onChange={handleXOffsetChange} unit="mm" value={editable.xOffset} />
+        <EditorNumberInput
+          modelId={modelId}
+          field="xOffset"
+          issue={issues.xOffset}
+          onChange={handleXOffsetChange}
+          unit="mm"
+          value={editable.xOffset}
+        />
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yAnchor.tooltip}>
         {t.project.editors.sections.holes.position.yAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yAnchor}>
-        <SegmentGroup.Root onValueChange={handleYAnchorChange} size="sm" value={editable.yAnchor}>
+        <EditorSegmentGroup onValueChange={handleYAnchorChange} size="sm" value={editable.yAnchor}>
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="start">
             <SegmentGroup.ItemHiddenInput />
@@ -101,13 +111,20 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
             <SegmentGroup.ItemHiddenInput />
             <PiAlignBottomSimple /> {t.project.editors.enums.common.anchor.vertical.end}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yOffset.tooltip}>
         {t.project.editors.sections.holes.position.yOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yOffset}>
-        <NumberInput issue={issues.yOffset} onChange={handleYOffsetChange} unit="mm" value={editable.yOffset} />
+        <EditorNumberInput
+          modelId={modelId}
+          field="yOffset"
+          issue={issues.yOffset}
+          onChange={handleYOffsetChange}
+          unit="mm"
+          value={editable.yOffset}
+        />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )

@@ -6,6 +6,7 @@ import type { EditableSchema } from '../schemas/editable'
 import type { HoleSchema } from '../schemas/hole'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
+import { optionalComparators } from '../utils/comparators'
 import { validateHoleSchema } from '../validators/validateHoleSchema'
 import { useEditableModel } from './useEditableModel'
 import { useHole } from './useHole'
@@ -40,6 +41,7 @@ export const useEditableHole = (holeId: string): UseEditableHoleResult => {
   const { editableValue, setValue, validationIssues } = useEditableModel({
     commit,
     context,
+    isEqual: optionalComparators.hole,
     validate: validateHoleSchema,
     value: hole,
     throttle: HOT_EDITOR_THROTTLE,

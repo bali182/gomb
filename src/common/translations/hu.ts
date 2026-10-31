@@ -61,6 +61,7 @@ export const HU = {
     },
   },
   project: {
+    computing: 'Számítás folyamatban…',
     tree: {
       title: 'Elemek',
       noModuleSelected: {
@@ -867,6 +868,12 @@ export const HU = {
       moduleNotFound: {
         title: 'A modul nem található',
         description: 'A megnyitni kívánt modul nem létezik.',
+      },
+      computationFailed: {
+        title: 'A modul kiszámítása nem sikerült',
+        description: 'A számítás hibával leállt. Újrapróbálhatod ugyanazt a műveletet.',
+        retry: 'Újrapróbálás',
+        back: 'Vissza a projektekhez',
       },
       noModules: {
         title: 'Még nincs modulod',

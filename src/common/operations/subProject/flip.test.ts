@@ -499,6 +499,26 @@ describe.each(axes)('flip: %s', (axis) => {
 describe.each(orientationCases)(
   'flip: $orientation opening, $axis flip',
   ({ orientation, axis, expectedOrientation, swapsEnds }) => {
+    it('mirrors the cluster own radii together with its opening direction', () => {
+      const fixture = createClusterSubProject(orientation)
+      const cluster = {
+        ...accessors.subProject(fixture).component.pocketCluster('cluster'),
+        ...radii,
+        individualRadii: true,
+      }
+      const original = { ...fixture, components: { ...fixture.components, cluster } }
+      const before = structuredClone(original)
+      const result = flip(original, cluster, axis)
+      const flippedCluster = accessors.subProject(result).component.pocketCluster(cluster.id)
+      expect(flippedCluster).toMatchObject({
+        ...mirroredRadii[axis],
+        individualRadii: true,
+        orientation: expectedOrientation,
+      })
+      expect(flip(result, flippedCluster, axis)).toEqual(original)
+      expect(original).toEqual(before)
+    })
+
     it('flips cluster stitching once with its owner and keeps it unchanged when only a pocket is flipped', () => {
       const fixture = createClusterSubProject(orientation)
       const shared = {

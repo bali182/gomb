@@ -1,7 +1,9 @@
-import { Box, Button, type CssProperties, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
-import { useMemo, type FC } from 'react'
+import { Box, type CssProperties, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
+import { useCallback, useMemo, type FC } from 'react'
+import { useEditorContext } from '../../contexts/EditorContext'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
+import { EditorButton } from '../common/EditorButton'
 import { Tooltip } from '../common/Tooltip'
 import {
   SELECTED_BORDER_COLOR,
@@ -24,6 +26,11 @@ type StitchLineEdgeToggleProps = {
 }
 
 export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side, tooltip }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const handleClick = useCallback((): void => {
+    setEditingInputId(undefined)
+    onClick()
+  }, [onClick, setEditingInputId])
   const layout = useMemo<StitchLineSegmentLayout>(() => getSideLayout(side), [side])
 
   const borderColor = useMemo<CssProperties['borderColor']>(
@@ -42,9 +49,17 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
   return (
     <Tooltip content={tooltip}>
       <Box {...layout.root}>
-        <Button aria-pressed={selected} cursor="pointer" onClick={onClick} _hover={hover} unstyled {...layout.button}>
+        <EditorButton
+          readOnly={isComputing}
+          aria-pressed={selected}
+          cursor="pointer"
+          onClick={handleClick}
+          _hover={hover}
+          unstyled
+          {...layout.button}
+        >
           <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
-        </Button>
+        </EditorButton>
       </Box>
     </Tooltip>
   )

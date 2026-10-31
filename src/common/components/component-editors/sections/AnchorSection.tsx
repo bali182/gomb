@@ -9,6 +9,7 @@ import {
   PiAlignTopSimple,
   PiInfo,
 } from 'react-icons/pi'
+import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasOffAxisAnchor } from '../../../schemas/common'
@@ -82,7 +83,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
         {t.project.editors.sections.components.anchor.offAxisAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.offAxisAnchor}>
-        <SegmentGroup.Root
+        <EditorSegmentGroup
           disabled={isOffAxisFill}
           onValueChange={handleOffAxisAnchorChange}
           size="sm"
@@ -134,7 +135,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
               ? t.project.editors.enums.common.anchor.vertical.end
               : t.project.editors.enums.common.anchor.horizontal.end}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )

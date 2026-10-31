@@ -63,8 +63,8 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
             onPointerLeave={isInteractive ? onPointerLeave : undefined}
           />
         )}
-        {computed.children.map((pocket) => (
-          <Pocket key={pocket.componentId} componentId={pocket.componentId} nestingLevel={nestingLevel} />
+        {computed.children.map((pocketId) => (
+          <Pocket key={pocketId} componentId={pocketId} nestingLevel={nestingLevel} />
         ))}
       </g>
       {settings.view.componentDimensionsVisible && active && (

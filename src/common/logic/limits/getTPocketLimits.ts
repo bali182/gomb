@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+import { POSITION_EPSILON } from '../../constants/layout'
 import type { PocketClusterSchema, TPocketSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
 import type { TPocketLimitsSchema } from '../../schemas/limits'
@@ -11,7 +13,7 @@ export const getTPocketLimits = (
 ): TPocketLimitsSchema => {
   const rect = computed.boundingRect
   const width = cluster.orientation === 'up' || cluster.orientation === 'down' ? rect.width : rect.height
-  const maximum = width.dividedBy(2)
+  const maximum = BigNumber.maximum(0, width.dividedBy(2).minus(POSITION_EPSILON))
   const adjusted: TPocketSchema = {
     ...pocket,
     tPocketTabWidth: clamp(pocket.tPocketTabWidth, 0, maximum).toNumber(),

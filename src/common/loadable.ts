@@ -3,17 +3,18 @@ import {
   LoadableWithValueSchema,
   LoadedSchema,
   LoadingFailedSchema,
+  LoadingFailedWithValueSchema,
   LoadingSchema,
   LoadingWithValueSchema,
   UninitializedSchema,
 } from './schemas/loadable'
 
 function hasValue<T>(loadable: LoadableSchema<T>): loadable is LoadableWithValueSchema<T> {
-  return loadable.type === 'loaded' || loadable.type === 'loading-with-value'
+  return loadable.type === 'loaded' || loadable.type === 'loading-with-value' || loadable.type === 'failed-with-value'
 }
 
 function isSettled<T>(loadable: LoadableSchema<T>): boolean {
-  return loadable.type === 'loaded' || loadable.type === 'failed'
+  return loadable.type === 'loaded' || loadable.type === 'failed' || loadable.type === 'failed-with-value'
 }
 
 function get<T>(loadable: LoadableSchema<T>): T | undefined
@@ -30,6 +31,8 @@ const map = <I, O>(loadable: LoadableSchema<I>, transform: (data: I) => O): Load
       return loadable
     case 'loading-with-value':
       return Loadable.loadingWith(transform(loadable.data))
+    case 'failed-with-value':
+      return Loadable.failedWith(transform(loadable.data), loadable.error)
     case 'loaded':
       return Loadable.loaded(transform(loadable.data))
   }
@@ -56,6 +59,18 @@ function merge(
   mergeFn: (...values: unknown[]) => unknown,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): LoadableSchema<any> {
+  const failedWithValue = loadables.find((loadable) => loadable.type === 'failed-with-value')
+  if (failedWithValue?.type === 'failed-with-value') {
+    if (!loadables.every(hasValue)) {
+      return Loadable.failed(failedWithValue.error)
+    }
+    try {
+      return Loadable.failedWith(mergeFn(...loadables.map((loadable) => get(loadable))), failedWithValue.error)
+    } catch (error) {
+      return Loadable.failed(error)
+    }
+  }
+
   let state: 'failed' | 'loading' | undefined = undefined
   let eachHasValue = true
   for (const loadable of loadables) {
@@ -113,6 +128,9 @@ export const Loadable = {
   },
   failed: (error?: unknown): LoadingFailedSchema => {
     return { type: 'failed', error }
+  },
+  failedWith: <T>(data: T, error: unknown): LoadingFailedWithValueSchema<T> => {
+    return { type: 'failed-with-value', data, error }
   },
   loaded: <T>(data: T): LoadedSchema<T> => {
     return { type: 'loaded', data }

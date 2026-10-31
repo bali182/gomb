@@ -5,11 +5,13 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { StitchLineCommonConfigSchema } from '../../../schemas/stitching'
 import { isDefined } from '../../../utils/isDefined'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { StitchHoleDistanceEditor } from '../StitchHoleDistanceEditor'
 
 type StitchingSettingsSectionProps<T extends Partial<StitchLineCommonConfigSchema>> = {
+  modelId: string
+  fieldPrefix?: string
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
@@ -18,6 +20,8 @@ type StitchingSettingsSectionProps<T extends Partial<StitchLineCommonConfigSchem
 }
 
 export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfigSchema>>({
+  modelId,
+  fieldPrefix = '',
   editable,
   issues,
   onChange,
@@ -79,7 +83,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         {t.project.editors.sections.stitchLines.settings.stitchMargin.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchMargin}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={fieldPrefix + 'stitchMargin'}
           issue={issues.stitchMargin}
           onChange={handleStitchMarginChange}
           onReset={isDefined(onReset) ? handleStitchMarginReset : undefined}
@@ -93,7 +99,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         {t.project.editors.sections.stitchLines.settings.stitchHoleLength.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleLength}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={fieldPrefix + 'stitchHoleLength'}
           issue={issues.stitchHoleLength}
           onChange={handleStitchHoleLengthChange}
           onReset={isDefined(onReset) ? handleStitchHoleLengthReset : undefined}
@@ -110,6 +118,8 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleDistance}>
         <StitchHoleDistanceEditor
+          modelId={modelId}
+          field={fieldPrefix + 'stitchHoleDistance'}
           issue={issues.stitchHoleDistance}
           onChange={handleStitchHoleDistanceChange}
           onReset={isDefined(onReset) ? handleStitchHoleDistanceReset : undefined}
@@ -124,7 +134,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         {t.project.editors.sections.stitchLines.settings.stitchHoleThickness.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchHoleThickness}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={fieldPrefix + 'stitchHoleThickness'}
           issue={issues.stitchHoleThickness}
           onChange={handleStitchHoleThicknessChange}
           onReset={isDefined(onReset) ? handleStitchHoleThicknessReset : undefined}
@@ -140,7 +152,9 @@ export const StitchingSettingsSection = <T extends Partial<StitchLineCommonConfi
         {t.project.editors.sections.stitchLines.settings.stitchLineThickness.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.stitchLineThickness}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={fieldPrefix + 'stitchLineThickness'}
           issue={issues.stitchLineThickness}
           onChange={handleStitchLineThicknessChange}
           onReset={isDefined(onReset) ? handleStitchLineThicknessReset : undefined}

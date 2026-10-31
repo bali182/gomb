@@ -31,6 +31,7 @@ import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
 import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
+import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
 const panels: SplitterPanelData[] = [
   { id: 'draw-area', collapsible: false },
@@ -105,6 +106,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
             </Box>
 
             {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
+            <SubProjectComputationFeedback />
           </Box>
         </Splitter.Panel>
 
@@ -172,17 +174,18 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 const EmptyProjectState: FC = () => {
   const { t } = useTranslation()
   const { createSubProject } = useProjectOperations()
-  const { navigateToSubProject } = useEditorContext()
+  const { navigateToSubProject, isComputing, setEditingInputId } = useEditorContext()
 
   const handleCreateSubProject = useCallback((): void => {
+    setEditingInputId(undefined)
     const subProject = createSubProject()
     navigateToSubProject(subProject.id)
-  }, [createSubProject, navigateToSubProject])
+  }, [createSubProject, navigateToSubProject, setEditingInputId])
 
   return (
     <CommonEmptyState
       content={
-        <Button onClick={handleCreateSubProject} variant="solid">
+        <Button disabled={isComputing} onClick={handleCreateSubProject} variant="solid">
           <PiPlus />
           {t.project.editors.actions.components.addRootPanel}
         </Button>

@@ -14,14 +14,15 @@ import {
   PiRows,
   PiRuler,
 } from 'react-icons/pi'
+import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { getComponentChildren } from '../../../operations/subProject/utils/getComponentChildren'
 import type { ComponentSchema, HasLayoutSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { EditorFieldTranslationSchema } from '../../../schemas/translation'
+import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
@@ -29,6 +30,7 @@ import { SectionGroup } from '../../common/SectionGroup'
 import { Tooltip } from '../../common/Tooltip'
 
 type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
+  modelId: string
   component: T
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
@@ -36,6 +38,7 @@ type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
 }
 
 export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
+  modelId,
   component,
   editable,
   issues,
@@ -44,9 +47,10 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
   const { t } = useTranslation()
   const { subProject } = useSubProject()
   const fillTranslation = useMemo<EditorFieldTranslationSchema | undefined>(() => {
-    const children = getComponentChildren(component, subProject).filter(
-      (child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child),
-    )
+    const children = accessors
+      .subProject(subProject)
+      .component.children(component.id)
+      .filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child))
     const hasFillChild = children.some((child) =>
       editable.layoutOrientation === 'horizontal' ? child.autoWidth : child.autoHeight,
     )
@@ -117,7 +121,7 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
         {t.project.editors.sections.components.layout.layoutOrientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutOrientation}>
-        <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.layoutOrientation}>
+        <EditorSegmentGroup onValueChange={handleOrientationChange} size="sm" value={editable.layoutOrientation}>
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="horizontal">
             <SegmentGroup.ItemHiddenInput />
@@ -127,14 +131,14 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
             <SegmentGroup.ItemHiddenInput />
             <PiRows /> {t.project.editors.enums.components.layoutOrientation.vertical}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.mainAxisAnchor.tooltip}>
         {t.project.editors.sections.components.layout.mainAxisAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.mainAxisAnchor}>
-        <SegmentGroup.Root
+        <EditorSegmentGroup
           disabled={isDefined(fillTranslation)}
           onValueChange={handleMainAxisAnchorChange}
           size="sm"
@@ -160,7 +164,7 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
             {editable.layoutOrientation === 'horizontal' ? <PiAlignRightSimple /> : <PiAlignBottomSimple />}
             {anchorLabels.end}
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.layoutGap.tooltip}>
@@ -168,6 +172,8 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutGap}>
         <AutoDimensionEditor
+          modelId={modelId}
+          field="layoutGap"
           auto={editable.autoLayoutGap}
           autoIcon={editable.layoutOrientation === 'horizontal' ? PiArrowsHorizontal : PiArrowsVertical}
           placeholder={t.project.editors.sections.components.layout.layoutGap.placeholder}

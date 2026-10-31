@@ -21,6 +21,7 @@ import { useCallback, useMemo, useState, type FC, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
 
 import typia from 'typia'
+import { useEditorContext } from '../../contexts/EditorContext'
 import {
   SubProjectSelectionContext,
   type SubProjectSelectionContextValue,
@@ -59,6 +60,8 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
   selection,
   setExpandedNodeIds,
 }) => {
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const canDragAndDrop = hasDragAndDrop && !isComputing
   const [activeDragData, setActiveDragData] = useState<TreeDragData | undefined>()
   const { dropTargetRectRef, handleDropAnimation } = useTreeDropAnimation()
   const sensors = useSensors(useSensor(PointerSensor))
@@ -106,6 +109,9 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
 
   const handleDragStart = useCallback(
     ({ active }: DragStartEvent): void => {
+      if (!canDragAndDrop) {
+        return
+      }
       dropTargetRectRef.current = undefined
 
       const dragData: unknown = active.data.current
@@ -114,7 +120,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
         setActiveDragData(dragData)
       }
     },
-    [dropTargetRectRef],
+    [canDragAndDrop, dropTargetRectRef],
   )
 
   const handleDragCancel = useCallback(
@@ -129,7 +135,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
     ({ active, over }: DragEndEvent): void => {
       setActiveDragData(undefined)
 
-      if (!isDefined(over) || !isDefined(operations)) {
+      if (!canDragAndDrop || !isDefined(over) || !isDefined(operations)) {
         return
       }
 
@@ -141,6 +147,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
       }
 
       dropTargetRectRef.current = { ...over.rect }
+      setEditingInputId(undefined)
 
       switch (dropData.kind) {
         case 'component-reorder': {
@@ -170,7 +177,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
         }
       }
     },
-    [dropTargetRectRef, operations],
+    [canDragAndDrop, dropTargetRectRef, operations, setEditingInputId],
   )
 
   return (

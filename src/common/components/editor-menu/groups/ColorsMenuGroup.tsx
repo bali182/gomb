@@ -31,6 +31,7 @@ export const ColorsMenuGroup: FC = () => {
     <Menu.ItemGroup>
       <Menu.ItemGroupLabel>{t.project.menus.project.colors.name}</Menu.ItemGroupLabel>
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={leatherColorValues}
         field="leatherColor"
         label={t.project.menus.project.colors.leatherColor}
@@ -38,6 +39,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.leatherColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={strokeColorValues}
         field="strokeColor"
         label={t.project.menus.project.colors.strokeColor}
@@ -45,6 +47,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.strokeColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={pocketItemColorValues}
         field="pocketItemColor"
         label={t.project.menus.project.colors.pocketItemColor}
@@ -52,6 +55,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.pocketItemColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={stitchHoleColorValues}
         field="stitchHoleColor"
         label={t.project.menus.project.colors.stitchHoleColor}
@@ -59,6 +63,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.stitchHoleColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={stitchLineColorValues}
         field="stitchLineColor"
         label={t.project.menus.project.colors.stitchLineColor}
@@ -66,6 +71,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.stitchLineColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={threadColorValues}
         field="threadColor"
         label={t.project.menus.project.colors.threadColor}
@@ -73,6 +79,7 @@ export const ColorsMenuGroup: FC = () => {
         value={project.colorSettings.threadColor}
       />
       <ColorPickerMenuItem
+        modelId={project.id}
         colors={selectionColorValues}
         field="selectionColor"
         label={t.project.menus.project.colors.selectionColor}

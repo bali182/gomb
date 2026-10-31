@@ -3,15 +3,14 @@ import { Fragment, type FC } from 'react'
 import { VIEWBOX_PADDING } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { PocketClusterSchema } from '../../schemas/components'
-import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams, DrawAreaPocketItemStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 
 type PocketStitchMaskProps = {
   id: string
@@ -22,9 +21,9 @@ type PocketStitchMaskProps = {
 export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, nestingLevel }) => {
   const { pocketItemStyles, componentStyles } = useDrawAreaContext()
   const pocketCluster = useComponent<PocketClusterSchema>(componentId)
-  const computedPocketCluster = useComputedComponent<ComputedPocketClusterSchema>(componentId)
   const { subProject, computedSubProject } = useSubProject()
   const source = accessors.subProject(subProject)
+  const computedAccessor = accessors.computedSubProject(computedSubProject)
   const x = computedSubProject.viewBox.x.minus(VIEWBOX_PADDING).toNumber()
   const y = computedSubProject.viewBox.y.minus(VIEWBOX_PADDING).toNumber()
   const width = computedSubProject.viewBox.width.plus(VIEWBOX_PADDING * 2).toNumber()
@@ -33,7 +32,9 @@ export const PocketStitchMask: FC<PocketStitchMaskProps> = ({ id, componentId, n
   const pocketFill = componentStyles.getMaskFillColor(componentStyleParams)
   const pocketStroke = componentStyles.getMaskStrokeColor(componentStyleParams)
   const pocketStrokeWidth = componentStyles.getBorderThickness(componentStyleParams)
-  const pockets = computedPocketCluster.children
+  const pockets = computedAccessor.component
+    .children(componentId)
+    .filter((pocket) => narrowers.is.computedFrontPocket(pocket) || narrowers.is.computedTPocket(pocket))
 
   return (
     <mask

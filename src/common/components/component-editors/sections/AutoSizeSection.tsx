@@ -11,6 +11,7 @@ import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type AutoSizeSectionProps<T> = {
+  modelId: string
   component: T
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
@@ -18,6 +19,7 @@ type AutoSizeSectionProps<T> = {
 }
 
 export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSchema>({
+  modelId,
   component,
   editable,
   issues,
@@ -90,6 +92,8 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.width}>
         <AutoDimensionEditor
+          modelId={modelId}
+          field="width"
           auto={editable.autoWidth}
           autoIcon={PiArrowsHorizontal}
           placeholder={t.project.editors.sections.components.autoSize.width.placeholder}
@@ -108,6 +112,8 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.height}>
         <AutoDimensionEditor
+          modelId={modelId}
+          field="height"
           auto={editable.autoHeight}
           autoIcon={PiArrowsVertical}
           placeholder={t.project.editors.sections.components.autoSize.height.placeholder}

@@ -1,12 +1,13 @@
-import { Box, HStack, IconButton, Input, InputGroup, Separator, type InputProps, type Tokens } from '@chakra-ui/react'
+import { Box, HStack, Input, InputGroup, Separator, type InputProps, type Tokens } from '@chakra-ui/react'
 import { useEffect, useRef, type FC, type ReactNode } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import { useNumberEditorStepContext } from '../../contexts/NumberEditorStepContext'
 import type { IssueSchema, SeveritySchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
+import { EditorIconButton } from './EditorIconButton'
 
-type NumberInputProps = {
+export type NumberInputProps = {
   value: string | undefined
   issue: IssueSchema | undefined
   placeholder?: string
@@ -14,6 +15,7 @@ type NumberInputProps = {
   onReset?: () => void
   isResetEnabled?: boolean
   disabled?: boolean
+  readOnly?: boolean
   startAddon?: ReactNode
   unit?: string
   step?: number
@@ -29,6 +31,7 @@ const issueBorderColors: Partial<Record<SeveritySchema, Tokens['colors']>> = {
 // TODO do we need this as a component?
 export const NumberInput: FC<NumberInputProps> = ({
   disabled,
+  readOnly,
   issue,
   onChange,
   onReset,
@@ -58,6 +61,7 @@ export const NumberInput: FC<NumberInputProps> = ({
     <Input
       borderColor={issueBorderColor}
       disabled={disabled}
+      readOnly={readOnly}
       focusRingColor={issueBorderColor}
       inputMode="decimal"
       onChange={(event) => onChange(event.currentTarget.value)}
@@ -72,17 +76,18 @@ export const NumberInput: FC<NumberInputProps> = ({
   )
 
   const resetButtonEl = isDefined(onReset) ? (
-    <IconButton
+    <EditorIconButton
       alignSelf="stretch"
       borderRadius="0"
       disabled={!isResetEnabled}
+      readOnly={readOnly}
       height="auto"
       onClick={onReset}
       size="xs"
       variant="plain"
     >
       <PiArrowCounterClockwise />
-    </IconButton>
+    </EditorIconButton>
   ) : undefined
 
   const unitEl = isDefined(unit) ? <Box px="1.5">{unit}</Box> : undefined

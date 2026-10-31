@@ -1,8 +1,13 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
+import { POSITION_EPSILON } from '../constants/layout'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
-import type { PocketOrientationSchema, SlantedPocketOpeningSchema } from '../schemas/components'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  PocketOrientationSchema,
+  SlantedPocketOpeningSchema,
+} from '../schemas/components'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getExportElementsForComponent } from './exports/getExportElements'
@@ -14,6 +19,40 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
   'physical pocket components: %s',
   (orientation) => {
     const vertical = orientation === 'up' || orientation === 'down'
+    it('keeps material when optical opening insets request the entire width', () => {
+      const opening: OpticalIllusionPocketOpeningSchema = {
+        type: 'optical-illusion',
+        direction: 'start',
+        startInset: 100,
+        endInset: 0,
+        leadingRadius: 0,
+        trailingRadius: 0,
+      }
+      const front = d.frontPocket({ id: 'front', opening })
+      const cluster = d.pocketCluster({ id: 'cluster', orientation, children: [front.id], pocketStep: 80 })
+      const root = d.rootPanel({
+        id: 'root',
+        width: vertical ? 100 : 80,
+        height: vertical ? 80 : 100,
+        children: [cluster.id],
+      })
+      const source = d.subProject({ id: 'sub', root, components: [cluster, front] })
+      const snapshot = structuredClone(source)
+      const computed = accessors.computedSubProject(getComputedSubProject(source, defaultStitchingSettings))
+      const path = computed.component.frontPocket(front.id).path
+      const area = getClosedPathLoops(path)
+        .flat()
+        .reduce(
+          (sum, segment) => sum.plus(segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y))),
+          new BigNumber(0),
+        )
+        .abs()
+        .dividedBy(2)
+      expect(area.gt(0)).toBe(true)
+      expect(computed.component.pocketCluster(cluster.id).path.commands.length).toBeGreaterThan(0)
+      expect(source).toEqual(snapshot)
+    })
+
     const fixture = (offset = 15) => {
       const opening: SlantedPocketOpeningSchema = { type: 'slanted', offset, side: 'end' }
       const pockets = [
@@ -48,10 +87,12 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const { cluster, subProject } = fixture()
       const before = structuredClone(subProject)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-      const result = accessors.computedSubProject(computed).component.pocketCluster(cluster.id)
-      expect(result.children.map((pocket) => pocket.componentId)).toEqual(['t1', 't2', 'front'])
-      result.children.forEach((pocket, index) => {
-        expect(computed.components[pocket.componentId]).toBe(pocket)
+      const accessor = accessors.computedSubProject(computed)
+      const result = accessor.component.pocketCluster(cluster.id)
+      expect(result.children).toEqual(['t1', 't2', 'front'])
+      result.children.forEach((pocketId, index) => {
+        const pocket = accessor.component.pocket(pocketId)
+        expect(pocket.componentId).toBe(pocketId)
         expect((vertical ? pocket.boundingRect.height : pocket.boundingRect.width).toNumber()).toBe(90)
         expect((vertical ? pocket.boundingRect.y : pocket.boundingRect.x).toNumber()).toBe(
           (orientation === 'up' || orientation === 'left' ? index : 2 - index) * 20,
@@ -132,8 +173,10 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         type: 'front-pocket',
         opening: { type: 'slanted', offset: { max: { value: new BigNumber(90) } } },
       })
-      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
-      for (const pocket of cluster.children) {
+      const accessor = accessors.computedSubProject(computed)
+      const cluster = accessor.component.pocketCluster('cluster')
+      for (const pocketId of cluster.children) {
+        const pocket = accessor.component.pocket(pocketId)
         for (const segment of getPathSegments(pocket.path)) {
           expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
         }
@@ -155,36 +198,77 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         pocketStep: { max: { value: new BigNumber(130).dividedBy(3) } },
       })
       expect(computed.limits.components.t1).toMatchObject({
-        tPocketTabWidth: { max: { value: new BigNumber(50) } },
-        tPocketTaper: { max: { value: new BigNumber(50) } },
+        tPocketTabWidth: { max: { value: new BigNumber(50).minus(POSITION_EPSILON) } },
+        tPocketTaper: { max: { value: new BigNumber(50).minus(POSITION_EPSILON) } },
       })
     })
-    it('inherits closed corner radii through the cluster and front pocket', () => {
-      const { subProject } = fixture(1)
-      const root = accessors.subProject(subProject).component.rootPanel()
-      const changed = {
-        ...subProject,
-        components: {
-          ...subProject.components,
-          root: { ...root, topLeftRadius: 12, topRightRadius: 12, bottomLeftRadius: 12, bottomRightRadius: 12 },
-        },
-      }
-      const computed = getComputedSubProject(changed, defaultStitchingSettings)
-      const cluster = accessors.computedSubProject(computed).component.pocketCluster('cluster')
-      const front = accessors.computedSubProject(computed).component.frontPocket('front')
-      const expected =
-        orientation === 'up'
-          ? ['bottomLeft', 'bottomRight']
-          : orientation === 'down'
-            ? ['topLeft', 'topRight']
-            : orientation === 'left'
-              ? ['topRight', 'bottomRight']
-              : ['topLeft', 'bottomLeft']
-      for (const [corner, radius] of Object.entries(front.cornerRadius)) {
-        expect(radius.toNumber()).toBe(expected.includes(corner) ? 12 : 0)
-      }
-      expect(Object.values(cluster.cornerRadius).some((radius) => radius.toNumber() === 12)).toBe(true)
-    })
+    it.each([
+      { parentRadius: 12, clusterRadius: 0, frontRadius: 0, expectedCluster: 12, expectedFront: 12 },
+      { parentRadius: 12, clusterRadius: 20, frontRadius: 0, expectedCluster: 20, expectedFront: 20 },
+      { parentRadius: 12, clusterRadius: 20, frontRadius: 30, expectedCluster: 20, expectedFront: 30 },
+      { parentRadius: 0, clusterRadius: 20, frontRadius: 0, expectedCluster: 20, expectedFront: 20 },
+    ])(
+      'inherits radii from parent $parentRadius through cluster $clusterRadius to front $frontRadius',
+      ({ parentRadius, clusterRadius, frontRadius, expectedCluster, expectedFront }) => {
+        const { subProject } = fixture(1)
+        const source = accessors.subProject(subProject)
+        const root = source.component.rootPanel()
+        const changed = {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            root: {
+              ...root,
+              topLeftRadius: parentRadius,
+              topRightRadius: parentRadius,
+              bottomLeftRadius: parentRadius,
+              bottomRightRadius: parentRadius,
+            },
+            cluster: {
+              ...source.component.pocketCluster('cluster'),
+              topLeftRadius: clusterRadius,
+              topRightRadius: clusterRadius,
+              bottomLeftRadius: clusterRadius,
+              bottomRightRadius: clusterRadius,
+            },
+            front: {
+              ...source.component.frontPocket('front'),
+              topLeftRadius: frontRadius,
+              topRightRadius: frontRadius,
+              bottomLeftRadius: frontRadius,
+              bottomRightRadius: frontRadius,
+            },
+          },
+          stitchLines: subProject.stitchLines.map((stitchLine) =>
+            stitchLine.id === 'border' ? { ...stitchLine, stitchMargin: 2, autoCornerRadius: true } : stitchLine,
+          ),
+        }
+        const before = structuredClone(changed)
+        const computed = getComputedSubProject(changed, defaultStitchingSettings)
+        const accessor = accessors.computedSubProject(computed)
+        const cluster = accessor.component.pocketCluster('cluster')
+        const front = accessor.component.frontPocket('front')
+        const border = accessor.stitchLine.bounds('border')
+        const expected =
+          orientation === 'up'
+            ? ['bottomLeft', 'bottomRight']
+            : orientation === 'down'
+              ? ['topLeft', 'topRight']
+              : orientation === 'left'
+                ? ['topRight', 'bottomRight']
+                : ['topLeft', 'bottomLeft']
+        for (const [corner, radius] of Object.entries(front.cornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedFront : 0)
+        }
+        for (const [corner, radius] of Object.entries(cluster.cornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedCluster : 0)
+        }
+        for (const [corner, radius] of Object.entries(border.autoComputedCornerRadius)) {
+          expect(radius.toNumber()).toBe(expected.includes(corner) ? expectedCluster - 2 : 0)
+        }
+        expect(changed).toEqual(before)
+      },
+    )
     it('lays out normal children inside the front pocket', () => {
       const { subProject } = fixture()
       const front = accessors.subProject(subProject).component.frontPocket('front')
@@ -196,7 +280,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const computed = getComputedSubProject(changed, defaultStitchingSettings)
       const parent = accessors.computedSubProject(computed).component.frontPocket('front')
       expect(computed.components.child.boundingRect).toEqual(parent.boundingRect)
-      expect(parent.children.map((child) => child.componentId)).toEqual(['child'])
+      expect(parent.children).toEqual(['child'])
     })
   },
 )

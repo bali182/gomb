@@ -3,7 +3,6 @@ import {
   Combobox,
   ComboboxRootProps,
   HStack,
-  IconButton,
   InputGroup,
   Portal,
   Separator,
@@ -13,10 +12,12 @@ import {
 import { useCallback, useMemo, type FC } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
+import { EditorIconButton } from '../common/EditorIconButton'
 
 const stitchHoleDistanceValues = ['2.7', '3.0', '3.38', '3.85', '4.0', '4.5', '5.0', '5.5', '6.0']
 
@@ -27,6 +28,8 @@ const stitchHoleDistanceCollection = createListCollection<string>({
 })
 
 type StitchHoleDistanceEditorProps = {
+  modelId: string
+  field: string
   value: string
   issue: IssueSchema | undefined
   onChange: (value: string) => void
@@ -36,6 +39,8 @@ type StitchHoleDistanceEditorProps = {
 }
 
 export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
+  modelId,
+  field,
   isResetEnabled,
   issue,
   onChange,
@@ -43,6 +48,9 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
   value,
   size = 'xs',
 }) => {
+  const { isComputing, editingInputId, setEditingInputId } = useEditorContext()
+  const inputId = `${modelId}:${field}`
+  const readOnly = isComputing && editingInputId !== inputId
   const { t } = useTranslation()
   const isCompact = size === '2xs'
   const isInvalid = isDefined(issue) && issue.severity === 'error'
@@ -58,9 +66,13 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
       if (details.reason !== 'input-change') {
         return
       }
+      if (readOnly) {
+        return
+      }
+      setEditingInputId(inputId)
       onChange(details.inputValue)
     },
-    [onChange],
+    [onChange, readOnly, setEditingInputId, inputId],
   )
 
   const handleValueChange = useCallback(
@@ -69,27 +81,36 @@ export const StitchHoleDistanceEditor: FC<StitchHoleDistanceEditorProps> = ({
       if (!isDefined(nextValue)) {
         return
       }
+      if (readOnly) {
+        return
+      }
+      setEditingInputId(inputId)
       onChange(nextValue)
     },
-    [onChange],
+    [onChange, readOnly, setEditingInputId, inputId],
   )
 
   const resetButtonEl = isDefined(onReset) ? (
-    <IconButton
+    <EditorIconButton
       alignSelf="stretch"
       borderRadius="0"
       disabled={!isResetEnabled}
+      readOnly={readOnly}
       height="auto"
-      onClick={onReset}
+      onClick={() => {
+        setEditingInputId(inputId)
+        onReset?.()
+      }}
       size={size}
       variant="plain"
     >
       <PiArrowCounterClockwise />
-    </IconButton>
+    </EditorIconButton>
   ) : undefined
 
   return (
     <Combobox.Root
+      readOnly={readOnly}
       allowCustomValue
       collection={stitchHoleDistanceCollection}
       inputValue={value}

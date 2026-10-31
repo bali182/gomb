@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
-import { ZERO_CORNER_RADIUS } from '../../constants/layout'
+import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type {
   FrontPocketSchema,
   PocketOrientationSchema,
@@ -8,10 +8,12 @@ import type {
   TPocketSchema,
 } from '../../schemas/components'
 import { d } from '../../testData'
+import { narrowers } from '../../utils/narrowers'
 import { calculatePocketClusterGeometry } from '../calculatePocketClusterGeometry'
 import { getAdjustedPocketOpening } from '../getAdjustedPocketOpening'
 import { getPathSegmentIntersections } from '../pathSegmentIntersections'
 import { getPathSegments } from '../pathSegments'
+import type { LinePathSegment } from '../pathSegmentTypes'
 import { createPocketCalculator } from '../pockets/createPocketCalculator'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 
@@ -87,6 +89,45 @@ describe('getRecessedPocketOpeningLimits', () => {
       bottomRightRadius: 30,
     })
     expect(limits.depth?.max?.value.toNumber()).toBeCloseTo(60 + Math.sqrt(700), 7)
+  })
+  it('leaves material between an unrounded recess and the T-pocket shoulder', () => {
+    const { opening, source, cluster, computed, limits } = createFixture(
+      { outerInset: 10, innerOffset: 15, depth: 40, innerRadius: 0, outerRadius: 0 },
+      { tPocketTabWidth: 20, tPocketTaper: 20 },
+    )
+    const path = createPocketCalculator(
+      source,
+      cluster,
+      getAdjustedPocketOpening(opening, limits),
+      computed.boundingRect,
+      computed.cornerRadius,
+    ).getPocketOpeningPath()
+    const shoulder: LinePathSegment = {
+      type: 'line',
+      start: { x: new BigNumber(0), y: new BigNumber(10) },
+      end: { x: new BigNumber(100), y: new BigNumber(10) },
+    }
+    const hits = getPathSegments(path).flatMap((segment) => getPathSegmentIntersections(segment, shoulder))
+    const left = hits.filter((hit) => hit.point.x.lt(50))
+    expect(left).toHaveLength(1)
+    const clearance = left[0].point.x.minus(20)
+    expect(clearance.gt(0)).toBe(true)
+    expect(clearance.toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
+  })
+
+  it('leaves material between the recess bottom and the tapered side', () => {
+    const { opening, limits } = createFixture(
+      { outerInset: 20, innerOffset: 25, depth: 60, innerRadius: 0, outerRadius: 0 },
+      { tPocketTabWidth: 10, tPocketTaper: 40 },
+    )
+    const adjusted = getAdjustedPocketOpening(opening, limits)
+    if (!narrowers.is.recessedPocketOpening(adjusted)) {
+      throw new Error('Expected a recessed opening')
+    }
+    const sideX = new BigNumber(adjusted.depth).minus(10).times(30).dividedBy(70).plus(10)
+    const clearance = new BigNumber(25).minus(sideX)
+    expect(clearance.gt(0)).toBe(true)
+    expect(clearance.toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
   })
   it.each([0, 5, 30, 100])('keeps the R15 inner circle with outer radius %s', (outerRadius) => {
     const { opening, limits } = createFixture({ outerRadius })

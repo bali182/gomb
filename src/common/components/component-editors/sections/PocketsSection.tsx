@@ -1,12 +1,13 @@
 import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PiCaretDown, PiCaretLeft, PiCaretRight, PiCaretUp } from 'react-icons/pi'
+import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { PocketClusterSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketsSectionProps = {
@@ -49,7 +50,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         {t.project.editors.sections.components.pockets.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
-        <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
+        <EditorSegmentGroup onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="up">
             <SegmentGroup.ItemHiddenInput />
@@ -67,14 +68,16 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
             <SegmentGroup.ItemHiddenInput />
             <PiCaretLeft />
           </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        </EditorSegmentGroup>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketStep.tooltip}>
         {t.project.editors.sections.components.pockets.pocketStep.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.pocketStep}>
-        <NumberInput
+        <EditorNumberInput
+          modelId={editable.id}
+          field="pocketStep"
           issue={issues.pocketStep}
           onChange={handlePocketStepChange}
           unit="mm"

@@ -46,12 +46,19 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
       <Tabs.Content value={StitchLineEditorTabs.settings} pt={0}>
         <SectionGroup.Root>
           <StitchSidesAndCornersSection editable={editable} issues={issues} onChange={onChange} />
-          <CornerRadiusSection value={value} editable={editable} issues={issues} onChange={onChange} />
+          <CornerRadiusSection
+            modelId={editable.id}
+            value={value}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+          />
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value={StitchLineEditorTabs.overrides} pt={0}>
         <SectionGroup.Root>
           <StitchingSettingsSection<ComponentBoundsStitchLineSchema>
+            modelId={editable.id}
             editable={editable}
             issues={issues}
             onChange={onChange}

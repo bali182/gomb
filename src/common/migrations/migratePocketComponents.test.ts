@@ -70,6 +70,13 @@ describe('physical pocket component migration', () => {
     const components = result.subProjects?.[0]?.components ?? {}
     const cluster = components.cluster
     expect(cluster?.children).toHaveLength(3)
+    expect(cluster).toMatchObject({
+      individualRadii: false,
+      topLeftRadius: 0,
+      topRightRadius: 0,
+      bottomLeftRadius: 8,
+      bottomRightRadius: 0,
+    })
     const children = cluster?.children?.map((id) => components[id]) ?? []
     expect(children.map((child) => child?.type)).toEqual(['t-pocket', 't-pocket', 'front-pocket'])
     expect(children[0]).toMatchObject({
@@ -194,5 +201,48 @@ describe('physical pocket component migration', () => {
     expect(
       migrateProject({ ...base, version: '0.0.0' }, { t: EN }).subProjects?.[0]?.components?.cluster?.children,
     ).toEqual([])
+  })
+
+  it('defaults missing cluster radii without changing an existing front pocket radius', () => {
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
+    const {
+      individualRadii: _individualRadii,
+      topLeftRadius: _topLeftRadius,
+      topRightRadius: _topRightRadius,
+      bottomLeftRadius: _bottomLeftRadius,
+      bottomRightRadius: _bottomRightRadius,
+      ...withoutRadii
+    } = cluster
+    const base = d.project({
+      id: 'project',
+      subProjects: [
+        d.subProject({
+          id: 'sub',
+          root: d.rootPanel({ id: 'root', children: [cluster.id] }),
+          components: [cluster, d.frontPocket({ id: 'front', bottomLeftRadius: 18 })],
+        }),
+      ],
+    })
+    const input = {
+      ...base,
+      subProjects: base.subProjects.map((subProject) => ({
+        ...subProject,
+        components: { ...subProject.components, cluster: withoutRadii },
+      })),
+    }
+    const before = structuredClone(input)
+    const result = migrateProject(input, { t: EN })
+    const components = result.subProjects?.[0]?.components
+    expect(components?.cluster).toMatchObject({
+      individualRadii: false,
+      topLeftRadius: 0,
+      topRightRadius: 0,
+      bottomLeftRadius: 0,
+      bottomRightRadius: 0,
+    })
+    expect(components?.front).toMatchObject({ bottomLeftRadius: 18 })
+    expect(typia.is<ProjectSchema>(result)).toBe(true)
+    expect(migrateProject(result, { t: EN })).toEqual(result)
+    expect(input).toEqual(before)
   })
 })

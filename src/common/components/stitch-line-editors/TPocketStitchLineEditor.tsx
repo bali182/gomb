@@ -48,6 +48,7 @@ export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
       <Tabs.Content value={StitchLineEditorTabs.overrides} pt={0}>
         <SectionGroup.Root>
           <StitchingSettingsSection<TPocketStitchLineSchema>
+            modelId={editable.id}
             editable={editable}
             issues={issues}
             onChange={onChange}

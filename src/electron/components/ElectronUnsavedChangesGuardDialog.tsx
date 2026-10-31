@@ -1,4 +1,5 @@
 import { Button, Dialog, IconButton, Portal } from '@chakra-ui/react'
+import { useSetAtom } from 'jotai'
 import { useCallback, useEffect, useRef, useState, type FC } from 'react'
 import { PiX } from 'react-icons/pi'
 import { useBlocker, type BlockerFunction } from 'react-router'
@@ -9,11 +10,13 @@ import { portalRef } from '../../common/portalRef'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronAppRoutes } from '../electronAppRoutes'
 import { useElectronProject } from '../hooks/useElectronProject'
+import { electronProjectAtom } from '../state/electronProjectAtom'
 
 export const ElectronUnsavedChangesGuardDialog: FC = () => {
   const [isWindowCloseRequested, setWindowCloseRequested] = useState(false)
   const isClosing = useRef(false)
   const { electronProject, saveProject } = useElectronProject()
+  const setElectronProject = useSetAtom(electronProjectAtom)
   const { t } = useTranslation()
   const loadedElectronProject = Loadable.get(electronProject)
   const filePath = loadedElectronProject?.filePath
@@ -51,13 +54,15 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
     }
 
     if (blocker.state === 'blocked') {
+      setElectronProject(Loadable.uninitialized())
       blocker.proceed()
     }
-  }, [blocker, isWindowCloseRequested])
+  }, [blocker, isWindowCloseRequested, setElectronProject])
 
   const saveAndProceed = useCallback(async (): Promise<void> => {
-    await saveProject()
-    proceed()
+    if (await saveProject()) {
+      proceed()
+    }
   }, [proceed, saveProject])
 
   const handleOpenChange = useCallback(

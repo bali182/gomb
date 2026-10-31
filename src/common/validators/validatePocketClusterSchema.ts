@@ -42,6 +42,14 @@ export const validatePocketClusterSchema = (
   const rightStretchResult = validateNumber(input.rightStretch, currentValue.rightStretch, context)
   const bottomStretchResult = validateNumber(input.bottomStretch, currentValue.bottomStretch, context)
   const leftStretchResult = validateNumber(input.leftStretch, currentValue.leftStretch, context)
+  const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context, { min: 0 })
+  const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context, { min: 0 })
+  const bottomLeftRadiusResult = validateNumber(input.bottomLeftRadius, currentValue.bottomLeftRadius, context, {
+    min: 0,
+  })
+  const bottomRightRadiusResult = validateNumber(input.bottomRightRadius, currentValue.bottomRightRadius, context, {
+    min: 0,
+  })
 
   const issues: IssuesSchema<PocketClusterSchema> = {
     name: nameResult.issues,
@@ -55,6 +63,10 @@ export const validatePocketClusterSchema = (
     rightStretch: rightStretchResult.issues,
     bottomStretch: bottomStretchResult.issues,
     leftStretch: leftStretchResult.issues,
+    topLeftRadius: topLeftRadiusResult.issues,
+    topRightRadius: topRightRadiusResult.issues,
+    bottomLeftRadius: bottomLeftRadiusResult.issues,
+    bottomRightRadius: bottomRightRadiusResult.issues,
   }
   const committedValue: PocketClusterSchema = {
     ...currentValue,
@@ -69,6 +81,11 @@ export const validatePocketClusterSchema = (
     rightStretch: rightStretchResult.committedValue,
     bottomStretch: bottomStretchResult.committedValue,
     leftStretch: leftStretchResult.committedValue,
+    topLeftRadius: topLeftRadiusResult.committedValue,
+    topRightRadius: topRightRadiusResult.committedValue,
+    bottomLeftRadius: bottomLeftRadiusResult.committedValue,
+    bottomRightRadius: bottomRightRadiusResult.committedValue,
+    individualRadii: input.individualRadii,
     autoWidth: input.autoWidth,
     autoHeight: input.autoHeight,
     individualStretch: input.individualStretch,
@@ -84,7 +101,11 @@ export const validatePocketClusterSchema = (
     !topStretchResult.isValid ||
     !rightStretchResult.isValid ||
     !bottomStretchResult.isValid ||
-    !leftStretchResult.isValid
+    !leftStretchResult.isValid ||
+    !topLeftRadiusResult.isValid ||
+    !topRightRadiusResult.isValid ||
+    !bottomLeftRadiusResult.isValid ||
+    !bottomRightRadiusResult.isValid
   ) {
     return createInvalidValidationResult(issues, committedValue)
   }

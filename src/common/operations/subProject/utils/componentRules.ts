@@ -27,8 +27,21 @@ export const canAddChild = (
   }
 }
 
-export const canDeleteComponent = (component: ComponentSchema): boolean =>
-  !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
+export const canDeleteComponent = (component: ComponentSchema, subProject: SubProjectSchema): boolean => {
+  if (narrowers.is.rootPanel(component)) {
+    return false
+  }
+  if (narrowers.is.frontPocket(component)) {
+    const parent = accessors.subProject(subProject).optional.component.parent(component.id)
+    return (
+      isDefined(parent) &&
+      narrowers.is.pocketCluster(parent) &&
+      parent.children.length === 1 &&
+      parent.children[0] === component.id
+    )
+  }
+  return true
+}
 
 export const canCloneComponent = (component: ComponentSchema): boolean =>
   !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
@@ -68,7 +81,13 @@ export const canMoveComponent = (subProject: SubProjectSchema, params: MoveCompo
   const accessor = accessors.subProject(subProject)
   const component = accessor.optional.component.byId(params.componentId)
   const parent = accessor.optional.component.byId(params.targetParentId)
-  if (!isDefined(component) || !isDefined(parent) || !canDeleteComponent(component) || component.id === parent.id) {
+  if (
+    !isDefined(component) ||
+    !isDefined(parent) ||
+    narrowers.is.rootPanel(component) ||
+    narrowers.is.frontPocket(component) ||
+    component.id === parent.id
+  ) {
     return false
   }
   if (

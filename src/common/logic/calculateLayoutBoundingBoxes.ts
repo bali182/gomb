@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import { ZERO } from '../constants/layout'
+import { POSITION_EPSILON, ZERO } from '../constants/layout'
 import type { AnchorSchema } from '../schemas/common'
 import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
@@ -141,18 +141,21 @@ const calculateMainAxisSizes = (
       continue
     }
 
-    sizesById[child.id] = clamp(getMainAxisSize(child, parent), ZERO)
+    sizesById[child.id] = clamp(getMainAxisSize(child, parent), POSITION_EPSILON)
   }
 
   const fixedComponentSpace = Object.values(sizesById).reduce((sum, componentSize) => sum.plus(componentSize), ZERO)
   const autoChildren = children.filter((child) => isMainAxisAuto(child, parent))
   const availableAutoSpace = BigNumber.maximum(parentSpace.minus(gapSpace).minus(fixedComponentSpace), ZERO)
   const autoComponentSize =
-    autoChildren.length === 0 ? ZERO : availableAutoSpace.dividedBy(new BigNumber(autoChildren.length))
+    autoChildren.length === 0
+      ? ZERO
+      : BigNumber.maximum(availableAutoSpace.dividedBy(new BigNumber(autoChildren.length)), POSITION_EPSILON)
   let remainingAutoSpace = availableAutoSpace
 
   for (const [index, child] of autoChildren.entries()) {
-    const size = index === autoChildren.length - 1 ? remainingAutoSpace : autoComponentSize
+    const size =
+      index === autoChildren.length - 1 ? BigNumber.maximum(remainingAutoSpace, POSITION_EPSILON) : autoComponentSize
 
     sizesById[child.id] = size
     remainingAutoSpace = remainingAutoSpace.minus(size)
@@ -169,10 +172,10 @@ const calculateCrossAxisSize = (
   const parentSpace = parent.layoutOrientation === 'horizontal' ? parentBoundingBox.height : parentBoundingBox.width
 
   if (isCrossAxisAuto(child, parent)) {
-    return parentSpace
+    return BigNumber.maximum(parentSpace, POSITION_EPSILON)
   }
 
-  return clamp(getCrossAxisSize(child, parent), ZERO)
+  return clamp(getCrossAxisSize(child, parent), POSITION_EPSILON)
 }
 
 const calculateHorizontalCrossAxisPosition = (

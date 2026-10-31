@@ -20,11 +20,35 @@ type PanelEditorProps = {
 export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues, onChange, parent }) => {
   return (
     <SectionGroup.Root>
-      <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <AutoSizeSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
       <AnchorSection<PanelSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <StretchSection component={component} editable={editable} issues={issues} onChange={onChange} />
-      <CornerRadiusSection<PanelSchema> value={component} editable={editable} issues={issues} onChange={onChange} />
-      <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <StretchSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
+      <CornerRadiusSection<PanelSchema>
+        modelId={editable.id}
+        value={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
+      <LayoutSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
     </SectionGroup.Root>
   )
 }

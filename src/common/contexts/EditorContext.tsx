@@ -1,9 +1,14 @@
 import { createContext, SetStateAction, useContext } from 'react'
+import { Loadable } from '../loadable'
+import type { LoadableSchema } from '../schemas/loadable'
 import { ProjectSchema } from '../schemas/project'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
+import { noop } from '../utils/noop'
 import { notImplemented } from '../utils/notImplemented'
 
 export type EditorContextOperations = {
+  retryComputation: () => void
+  setEditingInputId: (inputId: string | undefined) => void
   /** Overwrites the data model of the selected project. */
   setProject: (project: SetStateAction<ProjectSchema>) => void
   /** Overwrites the data model of the selected sub-project. */
@@ -18,14 +23,18 @@ export type EditorContextOperations = {
 }
 
 export type EditorContextValues = {
+  editingInputId: string | undefined
+  isComputing: boolean
   project?: ProjectSchema
   subProject?: SubProjectSchema
-  computedSubProject?: ComputedSubProjectSchema
+  computedSubProject: LoadableSchema<ComputedSubProjectSchema>
 }
 
 export type EditorContextType = EditorContextOperations & EditorContextValues
 
 export const EditorContextDefaultOperations: EditorContextOperations = {
+  retryComputation: notImplemented(),
+  setEditingInputId: noop,
   setProject: notImplemented(),
   setSubProject: notImplemented(),
   navigateToProjects: notImplemented(),
@@ -34,9 +43,11 @@ export const EditorContextDefaultOperations: EditorContextOperations = {
 }
 
 export const EditorContextDefaultValues: EditorContextValues = {
+  editingInputId: undefined,
+  isComputing: false,
   project: undefined,
   subProject: undefined,
-  computedSubProject: undefined,
+  computedSubProject: Loadable.uninitialized(),
 }
 
 export const EditorContext = createContext<EditorContextType>({

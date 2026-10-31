@@ -34,6 +34,34 @@ const createFixture = (): ValidationFixture => {
 }
 
 describe('validatePocketClusterSchema dimensions and stretch', () => {
+  describe.each(['topLeftRadius', 'topRightRadius', 'bottomLeftRadius', 'bottomRightRadius'] as const)(
+    '%s',
+    (field) => {
+      it('keeps non-negative requested radii and the individual-radii setting', () => {
+        const { component, input, context } = createFixture()
+        const result = validatePocketClusterSchema(
+          { ...input, [field]: '1000', individualRadii: true },
+          component,
+          context,
+        )
+        expect(result.isValid).toBe(true)
+        expect(result.committedValue[field]).toBe(1000)
+        expect(result.committedValue.individualRadii).toBe(true)
+      })
+
+      it.each(['-1', '', 'abc'])('rejects invalid radius %s while preserving valid edits', (value) => {
+        const { component, input, context } = createFixture()
+        const snapshot = structuredClone(component)
+        const result = validatePocketClusterSchema({ ...input, [field]: value, width: '80' }, component, context)
+        expect(result.isValid).toBe(false)
+        expect(result.issues[field]?.severity).toBe('error')
+        expect(result.committedValue[field]).toBe(component[field])
+        expect(result.committedValue.width).toBe(80)
+        expect(component).toEqual(snapshot)
+      })
+    },
+  )
+
   describe.each(['width', 'height'] as const)('%s', (field) => {
     it.each([true, false])('accepts zero with auto sizing %s', (auto) => {
       const { component, input, context } = createFixture()

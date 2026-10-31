@@ -129,9 +129,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         deleteRoot()
         break
       }
-      case 't-pocket':
-      case 'panel':
-      case 'pocket-cluster': {
+      default: {
         deleteComponent(component.id)
         onDelete(component.id)
         break
@@ -192,7 +190,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const stitchLineTypes = getComponentStitchLineTypes(component)
 
   const canClone = narrowers.is.rootPanel(component) || canCloneComponent(component)
-  const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component)
+  const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component, subProject)
   const handleOpenPocketCopy = useCallback((): void => {
     setPocketCopyOpen(true)
   }, [])
@@ -263,8 +261,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {canClone && <CloneComponentMenuItem onSelect={handleClone} />}
-                {canDelete && <DeleteComponentMenuItem onSelect={handleDelete} />}
+                <CloneComponentMenuItem disabled={!canClone} onSelect={handleClone} />
+                <DeleteComponentMenuItem disabled={!canDelete} onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>

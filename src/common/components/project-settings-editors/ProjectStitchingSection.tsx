@@ -25,6 +25,8 @@ export const ProjectStitchingSection: FC<ProjectStitchingSectionProps> = ({ edit
   return (
     <SectionGroup.Root>
       <StitchingSettingsSection<StitchLineCommonConfigSchema>
+        modelId={editable.id}
+        fieldPrefix="stitchingSettings."
         editable={editable.stitchingSettings}
         issues={issues.stitchingSettings ?? noIssues<StitchLineCommonConfigSchema>()}
         onChange={handleStitchingSettingsChange}

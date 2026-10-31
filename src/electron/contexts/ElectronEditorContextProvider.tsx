@@ -1,110 +1,131 @@
-import { useAtom } from 'jotai'
-import { useCallback, useEffect, useMemo, type FC, type PropsWithChildren, type SetStateAction } from 'react'
+import { useAtom, useSetAtom, useStore } from 'jotai'
+import { useCallback, useEffect, useMemo, useState, type FC, type PropsWithChildren, type SetStateAction } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { accessors } from '../../common/utils/accessors'
 
-import { getPatchedProject } from '../../common/component-patches/getPatchedProject'
-import { getPatchedSubProject } from '../../common/component-patches/getPatchedSubProject'
-import { needsFullProjectPatch } from '../../common/component-patches/needsFullProjectPatch'
 import { EditorContext, type EditorContextType } from '../../common/contexts/EditorContext'
 import { useClearSubProjectHistory } from '../../common/hooks/useClearSubProjectHistory'
+import { useEditorComputation } from '../../common/hooks/useEditorComputation'
 import { Loadable } from '../../common/loadable'
-import { getComputedSubProject } from '../../common/logic/getComputedSubProject'
+import type { EditorComputationControlSchema } from '../../common/schemas/editorComputation'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../common/schemas/subProject'
+import { accessors } from '../../common/utils/accessors'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronAppRoutes } from '../electronAppRoutes'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
 import type { ElectronSubProjectRouteParamsSchema } from '../schemas/electronRouteParams'
+import { electronComputationAtom } from '../state/electronComputationAtom'
 import { electronProjectAtom } from '../state/electronProjectAtom'
 
 export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { subProjectId } = useParams<ElectronSubProjectRouteParamsSchema>()
   const navigate = useNavigate()
+  const store = useStore()
   const [electronProject, setElectronProject] = useAtom(electronProjectAtom)
+  const setComputationControl = useSetAtom(electronComputationAtom)
   const { clearSubProjectHistory } = useClearSubProjectHistory()
   const loadedElectronProject = Loadable.get(electronProject)
-  const project = loadedElectronProject?.project
+  const storedProject = loadedElectronProject?.project
+  const {
+    state,
+    retryComputation,
+    setProject: computeProject,
+    setSubProject: computeSubProject,
+    getRequestId,
+    waitUntilIdle,
+  } = useEditorComputation({ project: storedProject, subProjectId })
+  const [editingInputId, setEditingInputId] = useState<string | undefined>(undefined)
+  const isComputing = state.result.type === 'loading' || state.result.type === 'loading-with-value'
+
+  useEffect(() => {
+    if (state.result.type === 'loaded') {
+      setEditingInputId(undefined)
+    }
+  }, [state.result])
+
+  useEffect(() => {
+    setEditingInputId(undefined)
+  }, [storedProject?.id, subProjectId])
+  const result = Loadable.get(state.result)
+  const project = result?.project ?? storedProject
+  const computedSubProject = useMemo<LoadableSchema<ComputedSubProjectSchema>>(
+    () => Loadable.map(state.result, (result) => result.computedSubProject),
+    [state.result],
+  )
+  const subProject = useMemo<SubProjectSchema | undefined>(
+    () =>
+      isDefined(project) && isDefined(subProjectId)
+        ? accessors.project(project).optional.subProject(subProjectId)
+        : undefined,
+    [project, subProjectId],
+  )
+  const hasSelectedSubProject = isDefined(subProject)
 
   useEffect(() => {
     clearSubProjectHistory()
   }, [clearSubProjectHistory, project?.id])
 
-  const subProject = useMemo<SubProjectSchema | undefined>(() => {
-    if (!isDefined(project) || !isDefined(subProjectId)) {
-      return undefined
+  useEffect(() => {
+    if (state.result.type !== 'loaded') {
+      return
     }
+    const updatedProject = state.result.data.project
+    setElectronProject(
+      (current): LoadableSchema<ElectronProjectSchema> =>
+        Loadable.map(current, (loaded) => {
+          if (loaded.project.id !== updatedProject.id) {
+            return loaded
+          }
+          return { ...loaded, project: updatedProject }
+        }),
+    )
+  }, [setElectronProject, state.result])
 
-    return accessors.project(project).optional.subProject(subProjectId)
-  }, [project, subProjectId])
-
-  const computedSubProject = useMemo<ComputedSubProjectSchema | undefined>(() => {
-    if (!isDefined(project) || !isDefined(subProject)) {
-      return undefined
+  useEffect(() => {
+    if (!hasSelectedSubProject) {
+      return
     }
-
-    return getComputedSubProject(subProject, project.stitchingSettings)
-  }, [project, subProject])
+    const control: EditorComputationControlSchema = { getRequestId, waitUntilIdle }
+    setComputationControl(control)
+    return () => {
+      setComputationControl((current) => (current === control ? undefined : current))
+    }
+  }, [getRequestId, hasSelectedSubProject, project?.id, setComputationControl, subProjectId, waitUntilIdle])
 
   const setProject = useCallback(
     (update: SetStateAction<ProjectSchema>): void => {
-      setElectronProject(
-        (currentElectronProject: LoadableSchema<ElectronProjectSchema>): LoadableSchema<ElectronProjectSchema> =>
-          Loadable.map(currentElectronProject, (loadedProject: ElectronProjectSchema): ElectronProjectSchema => {
-            const updatedProject = typeof update === 'function' ? update(loadedProject.project) : update
-            const projectToStore = needsFullProjectPatch(loadedProject.project, updatedProject)
-              ? getPatchedProject(updatedProject)
-              : updatedProject
-
-            return {
-              filePath: loadedProject.filePath,
-              isDirty: true,
-              project: projectToStore,
-            }
-          }),
+      const current = Loadable.get(store.get(electronProjectAtom))
+      if (!isDefined(current)) {
+        throw new Error('No project is open')
+      }
+      const updatedProject = typeof update === 'function' ? update(current.project) : update
+      if (isDefined(subProjectId) && isDefined(accessors.project(updatedProject).optional.subProject(subProjectId))) {
+        if (!current.isDirty) {
+          setElectronProject((value) => Loadable.map(value, (loaded) => ({ ...loaded, isDirty: true })))
+        }
+        computeProject(updatedProject)
+        return
+      }
+      setElectronProject((value) =>
+        Loadable.map(value, (loaded) => ({
+          ...loaded,
+          isDirty: true,
+          project: updatedProject,
+        })),
       )
     },
-    [setElectronProject],
+    [computeProject, setElectronProject, store, subProjectId],
   )
 
   const setSubProject = useCallback(
     (update: SetStateAction<SubProjectSchema>): void => {
-      if (!isDefined(subProjectId)) {
-        throw new Error('Cannot update the selected sub-project because no sub-project is selected.')
+      if (Loadable.get(store.get(electronProjectAtom))?.isDirty !== true) {
+        setElectronProject((value) => Loadable.map(value, (loaded) => ({ ...loaded, isDirty: true })))
       }
-
-      setProject((currentProject: ProjectSchema): ProjectSchema => {
-        const subProjectIndex = currentProject.subProjects.findIndex((candidate) => candidate.id === subProjectId)
-
-        if (subProjectIndex === -1) {
-          throw new Error(
-            `The sub-project selected by the route ("${subProjectId}") does not exist in the current project.`,
-          )
-        }
-
-        const currentSubProject = currentProject.subProjects[subProjectIndex]
-        const updatedSubProject = typeof update === 'function' ? update(currentSubProject) : update
-
-        if (updatedSubProject.id !== subProjectId) {
-          throw new Error('The selected sub-project ID cannot be changed')
-        }
-
-        const computedUpdatedSubProject = getComputedSubProject(updatedSubProject, currentProject.stitchingSettings)
-        const patchedSubProject = getPatchedSubProject(updatedSubProject, computedUpdatedSubProject)
-        const subProjects: SubProjectSchema[] = [
-          ...currentProject.subProjects.slice(0, subProjectIndex),
-          patchedSubProject,
-          ...currentProject.subProjects.slice(subProjectIndex + 1),
-        ]
-
-        return {
-          ...currentProject,
-          subProjects,
-        }
-      })
+      computeSubProject(update)
     },
-    [setProject, subProjectId],
+    [computeSubProject, setElectronProject, store],
   )
 
   const navigateToProjects = useCallback((): void => {
@@ -112,27 +133,31 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
   }, [navigate])
 
   const navigateToProject = useCallback((): void => {
-    if (!isDefined(loadedElectronProject)) {
-      throw new Error('Cannot navigate to the current project because no project file is open.')
+    const current = Loadable.get(store.get(electronProjectAtom))
+    if (!isDefined(current)) {
+      throw new Error('No project is open')
     }
-
-    navigate(electronAppRoutes.project(loadedElectronProject.filePath))
-  }, [loadedElectronProject, navigate])
+    navigate(electronAppRoutes.project(current.filePath))
+  }, [navigate, store])
 
   const navigateToSubProject = useCallback(
     (targetSubProjectId: string): void => {
-      if (!isDefined(loadedElectronProject)) {
-        throw new Error('Cannot navigate to a sub-project because no project file is open.')
+      const current = Loadable.get(store.get(electronProjectAtom))
+      if (!isDefined(current)) {
+        throw new Error('No project is open')
       }
-
-      navigate(electronAppRoutes.subProject(loadedElectronProject.filePath, targetSubProjectId))
+      navigate(electronAppRoutes.subProject(current.filePath, targetSubProjectId))
     },
-    [loadedElectronProject, navigate],
+    [navigate, store],
   )
 
   const value = useMemo<EditorContextType>(
     () => ({
+      retryComputation,
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,
@@ -142,7 +167,11 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
       subProject,
     }),
     [
+      retryComputation,
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,

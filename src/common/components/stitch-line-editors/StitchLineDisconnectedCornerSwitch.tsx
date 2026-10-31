@@ -1,6 +1,7 @@
 import { Box, Switch, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiLineSegment, PiProhibit, PiScissors } from 'react-icons/pi'
+import { EditorSwitch } from '../common/EditorSwitch'
 
 import type { StitchCornerSchema } from '../../schemas/stitching'
 import { Tooltip } from '../common/Tooltip'
@@ -41,7 +42,7 @@ export const StitchLineDisconnectedCornerSwitch: FC<StitchLineDisconnectedCorner
         p="3"
         position="absolute"
       >
-        <Switch.Root
+        <EditorSwitch
           checked={checked}
           disabled={disabled}
           onCheckedChange={(details) => onCheckedChange(details.checked)}
@@ -55,7 +56,7 @@ export const StitchLineDisconnectedCornerSwitch: FC<StitchLineDisconnectedCorner
               </Switch.ThumbIndicator>
             </Switch.Thumb>
           </Switch.Control>
-        </Switch.Root>
+        </EditorSwitch>
       </Box>
     </Tooltip>
   )

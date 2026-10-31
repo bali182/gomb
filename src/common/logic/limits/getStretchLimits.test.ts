@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
+import { POSITION_EPSILON } from '../../constants/layout'
 import type { HasStretchValuesSchema } from '../../schemas/common'
 import type { RectSchema } from '../../schemas/geometry'
 import { getStretchLimits } from './getStretchLimits'
@@ -10,108 +11,153 @@ type StretchPairTestCase = {
   size: number
   first: number
   second: number
-  firstMinimum: number
-  secondMinimum: number
+  firstMinimum: BigNumber
+  secondMinimum: BigNumber
 }
+
+const epsilon: BigNumber = new BigNumber(POSITION_EPSILON)
+const halfEpsilon: BigNumber = epsilon.dividedBy(2)
 
 describe.each([
   ['leftStretch', 'rightStretch'],
   ['topStretch', 'bottomStretch'],
 ] as const)('getStretchLimits: %s / %s', (firstField, secondField) => {
   it.each<StretchPairTestCase>([
-    { name: 'no stretch', size: 100, first: 0, second: 0, firstMinimum: -100, secondMinimum: -100 },
+    {
+      name: 'no stretch',
+      size: 100,
+      first: 0,
+      second: 0,
+      firstMinimum: epsilon.minus(100),
+      secondMinimum: epsilon.minus(100),
+    },
     {
       name: 'one edge using the whole size',
       size: 100,
       first: -100,
       second: 0,
-      firstMinimum: -100,
-      secondMinimum: -50,
+      firstMinimum: epsilon.minus(100),
+      secondMinimum: halfEpsilon.minus(50),
     },
     {
       name: 'one edge exceeding the whole size',
       size: 100,
       first: -120,
       second: 0,
-      firstMinimum: -100,
-      secondMinimum: -50,
+      firstMinimum: epsilon.minus(100),
+      secondMinimum: halfEpsilon.minus(50),
     },
     {
       name: 'both edges fitting below halfway',
       size: 100,
       first: -40,
       second: -40,
-      firstMinimum: -60,
-      secondMinimum: -60,
+      firstMinimum: epsilon.minus(60),
+      secondMinimum: epsilon.minus(60),
     },
-    { name: 'exactly halfway', size: 100, first: -50, second: -50, firstMinimum: -50, secondMinimum: -50 },
+    {
+      name: 'exactly halfway',
+      size: 100,
+      first: -50,
+      second: -50,
+      firstMinimum: halfEpsilon.minus(50),
+      secondMinimum: halfEpsilon.minus(50),
+    },
     {
       name: 'asymmetric compression exactly fitting',
       size: 100,
       first: -80,
       second: -20,
-      firstMinimum: -80,
-      secondMinimum: -50,
+      firstMinimum: epsilon.minus(80),
+      secondMinimum: halfEpsilon.minus(50),
     },
     {
       name: 'smaller edge displacing the larger edge',
       size: 100,
       first: -80,
       second: -30,
-      firstMinimum: -70,
-      secondMinimum: -50,
+      firstMinimum: epsilon.minus(70),
+      secondMinimum: halfEpsilon.minus(50),
     },
-    { name: 'both edges past halfway', size: 100, first: -80, second: -80, firstMinimum: -50, secondMinimum: -50 },
+    {
+      name: 'both edges past halfway',
+      size: 100,
+      first: -80,
+      second: -80,
+      firstMinimum: halfEpsilon.minus(50),
+      secondMinimum: halfEpsilon.minus(50),
+    },
     {
       name: 'extension providing additional space',
       size: 100,
       first: 30,
       second: -120,
-      firstMinimum: -50,
-      secondMinimum: -130,
+      firstMinimum: halfEpsilon.minus(50),
+      secondMinimum: epsilon.minus(130),
     },
     {
       name: 'compression exceeding additional space',
       size: 100,
       first: 30,
       second: -140,
-      firstMinimum: -50,
-      secondMinimum: -130,
+      firstMinimum: halfEpsilon.minus(50),
+      secondMinimum: epsilon.minus(130),
     },
-    { name: 'both edges extending', size: 100, first: 20, second: 30, firstMinimum: -130, secondMinimum: -120 },
+    {
+      name: 'both edges extending',
+      size: 100,
+      first: 20,
+      second: 30,
+      firstMinimum: epsilon.minus(130),
+      secondMinimum: epsilon.minus(120),
+    },
     {
       name: 'fractional asymmetric compression',
       size: 1.5,
       first: -0.9,
       second: -0.6,
-      firstMinimum: -0.9,
-      secondMinimum: -0.75,
+      firstMinimum: epsilon.minus(0.9),
+      secondMinimum: halfEpsilon.minus(0.75),
     },
     {
       name: 'compression below one millimeter',
       size: 0.5,
       first: -0.4,
       second: -0.2,
-      firstMinimum: -0.3,
-      secondMinimum: -0.25,
+      firstMinimum: epsilon.minus(0.3),
+      secondMinimum: halfEpsilon.minus(0.25),
     },
     {
       name: 'very small component',
       size: 0.00001,
       first: -0.000009,
       second: -0.000002,
-      firstMinimum: -0.000008,
-      secondMinimum: -0.000005,
+      firstMinimum: epsilon.minus(0.000008),
+      secondMinimum: halfEpsilon.minus(0.000005),
     },
-    { name: 'zero size without stretch', size: 0, first: 0, second: 0, firstMinimum: 0, secondMinimum: 0 },
-    { name: 'zero size with compression', size: 0, first: -10, second: -20, firstMinimum: 0, secondMinimum: 0 },
+    {
+      name: 'zero size without stretch',
+      size: 0,
+      first: 0,
+      second: 0,
+      firstMinimum: halfEpsilon,
+      secondMinimum: halfEpsilon,
+    },
+    {
+      name: 'zero size with compression',
+      size: 0,
+      first: -10,
+      second: -20,
+      firstMinimum: halfEpsilon,
+      secondMinimum: halfEpsilon,
+    },
     {
       name: 'zero size extended before compression',
       size: 0,
       first: 20,
       second: -10,
-      firstMinimum: 0,
-      secondMinimum: -20,
+      firstMinimum: halfEpsilon,
+      secondMinimum: epsilon.minus(20),
     },
   ])('$name', ({ size, first, second, firstMinimum, secondMinimum }) => {
     const horizontal = firstField === 'leftStretch'
@@ -141,7 +187,7 @@ describe.each([
     }
     const otherFirstField = horizontal ? 'topStretch' : 'leftStretch'
     const otherSecondField = horizontal ? 'bottomStretch' : 'rightStretch'
-    const otherMinimum = horizontal ? -43 : -37
+    const otherMinimum = epsilon.minus(horizontal ? 43 : 37)
     expect(limits[otherFirstField].min?.value.eq(otherMinimum)).toBe(true)
     expect(limits[otherSecondField].min?.value.eq(otherMinimum)).toBe(true)
     expect(stretch).toEqual(snapshot)

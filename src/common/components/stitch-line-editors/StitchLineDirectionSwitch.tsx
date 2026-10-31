@@ -2,6 +2,7 @@ import { Box, Switch } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiArrowDown, PiArrowLeft, PiArrowRight, PiArrowUp, PiProhibit } from 'react-icons/pi'
+import { EditorSwitch } from '../common/EditorSwitch'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
 import { Tooltip } from '../common/Tooltip'
@@ -72,7 +73,7 @@ export const StitchLineDirectionSwitch: FC<StitchLineDirectionSwitchProps> = ({
         justifySelf="center"
         opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
       >
-        <Switch.Root checked={checked} disabled={disabled} onCheckedChange={handleCheckedChange} size="md">
+        <EditorSwitch checked={checked} disabled={disabled} onCheckedChange={handleCheckedChange} size="md">
           <Switch.HiddenInput />
           <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
             <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
@@ -81,7 +82,7 @@ export const StitchLineDirectionSwitch: FC<StitchLineDirectionSwitchProps> = ({
               </Switch.ThumbIndicator>
             </Switch.Thumb>
           </Switch.Control>
-        </Switch.Root>
+        </EditorSwitch>
       </Box>
     </Tooltip>
   )

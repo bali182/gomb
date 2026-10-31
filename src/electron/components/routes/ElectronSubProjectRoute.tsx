@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { useEffect, type FC } from 'react'
 import { useParams } from 'react-router'
+import { SubProjectComputationState } from '../../../common/components/SubProjectComputationState'
 import { floatingEditorTabsAtom } from '../../../common/state/floatingEditorTabsAtom'
 
 import { DrawAreaContext } from '../../../common/contexts/DrawAreaContext'
@@ -28,11 +29,11 @@ export const ElectronSubProjectRoute: FC = () => {
     markOpened(filePath, subProjectId)
   }, [filePath, markOpened, project, subProjectExists, subProjectId])
 
-  if (!subProjectExists) {
-    return <ElectronEditorContent subProjectId={subProjectId} />
-  }
-
-  return <ExistingElectronSubProjectRoute subProjectId={subProjectId} />
+  return (
+    <SubProjectComputationState>
+      <ExistingElectronSubProjectRoute subProjectId={subProjectId} />
+    </SubProjectComputationState>
+  )
 }
 
 type ExistingElectronSubProjectRouteProps = {

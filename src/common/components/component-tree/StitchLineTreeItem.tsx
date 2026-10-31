@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { TreeItemVisual } from './TreeItemVisual'
 import type { TreeDragData } from './types/dragDataTypes'
@@ -26,6 +27,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
   renderMenu,
 }) => {
   const selection = useSubProjectSelectionContext()
+  const { isComputing } = useEditorContext()
   const { stitchLine } = node
   const isActiveStitchLine = activeDragData?.kind === 'stitch-line' && activeDragData.stitchLineId === stitchLine.id
   const isDisabledForActiveDrag = activeDragData !== undefined && !isActiveStitchLine
@@ -48,7 +50,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
       stitchLineId: stitchLine.id,
       stitchLineType: stitchLine.type,
     },
-    disabled: !hasDragAndDrop,
+    disabled: !hasDragAndDrop || isComputing,
     id: node.id,
   })
 
@@ -74,6 +76,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
               {...attributes}
               {...listeners}
               cursor={isDragging ? 'grabbing' : 'grab'}
+              disabled={isComputing}
               onClick={handleDragHandleClick}
               ref={setActivatorNodeRef}
               size="2xs"

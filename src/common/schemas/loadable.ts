@@ -21,7 +21,13 @@ export type LoadingFailedSchema = {
   error: unknown
 }
 
-export type LoadableWithValueSchema<T> = LoadingWithValueSchema<T> | LoadedSchema<T>
+export type LoadingFailedWithValueSchema<T> = {
+  type: 'failed-with-value'
+  data: T
+  error: unknown
+}
+
+export type LoadableWithValueSchema<T> = LoadingWithValueSchema<T> | LoadedSchema<T> | LoadingFailedWithValueSchema<T>
 
 export type LoadableSchema<T> =
   | UninitializedSchema
@@ -29,3 +35,4 @@ export type LoadableSchema<T> =
   | LoadedSchema<T>
   | LoadingWithValueSchema<T>
   | LoadingFailedSchema
+  | LoadingFailedWithValueSchema<T>

@@ -1,4 +1,4 @@
-import { HStack, IconButton, Tabs } from '@chakra-ui/react'
+import { HStack, Tabs } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 
 import { PiPlus, PiWalletDuotone } from 'react-icons/pi'
@@ -7,11 +7,12 @@ import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { accessors } from '../utils/accessors'
 import { ComponentActionsMenu } from './action-menus/ComponentActionsMenu'
+import { EditorIconButton } from './common/EditorIconButton'
 
 export const EditorSubProjectTabs: FC = () => {
   const { project } = useProject()
   const { createSubProject } = useProjectOperations()
-  const { navigateToSubProject, subProject } = useEditorContext()
+  const { navigateToSubProject, subProject, isComputing, setEditingInputId } = useEditorContext()
 
   const handleSubProjectClick = useCallback(
     (subProjectId: string): void => {
@@ -21,9 +22,10 @@ export const EditorSubProjectTabs: FC = () => {
   )
 
   const handleCreateSubProject = useCallback((): void => {
+    setEditingInputId(undefined)
     const subProject = createSubProject()
     navigateToSubProject(subProject.id)
-  }, [createSubProject, navigateToSubProject])
+  }, [createSubProject, navigateToSubProject, setEditingInputId])
 
   return (
     <Tabs.Root size="sm" value={subProject?.id} variant="subtle" width="100%">
@@ -46,9 +48,9 @@ export const EditorSubProjectTabs: FC = () => {
             </HStack>
           )
         })}
-        <IconButton size="xs" variant="ghost" ml="2" onClick={handleCreateSubProject}>
+        <EditorIconButton readOnly={isComputing} size="xs" variant="ghost" ml="2" onClick={handleCreateSubProject}>
           <PiPlus />
-        </IconButton>
+        </EditorIconButton>
       </Tabs.List>
     </Tabs.Root>
   )

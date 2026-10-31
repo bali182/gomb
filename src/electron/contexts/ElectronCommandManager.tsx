@@ -55,7 +55,8 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
         case 'open':
           return openProject()
         case 'save':
-          return saveProject()
+          await saveProject()
+          return
         case 'save-as':
           return saveProjectAs()
         case 'export':

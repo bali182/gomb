@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { narrowers } from '../../utils/narrowers'
 
-import { ZERO_CORNER_RADIUS } from '../../constants/layout'
+import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultOpticalIllusionPocketOpening } from '../../defaultStates'
 import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
@@ -31,14 +31,31 @@ const getLimits = (fields: Partial<OpticalIllusionPocketOpeningSchema> = {}) => 
 describe('getOpticalIllusionPocketOpeningLimits', () => {
   it.each([
     [70, 20, 70, 20],
-    [70, 40, 60, 40],
-    [40, 70, 40, 60],
-    [70, 80, 50, 50],
-    [0, 100, 0, 100],
+    [70, 40, 60 - POSITION_EPSILON, 40],
+    [40, 70, 40, 60 - POSITION_EPSILON],
+    [70, 80, 50 - POSITION_EPSILON / 2, 50 - POSITION_EPSILON / 2],
+    [0, 100, 0, 100 - POSITION_EPSILON],
   ])('shares width for inset pair %s / %s', (startInset, endInset, start, end) => {
     const { opening, adjusted } = getLimits({ startInset, endInset })
-    expect(adjusted).toMatchObject({ startInset: start, endInset: end })
+    if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) {
+      throw new Error('Wrong opening')
+    }
+    expect(adjusted.startInset).toBeCloseTo(start, 12)
+    expect(adjusted.endInset).toBeCloseTo(end, 12)
     expect(opening).toMatchObject({ startInset, endInset })
+  })
+
+  it.each([1, 2, 6])('reserves horizontal run for each of %s pockets', (count) => {
+    const opening = { ...defaultOpticalIllusionPocketOpening, startInset: 100, endInset: 100 }
+    const populated = { ...cluster, children: ['t', ...Array.from({ length: count - 1 }, (_, index) => `t-${index}`)] }
+    const limits = getOpticalIllusionPocketOpeningLimits(opening, pocket, populated, computed)
+    const adjusted = getAdjustedPocketOpening(opening, limits)
+    if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) {
+      throw new Error('Wrong opening')
+    }
+    const run = computed.boundingRect.width.minus(adjusted.startInset).minus(adjusted.endInset).dividedBy(count)
+    expect(run.gt(0)).toBe(true)
+    expect(run.toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
   })
 
   it('limits R at a 45-degree corner using its 2 mm leading section', () => {

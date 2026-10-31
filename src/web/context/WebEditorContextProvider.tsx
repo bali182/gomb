@@ -1,16 +1,15 @@
-import { useAtom } from 'jotai'
-import { useCallback, useEffect, useMemo, type FC, type PropsWithChildren, type SetStateAction } from 'react'
+import { useAtom, useStore } from 'jotai'
+import { useCallback, useEffect, useMemo, useState, type FC, type PropsWithChildren, type SetStateAction } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { accessors } from '../../common/utils/accessors'
 
-import { getPatchedProject } from '../../common/component-patches/getPatchedProject'
-import { getPatchedSubProject } from '../../common/component-patches/getPatchedSubProject'
-import { needsFullProjectPatch } from '../../common/component-patches/needsFullProjectPatch'
 import { EditorContext, type EditorContextType } from '../../common/contexts/EditorContext'
 import { useClearSubProjectHistory } from '../../common/hooks/useClearSubProjectHistory'
-import { getComputedSubProject } from '../../common/logic/getComputedSubProject'
+import { useEditorComputation } from '../../common/hooks/useEditorComputation'
+import { Loadable } from '../../common/loadable'
+import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../common/schemas/subProject'
+import { accessors } from '../../common/utils/accessors'
 import { isDefined } from '../../common/utils/isDefined'
 import type { WebSubProjectRouteParamsSchema } from '../schemas/webRouteParams'
 import { projectsAtom } from '../state/projectsAtom'
@@ -19,92 +18,83 @@ import { webAppRoutes } from '../webAppRoutes'
 export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { projectId, subProjectId } = useParams<WebSubProjectRouteParamsSchema>()
   const navigate = useNavigate()
+  const store = useStore()
   const [projects, setProjects] = useAtom(projectsAtom)
   const { clearSubProjectHistory } = useClearSubProjectHistory()
+  const storedProject = useMemo<ProjectSchema | undefined>(
+    () => projects.find((candidate) => candidate.id === projectId),
+    [projectId, projects],
+  )
+  const {
+    state,
+    retryComputation,
+    setProject: computeProject,
+    setSubProject: computeSubProject,
+  } = useEditorComputation({ project: storedProject, subProjectId })
+  const [editingInputId, setEditingInputId] = useState<string | undefined>(undefined)
+  const isComputing = state.result.type === 'loading' || state.result.type === 'loading-with-value'
 
-  const project = useMemo<ProjectSchema | undefined>(() => {
-    return projects.find((candidate) => candidate.id === projectId)
-  }, [projectId, projects])
+  useEffect(() => {
+    if (state.result.type === 'loaded') {
+      setEditingInputId(undefined)
+    }
+  }, [state.result])
+
+  useEffect(() => {
+    setEditingInputId(undefined)
+  }, [storedProject?.id, subProjectId])
+
+  const result = Loadable.get(state.result)
+  const project = result?.project ?? storedProject
+  const computedSubProject = useMemo<LoadableSchema<ComputedSubProjectSchema>>(
+    () => Loadable.map(state.result, (result) => result.computedSubProject),
+    [state.result],
+  )
 
   useEffect(() => {
     clearSubProjectHistory()
   }, [clearSubProjectHistory, project?.id])
 
-  const subProject = useMemo<SubProjectSchema | undefined>(() => {
-    return isDefined(project) && isDefined(subProjectId)
-      ? accessors.project(project).optional.subProject(subProjectId)
-      : undefined
-  }, [project, subProjectId])
-
-  const computedSubProject = useMemo<ComputedSubProjectSchema | undefined>(() => {
-    if (!isDefined(project) || !isDefined(subProject)) {
-      return undefined
+  useEffect(() => {
+    if (state.result.type !== 'loaded') {
+      return
     }
-    return getComputedSubProject(subProject, project.stitchingSettings)
-  }, [project, subProject])
+    const updatedProject = state.result.data.project
+    setProjects((currentProjects) =>
+      currentProjects.map((candidate) => (candidate.id === updatedProject.id ? updatedProject : candidate)),
+    )
+  }, [setProjects, state.result])
 
+  const subProject = useMemo<SubProjectSchema | undefined>(
+    () =>
+      isDefined(project) && isDefined(subProjectId)
+        ? accessors.project(project).optional.subProject(subProjectId)
+        : undefined,
+    [project, subProjectId],
+  )
   const setProject = useCallback(
     (update: SetStateAction<ProjectSchema>): void => {
-      const selectedProjectId = ensureSelectedProjectId(projectId)
-
-      setProjects((currentProjects) => {
-        const projectIndex = currentProjects.findIndex((candidate) => candidate.id === selectedProjectId)
-
-        if (projectIndex === -1) {
-          throw new Error(
-            `The project selected by the route ("${selectedProjectId}") does not exist in the current project list.`,
-          )
-        }
-
-        const currentProject = currentProjects[projectIndex]
-        const updatedProject = typeof update === 'function' ? update(currentProject) : update
-        const projectToStore = needsFullProjectPatch(currentProject, updatedProject)
-          ? getPatchedProject(updatedProject)
-          : updatedProject
-
-        return [...currentProjects.slice(0, projectIndex), projectToStore, ...currentProjects.slice(projectIndex + 1)]
-      })
+      const currentProject = store.get(projectsAtom).find((candidate) => candidate.id === projectId)
+      if (!isDefined(currentProject)) {
+        throw new Error('No project is selected')
+      }
+      const updatedProject = typeof update === 'function' ? update(currentProject) : update
+      if (isDefined(subProjectId) && isDefined(accessors.project(updatedProject).optional.subProject(subProjectId))) {
+        computeProject(updatedProject)
+        return
+      }
+      setProjects((currentProjects) =>
+        currentProjects.map((candidate) => (candidate.id === currentProject.id ? updatedProject : candidate)),
+      )
     },
-    [projectId, setProjects],
+    [computeProject, projectId, setProjects, store, subProjectId],
   )
 
   const setSubProject = useCallback(
     (update: SetStateAction<SubProjectSchema>): void => {
-      const selectedSubProjectId = ensureSelectedSubProjectId(subProjectId)
-
-      setProject((currentProject: ProjectSchema): ProjectSchema => {
-        const subProjectIndex = currentProject.subProjects.findIndex(
-          (candidate) => candidate.id === selectedSubProjectId,
-        )
-
-        if (subProjectIndex === -1) {
-          throw new Error(
-            `The sub-project selected by the route ("${selectedSubProjectId}") does not exist in the current project.`,
-          )
-        }
-
-        const currentSubProject = currentProject.subProjects[subProjectIndex]
-        const updatedSubProject = typeof update === 'function' ? update(currentSubProject) : update
-
-        if (updatedSubProject.id !== selectedSubProjectId) {
-          throw new Error('The selected subproject ID cannot be changed')
-        }
-
-        const computedUpdatedSubProject = getComputedSubProject(updatedSubProject, currentProject.stitchingSettings)
-        const patchedSubProject = getPatchedSubProject(updatedSubProject, computedUpdatedSubProject)
-        const subProjects: SubProjectSchema[] = [
-          ...currentProject.subProjects.slice(0, subProjectIndex),
-          patchedSubProject,
-          ...currentProject.subProjects.slice(subProjectIndex + 1),
-        ]
-
-        return {
-          ...currentProject,
-          subProjects,
-        }
-      })
+      computeSubProject(update)
     },
-    [setProject, subProjectId],
+    [computeSubProject],
   )
 
   const navigateToProjects = useCallback((): void => {
@@ -112,19 +102,29 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   }, [navigate])
 
   const navigateToProject = useCallback((): void => {
-    navigate(webAppRoutes.project(ensureSelectedProjectId(projectId)))
+    if (!isDefined(projectId)) {
+      throw new Error('No project is selected')
+    }
+    navigate(webAppRoutes.project(projectId))
   }, [navigate, projectId])
 
   const navigateToSubProject = useCallback(
     (targetSubProjectId: string): void => {
-      navigate(webAppRoutes.subProject(ensureSelectedProjectId(projectId), targetSubProjectId))
+      if (!isDefined(projectId)) {
+        throw new Error('No project is selected')
+      }
+      navigate(webAppRoutes.subProject(projectId, targetSubProjectId))
     },
     [navigate, projectId],
   )
 
   const value = useMemo<EditorContextType>(
     () => ({
+      retryComputation,
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,
@@ -134,7 +134,11 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
       subProject,
     }),
     [
+      retryComputation,
       computedSubProject,
+      editingInputId,
+      isComputing,
+      setEditingInputId,
       navigateToProject,
       navigateToProjects,
       navigateToSubProject,
@@ -146,18 +150,4 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
   )
 
   return <EditorContext.Provider value={value}>{children}</EditorContext.Provider>
-}
-
-const ensureSelectedProjectId = (projectId: string | undefined): string => {
-  if (!isDefined(projectId)) {
-    throw new Error('This operation can only run in the context of a valid project, derived from the route.')
-  }
-  return projectId
-}
-
-const ensureSelectedSubProjectId = (subProjectId: string | undefined): string => {
-  if (!isDefined(subProjectId)) {
-    throw new Error('This operation can only run in the context of a valid sub-project, derived from the route.')
-  }
-  return subProjectId
 }

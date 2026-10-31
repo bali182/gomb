@@ -1,15 +1,21 @@
-import { Box, Button, ColorSwatch, Grid, Menu, Text } from '@chakra-ui/react'
+import { Box, ColorSwatch, Grid, Text } from '@chakra-ui/react'
 import { ComponentType, FC, useCallback } from 'react'
 import { PiCheck } from 'react-icons/pi'
 import type { ColorValue } from '../../hooks/useColors'
+import { EditorButton } from './EditorButton'
+import { EditorMenuItem } from './EditorMenuItem'
 
 type SwatchItemProps = {
+  disabled?: boolean
+  readOnly?: boolean
   color: ColorValue
   isSelected: boolean
   onSelect: (color: ColorValue) => void
 }
 
 type SelectableColorSwatchProps = {
+  disabled?: boolean
+  readOnly?: boolean
   value: string | undefined
   colors: ColorValue[]
   onChange: (color: string | undefined) => void
@@ -17,7 +23,15 @@ type SelectableColorSwatchProps = {
   Item: ComponentType<SwatchItemProps>
 }
 
-export const SelectableColorSwatch = ({ value: v, canReset, colors, Item, onChange }: SelectableColorSwatchProps) => {
+export const SelectableColorSwatch = ({
+  value: v,
+  canReset,
+  colors,
+  Item,
+  onChange,
+  disabled,
+  readOnly,
+}: SelectableColorSwatchProps) => {
   const value = v?.toLowerCase()
 
   const onSelect = useCallback(
@@ -34,19 +48,30 @@ export const SelectableColorSwatch = ({ value: v, canReset, colors, Item, onChan
   return (
     <Grid gap="2" gridTemplateColumns="repeat(5, minmax(0, 1fr))">
       {colors.map((color) => {
-        return <Item key={color.key} color={color} isSelected={value === color.color} onSelect={onSelect} />
+        return (
+          <Item
+            disabled={disabled}
+            readOnly={readOnly}
+            key={color.key}
+            color={color}
+            isSelected={value === color.color}
+            onSelect={onSelect}
+          />
+        )
       })}
     </Grid>
   )
 }
 
-export const ButtonSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, onSelect }) => {
+export const ButtonSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, onSelect, disabled, readOnly }) => {
   const onClick = useCallback(() => {
     onSelect(color)
   }, [color, onSelect])
 
   return (
-    <Button
+    <EditorButton
+      disabled={disabled}
+      readOnly={readOnly}
       flexDirection="column"
       height="auto"
       key={color.key}
@@ -71,15 +96,17 @@ export const ButtonSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, onSel
         )}
       </ColorSwatch>
       <Text textStyle="2xs">{color.name}</Text>
-    </Button>
+    </EditorButton>
   )
 }
 
-export const MenuColorSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, onSelect }) => {
+export const MenuColorSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, onSelect, disabled, readOnly }) => {
   const handleSelect = useCallback(() => onSelect(color), [color, onSelect])
 
   return (
-    <Menu.Item
+    <EditorMenuItem
+      disabled={disabled}
+      readOnly={readOnly}
       closeOnSelect={false}
       flexDirection="column"
       height="auto"
@@ -103,6 +130,6 @@ export const MenuColorSwatchItem: FC<SwatchItemProps> = ({ color, isSelected, on
         )}
       </ColorSwatch>
       <Text textStyle="2xs">{color.name}</Text>
-    </Menu.Item>
+    </EditorMenuItem>
   )
 }

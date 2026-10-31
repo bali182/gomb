@@ -24,6 +24,7 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
       }
     }
     this.byId = this.byId.bind(this)
+    this.children = this.children.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -35,6 +36,10 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
 
   byId(id: string): ComponentSchema | undefined {
     return this.root.components[id]
+  }
+
+  children(id: string): ComponentSchema[] {
+    return (this.byId(id)?.children ?? []).map(this.byId).filter(isDefined)
   }
 
   pocket(id: string): PocketSchema | undefined {

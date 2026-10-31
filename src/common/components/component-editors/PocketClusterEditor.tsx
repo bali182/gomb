@@ -1,9 +1,11 @@
 import { Button } from '@chakra-ui/react'
-import type { FC } from 'react'
+import { useMemo, type FC } from 'react'
 import { PiWarningCircle } from 'react-icons/pi'
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
+import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
@@ -13,6 +15,7 @@ import { CommonEmptyState } from '../common/CommonEmptyState'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
+import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { PocketsSection } from './sections/PocketsSection'
 import { StretchSection } from './sections/StretchSection'
 
@@ -32,8 +35,21 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   parent,
 }) => {
   const { t } = useTranslation()
+  const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
   const { addComponent } = useSubProjectOperations()
+  const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
+    switch (component.orientation) {
+      case 'up':
+        return ['topLeftRadius', 'topRightRadius']
+      case 'down':
+        return ['bottomLeftRadius', 'bottomRightRadius']
+      case 'left':
+        return ['topLeftRadius', 'bottomLeftRadius']
+      case 'right':
+        return ['topRightRadius', 'bottomRightRadius']
+    }
+  }, [component.orientation])
   const accessor = accessors.subProject(subProject)
   const hasFront = component.children.some((id) => {
     return isDefined(accessor.optional.component.frontPocket(id))
@@ -45,7 +61,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         title={t.project.editors.emptyStates.missingFrontPocket.title}
         description={t.project.editors.emptyStates.missingFrontPocket.description}
         content={
-          <Button size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
+          <Button disabled={isComputing} size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
             {t.project.editors.emptyStates.missingFrontPocket.action}
           </Button>
         }
@@ -55,9 +71,29 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   return (
     <SectionGroup.Root>
       <PocketsSection component={component} editable={editable} issues={issues} onChange={onChange} />
-      <AutoSizeSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <AutoSizeSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
       <AnchorSection<PocketClusterSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <StretchSection component={component} editable={editable} issues={issues} onChange={onChange} />
+      <CornerRadiusSection
+        modelId={editable.id}
+        value={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+        disabledFields={disabledFields}
+      />
+      <StretchSection
+        modelId={editable.id}
+        component={component}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
     </SectionGroup.Root>
   )
 }

@@ -139,6 +139,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   BaseComponentSchema &
   HasChildrenSchema &
   HasOffAxisAnchor &
+  HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
   HasStretchSchema &
   PocketsSchema

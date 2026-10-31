@@ -52,14 +52,22 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
       <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
         <SectionGroup.Root>
           <CornerRadiusSection
+            modelId={editable.id}
             value={component}
             editable={editable}
             issues={issues}
             onChange={onChange}
             disabledFields={disabledFields}
           />
-          <LayoutSection component={component} editable={editable} issues={issues} onChange={onChange} />
+          <LayoutSection
+            modelId={editable.id}
+            component={component}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+          />
           <PocketOpeningSection
+            modelId={editable.id}
             cluster={parent}
             editable={editable.opening}
             issues={issues.opening}
@@ -69,7 +77,12 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
       </Tabs.Content>
       <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
         <SectionGroup.Root>
-          <ContentsSection<FrontPocketSchema> editable={editable} issues={issues} onChange={onChange} />
+          <ContentsSection<FrontPocketSchema>
+            modelId={editable.id}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+          />
         </SectionGroup.Root>
       </Tabs.Content>
     </Tabs.Root>

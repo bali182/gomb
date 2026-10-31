@@ -1,5 +1,5 @@
-import { Input } from '@chakra-ui/react'
 import { useCallback, type ChangeEvent, type FC } from 'react'
+import { EditorTextInput } from '../../../common/components/common/EditorTextInput'
 
 import { SectionGroup } from '../../../common/components/common/SectionGroup'
 import { useTranslation } from '../../../common/hooks/useTranslation'
@@ -32,7 +32,15 @@ export const WebProjectBasicSection: FC<WebProjectBasicSectionProps> = ({ editab
         {t.project.editors.sections.project.basic.name.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.name}>
-        <Input aria-invalid={hasNameError} autoFocus onChange={handleNameChange} size="xs" value={editable.name} />
+        <EditorTextInput
+          modelId={editable.id}
+          field="name"
+          aria-invalid={hasNameError}
+          autoFocus
+          onChange={handleNameChange}
+          size="xs"
+          value={editable.name}
+        />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )

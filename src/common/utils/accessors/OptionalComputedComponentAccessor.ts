@@ -17,14 +17,14 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
 
   constructor(private readonly root: ComputedSubProjectSchema) {
     for (const parent of Object.values(root.components)) {
-      for (const child of parent.children) {
-        const childId = child.componentId
+      for (const childId of parent.children) {
         if (!this.parents.has(childId)) {
           this.parents.set(childId, parent)
         }
       }
     }
     this.byId = this.byId.bind(this)
+    this.children = this.children.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -36,6 +36,10 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
 
   byId(id: string): ComputedComponentSchema | undefined {
     return this.root.components[id]
+  }
+
+  children(id: string): ComputedComponentSchema[] {
+    return (this.byId(id)?.children ?? []).map(this.byId).filter(isDefined)
   }
 
   pocket(id: string): ComputedPocketSchema | undefined {

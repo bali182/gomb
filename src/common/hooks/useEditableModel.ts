@@ -96,7 +96,7 @@ export const useEditableModel = <T, C extends EditableSchemaContextSchema>({
   const validationResult = validate(state.editableValue, isDefined(state.sentValue) ? state.sentValue : value, context)
 
   useLayoutEffect(() => {
-    if (value === state.projectValue) {
+    if (isEqual(value, state.projectValue)) {
       return
     }
 
@@ -112,7 +112,7 @@ export const useEditableModel = <T, C extends EditableSchemaContextSchema>({
 
   useEffect(() => {
     // Wait until the project value has been acknowledged or adopted before processing the draft.
-    if (value !== state.projectValue) {
+    if (!isEqual(value, state.projectValue)) {
       return
     }
 
@@ -152,6 +152,7 @@ export const useEditableModel = <T, C extends EditableSchemaContextSchema>({
     commitLocally,
     context,
     flushCommit,
+    isEqual,
     pendingUpdates,
     state,
     throttledCommit,

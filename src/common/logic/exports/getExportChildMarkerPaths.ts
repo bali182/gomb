@@ -1,4 +1,6 @@
 import type { ComputedComponentSchema } from '../../schemas/computed'
+import type { ComputedSubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { narrowers } from '../../utils/narrowers'
 
 import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
@@ -7,15 +9,16 @@ import type { LinePathSegment } from '../pathSegmentTypes'
 import { doLinePathSegmentsOverlap } from '../pathSegmentUtils'
 
 export const getExportChildMarkerPaths = (
-  children: ComputedComponentSchema[],
-  parentBoundingRect: RectSchema,
+  component: ComputedComponentSchema,
+  computedSubProject: ComputedSubProjectSchema,
 ): PathSchema[] => {
-  const parentMarkerLines = getBoundingRectMarkerLines(parentBoundingRect)
-  const boundingRects = children.flatMap((child) =>
-    narrowers.is.computedPocketCluster(child)
-      ? child.children.map((pocket) => pocket.boundingRect)
-      : [child.boundingRect],
-  )
+  const accessor = accessors.computedSubProject(computedSubProject)
+  const parentMarkerLines = getBoundingRectMarkerLines(component.boundingRect)
+  const boundingRects = accessor.component.children(component.componentId).flatMap((child) => {
+    return narrowers.is.computedPocketCluster(child)
+      ? accessor.component.children(child.componentId).map((pocket) => pocket.boundingRect)
+      : [child.boundingRect]
+  })
 
   const markerLines = boundingRects.flatMap((boundingRect) => {
     return getBoundingRectMarkerLines(boundingRect).filter(

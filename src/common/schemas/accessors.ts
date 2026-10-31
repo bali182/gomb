@@ -41,6 +41,7 @@ export type AccessorWithOptionalSchema<T> = T & {
 
 export type ComponentAccessorSchema = {
   byId(id: string): ComponentSchema
+  children(id: string): ComponentSchema[]
   pocket(id: string): PocketSchema
   rootPanel(id?: string): RootPanelSchema
   panel(id: string): PanelSchema
@@ -65,6 +66,7 @@ export type HoleAccessorSchema = {
 
 export type ComputedComponentAccessorSchema = {
   byId(id: string): ComputedComponentSchema
+  children(id: string): ComputedComponentSchema[]
   pocket(id: string): ComputedPocketSchema
   rootPanel(id?: string): ComputedRootPanelSchema
   panel(id: string): ComputedPanelSchema

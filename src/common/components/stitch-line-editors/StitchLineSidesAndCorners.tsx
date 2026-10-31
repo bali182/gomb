@@ -283,6 +283,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.leftStitchDirection.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('leftStartOffset')}
         field="leftStartOffset"
         issue={issues.leftStartOffset}
@@ -291,6 +292,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.leftStartOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('topStartOffset')}
         field="topStartOffset"
         issue={issues.topStartOffset}
@@ -299,6 +301,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topStartOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('topEndOffset')}
         field="topEndOffset"
         issue={issues.topEndOffset}
@@ -307,6 +310,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topEndOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('rightStartOffset')}
         field="rightStartOffset"
         issue={issues.rightStartOffset}
@@ -315,6 +319,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.rightStartOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('rightEndOffset')}
         field="rightEndOffset"
         issue={issues.rightEndOffset}
@@ -323,6 +328,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.rightEndOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('bottomStartOffset')}
         field="bottomStartOffset"
         issue={issues.bottomStartOffset}
@@ -331,6 +337,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomStartOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('bottomEndOffset')}
         field="bottomEndOffset"
         issue={issues.bottomEndOffset}
@@ -339,6 +346,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomEndOffset.tooltip}
       />
       <StitchLineOffsetInput
+        modelId={editable.id}
         disabled={isOffsetDisabled('leftEndOffset')}
         field="leftEndOffset"
         issue={issues.leftEndOffset}

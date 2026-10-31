@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import type { CommandSchema, CommandShortcutSchema, CommonCommandIdSchema } from '../../common/schemas/command'
+import { useEditorContext } from '../contexts/EditorContext'
 import { has } from '../utils/has'
 
 export type CommonCommandShortcutMap = Record<CommonCommandIdSchema, CommandShortcutSchema | undefined>
@@ -22,6 +23,7 @@ export const useCommonCommands = ({
   hasOpenSubProject,
   shortcuts,
 }: UseCommonCommandsParams): CommonCommandsMap => {
+  const { isComputing } = useEditorContext()
   const commands = useMemo<CommonCommandsMap>(() => {
     const getShortcut = createShortcutGetter(DEFAULT_SHORTCUTS, shortcuts)
     return {
@@ -34,12 +36,12 @@ export const useCommonCommands = ({
       // Edit - Undo/Redo
       undo: {
         id: 'undo',
-        disabled: !canUndo,
+        disabled: isComputing || !canUndo,
         shortcut: getShortcut('undo'),
       },
       redo: {
         id: 'redo',
-        disabled: !canRedo,
+        disabled: isComputing || !canRedo,
         shortcut: getShortcut('redo'),
       },
       // Edit - Change increments
@@ -124,7 +126,7 @@ export const useCommonCommands = ({
         shortcut: getShortcut('view-license'),
       },
     } satisfies CommonCommandsMap
-  }, [canRedo, canUndo, hasOpenProject, hasOpenSubProject, shortcuts])
+  }, [canRedo, canUndo, hasOpenProject, hasOpenSubProject, isComputing, shortcuts])
 
   return commands
 }

@@ -9,11 +9,12 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { has } from '../../../utils/has'
 import { getLabeledIssues } from '../../../utils/issueUtils'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
 
 type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
+  modelId: string
   disabledFields?: readonly (keyof HasCornerRadiusValuesSchema)[]
   value: T
   editable: EditableSchema<T>
@@ -22,6 +23,7 @@ type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoC
 }
 
 export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>>({
+  modelId,
   disabledFields,
   editable,
   issues,
@@ -134,7 +136,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={individualRadiusIssues}>
         <Grid gridTemplateColumns="repeat(2, minmax(0, 1fr))" minWidth="0" columnGap="3" rowGap="3">
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="topLeftRadius"
             issue={disabled ? undefined : issues.topLeftRadius}
             onChange={handleIndividualRadiusChange('topLeftRadius')}
             startAddon={<TbRadiusTopLeft />}
@@ -145,7 +149,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
             }
           />
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="topRightRadius"
             issue={disabled ? undefined : issues.topRightRadius}
             onChange={handleIndividualRadiusChange('topRightRadius')}
             startAddon={<TbRadiusTopRight />}
@@ -156,7 +162,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
             }
           />
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="bottomLeftRadius"
             issue={disabled ? undefined : issues.bottomLeftRadius}
             onChange={handleIndividualRadiusChange('bottomLeftRadius')}
             startAddon={<TbRadiusBottomLeft />}
@@ -167,7 +175,9 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
               disabled ? t.project.editors.sections.common.cornerRadius.autoCornerRadius.placeholder : undefined
             }
           />
-          <NumberInput
+          <EditorNumberInput
+            modelId={modelId}
+            field="bottomRightRadius"
             issue={disabled ? undefined : issues.bottomRightRadius}
             onChange={handleIndividualRadiusChange('bottomRightRadius')}
             startAddon={<TbRadiusBottomRight />}

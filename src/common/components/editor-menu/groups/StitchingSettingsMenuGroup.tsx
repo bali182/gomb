@@ -9,7 +9,7 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import type { BaseValidationContextSchema } from '../../../schemas/validation'
 import { optionalComparators } from '../../../utils/comparators'
 import { validateStitchLineCommonConfigSchema } from '../../../validators/validateStitchLineCommonConfigSchema'
-import { NumberInput } from '../../common/NumberInput'
+import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { StitchHoleDistanceEditor } from '../../stitch-line-editors/StitchHoleDistanceEditor'
 import { StitchingSettingsMenuItem } from '../items/StitchingSettingsMenuItem'
 
@@ -56,7 +56,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
       <Menu.ItemGroupLabel>{t.project.menus.project.stitching.name}</Menu.ItemGroupLabel>
       <Box onKeyDown={stopPropagation}>
         <StitchingSettingsMenuItem label={t.project.menus.project.stitching.margin}>
-          <NumberInput
+          <EditorNumberInput
+            modelId={project.id}
+            field="stitchingSettings.stitchMargin"
             issue={validationIssues.stitchMargin}
             onChange={handleStitchMarginChange}
             size="2xs"
@@ -65,7 +67,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
           />
         </StitchingSettingsMenuItem>
         <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeLength}>
-          <NumberInput
+          <EditorNumberInput
+            modelId={project.id}
+            field="stitchingSettings.stitchHoleLength"
             issue={validationIssues.stitchHoleLength}
             onChange={handleStitchHoleLengthChange}
             size="2xs"
@@ -75,6 +79,8 @@ export const StitchingSettingsMenuGroup: FC = () => {
         </StitchingSettingsMenuItem>
         <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeDistance}>
           <StitchHoleDistanceEditor
+            modelId={project.id}
+            field="stitchingSettings.stitchHoleDistance"
             isResetEnabled={false}
             issue={validationIssues.stitchHoleDistance}
             onChange={handleStitchHoleDistanceChange}
@@ -83,7 +89,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
           />
         </StitchingSettingsMenuItem>
         <StitchingSettingsMenuItem label={t.project.menus.project.stitching.holeThickness}>
-          <NumberInput
+          <EditorNumberInput
+            modelId={project.id}
+            field="stitchingSettings.stitchHoleThickness"
             issue={validationIssues.stitchHoleThickness}
             onChange={handleStitchHoleThicknessChange}
             size="2xs"
@@ -92,7 +100,9 @@ export const StitchingSettingsMenuGroup: FC = () => {
           />
         </StitchingSettingsMenuItem>
         <StitchingSettingsMenuItem label={t.project.menus.project.stitching.lineThickness}>
-          <NumberInput
+          <EditorNumberInput
+            modelId={project.id}
+            field="stitchingSettings.stitchLineThickness"
             issue={validationIssues.stitchLineThickness}
             onChange={handleStitchLineThicknessChange}
             size="2xs"

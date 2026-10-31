@@ -3,6 +3,7 @@ import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
 
+import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
 import { DropInsideIndicator } from './ComponentTreeDropIndicators'
@@ -29,6 +30,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
   renderMenu,
 }) => {
   const selection = useSubProjectSelectionContext()
+  const { isComputing } = useEditorContext()
   const { hole } = node
   const isActiveHole = activeDragData?.kind === 'hole' && activeDragData.holeId === hole.id
   const canAcceptStitchLine =
@@ -55,7 +57,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
       kind: 'hole',
       node,
     },
-    disabled: !hasDragAndDrop,
+    disabled: !hasDragAndDrop || isComputing,
     id: node.id,
   })
 
@@ -88,6 +90,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
       {...attributes}
       {...listeners}
       cursor={isDragging ? 'grabbing' : 'grab'}
+      disabled={isComputing}
       onClick={handleDragHandleClick}
       ref={setActivatorNodeRef}
       size="2xs"

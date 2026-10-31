@@ -4,7 +4,7 @@ import type { IconType } from 'react-icons'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiProhibit } from 'react-icons/pi'
 
 import type { IssueSchema } from '../../schemas/issues'
-import { NumberInput } from '../common/NumberInput'
+import { EditorNumberInput } from '../common/EditorNumberInput'
 import { Tooltip } from '../common/Tooltip'
 import { HIDDEN_INPUT_OPACITY } from './colors'
 
@@ -19,6 +19,7 @@ export type StitchLineOffsetField =
   | 'leftEndOffset'
 
 type StitchLineOffsetInputProps = {
+  modelId: string
   disabled: boolean
   field: StitchLineOffsetField
   issue: IssueSchema | undefined
@@ -82,6 +83,7 @@ const OFFSET_INPUT_CONFIGURATIONS: Record<StitchLineOffsetField, StitchLineOffse
 }
 
 export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({
+  modelId,
   disabled,
   field,
   issue,
@@ -95,7 +97,9 @@ export const StitchLineOffsetInput: FC<StitchLineOffsetInputProps> = ({
   return (
     <Tooltip content={tooltip}>
       <Box alignSelf={configuration.alignSelf} gridArea={configuration.gridArea} role="group" width="20">
-        <NumberInput
+        <EditorNumberInput
+          modelId={modelId}
+          field={field}
           disabled={disabled}
           issue={issue}
           opacity={disabled ? HIDDEN_INPUT_OPACITY : undefined}
