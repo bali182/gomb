@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import { ZERO } from '../../constants/layout'
+import { POSITION_EPSILON, ZERO } from '../../constants/layout'
 import type { OpticalIllusionPocketOpeningSchema, PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type {
@@ -20,13 +20,14 @@ export const getOpticalIllusionPocketOpeningLimits = (
   const width = vertical ? computed.boundingRect.width : computed.boundingRect.height
   const depth = vertical ? computed.boundingRect.height : computed.boundingRect.width
 
-  const startInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.endInset), width)
-  const endInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.startInset), width)
+  const pocketCount = cluster.children.length
+  const insetWidth = BigNumber.maximum(width.minus(new BigNumber(POSITION_EPSILON).times(pocketCount)), 0)
+  const startInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.endInset), insetWidth)
+  const endInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.startInset), insetWidth)
   const adjustedStartInset = clamp(opening.startInset, 0, startInsetMaximum)
   const adjustedEndInset = clamp(opening.endInset, 0, endInsetMaximum)
 
   const openingHeight = BigNumber.minimum(cluster.pocketStep, depth)
-  const pocketCount = cluster.children.length
   const pocketIndex = cluster.children.indexOf(pocket.id)
   const slantedWidth =
     pocketCount === 0 ? ZERO : width.minus(adjustedStartInset).minus(adjustedEndInset).dividedBy(pocketCount)

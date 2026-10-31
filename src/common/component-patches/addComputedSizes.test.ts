@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { narrowers } from '../utils/narrowers'
 
+import { POSITION_EPSILON } from '../constants/layout'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { d } from '../testData'
@@ -32,7 +33,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
   })
 
   it.each(['horizontal', 'vertical'] as const)(
-    'stores zero auto dimensions and zero auto gap in %s layouts',
+    'stores minimum positive auto dimensions and zero auto gap in %s layouts',
     (layoutOrientation) => {
       const root = d.rootPanel({
         id: 'root',
@@ -51,14 +52,16 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
       const patched = addComputedSizes(subProject, computed)
 
       expect(patched.components[child.id]).toMatchObject(
-        layoutOrientation === 'horizontal' ? { width: 0, height: 100 } : { width: 100, height: 0 },
+        layoutOrientation === 'horizontal'
+          ? { width: POSITION_EPSILON, height: 100 }
+          : { width: 100, height: POSITION_EPSILON },
       )
       expect(accessors.subProject(patched).component.rootPanel().layoutGap).toBe(0)
       expect(subProject).toEqual(snapshot)
     },
   )
 
-  it('retains zero layout dimensions when auto sizing is switched to fixed', () => {
+  it('retains minimum positive layout dimensions when auto sizing is switched to fixed', () => {
     const root = d.rootPanel({
       id: 'root',
       children: ['fixed', 'container'],
@@ -86,9 +89,9 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
     const fixedChild = { ...stored, autoWidth: false, autoHeight: false }
     const updated = { ...patched, components: { ...patched.components, [child.id]: fixedChild } }
     const computed = getComputedSubProject(updated, defaultStitchingSettings)
-    expect(fixedChild).toMatchObject({ width: 0, height: 0 })
-    expect(computed.components[child.id].boundingRect.width.toNumber()).toBe(0)
-    expect(computed.components[child.id].boundingRect.height.toNumber()).toBe(0)
+    expect(fixedChild).toMatchObject({ width: POSITION_EPSILON, height: POSITION_EPSILON })
+    expect(computed.components[child.id].boundingRect.width.toNumber()).toBe(POSITION_EPSILON)
+    expect(computed.components[child.id].boundingRect.height.toNumber()).toBe(POSITION_EPSILON)
   })
 
   it('keeps fixed sizes even when stretch changes the computed bounds', () => {

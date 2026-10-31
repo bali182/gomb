@@ -8,6 +8,7 @@ self.addEventListener('message', (event: MessageEvent<string>): void => {
   try {
     response = { type: 'completed', requestId: request.requestId, result: processEditorComputation(request) }
   } catch (error) {
+    console.error('[worker]', error)
     response = {
       type: 'failed',
       requestId: request.requestId,

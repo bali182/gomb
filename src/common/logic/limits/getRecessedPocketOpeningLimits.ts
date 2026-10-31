@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
-import { OUTER_RADIUS_SEARCH_PRECISION } from '../../constants/layout'
+import { OUTER_RADIUS_SEARCH_PRECISION, POSITION_EPSILON } from '../../constants/layout'
 import type {
   PocketClusterSchema,
   PocketOrientationSchema,
@@ -128,33 +128,34 @@ const getTPocketDepthMaximum = (
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
   const pocketDepth = isVertical ? pocket.boundingRect.height : pocket.boundingRect.width
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)
-  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth)
-  const taper = new BigNumber(sourcePocket.tPocketTaper)
+  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
+  const taper = new BigNumber(sourcePocket.tPocketTaper).plus(POSITION_EPSILON)
   const innerCornerX = width.dividedBy(2).minus(opening.innerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
     reason: 'pocket-opening-depth',
     severity: 'warning',
   }
-  if (maximum.value.isLessThanOrEqualTo(tabDepth)) {
+  if (maximum.value.isLessThan(tabDepth)) {
     return maximum
   }
 
   // Above the shoulder the full width is available. Below it, the unrounded side must
   // clear the shoulder endpoint and its bottom corner must clear the tapered edge.
   let boundaryMaximum = maximum.value
+  const aboveShoulderMaximum = BigNumber.maximum(tabDepth.minus(POSITION_EPSILON), 0)
   if (tabWidth.isGreaterThan(opening.outerInset)) {
     const shoulderMaximum = innerCornerX
       .minus(opening.outerInset)
       .times(tabDepth)
       .dividedBy(tabWidth.minus(opening.outerInset))
-    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(tabDepth, shoulderMaximum))
+    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, shoulderMaximum))
   }
   if (taper.isGreaterThan(tabWidth)) {
     const taperMaximum = tabDepth.plus(
       pocketDepth.minus(tabDepth).times(innerCornerX.minus(tabWidth)).dividedBy(taper.minus(tabWidth)),
     )
-    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(tabDepth, taperMaximum))
+    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, taperMaximum))
   }
   if (boundaryMaximum.isLessThan(maximum.value)) {
     maximum = { value: boundaryMaximum, reason: 'pocket-opening-boundary', severity: 'warning' }
@@ -205,7 +206,7 @@ const getOuterRadiusMaximum = (
   if (depth.isLessThanOrEqualTo(tabDepth)) {
     return maximum
   }
-  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth)
+  const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
   if (
     getOuterTransitionX({ ...opening, outerRadius: upperBound.toNumber() }, width, tabDepth).isGreaterThanOrEqualTo(
       tabWidth,

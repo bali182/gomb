@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { ZERO_CORNER_RADIUS } from '../constants/layout'
+import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../constants/layout'
 import { accessors } from '../utils/accessors'
 
 import type {
@@ -57,8 +57,8 @@ export const getComputedSubProject = (
   const rootBoundingRect: RectSchema = {
     x: new BigNumber(0),
     y: new BigNumber(0),
-    width: new BigNumber(rootComponent.width),
-    height: new BigNumber(rootComponent.height),
+    width: BigNumber.maximum(rootComponent.width, POSITION_EPSILON),
+    height: BigNumber.maximum(rootComponent.height, POSITION_EPSILON),
   }
   const root = computeRootPanel(rootComponent, rootBoundingRect, subProject, resolvedStitchLines, computedComponents)
   const holes = calculateHoles(subProject.holes, computedComponents)

@@ -1,8 +1,13 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
+import { POSITION_EPSILON } from '../constants/layout'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
-import type { PocketOrientationSchema, SlantedPocketOpeningSchema } from '../schemas/components'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  PocketOrientationSchema,
+  SlantedPocketOpeningSchema,
+} from '../schemas/components'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getExportElementsForComponent } from './exports/getExportElements'
@@ -14,6 +19,40 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
   'physical pocket components: %s',
   (orientation) => {
     const vertical = orientation === 'up' || orientation === 'down'
+    it('keeps material when optical opening insets request the entire width', () => {
+      const opening: OpticalIllusionPocketOpeningSchema = {
+        type: 'optical-illusion',
+        direction: 'start',
+        startInset: 100,
+        endInset: 0,
+        leadingRadius: 0,
+        trailingRadius: 0,
+      }
+      const front = d.frontPocket({ id: 'front', opening })
+      const cluster = d.pocketCluster({ id: 'cluster', orientation, children: [front.id], pocketStep: 80 })
+      const root = d.rootPanel({
+        id: 'root',
+        width: vertical ? 100 : 80,
+        height: vertical ? 80 : 100,
+        children: [cluster.id],
+      })
+      const source = d.subProject({ id: 'sub', root, components: [cluster, front] })
+      const snapshot = structuredClone(source)
+      const computed = accessors.computedSubProject(getComputedSubProject(source, defaultStitchingSettings))
+      const path = computed.component.frontPocket(front.id).path
+      const area = getClosedPathLoops(path)
+        .flat()
+        .reduce(
+          (sum, segment) => sum.plus(segment.start.x.times(segment.end.y).minus(segment.end.x.times(segment.start.y))),
+          new BigNumber(0),
+        )
+        .abs()
+        .dividedBy(2)
+      expect(area.gt(0)).toBe(true)
+      expect(computed.component.pocketCluster(cluster.id).path.commands.length).toBeGreaterThan(0)
+      expect(source).toEqual(snapshot)
+    })
+
     const fixture = (offset = 15) => {
       const opening: SlantedPocketOpeningSchema = { type: 'slanted', offset, side: 'end' }
       const pockets = [
@@ -159,8 +198,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         pocketStep: { max: { value: new BigNumber(130).dividedBy(3) } },
       })
       expect(computed.limits.components.t1).toMatchObject({
-        tPocketTabWidth: { max: { value: new BigNumber(50) } },
-        tPocketTaper: { max: { value: new BigNumber(50) } },
+        tPocketTabWidth: { max: { value: new BigNumber(50).minus(POSITION_EPSILON) } },
+        tPocketTaper: { max: { value: new BigNumber(50).minus(POSITION_EPSILON) } },
       })
     })
     it('inherits closed corner radii through the cluster and front pocket', () => {
