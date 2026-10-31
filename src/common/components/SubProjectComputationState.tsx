@@ -4,18 +4,19 @@ import { PiWarningCircle } from 'react-icons/pi'
 
 import { useEditorContext } from '../contexts/EditorContext'
 import { useTranslation } from '../hooks/useTranslation'
+import { Loadable } from '../loadable'
 import { isDefined } from '../utils/isDefined'
 import { CommonEmptyState } from './common/CommonEmptyState'
 
 export const SubProjectComputationState: FC<PropsWithChildren> = ({ children }) => {
-  const { computation, isComputing, subProject, computedSubProject } = useEditorContext()
+  const { isComputing, subProject, computedSubProject } = useEditorContext()
   const { t } = useTranslation()
 
-  if (computation.result.type === 'failed') {
-    return <SubProjectComputationFailed error={computation.result.error} />
+  if (computedSubProject.type === 'failed') {
+    return <SubProjectComputationFailed error={computedSubProject.error} />
   }
 
-  if (isDefined(subProject) && isDefined(computedSubProject) && computedSubProject.id === subProject.id) {
+  if (isDefined(subProject) && Loadable.hasValue(computedSubProject) && computedSubProject.data.id === subProject.id) {
     // TODO: Handle editing computation failures without unmounting the editor.
     return children
   }

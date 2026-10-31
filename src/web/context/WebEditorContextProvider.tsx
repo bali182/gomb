@@ -6,8 +6,9 @@ import { EditorContext, type EditorContextType } from '../../common/contexts/Edi
 import { useClearSubProjectHistory } from '../../common/hooks/useClearSubProjectHistory'
 import { useEditorComputation } from '../../common/hooks/useEditorComputation'
 import { Loadable } from '../../common/loadable'
+import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
-import type { SubProjectSchema } from '../../common/schemas/subProject'
+import type { ComputedSubProjectSchema, SubProjectSchema } from '../../common/schemas/subProject'
 import { accessors } from '../../common/utils/accessors'
 import { isDefined } from '../../common/utils/isDefined'
 import type { WebSubProjectRouteParamsSchema } from '../schemas/webRouteParams'
@@ -45,7 +46,10 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
 
   const result = Loadable.get(state.result)
   const project = result?.project ?? storedProject
-  const computedSubProject = result?.computedSubProject
+  const computedSubProject = useMemo<LoadableSchema<ComputedSubProjectSchema>>(
+    () => Loadable.map(state.result, (result) => result.computedSubProject),
+    [state.result],
+  )
 
   useEffect(() => {
     clearSubProjectHistory()
@@ -116,7 +120,6 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
 
   const value = useMemo<EditorContextType>(
     () => ({
-      computation: state,
       retryComputation,
       computedSubProject,
       editingInputId,
@@ -142,7 +145,6 @@ export const WebEditorContextProvider: FC<PropsWithChildren> = ({ children }) =>
       project,
       setProject,
       setSubProject,
-      state,
       subProject,
     ],
   )

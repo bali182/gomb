@@ -9,7 +9,7 @@ import { Loadable } from '../../common/loadable'
 import type { EditorComputationControlSchema } from '../../common/schemas/editorComputation'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
-import type { SubProjectSchema } from '../../common/schemas/subProject'
+import type { ComputedSubProjectSchema, SubProjectSchema } from '../../common/schemas/subProject'
 import { accessors } from '../../common/utils/accessors'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronAppRoutes } from '../electronAppRoutes'
@@ -49,7 +49,10 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
   }, [storedProject?.id, subProjectId])
   const result = Loadable.get(state.result)
   const project = result?.project ?? storedProject
-  const computedSubProject = result?.computedSubProject
+  const computedSubProject = useMemo<LoadableSchema<ComputedSubProjectSchema>>(
+    () => Loadable.map(state.result, (result) => result.computedSubProject),
+    [state.result],
+  )
   const subProject = useMemo<SubProjectSchema | undefined>(
     () =>
       isDefined(project) && isDefined(subProjectId)
@@ -150,7 +153,6 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
 
   const value = useMemo<EditorContextType>(
     () => ({
-      computation: state,
       retryComputation,
       computedSubProject,
       editingInputId,
@@ -176,7 +178,6 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
       project,
       setProject,
       setSubProject,
-      state,
       subProject,
     ],
   )

@@ -17,6 +17,7 @@ import {
 import { DrawAreaContext } from '../../contexts/DrawAreaContext'
 import { EditorContext, EditorContextDefaultOperations, EditorContextDefaultValues } from '../../contexts/EditorContext'
 import { DefaultGlobalSettingsOperations, GlobalSettingsContext } from '../../contexts/GlobalSettingsContext'
+import { Loadable } from '../../loadable'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
 import type { ProjectSchema } from '../../schemas/project'
@@ -68,7 +69,12 @@ export const renderSvgComponentToString = ({
 
   return renderToString(
     <EditorContext.Provider
-      value={{ ...EditorContextDefaultValues, ...EditorContextDefaultOperations, ...editorValues }}
+      value={{
+        ...EditorContextDefaultValues,
+        ...EditorContextDefaultOperations,
+        ...editorValues,
+        computedSubProject: Loadable.loaded(editorValues.computedSubProject),
+      }}
     >
       <GlobalSettingsContext.Provider value={{ ...DefaultGlobalSettingsOperations, settings }}>
         <DrawAreaContext.Provider value={context}>
