@@ -30,14 +30,12 @@ import { noop } from '../../utils/noop'
 import { PocketCopyDialog } from '../pocket-copy/PocketCopyDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
 import {
   AddComponentMenuItem,
   AddComponentStitchLineMenuItem,
   AddHoleMenuItem,
-  CloneComponentMenuItem,
   CopyPocketSettingsMenuItem,
-  DeleteComponentMenuItem,
   ExportComponentPngMenuItem,
 } from './ComponentActionsMenuItems'
 
@@ -261,8 +259,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CloneComponentMenuItem disabled={!canClone} onSelect={handleClone} />
-                <DeleteComponentMenuItem disabled={!canDelete} onSelect={handleDelete} />
+                <CloneMenuItem disabled={!canClone} onSelect={handleClone} />
+                <DeleteMenuItem disabled={!canDelete} onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>

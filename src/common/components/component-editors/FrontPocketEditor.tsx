@@ -68,7 +68,6 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
           />
           <PocketOpeningSection
             pocket={component}
-            cluster={parent}
             openingId={editable.openingId}
             onOpeningIdChange={handleOpeningIdChange}
           />

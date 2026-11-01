@@ -13,7 +13,9 @@ import { useCallback, useMemo, useState, type FC, type ReactNode } from 'react'
 import typia from 'typia'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { TreeDragAndDropContext, type TreeDragAndDropContextValue } from './TreeDragAndDropContext'
 import { TreeDragPreview } from './TreeDragPreview'
 import type { TreeDragData } from './types/dragDataTypes'
@@ -52,6 +54,21 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
             case 'stitch-line':
               operations.moveStitchLineToComponent(dragData.stitchLineId, dropData.componentId)
               return true
+            case 'pocket-opening': {
+              if (!isDefined(subProject)) {
+                return false
+              }
+              const accessor = accessors.subProject(subProject)
+              const component = accessor.optional.component.byId(dropData.componentId)
+              const opening = accessor.optional.pocketOpening.byId(dragData.openingId)
+              if (!isDefined(component) || !narrowers.is.pocket(component) || !isDefined(opening)) {
+                return false
+              }
+              if (component.openingId !== opening.id) {
+                operations.updateComponent({ ...component, openingId: opening.id })
+              }
+              return true
+            }
           }
         }
         case 'hole-stitch-line': {
@@ -63,7 +80,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
         }
       }
     },
-    [operations],
+    [operations, subProject],
   )
 
   const handleDragStart = useCallback(

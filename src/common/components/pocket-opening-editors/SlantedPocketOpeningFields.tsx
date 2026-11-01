@@ -1,21 +1,19 @@
 import { Select, createListCollection, type ListCollection, type SelectValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
-import { EditorSelect } from '../../common/EditorSelect'
+import { EditorSelect } from '../common/EditorSelect'
 
-import { useTranslation } from '../../../hooks/useTranslation'
-import type { PocketOrientationSchema } from '../../../schemas/components'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import type { PocketOpeningSideSchema, SlantedPocketOpeningSchema } from '../../../schemas/pocketOpening'
-import { isDefined } from '../../../utils/isDefined'
-import { EditorNumberInput } from '../../common/EditorNumberInput'
-import { SectionGroup } from '../../common/SectionGroup'
+import { useTranslation } from '../../hooks/useTranslation'
+import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
+import type { PocketOpeningSideSchema, SlantedPocketOpeningSchema } from '../../schemas/pocketOpening'
+import { isDefined } from '../../utils/isDefined'
+import { EditorNumberInput } from '../common/EditorNumberInput'
+import { SectionGroup } from '../common/SectionGroup'
 
 type SlantedPocketOpeningFieldsProps = {
   modelId: string
   editable: EditableSchema<SlantedPocketOpeningSchema>
   issues: IssuesSchema<SlantedPocketOpeningSchema>
-  orientation: PocketOrientationSchema
   onChange: (updated: EditableSchema<SlantedPocketOpeningSchema>) => void
 }
 
@@ -25,7 +23,6 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
   modelId,
   editable,
   issues,
-  orientation,
   onChange,
 }) => {
   const { t } = useTranslation()
@@ -34,9 +31,10 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
       createListCollection<PocketOpeningSideSchema>({
         items: sides,
         itemToValue: (side) => side,
-        itemToString: (side) => t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side],
+        itemToString: (side: PocketOpeningSideSchema): string =>
+          t.project.editors.enums.components.pocketOpeningSide[side],
       }),
-    [orientation, t],
+    [t],
   )
   const selectedValue = useMemo<string[]>(() => [editable.side], [editable.side])
   const handleOffsetChange = useCallback(
@@ -84,7 +82,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
             <Select.Content width="full">
               {collection.items.map((side) => (
                 <Select.Item key={side} item={side}>
-                  {t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side]}
+                  {t.project.editors.enums.components.pocketOpeningSide[side]}
                   <Select.ItemIndicator />
                 </Select.Item>
               ))}

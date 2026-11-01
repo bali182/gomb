@@ -4,14 +4,12 @@ import {
   Card,
   Flex,
   HStack,
-  IconButton,
   Splitter,
   SplitterPanelData,
   SplitterResizeEndDetails,
-  Text,
 } from '@chakra-ui/react'
 import { FC, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { PiPlus, PiStack, PiWarningCircle } from 'react-icons/pi'
+import { PiPlus, PiWarningCircle } from 'react-icons/pi'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
@@ -24,8 +22,10 @@ import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
+import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import { ResizableAccordion, type ResizableAccordionState } from './common/resizable-accordion/ResizableAccordion'
+import { ResizableAccordionHeaderIconButton } from './common/resizable-accordion/ResizableAccordionHeaderButtons'
 import { ResizableAccordionItem } from './common/resizable-accordion/ResizableAccordionItem'
 import { EditorComponentTree, type EditorComponentTreeHandle } from './component-tree/EditorComponentTree'
 import { EditorTreeDragAndDrop } from './component-tree/EditorTreeDragAndDrop'
@@ -36,6 +36,7 @@ import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
 import { CollapseAllIcon } from './icons/CollapseAllIcon'
 import { ExpandAllIcon } from './icons/ExpandAllIcon'
+import { EditorPocketOpeningTree } from './pocket-opening-tree/EditorPocketOpeningTree'
 import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
 const panels: SplitterPanelData[] = [
@@ -133,22 +134,15 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                     title={t.project.tree.title}
                     actions={
                       <HStack gap="1">
-                        <IconButton
-                          disabled={!isDefined(subProject)}
-                          onClick={handleExpandAll}
-                          size="xs"
-                          variant="ghost"
-                        >
+                        <ResizableAccordionHeaderIconButton disabled={!isDefined(subProject)} onClick={handleExpandAll}>
                           <ExpandAllIcon />
-                        </IconButton>
-                        <IconButton
+                        </ResizableAccordionHeaderIconButton>
+                        <ResizableAccordionHeaderIconButton
                           disabled={!isDefined(subProject)}
                           onClick={handleCollapseAll}
-                          size="xs"
-                          variant="ghost"
                         >
                           <CollapseAllIcon />
-                        </IconButton>
+                        </ResizableAccordionHeaderIconButton>
                       </HStack>
                     }
                   >
@@ -158,20 +152,12 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       <EmptyComponentTreeState />
                     )}
                   </ResizableAccordionItem>
-                  <ResizableAccordionItem id="openings" title={t.project.editors.tabs.components.pocketOpenings}>
-                    <Flex
-                      alignItems="center"
-                      color="fg.muted"
-                      direction="column"
-                      gap="2"
-                      height="100%"
-                      justifyContent="center"
-                      minHeight="24"
-                      p="4"
-                    >
-                      <PiStack size={24} />
-                      <Text fontSize="sm">{t.project.editors.tabs.components.pocketOpenings}</Text>
-                    </Flex>
+                  <ResizableAccordionItem
+                    id="openings"
+                    title={t.project.editors.tabs.components.pocketOpenings}
+                    actions={<AddPocketOpeningMenu />}
+                  >
+                    {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
                   </ResizableAccordionItem>
                 </ResizableAccordion>
               </EditorTreeDragAndDrop>

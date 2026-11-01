@@ -9,22 +9,20 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PiYoutubeLogoFill } from 'react-icons/pi'
-import { EditorSelect } from '../../common/EditorSelect'
+import { EditorSelect } from '../common/EditorSelect'
 
-import { useTranslation } from '../../../hooks/useTranslation'
-import type { PocketOrientationSchema } from '../../../schemas/components'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import type { OpticalIllusionPocketOpeningSchema, PocketOpeningSideSchema } from '../../../schemas/pocketOpening'
-import { isDefined } from '../../../utils/isDefined'
-import { EditorNumberInput } from '../../common/EditorNumberInput'
-import { SectionGroup } from '../../common/SectionGroup'
+import { useTranslation } from '../../hooks/useTranslation'
+import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
+import type { OpticalIllusionPocketOpeningSchema, PocketOpeningSideSchema } from '../../schemas/pocketOpening'
+import { isDefined } from '../../utils/isDefined'
+import { EditorNumberInput } from '../common/EditorNumberInput'
+import { SectionGroup } from '../common/SectionGroup'
 
 type OpticalIllusionPocketOpeningFieldsProps = {
   modelId: string
   editable: EditableSchema<OpticalIllusionPocketOpeningSchema>
   issues: IssuesSchema<OpticalIllusionPocketOpeningSchema>
-  orientation: PocketOrientationSchema
   onChange: (updated: EditableSchema<OpticalIllusionPocketOpeningSchema>) => void
 }
 
@@ -34,7 +32,6 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
   modelId,
   editable,
   issues,
-  orientation,
   onChange,
 }) => {
   const { t } = useTranslation()
@@ -43,9 +40,10 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       createListCollection<PocketOpeningSideSchema>({
         items: sides,
         itemToValue: (side) => side,
-        itemToString: (side) => t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side],
+        itemToString: (side: PocketOpeningSideSchema): string =>
+          t.project.editors.enums.components.pocketOpeningSide[side],
       }),
-    [orientation, t],
+    [t],
   )
   const selectedValue = useMemo<string[]>(() => [editable.direction], [editable.direction])
   const handleStartInsetChange = useCallback(
@@ -113,7 +111,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
             <Select.Content width="full">
               {collection.items.map((side) => (
                 <Select.Item key={side} item={side}>
-                  {t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side]}
+                  {t.project.editors.enums.components.pocketOpeningSide[side]}
                   <Select.ItemIndicator />
                 </Select.Item>
               ))}

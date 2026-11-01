@@ -7,14 +7,9 @@ import { useEditablePocketOpening } from '../../../hooks/useEditablePocketOpenin
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
-import type { PocketClusterSchema, PocketSchema } from '../../../schemas/components'
+import type { PocketSchema } from '../../../schemas/components'
 import type { IssuesSchema } from '../../../schemas/issues'
-import type {
-  OpticalIllusionPocketOpeningSchema,
-  PocketOpeningSchema,
-  RecessedPocketOpeningSchema,
-  SlantedPocketOpeningSchema,
-} from '../../../schemas/pocketOpening'
+import type { PocketOpeningSchema } from '../../../schemas/pocketOpening'
 import { accessors } from '../../../utils/accessors'
 import { getLimitIssues } from '../../../utils/getLimitIssues'
 import { getModelIconByType } from '../../../utils/getModelIcon'
@@ -22,14 +17,10 @@ import { isDefined } from '../../../utils/isDefined'
 import { noIssues } from '../../../utils/issueUtils'
 import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
-import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
-import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
-import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
-import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
+import { PocketOpeningFields } from '../../pocket-opening-editors/PocketOpeningEditor'
 
 type PocketOpeningSectionProps = {
   pocket: PocketSchema
-  cluster: PocketClusterSchema
   openingId: string
   onOpeningIdChange: (openingId: string) => void
 }
@@ -38,12 +29,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = (props) => (
   <PocketOpeningSectionContent key={props.openingId} {...props} />
 )
 
-const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({
-  pocket,
-  cluster,
-  openingId,
-  onOpeningIdChange,
-}) => {
+const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({ pocket, openingId, onOpeningIdChange }) => {
   const { subProject, computedSubProject } = useSubProject()
   const { isComputing, setEditingInputId } = useEditorContext()
   const translation = useTranslation()
@@ -118,39 +104,7 @@ const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({
       >
         {t.project.editors.sections.components.pocketOpening.title}
       </SectionGroup.SectionHeader>
-      {editable.type === 'optical-illusion' && (
-        <OpticalIllusionPocketOpeningFields
-          modelId={opening.id}
-          editable={editable}
-          issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
-          orientation={cluster.orientation}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'straight' && (
-        <StraightPocketOpeningFields
-          editable={editable}
-          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'recessed' && (
-        <RecessedPocketOpeningFields
-          modelId={opening.id}
-          editable={editable}
-          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'slanted' && (
-        <SlantedPocketOpeningFields
-          modelId={opening.id}
-          editable={editable}
-          issues={issues as IssuesSchema<SlantedPocketOpeningSchema>}
-          orientation={cluster.orientation}
-          onChange={onChange}
-        />
-      )}
+      <PocketOpeningFields editable={editable} issues={issues} onChange={onChange} />
     </SectionGroup.Section>
   )
 }

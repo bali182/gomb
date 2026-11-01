@@ -7,8 +7,7 @@ import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
-import { CloneStitchLineMenuItem, DeleteStitchLineMenuItem } from './StitchLineActionsMenuItems'
+import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
 
 type StitchLineActionsMenuProps = {
   stitchLine: StitchLineSchema
@@ -58,8 +57,8 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CloneStitchLineMenuItem onSelect={handleClone} />
-                <DeleteStitchLineMenuItem onSelect={handleDelete} />
+                <CloneMenuItem onSelect={handleClone} />
+                <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>

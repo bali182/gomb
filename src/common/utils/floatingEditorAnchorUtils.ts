@@ -1,13 +1,14 @@
 import type { HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from './accessors'
 import { isDefined } from './isDefined'
 
 export type FloatingEditorAnchor = {
-  contextElement: SVGGraphicsElement
+  contextElement: Element
   getBoundingClientRect: () => DOMRect
 }
 
@@ -23,7 +24,7 @@ const getStitchLineRouteElements = (stitchLineId: string): SVGGElement[] => {
   return Array.from(document.querySelectorAll<SVGGElement>(`[data-stitch-line-id="${CSS.escape(stitchLineId)}"]`))
 }
 
-export const getComponentAnchor = (
+const getComponentAnchor = (
   model: ComponentSchema,
   _subProject: SubProjectSchema,
 ): FloatingEditorAnchor | undefined => {
@@ -31,7 +32,7 @@ export const getComponentAnchor = (
   return isDefined(componentElement) ? getSvgElementAnchor(componentElement) : undefined
 }
 
-export const getStitchLineAnchor = (
+const getStitchLineAnchor = (
   model: StitchLineSchema,
   subProject: SubProjectSchema,
 ): FloatingEditorAnchor | undefined => {
@@ -46,7 +47,7 @@ export const getStitchLineAnchor = (
   })
 }
 
-export const getHoleAnchor = (model: HoleSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
+const getHoleAnchor = (model: HoleSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
   const component = accessors.subProject(subProject).component.byId(model.componentId)
 
   const componentAnchor = getComponentAnchor(component, subProject)
@@ -56,6 +57,19 @@ export const getHoleAnchor = (model: HoleSchema, subProject: SubProjectSchema): 
   }
 
   return getFallbackAnchor(componentAnchor, () => getHoleHighlightElement(model.id)?.getBoundingClientRect())
+}
+
+const getPocketOpeningAnchor = (model: PocketOpeningSchema): FloatingEditorAnchor | undefined => {
+  const element = document.querySelector<HTMLElement>(`[data-pocket-opening-id="${CSS.escape(model.id)}"]`)
+
+  if (!isDefined(element)) {
+    return undefined
+  }
+
+  return {
+    contextElement: element,
+    getBoundingClientRect: () => element.getBoundingClientRect(),
+  }
 }
 
 const getTargetAnchor = (target: HasTargetSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
@@ -109,4 +123,11 @@ const getUnionBoundingClientRect = (elements: SVGGElement[]): DOMRect | undefine
   }
 
   return new DOMRect(left, top, right - left, bottom - top)
+}
+
+export const floatingEditorAnchors = {
+  component: getComponentAnchor,
+  stitchLine: getStitchLineAnchor,
+  hole: getHoleAnchor,
+  pocketOpening: getPocketOpeningAnchor,
 }

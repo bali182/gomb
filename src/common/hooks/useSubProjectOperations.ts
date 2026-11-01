@@ -25,6 +25,7 @@ import { updateHole as updateHolePure } from '../operations/subProject/updateHol
 import { updateStitchLine as updateStitchLinePure } from '../operations/subProject/updateStitchLine'
 import { createComponent } from '../operations/subProject/utils/createComponent'
 import { createHole } from '../operations/subProject/utils/createHole'
+import { createPocketOpening } from '../operations/subProject/utils/createPocketOpening'
 import { createStitchLine } from '../operations/subProject/utils/createStitchLine'
 import { getUnusedComponentName } from '../operations/subProject/utils/getUnusedComponentName'
 import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
@@ -47,6 +48,8 @@ import { useSubProjectHistory } from './useSubProjectHistory'
 import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
+  addPocketOpening: (type: PocketOpeningSchema['type']) => PocketOpeningSchema
+  setDefaultPocketOpening: (openingId: string) => void
   updatePocketOpening: (opening: PocketOpeningSchema) => void
   deletePocketOpening: (openingId: string) => void
   addComponent: (
@@ -79,6 +82,46 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { settings } = useGlobalSettings()
   const { recordChange, recordThrottledChange: recordThrottledUpdate } = useSubProjectHistory()
   const { t } = useTranslation()
+
+  const addPocketOpening = useCallback(
+    (type: PocketOpeningSchema['type']): PocketOpeningSchema => {
+      const currentSubProject = ensureSubProject(subProject)
+      const opening = createPocketOpening({
+        type,
+        id: id(),
+        name: getUnusedName(
+          t.project.editors.enums.components.pocketOpening[type],
+          new Set(
+            Object.values(currentSubProject.pocketOpenings).map(
+              (candidate: PocketOpeningSchema): string => candidate.name,
+            ),
+          ),
+        ),
+      })
+      recordChange(currentSubProject)
+      setSubProject({
+        ...currentSubProject,
+        pocketOpenings: { ...currentSubProject.pocketOpenings, [opening.id]: opening },
+      })
+      return opening
+    },
+    [recordChange, setSubProject, subProject, t],
+  )
+
+  const setDefaultPocketOpening = useCallback(
+    (openingId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      if (
+        currentSubProject.defaultPocketOpening === openingId ||
+        !isDefined(accessors.subProject(currentSubProject).optional.pocketOpening.byId(openingId))
+      ) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject({ ...currentSubProject, defaultPocketOpening: openingId })
+    },
+    [recordChange, setSubProject, subProject],
+  )
 
   const updatePocketOpening = useCallback(
     (opening: PocketOpeningSchema): void => {
@@ -398,6 +441,8 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
 
   return useMemo<UseSubProjectOperationsOutput>(
     () => ({
+      addPocketOpening,
+      setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
       addComponent,
@@ -421,6 +466,8 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       updateStitchLine,
     }),
     [
+      addPocketOpening,
+      setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
       addComponent,

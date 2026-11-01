@@ -254,7 +254,13 @@ export const EN = {
         },
       },
       actions: {
+        pocketOpenings: {
+          add: 'Add opening',
+          setDefault: 'Set as default',
+        },
         common: {
+          clone: 'Clone',
+          delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
         },
@@ -269,17 +275,9 @@ export const EN = {
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
           copyPocketSettings: 'Copy settings…',
-          clone: 'Clone',
-          delete: 'Delete',
-        },
-        stitchLines: {
-          clone: 'Clone',
-          delete: 'Delete',
         },
         holes: {
           addStitching: 'Add stitching',
-          clone: 'Clone',
-          delete: 'Delete',
         },
       },
       sections: {
@@ -873,12 +871,10 @@ export const EN = {
             slanted: 'Slanted',
             'optical-illusion': 'Optical illusion',
           } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
-          slantedPocketOpeningSide: {
-            up: { start: 'Left', end: 'Right' },
-            right: { start: 'Top', end: 'Bottom' },
-            down: { start: 'Right', end: 'Left' },
-            left: { start: 'Bottom', end: 'Top' },
-          } satisfies Record<PocketOrientationSchema, EnumTranslationSchema<PocketOpeningSideSchema>>,
+          pocketOpeningSide: {
+            start: 'Start point',
+            end: 'End point',
+          } satisfies EnumTranslationSchema<PocketOpeningSideSchema>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',

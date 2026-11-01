@@ -1,6 +1,6 @@
 import { Menu } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
-import { PiCopy, PiImage, PiPaintBrushBroad, PiTrash } from 'react-icons/pi'
+import { PiImage, PiPaintBrushBroad } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
@@ -95,38 +95,12 @@ export const ExportComponentPngMenuItem: FC<ExportComponentPngMenuItemProps> = (
   )
 }
 
-export const CloneComponentMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
-  const { t } = useTranslation()
-  return (
-    <EditorActionMenuItem value="clone" disabled={disabled} onSelect={onSelect}>
-      <PiCopy />
-      <Menu.ItemText>{t.project.editors.actions.components.clone}</Menu.ItemText>
-    </EditorActionMenuItem>
-  )
-}
-
 export const CopyPocketSettingsMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
     <EditorActionMenuItem value="copy-pocket-settings" disabled={disabled} onSelect={onSelect}>
       <PiPaintBrushBroad />
       <Menu.ItemText>{t.project.editors.actions.components.copyPocketSettings}</Menu.ItemText>
-    </EditorActionMenuItem>
-  )
-}
-
-export const DeleteComponentMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
-  const { t } = useTranslation()
-  return (
-    <EditorActionMenuItem
-      value="delete"
-      disabled={disabled}
-      onSelect={onSelect}
-      color="fg.error"
-      _hover={{ bg: 'bg.error', color: 'fg.error' }}
-    >
-      <PiTrash />
-      <Menu.ItemText>{t.project.editors.actions.components.delete}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }

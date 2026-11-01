@@ -1,11 +1,11 @@
 import { useCallback, type FC } from 'react'
 
-import { useTranslation } from '../../../hooks/useTranslation'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import type { RecessedPocketOpeningSchema } from '../../../schemas/pocketOpening'
-import { EditorNumberInput } from '../../common/EditorNumberInput'
-import { SectionGroup } from '../../common/SectionGroup'
+import { useTranslation } from '../../hooks/useTranslation'
+import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
+import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
+import { EditorNumberInput } from '../common/EditorNumberInput'
+import { SectionGroup } from '../common/SectionGroup'
 
 type RecessedPocketOpeningFieldsProps = {
   modelId: string

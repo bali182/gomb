@@ -2,6 +2,7 @@ import { Box, IconButton, Text, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCaretRight, PiDotsSixVertical } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { getModelIconByType } from '../../utils/getModelIcon'
 import { TreeItemVisual } from '../common/tree/TreeItemVisual'
 import type { TreeDragData } from './types/dragDataTypes'
 import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
@@ -34,14 +35,20 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
         <Box key={depth} flexShrink="0" width="6" />
       ))}
       <TreeItemVisual
-        icon={getProjectTreeNodeIcon(node, subProject)}
+        icon={
+          node.kind === 'pocket-opening'
+            ? getModelIconByType(node.opening.type)
+            : getProjectTreeNodeIcon(node, subProject)
+        }
         isPositioned={false}
         trigger={
-          node.kind !== 'stitch-line' ? (
+          node.kind === 'component' || node.kind === 'hole' ? (
             <PiCaretRight opacity={node.children.length > 0 ? undefined : 0.4} />
           ) : undefined
         }
-        label={<Text flex="1">{getProjectTreeNodeLabel(node)}</Text>}
+        label={
+          <Text flex="1">{node.kind === 'pocket-opening' ? node.opening.name : getProjectTreeNodeLabel(node)}</Text>
+        }
         leading={
           <IconButton pointerEvents="none" size="2xs" variant="ghost" _hover={{ bg: 'transparent' }}>
             <PiDotsSixVertical />

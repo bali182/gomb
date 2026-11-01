@@ -188,7 +188,13 @@ export const HU = {
         },
       },
       actions: {
+        pocketOpenings: {
+          add: 'Új zsebnyílás',
+          setDefault: 'Beállítás alapértelmezettként',
+        },
         common: {
+          clone: 'Duplikálás',
+          delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',
         },
@@ -203,17 +209,9 @@ export const HU = {
           addPocketStitching: 'Zsebvarrás hozzáadása',
           exportToPng: 'Exportálás PNG-be',
           copyPocketSettings: 'Beállítások másolása…',
-          clone: 'Duplikálás',
-          delete: 'Törlés',
-        },
-        stitchLines: {
-          clone: 'Duplikálás',
-          delete: 'Törlés',
         },
         holes: {
           addStitching: 'Varrás hozzáadása',
-          clone: 'Duplikálás',
-          delete: 'Törlés',
         },
       },
       sections: {
@@ -794,11 +792,9 @@ export const HU = {
             slanted: 'Ferde',
             'optical-illusion': 'Optikai illúzió',
           },
-          slantedPocketOpeningSide: {
-            up: { start: 'Bal', end: 'Jobb' },
-            right: { start: 'Felső', end: 'Alsó' },
-            down: { start: 'Jobb', end: 'Bal' },
-            left: { start: 'Alsó', end: 'Felső' },
+          pocketOpeningSide: {
+            start: 'Kezdőpont',
+            end: 'Végpont',
           },
           pocketOrientation: {
             up: 'Fent',

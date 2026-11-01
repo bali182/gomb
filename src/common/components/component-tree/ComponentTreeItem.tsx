@@ -70,6 +70,8 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
         return canAddHole(component)
       case 'stitch-line':
         return canAddStitchLine(component, subProject, activeDragData.stitchLineType)
+      case 'pocket-opening':
+        return narrowers.is.pocket(component)
     }
   }, [activeDragData, component, hasDragAndDrop, subProject])
 
@@ -84,6 +86,8 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
         return false
       case 'stitch-line':
         return !canAddStitchLine(component, subProject, activeDragData.stitchLineType)
+      case 'pocket-opening':
+        return !narrowers.is.pocket(component)
     }
   }, [activeDragData, component, isActiveComponent, subProject])
 
