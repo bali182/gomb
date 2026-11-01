@@ -206,7 +206,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
     [setAttachmentDropNodeRef, setNodeRef],
   )
 
-  const Icon = getProjectTreeNodeIcon(node)
+  const Icon = getProjectTreeNodeIcon(node, subProject)
   const dragHandle = hasDragAndDrop ? (
     <IconButton
       {...attributes}

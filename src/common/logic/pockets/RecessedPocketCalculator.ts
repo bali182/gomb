@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
-import type { RecessedPocketOpeningSchema } from '../../schemas/components'
 import type { PathCommand, PathSchema, PointSchema } from '../../schemas/geometry'
+import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { StandardTPocketCalculator } from './StandardTPocketCalculator'
 
 export class RecessedPocketCalculator extends StandardTPocketCalculator<RecessedPocketOpeningSchema> {

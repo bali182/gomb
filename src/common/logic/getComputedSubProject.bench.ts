@@ -4,8 +4,8 @@ import { accessors } from '../utils/accessors'
 import { narrowers } from '../utils/narrowers'
 
 import { defaultStitchingSettings } from '../defaultStates'
-import type { PocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
@@ -32,8 +32,10 @@ type ComputationBenchmarkCase = {
   subProject: SubProjectSchema
 }
 
-const straight: PocketOpeningSchema = { type: 'straight' }
+const straight: PocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'straight' }
 const recessed: PocketOpeningSchema = {
+  id: 'opening',
+  name: 'Opening',
   type: 'recessed',
   outerInset: 18,
   innerOffset: 15,
@@ -52,6 +54,7 @@ const createClusterSubProject = ({
   const clusterIds = Array.from({ length: clusterCount }, (_, index) => `cluster-${index}`)
   return d.subProject({
     id: 'benchmark',
+    pocketOpenings: [opening],
     root: d.rootPanel({ id: 'root', width: clusterCount * 120, height: 160, children: panelIds }),
     components: panelIds.flatMap((panelId, index) => {
       const pocketIds = Array.from({ length: pocketCount }, (_, number) => clusterIds[index] + '-pocket-' + number)
@@ -62,13 +65,13 @@ const createClusterSubProject = ({
           number === pocketCount - 1
             ? d.frontPocket({
                 id,
-                opening,
+                openingId: opening.id,
                 topLeftRadius: 4,
                 topRightRadius: 4,
                 bottomLeftRadius: 4,
                 bottomRightRadius: 4,
               })
-            : d.tPocket({ id, opening }),
+            : d.tPocket({ id, openingId: opening.id }),
         ),
       ]
     }),

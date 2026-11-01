@@ -58,12 +58,15 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
 
   const createSubProject = useCallback((): SubProjectSchema => {
     const currentProject = ensureProject(project)
-    const result = addSubProjectPure(currentProject, { baseRootComponentName: t.defaultNames.rootPanel })
+    const result = addSubProjectPure(currentProject, {
+      baseRootComponentName: t.defaultNames.rootPanel,
+      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
+    })
 
     setProject(result.project)
 
     return result.subProject
-  }, [project, setProject, t.defaultNames.rootPanel])
+  }, [project, setProject, t])
 
   const cloneSubProject = useCallback(
     (sourceSubProject: SubProjectSchema): void => {

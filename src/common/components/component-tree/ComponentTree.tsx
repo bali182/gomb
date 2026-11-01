@@ -19,6 +19,7 @@ import {
 } from '@dnd-kit/core'
 import { useCallback, useMemo, useState, type FC, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
+import { useSubProject } from '../../hooks/useSubProject'
 
 import typia from 'typia'
 import { useEditorContext } from '../../contexts/EditorContext'
@@ -256,6 +257,7 @@ type TreeDragPreviewProps = {
 }
 
 const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData }) => {
+  const { subProject } = useSubProject()
   const { node } = dragData
   const isBranch = node.kind !== 'stitch-line'
   const isExpandable = node.children.length > 0
@@ -268,7 +270,7 @@ const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData }) => {
 
   const visual = (
     <TreeItemVisual
-      icon={getProjectTreeNodeIcon(node)}
+      icon={getProjectTreeNodeIcon(node, subProject)}
       isBranch={isBranch}
       isExpandable={isExpandable}
       isPositioned={isPositioned}

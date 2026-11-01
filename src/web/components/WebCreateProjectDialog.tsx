@@ -65,11 +65,21 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
       baseRootComponentName: t.defaultNames.rootPanel,
+      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
     })
     addProject(createdProject)
     onOpenChange(false)
     navigate(webAppRoutes.subProject(createdProject.id, initialSubProject.id))
-  }, [addProject, context, editableValue, navigate, onOpenChange, project, t.defaultNames.rootPanel])
+  }, [
+    addProject,
+    context,
+    editableValue,
+    navigate,
+    onOpenChange,
+    project,
+    t.defaultNames.rootPanel,
+    t.project.editors.enums.components.pocketOpening.straight,
+  ])
 
   return (
     <EditDialog

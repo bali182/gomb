@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultStitchingSettings } from '../../defaultStates'
-import type { PocketOpeningSchema, PocketOrientationSchema } from '../../schemas/components'
+import type { PocketOrientationSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 import { d } from '../../testData'
 import { createPocketCalculator } from '../pockets/createPocketCalculator'
@@ -17,7 +18,7 @@ const createFixture = (opening: PocketOpeningSchema, orientation: PocketOrientat
     orientation,
     pocketStep: 20,
   })
-  const source = d.tPocket({ id: 't', opening, tPocketTabWidth: 10, tPocketTaper: 35 })
+  const source = d.tPocket({ id: 't', openingId: opening.id, tPocketTabWidth: 10, tPocketTaper: 35 })
   const rect = {
     x: new BigNumber(0),
     y: new BigNumber(0),
@@ -48,7 +49,7 @@ const createFixture = (opening: PocketOpeningSchema, orientation: PocketOrientat
 
 describe('calculateTPocketStitchLine', () => {
   it('intersects the tapered edges at the actual stitch margin', () => {
-    const { cluster, pocket, stitchLine } = createFixture({ type: 'straight' })
+    const { cluster, pocket, stitchLine } = createFixture({ id: 'opening', name: 'Opening', type: 'straight' })
     const result = calculateTPocketStitchLine(stitchLine, cluster, pocket)
     expect(result?.line.start.x.toNumber()).toBeCloseTo(10 + (25 * 55) / 70, 9)
     expect(result?.line.end.x.toNumber()).toBeCloseTo(90 - (25 * 55) / 70, 9)
@@ -59,7 +60,10 @@ describe('calculateTPocketStitchLine', () => {
   it.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     'follows slanted shoulders facing %s and retains offset signs',
     (orientation) => {
-      const { cluster, pocket, stitchLine } = createFixture({ type: 'slanted', offset: 15, side: 'end' }, orientation)
+      const { cluster, pocket, stitchLine } = createFixture(
+        { id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' },
+        orientation,
+      )
       const left = 10 + (25 * (75 - 21.5)) / (90 - 21.5)
       const right = 90 - (25 * (75 - 33.5)) / (90 - 33.5)
       const expected: Record<PocketOrientationSchema, number[]> = {
@@ -84,8 +88,8 @@ describe('calculateTPocketStitchLine', () => {
   )
 
   it('mirrors the stitch endpoints with the slanted side', () => {
-    const end = createFixture({ type: 'slanted', offset: 15, side: 'end' })
-    const start = createFixture({ type: 'slanted', offset: 15, side: 'start' })
+    const end = createFixture({ id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' })
+    const start = createFixture({ id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'start' })
     const first = calculateTPocketStitchLine(end.stitchLine, end.cluster, end.pocket)
     const second = calculateTPocketStitchLine(start.stitchLine, start.cluster, start.pocket)
     expect(second?.line.start.x.toNumber()).toBeCloseTo(100 - (first?.line.end.x.toNumber() ?? 0), 9)
@@ -93,7 +97,7 @@ describe('calculateTPocketStitchLine', () => {
   })
 
   it('handles vertex hits once and skips a missing or collapsed stitch span', () => {
-    const { cluster, pocket, stitchLine } = createFixture({ type: 'straight' })
+    const { cluster, pocket, stitchLine } = createFixture({ id: 'opening', name: 'Opening', type: 'straight' })
     const atBottom = calculateTPocketStitchLine({ ...stitchLine, stitchMargin: 0 }, cluster, pocket)
     expect(atBottom?.line.start.x.toNumber()).toBe(35)
     expect(atBottom?.line.end.x.toNumber()).toBe(65)
@@ -104,7 +108,7 @@ describe('calculateTPocketStitchLine', () => {
       boundingRect: { ...pocket.boundingRect, width: new BigNumber(0) },
     }
     expect(calculateTPocketStitchLine(stitchLine, cluster, empty)).toBeUndefined()
-    const triangle = createFixture({ type: 'straight' })
+    const triangle = createFixture({ id: 'opening', name: 'Opening', type: 'straight' })
     const pointedCluster = triangle.cluster
     const pointedSource = { ...triangle.source, tPocketTaper: 50 }
     const pointed = {
@@ -112,7 +116,7 @@ describe('calculateTPocketStitchLine', () => {
       path: createPocketCalculator(
         pointedSource,
         pointedCluster,
-        pointedSource.opening,
+        { id: 'straight', name: 'Straight', type: 'straight' },
         triangle.pocket.boundingRect,
         ZERO_CORNER_RADIUS,
       ).getTPocketPath(),

@@ -2,9 +2,9 @@ import { EmptyState } from '@chakra-ui/react'
 import { type FC } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { StraightPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
+import type { StraightPocketOpeningSchema } from '../../../schemas/pocketOpening'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type StraightPocketOpeningFieldsProps = {

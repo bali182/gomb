@@ -1,6 +1,12 @@
 import type { TranslationSchema } from '../translations/translationSchema'
 import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema, TPocketSchema } from './components'
 import type { HoleSchema } from './hole'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from './pocketOpening'
 import type { ProjectSchema } from './project'
 import type { ColorSettingsSchema, GlobalSettingsSchema } from './settings'
 import type {
@@ -63,6 +69,22 @@ export type ProjectMigratorSchema = {
     input: DeepPartialSchema<TPocketSchema>,
     context: ProjectMigrationContextSchema,
   ) => DeepPartialSchema<TPocketSchema>
+  straightPocketOpening: (
+    input: DeepPartialSchema<StraightPocketOpeningSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<StraightPocketOpeningSchema>
+  recessedPocketOpening: (
+    input: DeepPartialSchema<RecessedPocketOpeningSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<RecessedPocketOpeningSchema>
+  slantedPocketOpening: (
+    input: DeepPartialSchema<SlantedPocketOpeningSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<SlantedPocketOpeningSchema>
+  opticalIllusionPocketOpening: (
+    input: DeepPartialSchema<OpticalIllusionPocketOpeningSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<OpticalIllusionPocketOpeningSchema>
   hole: (input: DeepPartialSchema<HoleSchema>, context: ProjectMigrationContextSchema) => DeepPartialSchema<HoleSchema>
   componentBoundsStitchLine: (
     input: DeepPartialSchema<ComponentBoundsStitchLineSchema>,

@@ -2,13 +2,13 @@ import { IconButton, TreeView } from '@chakra-ui/react'
 import { useDraggable } from '@dnd-kit/core'
 import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
+import { getModelIconByType } from '../../utils/getModelIcon'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { TreeItemVisual } from './TreeItemVisual'
 import type { TreeDragData } from './types/dragDataTypes'
 import type { StitchLineTreeNode } from './types/nodeTypes'
-import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
 type StitchLineTreeItemProps = {
@@ -65,7 +65,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
       h="9"
     >
       <TreeItemVisual
-        icon={getProjectTreeNodeIcon(node)}
+        icon={getModelIconByType(stitchLine.type)}
         isBranch={false}
         isExpandable={false}
         isPositioned={false}

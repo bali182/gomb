@@ -1,6 +1,5 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
-import { defaultSlantedPocketOpening } from '../defaultStates'
 import type { ProjectSchema } from '../schemas/project'
 import { d } from '../testData'
 import { EN } from '../translations/en'
@@ -62,7 +61,7 @@ describe('physical pocket component migration', () => {
       })),
     }
   }
-  it('moves pocket geometry, openings and nested children while keeping one cluster-owned stitch line', () => {
+  it('moves geometry and nested children and assigns default openings', () => {
     const input = fixture()
     const before = structuredClone(input)
     const result = migrateProject(input, { t: EN })
@@ -82,9 +81,9 @@ describe('physical pocket component migration', () => {
     expect(children[0]).toMatchObject({
       tPocketTabWidth: 12,
       tPocketTaper: 25,
-      opening: defaultSlantedPocketOpening,
+      openingId: result.subProjects?.[0]?.defaultPocketOpening,
     })
-    expect(children[1]).toMatchObject({ opening: { type: 'slanted', offset: 23, side: 'start' } })
+    expect(children[1]).toMatchObject({ openingId: result.subProjects?.[0]?.defaultPocketOpening })
     expect(children[2]).toMatchObject({
       children: ['child'],
       layoutOrientation: 'vertical',
@@ -184,7 +183,7 @@ describe('physical pocket component migration', () => {
     )
     const components = result.subProjects?.[0]?.components ?? {}
     for (const id of components.cluster?.children ?? []) {
-      expect(components[id]).toMatchObject({ opening: { type: 'straight' } })
+      expect(components[id]).toMatchObject({ openingId: result.subProjects?.[0]?.defaultPocketOpening })
     }
   })
   it('does not populate an empty cluster already using the new model', () => {

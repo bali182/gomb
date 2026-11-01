@@ -3,7 +3,7 @@ import { useCallback, type FC } from 'react'
 import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketClusterSchema, PocketOpeningSchema, TPocketSchema } from '../../schemas/components'
+import type { PocketClusterSchema, TPocketSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { EditorNumberInput } from '../common/EditorNumberInput'
@@ -25,8 +25,8 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
     defaultTab: PocketEditorTabs.layout,
     tabs: PocketEditorTabs,
   })
-  const handleOpeningChange = useCallback(
-    (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
+  const handleOpeningIdChange = useCallback(
+    (openingId: string): void => onChange({ ...editable, openingId }),
     [editable, onChange],
   )
   const handleTabWidthChange = useCallback(
@@ -79,11 +79,10 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
             </SectionGroup.SectionRowEditor>
           </SectionGroup.Section>
           <PocketOpeningSection
-            modelId={editable.id}
+            pocket={component}
             cluster={parent}
-            editable={editable.opening}
-            issues={issues.opening}
-            onChange={handleOpeningChange}
+            openingId={editable.openingId}
+            onOpeningIdChange={handleOpeningIdChange}
           />
         </SectionGroup.Root>
       </Tabs.Content>

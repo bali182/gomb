@@ -4,7 +4,7 @@ import { useEditableHole } from '../../hooks/useEditableHole'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
-import { getModelIcon } from '../../utils/getModelIcon'
+import { getModelIconByType } from '../../utils/getModelIcon'
 import { HoleActionsMenu } from '../action-menus/HoleActionsMenu'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
@@ -24,7 +24,7 @@ export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement,
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<HoleSchema>
         editable={editableHole}
-        icon={getModelIcon(editedHole)}
+        icon={getModelIconByType(editedHole.type)}
         issues={validationIssues}
         menu={<HoleActionsMenu hole={editedHole} onAddStitchLine={onAdd} size="xs" />}
         onChange={setHole}

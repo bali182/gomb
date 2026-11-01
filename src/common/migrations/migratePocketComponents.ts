@@ -1,16 +1,9 @@
-import {
-  defaultFrontPocket,
-  defaultPocketCluster,
-  defaultRecessedPocketOpening,
-  defaultSlantedPocketOpening,
-  defaultTPocket,
-} from '../defaultStates'
+import { defaultFrontPocket, defaultPocketCluster, defaultTPocket } from '../defaultStates'
 import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
 import type {
   ComponentSchema,
   FrontPocketSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
   PocketSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -94,7 +87,7 @@ type LegacyPocketClusterStitchLineSchema = Omit<TPocketStitchLineSchema, 'type'>
 
 type PocketClusterMigrationResultSchema = {
   cluster: DeepPartialSchema<PocketClusterSchema>
-  pockets: PocketSchema[]
+  pockets: DeepPartialSchema<PocketSchema>[]
 }
 
 export const migratePocketComponents: ProjectMigration = (project, { t }) => ({
@@ -124,7 +117,7 @@ const migrateSubProjectPocketComponents = (
     const migrated = migratePocketCluster(legacy, names, translation)
     components[clusterId] = migrated.cluster
     for (const pocket of migrated.pockets) {
-      components[pocket.id] = pocket
+      components[m.requireString(pocket, 'id')] = pocket
     }
   }
   return {
@@ -140,18 +133,15 @@ const migratePocketCluster = (
   translation: TranslationSchema,
 ): PocketClusterMigrationResultSchema => {
   const count = Math.max(1, Math.floor(cluster.pocketCount ?? 3))
-  const pockets: PocketSchema[] = []
+  const pockets: DeepPartialSchema<PocketSchema>[] = []
   for (let index = 0; index < count; index += 1) {
-    const reference = cluster.openingMapping?.[index + 1]
-    const requested = cluster.openings?.find((opening) => opening.id === reference) ?? cluster.defaultOpening
-    const opening = migrateOpening(requested)
     const front = index === count - 1
     const name = getUnusedName(front ? translation.defaultNames.frontPocket : translation.defaultNames.tPocket, names)
     names.add(name)
     if (front) {
-      pockets.push(createMigratedFrontPocket(cluster, opening, name))
+      pockets.push(createMigratedFrontPocket(cluster, name))
     } else {
-      pockets.push(createMigratedTPocket(cluster, opening, name))
+      pockets.push(createMigratedTPocket(cluster, name))
     }
   }
   const {
@@ -167,21 +157,23 @@ const migratePocketCluster = (
     ...remaining
   } = cluster
   return {
-    cluster: { ...defaultPocketCluster, ...remaining, children: pockets.map((pocket) => pocket.id) },
+    cluster: {
+      ...defaultPocketCluster,
+      ...remaining,
+      children: pockets.map((pocket) => m.requireString(pocket, 'id')),
+    },
     pockets,
   }
 }
 
 const createMigratedFrontPocket = (
   cluster: DeepPartialSchema<LegacyPocketClusterSchema>,
-  opening: PocketOpeningSchema,
   name: string,
-): FrontPocketSchema => ({
+): DeepPartialSchema<FrontPocketSchema> => ({
   ...defaultFrontPocket,
   id: id(),
   name,
   color: cluster.color,
-  opening,
   children: cluster.children ?? [],
   layoutOrientation: cluster.layoutOrientation ?? defaultFrontPocket.layoutOrientation,
   layoutGap: cluster.layoutGap ?? defaultFrontPocket.layoutGap,
@@ -195,14 +187,12 @@ const createMigratedFrontPocket = (
 
 const createMigratedTPocket = (
   cluster: DeepPartialSchema<LegacyPocketClusterSchema>,
-  opening: PocketOpeningSchema,
   name: string,
-): TPocketSchema => ({
+): DeepPartialSchema<TPocketSchema> => ({
   ...defaultTPocket,
   id: id(),
   name,
   color: cluster.color,
-  opening,
   children: [],
   tPocketTabWidth: cluster.tPocketTabWidth ?? defaultTPocket.tPocketTabWidth,
   tPocketTaper: cluster.tPocketTaper ?? defaultTPocket.tPocketTaper,
@@ -218,26 +208,4 @@ const migratePocketClusterStitchLines = (
     }
     return { ...line, type: 't-pocket-stitch-line' }
   })
-}
-
-const migrateOpening = (input: DeepPartialSchema<LegacyOpeningSchema> | undefined): PocketOpeningSchema => {
-  switch (input?.type) {
-    case 'slanted':
-      return {
-        type: 'slanted',
-        offset: input.offset ?? defaultSlantedPocketOpening.offset,
-        side: input.side ?? defaultSlantedPocketOpening.side,
-      }
-    case 'recessed':
-      return {
-        type: 'recessed',
-        outerInset: input.outerInset ?? defaultRecessedPocketOpening.outerInset,
-        innerOffset: input.innerOffset ?? defaultRecessedPocketOpening.innerOffset,
-        outerRadius: input.outerRadius ?? defaultRecessedPocketOpening.outerRadius,
-        innerRadius: input.innerRadius ?? defaultRecessedPocketOpening.innerRadius,
-        depth: input.depth ?? defaultRecessedPocketOpening.depth,
-      }
-    default:
-      return { type: 'straight' }
-  }
 }

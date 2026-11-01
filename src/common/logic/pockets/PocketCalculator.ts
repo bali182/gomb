@@ -2,8 +2,9 @@ import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
-import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, PathCommand, PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 
 /** One pocket's immutable calculation inputs. Opening paths are local previews, complete paths are positioned. */
 export abstract class PocketCalculator<T extends PocketOpeningSchema> {

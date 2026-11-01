@@ -9,7 +9,6 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
   PocketOrientationSchema,
   RootPanelSchema,
 } from '../../schemas/components'
@@ -143,16 +142,12 @@ const flipComponent = (
     }
     case 'front-pocket': {
       const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
-      const flippedOrientation = flippedComponentIds.has(cluster.id)
-        ? flipOrientation(cluster.orientation, axis)
-        : cluster.orientation
       const flipped: FrontPocketSchema = {
         ...component,
         ...flipCornerRadii(component, axis),
         children: flipChildOrder(component, axis),
         mainAxisAnchor:
           component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
-        opening: flipPocketOpening(component.opening, cluster.orientation, flippedOrientation, axis),
         itemCrossAxisOffset: isCrossAxisFlip(cluster.orientation, axis)
           ? 0 - component.itemCrossAxisOffset
           : component.itemCrossAxisOffset,
@@ -161,16 +156,10 @@ const flipComponent = (
     }
     case 't-pocket': {
       const cluster = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
-      const flippedOrientation = flippedComponentIds.has(cluster.id)
-        ? flipOrientation(cluster.orientation, axis)
-        : cluster.orientation
-      const opening = flipPocketOpening(component.opening, cluster.orientation, flippedOrientation, axis)
       const itemCrossAxisOffset = isCrossAxisFlip(cluster.orientation, axis)
         ? 0 - component.itemCrossAxisOffset
         : component.itemCrossAxisOffset
-      return opening === component.opening && itemCrossAxisOffset === component.itemCrossAxisOffset
-        ? component
-        : { ...component, opening, itemCrossAxisOffset }
+      return itemCrossAxisOffset === component.itemCrossAxisOffset ? component : { ...component, itemCrossAxisOffset }
     }
   }
 }
@@ -275,27 +264,6 @@ const flipStitchLine = (
             stitchDisconnectedBottomRightCorner: stitchLine.stitchDisconnectedTopRightCorner,
           }
       }
-  }
-}
-
-const flipPocketOpening = (
-  opening: PocketOpeningSchema,
-  originalOrientation: PocketOrientationSchema,
-  flippedOrientation: PocketOrientationSchema,
-  axis: FlipAxisSchema,
-): PocketOpeningSchema => {
-  // Reversing the cluster's opening direction also reverses its local start/end convention.
-  if (originalOrientation === flippedOrientation && !isCrossAxisFlip(originalOrientation, axis)) {
-    return opening
-  }
-  switch (opening.type) {
-    case 'straight':
-    case 'recessed':
-      return opening
-    case 'slanted':
-      return { ...opening, side: opening.side === 'start' ? 'end' : 'start' }
-    case 'optical-illusion':
-      return { ...opening, direction: opening.direction === 'start' ? 'end' : 'start' }
   }
 }
 

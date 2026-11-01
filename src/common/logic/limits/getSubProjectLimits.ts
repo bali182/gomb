@@ -153,6 +153,7 @@ const getComponentLimits = (
       }
       return getFrontPocketLimits(
         component,
+        accessors.subProject(subProject).pocketOpening.byId(component.openingId),
         narrowers.assert.computedFrontPocket(computed),
         normalizePocketCluster(cluster, parent.boundingRect),
         parent,
@@ -168,6 +169,7 @@ const getComponentLimits = (
       }
       return getTPocketLimits(
         component,
+        accessors.subProject(subProject).pocketOpening.byId(component.openingId),
         narrowers.assert.computedTPocket(computed),
         normalizePocketCluster(cluster, parent.boundingRect),
       )

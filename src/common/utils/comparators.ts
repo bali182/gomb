@@ -3,11 +3,11 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
@@ -57,6 +57,12 @@ export const comparators = {
     return (
       a.id === b.id &&
       a.root === b.root &&
+      a.defaultPocketOpening === b.defaultPocketOpening &&
+      Object.keys(a.pocketOpenings).length === Object.keys(b.pocketOpenings).length &&
+      Object.entries(a.pocketOpenings).every(
+        ([id, opening]) =>
+          id in b.pocketOpenings && comparators.pocketOpening(opening, accessor.pocketOpening.byId(id)),
+      ) &&
       Object.keys(a.components).length === Object.keys(b.components).length &&
       Object.entries(a.components).every(
         ([id, component]) => id in b.components && comparators.component(component, accessor.component.byId(id)),
@@ -126,6 +132,9 @@ export const comparators = {
     )
   },
   pocketOpening: (a: PocketOpeningSchema, b: PocketOpeningSchema): boolean => {
+    if (a.id !== b.id || a.name !== b.name) {
+      return false
+    }
     if (narrowers.is.opticalIllusionPocketOpening(a) && narrowers.is.opticalIllusionPocketOpening(b)) {
       return (
         a.direction === b.direction &&
@@ -169,7 +178,7 @@ export const comparators = {
     a.itemOrientation === b.itemOrientation &&
     a.itemCrossAxisOffset === b.itemCrossAxisOffset &&
     a.itemOpeningOffset === b.itemOpeningOffset &&
-    comparators.pocketOpening(a.opening, b.opening),
+    a.openingId === b.openingId,
   tPocket: (a: TPocketSchema, b: TPocketSchema): boolean =>
     a.id === b.id &&
     a.name === b.name &&
@@ -181,7 +190,7 @@ export const comparators = {
     a.itemOrientation === b.itemOrientation &&
     a.itemCrossAxisOffset === b.itemCrossAxisOffset &&
     a.itemOpeningOffset === b.itemOpeningOffset &&
-    comparators.pocketOpening(a.opening, b.opening),
+    a.openingId === b.openingId,
   pocketCluster: (a: PocketClusterSchema, b: PocketClusterSchema): boolean => {
     return (
       a.id === b.id &&

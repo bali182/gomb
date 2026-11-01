@@ -1,25 +1,24 @@
 import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
-import { useCallback, type FC } from 'react'
+import { useCallback, useMemo, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiCaretDown } from 'react-icons/pi'
 import { useEditorContext } from '../../../contexts/EditorContext'
-import {
-  defaultOpticalIllusionPocketOpening,
-  defaultRecessedPocketOpening,
-  defaultSlantedPocketOpening,
-} from '../../../defaultStates'
+import { useCombinedIssues } from '../../../hooks/useCombinedIssues'
+import { useEditablePocketOpening } from '../../../hooks/useEditablePocketOpening'
+import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
+import type { PocketClusterSchema, PocketSchema } from '../../../schemas/components'
+import type { IssuesSchema } from '../../../schemas/issues'
 import type {
   OpticalIllusionPocketOpeningSchema,
-  PocketClusterSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   SlantedPocketOpeningSchema,
-} from '../../../schemas/components'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import { getEditableSchema } from '../../../utils/getEditableSchema'
+} from '../../../schemas/pocketOpening'
+import { accessors } from '../../../utils/accessors'
+import { getLimitIssues } from '../../../utils/getLimitIssues'
+import { isDefined } from '../../../utils/isDefined'
 import { noIssues } from '../../../utils/issueUtils'
 import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -33,13 +32,12 @@ import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
 import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
 type PocketOpeningSectionProps = {
-  modelId: string
+  pocket: PocketSchema
   cluster: PocketClusterSchema
-  editable: EditableSchema<PocketOpeningSchema>
-  issues: IssuesSchema<PocketOpeningSchema> | undefined
-  onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
+  openingId: string
+  onOpeningIdChange: (openingId: string) => void
 }
-const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted', 'optical-illusion']
+
 const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
   'optical-illusion': OpticalIllusionPocketOpeningIcon,
   straight: StraightPocketOpeningIcon,
@@ -47,36 +45,48 @@ const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
   slanted: SlantedPocketOpeningIcon,
 }
 
-export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
-  modelId,
+export const PocketOpeningSection: FC<PocketOpeningSectionProps> = (props) => (
+  <PocketOpeningSectionContent key={props.openingId} {...props} />
+)
+
+const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({
+  pocket,
   cluster,
-  editable,
-  issues: incomingIssues,
-  onChange,
+  openingId,
+  onOpeningIdChange,
 }) => {
+  const { subProject, computedSubProject } = useSubProject()
   const { isComputing, setEditingInputId } = useEditorContext()
-  const { t, language } = useTranslation()
-  const issues = incomingIssues ?? noIssues<PocketOpeningSchema>()
-  const OpeningIcon = openingIcons[editable.type]
-  const handleTypeChange = useCallback(
+  const translation = useTranslation()
+  const { t } = translation
+  const {
+    opening,
+    editableOpening: editable,
+    validationIssues,
+    setOpening: onChange,
+  } = useEditablePocketOpening(openingId)
+
+  const limits = accessors.computedSubProject(computedSubProject).limits.component(pocket.id)
+
+  const limitIssues = useMemo<IssuesSchema<PocketOpeningSchema>>(() => {
+    if ((limits.type === 'front-pocket' || limits.type === 't-pocket') && limits.opening.type === opening.type) {
+      return getLimitIssues(opening, limits.opening, translation)
+    }
+    return noIssues<PocketOpeningSchema>()
+  }, [opening, limits, translation])
+
+  const issues = useCombinedIssues<PocketOpeningSchema>(validationIssues, limitIssues)
+
+  const OpeningIcon = openingIcons[opening.type]
+
+  const handleOpeningChange = useCallback(
     (details: MenuValueChangeDetails): void => {
-      setEditingInputId(undefined)
-      switch (details.value) {
-        case 'optical-illusion':
-          onChange(getEditableSchema(defaultOpticalIllusionPocketOpening, { language }))
-          break
-        case 'straight':
-          onChange({ type: 'straight' })
-          break
-        case 'recessed':
-          onChange(getEditableSchema(defaultRecessedPocketOpening, { language }))
-          break
-        case 'slanted':
-          onChange(getEditableSchema(defaultSlantedPocketOpening, { language }))
-          break
+      if (isDefined(accessors.subProject(subProject).optional.pocketOpening.byId(details.value))) {
+        setEditingInputId(undefined)
+        onOpeningIdChange(details.value)
       }
     },
-    [language, onChange, setEditingInputId],
+    [onOpeningIdChange, setEditingInputId, subProject],
   )
   return (
     <SectionGroup.Section>
@@ -92,20 +102,20 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
                 _expanded={{ bg: 'bg.emphasized' }}
               >
                 <OpeningIcon />
-                {t.project.editors.enums.components.pocketOpening[editable.type]}
+                {opening.name}
                 <PiCaretDown />
               </MiniButton>
             </Menu.Trigger>
             <Portal container={portalRef}>
               <Menu.Positioner>
                 <Menu.Content width="max-content">
-                  <Menu.RadioItemGroup value={editable.type} onValueChange={handleTypeChange}>
-                    {openingTypes.map((type) => {
-                      const Icon = openingIcons[type]
+                  <Menu.RadioItemGroup value={openingId} onValueChange={handleOpeningChange}>
+                    {Object.values(subProject.pocketOpenings).map((candidate) => {
+                      const Icon = openingIcons[candidate.type]
                       return (
-                        <Menu.RadioItem disabled={isComputing} key={type} value={type}>
+                        <Menu.RadioItem disabled={isComputing} key={candidate.id} value={candidate.id}>
                           <Icon />
-                          <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
+                          <Menu.ItemText>{candidate.name}</Menu.ItemText>
                           <Menu.ItemIndicator />
                         </Menu.RadioItem>
                       )
@@ -119,10 +129,9 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       >
         {t.project.editors.sections.components.pocketOpening.title}
       </SectionGroup.SectionHeader>
-
       {editable.type === 'optical-illusion' && (
         <OpticalIllusionPocketOpeningFields
-          modelId={modelId}
+          modelId={opening.id}
           editable={editable}
           issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
           orientation={cluster.orientation}
@@ -138,7 +147,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       )}
       {editable.type === 'recessed' && (
         <RecessedPocketOpeningFields
-          modelId={modelId}
+          modelId={opening.id}
           editable={editable}
           issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
           onChange={onChange}
@@ -146,7 +155,7 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       )}
       {editable.type === 'slanted' && (
         <SlantedPocketOpeningFields
-          modelId={modelId}
+          modelId={opening.id}
           editable={editable}
           issues={issues as IssuesSchema<SlantedPocketOpeningSchema>}
           orientation={cluster.orientation}

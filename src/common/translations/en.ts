@@ -15,19 +15,21 @@ import type {
   HasLayoutSchema,
   HasPocketItemSchema,
   LayoutOrientationSchema,
-  OpticalIllusionPocketOpeningOwnSchema,
-  PocketOpeningSchema,
-  PocketOpeningSideSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  RecessedPocketOpeningOwnSchema,
-  SlantedPocketOpeningOwnSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
 import type { PocketSettingsCopySelectionSchema } from '../schemas/pocketCopy'
+import type {
+  OpticalIllusionPocketOpeningOwnSchema,
+  PocketOpeningSchema,
+  PocketOpeningSideSchema,
+  RecessedPocketOpeningOwnSchema,
+  SlantedPocketOpeningOwnSchema,
+} from '../schemas/pocketOpening'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,

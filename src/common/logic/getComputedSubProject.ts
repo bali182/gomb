@@ -237,7 +237,13 @@ const computePocketCluster = (
     { ...pocketCluster, children: pockets.map((pocket) => pocket.id) },
     boundingRect,
   )
-  const geometry = calculatePocketClusterGeometry(normalizedPocketCluster, pockets, boundingRect, cornerRadius)
+  const geometry = calculatePocketClusterGeometry(
+    normalizedPocketCluster,
+    pockets,
+    boundingRect,
+    cornerRadius,
+    subProject,
+  )
   completePocketChildren(geometry.children, subProject, resolvedStitchLines, computedComponents)
   const computed: ComputedPocketClusterSchema = {
     type: 'computed-pocket-cluster',

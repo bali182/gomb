@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
 import { ZERO } from '../../constants/layout'
-import type { PocketOpeningSchema } from '../../schemas/components'
 import type { PathSchema } from '../../schemas/geometry'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { getTPocketTabDepth } from '../pocketUtils'
 import { PocketCalculator } from './PocketCalculator'
 

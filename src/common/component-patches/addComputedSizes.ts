@@ -1,32 +1,36 @@
-import { updateProjectComponents } from '../operations/subProject/utils/updateProjectComponents'
 import { ComponentSchema, HasAutoDimensionsSchema, HasChildrenSchema, HasLayoutSchema } from '../schemas/components'
 import { ComputedPanelSchema, ComputedPocketClusterSchema, HasComputedLayoutGapSchema } from '../schemas/computed'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { narrowers } from '../utils/narrowers'
+import { updateComponents } from '../utils/updateComponents'
 
 export const addComputedSizes = (
   subProject: SubProjectSchema,
   computedProject: ComputedSubProjectSchema,
 ): SubProjectSchema => {
-  return updateProjectComponents(subProject, computedProject, (_id, component, computedComponent) => {
-    switch (component.type) {
-      case 't-pocket':
-        return component
-      case 'front-pocket':
-        return updateAutoLayoutGapComponent(component, narrowers.assert.computedFrontPocket(computedComponent))
-      case 'root-panel': {
-        const computedRootPanel = narrowers.assert.computedRootPanel(computedComponent)
-        return updateAutoLayoutGapComponent(component, computedRootPanel)
+  return updateComponents({
+    subProject,
+    computedSubProject: computedProject,
+    mapper: (_id, component, computedComponent) => {
+      switch (component.type) {
+        case 't-pocket':
+          return component
+        case 'front-pocket':
+          return updateAutoLayoutGapComponent(component, narrowers.assert.computedFrontPocket(computedComponent))
+        case 'root-panel': {
+          const computedRootPanel = narrowers.assert.computedRootPanel(computedComponent)
+          return updateAutoLayoutGapComponent(component, computedRootPanel)
+        }
+        case 'panel': {
+          const computedPanel = narrowers.assert.computedPanel(computedComponent)
+          return updateAutoLayoutGapComponent(updateAutoSizeComponent(component, computedPanel), computedPanel)
+        }
+        case 'pocket-cluster': {
+          const computedCluster = narrowers.assert.computedPocketCluster(computedComponent)
+          return updateAutoSizeComponent(component, computedCluster)
+        }
       }
-      case 'panel': {
-        const computedPanel = narrowers.assert.computedPanel(computedComponent)
-        return updateAutoLayoutGapComponent(updateAutoSizeComponent(component, computedPanel), computedPanel)
-      }
-      case 'pocket-cluster': {
-        const computedCluster = narrowers.assert.computedPocketCluster(computedComponent)
-        return updateAutoSizeComponent(component, computedCluster)
-      }
-    }
+    },
   })
 }
 

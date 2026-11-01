@@ -7,7 +7,6 @@ import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
 import { validatePocketItemSchema } from './validatePocketItemSchema'
-import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 export const validateFrontPocketSchema = (
   input: EditableSchema<FrontPocketSchema>,
@@ -44,7 +43,6 @@ export const validateFrontPocketSchema = (
     min: 0,
   })
   const pocketItemResult = validatePocketItemSchema(input, currentValue, context)
-  const openingResult = validatePocketOpeningSchema(input.opening, currentValue.opening, context)
 
   const issues: IssuesSchema<FrontPocketSchema> = {
     ...pocketItemResult.issues,
@@ -57,7 +55,7 @@ export const validateFrontPocketSchema = (
     topRightRadius: topRightRadiusResult.issues,
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
-    opening: openingResult.issues,
+    openingId: undefined,
   }
   const committedValue: FrontPocketSchema = {
     ...currentValue,
@@ -71,7 +69,7 @@ export const validateFrontPocketSchema = (
     topRightRadius: topRightRadiusResult.committedValue,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
-    opening: openingResult.committedValue,
+    openingId: input.openingId,
     individualRadii: input.individualRadii,
     autoLayoutGap: input.autoLayoutGap,
   }
@@ -85,8 +83,7 @@ export const validateFrontPocketSchema = (
     !topRightRadiusResult.isValid ||
     !bottomLeftRadiusResult.isValid ||
     !bottomRightRadiusResult.isValid ||
-    !pocketItemResult.isValid ||
-    !openingResult.isValid
+    !pocketItemResult.isValid
   ) {
     return createInvalidValidationResult(issues, committedValue)
   }

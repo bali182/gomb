@@ -1,6 +1,7 @@
 import type { ComponentSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectMigration, ProjectMigrationContextSchema, ProjectMigratorSchema } from '../schemas/migration'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
@@ -37,6 +38,14 @@ const migrateSubProject = (
   context: ProjectMigrationContextSchema,
 ): DeepPartialSchema<SubProjectSchema> => {
   const migratedSubProject = migrator.subProject(m.requireObject(subProject), context)
+  const pocketOpenings = Object.fromEntries(
+    Object.entries(
+      m.requireObjectField<SubProjectSchema, Record<string, PocketOpeningSchema>>(migratedSubProject, 'pocketOpenings'),
+    ).map(([id, opening]) => [
+      id,
+      migratePocketOpening(migrator, m.requireObject<PocketOpeningSchema>(opening), context),
+    ]),
+  )
   const components = Object.fromEntries(
     Object.entries(m.requireObject(migratedSubProject.components)).map(([id, component]) => [
       id,
@@ -52,9 +61,29 @@ const migrateSubProject = (
 
   return {
     ...migratedSubProject,
+    pocketOpenings,
     components,
     holes,
     stitchLines,
+  }
+}
+
+const migratePocketOpening = (
+  migrator: ProjectMigratorSchema,
+  opening: DeepPartialSchema<PocketOpeningSchema>,
+  context: ProjectMigrationContextSchema,
+): DeepPartialSchema<PocketOpeningSchema> => {
+  switch (opening.type) {
+    case 'straight':
+      return migrator.straightPocketOpening(opening, context)
+    case 'recessed':
+      return migrator.recessedPocketOpening(opening, context)
+    case 'slanted':
+      return migrator.slantedPocketOpening(opening, context)
+    case 'optical-illusion':
+      return migrator.opticalIllusionPocketOpening(opening, context)
+    default:
+      throw new Error('Unknown pocket opening type')
   }
 }
 

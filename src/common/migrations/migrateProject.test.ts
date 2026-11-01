@@ -1,6 +1,7 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 import { defaultOpticalIllusionPocketOpening } from '../defaultStates'
+import { loadProjectFromContents } from '../utils/loadProjectFromContents'
 
 import { VERSION } from '../../version'
 import type { HasStretchSchema } from '../schemas/common'
@@ -60,7 +61,7 @@ describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: 
 
 const createProjectWithSubProject = (): ProjectSchema => {
   const project = createProject('Project')
-  const subProject = createSubProject('Root', project.stitchingSettings)
+  const subProject = createSubProject('Root', project.stitchingSettings, 'Straight')
 
   return {
     ...project,
@@ -254,33 +255,81 @@ describe('migrateProject', () => {
   })
 })
 
-describe('optical illusion opening migration', () => {
-  it('fills opening defaults and preserves custom configuration on a second migration', () => {
+describe('standalone opening migration', () => {
+  it('fills missing parameters and preserves standalone identities, references and unused openings', () => {
     const root = d.rootPanel({ id: 'root', children: ['cluster'] })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
-    const t = d.tPocket({
-      id: 't',
-      opening: {
-        ...defaultOpticalIllusionPocketOpening,
-        direction: 'start',
-        startInset: 17,
-        endInset: 23,
-        leadingRadius: 4,
-        trailingRadius: 9,
-      },
-    })
-    const front = d.frontPocket({ id: 'front', opening: defaultOpticalIllusionPocketOpening })
+    const opening = {
+      type: 'optical-illusion' as const,
+      ...defaultOpticalIllusionPocketOpening,
+      id: 'optical',
+      name: 'Optical',
+      startInset: 17,
+      endInset: 23,
+      leadingRadius: 4,
+      trailingRadius: 9,
+    }
+    const unused = { ...opening, id: 'unused', name: 'Unused' }
+    const t = d.tPocket({ id: 't', openingId: opening.id })
+    const front = d.frontPocket({ id: 'front' })
     const project: DeepPartialSchema<ProjectSchema> = d.project({
       id: 'project',
-      subProjects: [d.subProject({ id: 'sub', root, components: [cluster, t, front] })],
+      subProjects: [
+        d.subProject({ id: 'sub', root, components: [cluster, t, front], pocketOpenings: [opening, unused] }),
+      ],
     })
-    const frontInput = project.subProjects?.[0]?.components?.front
-    if (!isDefined(frontInput) || frontInput.type !== 'front-pocket') throw new Error('Missing front')
-    frontInput.opening = { type: 'optical-illusion' }
+    const openingInput = project.subProjects?.[0]?.pocketOpenings?.optical
+    if (!isDefined(openingInput) || openingInput.type !== 'optical-illusion') {
+      throw new Error('Missing opening')
+    }
+    delete openingInput.trailingRadius
     const migrated = migrateProject(project, context)
-    expect(migrated.subProjects?.[0]?.components?.front).toHaveProperty('opening', defaultOpticalIllusionPocketOpening)
-    expect(migrated.subProjects?.[0]?.components?.t).toHaveProperty('opening', t.opening)
+    expect(migrated.subProjects?.[0]?.pocketOpenings?.optical).toEqual({
+      ...opening,
+      trailingRadius: defaultOpticalIllusionPocketOpening.trailingRadius,
+    })
+    expect(migrated.subProjects?.[0]?.pocketOpenings?.unused).toEqual(unused)
+    expect(migrated.subProjects?.[0]?.components?.t).toHaveProperty('openingId', opening.id)
     expect(migrateProject(migrated, context)).toEqual(migrated)
     expect(typia.is<ProjectSchema>(migrated)).toBe(true)
   })
+})
+
+it('loads inline pockets using the subproject default and prunes obsolete opening fields', () => {
+  const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+  const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
+  const { openingId: _tOpeningId, ...t } = d.tPocket({ id: 't' })
+  const { openingId: _frontOpeningId, ...front } = d.frontPocket({ id: 'front' })
+  const base = d.subProject({ id: 'sub', root, components: [cluster] })
+  const { defaultPocketOpening: _defaultPocketOpening, pocketOpenings: _pocketOpenings, ...legacySubProject } = base
+  const legacy = {
+    ...d.project({ id: 'project', subProjects: [] }),
+    version: '0.0.0',
+    subProjects: [
+      {
+        ...legacySubProject,
+        components: {
+          ...legacySubProject.components,
+          t: { ...t, opening: { type: 'slanted', side: 'end', offset: 23 } },
+          front: { ...front, opening: { type: 'recessed', depth: 12 } },
+        },
+      },
+    ],
+  }
+  const loaded = loadProjectFromContents(JSON.stringify(legacy), context)
+  const subProject = loaded.subProjects[0]
+  const separatelyLoaded = loadProjectFromContents(JSON.stringify(legacy), context)
+  expect(subProject.defaultPocketOpening).not.toBe(separatelyLoaded.subProjects[0].defaultPocketOpening)
+  expect(subProject.pocketOpenings).toEqual({
+    [subProject.defaultPocketOpening]: {
+      id: subProject.defaultPocketOpening,
+      name: EN.project.editors.enums.components.pocketOpening.straight,
+      type: 'straight',
+    },
+  })
+  for (const id of ['t', 'front']) {
+    expect(subProject.components[id]).toHaveProperty('openingId', subProject.defaultPocketOpening)
+    expect(subProject.components[id]).not.toHaveProperty('opening')
+  }
+  expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(loaded)
 })

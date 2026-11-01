@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
 import { ZERO } from '../../constants/layout'
-import type { PocketClusterSchema, PocketSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { SlantedPocketOpeningLimitsSchema } from '../../schemas/limits'
+import type { SlantedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { narrowers } from '../../utils/narrowers'
 import { getTPocketTabDepth } from '../pocketUtils'
 

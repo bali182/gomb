@@ -5,7 +5,7 @@ export type SubProjectHistorySchema = {
   redo: SubProjectSchema[]
 }
 
-export type SubProjectHistoryEntitySchema = 'component' | 'hole' | 'stitch-line'
+export type SubProjectHistoryEntitySchema = 'component' | 'hole' | 'stitch-line' | 'opening'
 
 export type SubProjectHistoryThrottleKeySchema = `${SubProjectHistoryEntitySchema}:${string}`
 

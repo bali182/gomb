@@ -3,13 +3,10 @@ import { useCallback, useMemo, type FC } from 'react'
 import { EditorSelect } from '../../common/EditorSelect'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type {
-  PocketOpeningSideSchema,
-  PocketOrientationSchema,
-  SlantedPocketOpeningSchema,
-} from '../../../schemas/components'
+import type { PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
+import type { PocketOpeningSideSchema, SlantedPocketOpeningSchema } from '../../../schemas/pocketOpening'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -101,7 +98,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
       <SectionGroup.SectionRowEditor issue={issues.offset}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.offset"
+          field="offset"
           value={editable.offset}
           issue={issues.offset}
           onChange={handleOffsetChange}

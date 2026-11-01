@@ -1,9 +1,9 @@
 import { useCallback, type FC } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { RecessedPocketOpeningSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
+import type { RecessedPocketOpeningSchema } from '../../../schemas/pocketOpening'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
@@ -62,7 +62,7 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.outerInset}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.outerInset"
+          field="outerInset"
           value={editable.outerInset}
           issue={issues.outerInset}
           onChange={handleOuterInsetChange}
@@ -77,7 +77,7 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.innerOffset}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.innerOffset"
+          field="innerOffset"
           value={editable.innerOffset}
           issue={issues.innerOffset}
           onChange={handleInnerOffsetChange}
@@ -90,7 +90,7 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.depth}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.depth"
+          field="depth"
           value={editable.depth}
           issue={issues.depth}
           onChange={handleDepthChange}
@@ -105,7 +105,7 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.outerRadius}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.outerRadius"
+          field="outerRadius"
           value={editable.outerRadius}
           issue={issues.outerRadius}
           onChange={handleOuterRadiusChange}
@@ -120,7 +120,7 @@ export const RecessedPocketOpeningFields: FC<RecessedPocketOpeningFieldsProps> =
       <SectionGroup.SectionRowEditor issue={issues.innerRadius}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.innerRadius"
+          field="innerRadius"
           value={editable.innerRadius}
           issue={issues.innerRadius}
           onChange={handleInnerRadiusChange}

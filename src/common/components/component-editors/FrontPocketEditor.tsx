@@ -4,7 +4,7 @@ import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
-import type { FrontPocketSchema, PocketClusterSchema, PocketOpeningSchema } from '../../schemas/components'
+import type { FrontPocketSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
@@ -27,8 +27,8 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
     tabs: PocketEditorTabs,
   })
   const { t } = useTranslation()
-  const handleOpeningChange = useCallback(
-    (opening: EditableSchema<PocketOpeningSchema>): void => onChange({ ...editable, opening }),
+  const handleOpeningIdChange = useCallback(
+    (openingId: string): void => onChange({ ...editable, openingId }),
     [editable, onChange],
   )
   const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
@@ -67,11 +67,10 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
             onChange={onChange}
           />
           <PocketOpeningSection
-            modelId={editable.id}
+            pocket={component}
             cluster={parent}
-            editable={editable.opening}
-            issues={issues.opening}
-            onChange={handleOpeningChange}
+            openingId={editable.openingId}
+            onOpeningIdChange={handleOpeningIdChange}
           />
         </SectionGroup.Root>
       </Tabs.Content>

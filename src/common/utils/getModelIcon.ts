@@ -9,8 +9,10 @@ import { SlantedFrontPocketIcon } from '../components/icons/SlantedFrontPocketIc
 import { SlantedTPocketIcon } from '../components/icons/SlantedTPocketIcon'
 import { StraightFrontPocketIcon } from '../components/icons/StraightFrontPocketIcon'
 import { StraightTPocketIcon } from '../components/icons/StraightTPocketIcon'
-import type { PocketOpeningSchema } from '../schemas/components'
 import type { ModelObjectSchema } from '../schemas/modelObject'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
+import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from './accessors'
 
 const frontPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
   'optical-illusion': OpticalIllusionFrontPocketIcon,
@@ -26,12 +28,12 @@ const tPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
   slanted: SlantedTPocketIcon,
 }
 
-export const getModelIcon = (model: ModelObjectSchema): IconType => {
+export const getModelIcon = (model: ModelObjectSchema, subProject: SubProjectSchema): IconType => {
   switch (model.type) {
     case 'front-pocket':
-      return frontPocketIcons[model.opening.type]
+      return frontPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
     case 't-pocket':
-      return tPocketIcons[model.opening.type]
+      return tPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
     default:
       return getModelIconByType(model.type)
   }

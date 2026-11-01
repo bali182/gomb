@@ -9,15 +9,10 @@ import type { HasTypeSchema } from '../schemas/common'
 import type {
   ComponentSchema,
   FrontPocketSchema,
-  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
   PocketSchema,
-  RecessedPocketOpeningSchema,
   RootPanelSchema,
-  SlantedPocketOpeningSchema,
-  StraightPocketOpeningSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type {
@@ -38,6 +33,13 @@ import type {
 import type { HoleSchema } from '../schemas/hole'
 import type { IssueSchema } from '../schemas/issues'
 import type { ModelObjectSchema } from '../schemas/modelObject'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  PocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from '../schemas/pocketOpening'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import { isRecord } from './isRecord'
 

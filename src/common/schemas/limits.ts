@@ -2,18 +2,20 @@ import type BigNumber from 'bignumber.js'
 import type { HasCornerRadiusValuesSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
 import type {
   FrontPocketSchema,
-  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketsSchema,
-  RecessedPocketOpeningSchema,
   RootPanelSchema,
-  SlantedPocketOpeningSchema,
-  StraightPocketOpeningSchema,
   TPocketSchema,
 } from './components'
 import type { HoleSchema } from './hole'
 import type { SeveritySchema } from './issues'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from './pocketOpening'
 import type { ComponentBoundsStitchLineSchema, TPocketStitchLineSchema } from './stitching'
 import type { NumericFieldNameSchema } from './utils'
 

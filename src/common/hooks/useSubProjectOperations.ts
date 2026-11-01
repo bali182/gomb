@@ -1,4 +1,7 @@
 import { useCallback, useMemo } from 'react'
+import { deletePocketOpening as deletePocketOpeningPure } from '../operations/subProject/deletePocketOpening'
+import { updatePocketOpening as updatePocketOpeningPure } from '../operations/subProject/updatePocketOpening'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 
 import { useEditorContext } from '../contexts/EditorContext'
 import {
@@ -44,6 +47,8 @@ import { useSubProjectHistory } from './useSubProjectHistory'
 import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
+  updatePocketOpening: (opening: PocketOpeningSchema) => void
+  deletePocketOpening: (openingId: string) => void
   addComponent: (
     parentId: string,
     type: ComponentSchema['type'],
@@ -75,6 +80,32 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { recordChange, recordThrottledChange: recordThrottledUpdate } = useSubProjectHistory()
   const { t } = useTranslation()
 
+  const updatePocketOpening = useCallback(
+    (opening: PocketOpeningSchema): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = updatePocketOpeningPure(currentSubProject, { opening })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordThrottledUpdate(`opening:${opening.id}`, currentSubProject)
+      setSubProject(updated)
+    },
+    [recordThrottledUpdate, setSubProject, subProject],
+  )
+
+  const deletePocketOpening = useCallback(
+    (openingId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = deletePocketOpeningPure(currentSubProject, { openingId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
+  )
+
   const addComponent = useCallback(
     (parentId: string, type: ComponentSchema['type'], position: ComponentInsertionPositionSchema): ComponentSchema => {
       const currentProject = ensureProject(project)
@@ -85,6 +116,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
         id: id(),
         name: getUnusedComponentName(type, currentSubProject, t.defaultNames),
         stitchingSettings: currentProject.stitchingSettings,
+        openingId: currentSubProject.defaultPocketOpening,
       })
 
       recordChange(currentSubProject)
@@ -366,6 +398,8 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
 
   return useMemo<UseSubProjectOperationsOutput>(
     () => ({
+      updatePocketOpening,
+      deletePocketOpening,
       addComponent,
       addHole,
       addStitchLineToComponent,
@@ -387,6 +421,8 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       updateStitchLine,
     }),
     [
+      updatePocketOpening,
+      deletePocketOpening,
       addComponent,
       addHole,
       addStitchLineToComponent,
@@ -442,7 +478,7 @@ const copyPocketFields = (
     }
   }
   if (selection.copyOpening) {
-    updatedPocket = { ...updatedPocket, opening: { ...source.opening } }
+    updatedPocket = { ...updatedPocket, openingId: source.openingId }
   }
   if (selection.copyShape && narrowers.is.tPocket(source) && narrowers.is.tPocket(updatedPocket)) {
     updatedPocket = {

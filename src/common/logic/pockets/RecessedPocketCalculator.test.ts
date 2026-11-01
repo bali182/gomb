@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
-import type { PocketOrientationSchema, RecessedPocketOpeningSchema } from '../../schemas/components'
+import type { PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
+import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { getPathSegments } from '../pathSegments'
 import type { ArcPathSegment, PathSegment } from '../pathSegmentTypes'
@@ -19,6 +20,8 @@ const rect: RectSchema = {
 }
 
 const createOpening = (overrides: Partial<RecessedPocketOpeningSchema> = {}): RecessedPocketOpeningSchema => ({
+  id: 'opening',
+  name: 'Opening',
   type: 'recessed',
   outerInset: 29,
   innerOffset: 15,

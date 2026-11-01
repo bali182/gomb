@@ -1,12 +1,14 @@
 import type { FrontPocketSchema, PocketClusterSchema } from '../../schemas/components'
 import type { ComputedFrontPocketSchema, ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { FrontPocketLimitsSchema } from '../../schemas/limits'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { getCornerRadius } from '../cornerRadiusUtils'
 import { getFrontPocketCornerRadiusLimits } from './getFrontPocketCornerRadiusLimits'
 import { getPocketOpeningLimits } from './getPocketOpeningLimits'
 
 export const getFrontPocketLimits = (
   pocket: FrontPocketSchema,
+  opening: PocketOpeningSchema,
   computed: ComputedFrontPocketSchema,
   cluster: PocketClusterSchema,
   computedCluster: ComputedPocketClusterSchema,
@@ -21,5 +23,5 @@ export const getFrontPocketLimits = (
     },
     cluster,
   ),
-  opening: getPocketOpeningLimits(pocket, cluster, computed),
+  opening: getPocketOpeningLimits(pocket, opening, cluster, computed),
 })

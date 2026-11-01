@@ -1,6 +1,6 @@
 import { ZERO } from '../../constants/layout'
-import type { StraightPocketOpeningSchema } from '../../schemas/components'
 import type { PathSchema } from '../../schemas/geometry'
+import type { StraightPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { StandardTPocketCalculator } from './StandardTPocketCalculator'
 
 export class StraightPocketCalculator extends StandardTPocketCalculator<StraightPocketOpeningSchema> {

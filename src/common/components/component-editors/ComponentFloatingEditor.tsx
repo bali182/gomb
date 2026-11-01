@@ -39,7 +39,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
     validationIssues,
   } = useEditableComponent(component.id)
 
-  const Icon = getModelIcon(editedComponent)
+  const Icon = getModelIcon(editedComponent, subProject)
 
   const handleColorReset = useCallback((): void => {
     const updatedEditable = { ...editableComponent }

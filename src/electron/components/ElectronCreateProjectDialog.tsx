@@ -79,6 +79,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
       baseRootComponentName: t.defaultNames.rootPanel,
+      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
     })
 
     const response = await electronApi.write({
@@ -103,6 +104,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     project,
     showSaveFailedToast,
     t.defaultNames.rootPanel,
+    t.project.editors.enums.components.pocketOpening.straight,
   ])
 
   return (
