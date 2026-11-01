@@ -11,8 +11,13 @@ import { narrowers } from '../utils/narrowers'
 type ComponentSelectionSchema = HasTypeSchema<'component'> & { componentId: string }
 type StitchLineSelectionSchema = HasTypeSchema<'stitch-line'> & { stitchLineId: string }
 type HoleSelectionSchema = HasTypeSchema<'hole'> & { holeId: string }
+type PocketOpeningSelectionSchema = HasTypeSchema<'pocket-opening'> & { openingId: string }
 
-type SelectionSchema = ComponentSelectionSchema | StitchLineSelectionSchema | HoleSelectionSchema
+type SelectionSchema =
+  | ComponentSelectionSchema
+  | StitchLineSelectionSchema
+  | HoleSelectionSchema
+  | PocketOpeningSelectionSchema
 
 export const useSubProjectSelection = (subProject: SubProjectSchema): SubProjectSelectionContextValue => {
   const [selectionInternal, setSelectionInternal] = useState<SelectionSchema | undefined>()
@@ -81,6 +86,9 @@ const getSelectionSchema = (model: ModelObjectSchema): SelectionSchema | undefin
   if (narrowers.is.hole(model)) {
     return { type: 'hole', holeId: model.id }
   }
+  if (narrowers.is.pocketOpening(model)) {
+    return { type: 'pocket-opening', openingId: model.id }
+  }
   return undefined
 }
 
@@ -101,5 +109,7 @@ const getModelObject = (
       return optional.stitchLine.byId(selection.stitchLineId)
     case 'hole':
       return optional.hole.byId(selection.holeId)
+    case 'pocket-opening':
+      return optional.pocketOpening.byId(selection.openingId)
   }
 }

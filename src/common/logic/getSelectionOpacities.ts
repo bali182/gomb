@@ -1,4 +1,5 @@
 import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
+import type { ComponentSchema } from '../schemas/components'
 import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
@@ -21,6 +22,7 @@ export const getSelectionOpacities = (
   isEditingPocketContents: boolean,
 ): SelectionOpacitiesSchema => {
   const relatedComponentIds = getRelatedComponentIds(selection, subProject)
+  const hasSelection = isDefined(selection) && (!narrowers.is.pocketOpening(selection) || relatedComponentIds.size > 0)
   const opacities: SelectionOpacitiesSchema = {
     components: {},
     pocketItems: {},
@@ -28,8 +30,13 @@ export const getSelectionOpacities = (
   }
 
   for (const component of Object.values(subProject.components)) {
-    const isRelated = !isDefined(selection) || relatedComponentIds.has(component.id)
-    const isContentsOwner = isEditingPocketContents && selection?.id === component.id && narrowers.is.pocket(component)
+    const isRelated = !hasSelection || relatedComponentIds.has(component.id)
+    const isContentsOwner =
+      isEditingPocketContents &&
+      isDefined(selection) &&
+      narrowers.is.pocket(selection) &&
+      selection.id === component.id &&
+      narrowers.is.pocket(component)
     opacities.components[component.id] = {
       fill: isRelated ? ACTIVE_COMPONENT_FILL_OPACITY : INACTIVE_COMPONENT_FILL_OPACITY,
       stroke: isRelated ? ACTIVE_COMPONENT_STROKE_OPACITY : INACTIVE_COMPONENT_STROKE_OPACITY,
@@ -39,7 +46,11 @@ export const getSelectionOpacities = (
     }
 
     if (narrowers.is.pocket(component)) {
-      const isRelatedItem = !isDefined(selection) || (narrowers.is.component(selection) && isRelated)
+      const isRelatedItem =
+        !hasSelection ||
+        (isDefined(selection) &&
+          (narrowers.is.component(selection) || narrowers.is.pocketOpening(selection)) &&
+          isRelated)
       opacities.pocketItems[component.id] = {
         fill: isRelatedItem ? ACTIVE_POCKET_ITEM_FILL_OPACITY : INACTIVE_POCKET_ITEM_FILL_OPACITY,
         stroke: isRelatedItem ? ACTIVE_POCKET_ITEM_STROKE_OPACITY : INACTIVE_POCKET_ITEM_STROKE_OPACITY,
@@ -49,7 +60,8 @@ export const getSelectionOpacities = (
 
   for (const stitchLine of subProject.stitchLines) {
     const isRelated =
-      !isDefined(selection) || isRelatedStitchLine(stitchLine, selection, relatedComponentIds, subProject)
+      !hasSelection ||
+      (isDefined(selection) && isRelatedStitchLine(stitchLine, selection, relatedComponentIds, subProject))
     opacities.stitchLines[stitchLine.id] = {
       stroke: isRelated ? ACTIVE_STITCH_LINE_OPACITY : INACTIVE_STITCH_LINE_OPACITY,
     }
@@ -64,6 +76,16 @@ const getRelatedComponentIds = (
 ): ReadonlySet<string> => {
   if (!isDefined(selection)) {
     return new Set<string>()
+  }
+  if (narrowers.is.pocketOpening(selection)) {
+    return new Set(
+      Object.values(subProject.components)
+        .filter(
+          (component: ComponentSchema): boolean =>
+            narrowers.is.pocket(component) && component.openingId === selection.id,
+        )
+        .map((component: ComponentSchema): string => component.id),
+    )
   }
   if (narrowers.is.component(selection)) {
     return new Set(

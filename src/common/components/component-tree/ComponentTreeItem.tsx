@@ -9,9 +9,10 @@ import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectio
 import { useSubProject } from '../../hooks/useSubProject'
 import { canAddHole, canAddStitchLine, canMoveComponent } from '../../operations/subProject/utils/componentRules'
 import { isDefined } from '../../utils/isDefined'
+import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
+import { TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { DropInsideIndicator, ReorderDropIndicator } from './ComponentTreeDropIndicators'
-import { TreeItemVisual } from './TreeItemVisual'
-import { TreeDragData } from './types/dragDataTypes'
+import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type {
   ComponentAttachmentDropData,
   ComponentReorderDropData,
@@ -22,7 +23,6 @@ import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
 type ComponentTreeItemProps = {
-  activeDragData: TreeDragData | undefined
   hasDragAndDrop: boolean
   indexPath: number[]
   node: ComponentTreeNode
@@ -31,13 +31,13 @@ type ComponentTreeItemProps = {
 }
 
 export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
-  activeDragData,
   hasDragAndDrop,
   indexPath,
   node,
   nodeState,
   renderMenu,
 }) => {
+  const { activeDragData } = useTreeDragAndDropContext()
   const selection = useSubProjectSelectionContext()
   const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
@@ -264,10 +264,9 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       {hasDragAndDrop && insertionIndicators}
       <TreeItemVisual
         icon={Icon}
-        isBranch={true}
-        isExpandable={isExpandable}
+        trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
-        label={getProjectTreeNodeLabel(node)}
+        label={<TreeView.BranchText>{getProjectTreeNodeLabel(node)}</TreeView.BranchText>}
         leading={dragHandle}
         trailing={renderMenu?.(node)}
       />

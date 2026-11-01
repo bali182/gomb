@@ -29,6 +29,11 @@ export const flip = (
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   switch (model.type) {
+    case 'straight':
+    case 'slanted':
+    case 'recessed':
+    case 'optical-illusion':
+      return subProject
     case 'root-panel':
       return flipComponentSubtree(subProject, narrowers.assert.rootPanel(accessor.component.byId(model.id)), axis)
     case 'panel':

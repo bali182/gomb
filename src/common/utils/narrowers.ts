@@ -67,6 +67,9 @@ export const narrowers = {
     tPocket: (input: ModelObjectSchema): input is TPocketSchema => {
       return hasType(input, 't-pocket')
     },
+    pocketOpening: (input: ModelObjectSchema): input is PocketOpeningSchema => {
+      return hasOneOfType(input, 'straight', 'slanted', 'recessed', 'optical-illusion')
+    },
     straightPocketOpening: (input: PocketOpeningSchema): input is StraightPocketOpeningSchema => {
       return hasType(input, 'straight')
     },

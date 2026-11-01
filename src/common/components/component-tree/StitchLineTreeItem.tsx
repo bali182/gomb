@@ -6,31 +6,26 @@ import { getModelIconByType } from '../../utils/getModelIcon'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { TreeItemVisual } from './TreeItemVisual'
-import type { TreeDragData } from './types/dragDataTypes'
+import { isDefined } from '../../utils/isDefined'
+import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { StitchLineTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
 type StitchLineTreeItemProps = {
-  activeDragData: TreeDragData | undefined
   hasDragAndDrop: boolean
   indexPath: number[]
   node: StitchLineTreeNode
   renderMenu?: (node: StitchLineTreeNode) => ReactNode
 }
 
-export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
-  activeDragData,
-  hasDragAndDrop,
-  indexPath,
-  node,
-  renderMenu,
-}) => {
+export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop, indexPath, node, renderMenu }) => {
+  const { activeDragData } = useTreeDragAndDropContext()
   const selection = useSubProjectSelectionContext()
   const { isComputing } = useEditorContext()
   const { stitchLine } = node
   const isActiveStitchLine = activeDragData?.kind === 'stitch-line' && activeDragData.stitchLineId === stitchLine.id
-  const isDisabledForActiveDrag = activeDragData !== undefined && !isActiveStitchLine
+  const isDisabledForActiveDrag = isDefined(activeDragData) && !isActiveStitchLine
   const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation()
   }, [])
@@ -66,10 +61,8 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
     >
       <TreeItemVisual
         icon={getModelIconByType(stitchLine.type)}
-        isBranch={false}
-        isExpandable={false}
         isPositioned={false}
-        label={getProjectTreeNodeLabel(node)}
+        label={<TreeView.ItemText>{getProjectTreeNodeLabel(node)}</TreeView.ItemText>}
         leading={
           hasDragAndDrop ? (
             <IconButton

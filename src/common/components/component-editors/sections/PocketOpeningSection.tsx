@@ -1,6 +1,5 @@
 import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
-import type { IconType } from 'react-icons'
 import { PiCaretDown } from 'react-icons/pi'
 import { useEditorContext } from '../../../contexts/EditorContext'
 import { useCombinedIssues } from '../../../hooks/useCombinedIssues'
@@ -18,14 +17,11 @@ import type {
 } from '../../../schemas/pocketOpening'
 import { accessors } from '../../../utils/accessors'
 import { getLimitIssues } from '../../../utils/getLimitIssues'
+import { getModelIconByType } from '../../../utils/getModelIcon'
 import { isDefined } from '../../../utils/isDefined'
 import { noIssues } from '../../../utils/issueUtils'
 import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
-import { OpticalIllusionPocketOpeningIcon } from '../../icons/OpticalIllusionPocketOpeningIcon'
-import { RecessedPocketOpeningIcon } from '../../icons/RecessedPocketOpeningIcon'
-import { SlantedPocketOpeningIcon } from '../../icons/SlantedPocketOpeningIcon'
-import { StraightPocketOpeningIcon } from '../../icons/StraightPocketOpeningIcon'
 import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
@@ -36,13 +32,6 @@ type PocketOpeningSectionProps = {
   cluster: PocketClusterSchema
   openingId: string
   onOpeningIdChange: (openingId: string) => void
-}
-
-const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
-  'optical-illusion': OpticalIllusionPocketOpeningIcon,
-  straight: StraightPocketOpeningIcon,
-  recessed: RecessedPocketOpeningIcon,
-  slanted: SlantedPocketOpeningIcon,
 }
 
 export const PocketOpeningSection: FC<PocketOpeningSectionProps> = (props) => (
@@ -77,7 +66,7 @@ const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({
 
   const issues = useCombinedIssues<PocketOpeningSchema>(validationIssues, limitIssues)
 
-  const OpeningIcon = openingIcons[opening.type]
+  const OpeningIcon = getModelIconByType(opening.type)
 
   const handleOpeningChange = useCallback(
     (details: MenuValueChangeDetails): void => {
@@ -111,7 +100,7 @@ const PocketOpeningSectionContent: FC<PocketOpeningSectionProps> = ({
                 <Menu.Content width="max-content">
                   <Menu.RadioItemGroup value={openingId} onValueChange={handleOpeningChange}>
                     {Object.values(subProject.pocketOpenings).map((candidate) => {
-                      const Icon = openingIcons[candidate.type]
+                      const Icon = getModelIconByType(candidate.type)
                       return (
                         <Menu.RadioItem disabled={isComputing} key={candidate.id} value={candidate.id}>
                           <Icon />
