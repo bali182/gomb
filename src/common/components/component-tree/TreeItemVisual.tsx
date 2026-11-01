@@ -29,12 +29,16 @@ export const TreeItemVisual: FC<TreeItemVisualProps> = ({
 
   const branchTrigger = isBranch ? (
     <TreeView.BranchTrigger
+      alignSelf="stretch"
       aria-disabled={!isExpandable}
       cursor={isExpandable ? undefined : 'not-allowed'}
+      flexShrink="0"
+      mx="-2"
       onClickCapture={!isExpandable ? handleDisabledBranchTriggerClickCapture : undefined}
       opacity={isExpandable ? undefined : 0.4}
+      px="2"
     >
-      <TreeView.BranchIndicator asChild>
+      <TreeView.BranchIndicator asChild transition="transform 200ms">
         <PiCaretRight />
       </TreeView.BranchIndicator>
     </TreeView.BranchTrigger>
@@ -52,9 +56,10 @@ export const TreeItemVisual: FC<TreeItemVisualProps> = ({
       display="flex"
       flex="1"
       gap="2"
+      height="100%"
       minW="0"
       position={isPositioned ? 'relative' : undefined}
-      py="1.5"
+      py="0"
       zIndex={isPositioned ? '1' : undefined}
     >
       {branchTrigger}

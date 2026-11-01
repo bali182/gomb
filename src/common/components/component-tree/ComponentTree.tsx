@@ -3,6 +3,7 @@ import {
   IconButton,
   TreeView,
   type TreeCollection,
+  type TreeViewBranchContentProps,
   type TreeViewExpandedChangeDetails,
   type TreeViewSelectionChangeDetails,
 } from '@chakra-ui/react'
@@ -41,6 +42,14 @@ import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 import { getComponentNodeId, getHoleNodeId, getStitchLineNodeId } from './utils/treeNodeIds'
 import { useTreeDropAnimation } from './utils/useTreeDropAnimation'
+
+const branchContentProps: TreeViewBranchContentProps = {
+  animationDuration: '200ms',
+  animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  overflow: 'hidden',
+  _open: { animationName: 'expand-height' },
+  _closed: { animationName: 'collapse-height' },
+}
 
 export type ComponentTreeProps = {
   expandedNodeIds: string[]
@@ -191,6 +200,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
         sensors={sensors}
       >
         <TreeView.Root
+          animateContent
           lazyMount
           unmountOnExit
           collection={collection}
@@ -203,6 +213,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
         >
           <TreeView.Tree>
             <TreeView.Node<ProjectTreeNode>
+              branchContentProps={branchContentProps}
               indentGuide={<TreeView.BranchIndentGuide />}
               render={({ indexPath, node, nodeState }) => {
                 switch (node.kind) {
