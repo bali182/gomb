@@ -267,7 +267,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       {hasDragAndDrop && insideDropAreaFeedback}
       {hasDragAndDrop && insertionIndicators}
       <TreeItemVisual
-        icon={Icon}
+        icon={<Icon />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
         label={<TreeView.BranchText>{getProjectTreeNodeLabel(node)}</TreeView.BranchText>}

@@ -24,6 +24,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop
   const selection = useSubProjectSelectionContext()
   const { isComputing } = useEditorContext()
   const { stitchLine } = node
+  const Icon = getModelIconByType(stitchLine.type)
   const isActiveStitchLine = activeDragData?.kind === 'stitch-line' && activeDragData.stitchLineId === stitchLine.id
   const isDisabledForActiveDrag = isDefined(activeDragData) && !isActiveStitchLine
   const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
@@ -60,7 +61,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop
       h="9"
     >
       <TreeItemVisual
-        icon={getModelIconByType(stitchLine.type)}
+        icon={<Icon />}
         isPositioned={false}
         label={<TreeView.ItemText>{getProjectTreeNodeLabel(node)}</TreeView.ItemText>}
         leading={

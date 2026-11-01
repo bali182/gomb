@@ -4,10 +4,10 @@ import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { getModelIconByType } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { useTreeDragAndDropContext } from '../component-tree/TreeDragAndDropContext'
+import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { PocketOpeningTreeItemNode } from './types/nodeTypes'
 
 type PocketOpeningTreeItemProps = {
@@ -18,7 +18,7 @@ type PocketOpeningTreeItemProps = {
 
 export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({ node, indexPath, renderMenu }) => {
   const { opening } = node
-  const { isComputing } = useEditorContext()
+  const { isComputing, subProject } = useEditorContext()
   const selection = useSubProjectSelectionContext()
   const { activeDragData } = useTreeDragAndDropContext()
   const isActiveOpening = activeDragData?.kind === 'pocket-opening' && activeDragData.openingId === opening.id
@@ -54,7 +54,7 @@ export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({ node, in
       onPointerLeave={handlePointerLeave}
     >
       <TreeItemVisual
-        icon={getModelIconByType(opening.type)}
+        icon={<PocketOpeningIcon type={opening.type} isDefault={subProject?.defaultPocketOpening === opening.id} />}
         isPositioned={false}
         label={<TreeView.ItemText>{opening.name}</TreeView.ItemText>}
         leading={

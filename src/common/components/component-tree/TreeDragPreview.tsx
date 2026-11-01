@@ -2,8 +2,8 @@ import { Box, IconButton, Text, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCaretRight, PiDotsSixVertical } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
-import { getModelIconByType } from '../../utils/getModelIcon'
 import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { TreeDragData } from './types/dragDataTypes'
 import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
@@ -35,11 +35,7 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
         <Box key={depth} flexShrink="0" width="6" />
       ))}
       <TreeItemVisual
-        icon={
-          node.kind === 'pocket-opening'
-            ? getModelIconByType(node.opening.type)
-            : getProjectTreeNodeIcon(node, subProject)
-        }
+        icon={<TreeDragPreviewIcon dragData={dragData} subProject={subProject} />}
         isPositioned={false}
         trigger={
           node.kind === 'component' || node.kind === 'hole' ? (
@@ -58,4 +54,16 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
       />
     </Box>
   )
+}
+
+const TreeDragPreviewIcon: FC<TreeDragPreviewProps> = ({ dragData, subProject }) => {
+  const { node } = dragData
+  if (node.kind === 'pocket-opening') {
+    return (
+      <PocketOpeningIcon type={node.opening.type} isDefault={subProject.defaultPocketOpening === node.opening.id} />
+    )
+  }
+
+  const Icon = getProjectTreeNodeIcon(node, subProject)
+  return <Icon />
 }

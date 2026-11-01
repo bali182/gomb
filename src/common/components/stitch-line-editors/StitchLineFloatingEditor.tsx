@@ -25,6 +25,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
     stitchLine: editedStitchLine,
     validationIssues,
   } = useEditableStitchLine(stitchLine.id)
+  const Icon = getModelIconByType(editedStitchLine.type)
 
   const handleRenderTargetChange = useCallback(
     (onTop: string): void => {
@@ -45,7 +46,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<StitchLineSchema>
         editable={editableStitchLine}
-        icon={getModelIconByType(editedStitchLine.type)}
+        icon={<Icon />}
         issues={validationIssues}
         menu={<StitchLineActionsMenu size="xs" stitchLine={editedStitchLine} />}
         onChange={setStitchLine}

@@ -19,12 +19,13 @@ type HoleFloatingEditorProps = {
 
 export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement, hole, onAdd, onClose }) => {
   const { editableHole, hole: editedHole, setHole, validationIssues } = useEditableHole(hole.id)
+  const Icon = getModelIconByType(editedHole.type)
 
   return (
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<HoleSchema>
         editable={editableHole}
-        icon={getModelIconByType(editedHole.type)}
+        icon={<Icon />}
         issues={validationIssues}
         menu={<HoleActionsMenu hole={editedHole} onAddStitchLine={onAdd} size="xs" />}
         onChange={setHole}

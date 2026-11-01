@@ -114,7 +114,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({ hasDragAndDrop, indexPath,
     >
       {hasDragAndDrop && dropFeedback}
       <TreeItemVisual
-        icon={Icon}
+        icon={<Icon />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
         label={<TreeView.BranchText>{label}</TreeView.BranchText>}

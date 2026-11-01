@@ -1,9 +1,8 @@
 import { Box } from '@chakra-ui/react'
 import type { FC, ReactNode } from 'react'
-import type { IconType } from 'react-icons'
 
 type TreeItemVisualProps = {
-  icon: IconType
+  icon: ReactNode
   trigger?: ReactNode
   label: ReactNode
   leading: ReactNode
@@ -11,14 +10,7 @@ type TreeItemVisualProps = {
   isPositioned: boolean
 }
 
-export const TreeItemVisual: FC<TreeItemVisualProps> = ({
-  icon: Icon,
-  trigger,
-  label,
-  leading,
-  trailing,
-  isPositioned,
-}) => (
+export const TreeItemVisual: FC<TreeItemVisualProps> = ({ icon, trigger, label, leading, trailing, isPositioned }) => (
   <Box
     alignItems="center"
     display="flex"
@@ -32,7 +24,9 @@ export const TreeItemVisual: FC<TreeItemVisualProps> = ({
   >
     {trigger}
     {leading}
-    <Icon />
+    <Box display="inline-flex" boxSize="4" fontSize="md" flexShrink="0">
+      {icon}
+    </Box>
     {label}
     {trailing}
   </Box>

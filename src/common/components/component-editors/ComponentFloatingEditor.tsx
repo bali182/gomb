@@ -52,7 +52,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
       <ComponentFloatingEditorHeader
         baseColor={project.colorSettings.leatherColor}
         editable={editableComponent}
-        icon={Icon}
+        icon={<Icon />}
         issues={validationIssues}
         menu={
           <ComponentActionsMenu
