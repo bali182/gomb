@@ -8,7 +8,7 @@ import {
   SplitterPanelData,
   SplitterResizeEndDetails,
 } from '@chakra-ui/react'
-import { FC, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PiPlus, PiWarningCircle } from 'react-icons/pi'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
@@ -22,6 +22,7 @@ import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
+import { narrowers } from '../utils/narrowers'
 import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import { ResizableAccordion, type ResizableAccordionState } from './common/resizable-accordion/ResizableAccordion'
@@ -65,6 +66,18 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
       stopMeasuring()
     }
   }, [selected, stopMeasuring])
+
+  useLayoutEffect(() => {
+    if (!isDefined(selected) || !narrowers.is.pocketOpening(selected)) {
+      return
+    }
+    setAccordionState((current: ResizableAccordionState): ResizableAccordionState => {
+      if (current.openings.open) {
+        return current
+      }
+      return { ...current, openings: { ...current.openings, open: true } }
+    })
+  }, [selected])
 
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
   const subProject = useMemo<SubProjectSchema | undefined>(

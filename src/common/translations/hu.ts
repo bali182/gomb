@@ -193,6 +193,7 @@ export const HU = {
       actions: {
         pocketOpenings: {
           add: 'Új zsebnyílás',
+          edit: 'Zsebnyílás szerkesztése',
           setDefault: 'Beállítás alapértelmezettként',
         },
         common: {

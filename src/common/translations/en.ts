@@ -259,6 +259,7 @@ export const EN = {
       actions: {
         pocketOpenings: {
           add: 'Add opening',
+          edit: 'Edit opening',
           setDefault: 'Set as default',
         },
         common: {

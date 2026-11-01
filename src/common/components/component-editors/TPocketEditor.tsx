@@ -78,11 +78,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
               />
             </SectionGroup.SectionRowEditor>
           </SectionGroup.Section>
-          <PocketOpeningSection
-            pocket={component}
-            openingId={editable.openingId}
-            onOpeningIdChange={handleOpeningIdChange}
-          />
+          <PocketOpeningSection openingId={editable.openingId} onOpeningIdChange={handleOpeningIdChange} />
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value={PocketEditorTabs.contents} pt={0}>
