@@ -67,6 +67,7 @@ export const ResizableAccordionItem: FC<ResizableAccordionItemProps> = ({ id, ti
           minWidth="0"
           onClick={handleToggle}
           px="2"
+          size="sm"
           variant="ghost"
         >
           <Box

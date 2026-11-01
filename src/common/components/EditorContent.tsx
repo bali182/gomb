@@ -11,7 +11,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { FC, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { PiCopySimple, PiMinus, PiPlus, PiStack, PiWarningCircle } from 'react-icons/pi'
+import { PiPlus, PiStack, PiWarningCircle } from 'react-icons/pi'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
@@ -33,6 +33,8 @@ import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
 import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
+import { CollapseAllIcon } from './icons/CollapseAllIcon'
+import { ExpandAllIcon } from './icons/ExpandAllIcon'
 import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
 const panels: SplitterPanelData[] = [
@@ -130,15 +132,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                   actions={
                     <HStack gap="1">
                       <IconButton disabled={!isDefined(subProject)} onClick={handleExpandAll} size="xs" variant="ghost">
-                        <PiCopySimple />
-                        <PiPlus
-                          style={{
-                            left: '50%',
-                            position: 'absolute',
-                            top: '50%',
-                            transform: 'translate(-56.25%, -43.75%) scale(0.5)',
-                          }}
-                        />
+                        <ExpandAllIcon />
                       </IconButton>
                       <IconButton
                         disabled={!isDefined(subProject)}
@@ -146,15 +140,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                         size="xs"
                         variant="ghost"
                       >
-                        <PiCopySimple />
-                        <PiMinus
-                          style={{
-                            left: '50%',
-                            position: 'absolute',
-                            top: '50%',
-                            transform: 'translate(-56.25%, -43.75%) scale(0.5)',
-                          }}
-                        />
+                        <CollapseAllIcon />
                       </IconButton>
                     </HStack>
                   }
