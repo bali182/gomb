@@ -253,6 +253,9 @@ export const EN = {
           stitching: 'Stitching',
         },
       },
+      pocketOpeningPreview: {
+        description: "The pocket's actual shape depends on its dimensions and layout.",
+      },
       actions: {
         pocketOpenings: {
           add: 'Add opening',
@@ -872,8 +875,8 @@ export const EN = {
             'optical-illusion': 'Optical illusion',
           } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
           pocketOpeningSide: {
-            start: 'Start point',
-            end: 'End point',
+            start: 'Start',
+            end: 'End',
           } satisfies EnumTranslationSchema<PocketOpeningSideSchema>,
           pocketOrientation: {
             up: 'Top',

@@ -10,17 +10,31 @@ import type {
 } from '../../schemas/pocketOpening'
 import { SectionGroup } from '../common/SectionGroup'
 import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
+import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
 import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
 import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
 import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
-type PocketOpeningEditorProps = {
+type PocketOpeningFieldsProps = {
   editable: EditableSchema<PocketOpeningSchema>
   issues: IssuesSchema<PocketOpeningSchema>
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
 }
 
-export const PocketOpeningFields: FC<PocketOpeningEditorProps> = ({ editable, issues, onChange }) => {
+type PocketOpeningEditorProps = PocketOpeningFieldsProps & {
+  opening: PocketOpeningSchema
+}
+
+export const PocketOpeningEditor: FC<PocketOpeningEditorProps> = ({ opening, editable, issues, onChange }) => (
+  <SectionGroup.Root>
+    <PocketOpeningEditorPreview opening={opening} />
+    <SectionGroup.Section>
+      <PocketOpeningFields editable={editable} issues={issues} onChange={onChange} />
+    </SectionGroup.Section>
+  </SectionGroup.Root>
+)
+
+export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, issues, onChange }) => {
   switch (editable.type) {
     case 'straight':
       return (
@@ -59,11 +73,3 @@ export const PocketOpeningFields: FC<PocketOpeningEditorProps> = ({ editable, is
       )
   }
 }
-
-export const PocketOpeningEditor: FC<PocketOpeningEditorProps> = (props) => (
-  <SectionGroup.Root>
-    <SectionGroup.Section>
-      <PocketOpeningFields {...props} />
-    </SectionGroup.Section>
-  </SectionGroup.Root>
-)

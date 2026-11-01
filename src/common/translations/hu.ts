@@ -187,6 +187,9 @@ export const HU = {
           stitching: 'Varrás',
         },
       },
+      pocketOpeningPreview: {
+        description: 'A zseb tényleges alakja a méreteitől és az elrendezésétől függ.',
+      },
       actions: {
         pocketOpenings: {
           add: 'Új zsebnyílás',

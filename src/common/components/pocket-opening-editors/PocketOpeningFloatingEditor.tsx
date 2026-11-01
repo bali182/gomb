@@ -36,7 +36,12 @@ export const PocketOpeningFloatingEditor: FC<PocketOpeningFloatingEditorProps> =
         menu={<PocketOpeningActionsMenu opening={editedOpening} size="xs" onDelete={onClose} />}
         onChange={setOpening}
       />
-      <PocketOpeningEditor editable={editableOpening} issues={validationIssues} onChange={setOpening} />
+      <PocketOpeningEditor
+        opening={editedOpening}
+        editable={editableOpening}
+        issues={validationIssues}
+        onChange={setOpening}
+      />
     </FloatingEditor>
   )
 }
