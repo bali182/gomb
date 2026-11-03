@@ -4,3 +4,5 @@ import type { PocketOpeningSchema } from './pocketOpening'
 import type { StitchLineSchema } from './stitching'
 
 export type ModelObjectSchema = ComponentSchema | StitchLineSchema | HoleSchema | PocketOpeningSchema
+
+export type ModelObjectTypeSchema = ModelObjectSchema['type']
