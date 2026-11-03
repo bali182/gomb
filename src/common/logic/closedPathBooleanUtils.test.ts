@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { narrowers } from '../utils/narrowers'
 
-import type { RecessedPocketOpeningSchema } from '../schemas/components'
 import type { PathSchema } from '../schemas/geometry'
+import type { RecessedPocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
 import { calculateRectPath } from './calculateRectPath'
 import {
@@ -245,6 +245,8 @@ describe('closed path boolean operations', () => {
       const corner = new BigNumber(0)
       const corners = { topLeft: corner, topRight: corner, bottomLeft: corner, bottomRight: corner }
       const opening: RecessedPocketOpeningSchema = {
+        id: 'opening',
+        name: 'Opening',
         type: 'recessed',
         outerInset: 35,
         innerOffset: 15,

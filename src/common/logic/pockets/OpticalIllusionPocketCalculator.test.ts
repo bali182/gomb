@@ -4,12 +4,9 @@ import { narrowers } from '../../utils/narrowers'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultExportParams, defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../../defaultStates'
-import type {
-  OpticalIllusionPocketOpeningSchema,
-  PocketOpeningSideSchema,
-  PocketOrientationSchema,
-} from '../../schemas/components'
+import type { PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
+import type { OpticalIllusionPocketOpeningSchema, PocketOpeningSideSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { getExportElementsForComponent } from '../exports/getExportElements'
 import { getComputedSubProject } from '../getComputedSubProject'
@@ -25,6 +22,9 @@ const rect: RectSchema = {
   height: new BigNumber(80),
 }
 const opening: OpticalIllusionPocketOpeningSchema = {
+  type: 'optical-illusion' as const,
+  id: 'opening',
+  name: 'Opening',
   ...defaultOpticalIllusionPocketOpening,
   direction: 'start',
 }
@@ -35,7 +35,7 @@ const calculator = (input: OpticalIllusionPocketOpeningSchema = opening, depth =
     children: ['t', 'middle', 'front'],
     pocketStep: 15,
   })
-  const pocket = d.tPocket({ id: cluster.children[index], opening: input, tPocketTabWidth: 20, tPocketTaper: 30 })
+  const pocket = d.tPocket({ id: cluster.children[index], openingId: input.id, tPocketTabWidth: 20, tPocketTaper: 30 })
   return new OpticalIllusionPocketCalculator(
     pocket,
     cluster,
@@ -199,15 +199,16 @@ describe('OpticalIllusionPocketCalculator', () => {
     })
     const t = d.tPocket({
       id: 't',
-      opening: { ...opening, leadingRadius: 7, trailingRadius: 4 },
+      openingId: 'rounded',
       tPocketTabWidth: 20,
       tPocketTaper: 30,
     })
-    const front = d.frontPocket({ id: 'front', opening })
+    const front = d.frontPocket({ id: 'front', openingId: opening.id })
     const source = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root', width: 150, height: 150, children: ['cluster'] }),
       components: [cluster, t, front],
+      pocketOpenings: [opening, { ...opening, id: 'rounded', name: 'Rounded', leadingRadius: 7, trailingRadius: 4 }],
       holes: [d.hole({ id: 'hole', componentId: 't', width: 2, height: 2 })],
       stitchLines: [d.tPocketStitchLine({ id: 'stitch', targetId: 't', targetType: 'component' })],
     })

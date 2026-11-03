@@ -1,13 +1,14 @@
 import BigNumber from 'bignumber.js'
 
 import { POSITION_EPSILON, ZERO } from '../../constants/layout'
-import type { OpticalIllusionPocketOpeningSchema, PocketClusterSchema, PocketSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
 import type {
   NumericBoundSchema,
   OpticalIllusionPocketOpeningLimitsReasonSchema,
   OpticalIllusionPocketOpeningLimitsSchema,
 } from '../../schemas/limits'
+import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { clamp } from '../../utils/clamp'
 
 export const getOpticalIllusionPocketOpeningLimits = (

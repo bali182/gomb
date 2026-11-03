@@ -11,7 +11,7 @@ type FloatingEditorProps = {
 }
 
 export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, children, onClose }) => {
-  const positioningTarget = useMemo(
+  const positioningTarget = useMemo<FloatingEditorAnchor>(
     () => ({
       getBoundingClientRect: anchorElement.getBoundingClientRect,
       contextElement: anchorElement.contextElement,
@@ -52,7 +52,11 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
   }, [anchorElement.contextElement, onClose])
 
   useEffect(() => {
-    const editorElement = anchorElement.contextElement.ownerSVGElement?.parentElement
+    const contextElement = anchorElement.contextElement
+    const editorElement =
+      contextElement instanceof SVGElement
+        ? contextElement.ownerSVGElement?.parentElement
+        : contextElement.parentElement
 
     if (!isDefined(editorElement)) {
       return

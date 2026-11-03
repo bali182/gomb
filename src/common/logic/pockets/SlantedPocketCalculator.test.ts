@@ -4,18 +4,15 @@ import { narrowers } from '../../utils/narrowers'
 import type { ArcPathSegment } from '../pathSegmentTypes'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
-import type { PocketOrientationSchema, SlantedPocketOpeningSchema } from '../../schemas/components'
+import type { PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
+import type { SlantedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { last } from '../../utils/last'
 import { getPathSegments } from '../pathSegments'
 import { createPocketCalculator } from './createPocketCalculator'
 
-const opening: SlantedPocketOpeningSchema = {
-  type: 'slanted',
-  offset: 15,
-  side: 'end',
-}
+const opening: SlantedPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' }
 const rect: RectSchema = {
   x: new BigNumber(11),
   y: new BigNumber(17),

@@ -2,33 +2,28 @@ import { IconButton, TreeView } from '@chakra-ui/react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback, useMemo, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
+import { getModelIconByType } from '../../utils/getModelIcon'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
+import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
+import { TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { DropInsideIndicator } from './ComponentTreeDropIndicators'
-import { TreeItemVisual } from './TreeItemVisual'
-import type { TreeDragData } from './types/dragDataTypes'
+import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { HoleStitchLineDropData } from './types/dropDataTypes'
 import type { HoleTreeNode } from './types/nodeTypes'
-import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
 type HoleTreeItemProps = {
-  activeDragData: TreeDragData | undefined
   hasDragAndDrop: boolean
   indexPath: number[]
   node: HoleTreeNode
   renderMenu?: (node: HoleTreeNode) => ReactNode
 }
 
-export const HoleTreeItem: FC<HoleTreeItemProps> = ({
-  activeDragData,
-  hasDragAndDrop,
-  indexPath,
-  node,
-  renderMenu,
-}) => {
+export const HoleTreeItem: FC<HoleTreeItemProps> = ({ hasDragAndDrop, indexPath, node, renderMenu }) => {
+  const { activeDragData } = useTreeDragAndDropContext()
   const selection = useSubProjectSelectionContext()
   const { isComputing } = useEditorContext()
   const { hole } = node
@@ -83,7 +78,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
     [setDropNodeRef, setNodeRef],
   )
 
-  const Icon = getProjectTreeNodeIcon(node)
+  const Icon = getModelIconByType(hole.type)
   const label = getProjectTreeNodeLabel(node)
   const dragHandle = hasDragAndDrop ? (
     <IconButton
@@ -119,11 +114,10 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
     >
       {hasDragAndDrop && dropFeedback}
       <TreeItemVisual
-        icon={Icon}
-        isBranch={true}
-        isExpandable={isExpandable}
+        icon={<Icon />}
+        trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
-        label={label}
+        label={<TreeView.BranchText>{label}</TreeView.BranchText>}
         leading={dragHandle}
         trailing={renderMenu?.(node)}
       />

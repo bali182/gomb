@@ -1,32 +1,49 @@
-import {
-  defaultOpticalIllusionPocketOpening,
-  defaultRecessedPocketOpening,
-  defaultSlantedPocketOpening,
-} from '../defaultStates'
+import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
 import type {
   OpticalIllusionPocketOpeningSchema,
   PocketOpeningSchema,
   RecessedPocketOpeningSchema,
   SlantedPocketOpeningSchema,
-} from '../schemas/components'
-import type { EditableSchema } from '../schemas/editable'
-import type { IssuesSchema } from '../schemas/issues'
-import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+} from '../schemas/pocketOpening'
+import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { narrowers } from '../utils/narrowers'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
+import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 export const validatePocketOpeningSchema = (
   input: EditableSchema<PocketOpeningSchema>,
   currentValue: PocketOpeningSchema,
-  context: BaseValidationContextSchema,
-): ValidationResultSchema<PocketOpeningSchema> => validatePocketOpeningByType(input, currentValue, context)
+  context: ComponentBasedValidationContextSchema,
+): ValidationResultSchema<PocketOpeningSchema> => {
+  if (input.type !== currentValue.type) {
+    return createInvalidValidationResult<PocketOpeningSchema>(
+      { type: { severity: 'error', message: context.t.primitive.invalid } },
+      currentValue,
+    )
+  }
+  const name = validateName(
+    input.name,
+    currentValue.name,
+    currentValue.id,
+    Object.values(context.subProject.pocketOpenings),
+    context,
+  )
+  const result = validatePocketOpeningByType(input, currentValue, context)
+  const issues: IssuesSchema<PocketOpeningSchema> = { ...result.issues, name: name.issues }
+  const committedValue: PocketOpeningSchema = { ...result.committedValue, name: name.committedValue }
+  if (!name.isValid || !result.isValid) {
+    return createInvalidValidationResult<PocketOpeningSchema>(issues, committedValue)
+  }
+  return createValidValidationResult<PocketOpeningSchema>(issues, { ...result.value, name: name.value }, committedValue)
+}
 
 const validatePocketOpeningByType = (
   input: EditableSchema<PocketOpeningSchema>,
   currentValue: PocketOpeningSchema,
-  context: BaseValidationContextSchema,
+  context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<PocketOpeningSchema> => {
   const typeResult = validatePrimitiveUnion(
     input.type,
@@ -41,33 +58,39 @@ const validatePocketOpeningByType = (
 
   switch (input.type) {
     case 'optical-illusion':
-      return validateOpticalIllusionPocketOpeningSchema(
-        input,
-        narrowers.is.opticalIllusionPocketOpening(currentValue) ? currentValue : defaultOpticalIllusionPocketOpening,
-        context,
-      )
+      if (!narrowers.is.opticalIllusionPocketOpening(currentValue)) {
+        return createInvalidValidationResult<PocketOpeningSchema>(
+          { type: { severity: 'error', message: context.t.primitive.invalid } },
+          currentValue,
+        )
+      }
+      return validateOpticalIllusionPocketOpeningSchema(input, currentValue, context)
 
     case 'straight':
-      return createValidValidationResult<PocketOpeningSchema>({ type: undefined }, { type: 'straight' })
+      return createValidValidationResult<PocketOpeningSchema>({ type: undefined }, currentValue)
     case 'recessed':
-      return validateRecessedPocketOpeningSchema(
-        input,
-        narrowers.is.recessedPocketOpening(currentValue) ? currentValue : defaultRecessedPocketOpening,
-        context,
-      )
+      if (!narrowers.is.recessedPocketOpening(currentValue)) {
+        return createInvalidValidationResult<PocketOpeningSchema>(
+          { type: { severity: 'error', message: context.t.primitive.invalid } },
+          currentValue,
+        )
+      }
+      return validateRecessedPocketOpeningSchema(input, currentValue, context)
     case 'slanted':
-      return validateSlantedPocketOpeningSchema(
-        input,
-        narrowers.is.slantedPocketOpening(currentValue) ? currentValue : defaultSlantedPocketOpening,
-        context,
-      )
+      if (!narrowers.is.slantedPocketOpening(currentValue)) {
+        return createInvalidValidationResult<PocketOpeningSchema>(
+          { type: { severity: 'error', message: context.t.primitive.invalid } },
+          currentValue,
+        )
+      }
+      return validateSlantedPocketOpeningSchema(input, currentValue, context)
   }
 }
 
 const validateSlantedPocketOpeningSchema = (
   input: EditableSchema<SlantedPocketOpeningSchema>,
   currentValue: SlantedPocketOpeningSchema,
-  context: BaseValidationContextSchema,
+  context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<SlantedPocketOpeningSchema> => {
   const offset = validateNumber(input.offset, currentValue.offset, context, { min: 0, minInclusive: false })
   const side = validatePrimitiveUnion(input.side, currentValue.side, { start: true, end: true }, context)
@@ -90,7 +113,7 @@ const validateSlantedPocketOpeningSchema = (
 const validateRecessedPocketOpeningSchema = (
   input: EditableSchema<RecessedPocketOpeningSchema>,
   currentValue: RecessedPocketOpeningSchema,
-  context: BaseValidationContextSchema,
+  context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<RecessedPocketOpeningSchema> => {
   const outerInset = validateNumber(input.outerInset, currentValue.outerInset, context, { min: 0 })
   const innerOffset = validateNumber(input.innerOffset, currentValue.innerOffset, context, { min: 0 })
@@ -137,7 +160,7 @@ const validateRecessedPocketOpeningSchema = (
 const validateOpticalIllusionPocketOpeningSchema = (
   input: EditableSchema<OpticalIllusionPocketOpeningSchema>,
   currentValue: OpticalIllusionPocketOpeningSchema,
-  context: BaseValidationContextSchema,
+  context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<OpticalIllusionPocketOpeningSchema> => {
   const direction = validatePrimitiveUnion(input.direction, currentValue.direction, { start: true, end: true }, context)
   const startInset = validateNumber(input.startInset, currentValue.startInset, context, { min: 0 })

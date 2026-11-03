@@ -1,6 +1,5 @@
 import { ColorSwatch, HStack, type PopoverRootProps } from '@chakra-ui/react'
-import { useCallback, useMemo, useRef, type ReactElement } from 'react'
-import type { IconType } from 'react-icons'
+import { useCallback, useMemo, useRef, type ReactElement, type ReactNode } from 'react'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { leatherColors } from '../../data/colors'
@@ -17,7 +16,7 @@ import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHe
 type ComponentFloatingEditorHeaderProps<T extends BaseComponentSchema> = {
   baseColor: string
   editable: EditableSchema<T>
-  icon: IconType
+  icon: ReactNode
   issues: IssuesSchema<T>
   menu: ReactElement
   onChange: (updated: EditableSchema<T>) => void

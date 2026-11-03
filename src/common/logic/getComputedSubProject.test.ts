@@ -72,12 +72,20 @@ describe('empty pocket cluster placeholder', () => {
     const original = d.subProject({ id: 'sp', root, components: [cluster] })
     const empty = getComputedSubProject(original, defaultStitchingSettings)
     expect(getClosedPathArea(empty.components.cluster.path)).toBeCloseTo(8000, 7)
-    const front = d.frontPocket({
-      id: 'front',
-      opening: { type: 'recessed', outerInset: 10, innerOffset: 15, depth: 12, outerRadius: 0, innerRadius: 0 },
-    })
+    const opening = {
+      id: 'recessed',
+      name: 'Recessed',
+      type: 'recessed',
+      outerInset: 10,
+      innerOffset: 15,
+      depth: 12,
+      outerRadius: 0,
+      innerRadius: 0,
+    } as const
+    const front = d.frontPocket({ id: 'front', openingId: opening.id })
     const populated: SubProjectSchema = {
       ...original,
+      pocketOpenings: { ...original.pocketOpenings, [opening.id]: opening },
       components: { ...original.components, cluster: { ...cluster, children: [front.id] }, [front.id]: front },
     }
     const computed = getComputedSubProject(populated, defaultStitchingSettings)

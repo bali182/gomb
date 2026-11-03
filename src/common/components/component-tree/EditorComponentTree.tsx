@@ -2,7 +2,6 @@ import { useCallback, useEffect, useImperativeHandle, useState, type FC, type Re
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSubProject } from '../../hooks/useSubProject'
-import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import type { HasTargetSchema } from '../../schemas/common'
 import { isDefined } from '../../utils/isDefined'
 import { ComponentActionsMenu } from '../action-menus/ComponentActionsMenu'
@@ -27,7 +26,6 @@ type EditorComponentTreeProps = {
 export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
   const { selection } = useDrawAreaContext()
   const { subProject } = useSubProject()
-  const operations = useSubProjectOperations()
   const [expandedNodeIds, setExpandedNodeIds] = useState<string[]>(() => [getComponentNodeId(subProject.root)])
 
   const collection = useComponentTreeCollection(subProject, {
@@ -123,7 +121,6 @@ export const EditorComponentTree: FC<EditorComponentTreeProps> = ({ ref }) => {
       collection={collection}
       expandedNodeIds={expandedNodeIds}
       hasDragAndDrop={true}
-      operations={operations}
       renderMenu={renderMenu}
       selection={selection}
       setExpandedNodeIds={setExpandedNodeIds}

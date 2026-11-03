@@ -15,17 +15,19 @@ import {
 } from '../defaultStates'
 import type {
   FrontPocketSchema,
-  OpticalIllusionPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
-  PocketOpeningSchema,
-  RecessedPocketOpeningSchema,
   RootPanelSchema,
-  SlantedPocketOpeningSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
 import type { ProjectMigratorSchema } from '../schemas/migration'
+import type {
+  OpticalIllusionPocketOpeningSchema,
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type {
@@ -34,7 +36,6 @@ import type {
   TPocketStitchLineSchema,
 } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import type { DeepPartialSchema } from '../schemas/utils'
 import { createProjectMigration } from './createProjectMigration'
 import { m } from './migrationUtils'
 
@@ -54,12 +55,10 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     const subProject = m.requireObject(input)
     m.requireString(subProject, 'id')
     m.requireString(subProject, 'root')
+    m.requireString(subProject, 'defaultPocketOpening')
     m.requireObjectField(subProject, 'components')
-
-    return m.applyDefaults<SubProjectSchema>(subProject, {
-      holes: [],
-      stitchLines: [],
-    })
+    m.requireObjectField(subProject, 'pocketOpenings')
+    return m.applyDefaults<SubProjectSchema>(subProject, { holes: [], stitchLines: [] })
   },
   colorSettings: (input) => {
     return m.applyDefaults<ColorSettingsSchema>(m.requireObject(input), defaultColorSettings)
@@ -86,13 +85,41 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   pocketCluster: (input) => m.applyDefaults<PocketClusterSchema>(m.requireObject(input), defaultPocketCluster),
   frontPocket: (input) => {
     const pocket = m.applyDefaults<FrontPocketSchema>(m.requireObject(input), defaultFrontPocket)
-    pocket.opening = migratePocketOpening(pocket.opening ?? { type: 'straight' })
+    m.requireString(pocket, 'openingId')
     return pocket
   },
   tPocket: (input) => {
     const pocket = m.applyDefaults<TPocketSchema>(m.requireObject(input), defaultTPocket)
-    pocket.opening = migratePocketOpening(pocket.opening ?? { type: 'straight' })
+    m.requireString(pocket, 'openingId')
     return pocket
+  },
+  straightPocketOpening: (input) => {
+    const opening = m.requireObject<StraightPocketOpeningSchema>(input)
+    m.requireString(opening, 'id')
+    m.requireString(opening, 'name')
+    m.requireValue(opening, 'type', 'straight')
+    return opening
+  },
+  recessedPocketOpening: (input) => {
+    const opening = m.requireObject<RecessedPocketOpeningSchema>(input)
+    m.requireString(opening, 'id')
+    m.requireString(opening, 'name')
+    m.requireValue(opening, 'type', 'recessed')
+    return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
+  },
+  slantedPocketOpening: (input) => {
+    const opening = m.requireObject<SlantedPocketOpeningSchema>(input)
+    m.requireString(opening, 'id')
+    m.requireString(opening, 'name')
+    m.requireValue(opening, 'type', 'slanted')
+    return m.applyDefaults<SlantedPocketOpeningSchema>(opening, defaultSlantedPocketOpening)
+  },
+  opticalIllusionPocketOpening: (input) => {
+    const opening = m.requireObject<OpticalIllusionPocketOpeningSchema>(input)
+    m.requireString(opening, 'id')
+    m.requireString(opening, 'name')
+    m.requireValue(opening, 'type', 'optical-illusion')
+    return m.applyDefaults<OpticalIllusionPocketOpeningSchema>(opening, defaultOpticalIllusionPocketOpening)
   },
   hole: (input) => {
     const hole = m.requireObject<HoleSchema>(input)
@@ -123,26 +150,6 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
 
     return m.applyDefaults<TPocketStitchLineSchema>(stitchLine, defaultTPocketStitchLine)
   },
-}
-
-const migratePocketOpening = (
-  input: DeepPartialSchema<PocketOpeningSchema>,
-): DeepPartialSchema<PocketOpeningSchema> => {
-  const opening = m.requireObject<PocketOpeningSchema>(input)
-  m.requirePrimitiveUnion(opening, 'type', ['straight', 'recessed', 'slanted', 'optical-illusion'])
-
-  switch (opening.type) {
-    case 'optical-illusion':
-      return m.applyDefaults<OpticalIllusionPocketOpeningSchema>(opening, defaultOpticalIllusionPocketOpening)
-    case 'straight':
-      return { type: 'straight' }
-    case 'recessed':
-      return m.applyDefaults<RecessedPocketOpeningSchema>(opening, defaultRecessedPocketOpening)
-    case 'slanted':
-      return m.applyDefaults<SlantedPocketOpeningSchema>(opening, defaultSlantedPocketOpening)
-    default:
-      throw new Error('Missing pocket opening type')
-  }
 }
 
 export const defaultProjectMigrator = createProjectMigration(defaultProjectMigratorSchema)

@@ -21,6 +21,7 @@ type CreateComponentParams<T extends ComponentSchema> = {
   type: T['type']
   id: string
   name: string
+  openingId?: string
   color?: string
   stitchingSettings: StitchLineCommonConfigSchema
 }
@@ -35,11 +36,16 @@ const createComponentRaw = ({
   id,
   name,
   stitchingSettings,
+  openingId,
 }: CreateComponentParams<ComponentSchema>): ComponentSchema => {
   switch (type) {
     case 'front-pocket': {
+      if (!isDefined(openingId)) {
+        throw new Error('An opening ID is required to create a front pocket')
+      }
       const component: FrontPocketSchema = {
         ...defaultFrontPocket,
+        openingId,
         id,
         name,
         ...(isDefined(color) ? { color } : {}),
@@ -47,8 +53,12 @@ const createComponentRaw = ({
       return component
     }
     case 't-pocket': {
+      if (!isDefined(openingId)) {
+        throw new Error('An opening ID is required to create a T-pocket')
+      }
       const component: TPocketSchema = {
         ...defaultTPocket,
+        openingId,
         id,
         name,
         ...(isDefined(color) ? { color } : {}),

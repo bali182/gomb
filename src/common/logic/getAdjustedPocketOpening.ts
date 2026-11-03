@@ -1,5 +1,5 @@
-import type { PocketOpeningSchema } from '../schemas/components'
 import type { PocketOpeningLimitsSchema } from '../schemas/limits'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import { clamp } from '../utils/clamp'
 
 /** Applies the calculated bounds without changing the requested opening. */

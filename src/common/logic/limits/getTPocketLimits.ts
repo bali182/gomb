@@ -3,11 +3,13 @@ import { POSITION_EPSILON } from '../../constants/layout'
 import type { PocketClusterSchema, TPocketSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
 import type { TPocketLimitsSchema } from '../../schemas/limits'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { clamp } from '../../utils/clamp'
 import { getPocketOpeningLimits } from './getPocketOpeningLimits'
 
 export const getTPocketLimits = (
   pocket: TPocketSchema,
+  opening: PocketOpeningSchema,
   computed: ComputedTPocketSchema,
   cluster: PocketClusterSchema,
 ): TPocketLimitsSchema => {
@@ -23,6 +25,6 @@ export const getTPocketLimits = (
     type: pocket.type,
     tPocketTabWidth: { max: { value: maximum, reason: 't-pocket-tab-width-exceeds-half-width', severity: 'warning' } },
     tPocketTaper: { max: { value: maximum, reason: 't-pocket-taper-exceeds-half-width', severity: 'warning' } },
-    opening: getPocketOpeningLimits(adjusted, cluster, computed),
+    opening: getPocketOpeningLimits(adjusted, opening, cluster, computed),
   }
 }

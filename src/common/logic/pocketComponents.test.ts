@@ -3,11 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
 import { POSITION_EPSILON } from '../constants/layout'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
-import type {
-  OpticalIllusionPocketOpeningSchema,
-  PocketOrientationSchema,
-  SlantedPocketOpeningSchema,
-} from '../schemas/components'
+import type { PocketOrientationSchema } from '../schemas/components'
+import type { OpticalIllusionPocketOpeningSchema, SlantedPocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getExportElementsForComponent } from './exports/getExportElements'
@@ -21,6 +18,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     const vertical = orientation === 'up' || orientation === 'down'
     it('keeps material when optical opening insets request the entire width', () => {
       const opening: OpticalIllusionPocketOpeningSchema = {
+        id: 'opening',
+        name: 'Opening',
         type: 'optical-illusion',
         direction: 'start',
         startInset: 100,
@@ -28,7 +27,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         leadingRadius: 0,
         trailingRadius: 0,
       }
-      const front = d.frontPocket({ id: 'front', opening })
+      const front = d.frontPocket({ id: 'front', openingId: opening.id })
       const cluster = d.pocketCluster({ id: 'cluster', orientation, children: [front.id], pocketStep: 80 })
       const root = d.rootPanel({
         id: 'root',
@@ -36,7 +35,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         height: vertical ? 80 : 100,
         children: [cluster.id],
       })
-      const source = d.subProject({ id: 'sub', root, components: [cluster, front] })
+      const source = d.subProject({ id: 'sub', root, components: [cluster, front], pocketOpenings: [opening] })
       const snapshot = structuredClone(source)
       const computed = accessors.computedSubProject(getComputedSubProject(source, defaultStitchingSettings))
       const path = computed.component.frontPocket(front.id).path
@@ -54,11 +53,17 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     })
 
     const fixture = (offset = 15) => {
-      const opening: SlantedPocketOpeningSchema = { type: 'slanted', offset, side: 'end' }
+      const opening: SlantedPocketOpeningSchema = {
+        id: 'opening',
+        name: 'Opening',
+        type: 'slanted',
+        offset,
+        side: 'end',
+      }
       const pockets = [
-        d.tPocket({ id: 't1', opening, tPocketTabWidth: 10, tPocketTaper: 35 }),
-        d.tPocket({ id: 't2', opening }),
-        d.frontPocket({ id: 'front', opening }),
+        d.tPocket({ id: 't1', openingId: opening.id, tPocketTabWidth: 10, tPocketTaper: 35 }),
+        d.tPocket({ id: 't2', openingId: opening.id }),
+        d.frontPocket({ id: 'front', openingId: opening.id }),
       ]
       const cluster = d.pocketCluster({
         id: 'cluster',
@@ -76,6 +81,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         id: 'sub',
         root,
         components: [cluster, ...pockets],
+        pocketOpenings: [opening],
         stitchLines: [
           d.tPocketStitchLine({ id: 'bottom', targetId: 't1', targetType: 'component', stitchMargin: 15 }),
           d.componentBoundsStitchLine({ id: 'border', targetId: 'cluster', targetType: 'component' }),

@@ -15,19 +15,21 @@ import type {
   HasLayoutSchema,
   HasPocketItemSchema,
   LayoutOrientationSchema,
-  OpticalIllusionPocketOpeningOwnSchema,
-  PocketOpeningSchema,
-  PocketOpeningSideSchema,
   PocketOrientationSchema,
   PocketsSchema,
-  RecessedPocketOpeningOwnSchema,
-  SlantedPocketOpeningOwnSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
 import type { PocketSettingsCopySelectionSchema } from '../schemas/pocketCopy'
+import type {
+  OpticalIllusionPocketOpeningOwnSchema,
+  PocketOpeningSchema,
+  PocketOpeningSideSchema,
+  RecessedPocketOpeningOwnSchema,
+  SlantedPocketOpeningOwnSchema,
+} from '../schemas/pocketOpening'
 import type {
   AppSettingsSchema,
   ComponentColorSettingsSchema,
@@ -251,8 +253,18 @@ export const EN = {
           stitching: 'Stitching',
         },
       },
+      pocketOpeningPreview: {
+        description: "The pocket's actual shape depends on its dimensions and layout.",
+      },
       actions: {
+        pocketOpenings: {
+          add: 'Add opening',
+          edit: 'Edit opening',
+          setDefault: 'Set as default',
+        },
         common: {
+          clone: 'Clone',
+          delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
         },
@@ -267,17 +279,9 @@ export const EN = {
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
           copyPocketSettings: 'Copy settings…',
-          clone: 'Clone',
-          delete: 'Delete',
-        },
-        stitchLines: {
-          clone: 'Clone',
-          delete: 'Delete',
         },
         holes: {
           addStitching: 'Add stitching',
-          clone: 'Clone',
-          delete: 'Delete',
         },
       },
       sections: {
@@ -871,12 +875,10 @@ export const EN = {
             slanted: 'Slanted',
             'optical-illusion': 'Optical illusion',
           } satisfies EnumTranslationSchema<PocketOpeningSchema['type']>,
-          slantedPocketOpeningSide: {
-            up: { start: 'Left', end: 'Right' },
-            right: { start: 'Top', end: 'Bottom' },
-            down: { start: 'Right', end: 'Left' },
-            left: { start: 'Bottom', end: 'Top' },
-          } satisfies Record<PocketOrientationSchema, EnumTranslationSchema<PocketOpeningSideSchema>>,
+          pocketOpeningSide: {
+            start: 'Start',
+            end: 'End',
+          } satisfies EnumTranslationSchema<PocketOpeningSideSchema>,
           pocketOrientation: {
             up: 'Top',
             down: 'Bottom',

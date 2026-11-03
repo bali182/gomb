@@ -4,7 +4,7 @@ import { narrowers } from '../../utils/narrowers'
 import { useEditableStitchLine } from '../../hooks/useEditableStitchLine'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
-import { getModelIcon } from '../../utils/getModelIcon'
+import { getModelIconByType } from '../../utils/getModelIcon'
 import { StitchLineActionsMenu } from '../action-menus/StitchLineActionsMenu'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
@@ -25,6 +25,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
     stitchLine: editedStitchLine,
     validationIssues,
   } = useEditableStitchLine(stitchLine.id)
+  const Icon = getModelIconByType(editedStitchLine.type)
 
   const handleRenderTargetChange = useCallback(
     (onTop: string): void => {
@@ -45,7 +46,7 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
       <IdentityFloatingEditorHeader<StitchLineSchema>
         editable={editableStitchLine}
-        icon={getModelIcon(editedStitchLine)}
+        icon={<Icon />}
         issues={validationIssues}
         menu={<StitchLineActionsMenu size="xs" stitchLine={editedStitchLine} />}
         onChange={setStitchLine}

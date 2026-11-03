@@ -70,6 +70,10 @@ export const cloneSubProject = (
         id: getUnusedId(),
         root: cloneResult.clonedRootId,
         stitchLines: cloneResult.clonedStitchLines,
+        defaultPocketOpening: sourceSubProject.defaultPocketOpening,
+        pocketOpenings: Object.fromEntries(
+          Object.entries(sourceSubProject.pocketOpenings).map(([id, opening]) => [id, { ...opening }]),
+        ),
       },
     ],
   }

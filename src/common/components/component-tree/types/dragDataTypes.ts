@@ -1,4 +1,5 @@
 import type { StitchLineSchema } from '../../../schemas/stitching'
+import type { PocketOpeningTreeItemNode } from '../../pocket-opening-tree/types/nodeTypes'
 import type { ComponentTreeNode, HoleTreeNode, StitchLineTreeNode } from './nodeTypes'
 
 export type ComponentTreeDragData = {
@@ -23,4 +24,11 @@ export type StitchLineTreeDragData = {
   stitchLineType: StitchLineSchema['type']
 }
 
-export type TreeDragData = ComponentTreeDragData | HoleTreeDragData | StitchLineTreeDragData
+export type PocketOpeningTreeDragData = {
+  kind: 'pocket-opening'
+  openingId: string
+  indexPath: number[]
+  node: PocketOpeningTreeItemNode
+}
+
+export type TreeDragData = ComponentTreeDragData | HoleTreeDragData | StitchLineTreeDragData | PocketOpeningTreeDragData

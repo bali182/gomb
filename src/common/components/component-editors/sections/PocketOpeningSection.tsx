@@ -1,82 +1,45 @@
 import { Menu, Portal, type MenuValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
-import type { IconType } from 'react-icons'
-import { PiCaretDown } from 'react-icons/pi'
+import { PiCaretDown, PiPencilSimple } from 'react-icons/pi'
+import { useDrawAreaContext } from '../../../contexts/DrawAreaContext'
 import { useEditorContext } from '../../../contexts/EditorContext'
-import {
-  defaultOpticalIllusionPocketOpening,
-  defaultRecessedPocketOpening,
-  defaultSlantedPocketOpening,
-} from '../../../defaultStates'
+import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
-import type {
-  OpticalIllusionPocketOpeningSchema,
-  PocketClusterSchema,
-  PocketOpeningSchema,
-  RecessedPocketOpeningSchema,
-  SlantedPocketOpeningSchema,
-} from '../../../schemas/components'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import { getEditableSchema } from '../../../utils/getEditableSchema'
-import { noIssues } from '../../../utils/issueUtils'
+import { accessors } from '../../../utils/accessors'
+import { getModelIconByType } from '../../../utils/getModelIcon'
+import { isDefined } from '../../../utils/isDefined'
+import { EditorButton } from '../../common/EditorButton'
 import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
-import { OpticalIllusionPocketOpeningIcon } from '../../icons/OpticalIllusionPocketOpeningIcon'
-import { RecessedPocketOpeningIcon } from '../../icons/RecessedPocketOpeningIcon'
-import { SlantedPocketOpeningIcon } from '../../icons/SlantedPocketOpeningIcon'
-import { StraightPocketOpeningIcon } from '../../icons/StraightPocketOpeningIcon'
-import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
-import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
-import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
-import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
 
 type PocketOpeningSectionProps = {
-  modelId: string
-  cluster: PocketClusterSchema
-  editable: EditableSchema<PocketOpeningSchema>
-  issues: IssuesSchema<PocketOpeningSchema> | undefined
-  onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
-}
-const openingTypes: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted', 'optical-illusion']
-const openingIcons: Record<PocketOpeningSchema['type'], IconType> = {
-  'optical-illusion': OpticalIllusionPocketOpeningIcon,
-  straight: StraightPocketOpeningIcon,
-  recessed: RecessedPocketOpeningIcon,
-  slanted: SlantedPocketOpeningIcon,
+  openingId: string
+  onOpeningIdChange: (openingId: string) => void
 }
 
-export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
-  modelId,
-  cluster,
-  editable,
-  issues: incomingIssues,
-  onChange,
-}) => {
+export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({ openingId, onOpeningIdChange }) => {
+  const { subProject } = useSubProject()
+  const { selection } = useDrawAreaContext()
   const { isComputing, setEditingInputId } = useEditorContext()
-  const { t, language } = useTranslation()
-  const issues = incomingIssues ?? noIssues<PocketOpeningSchema>()
-  const OpeningIcon = openingIcons[editable.type]
-  const handleTypeChange = useCallback(
+  const { t } = useTranslation()
+  const opening = accessors.subProject(subProject).pocketOpening.byId(openingId)
+
+  const OpeningIcon = getModelIconByType(opening.type)
+
+  const handleEditOpening = useCallback((): void => {
+    setEditingInputId(undefined)
+    selection.select(opening)
+  }, [opening, selection, setEditingInputId])
+
+  const handleOpeningChange = useCallback(
     (details: MenuValueChangeDetails): void => {
-      setEditingInputId(undefined)
-      switch (details.value) {
-        case 'optical-illusion':
-          onChange(getEditableSchema(defaultOpticalIllusionPocketOpening, { language }))
-          break
-        case 'straight':
-          onChange({ type: 'straight' })
-          break
-        case 'recessed':
-          onChange(getEditableSchema(defaultRecessedPocketOpening, { language }))
-          break
-        case 'slanted':
-          onChange(getEditableSchema(defaultSlantedPocketOpening, { language }))
-          break
+      if (isDefined(accessors.subProject(subProject).optional.pocketOpening.byId(details.value))) {
+        setEditingInputId(undefined)
+        onOpeningIdChange(details.value)
       }
     },
-    [language, onChange, setEditingInputId],
+    [onOpeningIdChange, setEditingInputId, subProject],
   )
   return (
     <SectionGroup.Section>
@@ -92,20 +55,20 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
                 _expanded={{ bg: 'bg.emphasized' }}
               >
                 <OpeningIcon />
-                {t.project.editors.enums.components.pocketOpening[editable.type]}
+                {opening.name}
                 <PiCaretDown />
               </MiniButton>
             </Menu.Trigger>
             <Portal container={portalRef}>
               <Menu.Positioner>
                 <Menu.Content width="max-content">
-                  <Menu.RadioItemGroup value={editable.type} onValueChange={handleTypeChange}>
-                    {openingTypes.map((type) => {
-                      const Icon = openingIcons[type]
+                  <Menu.RadioItemGroup value={openingId} onValueChange={handleOpeningChange}>
+                    {Object.values(subProject.pocketOpenings).map((candidate) => {
+                      const Icon = getModelIconByType(candidate.type)
                       return (
-                        <Menu.RadioItem disabled={isComputing} key={type} value={type}>
+                        <Menu.RadioItem disabled={isComputing} key={candidate.id} value={candidate.id}>
                           <Icon />
-                          <Menu.ItemText>{t.project.editors.enums.components.pocketOpening[type]}</Menu.ItemText>
+                          <Menu.ItemText>{candidate.name}</Menu.ItemText>
                           <Menu.ItemIndicator />
                         </Menu.RadioItem>
                       )
@@ -119,40 +82,12 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({
       >
         {t.project.editors.sections.components.pocketOpening.title}
       </SectionGroup.SectionHeader>
-
-      {editable.type === 'optical-illusion' && (
-        <OpticalIllusionPocketOpeningFields
-          modelId={modelId}
-          editable={editable}
-          issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
-          orientation={cluster.orientation}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'straight' && (
-        <StraightPocketOpeningFields
-          editable={editable}
-          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'recessed' && (
-        <RecessedPocketOpeningFields
-          modelId={modelId}
-          editable={editable}
-          issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
-          onChange={onChange}
-        />
-      )}
-      {editable.type === 'slanted' && (
-        <SlantedPocketOpeningFields
-          modelId={modelId}
-          editable={editable}
-          issues={issues as IssuesSchema<SlantedPocketOpeningSchema>}
-          orientation={cluster.orientation}
-          onChange={onChange}
-        />
-      )}
+      <SectionGroup.SectionFullWidthContent>
+        <EditorButton width="full" size="sm" variant="outline" onClick={handleEditOpening}>
+          <PiPencilSimple />
+          {t.project.editors.actions.pocketOpenings.edit}
+        </EditorButton>
+      </SectionGroup.SectionFullWidthContent>
     </SectionGroup.Section>
   )
 }

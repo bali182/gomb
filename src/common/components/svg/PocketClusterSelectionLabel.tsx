@@ -5,7 +5,7 @@ import { useComputedComponent } from '../../hooks/useComputedComponent'
 import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { PointSchema } from '../../schemas/geometry'
-import { getModelIcon } from '../../utils/getModelIcon'
+import { getModelIconByType } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { Label } from './Label'
@@ -77,7 +77,7 @@ export const PocketClusterSelectionLabel: FC<PocketClusterSelectionLabelProps> =
 
   return (
     <Label
-      icon={getModelIcon(cluster)}
+      icon={getModelIconByType(cluster.type)}
       label={cluster.name}
       getPosition={getLabelPosition}
       rotation={labelRotation}

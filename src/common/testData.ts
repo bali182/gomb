@@ -1,6 +1,7 @@
 import { defaultStitchingSettings } from './defaultStates'
 import { createComponent } from './operations/subProject/utils/createComponent'
 import { createHole } from './operations/subProject/utils/createHole'
+import { createPocketOpening } from './operations/subProject/utils/createPocketOpening'
 import { createStitchLine } from './operations/subProject/utils/createStitchLine'
 import { HasComponentReferenceSchema, HasComponentTargetSchema, HasId, HasTargetSchema } from './schemas/common'
 import {
@@ -12,6 +13,7 @@ import {
   TPocketSchema,
 } from './schemas/components'
 import { HoleSchema } from './schemas/hole'
+import type { PocketOpeningSchema } from './schemas/pocketOpening'
 import { ProjectSchema } from './schemas/project'
 import {
   ComponentBoundsStitchLineSchema,
@@ -20,8 +22,10 @@ import {
   TPocketStitchLineSchema,
 } from './schemas/stitching'
 import { SubProjectSchema } from './schemas/subProject'
+import { accessors } from './utils/accessors'
 import { createProject } from './utils/createProject'
 import { createSubProject } from './utils/createSubProject'
+import { id as generateId } from './utils/id'
 import { isDefined } from './utils/isDefined'
 import { narrowers } from './utils/narrowers'
 
@@ -40,6 +44,7 @@ type CreateSubProjectConfig = HasId &
     components?: ComponentSchema[]
     stitchLines?: StitchLineSchema[]
     holes?: HoleSchema[]
+    pocketOpenings?: PocketOpeningSchema[]
   }
 
 type CreateRootPanelConfig = Partial<RootPanelSchema> & HasId & HasStitchingSettings
@@ -68,9 +73,10 @@ export const d = {
     components = [],
     stitchLines = [],
     holes = [],
+    pocketOpenings = [],
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
-    const subProject = createSubProject(id, stitchingSettings)
+    const subProject = createSubProject(id, stitchingSettings, 'Straight')
     subProject.root = root.id
     subProject.components = {
       [root.id]: root,
@@ -79,7 +85,21 @@ export const d = {
       subProject.components[component.id] = component
     }
     subProject.stitchLines = stitchLines
+    subProject.pocketOpenings = {
+      ...subProject.pocketOpenings,
+      ...Object.fromEntries(pocketOpenings.map((opening) => [opening.id, opening])),
+    }
     subProject.holes = holes
+    const accessor = accessors.subProject(subProject)
+    for (const component of components) {
+      if (narrowers.is.pocket(component) && !isDefined(accessor.optional.pocketOpening.byId(component.openingId))) {
+        subProject.pocketOpenings[component.openingId] = createPocketOpening({
+          type: 'straight',
+          id: component.openingId,
+          name: component.openingId,
+        })
+      }
+    }
     return subProject
   },
 
@@ -88,11 +108,17 @@ export const d = {
     stitchingSettings = defaultStitchingSettings,
     ...rest
   }: CreateRootPanelConfig): RootPanelSchema => {
-    return { ...createComponent({ type: 'root-panel', id, name: id, stitchingSettings }), ...rest }
+    return {
+      ...createComponent({ type: 'root-panel', id, name: id, stitchingSettings }),
+      ...rest,
+    }
   },
 
   panel: ({ id, stitchingSettings = defaultStitchingSettings, ...rest }: CreatePanelConfig): PanelSchema => {
-    return { ...createComponent({ type: 'panel', id, name: id, stitchingSettings }), ...rest }
+    return {
+      ...createComponent({ type: 'panel', id, name: id, stitchingSettings }),
+      ...rest,
+    }
   },
 
   pocketCluster: ({
@@ -101,7 +127,12 @@ export const d = {
     ...rest
   }: CreatePocketClusterConfig): PocketClusterSchema => {
     return {
-      ...createComponent({ type: 'pocket-cluster', id, name: id, stitchingSettings }),
+      ...createComponent({
+        type: 'pocket-cluster',
+        id,
+        name: id,
+        stitchingSettings,
+      }),
       ...rest,
     }
   },
@@ -109,17 +140,31 @@ export const d = {
   frontPocket: ({
     id,
     stitchingSettings = defaultStitchingSettings,
+    openingId = generateId(),
     ...rest
   }: Partial<FrontPocketSchema> & HasId & HasStitchingSettings): FrontPocketSchema => ({
-    ...createComponent<FrontPocketSchema>({ type: 'front-pocket', id, name: id, stitchingSettings }),
+    ...createComponent<FrontPocketSchema>({
+      type: 'front-pocket',
+      id,
+      name: id,
+      openingId,
+      stitchingSettings,
+    }),
     ...rest,
   }),
   tPocket: ({
     id,
     stitchingSettings = defaultStitchingSettings,
+    openingId = generateId(),
     ...rest
   }: Partial<TPocketSchema> & HasId & HasStitchingSettings): TPocketSchema => ({
-    ...createComponent<TPocketSchema>({ type: 't-pocket', id, name: id, stitchingSettings }),
+    ...createComponent<TPocketSchema>({
+      type: 't-pocket',
+      id,
+      name: id,
+      openingId,
+      stitchingSettings,
+    }),
     ...rest,
   }),
 

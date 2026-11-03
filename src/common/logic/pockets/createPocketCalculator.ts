@@ -1,5 +1,6 @@
-import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, RectSchema } from '../../schemas/geometry'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { OpticalIllusionPocketCalculator } from './OpticalIllusionPocketCalculator'
 import type { PocketCalculator } from './PocketCalculator'
 import { RecessedPocketCalculator } from './RecessedPocketCalculator'

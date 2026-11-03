@@ -22,15 +22,18 @@ import type {
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
-  OpticalIllusionPocketOpeningSchema,
+  HasPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
-  RecessedPocketOpeningSchema,
   RootPanelSchema,
-  SlantedPocketOpeningSchema,
   TPocketSchema,
 } from './schemas/components'
 import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
+import type {
+  OpticalIllusionPocketOpeningOwnSchema,
+  RecessedPocketOpeningOwnSchema,
+  SlantedPocketOpeningOwnSchema,
+} from './schemas/pocketOpening'
 import type { ColorSettingsSchema, ExportSettingsSchema } from './schemas/settings'
 
 import type {
@@ -125,8 +128,7 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
   children: [],
 }
 
-export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
-  type: 'recessed',
+export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
   outerInset: 15,
   innerOffset: 15,
   depth: 10,
@@ -134,8 +136,7 @@ export const defaultRecessedPocketOpening: RecessedPocketOpeningSchema = {
   innerRadius: 10,
 }
 
-export const defaultOpticalIllusionPocketOpening: OpticalIllusionPocketOpeningSchema = {
-  type: 'optical-illusion',
+export const defaultOpticalIllusionPocketOpening: OpticalIllusionPocketOpeningOwnSchema = {
   direction: 'start',
   startInset: 10,
   endInset: 10,
@@ -143,8 +144,7 @@ export const defaultOpticalIllusionPocketOpening: OpticalIllusionPocketOpeningSc
   trailingRadius: 0,
 }
 
-export const defaultSlantedPocketOpening: SlantedPocketOpeningSchema = {
-  type: 'slanted',
+export const defaultSlantedPocketOpening: SlantedPocketOpeningOwnSchema = {
   offset: 15,
   side: 'start',
 }
@@ -155,19 +155,17 @@ export const defaultHasPocketItem: HasPocketItemSchema = {
   itemOpeningOffset: 0,
 }
 
-export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName> = {
+export const defaultFrontPocket: Omit<FrontPocketSchema, keyof HasId | keyof HasName | keyof HasPocketOpeningSchema> = {
   ...defaultHasPocketItem,
   ...defaultHasLayout,
   ...defaultHasCornerRadius,
   type: 'front-pocket',
   children: [],
-  opening: { type: 'straight' },
 }
-export const defaultTPocket: Omit<TPocketSchema, keyof HasId | keyof HasName> = {
+export const defaultTPocket: Omit<TPocketSchema, keyof HasId | keyof HasName | keyof HasPocketOpeningSchema> = {
   ...defaultHasPocketItem,
   type: 't-pocket',
   children: [],
-  opening: { type: 'straight' },
   tPocketTabWidth: 8,
   tPocketTaper: 20,
 }

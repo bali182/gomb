@@ -4,8 +4,8 @@ import { narrowers } from '../../utils/narrowers'
 
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultOpticalIllusionPocketOpening } from '../../defaultStates'
-import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/components'
 import type { ComputedTPocketSchema } from '../../schemas/computed'
+import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { getAdjustedPocketOpening } from '../getAdjustedPocketOpening'
 import { getPathSegments } from '../pathSegments'
@@ -23,7 +23,13 @@ const computed: ComputedTPocketSchema = {
   cornerRadius: ZERO_CORNER_RADIUS,
 }
 const getLimits = (fields: Partial<OpticalIllusionPocketOpeningSchema> = {}) => {
-  const opening = { ...defaultOpticalIllusionPocketOpening, ...fields }
+  const opening = {
+    type: 'optical-illusion' as const,
+    id: 'opening',
+    name: 'Opening',
+    ...defaultOpticalIllusionPocketOpening,
+    ...fields,
+  }
   const limits = getOpticalIllusionPocketOpeningLimits(opening, pocket, cluster, computed)
   return { opening, limits, adjusted: getAdjustedPocketOpening(opening, limits) }
 }
@@ -46,7 +52,14 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
   })
 
   it.each([1, 2, 6])('reserves horizontal run for each of %s pockets', (count) => {
-    const opening = { ...defaultOpticalIllusionPocketOpening, startInset: 100, endInset: 100 }
+    const opening = {
+      type: 'optical-illusion' as const,
+      id: 'opening',
+      name: 'Opening',
+      ...defaultOpticalIllusionPocketOpening,
+      startInset: 100,
+      endInset: 100,
+    }
     const populated = { ...cluster, children: ['t', ...Array.from({ length: count - 1 }, (_, index) => `t-${index}`)] }
     const limits = getOpticalIllusionPocketOpeningLimits(opening, pocket, populated, computed)
     const adjusted = getAdjustedPocketOpening(opening, limits)

@@ -1,12 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
-import type {
-  FrontPocketSchema,
-  PocketOrientationSchema,
-  RecessedPocketOpeningSchema,
-  TPocketSchema,
-} from '../../schemas/components'
+import type { FrontPocketSchema, PocketOrientationSchema, TPocketSchema } from '../../schemas/components'
+import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { narrowers } from '../../utils/narrowers'
 import { calculatePocketClusterGeometry } from '../calculatePocketClusterGeometry'
@@ -24,6 +20,8 @@ const createFixture = (
   frontOverrides?: Partial<FrontPocketSchema>,
 ) => {
   const opening: RecessedPocketOpeningSchema = {
+    id: 'opening',
+    name: 'Opening',
     type: 'recessed',
     outerInset: 35,
     innerOffset: 15,
@@ -32,8 +30,8 @@ const createFixture = (
     innerRadius: 15,
     ...overrides,
   }
-  const pocket = d.tPocket({ id: 't', opening, ...tOverrides })
-  const front = d.frontPocket({ id: 'front', opening, ...frontOverrides })
+  const pocket = d.tPocket({ id: 't', openingId: opening.id, ...tOverrides })
+  const front = d.frontPocket({ id: 'front', openingId: opening.id, ...frontOverrides })
   const source = frontOverrides === undefined ? pocket : front
   const cluster = d.pocketCluster({
     id: 'cluster',
@@ -42,11 +40,13 @@ const createFixture = (
     children: frontOverrides === undefined ? ['t', 't2', 'front'] : ['front'],
   })
   const rect = { x: new BigNumber(11), y: new BigNumber(17), width: new BigNumber(100), height: new BigNumber(100) }
+  const pockets = frontOverrides === undefined ? [pocket, d.tPocket({ id: 't2' }), front] : [front]
   const geometry = calculatePocketClusterGeometry(
     cluster,
-    frontOverrides === undefined ? [pocket, d.tPocket({ id: 't2' }), front] : [front],
+    pockets,
     rect,
     ZERO_CORNER_RADIUS,
+    d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }), components: pockets, pocketOpenings: [opening] }),
   )
   const computed = geometry.children[0]
   return {

@@ -6,11 +6,11 @@ import type {
   PocketClusterSchema,
   PocketOrientationSchema,
   PocketSchema,
-  RecessedPocketOpeningSchema,
   TPocketSchema,
 } from '../../schemas/components'
 import type { ComputedFrontPocketSchema, ComputedTPocketSchema } from '../../schemas/computed'
 import type { NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../../schemas/limits'
+import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { clamp } from '../../utils/clamp'
 import { getTPocketTabDepth } from '../pocketUtils'
 

@@ -2,35 +2,31 @@ import { IconButton, TreeView } from '@chakra-ui/react'
 import { useDraggable } from '@dnd-kit/core'
 import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiDotsSixVertical } from 'react-icons/pi'
+import { getModelIconByType } from '../../utils/getModelIcon'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { TreeItemVisual } from './TreeItemVisual'
-import type { TreeDragData } from './types/dragDataTypes'
+import { isDefined } from '../../utils/isDefined'
+import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { StitchLineTreeNode } from './types/nodeTypes'
-import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
 type StitchLineTreeItemProps = {
-  activeDragData: TreeDragData | undefined
   hasDragAndDrop: boolean
   indexPath: number[]
   node: StitchLineTreeNode
   renderMenu?: (node: StitchLineTreeNode) => ReactNode
 }
 
-export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
-  activeDragData,
-  hasDragAndDrop,
-  indexPath,
-  node,
-  renderMenu,
-}) => {
+export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop, indexPath, node, renderMenu }) => {
+  const { activeDragData } = useTreeDragAndDropContext()
   const selection = useSubProjectSelectionContext()
   const { isComputing } = useEditorContext()
   const { stitchLine } = node
+  const Icon = getModelIconByType(stitchLine.type)
   const isActiveStitchLine = activeDragData?.kind === 'stitch-line' && activeDragData.stitchLineId === stitchLine.id
-  const isDisabledForActiveDrag = activeDragData !== undefined && !isActiveStitchLine
+  const isDisabledForActiveDrag = isDefined(activeDragData) && !isActiveStitchLine
   const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation()
   }, [])
@@ -65,11 +61,9 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
       h="9"
     >
       <TreeItemVisual
-        icon={getProjectTreeNodeIcon(node)}
-        isBranch={false}
-        isExpandable={false}
+        icon={<Icon />}
         isPositioned={false}
-        label={getProjectTreeNodeLabel(node)}
+        label={<TreeView.ItemText>{getProjectTreeNodeLabel(node)}</TreeView.ItemText>}
         leading={
           hasDragAndDrop ? (
             <IconButton

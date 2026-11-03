@@ -2,15 +2,21 @@ import type { IconType } from 'react-icons'
 import { PiCardsThreeDuotone, PiNeedleDuotone, PiRectangleDuotone, PiWalletDuotone } from 'react-icons/pi'
 import { HoleIcon } from '../components/icons/HoleIcon'
 import { OpticalIllusionFrontPocketIcon } from '../components/icons/OpticalIllusionFrontPocketIcon'
+import { OpticalIllusionPocketOpeningIcon } from '../components/icons/OpticalIllusionPocketOpeningIcon'
 import { OpticalIllusionTPocketIcon } from '../components/icons/OpticalIllusionTPocketIcon'
 import { RecessedFrontPocketIcon } from '../components/icons/RecessedFrontPocketIcon'
+import { RecessedPocketOpeningIcon } from '../components/icons/RecessedPocketOpeningIcon'
 import { RecessedTPocketIcon } from '../components/icons/RecessedTPocketIcon'
 import { SlantedFrontPocketIcon } from '../components/icons/SlantedFrontPocketIcon'
+import { SlantedPocketOpeningIcon } from '../components/icons/SlantedPocketOpeningIcon'
 import { SlantedTPocketIcon } from '../components/icons/SlantedTPocketIcon'
 import { StraightFrontPocketIcon } from '../components/icons/StraightFrontPocketIcon'
+import { StraightPocketOpeningIcon } from '../components/icons/StraightPocketOpeningIcon'
 import { StraightTPocketIcon } from '../components/icons/StraightTPocketIcon'
-import type { PocketOpeningSchema } from '../schemas/components'
 import type { ModelObjectSchema } from '../schemas/modelObject'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
+import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from './accessors'
 
 const frontPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
   'optical-illusion': OpticalIllusionFrontPocketIcon,
@@ -26,12 +32,12 @@ const tPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
   slanted: SlantedTPocketIcon,
 }
 
-export const getModelIcon = (model: ModelObjectSchema): IconType => {
+export const getModelIcon = (model: ModelObjectSchema, subProject: SubProjectSchema): IconType => {
   switch (model.type) {
     case 'front-pocket':
-      return frontPocketIcons[model.opening.type]
+      return frontPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
     case 't-pocket':
-      return tPocketIcons[model.opening.type]
+      return tPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
     default:
       return getModelIconByType(model.type)
   }
@@ -55,5 +61,13 @@ export const getModelIconByType = (type: ModelObjectSchema['type']): IconType =>
       return PiNeedleDuotone
     case 't-pocket-stitch-line':
       return PiNeedleDuotone
+    case 'straight':
+      return StraightPocketOpeningIcon
+    case 'slanted':
+      return SlantedPocketOpeningIcon
+    case 'recessed':
+      return RecessedPocketOpeningIcon
+    case 'optical-illusion':
+      return OpticalIllusionPocketOpeningIcon
   }
 }

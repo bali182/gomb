@@ -9,25 +9,20 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PiYoutubeLogoFill } from 'react-icons/pi'
-import { EditorSelect } from '../../common/EditorSelect'
+import { EditorSelect } from '../common/EditorSelect'
 
-import { useTranslation } from '../../../hooks/useTranslation'
-import type {
-  OpticalIllusionPocketOpeningSchema,
-  PocketOpeningSideSchema,
-  PocketOrientationSchema,
-} from '../../../schemas/components'
-import type { EditableSchema } from '../../../schemas/editable'
-import type { IssuesSchema } from '../../../schemas/issues'
-import { isDefined } from '../../../utils/isDefined'
-import { EditorNumberInput } from '../../common/EditorNumberInput'
-import { SectionGroup } from '../../common/SectionGroup'
+import { useTranslation } from '../../hooks/useTranslation'
+import type { EditableSchema } from '../../schemas/editable'
+import type { IssuesSchema } from '../../schemas/issues'
+import type { OpticalIllusionPocketOpeningSchema, PocketOpeningSideSchema } from '../../schemas/pocketOpening'
+import { isDefined } from '../../utils/isDefined'
+import { EditorNumberInput } from '../common/EditorNumberInput'
+import { SectionGroup } from '../common/SectionGroup'
 
 type OpticalIllusionPocketOpeningFieldsProps = {
   modelId: string
   editable: EditableSchema<OpticalIllusionPocketOpeningSchema>
   issues: IssuesSchema<OpticalIllusionPocketOpeningSchema>
-  orientation: PocketOrientationSchema
   onChange: (updated: EditableSchema<OpticalIllusionPocketOpeningSchema>) => void
 }
 
@@ -37,7 +32,6 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
   modelId,
   editable,
   issues,
-  orientation,
   onChange,
 }) => {
   const { t } = useTranslation()
@@ -46,9 +40,10 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       createListCollection<PocketOpeningSideSchema>({
         items: sides,
         itemToValue: (side) => side,
-        itemToString: (side) => t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side],
+        itemToString: (side: PocketOpeningSideSchema): string =>
+          t.project.editors.enums.components.pocketOpeningSide[side],
       }),
-    [orientation, t],
+    [t],
   )
   const selectedValue = useMemo<string[]>(() => [editable.direction], [editable.direction])
   const handleStartInsetChange = useCallback(
@@ -116,7 +111,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
             <Select.Content width="full">
               {collection.items.map((side) => (
                 <Select.Item key={side} item={side}>
-                  {t.project.editors.enums.components.slantedPocketOpeningSide[orientation][side]}
+                  {t.project.editors.enums.components.pocketOpeningSide[side]}
                   <Select.ItemIndicator />
                 </Select.Item>
               ))}
@@ -132,7 +127,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       <SectionGroup.SectionRowEditor issue={issues.startInset}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.startInset"
+          field="startInset"
           value={editable.startInset}
           issue={issues.startInset}
           onChange={handleStartInsetChange}
@@ -147,7 +142,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       <SectionGroup.SectionRowEditor issue={issues.endInset}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.endInset"
+          field="endInset"
           value={editable.endInset}
           issue={issues.endInset}
           onChange={handleEndInsetChange}
@@ -162,7 +157,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       <SectionGroup.SectionRowEditor issue={issues.leadingRadius}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.leadingRadius"
+          field="leadingRadius"
           value={editable.leadingRadius}
           issue={issues.leadingRadius}
           onChange={handleLeadingRadiusChange}
@@ -177,7 +172,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
       <SectionGroup.SectionRowEditor issue={issues.trailingRadius}>
         <EditorNumberInput
           modelId={modelId}
-          field="opening.trailingRadius"
+          field="trailingRadius"
           value={editable.trailingRadius}
           issue={issues.trailingRadius}
           onChange={handleTrailingRadiusChange}

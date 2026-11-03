@@ -318,13 +318,20 @@ it('clones every optical illusion setting', () => {
   const a = original.components.a
   if (!narrowers.is.tPocket(a)) throw new Error('Missing pocket')
   const opening = {
+    type: 'optical-illusion' as const,
     ...defaultOpticalIllusionPocketOpening,
+    id: 'optical',
+    name: 'Optical',
     startInset: 12,
     endInset: 23,
     leadingRadius: 7,
     trailingRadius: 3,
   }
-  const source = { ...original, components: { ...original.components, a: { ...a, opening } } }
+  const source = {
+    ...original,
+    pocketOpenings: { ...original.pocketOpenings, [opening.id]: opening },
+    components: { ...original.components, a: { ...a, openingId: opening.id } },
+  }
   let next = 0
   const cloned = cloneComponent(source, {
     componentId: 'first',
@@ -339,7 +346,8 @@ it('clones every optical illusion setting', () => {
   const copiedCluster = cloned.components[cloned.components.root.children[1]]
   const copiedPocket = cloned.components[copiedCluster.children[0]]
   if (!narrowers.is.tPocket(copiedPocket)) throw new Error('Missing copied pocket')
-  expect(copiedPocket.opening).toEqual(opening)
+  expect(copiedPocket.openingId).toBe(opening.id)
+  expect(cloned.pocketOpenings).toBe(source.pocketOpenings)
 })
 
 describe('cluster T-pocket stitching ownership', () => {

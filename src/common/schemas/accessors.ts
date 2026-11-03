@@ -20,6 +20,7 @@ import {
 } from './computed'
 import { HoleSchema } from './hole'
 import { ComponentLimitsSchema, HoleLimitsSchema, StitchLineLimitsSchema } from './limits'
+import type { PocketOpeningSchema } from './pocketOpening'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from './stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
 
@@ -59,6 +60,11 @@ export type StitchLineAccessorSchema = {
   byOnTop(componentId: string): StitchLineSchema[]
 }
 
+export type PocketOpeningAccessorSchema = {
+  byId(id: string): PocketOpeningSchema
+  defaultOpening(): PocketOpeningSchema
+}
+
 export type HoleAccessorSchema = {
   // Do we need anything else?
   byId(id: string): HoleSchema
@@ -96,12 +102,14 @@ export type SubProjectLimitsAccessorSchema = {
 }
 
 export type OptionalSubProjectAccessorSchema = {
+  pocketOpening: OptionalAccessorSchema<PocketOpeningAccessorSchema>
   component: OptionalAccessorSchema<ComponentAccessorSchema>
   stitchLine: OptionalAccessorSchema<StitchLineAccessorSchema>
   hole: OptionalAccessorSchema<HoleAccessorSchema>
 }
 
 export type SubProjectAccessorSchema = {
+  pocketOpening: PocketOpeningAccessorSchema
   component: ComponentAccessorSchema
   stitchLine: StitchLineAccessorSchema
   hole: HoleAccessorSchema

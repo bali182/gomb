@@ -7,6 +7,7 @@ import { getUnusedName } from '../subProject/utils/getUnusedName'
 
 type AddSubProjectParams = {
   baseRootComponentName: string
+  defaultOpeningName: string
 }
 
 type AddSubProjectResult = {
@@ -16,7 +17,7 @@ type AddSubProjectResult = {
 
 export const addSubProject = (
   project: ProjectSchema,
-  { baseRootComponentName }: AddSubProjectParams,
+  { baseRootComponentName, defaultOpeningName }: AddSubProjectParams,
 ): AddSubProjectResult => {
   const usedRootNames = new Set(
     project.subProjects
@@ -24,7 +25,11 @@ export const addSubProject = (
       .filter(isDefined)
       .map((rootPanel) => rootPanel.name),
   )
-  const subProject = createSubProject(getUnusedName(baseRootComponentName, usedRootNames), project.stitchingSettings)
+  const subProject = createSubProject(
+    getUnusedName(baseRootComponentName, usedRootNames),
+    project.stitchingSettings,
+    defaultOpeningName,
+  )
 
   return {
     project: {

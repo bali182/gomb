@@ -1,14 +1,17 @@
-import { ComponentSchema } from './components'
-import { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from './computed'
-import { RectSchema } from './geometry'
-import { HoleSchema } from './hole'
+import type { ComponentSchema } from './components'
+import type { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from './computed'
+import type { RectSchema } from './geometry'
+import type { HoleSchema } from './hole'
 import type { SubProjectLimitsSchema } from './limits'
-import { StitchLineSchema } from './stitching'
+import type { PocketOpeningSchema } from './pocketOpening'
+import type { StitchLineSchema } from './stitching'
 
 export type SubProjectSchema = {
   id: string
   root: string
+  defaultPocketOpening: string
   components: Record<string, ComponentSchema>
+  pocketOpenings: Record<string, PocketOpeningSchema>
   holes: HoleSchema[]
   stitchLines: StitchLineSchema[]
 }

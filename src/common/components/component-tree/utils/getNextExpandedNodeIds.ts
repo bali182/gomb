@@ -11,6 +11,9 @@ export const getNextExpandedNodeIds = (
   subProject: SubProjectSchema,
   expandedIds: string[],
 ): string[] => {
+  if (narrowers.is.pocketOpening(selection)) {
+    return expandedIds
+  }
   if (narrowers.is.component(selection)) {
     return getNextExpandedNodeIdsForComponent(selection.id, subProject, expandedIds)
   }

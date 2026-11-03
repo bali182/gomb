@@ -19,6 +19,8 @@ describe('isPointInClosedPath', () => {
       d.frontPocket({ id: 'front' }),
       d.pocketCluster({ id: 'cluster', orientation: 'right' }),
       {
+        id: 'opening',
+        name: 'Opening',
         type: 'recessed',
         outerInset: 43.3,
         innerOffset: 8,

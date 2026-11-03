@@ -5,8 +5,9 @@ import { ZERO } from '../../constants/layout'
 import { usePath } from '../../hooks/usePath'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
 import type { PocketCalculator } from '../../logic/pockets/PocketCalculator'
-import type { PocketClusterSchema, PocketOpeningSchema, PocketSchema } from '../../schemas/components'
+import type { PocketClusterSchema, PocketSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, PathSchema, RectSchema } from '../../schemas/geometry'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { getViewBox } from '../../utils/getViewBox'
 
 type PocketOpeningPreviewProps = {

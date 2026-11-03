@@ -7,8 +7,8 @@ import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
-import { AddHoleStitchLineMenuItem, CloneHoleMenuItem, DeleteHoleMenuItem } from './HoleActionsMenuItems'
+import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import { AddHoleStitchLineMenuItem } from './HoleActionsMenuItems'
 
 type HoleActionsMenuProps = {
   hole: HoleSchema
@@ -64,8 +64,8 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CloneHoleMenuItem onSelect={handleClone} />
-                <DeleteHoleMenuItem onSelect={handleDelete} />
+                <CloneMenuItem onSelect={handleClone} />
+                <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>
           </Menu.Positioner>
