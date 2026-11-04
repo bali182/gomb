@@ -307,14 +307,14 @@ export type ModelConstraintFieldCompatibilitySchema<
 
 export type ConstraintFieldCompatibilityDefinitionsSchema = {
   'root-panel': ModelConstraintFieldCompatibilitySchema<RootPanelConstraintFieldNameSchema>
-  panel: ModelConstraintFieldCompatibilitySchema<PanelConstraintFieldNameSchema>
+  'panel': ModelConstraintFieldCompatibilitySchema<PanelConstraintFieldNameSchema>
   'pocket-cluster': ModelConstraintFieldCompatibilitySchema<PocketClusterConstraintFieldNameSchema>
   'front-pocket': ModelConstraintFieldCompatibilitySchema<FrontPocketConstraintFieldNameSchema>
   't-pocket': ModelConstraintFieldCompatibilitySchema<TPocketConstraintFieldNameSchema>
-  hole: ModelConstraintFieldCompatibilitySchema<HoleConstraintFieldNameSchema>
-  straight: Record<string, never>
-  recessed: ModelConstraintFieldCompatibilitySchema<RecessedPocketOpeningConstraintFieldNameSchema>
-  slanted: ModelConstraintFieldCompatibilitySchema<SlantedPocketOpeningConstraintFieldNameSchema>
+  'hole': ModelConstraintFieldCompatibilitySchema<HoleConstraintFieldNameSchema>
+  'straight': Record<string, never>
+  'recessed': ModelConstraintFieldCompatibilitySchema<RecessedPocketOpeningConstraintFieldNameSchema>
+  'slanted': ModelConstraintFieldCompatibilitySchema<SlantedPocketOpeningConstraintFieldNameSchema>
   'optical-illusion': ModelConstraintFieldCompatibilitySchema<OpticalIllusionPocketOpeningConstraintFieldNameSchema>
   'component-bounds-stitch-line': ModelConstraintFieldCompatibilitySchema<ComponentBoundsStitchLineConstraintFieldNameSchema>
   't-pocket-stitch-line': ModelConstraintFieldCompatibilitySchema<TPocketStitchLineConstraintFieldNameSchema>
@@ -333,14 +333,14 @@ export type ModelConstraintFieldBlockersSchema<Fields extends ConstraintFieldNam
 
 export type ConstraintFieldBlockerDefinitionsSchema = {
   'root-panel': ModelConstraintFieldBlockersSchema<RootPanelConstraintFieldNameSchema>
-  panel: ModelConstraintFieldBlockersSchema<PanelConstraintFieldNameSchema>
+  'panel': ModelConstraintFieldBlockersSchema<PanelConstraintFieldNameSchema>
   'pocket-cluster': ModelConstraintFieldBlockersSchema<PocketClusterConstraintFieldNameSchema>
   'front-pocket': ModelConstraintFieldBlockersSchema<FrontPocketConstraintFieldNameSchema>
   't-pocket': ModelConstraintFieldBlockersSchema<TPocketConstraintFieldNameSchema>
-  hole: ModelConstraintFieldBlockersSchema<HoleConstraintFieldNameSchema>
-  straight: Record<string, never>
-  recessed: ModelConstraintFieldBlockersSchema<RecessedPocketOpeningConstraintFieldNameSchema>
-  slanted: ModelConstraintFieldBlockersSchema<SlantedPocketOpeningConstraintFieldNameSchema>
+  'hole': ModelConstraintFieldBlockersSchema<HoleConstraintFieldNameSchema>
+  'straight': Record<string, never>
+  'recessed': ModelConstraintFieldBlockersSchema<RecessedPocketOpeningConstraintFieldNameSchema>
+  'slanted': ModelConstraintFieldBlockersSchema<SlantedPocketOpeningConstraintFieldNameSchema>
   'optical-illusion': ModelConstraintFieldBlockersSchema<OpticalIllusionPocketOpeningConstraintFieldNameSchema>
   'component-bounds-stitch-line': ModelConstraintFieldBlockersSchema<ComponentBoundsStitchLineConstraintFieldNameSchema>
   't-pocket-stitch-line': ModelConstraintFieldBlockersSchema<TPocketStitchLineConstraintFieldNameSchema>
