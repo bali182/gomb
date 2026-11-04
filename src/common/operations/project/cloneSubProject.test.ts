@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { getProjectIds } from '../../utils/getProjectIds'
+import { IdGenerator } from '../../utils/random/IdGenerator'
 
 import { defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
@@ -27,21 +29,26 @@ describe('cloneSubProject', () => {
     const existingRoot = d.rootPanel({ id: 'existing-root', name: 'Wallet 1' })
     const existingSubProject = d.subProject({ id: 'existing-sub-project', root: existingRoot })
     const project = d.project({ id: 'project', subProjects: [sourceSubProject, existingSubProject] })
-    let idCounter = 0
 
     const result = cloneSubProject(project, {
-      getUnusedId: (): string => {
-        idCounter += 1
-        return `clone-${idCounter}`
-      },
+      idGenerator: new IdGenerator(getProjectIds(project)),
       subProject: sourceSubProject,
     })
     const clonedSubProject = result.subProjects[result.subProjects.length - 1]
 
-    expect(clonedSubProject).toMatchObject({ id: 'clone-5', root: 'clone-1' })
-    expect(clonedSubProject?.components['clone-1']).toMatchObject({ children: ['clone-2'], name: 'Wallet 2' })
-    expect(clonedSubProject?.holes).toMatchObject([{ componentId: 'clone-2', id: 'clone-3' }])
-    expect(clonedSubProject?.stitchLines).toMatchObject([{ id: 'clone-4', targetId: 'clone-3', targetType: 'hole' }])
+    const copiedRoot = clonedSubProject.components[clonedSubProject.root]
+    const copiedPanelId = copiedRoot.children[0]
+    const copiedHole = clonedSubProject.holes[0]
+    expect(clonedSubProject.id).toMatch(/^sub-project-/)
+    expect(copiedRoot).toMatchObject({ id: expect.stringMatching(/^component-/), name: 'Wallet 2' })
+    expect(copiedHole).toMatchObject({ componentId: copiedPanelId, id: expect.stringMatching(/^hole-/) })
+    expect(clonedSubProject.stitchLines).toMatchObject([
+      { id: expect.stringMatching(/^stitch-line-/), targetId: copiedHole.id, targetType: 'hole' },
+    ])
+    const originalIds = getProjectIds(project)
+    for (const id of getProjectIds({ subProjects: [clonedSubProject] })) {
+      expect(originalIds.has(id)).toBe(false)
+    }
   })
   it('remaps cluster and pocket stitch owners while retaining one computed object per source', () => {
     const source = d.subProject({
@@ -59,8 +66,10 @@ describe('cloneSubProject', () => {
     })
     const project = d.project({ id: 'project', subProjects: [source] })
     const snapshot = structuredClone(project)
-    let count = 0
-    const result = cloneSubProject(project, { subProject: source, getUnusedId: () => `copy-${++count}` })
+    const result = cloneSubProject(project, {
+      subProject: source,
+      idGenerator: new IdGenerator(getProjectIds(project)),
+    })
     const cloned = result.subProjects[1]
     const accessor = accessors.subProject(cloned)
     const clusterId = accessor.component.rootPanel().children[0]
@@ -74,4 +83,37 @@ describe('cloneSubProject', () => {
     )
     expect(project).toEqual(snapshot)
   })
+})
+
+it('maps onTop references inside a full subproject clone', () => {
+  const source = d.subProject({
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    components: [d.panel({ id: 'panel' })],
+    stitchLines: [
+      d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component', onTop: 'root' }),
+    ],
+  })
+  const project = d.project({ id: 'project', subProjects: [source] })
+  const cloned = cloneSubProject(project, { subProject: source, idGenerator: new IdGenerator(getProjectIds(project)) })
+    .subProjects[1]
+  expect(cloned.stitchLines[0]).toMatchObject({
+    targetId: cloned.components[cloned.root].children[0],
+    onTop: cloned.root,
+  })
+})
+
+it.each(['missing-root', 'missing-child', 'cycle'])('does not clone an invalid subproject: %s', (invalidity) => {
+  const source = d.subProject({
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    components: [d.panel({ id: 'panel' })],
+  })
+  if (invalidity === 'missing-root') {
+    source.root = 'missing'
+  } else {
+    source.components.panel.children = [invalidity === 'cycle' ? 'root' : 'missing']
+  }
+  const project = d.project({ id: 'project', subProjects: [source] })
+  expect(cloneSubProject(project, { subProject: source, idGenerator: new IdGenerator() })).toBe(project)
 })

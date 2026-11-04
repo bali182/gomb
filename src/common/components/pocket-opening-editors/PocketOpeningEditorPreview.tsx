@@ -22,8 +22,8 @@ import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getModelIconByType } from '../../utils/getModelIcon'
-import { id } from '../../utils/id'
 import { narrowers } from '../../utils/narrowers'
+import { IdGenerator } from '../../utils/random/IdGenerator'
 import { OpticalIllusionPocketOpeningStackIcon } from '../icons/OpticalIllusionPocketOpeningStackIcon'
 import { RecessedPocketOpeningStackIcon } from '../icons/RecessedPocketOpeningStackIcon'
 import { SlantedPocketOpeningStackIcon } from '../icons/SlantedPocketOpeningStackIcon'
@@ -197,10 +197,14 @@ const PocketOpeningPreviewPocket: FC<PocketOpeningPreviewPocketProps> = ({ pocke
 }
 
 const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSchema => {
-  const opening: PocketOpeningSchema = { type: 'straight', id: id(), name: 'Preview opening' }
+  const opening: PocketOpeningSchema = {
+    type: 'straight',
+    id: IdGenerator.unsafe.get('pocket-opening'),
+    name: 'Preview opening',
+  }
   const frontPocket: FrontPocketSchema = {
     ...defaultFrontPocket,
-    id: id(),
+    id: IdGenerator.unsafe.get('component'),
     name: 'Preview front pocket',
     openingId: opening.id,
   }
@@ -208,7 +212,7 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
     { length: mode === 'stack' ? 2 : 0 },
     (): TPocketSchema => ({
       ...defaultTPocket,
-      id: id(),
+      id: IdGenerator.unsafe.get('component'),
       name: 'Preview T-pocket',
       openingId: opening.id,
     }),
@@ -216,7 +220,7 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
   const pockets = [...tPockets, frontPocket]
   const cluster: PocketClusterSchema = {
     ...defaultPocketCluster,
-    id: id(),
+    id: IdGenerator.unsafe.get('component'),
     name: 'Preview cluster',
     width: PREVIEW_WIDTH,
     height: PREVIEW_CLUSTER_HEIGHT,
@@ -227,7 +231,7 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
   }
   const root: RootPanelSchema = {
     ...defaultRootPanel,
-    id: id(),
+    id: IdGenerator.unsafe.get('component'),
     name: 'Preview root',
     width: PREVIEW_WIDTH,
     height: PREVIEW_CLUSTER_HEIGHT,
@@ -235,7 +239,7 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
   }
   const components: ComponentSchema[] = [root, cluster, ...pockets]
   return {
-    id: id(),
+    id: IdGenerator.unsafe.get('sub-project'),
     root: root.id,
     defaultPocketOpening: opening.id,
     pocketOpenings: { [opening.id]: opening },

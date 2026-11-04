@@ -11,8 +11,10 @@ import { addSubProject } from '../../common/operations/project/addSubProject'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
 import { createProject } from '../../common/utils/createProject'
+import { getProjectIds } from '../../common/utils/getProjectIds'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
 import { isDefined } from '../../common/utils/isDefined'
+import { IdGenerator } from '../../common/utils/random/IdGenerator'
 import { validateProjectSchema } from '../../common/validators/validateProjectSchema'
 import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
@@ -78,6 +80,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
+      idGenerator: new IdGenerator(getProjectIds(validationResult.value)),
       baseRootComponentName: t.defaultNames.rootPanel,
       defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
     })

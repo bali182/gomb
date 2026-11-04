@@ -6,6 +6,7 @@ import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
 import { narrowers } from '../../utils/narrowers'
+import { IdGenerator } from '../../utils/random/IdGenerator'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
 import { cloneComponent } from './cloneComponent'
 import { deleteComponent } from './deleteComponent'
@@ -255,7 +256,7 @@ describe('pocket component operations', () => {
       cloneComponent(source, {
         componentId: front.id,
         settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-        ids: { component: () => 'copy', hole: () => 'copy-hole', stitchLine: () => 'copy-stitch' },
+        idGenerator: new IdGenerator(),
         names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
       }),
     ).toBe(source)
@@ -278,11 +279,10 @@ describe('pocket component operations', () => {
   })
   it('copies pockets and their nested children', () => {
     const source = fixture()
-    let next = 0
     const result = cloneComponent(source, {
       componentId: 'first',
       settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-      ids: { component: () => `copy-${next++}`, hole: () => `hole-${next++}`, stitchLine: () => `stitch-${next++}` },
+      idGenerator: new IdGenerator(),
       names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
     })
     const rootId = result.components.root.children[1]
@@ -296,20 +296,19 @@ describe('pocket component operations', () => {
   it('clones a pocket cluster without its children as an empty sibling', () => {
     const source = fixture()
     const before = structuredClone(source)
-    let next = 0
 
     const result = cloneComponent(source, {
       componentId: 'first',
       settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
-      ids: { component: () => `copy-${next++}`, hole: () => `hole-${next++}`, stitchLine: () => `stitch-${next++}` },
+      idGenerator: new IdGenerator(),
       names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
     })
-    expect(result.components.root.children).toEqual(['first', 'copy-0', 'second'])
-    expect(result.components['copy-0']).toMatchObject({ type: 'pocket-cluster', children: [] })
-    expect(Object.keys(result.components)).toEqual([...Object.keys(source.components), 'copy-0'])
+    const copyId = result.components.root.children[1]
+    expect(result.components.root.children).toEqual(['first', copyId, 'second'])
+    expect(result.components[copyId]).toMatchObject({ type: 'pocket-cluster', children: [] })
+    expect(Object.keys(result.components)).toEqual([...Object.keys(source.components), copyId])
     expect(result.components.first).toBe(source.components.first)
     expect(source).toEqual(before)
-    expect(next).toBe(1)
   })
 })
 
@@ -332,15 +331,10 @@ it('clones every optical illusion setting', () => {
     pocketOpenings: { ...original.pocketOpenings, [opening.id]: opening },
     components: { ...original.components, a: { ...a, openingId: opening.id } },
   }
-  let next = 0
   const cloned = cloneComponent(source, {
     componentId: 'first',
     settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-    ids: {
-      component: () => `optical-copy-${next++}`,
-      hole: () => `hole-${next++}`,
-      stitchLine: () => `stitch-${next++}`,
-    },
+    idGenerator: new IdGenerator(),
     names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
   })
   const copiedCluster = cloned.components[cloned.components.root.children[1]]

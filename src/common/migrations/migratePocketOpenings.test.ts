@@ -36,6 +36,12 @@ describe('migratePocketOpenings', () => {
     if (!isDefined(subProject) || !isDefined(defaultId)) {
       throw new Error('Missing migrated default')
     }
+    expect(defaultId).toMatch(/^pocket-opening-/)
+    expect(migrated.id).toBe(project.id)
+    expect(subProject.id).toBe(project.subProjects?.[0]?.id)
+    expect(subProject.root).toBe('root')
+    expect(subProject.components?.t?.id).toBe('t')
+    expect(subProject.components?.front?.id).toBe('front')
     expect(subProject.pocketOpenings?.[defaultId]).toEqual({
       type: 'straight',
       id: defaultId,

@@ -8,8 +8,9 @@ import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { id } from '../utils/id'
+import { getProjectIds } from '../utils/getProjectIds'
 import { isDefined } from '../utils/isDefined'
+import { IdGenerator } from '../utils/random/IdGenerator'
 import { useTranslation } from './useTranslation'
 
 export type UseProjectOperationsOutput = {
@@ -59,6 +60,7 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
   const createSubProject = useCallback((): SubProjectSchema => {
     const currentProject = ensureProject(project)
     const result = addSubProjectPure(currentProject, {
+      idGenerator: new IdGenerator(getProjectIds(currentProject)),
       baseRootComponentName: t.defaultNames.rootPanel,
       defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
     })
@@ -74,7 +76,7 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
 
       setProject(
         cloneSubProjectPure(currentProject, {
-          getUnusedId: id,
+          idGenerator: new IdGenerator(getProjectIds(currentProject)),
           subProject: sourceSubProject,
         }),
       )

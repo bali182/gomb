@@ -77,6 +77,15 @@ describe('physical pocket component migration', () => {
       bottomRightRadius: 0,
     })
     const children = cluster?.children?.map((id) => components[id]) ?? []
+    for (const child of children) {
+      expect(child?.id).toMatch(/^component-/)
+    }
+    expect(result.id).toBe(input.id)
+    expect(result.subProjects?.[0]?.id).toBe(input.subProjects[0].id)
+    expect(result.subProjects?.[0]?.root).toBe('root')
+    expect(components.root?.id).toBe('root')
+    expect(components.cluster?.id).toBe('cluster')
+    expect(components.child?.id).toBe('child')
     expect(children.map((child) => child?.type)).toEqual(['t-pocket', 't-pocket', 'front-pocket'])
     expect(children[0]).toMatchObject({
       tPocketTabWidth: 12,

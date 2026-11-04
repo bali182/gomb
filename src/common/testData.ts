@@ -25,9 +25,9 @@ import { SubProjectSchema } from './schemas/subProject'
 import { accessors } from './utils/accessors'
 import { createProject } from './utils/createProject'
 import { createSubProject } from './utils/createSubProject'
-import { id as generateId } from './utils/id'
 import { isDefined } from './utils/isDefined'
 import { narrowers } from './utils/narrowers'
+import { IdGenerator } from './utils/random/IdGenerator'
 
 type HasStitchingSettings = {
   stitchingSettings?: StitchLineCommonConfigSchema
@@ -76,7 +76,7 @@ export const d = {
     pocketOpenings = [],
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
-    const subProject = createSubProject(id, stitchingSettings, 'Straight')
+    const subProject = createSubProject(id, stitchingSettings, 'Straight', new IdGenerator())
     subProject.root = root.id
     subProject.components = {
       [root.id]: root,
@@ -140,7 +140,7 @@ export const d = {
   frontPocket: ({
     id,
     stitchingSettings = defaultStitchingSettings,
-    openingId = generateId(),
+    openingId = IdGenerator.unsafe.get('pocket-opening'),
     ...rest
   }: Partial<FrontPocketSchema> & HasId & HasStitchingSettings): FrontPocketSchema => ({
     ...createComponent<FrontPocketSchema>({
@@ -155,7 +155,7 @@ export const d = {
   tPocket: ({
     id,
     stitchingSettings = defaultStitchingSettings,
-    openingId = generateId(),
+    openingId = IdGenerator.unsafe.get('pocket-opening'),
     ...rest
   }: Partial<TPocketSchema> & HasId & HasStitchingSettings): TPocketSchema => ({
     ...createComponent<TPocketSchema>({

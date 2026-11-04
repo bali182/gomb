@@ -7,13 +7,15 @@ import type {
   PocketSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { IdGeneratorSchema } from '../schemas/idGenerator'
 import type { ProjectMigration } from '../schemas/migration'
 import type { StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import type { DeepPartialSchema } from '../schemas/utils'
 import type { TranslationSchema } from '../translations/translationSchema'
-import { id } from '../utils/id'
+import { getProjectIds } from '../utils/getProjectIds'
 import { isDefined } from '../utils/isDefined'
+import { IdGenerator } from '../utils/random/IdGenerator'
 import { m } from './migrationUtils'
 
 // Saved shapes before pockets became standalone components.
@@ -90,14 +92,20 @@ type PocketClusterMigrationResultSchema = {
   pockets: DeepPartialSchema<PocketSchema>[]
 }
 
-export const migratePocketComponents: ProjectMigration = (project, { t }) => ({
-  ...project,
-  subProjects: project.subProjects?.map((subProject) => migrateSubProjectPocketComponents(subProject, t)),
-})
+export const migratePocketComponents: ProjectMigration = (project, { t }) => {
+  const idGenerator = new IdGenerator(getProjectIds(project))
+  return {
+    ...project,
+    subProjects: project.subProjects?.map((subProject) =>
+      migrateSubProjectPocketComponents(subProject, t, idGenerator),
+    ),
+  }
+}
 
 const migrateSubProjectPocketComponents = (
   subProject: DeepPartialSchema<SubProjectSchema>,
   translation: TranslationSchema,
+  idGenerator: IdGeneratorSchema,
 ): DeepPartialSchema<SubProjectSchema> => {
   if (!isDefined(subProject.components)) {
     return subProject
@@ -114,7 +122,7 @@ const migrateSubProjectPocketComponents = (
     if (!isDefined(legacy.pocketCount) && !isDefined(legacy.defaultOpening) && !isDefined(legacy.openingMapping)) {
       continue
     }
-    const migrated = migratePocketCluster(legacy, names, translation)
+    const migrated = migratePocketCluster(legacy, names, translation, idGenerator)
     components[clusterId] = migrated.cluster
     for (const pocket of migrated.pockets) {
       components[m.requireString(pocket, 'id')] = pocket
@@ -131,6 +139,7 @@ const migratePocketCluster = (
   cluster: DeepPartialSchema<LegacyPocketClusterSchema>,
   names: Set<string>,
   translation: TranslationSchema,
+  idGenerator: IdGeneratorSchema,
 ): PocketClusterMigrationResultSchema => {
   const count = Math.max(1, Math.floor(cluster.pocketCount ?? 3))
   const pockets: DeepPartialSchema<PocketSchema>[] = []
@@ -139,9 +148,9 @@ const migratePocketCluster = (
     const name = getUnusedName(front ? translation.defaultNames.frontPocket : translation.defaultNames.tPocket, names)
     names.add(name)
     if (front) {
-      pockets.push(createMigratedFrontPocket(cluster, name))
+      pockets.push(createMigratedFrontPocket(cluster, name, idGenerator))
     } else {
-      pockets.push(createMigratedTPocket(cluster, name))
+      pockets.push(createMigratedTPocket(cluster, name, idGenerator))
     }
   }
   const {
@@ -169,9 +178,10 @@ const migratePocketCluster = (
 const createMigratedFrontPocket = (
   cluster: DeepPartialSchema<LegacyPocketClusterSchema>,
   name: string,
+  idGenerator: IdGeneratorSchema,
 ): DeepPartialSchema<FrontPocketSchema> => ({
   ...defaultFrontPocket,
-  id: id(),
+  id: idGenerator.getAndForbid('component'),
   name,
   color: cluster.color,
   children: cluster.children ?? [],
@@ -188,9 +198,10 @@ const createMigratedFrontPocket = (
 const createMigratedTPocket = (
   cluster: DeepPartialSchema<LegacyPocketClusterSchema>,
   name: string,
+  idGenerator: IdGeneratorSchema,
 ): DeepPartialSchema<TPocketSchema> => ({
   ...defaultTPocket,
-  id: id(),
+  id: idGenerator.getAndForbid('component'),
   name,
   color: cluster.color,
   children: [],

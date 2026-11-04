@@ -10,7 +10,9 @@ import { getUnusedName } from '../../common/operations/subProject/utils/getUnuse
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
 import { createProject } from '../../common/utils/createProject'
+import { getProjectIds } from '../../common/utils/getProjectIds'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
+import { IdGenerator } from '../../common/utils/random/IdGenerator'
 import { validateProjectSchema } from '../../common/validators/validateProjectSchema'
 import { useProjects } from '../hooks/useProjects'
 import { webAppRoutes } from '../webAppRoutes'
@@ -64,6 +66,7 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
+      idGenerator: new IdGenerator(getProjectIds(validationResult.value)),
       baseRootComponentName: t.defaultNames.rootPanel,
       defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
     })

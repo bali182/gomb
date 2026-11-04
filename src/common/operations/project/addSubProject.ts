@@ -1,3 +1,4 @@
+import type { IdGeneratorSchema } from '../../schemas/idGenerator'
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -8,6 +9,7 @@ import { getUnusedName } from '../subProject/utils/getUnusedName'
 type AddSubProjectParams = {
   baseRootComponentName: string
   defaultOpeningName: string
+  idGenerator: IdGeneratorSchema
 }
 
 type AddSubProjectResult = {
@@ -17,7 +19,7 @@ type AddSubProjectResult = {
 
 export const addSubProject = (
   project: ProjectSchema,
-  { baseRootComponentName, defaultOpeningName }: AddSubProjectParams,
+  { baseRootComponentName, defaultOpeningName, idGenerator }: AddSubProjectParams,
 ): AddSubProjectResult => {
   const usedRootNames = new Set(
     project.subProjects
@@ -29,6 +31,7 @@ export const addSubProject = (
     getUnusedName(baseRootComponentName, usedRootNames),
     project.stitchingSettings,
     defaultOpeningName,
+    idGenerator,
   )
 
   return {

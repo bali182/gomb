@@ -1,18 +1,23 @@
+import type { ComponentSchema } from '../../schemas/components'
+import type { IdGeneratorSchema } from '../../schemas/idGenerator'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { cloneComponentTree } from '../subProject/cloneComponentTree'
+import { getCloneIdMappings } from '../subProject/utils/getCloneIdMappings'
 import { getUnusedName } from '../subProject/utils/getUnusedName'
 
 export type CloneSubProjectParams = {
-  getUnusedId: () => string
+  idGenerator: IdGeneratorSchema
   subProject: SubProjectSchema
 }
 
 export const cloneSubProject = (
   project: ProjectSchema,
-  { getUnusedId, subProject: sourceSubProject }: CloneSubProjectParams,
+  { idGenerator, subProject: sourceSubProject }: CloneSubProjectParams,
 ): ProjectSchema => {
   const sourceRootPanel = accessors.subProject(sourceSubProject).optional.component.rootPanel()
 
@@ -20,15 +25,12 @@ export const cloneSubProject = (
     return project
   }
 
+  const idMappings = getCloneIdMappings(sourceSubProject, idGenerator)
   const cloneResult = cloneComponentTree({
     subProject: sourceSubProject,
     componentId: sourceSubProject.root,
     settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-    ids: {
-      component: getUnusedId,
-      hole: getUnusedId,
-      stitchLine: getUnusedId,
-    },
+    idMappings,
     names: {
       component: (sourceName) => sourceName,
       hole: (sourceName) => sourceName,
@@ -53,6 +55,12 @@ export const cloneSubProject = (
       .map((root) => root.name),
   )
   const rootName = getUnusedName(sourceRootPanel.name, usedRootNames)
+  const components = Object.fromEntries(
+    Object.values(cloneResult.clonedComponents).map((component): [string, ComponentSchema] => [
+      component.id,
+      narrowers.is.pocket(component) ? { ...component, openingId: idMappings[component.openingId] } : component,
+    ]),
+  )
 
   return {
     ...project,
@@ -60,19 +68,22 @@ export const cloneSubProject = (
       ...project.subProjects,
       {
         components: {
-          ...cloneResult.clonedComponents,
+          ...components,
           [cloneResult.clonedRootId]: {
             ...clonedRoot,
             name: rootName,
           },
         },
         holes: cloneResult.clonedHoles,
-        id: getUnusedId(),
+        id: idMappings[sourceSubProject.id],
         root: cloneResult.clonedRootId,
         stitchLines: cloneResult.clonedStitchLines,
-        defaultPocketOpening: sourceSubProject.defaultPocketOpening,
+        defaultPocketOpening: idMappings[sourceSubProject.defaultPocketOpening],
         pocketOpenings: Object.fromEntries(
-          Object.entries(sourceSubProject.pocketOpenings).map(([id, opening]) => [id, { ...opening }]),
+          Object.values(sourceSubProject.pocketOpenings).map((opening): [string, PocketOpeningSchema] => [
+            idMappings[opening.id],
+            { ...opening, id: idMappings[opening.id] },
+          ]),
         ),
       },
     ],

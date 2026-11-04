@@ -12,12 +12,6 @@ export type CloneComponentSettings = {
   cloneStitchLines: boolean
 }
 
-export type CloneComponentIdGenerators = {
-  component: () => string
-  hole: () => string
-  stitchLine: () => string
-}
-
 export type CloneComponentNameGenerators = {
   component: (sourceName: string, usedNames: Set<string>) => string
   hole: (sourceName: string, usedNames: Set<string>) => string
@@ -28,7 +22,7 @@ export type CloneComponentTreeParams = {
   subProject: SubProjectSchema
   componentId: string
   settings: CloneComponentSettings
-  ids: CloneComponentIdGenerators
+  idMappings: Readonly<Record<string, string>>
   names: CloneComponentNameGenerators
 }
 
@@ -43,7 +37,7 @@ export const cloneComponentTree = ({
   subProject,
   componentId,
   settings,
-  ids,
+  idMappings,
   names,
 }: CloneComponentTreeParams): CloneComponentTreeResult | undefined => {
   const sourceComponent = accessors.subProject(subProject).optional.component.byId(componentId)
@@ -61,36 +55,29 @@ export const cloneComponentTree = ({
     return undefined
   }
 
-  const clonedComponentIdBySourceComponentId = getClonedComponentIdMapping(componentsToClone, ids)
-  const clonedRootId = clonedComponentIdBySourceComponentId[componentId]
-
+  const clonedRootId = idMappings[componentId]
   if (!isDefined(clonedRootId)) {
     return undefined
   }
 
-  const clonedHolesResult = settings.cloneHoles
-    ? cloneHoles(subProject, clonedComponentIdBySourceComponentId, ids, names)
-    : { clonedHoleIdBySourceHoleId: {}, clonedHoles: [] }
+  const componentIdsToClone = new Set(componentsToClone.map((component) => component.id))
+  const holesToClone = settings.cloneHoles
+    ? subProject.holes.filter((hole) => componentIdsToClone.has(hole.componentId))
+    : []
+  const holeIdsToClone = new Set(holesToClone.map((hole) => hole.id))
+  const stitchLinesToClone = settings.cloneStitchLines
+    ? subProject.stitchLines.filter((stitchLine) =>
+        stitchLine.targetType === 'component'
+          ? componentIdsToClone.has(stitchLine.targetId)
+          : holeIdsToClone.has(stitchLine.targetId),
+      )
+    : []
 
   return {
     clonedRootId,
-    clonedComponents: createComponentClones(
-      subProject,
-      componentsToClone,
-      clonedComponentIdBySourceComponentId,
-      settings,
-      names,
-    ),
-    clonedHoles: clonedHolesResult.clonedHoles,
-    clonedStitchLines: settings.cloneStitchLines
-      ? cloneStitchLines(
-          subProject,
-          clonedComponentIdBySourceComponentId,
-          clonedHolesResult.clonedHoleIdBySourceHoleId,
-          ids,
-          names,
-        )
-      : [],
+    clonedComponents: createComponentClones(subProject, componentsToClone, idMappings, settings, names),
+    clonedHoles: cloneHoles(subProject, holesToClone, idMappings, names),
+    clonedStitchLines: cloneStitchLines(subProject, stitchLinesToClone, componentIdsToClone, idMappings, names),
   }
 }
 
@@ -124,32 +111,20 @@ const collectClonedComponents = (
   return true
 }
 
-const getClonedComponentIdMapping = (
-  componentsToClone: ComponentSchema[],
-  ids: CloneComponentIdGenerators,
-): Record<string, string> => {
-  return Object.fromEntries(componentsToClone.map((component) => [component.id, ids.component()]))
-}
-
 const createComponentClones = (
   subProject: SubProjectSchema,
   componentsToClone: ComponentSchema[],
-  clonedComponentIdBySourceComponentId: Record<string, string>,
+  idMappings: Readonly<Record<string, string>>,
   settings: CloneComponentSettings,
   names: CloneComponentNameGenerators,
 ): Record<string, ComponentSchema> => {
   const usedNames = new Set(Object.values(subProject.components).map((component) => component.name))
 
   return Object.fromEntries(
-    componentsToClone.map((sourceComponent) => {
+    componentsToClone.map((sourceComponent): [string, ComponentSchema] => {
       const clonedName = names.component(sourceComponent.name, usedNames)
       usedNames.add(clonedName)
-      const componentClone = createComponentClone(
-        sourceComponent,
-        clonedComponentIdBySourceComponentId,
-        settings,
-        clonedName,
-      )
+      const componentClone = createComponentClone(sourceComponent, idMappings, settings, clonedName)
 
       return [componentClone.id, componentClone]
     }),
@@ -158,85 +133,54 @@ const createComponentClones = (
 
 const createComponentClone = (
   sourceComponent: ComponentSchema,
-  clonedComponentIdBySourceComponentId: Record<string, string>,
+  idMappings: Readonly<Record<string, string>>,
   settings: CloneComponentSettings,
   clonedComponentName: string,
 ): ComponentSchema => {
-  const clonedComponentId = clonedComponentIdBySourceComponentId[sourceComponent.id]
+  const clonedComponentId = idMappings[sourceComponent.id]
 
   return {
     ...sourceComponent,
-    children: settings.cloneComponentTree
-      ? sourceComponent.children.map((childId) => clonedComponentIdBySourceComponentId[childId])
-      : [],
+    children: settings.cloneComponentTree ? sourceComponent.children.map((childId) => idMappings[childId]) : [],
     id: clonedComponentId,
     name: clonedComponentName,
   }
 }
 
-type CloneHolesResult = {
-  clonedHoleIdBySourceHoleId: Record<string, string>
-  clonedHoles: HoleSchema[]
-}
-
 const cloneHoles = (
   subProject: SubProjectSchema,
-  clonedComponentIdBySourceComponentId: Record<string, string>,
-  ids: CloneComponentIdGenerators,
+  holesToClone: HoleSchema[],
+  idMappings: Readonly<Record<string, string>>,
   names: CloneComponentNameGenerators,
-): CloneHolesResult => {
+): HoleSchema[] => {
   const usedNames = new Set(subProject.holes.map((hole) => hole.name))
-  const sourceHoles = subProject.holes.filter((hole) =>
-    isDefined(clonedComponentIdBySourceComponentId[hole.componentId]),
-  )
-  const clonedHoleIdBySourceHoleId: Record<string, string> = {}
-  const clonedHoles: HoleSchema[] = []
-
-  for (const sourceHole of sourceHoles) {
-    const componentId = clonedComponentIdBySourceComponentId[sourceHole.componentId]
+  return holesToClone.map((sourceHole) => {
     const name = names.hole(sourceHole.name, usedNames)
-    const id = ids.hole()
-
     usedNames.add(name)
-    clonedHoleIdBySourceHoleId[sourceHole.id] = id
-    clonedHoles.push({ ...sourceHole, componentId, id, name })
-  }
-
-  return { clonedHoleIdBySourceHoleId, clonedHoles }
+    return { ...sourceHole, id: idMappings[sourceHole.id], componentId: idMappings[sourceHole.componentId], name }
+  })
 }
 
 const cloneStitchLines = (
   subProject: SubProjectSchema,
-  clonedComponentIdBySourceComponentId: Record<string, string>,
-  clonedHoleIdBySourceHoleId: Record<string, string>,
-  ids: CloneComponentIdGenerators,
+  stitchLinesToClone: StitchLineSchema[],
+  componentIdsToClone: ReadonlySet<string>,
+  idMappings: Readonly<Record<string, string>>,
   names: CloneComponentNameGenerators,
 ): StitchLineSchema[] => {
   const usedNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
-  const clonedStitchLines: StitchLineSchema[] = []
-
-  for (const sourceStitchLine of subProject.stitchLines) {
-    const targetId =
-      sourceStitchLine.targetType === 'component'
-        ? clonedComponentIdBySourceComponentId[sourceStitchLine.targetId]
-        : clonedHoleIdBySourceHoleId[sourceStitchLine.targetId]
-
-    if (!isDefined(targetId)) {
-      continue
-    }
-
+  return stitchLinesToClone.map((sourceStitchLine) => {
     const name = names.stitchLine(sourceStitchLine.name, usedNames)
     usedNames.add(name)
+    const id = idMappings[sourceStitchLine.id]
+    const targetId = idMappings[sourceStitchLine.targetId]
     if (narrowers.is.componentBoundsStitchLine(sourceStitchLine)) {
-      const onTop = isDefined(sourceStitchLine.onTop)
-        ? clonedComponentIdBySourceComponentId[sourceStitchLine.onTop]
-        : undefined
-      clonedStitchLines.push({ ...sourceStitchLine, id: ids.stitchLine(), name, targetId, onTop })
-      continue
+      const onTop =
+        isDefined(sourceStitchLine.onTop) && componentIdsToClone.has(sourceStitchLine.onTop)
+          ? idMappings[sourceStitchLine.onTop]
+          : undefined
+      return { ...sourceStitchLine, id, name, targetId, onTop }
     }
-
-    clonedStitchLines.push({ ...sourceStitchLine, id: ids.stitchLine(), name, targetId })
-  }
-
-  return clonedStitchLines
+    return { ...sourceStitchLine, id, name, targetId }
+  })
 }

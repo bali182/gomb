@@ -11,9 +11,10 @@ import type { EditorComputationControlSchema } from '../../common/schemas/editor
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
-import { id } from '../../common/utils/id'
+import { getProjectIds } from '../../common/utils/getProjectIds'
 import { isDefined } from '../../common/utils/isDefined'
 import { loadProjectFromContents } from '../../common/utils/loadProjectFromContents'
+import { IdGenerator } from '../../common/utils/random/IdGenerator'
 import { electronApi } from '../electronApi'
 import { electronAppRoutes } from '../electronAppRoutes'
 import type { ElectronProjectSchema } from '../schemas/electronProject'
@@ -278,7 +279,7 @@ export const useElectronProject = (filePath?: string): UseElectronProjectSchema 
       isDirty: false,
       project: {
         ...prepared.target.project,
-        id: id(),
+        id: new IdGenerator(getProjectIds(prepared.target.project)).get('project'),
       },
     }
 

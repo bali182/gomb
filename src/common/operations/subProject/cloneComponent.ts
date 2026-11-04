@@ -1,24 +1,25 @@
+import type { IdGeneratorSchema } from '../../schemas/idGenerator'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import {
   cloneComponentTree,
-  type CloneComponentIdGenerators,
   type CloneComponentNameGenerators,
   type CloneComponentSettings,
 } from './cloneComponentTree'
 import { canCloneComponent } from './utils/componentRules'
+import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export type CloneComponentParams = {
   componentId: string
-  ids: CloneComponentIdGenerators
+  idGenerator: IdGeneratorSchema
   names: CloneComponentNameGenerators
   settings: CloneComponentSettings
 }
 
 export const cloneComponent = (
   subProject: SubProjectSchema,
-  { componentId, ids, names, settings }: CloneComponentParams,
+  { componentId, idGenerator, names, settings }: CloneComponentParams,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   const sourceComponent = accessor.optional.component.byId(componentId)
@@ -39,7 +40,8 @@ export const cloneComponent = (
     return subProject
   }
 
-  const cloneResult = cloneComponentTree({ subProject, componentId, settings, ids, names })
+  const idMappings = getCloneIdMappings(subProject, idGenerator)
+  const cloneResult = cloneComponentTree({ subProject, componentId, settings, idMappings, names })
 
   if (!isDefined(cloneResult)) {
     return subProject

@@ -2,6 +2,7 @@ import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 import { defaultOpticalIllusionPocketOpening } from '../defaultStates'
 import { loadProjectFromContents } from '../utils/loadProjectFromContents'
+import { IdGenerator } from '../utils/random/IdGenerator'
 
 import { VERSION } from '../../version'
 import type { HasStretchSchema } from '../schemas/common'
@@ -61,7 +62,7 @@ describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: 
 
 const createProjectWithSubProject = (): ProjectSchema => {
   const project = createProject('Project')
-  const subProject = createSubProject('Root', project.stitchingSettings, 'Straight')
+  const subProject = createSubProject('Root', project.stitchingSettings, 'Straight', new IdGenerator())
 
   return {
     ...project,
@@ -332,4 +333,32 @@ it('loads inline pockets using the subproject default and prunes obsolete openin
     expect(subProject.components[id]).not.toHaveProperty('opening')
   }
   expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(loaded)
+})
+
+it('preserves legacy IDs and references on loading and reloading a current project', () => {
+  const subProject = d.subProject({
+    id: 'legacy-sub',
+    root: d.rootPanel({ id: 'legacy-root', children: ['legacy-cluster'] }),
+    components: [
+      d.pocketCluster({ id: 'legacy-cluster', children: ['legacy-pocket'] }),
+      d.tPocket({ id: 'legacy-pocket', openingId: 'legacy-opening', itemId: 'ID-1' }),
+    ],
+    holes: [d.hole({ id: 'legacy-hole', componentId: 'legacy-pocket' })],
+    stitchLines: [
+      d.componentBoundsStitchLine({
+        id: 'legacy-stitch',
+        targetId: 'legacy-hole',
+        targetType: 'hole',
+        onTop: 'legacy-root',
+      }),
+    ],
+    pocketOpenings: [{ id: 'legacy-opening', name: 'Opening', type: 'straight' }],
+  })
+  const project = d.project({
+    id: 'legacy-project',
+    subProjects: [{ ...subProject, id: 'legacy-sub', defaultPocketOpening: 'legacy-opening' }],
+  })
+  const loaded = loadProjectFromContents(JSON.stringify(project), context)
+  expect(loaded).toEqual(project)
+  expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(project)
 })

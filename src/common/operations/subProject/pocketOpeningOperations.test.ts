@@ -5,6 +5,7 @@ import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
 import { comparators } from '../../utils/comparators'
 import { createSubProject } from '../../utils/createSubProject'
+import { IdGenerator } from '../../utils/random/IdGenerator'
 import { cloneSubProject } from '../project/cloneSubProject'
 import { deletePocketOpening } from './deletePocketOpening'
 import { updatePocketOpening } from './updatePocketOpening'
@@ -46,8 +47,8 @@ const fixture = () => {
 
 describe('standalone opening operations', () => {
   it('creates an independent straight default using the supplied name', () => {
-    const first = createSubProject('Root', defaultStitchingSettings, 'Egyenes')
-    const second = createSubProject('Root', defaultStitchingSettings, 'Straight')
+    const first = createSubProject('Root', defaultStitchingSettings, 'Egyenes', new IdGenerator())
+    const second = createSubProject('Root', defaultStitchingSettings, 'Straight', new IdGenerator())
     expect(first.defaultPocketOpening).not.toBe(second.defaultPocketOpening)
     expect(accessors.subProject(first).pocketOpening.defaultOpening()).toEqual({
       id: first.defaultPocketOpening,
@@ -127,19 +128,29 @@ describe('standalone opening operations', () => {
     const { subProject } = fixture()
     const unused = { type: 'slanted' as const, ...defaultSlantedPocketOpening, id: 'unused', name: 'Unused' }
     const source = { ...subProject, pocketOpenings: { ...subProject.pocketOpenings, unused } }
-    let counter = 0
     const result = cloneSubProject(d.project({ id: 'project', subProjects: [source] }), {
       subProject: source,
-      getUnusedId: () => `copy-${++counter}`,
+      idGenerator: new IdGenerator(),
     })
     const cloned = result.subProjects[1]
-    expect(cloned.defaultPocketOpening).toBe(source.defaultPocketOpening)
-    expect(cloned.pocketOpenings).toEqual(source.pocketOpenings)
+    expect(cloned.defaultPocketOpening).not.toBe(source.defaultPocketOpening)
+    expect(cloned.pocketOpenings[cloned.defaultPocketOpening]).toMatchObject({ name: 'Default' })
+    expect(Object.values(cloned.pocketOpenings).map(({ id: _id, ...opening }) => opening)).toEqual(
+      Object.values(source.pocketOpenings).map(({ id: _id, ...opening }) => opening),
+    )
+    for (const id of Object.keys(cloned.pocketOpenings)) {
+      expect(id).toMatch(/^pocket-opening-/)
+      expect(Object.keys(source.pocketOpenings)).not.toContain(id)
+    }
     expect(cloned.pocketOpenings).not.toBe(source.pocketOpenings)
-    expect(cloned.pocketOpenings.unused).not.toBe(unused)
+    const copiedShared = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Slanted')
+    expect(Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Unused')).toEqual({
+      ...unused,
+      id: expect.stringMatching(/^pocket-opening-/),
+    })
     for (const pocket of Object.values(cloned.components)) {
       if (pocket.type === 't-pocket' || pocket.type === 'front-pocket') {
-        expect(pocket.openingId).toBe('shared')
+        expect(pocket.openingId).toBe(copiedShared?.id)
       }
     }
   })

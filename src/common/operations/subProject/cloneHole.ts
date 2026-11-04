@@ -1,15 +1,17 @@
 import type { HoleSchema } from '../../schemas/hole'
+import type { IdGeneratorSchema } from '../../schemas/idGenerator'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export type CloneHoleParams = {
   holeId: string
-  getUnusedId: () => string
+  idGenerator: IdGeneratorSchema
   getUnusedName: (sourceName: string, usedNames: Set<string>) => string
 }
 
 export const cloneHole = (
   subProject: SubProjectSchema,
-  { holeId, getUnusedId, getUnusedName }: CloneHoleParams,
+  { holeId, idGenerator, getUnusedName }: CloneHoleParams,
 ): SubProjectSchema => {
   const sourceHoleIndex = subProject.holes.findIndex((hole) => hole.id === holeId)
 
@@ -17,11 +19,12 @@ export const cloneHole = (
     return subProject
   }
 
+  const idMappings = getCloneIdMappings(subProject, idGenerator)
   const sourceHole = subProject.holes[sourceHoleIndex]
   const usedNames = new Set(subProject.holes.map((hole) => hole.name))
   const clonedHole: HoleSchema = {
     ...sourceHole,
-    id: getUnusedId(),
+    id: idMappings[sourceHole.id],
     name: getUnusedName(sourceHole.name, usedNames),
   }
 
