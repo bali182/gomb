@@ -13,6 +13,17 @@ const settings = { cloneComponentTree: true, cloneHoles: true, cloneStitchLines:
 const fixture = () =>
   d.subProject({
     id: 'sub',
+    constraints: {
+      linked: {
+        id: 'linked',
+        type: 'constraint',
+        relation: 'equal',
+        fields: [
+          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+          { id: 'child-field', type: 'panel-constraint-field', modelId: 'child', field: 'height' },
+        ],
+      },
+    },
     root: d.rootPanel({ id: 'root', children: ['panel', 'outside'] }),
     components: [
       d.panel({ id: 'panel', children: ['child'], name: 'Shared' }),
@@ -56,6 +67,7 @@ describe('cloneComponent', () => {
         idGenerator: new IdGenerator(sourceIds),
         settings: { cloneComponentTree, cloneHoles, cloneStitchLines },
       })
+      expect(result.constraints).toBe(source.constraints)
       const copyId = result.components.root.children[1]
       const copy = result.components[copyId]
       const componentCount = cloneComponentTree ? 2 : 1
@@ -121,6 +133,21 @@ describe('cloneComponent', () => {
         d.tPocket({ id: 't', openingId: 'opening' }),
         d.frontPocket({ id: 'front', openingId: 'opening' }),
       ],
+      pocketOpenings: [
+        { id: 'opening', type: 'slanted', name: 'Shared', offset: 4, side: 'start' },
+        { id: 'other-opening', type: 'slanted', name: 'Other', offset: 4, side: 'start' },
+      ],
+      constraints: {
+        linked: {
+          id: 'linked',
+          type: 'constraint',
+          relation: 'equal',
+          fields: [
+            { id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'offset' },
+            { id: 'other-opening-field', type: 'slanted-constraint-field', modelId: 'other-opening', field: 'offset' },
+          ],
+        },
+      },
       stitchLines: [
         d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
         d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
@@ -132,6 +159,7 @@ describe('cloneComponent', () => {
     expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe('opening')
     expect(accessor.component.frontPocket(cluster.children[1]).openingId).toBe('opening')
     expect(result.pocketOpenings).toBe(source.pocketOpenings)
+    expect(result.constraints).toBe(source.constraints)
     expect(result.stitchLines.slice(-2).map((stitchLine) => stitchLine.targetId)).toEqual([
       cluster.id,
       cluster.children[0],

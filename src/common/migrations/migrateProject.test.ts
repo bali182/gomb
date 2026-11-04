@@ -362,3 +362,31 @@ it('preserves legacy IDs and references on loading and reloading a current proje
   expect(loaded).toEqual(project)
   expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(project)
 })
+
+it('defaults missing constraints and preserves existing constraints through save and reload', () => {
+  const source = d.subProject({
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    components: [d.panel({ id: 'panel' })],
+    constraints: {
+      linked: {
+        id: 'linked',
+        type: 'constraint',
+        relation: 'equal',
+        fields: [
+          { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
+          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+        ],
+      },
+    },
+  })
+  const project = d.project({ id: 'project', subProjects: [source] })
+  const snapshot = structuredClone(project)
+  const loaded = loadProjectFromContents(JSON.stringify(project), context)
+  expect(loaded).toEqual(project)
+  expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(project)
+  const { constraints: _constraints, ...legacy } = source
+  const oldProject = { ...project, subProjects: [legacy] }
+  expect(loadProjectFromContents(JSON.stringify(oldProject), context).subProjects[0].constraints).toEqual({})
+  expect(project).toEqual(snapshot)
+})

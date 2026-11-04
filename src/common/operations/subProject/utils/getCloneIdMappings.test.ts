@@ -7,6 +7,17 @@ import { getCloneIdMappings } from './getCloneIdMappings'
 const fixture = () =>
   d.subProject({
     id: 'sub',
+    constraints: {
+      constraint: {
+        id: 'constraint',
+        type: 'constraint',
+        relation: 'equal',
+        fields: [
+          { id: 'first-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+          { id: 'second-field', type: 'panel-constraint-field', modelId: 'unused-panel', field: 'height' },
+        ],
+      },
+    },
     root: d.rootPanel({ id: 'root', children: ['panel'] }),
     components: [d.panel({ id: 'panel' }), d.panel({ id: 'unused-panel' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
@@ -28,6 +39,9 @@ describe('getCloneIdMappings', () => {
     for (const component of Object.values(source.components)) {
       expect(mapping[component.id]).toMatch(/^component-/)
     }
+    expect(mapping.constraint).toMatch(/^constraint-/)
+    expect(mapping['first-field']).toMatch(/^constraint-field-/)
+    expect(mapping['second-field']).toMatch(/^constraint-field-/)
     expect(mapping.hole).toMatch(/^hole-/)
     expect(mapping.stitch).toMatch(/^stitch-line-/)
     for (const opening of Object.values(source.pocketOpenings)) {
@@ -41,9 +55,12 @@ describe('getCloneIdMappings', () => {
     expect(source).toEqual(snapshot)
   })
 
-  it('throws if duplicate source IDs collapse entries in the record', () => {
-    const source = fixture()
-    source.holes[0].id = 'panel'
-    expect(() => getCloneIdMappings(source, new IdGenerator())).toThrow('Duplicate source IDs in clone mapping')
-  })
+  it.each(['panel', 'constraint', 'first-field'])(
+    'throws if source ID %s is duplicated across object types',
+    (duplicateId) => {
+      const source = fixture()
+      source.holes[0].id = duplicateId
+      expect(() => getCloneIdMappings(source, new IdGenerator())).toThrow('Duplicate source IDs in clone mapping')
+    },
+  )
 })

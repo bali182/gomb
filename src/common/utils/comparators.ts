@@ -6,6 +6,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
@@ -58,6 +59,10 @@ export const comparators = {
       a.id === b.id &&
       a.root === b.root &&
       a.defaultPocketOpening === b.defaultPocketOpening &&
+      Object.keys(a.constraints).length === Object.keys(b.constraints).length &&
+      Object.entries(a.constraints).every(
+        ([id, constraint]) => id in b.constraints && comparators.constraint(constraint, b.constraints[id]),
+      ) &&
       Object.keys(a.pocketOpenings).length === Object.keys(b.pocketOpenings).length &&
       Object.entries(a.pocketOpenings).every(
         ([id, opening]) =>
@@ -70,6 +75,18 @@ export const comparators = {
       areArraysEqual(a.holes, b.holes, comparators.hole) &&
       areArraysEqual(a.stitchLines, b.stitchLines, comparators.stitchLine)
     )
+  },
+
+  constraint: (a: ConstraintSchema, b: ConstraintSchema): boolean => {
+    return (
+      a.id === b.id &&
+      a.type === b.type &&
+      a.relation === b.relation &&
+      areArraysEqual(a.fields, b.fields, comparators.constraintField)
+    )
+  },
+  constraintField: (a: ConstraintFieldSchema, b: ConstraintFieldSchema): boolean => {
+    return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field
   },
 
   component: (a: ComponentSchema, b: ComponentSchema): boolean => {

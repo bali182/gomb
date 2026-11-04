@@ -12,6 +12,7 @@ import {
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
+import type { ConstraintSchema } from './schemas/constraints'
 import { HoleSchema } from './schemas/hole'
 import type { PocketOpeningSchema } from './schemas/pocketOpening'
 import { ProjectSchema } from './schemas/project'
@@ -45,6 +46,7 @@ type CreateSubProjectConfig = HasId &
     stitchLines?: StitchLineSchema[]
     holes?: HoleSchema[]
     pocketOpenings?: PocketOpeningSchema[]
+    constraints?: Record<string, ConstraintSchema>
   }
 
 type CreateRootPanelConfig = Partial<RootPanelSchema> & HasId & HasStitchingSettings
@@ -74,6 +76,7 @@ export const d = {
     stitchLines = [],
     holes = [],
     pocketOpenings = [],
+    constraints = {},
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
     const subProject = createSubProject(id, stitchingSettings, 'Straight', new IdGenerator())
@@ -89,6 +92,7 @@ export const d = {
       ...subProject.pocketOpenings,
       ...Object.fromEntries(pocketOpenings.map((opening) => [opening.id, opening])),
     }
+    subProject.constraints = constraints
     subProject.holes = holes
     const accessor = accessors.subProject(subProject)
     for (const component of components) {

@@ -7,6 +7,10 @@ export const getCloneIdMappings = (
 ): Record<string, string> => {
   const entries: [string, string][] = [
     [subProject.id, idGenerator.get('sub-project')],
+    ...Object.values(subProject.constraints).flatMap((constraint): [string, string][] => [
+      [constraint.id, idGenerator.getAndForbid('constraint')],
+      ...constraint.fields.map((field): [string, string] => [field.id, idGenerator.getAndForbid('constraint-field')]),
+    ]),
     ...Object.values(subProject.components).map((component): [string, string] => [
       component.id,
       idGenerator.getAndForbid('component'),

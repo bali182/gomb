@@ -7,6 +7,17 @@ import { getUnusedName } from './utils/getUnusedName'
 const fixture = () =>
   d.subProject({
     id: 'sub',
+    constraints: {
+      linked: {
+        id: 'linked',
+        type: 'constraint',
+        relation: 'equal',
+        fields: [
+          { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
+          { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
+        ],
+      },
+    },
     root: d.rootPanel({ id: 'root' }),
     holes: [d.hole({ id: 'hole', componentId: 'root', name: 'Hole' })],
   })
@@ -18,6 +29,7 @@ describe('cloneHole', () => {
     expect(result.holes).toHaveLength(2)
     expect(result.holes[0]).toBe(source.holes[0])
     expect(result.holes[1]).toEqual({ ...source.holes[0], id: expect.stringMatching(/^hole-/), name: 'Hole 1' })
+    expect(result.constraints).toBe(source.constraints)
     expect(result.components).toBe(source.components)
     expect(result.pocketOpenings).toBe(source.pocketOpenings)
     expect(source).toEqual(snapshot)

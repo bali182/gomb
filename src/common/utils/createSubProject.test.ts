@@ -9,6 +9,7 @@ describe('createSubProject', () => {
     const generate = vi.spyOn(generator, 'get')
     const forbid = vi.spyOn(generator, 'forbidOne')
     const subProject = createSubProject('Root', defaultStitchingSettings, 'Straight', generator)
+    expect(subProject.constraints).toEqual({})
     expect(subProject.id).toMatch(/^sub-project-/)
     expect(subProject.root).toMatch(/^component-/)
     expect(subProject.defaultPocketOpening).toMatch(/^pocket-opening-/)

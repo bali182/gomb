@@ -9,6 +9,9 @@ describe('getProjectIds', () => {
         subProjects: [
           {
             id: 'sub',
+            constraints: {
+              constraint: { id: 'constraint', fields: [{ id: 'constraint-field', modelId: 'model-reference' }] },
+            },
             root: 'root-reference',
             defaultPocketOpening: 'opening-reference',
             components: { key: { id: 'component', children: ['child-reference'], itemId: 'ID-1' } },
@@ -19,14 +22,35 @@ describe('getProjectIds', () => {
           { id: 'other-sub', components: { key: { id: 'other-component' } } },
         ],
       }),
-    ).toEqual(new Set(['project', 'sub', 'component', 'hole', 'stitch', 'opening', 'other-sub', 'other-component']))
+    ).toEqual(
+      new Set([
+        'project',
+        'sub',
+        'constraint',
+        'constraint-field',
+        'component',
+        'hole',
+        'stitch',
+        'opening',
+        'other-sub',
+        'other-component',
+      ]),
+    )
   })
 
   it('accepts incomplete migration input', () => {
     expect(getProjectIds({})).toEqual(new Set())
     expect(
       getProjectIds({
-        subProjects: [{ components: { empty: {} }, holes: [{}], stitchLines: [{}], pocketOpenings: { empty: {} } }],
+        subProjects: [
+          {
+            constraints: { empty: {}, partial: { fields: [{}] } },
+            components: { empty: {} },
+            holes: [{}],
+            stitchLines: [{}],
+            pocketOpenings: { empty: {} },
+          },
+        ],
       }),
     ).toEqual(new Set())
   })

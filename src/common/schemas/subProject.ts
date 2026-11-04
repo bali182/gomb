@@ -1,5 +1,6 @@
 import type { ComponentSchema } from './components'
 import type { ComputedComponentSchema, ComputedHoleSchema, ComputedStitchLineSchema } from './computed'
+import type { ConstraintSchema } from './constraints'
 import type { RectSchema } from './geometry'
 import type { HoleSchema } from './hole'
 import type { SubProjectLimitsSchema } from './limits'
@@ -10,6 +11,7 @@ export type SubProjectSchema = {
   id: string
   root: string
   defaultPocketOpening: string
+  constraints: Record<string, ConstraintSchema>
   components: Record<string, ComponentSchema>
   pocketOpenings: Record<string, PocketOpeningSchema>
   holes: HoleSchema[]

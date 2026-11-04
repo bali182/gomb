@@ -32,6 +32,7 @@ export const createSubProject = (
     components: {
       [root.id]: root,
     },
+    constraints: {},
     holes: [],
     stitchLines: [],
   }

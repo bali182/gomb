@@ -13,6 +13,12 @@ export const getProjectIds = (project: DeepPartialSchema<ProjectSchema>): Set<st
   addId(project.id)
   for (const subProject of project.subProjects ?? []) {
     addId(subProject.id)
+    for (const constraint of Object.values(subProject.constraints ?? {})) {
+      addId(constraint?.id)
+      for (const field of constraint?.fields ?? []) {
+        addId(field.id)
+      }
+    }
     for (const component of Object.values(subProject.components ?? {})) {
       addId(component?.id)
     }
