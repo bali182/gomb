@@ -5,7 +5,7 @@ const definitions: ConstraintFieldBlockerDefinitionsSchema = {
   'root-panel': {
     layoutGap: (model) => (narrowers.assert.rootPanel(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
   },
-  panel: {
+  'panel': {
     width: (model) => (narrowers.assert.panel(model).autoWidth ? 'auto-width' : undefined),
     height: (model) => (narrowers.assert.panel(model).autoHeight ? 'auto-height' : undefined),
     layoutGap: (model) => (narrowers.assert.panel(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
@@ -27,13 +27,14 @@ const definitions: ConstraintFieldBlockerDefinitionsSchema = {
     bottomRightRadius: (model) =>
       narrowers.assert.componentBoundsStitchLine(model).autoCornerRadius ? 'auto-corner-radius' : undefined,
   },
-  hole: {},
-  straight: {},
-  recessed: {},
-  slanted: {},
+  'hole': {},
+  'straight': {},
+  'recessed': {},
+  'slanted': {},
   't-pocket-stitch-line': {},
   't-pocket': {},
   'optical-illusion': {},
+  'constraint': {},
 }
 
 export const constraintFieldBlockers: ConstraintFieldBlockersSchema = definitions

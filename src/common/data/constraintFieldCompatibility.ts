@@ -15,7 +15,7 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
     mainAxisAnchor: 'enum:anchor',
     layoutGap: 'number',
   },
-  panel: {
+  'panel': {
     width: 'number',
     height: 'number',
     topLeftRadius: 'number',
@@ -69,7 +69,7 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
     itemCrossAxisOffset: 'number',
     itemOpeningOffset: 'number',
   },
-  hole: {
+  'hole': {
     width: 'number',
     height: 'number',
     topLeftRadius: 'number',
@@ -81,14 +81,14 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
     xOffset: 'number',
     yOffset: 'number',
   },
-  recessed: {
+  'recessed': {
     outerInset: 'number',
     innerOffset: 'number',
     outerRadius: 'number',
     innerRadius: 'number',
     depth: 'number',
   },
-  slanted: {
+  'slanted': {
     offset: 'number',
     side: 'enum:pocket-opening-side',
   },
@@ -145,7 +145,8 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
     endOffset: 'number',
     stitchDirection: 'enum:stitch-direction',
   },
-  straight: {},
+  'straight': {},
+  'constraint': {},
 }
 
 export const constraintFieldCompatibility: ConstraintFieldCompatibilitySchema = definitions

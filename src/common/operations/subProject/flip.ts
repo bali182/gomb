@@ -44,6 +44,8 @@ export const flip = (
       return flipComponentSubtree(subProject, accessor.component.frontPocket(model.id), axis)
     case 't-pocket':
       return flipComponentSubtree(subProject, accessor.component.tPocket(model.id), axis)
+    case 'constraint':
+      return subProject
     case 'hole': {
       const hole = accessor.hole.byId(model.id)
       const updated = updateHole(subProject, { hole: flipHole(hole, axis) })
