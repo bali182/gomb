@@ -1,15 +1,17 @@
 import type { ConstraintSchema } from '../../schemas/constraints'
+import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
 import type { SubProjectSchema } from '../../schemas/subProject'
-import { accessors } from '../../utils/accessors'
-import { isDefined } from '../../utils/isDefined'
+import { getSubProjectIds } from '../../utils/idCollectorUtils'
 
 export type AddConstraintParams = {
-  constraint: ConstraintSchema
+  type: ConstraintSchema['type']
+  modelFactory: ReadonlyModelObjectFactorySchema
 }
 
-export const addConstraint = (subProject: SubProjectSchema, { constraint }: AddConstraintParams): SubProjectSchema => {
-  if (isDefined(accessors.subProject(subProject).optional.constraint.byId(constraint.id))) {
-    return subProject
-  }
+export const addConstraint = (
+  subProject: SubProjectSchema,
+  { type, modelFactory }: AddConstraintParams,
+): SubProjectSchema => {
+  const constraint = modelFactory.createConstraint({ type, forbiddenIds: getSubProjectIds(subProject) })
   return { ...subProject, constraints: { ...subProject.constraints, [constraint.id]: constraint } }
 }

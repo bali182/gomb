@@ -47,10 +47,10 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
         return
       }
 
-      const idGenerator = new IdGenerator([project.id, ...projects.map((candidate) => candidate.id)])
+      const idGenerator = new IdGenerator()
       const importedProject: ProjectSchema = {
         ...project,
-        id: idGenerator.get('project'),
+        id: idGenerator.get('project', new Set([project.id, ...projects.map((candidate) => candidate.id)])),
         name: `${project.name} (${result.value.name})`,
       }
 

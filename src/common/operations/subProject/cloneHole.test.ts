@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { d } from '../../testData'
-import { IdGenerator } from '../../utils/random/IdGenerator'
+import { EN } from '../../translations/en'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { cloneHole } from './cloneHole'
-import { getUnusedName } from './utils/getUnusedName'
+
+const nameGenerator = new NameGenerator(EN.defaultNames)
 
 const fixture = () =>
   d.subProject({
@@ -10,8 +12,7 @@ const fixture = () =>
     constraints: {
       linked: {
         id: 'linked',
-        type: 'constraint',
-        relation: 'equal',
+        type: 'equal-constraint',
         fields: [
           { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
           { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
@@ -25,7 +26,7 @@ describe('cloneHole', () => {
   it('copies only the hole, retaining its owner and inserting after the source', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = cloneHole(source, { holeId: 'hole', idGenerator: new IdGenerator(), getUnusedName })
+    const result = cloneHole(source, { holeId: 'hole', nameGenerator })
     expect(result.holes).toHaveLength(2)
     expect(result.holes[0]).toBe(source.holes[0])
     expect(result.holes[1]).toEqual({ ...source.holes[0], id: expect.stringMatching(/^hole-/), name: 'Hole 1' })
@@ -36,6 +37,6 @@ describe('cloneHole', () => {
   })
   it('retains the source for an unknown hole', () => {
     const source = fixture()
-    expect(cloneHole(source, { holeId: 'missing', idGenerator: new IdGenerator(), getUnusedName })).toBe(source)
+    expect(cloneHole(source, { holeId: 'missing', nameGenerator })).toBe(source)
   })
 })

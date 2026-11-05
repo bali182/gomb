@@ -78,12 +78,7 @@ export const comparators = {
   },
 
   constraint: (a: ConstraintSchema, b: ConstraintSchema): boolean => {
-    return (
-      a.id === b.id &&
-      a.type === b.type &&
-      a.relation === b.relation &&
-      areArraysEqual(a.fields, b.fields, comparators.constraintField)
-    )
+    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.constraintField)
   },
   constraintField: (a: ConstraintFieldSchema, b: ConstraintFieldSchema): boolean => {
     return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field

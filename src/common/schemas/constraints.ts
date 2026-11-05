@@ -305,7 +305,7 @@ export type ModelConstraintFieldCompatibilitySchema<
 > = Readonly<Partial<Record<Fields, ConstraintCompatibilityGroupSchema>>>
 
 export type ConstraintFieldCompatibilityDefinitionsSchema = {
-  constraint: Record<string, never>
+  'equal-constraint': Record<string, never>
   'root-panel': ModelConstraintFieldCompatibilitySchema<RootPanelConstraintFieldNameSchema>
   'panel': ModelConstraintFieldCompatibilitySchema<PanelConstraintFieldNameSchema>
   'pocket-cluster': ModelConstraintFieldCompatibilitySchema<PocketClusterConstraintFieldNameSchema>
@@ -332,7 +332,7 @@ export type ModelConstraintFieldBlockersSchema<Fields extends ConstraintFieldNam
   Readonly<Partial<Record<Fields, ConstraintFieldBlockerSchema>>>
 
 export type ConstraintFieldBlockerDefinitionsSchema = {
-  constraint: Record<string, never>
+  'equal-constraint': Record<string, never>
   'root-panel': ModelConstraintFieldBlockersSchema<RootPanelConstraintFieldNameSchema>
   'panel': ModelConstraintFieldBlockersSchema<PanelConstraintFieldNameSchema>
   'pocket-cluster': ModelConstraintFieldBlockersSchema<PocketClusterConstraintFieldNameSchema>

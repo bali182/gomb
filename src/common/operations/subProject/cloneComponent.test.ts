@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { d } from '../../testData'
+import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
-import { getProjectIds } from '../../utils/getProjectIds'
-import { IdGenerator } from '../../utils/random/IdGenerator'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { getProjectIds } from '../../utils/idCollectorUtils'
 import { cloneComponent } from './cloneComponent'
-import { getUnusedName } from './utils/getUnusedName'
 
-const names = { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName }
+const nameGenerator = new NameGenerator(EN.defaultNames)
+
 const settings = { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true }
 const fixture = () =>
   d.subProject({
@@ -16,8 +17,7 @@ const fixture = () =>
     constraints: {
       linked: {
         id: 'linked',
-        type: 'constraint',
-        relation: 'equal',
+        type: 'equal-constraint',
         fields: [
           { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
           { id: 'child-field', type: 'panel-constraint-field', modelId: 'child', field: 'height' },
@@ -63,8 +63,7 @@ describe('cloneComponent', () => {
       const sourceIds = getProjectIds(project)
       const result = cloneComponent(source, {
         componentId: 'panel',
-        names,
-        idGenerator: new IdGenerator(sourceIds),
+        nameGenerator,
         settings: { cloneComponentTree, cloneHoles, cloneStitchLines },
       })
       expect(result.constraints).toBe(source.constraints)
@@ -72,7 +71,7 @@ describe('cloneComponent', () => {
       const copy = result.components[copyId]
       const componentCount = cloneComponentTree ? 2 : 1
       expect(result.components.root.children).toEqual(['panel', copyId, 'outside'])
-      expect(copy.id).toMatch(/^component-/)
+      expect(copy.id).toMatch(/^panel-/)
       expect(copy.children).toHaveLength(cloneComponentTree ? 1 : 0)
       expect(Object.keys(result.components)).toHaveLength(Object.keys(source.components).length + componentCount)
       expect(result.holes).toHaveLength(source.holes.length + (cloneHoles ? componentCount : 0))
@@ -84,7 +83,7 @@ describe('cloneComponent', () => {
       expect(copiedHoles.map((hole) => hole.componentId)).toEqual(cloneHoles ? copies : [])
       const targets = new Set([...copies, ...copiedHoles.map((hole) => hole.id)])
       for (const stitchLine of result.stitchLines.slice(source.stitchLines.length)) {
-        expect(stitchLine.id).toMatch(/^stitch-line-/)
+        expect(stitchLine.id).toMatch(/^component-bounds-stitch-line-/)
         expect(targets.has(stitchLine.targetId)).toBe(true)
       }
       for (const id of getProjectIds({ subProjects: [result] })) {
@@ -98,7 +97,7 @@ describe('cloneComponent', () => {
 
   it('reserves names for every copied entity', () => {
     const source = fixture()
-    const result = cloneComponent(source, { componentId: 'panel', names, settings, idGenerator: new IdGenerator() })
+    const result = cloneComponent(source, { componentId: 'panel', nameGenerator, settings })
     const copy = result.components[result.components.root.children[1]]
     expect(copy.name).toBe('Shared 1')
     expect(result.components[copy.children[0]].name).toBe('Shared 2')
@@ -113,15 +112,13 @@ describe('cloneComponent', () => {
 
   it.each(['root', 'missing'])('does not clone %s', (componentId) => {
     const source = fixture()
-    expect(cloneComponent(source, { componentId, names, settings, idGenerator: new IdGenerator() })).toBe(source)
+    expect(cloneComponent(source, { componentId, nameGenerator, settings })).toBe(source)
   })
 
   it.each(['missing', 'panel'])('does not clone an invalid tree referencing %s', (childId) => {
     const source = fixture()
     source.components.child.children = [childId]
-    expect(cloneComponent(source, { componentId: 'panel', names, settings, idGenerator: new IdGenerator() })).toBe(
-      source,
-    )
+    expect(cloneComponent(source, { componentId: 'panel', nameGenerator, settings })).toBe(source)
   })
 
   it('copies a cluster tree and preserves the shared opening references', () => {
@@ -140,8 +137,7 @@ describe('cloneComponent', () => {
       constraints: {
         linked: {
           id: 'linked',
-          type: 'constraint',
-          relation: 'equal',
+          type: 'equal-constraint',
           fields: [
             { id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'offset' },
             { id: 'other-opening-field', type: 'slanted-constraint-field', modelId: 'other-opening', field: 'offset' },
@@ -153,7 +149,7 @@ describe('cloneComponent', () => {
         d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
       ],
     })
-    const result = cloneComponent(source, { componentId: 'cluster', names, settings, idGenerator: new IdGenerator() })
+    const result = cloneComponent(source, { componentId: 'cluster', nameGenerator, settings })
     const accessor = accessors.subProject(result)
     const cluster = accessor.component.pocketCluster(result.components.root.children[1])
     expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe('opening')
@@ -165,7 +161,7 @@ describe('cloneComponent', () => {
       cluster.children[0],
     ])
 
-    const pocketCopy = cloneComponent(source, { componentId: 't', names, settings, idGenerator: new IdGenerator() })
+    const pocketCopy = cloneComponent(source, { componentId: 't', nameGenerator, settings })
     const copyId = pocketCopy.components.cluster.children[1]
     expect(pocketCopy.stitchLines).toHaveLength(3)
     expect(pocketCopy.stitchLines[0]).toBe(source.stitchLines[0])

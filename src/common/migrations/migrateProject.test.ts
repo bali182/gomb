@@ -1,6 +1,8 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
 import { defaultOpticalIllusionPocketOpening } from '../defaultStates'
+import { NameGenerator } from '../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
 import { loadProjectFromContents } from '../utils/loadProjectFromContents'
 import { IdGenerator } from '../utils/random/IdGenerator'
 
@@ -62,7 +64,10 @@ describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: 
 
 const createProjectWithSubProject = (): ProjectSchema => {
   const project = createProject('Project')
-  const subProject = createSubProject('Root', project.stitchingSettings, 'Straight', new IdGenerator())
+  const subProject = createSubProject({
+    project,
+    modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames)),
+  })
 
   return {
     ...project,
@@ -296,45 +301,6 @@ describe('standalone opening migration', () => {
   })
 })
 
-it('loads inline pockets using the subproject default and prunes obsolete opening fields', () => {
-  const root = d.rootPanel({ id: 'root', children: ['cluster'] })
-  const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
-  const { openingId: _tOpeningId, ...t } = d.tPocket({ id: 't' })
-  const { openingId: _frontOpeningId, ...front } = d.frontPocket({ id: 'front' })
-  const base = d.subProject({ id: 'sub', root, components: [cluster] })
-  const { defaultPocketOpening: _defaultPocketOpening, pocketOpenings: _pocketOpenings, ...legacySubProject } = base
-  const legacy = {
-    ...d.project({ id: 'project', subProjects: [] }),
-    version: '0.0.0',
-    subProjects: [
-      {
-        ...legacySubProject,
-        components: {
-          ...legacySubProject.components,
-          t: { ...t, opening: { type: 'slanted', side: 'end', offset: 23 } },
-          front: { ...front, opening: { type: 'recessed', depth: 12 } },
-        },
-      },
-    ],
-  }
-  const loaded = loadProjectFromContents(JSON.stringify(legacy), context)
-  const subProject = loaded.subProjects[0]
-  const separatelyLoaded = loadProjectFromContents(JSON.stringify(legacy), context)
-  expect(subProject.defaultPocketOpening).not.toBe(separatelyLoaded.subProjects[0].defaultPocketOpening)
-  expect(subProject.pocketOpenings).toEqual({
-    [subProject.defaultPocketOpening]: {
-      id: subProject.defaultPocketOpening,
-      name: EN.project.editors.enums.components.pocketOpening.straight,
-      type: 'straight',
-    },
-  })
-  for (const id of ['t', 'front']) {
-    expect(subProject.components[id]).toHaveProperty('openingId', subProject.defaultPocketOpening)
-    expect(subProject.components[id]).not.toHaveProperty('opening')
-  }
-  expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(loaded)
-})
-
 it('preserves legacy IDs and references on loading and reloading a current project', () => {
   const subProject = d.subProject({
     id: 'legacy-sub',
@@ -371,8 +337,7 @@ it('defaults missing constraints and preserves existing constraints through save
     constraints: {
       linked: {
         id: 'linked',
-        type: 'constraint',
-        relation: 'equal',
+        type: 'equal-constraint',
         fields: [
           { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
           { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },

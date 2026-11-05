@@ -2,13 +2,20 @@ import { describe, expect, it } from 'vitest'
 import { defaultSlantedPocketOpening, defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { d } from '../../testData'
+import { EN } from '../../translations/en'
+import { HU } from '../../translations/hu'
 import { accessors } from '../../utils/accessors'
 import { comparators } from '../../utils/comparators'
+import { createProject } from '../../utils/createProject'
 import { createSubProject } from '../../utils/createSubProject'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { IdGenerator } from '../../utils/random/IdGenerator'
 import { cloneSubProject } from '../project/cloneSubProject'
 import { deletePocketOpening } from './deletePocketOpening'
 import { updatePocketOpening } from './updatePocketOpening'
+
+const nameGenerator = new NameGenerator(EN.defaultNames)
 
 const fixture = () => {
   const opening = {
@@ -46,13 +53,19 @@ const fixture = () => {
 }
 
 describe('standalone opening operations', () => {
-  it('creates an independent straight default using the supplied name', () => {
-    const first = createSubProject('Root', defaultStitchingSettings, 'Egyenes', new IdGenerator())
-    const second = createSubProject('Root', defaultStitchingSettings, 'Straight', new IdGenerator())
+  it('creates independent straight defaults using the factory language', () => {
+    const first = createSubProject({
+      project: createProject('Project'),
+      modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(HU.defaultNames)),
+    })
+    const second = createSubProject({
+      project: createProject('Project'),
+      modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames)),
+    })
     expect(first.defaultPocketOpening).not.toBe(second.defaultPocketOpening)
     expect(accessors.subProject(first).pocketOpening.defaultOpening()).toEqual({
       id: first.defaultPocketOpening,
-      name: 'Egyenes',
+      name: 'Egyenes 1',
       type: 'straight',
     })
     expect(first.pocketOpenings[first.defaultPocketOpening]).not.toBe(
@@ -130,7 +143,7 @@ describe('standalone opening operations', () => {
     const source = { ...subProject, pocketOpenings: { ...subProject.pocketOpenings, unused } }
     const result = cloneSubProject(d.project({ id: 'project', subProjects: [source] }), {
       subProject: source,
-      idGenerator: new IdGenerator(),
+      nameGenerator,
     })
     const cloned = result.subProjects[1]
     expect(cloned.defaultPocketOpening).not.toBe(source.defaultPocketOpening)
@@ -138,15 +151,16 @@ describe('standalone opening operations', () => {
     expect(Object.values(cloned.pocketOpenings).map(({ id: _id, ...opening }) => opening)).toEqual(
       Object.values(source.pocketOpenings).map(({ id: _id, ...opening }) => opening),
     )
-    for (const id of Object.keys(cloned.pocketOpenings)) {
-      expect(id).toMatch(/^pocket-opening-/)
+    for (const opening of Object.values(cloned.pocketOpenings)) {
+      const id = opening.id
+      expect(id.startsWith(`${opening.type}-pocket-opening-`)).toBe(true)
       expect(Object.keys(source.pocketOpenings)).not.toContain(id)
     }
     expect(cloned.pocketOpenings).not.toBe(source.pocketOpenings)
     const copiedShared = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Slanted')
     expect(Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Unused')).toEqual({
       ...unused,
-      id: expect.stringMatching(/^pocket-opening-/),
+      id: expect.stringMatching(/^slanted-pocket-opening-/),
     })
     for (const pocket of Object.values(cloned.components)) {
       if (pocket.type === 't-pocket' || pocket.type === 'front-pocket') {

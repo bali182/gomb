@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { getProjectIds } from '../../utils/getProjectIds'
-import { IdGenerator } from '../../utils/random/IdGenerator'
+import { EN } from '../../translations/en'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { getProjectIds } from '../../utils/idCollectorUtils'
 
 import { defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
 import { cloneSubProject } from './cloneSubProject'
+
+const nameGenerator = new NameGenerator(EN.defaultNames)
 
 describe('cloneSubProject', () => {
   it('builds a complete cloned subproject from the component tree result', () => {
@@ -31,8 +34,8 @@ describe('cloneSubProject', () => {
     const project = d.project({ id: 'project', subProjects: [sourceSubProject, existingSubProject] })
 
     const result = cloneSubProject(project, {
-      idGenerator: new IdGenerator(getProjectIds(project)),
       subProject: sourceSubProject,
+      nameGenerator,
     })
     const clonedSubProject = result.subProjects[result.subProjects.length - 1]
 
@@ -40,10 +43,16 @@ describe('cloneSubProject', () => {
     const copiedPanelId = copiedRoot.children[0]
     const copiedHole = clonedSubProject.holes[0]
     expect(clonedSubProject.id).toMatch(/^sub-project-/)
-    expect(copiedRoot).toMatchObject({ id: expect.stringMatching(/^component-/), name: 'Wallet 2' })
-    expect(copiedHole).toMatchObject({ componentId: copiedPanelId, id: expect.stringMatching(/^hole-/) })
+    expect(copiedRoot).toMatchObject({ id: expect.stringMatching(/^root-panel-/), name: 'Wallet 2' })
+    expect(clonedSubProject.components[copiedPanelId].name).toBe('Panel')
+    expect(copiedHole).toMatchObject({ componentId: copiedPanelId, id: expect.stringMatching(/^hole-/), name: 'Hole' })
     expect(clonedSubProject.stitchLines).toMatchObject([
-      { id: expect.stringMatching(/^stitch-line-/), targetId: copiedHole.id, targetType: 'hole' },
+      {
+        id: expect.stringMatching(/^component-bounds-stitch-line-/),
+        targetId: copiedHole.id,
+        targetType: 'hole',
+        name: 'Stitch line',
+      },
     ])
     const originalIds = getProjectIds(project)
     for (const id of getProjectIds({ subProjects: [clonedSubProject] })) {
@@ -68,7 +77,7 @@ describe('cloneSubProject', () => {
     const snapshot = structuredClone(project)
     const result = cloneSubProject(project, {
       subProject: source,
-      idGenerator: new IdGenerator(getProjectIds(project)),
+      nameGenerator,
     })
     const cloned = result.subProjects[1]
     const accessor = accessors.subProject(cloned)
@@ -95,8 +104,7 @@ it('maps onTop references inside a full subproject clone', () => {
     ],
   })
   const project = d.project({ id: 'project', subProjects: [source] })
-  const cloned = cloneSubProject(project, { subProject: source, idGenerator: new IdGenerator(getProjectIds(project)) })
-    .subProjects[1]
+  const cloned = cloneSubProject(project, { subProject: source, nameGenerator }).subProjects[1]
   expect(cloned.stitchLines[0]).toMatchObject({
     targetId: cloned.components[cloned.root].children[0],
     onTop: cloned.root,
@@ -115,7 +123,7 @@ it.each(['missing-root', 'missing-child', 'cycle'])('does not clone an invalid s
     source.components.panel.children = [invalidity === 'cycle' ? 'root' : 'missing']
   }
   const project = d.project({ id: 'project', subProjects: [source] })
-  expect(cloneSubProject(project, { subProject: source, idGenerator: new IdGenerator() })).toBe(project)
+  expect(cloneSubProject(project, { subProject: source, nameGenerator })).toBe(project)
 })
 
 it('clones the complete constraint structure with fresh IDs and remapped models', () => {
@@ -137,8 +145,7 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
     constraints: {
       dimensions: {
         id: 'dimensions',
-        type: 'constraint',
-        relation: 'equal',
+        type: 'equal-constraint',
         fields: [
           { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
           { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
@@ -153,8 +160,7 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
       },
       openings: {
         id: 'openings',
-        type: 'constraint',
-        relation: 'equal',
+        type: 'equal-constraint',
         fields: [
           { id: 'shared-field', type: 'slanted-constraint-field', modelId: 'shared-opening', field: 'offset' },
           { id: 'unused-field', type: 'slanted-constraint-field', modelId: 'unused-opening', field: 'offset' },
@@ -164,8 +170,7 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
   })
   const project = d.project({ id: 'project', subProjects: [source] })
   const snapshot = structuredClone(project)
-  const cloned = cloneSubProject(project, { subProject: source, idGenerator: new IdGenerator(getProjectIds(project)) })
-    .subProjects[1]
+  const cloned = cloneSubProject(project, { subProject: source, nameGenerator }).subProjects[1]
   const copiedConstraints = Object.values(cloned.constraints)
   expect(copiedConstraints).toHaveLength(2)
   const dimensions = copiedConstraints[0]
@@ -186,14 +191,14 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
   const originalConstraints = Object.values(source.constraints)
   for (const [index, constraint] of copiedConstraints.entries()) {
     expect(cloned.constraints[constraint.id]).toBe(constraint)
-    expect(constraint.id).toMatch(/^constraint-/)
+    expect(constraint.id).toMatch(/^equal-constraint-/)
     expect(constraint).not.toBe(originalConstraints[index])
     expect(constraint.fields).not.toBe(originalConstraints[index].fields)
     expect(constraint.fields.map(({ type, field }) => ({ type, field }))).toEqual(
       originalConstraints[index].fields.map(({ type, field }) => ({ type, field })),
     )
     for (const [fieldIndex, field] of constraint.fields.entries()) {
-      expect(field.id).toMatch(/^constraint-field-/)
+      expect(field.id.startsWith(`${field.type}-`)).toBe(true)
       expect(field).not.toBe(originalConstraints[index].fields[fieldIndex])
     }
   }

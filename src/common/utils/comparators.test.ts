@@ -6,8 +6,7 @@ import { comparators } from './comparators'
 const field: ConstraintFieldSchema = { id: 'field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }
 const constraint: ConstraintSchema = {
   id: 'constraint',
-  type: 'constraint',
-  relation: 'equal',
+  type: 'equal-constraint',
   fields: [field, { ...field, id: 'other', field: 'height' }],
 }
 

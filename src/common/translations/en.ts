@@ -70,7 +70,8 @@ import type {
 
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
-import { CurrencyIdSchema } from '../schemas/currency'
+import type { CurrencyIdSchema } from '../schemas/currency'
+import type { IdPrefixSchema } from '../schemas/idGenerator'
 
 const language: LanguageSchema = 'en-GB'
 
@@ -1058,16 +1059,33 @@ export const EN = {
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
   defaultNames: {
-    project: 'Project',
-    rootPanel: 'Module',
-    panel: 'Panel',
-    pocketCluster: 'Pocket cluster',
-    frontPocket: 'Front pocket',
-    tPocket: 'T-pocket',
-    componentBoundsStitchLine: 'Stitching',
-    tPocketStitchLine: 'Pocket stitching',
-    hole: 'Hole',
-  },
+    'project': 'Project',
+    'sub-project': 'Subproject',
+    'root-panel': 'Module',
+    'panel': 'Panel',
+    'pocket-cluster': 'Pocket cluster',
+    'front-pocket': 'Front pocket',
+    't-pocket': 'T-pocket',
+    't-pocket-stitch-line': 'Pocket stitching',
+    'component-bounds-stitch-line': 'Stitching',
+    'hole': 'Hole',
+    'straight-pocket-opening': 'Straight',
+    'recessed-pocket-opening': 'Recessed',
+    'slanted-pocket-opening': 'Slanted',
+    'optical-illusion-pocket-opening': 'Optical illusion',
+    'equal-constraint': 'Equality',
+    'root-panel-constraint-field': 'Field',
+    'panel-constraint-field': 'Field',
+    'pocket-cluster-constraint-field': 'Field',
+    'front-pocket-constraint-field': 'Field',
+    't-pocket-constraint-field': 'Field',
+    'hole-constraint-field': 'Field',
+    'recessed-constraint-field': 'Field',
+    'slanted-constraint-field': 'Field',
+    'optical-illusion-constraint-field': 'Field',
+    'component-bounds-stitch-line-constraint-field': 'Field',
+    't-pocket-stitch-line-constraint-field': 'Field',
+  } satisfies Record<IdPrefixSchema, string>,
   data: {
     pocketItemGroups: {
       cards: 'Cards',

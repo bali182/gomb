@@ -1,37 +1,36 @@
-import { createComponent } from '../operations/subProject/utils/createComponent'
-import { createPocketOpening } from '../operations/subProject/utils/createPocketOpening'
-import type { IdGeneratorSchema } from '../schemas/idGenerator'
-import { StitchLineCommonConfigSchema } from '../schemas/stitching'
+import type { ReadonlyModelObjectFactorySchema } from '../schemas/factory'
+import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectSchema } from '../schemas/subProject'
+import { accessors } from './accessors'
+import { getProjectIds } from './idCollectorUtils'
+import { isDefined } from './isDefined'
+import { IdGenerator } from './random/IdGenerator'
 
-export const createSubProject = (
-  rootName: string,
-  stitchingSettings: StitchLineCommonConfigSchema,
-  defaultOpeningName: string,
-  idGenerator: IdGeneratorSchema,
-): SubProjectSchema => {
-  const root = createComponent({
-    id: idGenerator.get('component'),
-    name: rootName,
-    type: 'root-panel',
-    stitchingSettings,
-  })
-  const defaultPocketOpening = createPocketOpening({
-    type: 'straight',
-    id: idGenerator.get('pocket-opening'),
-    name: defaultOpeningName,
-  })
+export type CreateSubProjectParams = {
+  project: ProjectSchema
+  modelFactory: ReadonlyModelObjectFactorySchema
+}
 
+export const createSubProject = ({ project, modelFactory }: CreateSubProjectParams): SubProjectSchema => {
+  const forbiddenIds = getProjectIds(project)
+  const forbiddenNames = new Set(
+    project.subProjects
+      .map((subProject) => accessors.subProject(subProject).optional.component.rootPanel())
+      .filter(isDefined)
+      .map((root) => root.name),
+  )
+  const root = modelFactory.createRootPanel({
+    stitchingSettings: project.stitchingSettings,
+    forbiddenIds,
+    forbiddenNames,
+  })
+  const defaultPocketOpening = modelFactory.createStraightPocketOpening({ forbiddenIds })
   return {
-    id: idGenerator.get('sub-project'),
+    id: new IdGenerator().get('sub-project', forbiddenIds),
     root: root.id,
     defaultPocketOpening: defaultPocketOpening.id,
-    pocketOpenings: {
-      [defaultPocketOpening.id]: defaultPocketOpening,
-    },
-    components: {
-      [root.id]: root,
-    },
+    pocketOpenings: { [defaultPocketOpening.id]: defaultPocketOpening },
+    components: { [root.id]: root },
     constraints: {},
     holes: [],
     stitchLines: [],

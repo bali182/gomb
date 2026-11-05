@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState, type FC } from 'react'
 import { useNavigate } from 'react-router'
+import { NameGenerator } from '../../common/utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../../common/utils/factory/ReadonlyModelObjectFactory'
 
 import { EditDialog } from '../../common/components/EditDialog'
 import { toaster } from '../../common/components/Toaster'
@@ -11,7 +13,6 @@ import { addSubProject } from '../../common/operations/project/addSubProject'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
 import { createProject } from '../../common/utils/createProject'
-import { getProjectIds } from '../../common/utils/getProjectIds'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
 import { isDefined } from '../../common/utils/isDefined'
 import { IdGenerator } from '../../common/utils/random/IdGenerator'
@@ -80,9 +81,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
-      idGenerator: new IdGenerator(getProjectIds(validationResult.value)),
-      baseRootComponentName: t.defaultNames.rootPanel,
-      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
+      modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(t.defaultNames)),
     })
 
     const response = await electronApi.write({
@@ -106,8 +105,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     onOpenChange,
     project,
     showSaveFailedToast,
-    t.defaultNames.rootPanel,
-    t.project.editors.enums.components.pocketOpening.straight,
+    t.defaultNames,
   ])
 
   return (

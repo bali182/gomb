@@ -1,6 +1,6 @@
 import type { ComponentSchema } from '../../schemas/components'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
-import type { IdGeneratorSchema } from '../../schemas/idGenerator'
+import type { NameGeneratorSchema } from '../../schemas/idGenerator'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -9,16 +9,15 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { cloneComponentTree } from '../subProject/cloneComponentTree'
 import { getCloneIdMappings } from '../subProject/utils/getCloneIdMappings'
-import { getUnusedName } from '../subProject/utils/getUnusedName'
 
 export type CloneSubProjectParams = {
-  idGenerator: IdGeneratorSchema
+  nameGenerator: NameGeneratorSchema
   subProject: SubProjectSchema
 }
 
 export const cloneSubProject = (
   project: ProjectSchema,
-  { idGenerator, subProject: sourceSubProject }: CloneSubProjectParams,
+  { subProject: sourceSubProject, nameGenerator }: CloneSubProjectParams,
 ): ProjectSchema => {
   const sourceRootPanel = accessors.subProject(sourceSubProject).optional.component.rootPanel()
 
@@ -26,17 +25,14 @@ export const cloneSubProject = (
     return project
   }
 
-  const idMappings = getCloneIdMappings(sourceSubProject, idGenerator)
+  const idMappings = getCloneIdMappings(sourceSubProject)
   const cloneResult = cloneComponentTree({
     subProject: sourceSubProject,
     componentId: sourceSubProject.root,
     settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
     idMappings,
-    names: {
-      component: (sourceName) => sourceName,
-      hole: (sourceName) => sourceName,
-      stitchLine: (sourceName) => sourceName,
-    },
+    nameGenerator,
+    preserveNames: true,
   })
 
   if (!isDefined(cloneResult)) {
@@ -55,7 +51,7 @@ export const cloneSubProject = (
       .filter(isDefined)
       .map((root) => root.name),
   )
-  const rootName = getUnusedName(sourceRootPanel.name, usedRootNames)
+  const rootName = nameGenerator.getByBaseName(sourceRootPanel.name, usedRootNames)
   const components = Object.fromEntries(
     Object.values(cloneResult.clonedComponents).map((component): [string, ComponentSchema] => [
       component.id,

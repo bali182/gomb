@@ -34,7 +34,7 @@ const definitions: ConstraintFieldBlockerDefinitionsSchema = {
   't-pocket-stitch-line': {},
   't-pocket': {},
   'optical-illusion': {},
-  'constraint': {},
+  'equal-constraint': {},
 }
 
 export const constraintFieldBlockers: ConstraintFieldBlockersSchema = definitions

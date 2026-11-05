@@ -1,8 +1,4 @@
 import { defaultStitchingSettings } from './defaultStates'
-import { createComponent } from './operations/subProject/utils/createComponent'
-import { createHole } from './operations/subProject/utils/createHole'
-import { createPocketOpening } from './operations/subProject/utils/createPocketOpening'
-import { createStitchLine } from './operations/subProject/utils/createStitchLine'
 import { HasComponentReferenceSchema, HasComponentTargetSchema, HasId, HasTargetSchema } from './schemas/common'
 import {
   ComponentSchema,
@@ -23,9 +19,12 @@ import {
   TPocketStitchLineSchema,
 } from './schemas/stitching'
 import { SubProjectSchema } from './schemas/subProject'
+import { EN } from './translations/en'
 import { accessors } from './utils/accessors'
 import { createProject } from './utils/createProject'
 import { createSubProject } from './utils/createSubProject'
+import { NameGenerator } from './utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from './utils/factory/ReadonlyModelObjectFactory'
 import { isDefined } from './utils/isDefined'
 import { narrowers } from './utils/narrowers'
 import { IdGenerator } from './utils/random/IdGenerator'
@@ -58,6 +57,9 @@ type CreateHoleConfig = Partial<HoleSchema> & HasId & HasComponentReferenceSchem
 type CreateComponentBoundsStitchLineConfig = Partial<ComponentBoundsStitchLineSchema> & HasId & HasTargetSchema
 type CreateTPocketStitchLineConfig = Partial<TPocketStitchLineSchema> & HasId & HasComponentTargetSchema
 
+const idGenerator = new IdGenerator()
+const modelFactory = new ReadonlyModelObjectFactory(idGenerator, new NameGenerator(EN.defaultNames))
+
 export const d = {
   project: ({ id, subProjects, stitchingSettings }: CreateTestProjectConfig): ProjectSchema => {
     const project = createProject(id)
@@ -79,7 +81,8 @@ export const d = {
     constraints = {},
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
-    const subProject = createSubProject(id, stitchingSettings, 'Straight', new IdGenerator())
+    const subProject = createSubProject({ project: { ...createProject(id), stitchingSettings }, modelFactory })
+    subProject.id = id
     subProject.root = root.id
     subProject.components = {
       [root.id]: root,
@@ -97,11 +100,11 @@ export const d = {
     const accessor = accessors.subProject(subProject)
     for (const component of components) {
       if (narrowers.is.pocket(component) && !isDefined(accessor.optional.pocketOpening.byId(component.openingId))) {
-        subProject.pocketOpenings[component.openingId] = createPocketOpening({
-          type: 'straight',
+        subProject.pocketOpenings[component.openingId] = {
+          ...modelFactory.createStraightPocketOpening({}),
           id: component.openingId,
           name: component.openingId,
-        })
+        }
       }
     }
     return subProject
@@ -113,14 +116,18 @@ export const d = {
     ...rest
   }: CreateRootPanelConfig): RootPanelSchema => {
     return {
-      ...createComponent({ type: 'root-panel', id, name: id, stitchingSettings }),
+      ...modelFactory.createRootPanel({ stitchingSettings }),
+      id,
+      name: id,
       ...rest,
     }
   },
 
-  panel: ({ id, stitchingSettings = defaultStitchingSettings, ...rest }: CreatePanelConfig): PanelSchema => {
+  panel: ({ id, stitchingSettings: _stitchingSettings, ...rest }: CreatePanelConfig): PanelSchema => {
     return {
-      ...createComponent({ type: 'panel', id, name: id, stitchingSettings }),
+      ...modelFactory.createPanel({}),
+      id,
+      name: id,
       ...rest,
     }
   },
@@ -131,49 +138,38 @@ export const d = {
     ...rest
   }: CreatePocketClusterConfig): PocketClusterSchema => {
     return {
-      ...createComponent({
-        type: 'pocket-cluster',
-        id,
-        name: id,
-        stitchingSettings,
-      }),
+      ...modelFactory.createPocketCluster({ stitchingSettings }),
+      id,
+      name: id,
       ...rest,
     }
   },
 
   frontPocket: ({
     id,
-    stitchingSettings = defaultStitchingSettings,
-    openingId = IdGenerator.unsafe.get('pocket-opening'),
+    stitchingSettings: _stitchingSettings,
+    openingId = idGenerator.get('straight-pocket-opening'),
     ...rest
   }: Partial<FrontPocketSchema> & HasId & HasStitchingSettings): FrontPocketSchema => ({
-    ...createComponent<FrontPocketSchema>({
-      type: 'front-pocket',
-      id,
-      name: id,
-      openingId,
-      stitchingSettings,
-    }),
+    ...modelFactory.createFrontPocket({ openingId }),
+    id,
+    name: id,
     ...rest,
   }),
   tPocket: ({
     id,
-    stitchingSettings = defaultStitchingSettings,
-    openingId = IdGenerator.unsafe.get('pocket-opening'),
+    stitchingSettings: _stitchingSettings,
+    openingId = idGenerator.get('straight-pocket-opening'),
     ...rest
   }: Partial<TPocketSchema> & HasId & HasStitchingSettings): TPocketSchema => ({
-    ...createComponent<TPocketSchema>({
-      type: 't-pocket',
-      id,
-      name: id,
-      openingId,
-      stitchingSettings,
-    }),
+    ...modelFactory.createTPocket({ openingId }),
+    id,
+    name: id,
     ...rest,
   }),
 
   hole: ({ id, componentId, ...rest }: CreateHoleConfig): HoleSchema => {
-    return { ...createHole({ id, name: id, componentId, ...rest }) }
+    return { ...modelFactory.createHole({ componentId }), id, name: id, ...rest }
   },
 
   componentBoundsStitchLine: ({
@@ -182,10 +178,8 @@ export const d = {
     targetType,
     ...rest
   }: CreateComponentBoundsStitchLineConfig): ComponentBoundsStitchLineSchema => {
-    const stitchLine = narrowers.assert.componentBoundsStitchLine(
-      createStitchLine('component-bounds-stitch-line', { targetId, targetType }, id, id),
-    )
-    return { ...stitchLine, ...rest }
+    const stitchLine = modelFactory.createComponentBoundsStitchLine({ targetId, targetType })
+    return { ...stitchLine, id, name: id, ...rest }
   },
 
   tPocketStitchLine: ({
@@ -194,9 +188,7 @@ export const d = {
     targetType,
     ...rest
   }: CreateTPocketStitchLineConfig): TPocketStitchLineSchema => {
-    const stitchLine = narrowers.assert.tPocketStitchLine(
-      createStitchLine('t-pocket-stitch-line', { targetId, targetType }, id, id),
-    )
-    return { ...stitchLine, ...rest }
+    const stitchLine = modelFactory.createTPocketStitchLine({ targetId, targetType })
+    return { ...stitchLine, id, name: id, ...rest }
   },
 }

@@ -5,7 +5,7 @@ import { IdGenerator } from './random/IdGenerator'
 
 export const createProject = (name: string): ProjectSchema => {
   return {
-    id: IdGenerator.unsafe.get('project'),
+    id: new IdGenerator().get('project'),
     name,
     version: VERSION,
     subProjects: [],

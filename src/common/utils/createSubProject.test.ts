@@ -1,29 +1,53 @@
 import { describe, expect, it, vi } from 'vitest'
-import { defaultStitchingSettings } from '../defaultStates'
+import { d } from '../testData'
+import { EN } from '../translations/en'
+import { createProject } from './createProject'
 import { createSubProject } from './createSubProject'
+import { NameGenerator } from './factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from './factory/ReadonlyModelObjectFactory'
 import { IdGenerator } from './random/IdGenerator'
 
+const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
+
 describe('createSubProject', () => {
-  it('uses the supplied generator without reserving IDs with distinct prefixes', () => {
-    const generator = new IdGenerator()
-    const generate = vi.spyOn(generator, 'get')
-    const forbid = vi.spyOn(generator, 'forbidOne')
-    const subProject = createSubProject('Root', defaultStitchingSettings, 'Straight', generator)
-    expect(subProject.constraints).toEqual({})
-    expect(subProject.id).toMatch(/^sub-project-/)
-    expect(subProject.root).toMatch(/^component-/)
-    expect(subProject.defaultPocketOpening).toMatch(/^pocket-opening-/)
-    expect(subProject.components[subProject.root]).toMatchObject({
-      id: subProject.root,
-      type: 'root-panel',
-      name: 'Root',
+  it('creates a root and straight default with factory-generated names', () => {
+    const project = createProject('Project')
+    const snapshot = structuredClone(project)
+    const forbid = vi.spyOn(IdGenerator.prototype, 'getAndForbid')
+    try {
+      const subProject = createSubProject({ project, modelFactory })
+      expect(subProject.constraints).toEqual({})
+      expect(subProject.id).toMatch(/^sub-project-/)
+      expect(subProject.root).toMatch(/^root-panel-/)
+      expect(subProject.defaultPocketOpening).toMatch(/^straight-pocket-opening-/)
+      expect(subProject.components[subProject.root]).toMatchObject({ type: 'root-panel', name: 'Module 1' })
+      expect(subProject.pocketOpenings[subProject.defaultPocketOpening]).toEqual({
+        id: subProject.defaultPocketOpening,
+        name: 'Straight 1',
+        type: 'straight',
+      })
+      expect(forbid).not.toHaveBeenCalled()
+      expect(project).toEqual(snapshot)
+    } finally {
+      forbid.mockRestore()
+    }
+  })
+
+  it('uses root names across subprojects and current project stitching settings', () => {
+    const project = d.project({
+      id: 'project',
+      subProjects: [
+        d.subProject({ id: 'first', root: d.rootPanel({ id: 'root1', name: 'Module 1' }) }),
+        d.subProject({ id: 'second', root: d.rootPanel({ id: 'root2', name: 'Module 2' }) }),
+      ],
     })
-    expect(subProject.pocketOpenings[subProject.defaultPocketOpening]).toEqual({
-      id: subProject.defaultPocketOpening,
-      name: 'Straight',
-      type: 'straight',
-    })
-    expect(generate.mock.calls.map(([type]) => type).sort()).toEqual(['component', 'pocket-opening', 'sub-project'])
-    expect(forbid).not.toHaveBeenCalled()
+    const createRoot = vi.spyOn(modelFactory, 'createRootPanel')
+    try {
+      const subProject = createSubProject({ project, modelFactory })
+      expect(subProject.components[subProject.root].name).toBe('Module 3')
+      expect(createRoot).toHaveBeenCalledWith(expect.objectContaining({ stitchingSettings: project.stitchingSettings }))
+    } finally {
+      createRoot.mockRestore()
+    }
   })
 })

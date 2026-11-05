@@ -1,7 +1,7 @@
-import { ConstraintAccessor } from './ConstraintAccessor'
 import type { AccessorOwnerSchema, SubProjectAccessorSchema } from '../../schemas/accessors'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { ComponentAccessor } from './ComponentAccessor'
+import { ConstraintAccessor } from './ConstraintAccessor'
 import { HoleAccessor } from './HoleAccessor'
 import { OptionalSubProjectAccessor } from './OptionalSubProjectAccessor'
 import { PocketOpeningAccessor } from './PocketOpeningAccessor'

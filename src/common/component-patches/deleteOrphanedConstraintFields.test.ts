@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
-import { createPocketOpening } from '../operations/subProject/utils/createPocketOpening'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import { d } from '../testData'
+import { EN } from '../translations/en'
+import { NameGenerator } from '../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
+import { IdGenerator } from '../utils/random/IdGenerator'
 import { deleteOrphanedConstraintFields } from './deleteOrphanedConstraintFields'
 import { getPatchedSubProject } from './getPatchedSubProject'
+
+const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 
 const fields: ConstraintFieldSchema[] = [
   { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
@@ -42,11 +47,11 @@ const fixture = () =>
       d.tPocketStitchLine({ id: 'stitch', targetId: 't', targetType: 'component' }),
     ],
     pocketOpenings: [
-      createPocketOpening({ id: 'recessed', type: 'recessed', name: 'Recessed' }),
-      createPocketOpening({ id: 'slanted', type: 'slanted', name: 'Slanted' }),
-      createPocketOpening({ id: 'optical', type: 'optical-illusion', name: 'Optical' }),
+      { ...modelFactory.createPocketOpening({ type: 'recessed' }), id: 'recessed', name: 'Recessed' },
+      { ...modelFactory.createPocketOpening({ type: 'slanted' }), id: 'slanted', name: 'Slanted' },
+      { ...modelFactory.createPocketOpening({ type: 'optical-illusion' }), id: 'optical', name: 'Optical' },
     ],
-    constraints: { linked: { id: 'linked', type: 'constraint', relation: 'equal', fields } },
+    constraints: { linked: { id: 'linked', type: 'equal-constraint', fields } },
   })
 
 describe('deleteOrphanedConstraintFields', () => {

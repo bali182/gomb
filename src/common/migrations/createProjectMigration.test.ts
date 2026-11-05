@@ -1,10 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createPocketOpening } from '../operations/subProject/utils/createPocketOpening'
 import type { ProjectMigratorSchema } from '../schemas/migration'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
 import { EN } from '../translations/en'
+import { NameGenerator } from '../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
+import { IdGenerator } from '../utils/random/IdGenerator'
 import { createProjectMigration } from './createProjectMigration'
+
+const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 
 const createMigrator = (): ProjectMigratorSchema => ({
   project: (input) => input,
@@ -27,7 +31,7 @@ const createMigrator = (): ProjectMigratorSchema => ({
 
 const fixture = () => {
   const types: PocketOpeningSchema['type'][] = ['straight', 'recessed', 'slanted', 'optical-illusion']
-  const openings = types.map((type) => createPocketOpening({ type, id: type, name: type }))
+  const openings = types.map((type) => ({ ...modelFactory.createPocketOpening({ type: type }), id: type, name: type }))
   const subProject = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }), pocketOpenings: openings })
   return { project: d.project({ id: 'project', subProjects: [subProject] }), openings }
 }

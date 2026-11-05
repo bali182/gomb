@@ -9,6 +9,8 @@ import type {
 import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { isDefined } from '../isDefined'
+import { narrowers } from '../narrowers'
 
 export class OptionalConstraintAccessor implements OptionalAccessorSchema<ConstraintAccessorSchema> {
   private readonly constraintsByModel = new Map<string, ConstraintSchema[]>()
@@ -74,10 +76,17 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
         return this.stitchLine.bounds(field.modelId)
       case 't-pocket-stitch-line-constraint-field':
         return this.stitchLine.tPocket(field.modelId)
-      case 'recessed-constraint-field':
-      case 'slanted-constraint-field':
+      case 'recessed-constraint-field': {
+        const opening = this.pocketOpening.byId(field.modelId)
+        return isDefined(opening) && narrowers.is.recessedPocketOpening(opening) ? opening : undefined
+      }
+      case 'slanted-constraint-field': {
+        const opening = this.pocketOpening.byId(field.modelId)
+        return isDefined(opening) && narrowers.is.slantedPocketOpening(opening) ? opening : undefined
+      }
       case 'optical-illusion-constraint-field': {
-        return this.pocketOpening.byId(field.modelId)
+        const opening = this.pocketOpening.byId(field.modelId)
+        return isDefined(opening) && narrowers.is.opticalIllusionPocketOpening(opening) ? opening : undefined
       }
     }
   }

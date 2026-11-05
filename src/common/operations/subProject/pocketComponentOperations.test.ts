@@ -1,10 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { getPatchedSubProject } from '../../component-patches/getPatchedSubProject'
 import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
+import type { ComponentSchema } from '../../schemas/components'
+import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
+import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { narrowers } from '../../utils/narrowers'
 import { IdGenerator } from '../../utils/random/IdGenerator'
 import { addComponent, type ComponentInsertionPositionSchema } from './addComponent'
@@ -19,7 +24,14 @@ import {
   canDeleteComponent,
   canMoveComponent,
 } from './utils/componentRules'
-import { getUnusedName } from './utils/getUnusedName'
+
+const nameGenerator = new NameGenerator(EN.defaultNames)
+
+const createFactory = (component: ComponentSchema): ReadonlyModelObjectFactorySchema => {
+  const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
+  vi.spyOn(modelFactory, 'createComponent').mockReturnValue(component)
+  return modelFactory
+}
 
 const fixture = () => {
   const first = d.pocketCluster({ id: 'first', children: ['a', 'front-a'] })
@@ -83,7 +95,13 @@ describe('pocket component operations', () => {
     const source = fixture()
     const before = structuredClone(source)
     const component = d.panel({ id: 'new' })
-    const result = addComponent(source, { parentId: 'root', component, position })
+    const result = addComponent(source, {
+      parentId: 'root',
+      type: component.type,
+      modelFactory: createFactory(component),
+      stitchingSettings: defaultStitchingSettings,
+      position,
+    })
 
     expect(result.components.root.children).toEqual(expected)
     expect(result.components.new).toBe(component)
@@ -93,7 +111,9 @@ describe('pocket component operations', () => {
     const source = fixture()
     const result = addComponent(source, {
       parentId: 'root',
-      component: d.panel({ id: 'new' }),
+      type: 'panel',
+      modelFactory: createFactory(d.panel({ id: 'new' })),
+      stitchingSettings: defaultStitchingSettings,
       position,
     })
 
@@ -102,12 +122,24 @@ describe('pocket component operations', () => {
   })
   it('inserts new T-pockets at the requested start position', () => {
     const source = fixture()
-    const added = addComponent(source, { parentId: 'first', component: d.tPocket({ id: 'new' }), position: 'start' })
+    const added = addComponent(source, {
+      parentId: 'first',
+      type: 't-pocket',
+      modelFactory: createFactory(d.tPocket({ id: 'new' })),
+      stitchingSettings: defaultStitchingSettings,
+      position: 'start',
+    })
     expect(added.components.first.children).toEqual(['new', 'a', 'front-a'])
   })
   it('inserts a T-pocket at the requested index', () => {
     const source = fixture()
-    const result = addComponent(source, { parentId: 'first', component: d.tPocket({ id: 'new' }), position: 1 })
+    const result = addComponent(source, {
+      parentId: 'first',
+      type: 't-pocket',
+      modelFactory: createFactory(d.tPocket({ id: 'new' })),
+      stitchingSettings: defaultStitchingSettings,
+      position: 1,
+    })
 
     expect(result.components.first.children).toEqual(['a', 'new', 'front-a'])
   })
@@ -115,7 +147,13 @@ describe('pocket component operations', () => {
     'inserts a T-pocket at the requested position even after the front: %s',
     (position) => {
       const source = fixture()
-      const result = addComponent(source, { parentId: 'first', component: d.tPocket({ id: 'new' }), position })
+      const result = addComponent(source, {
+        parentId: 'first',
+        type: 't-pocket',
+        modelFactory: createFactory(d.tPocket({ id: 'new' })),
+        stitchingSettings: defaultStitchingSettings,
+        position,
+      })
 
       expect(result.components.first.children).toEqual(['a', 'front-a', 'new'])
     },
@@ -131,7 +169,9 @@ describe('pocket component operations', () => {
     const before = structuredClone(source)
     const result = addComponent(source, {
       parentId: 'first',
-      component: d.frontPocket({ id: 'recovered' }),
+      type: 'front-pocket',
+      modelFactory: createFactory(d.frontPocket({ id: 'recovered' })),
+      stitchingSettings: defaultStitchingSettings,
       position,
     })
 
@@ -148,7 +188,13 @@ describe('pocket component operations', () => {
   it('only permits adding the front pocket while a cluster has no front pocket', () => {
     const source = fixture()
     const cluster = d.pocketCluster({ id: 'empty' })
-    const withEmpty = addComponent(source, { parentId: 'root', component: cluster, position: 'end' })
+    const withEmpty = addComponent(source, {
+      parentId: 'root',
+      type: cluster.type,
+      modelFactory: createFactory(cluster),
+      stitchingSettings: defaultStitchingSettings,
+      position: 'end',
+    })
     expect(canAddChild(cluster, 't-pocket', withEmpty)).toBe(false)
     expect(canAddChild(cluster, 'front-pocket', withEmpty)).toBe(true)
     expect(canAddChild(cluster, 'panel', withEmpty)).toBe(false)
@@ -158,7 +204,9 @@ describe('pocket component operations', () => {
 
     const withFront = addComponent(withEmpty, {
       parentId: cluster.id,
-      component: d.frontPocket({ id: 'new-front' }),
+      type: 'front-pocket',
+      modelFactory: createFactory(d.frontPocket({ id: 'new-front' })),
+      stitchingSettings: defaultStitchingSettings,
       position: 'end',
     })
     expect(canAddChild(withFront.components.empty, 't-pocket', withFront)).toBe(true)
@@ -179,7 +227,13 @@ describe('pocket component operations', () => {
     const source = fixture()
     const before = structuredClone(source)
     const cluster = d.pocketCluster({ id: 'empty' })
-    const result = addComponent(source, { parentId: 'root', component: cluster, position: 'end' })
+    const result = addComponent(source, {
+      parentId: 'root',
+      type: cluster.type,
+      modelFactory: createFactory(cluster),
+      stitchingSettings: defaultStitchingSettings,
+      position: 'end',
+    })
     expect(result.components.root.children).toEqual(['first', 'second', 'empty'])
     expect(result.components.empty).toBe(cluster)
     expect(result.components.empty.children).toEqual([])
@@ -191,9 +245,22 @@ describe('pocket component operations', () => {
     const before = structuredClone(source)
     const pockets = [d.tPocket({ id: 'new-t1' }), d.tPocket({ id: 'new-t2' }), d.frontPocket({ id: 'new-front' })]
     const cluster = d.pocketCluster({ id: 'new-cluster', children: [] })
-    const withCluster = addComponent(source, { parentId: 'root', component: cluster, position: 'end' })
+    const withCluster = addComponent(source, {
+      parentId: 'root',
+      type: cluster.type,
+      modelFactory: createFactory(cluster),
+      stitchingSettings: defaultStitchingSettings,
+      position: 'end',
+    })
     const result = pockets.reduce<SubProjectSchema>(
-      (current, pocket) => addComponent(current, { parentId: cluster.id, component: pocket, position: 'end' }),
+      (current, pocket) =>
+        addComponent(current, {
+          parentId: cluster.id,
+          type: pocket.type,
+          modelFactory: createFactory(pocket),
+          stitchingSettings: defaultStitchingSettings,
+          position: 'end',
+        }),
       withCluster,
     )
 
@@ -245,7 +312,9 @@ describe('pocket component operations', () => {
     const alone = deleteComponent(fixture(), { componentId: 'a' })
     const source = addComponent(alone, {
       parentId: 'root',
-      component: d.pocketCluster({ id: 'empty' }),
+      type: 'pocket-cluster',
+      modelFactory: createFactory(d.pocketCluster({ id: 'empty' })),
+      stitchingSettings: defaultStitchingSettings,
       position: 'end',
     })
     const before = structuredClone(source)
@@ -256,8 +325,7 @@ describe('pocket component operations', () => {
       cloneComponent(source, {
         componentId: front.id,
         settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-        idGenerator: new IdGenerator(),
-        names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+        nameGenerator,
       }),
     ).toBe(source)
     const move = { componentId: front.id, targetParentId: 'empty', beforeComponentId: undefined }
@@ -273,8 +341,13 @@ describe('pocket component operations', () => {
       components: { ...source.components, first: d.pocketCluster({ id: 'first', children: [] }) },
     }
     expect(
-      addComponent(empty, { parentId: 'first', component: d.frontPocket({ id: 'recovered' }), position: 'end' })
-        .components.first.children,
+      addComponent(empty, {
+        parentId: 'first',
+        type: 'front-pocket',
+        modelFactory: createFactory(d.frontPocket({ id: 'recovered' })),
+        stitchingSettings: defaultStitchingSettings,
+        position: 'end',
+      }).components.first.children,
     ).toEqual(['recovered'])
   })
   it('copies pockets and their nested children', () => {
@@ -282,8 +355,7 @@ describe('pocket component operations', () => {
     const result = cloneComponent(source, {
       componentId: 'first',
       settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-      idGenerator: new IdGenerator(),
-      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+      nameGenerator,
     })
     const rootId = result.components.root.children[1]
     const copy = result.components[rootId]
@@ -300,8 +372,7 @@ describe('pocket component operations', () => {
     const result = cloneComponent(source, {
       componentId: 'first',
       settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
-      idGenerator: new IdGenerator(),
-      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+      nameGenerator,
     })
     const copyId = result.components.root.children[1]
     expect(result.components.root.children).toEqual(['first', copyId, 'second'])
@@ -334,8 +405,7 @@ it('clones every optical illusion setting', () => {
   const cloned = cloneComponent(source, {
     componentId: 'first',
     settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-    idGenerator: new IdGenerator(),
-    names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+    nameGenerator,
   })
   const copiedCluster = cloned.components[cloned.components.root.children[1]]
   const copiedPocket = cloned.components[copiedCluster.children[0]]

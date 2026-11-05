@@ -1,5 +1,3 @@
-import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from './constraints'
-import type { ModelObjectSchema } from './modelObject'
 import {
   ComponentSchema,
   FrontPocketSchema,
@@ -20,8 +18,10 @@ import {
   ComputedStitchLineSchema,
   ComputedTPocketSchema,
 } from './computed'
+import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from './constraints'
 import { HoleSchema } from './hole'
 import { ComponentLimitsSchema, HoleLimitsSchema, StitchLineLimitsSchema } from './limits'
+import type { ModelObjectSchema } from './modelObject'
 import type { PocketOpeningSchema } from './pocketOpening'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from './stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from './subProject'

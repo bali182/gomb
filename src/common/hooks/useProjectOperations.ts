@@ -1,4 +1,8 @@
 import { useCallback, useMemo } from 'react'
+import type { ReadonlyModelObjectFactorySchema } from '../schemas/factory'
+import type { IdGeneratorSchema, NameGeneratorSchema } from '../schemas/idGenerator'
+import { NameGenerator } from '../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
 
 import { useEditorContext } from '../contexts/EditorContext'
 import { addSubProject as addSubProjectPure } from '../operations/project/addSubProject'
@@ -8,7 +12,6 @@ import type { ProjectSchema } from '../schemas/project'
 import type { ColorSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { getProjectIds } from '../utils/getProjectIds'
 import { isDefined } from '../utils/isDefined'
 import { IdGenerator } from '../utils/random/IdGenerator'
 import { useTranslation } from './useTranslation'
@@ -25,6 +28,12 @@ export type UseProjectOperationsOutput = {
 export const useProjectOperations = (): UseProjectOperationsOutput => {
   const { project, setProject } = useEditorContext()
   const { t } = useTranslation()
+  const idGenerator = useMemo<IdGeneratorSchema>(() => new IdGenerator(), [])
+  const nameGenerator = useMemo<NameGeneratorSchema>(() => new NameGenerator(t.defaultNames), [t.defaultNames])
+  const modelFactory = useMemo<ReadonlyModelObjectFactorySchema>(
+    () => new ReadonlyModelObjectFactory(idGenerator, nameGenerator),
+    [idGenerator, nameGenerator],
+  )
 
   const updateProject = useCallback(
     (updatedProject: ProjectSchema): void => {
@@ -60,15 +69,13 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
   const createSubProject = useCallback((): SubProjectSchema => {
     const currentProject = ensureProject(project)
     const result = addSubProjectPure(currentProject, {
-      idGenerator: new IdGenerator(getProjectIds(currentProject)),
-      baseRootComponentName: t.defaultNames.rootPanel,
-      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
+      modelFactory,
     })
 
     setProject(result.project)
 
     return result.subProject
-  }, [project, setProject, t])
+  }, [modelFactory, project, setProject])
 
   const cloneSubProject = useCallback(
     (sourceSubProject: SubProjectSchema): void => {
@@ -76,12 +83,12 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
 
       setProject(
         cloneSubProjectPure(currentProject, {
-          idGenerator: new IdGenerator(getProjectIds(currentProject)),
           subProject: sourceSubProject,
+          nameGenerator,
         }),
       )
     },
-    [project, setProject],
+    [nameGenerator, project, setProject],
   )
 
   const deleteSubProject = useCallback(

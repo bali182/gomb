@@ -857,11 +857,19 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical
 
 it.each(axes)('leaves a constraint and its target models unchanged when flipped %s', (axis) => {
   const source = d.subProject({
-    id: 'sub', root: d.rootPanel({ id: 'root', children: ['panel'] }), components: [d.panel({ id: 'panel' })],
-    constraints: { linked: { id: 'linked', type: 'constraint', relation: 'equal', fields: [
-      { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
-      { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
-    ] } },
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    components: [d.panel({ id: 'panel' })],
+    constraints: {
+      linked: {
+        id: 'linked',
+        type: 'equal-constraint',
+        fields: [
+          { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
+          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+        ],
+      },
+    },
   })
   const snapshot = structuredClone(source)
   expect(flip(source, source.constraints.linked, axis)).toBe(source)
