@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { IdTypeSchema } from '../../schemas/idGenerator'
+import type { IdPrefixSchema } from '../../schemas/idGenerator'
 import { IdGenerator } from './IdGenerator'
 
 const { random } = vi.hoisted(() => ({ random: vi.fn() }))
@@ -10,7 +10,7 @@ beforeEach(() => {
 })
 
 describe('IdGenerator', () => {
-  const types: IdTypeSchema[] = [
+  const types: IdPrefixSchema[] = [
     'project',
     'sub-project',
     'component',

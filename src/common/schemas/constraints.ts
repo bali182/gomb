@@ -269,8 +269,7 @@ export type ConstraintFieldSchema =
 
 export type EqualConstraintSchema = {
   id: string
-  type: 'constraint'
-  relation: 'equal'
+  type: 'equal-constraint'
   fields: ConstraintFieldSchema[]
 }
 
