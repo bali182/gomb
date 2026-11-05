@@ -1,5 +1,9 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
+import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { ModelObjectTypeSchema } from '../schemas/modelObject'
+import type { HasCustomRenderTarget } from '../schemas/stitching'
+import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { LimitReasonSchema } from '../schemas/limits'
@@ -191,6 +195,9 @@ export const HU = {
         description: 'A zseb tényleges alakja a méreteitől és az elrendezésétől függ.',
       },
       actions: {
+        constraints: {
+          add: 'Constraint hozzáadása',
+        },
         pocketOpenings: {
           add: 'Új zsebnyílás',
           edit: 'Zsebnyílás szerkesztése',
@@ -219,6 +226,14 @@ export const HU = {
         },
       },
       sections: {
+        constraints: {
+          title: 'Constraintek',
+          empty: 'Üres',
+          selectModel: 'Válassz elemet…',
+          selectField: 'Válassz mezőt…',
+          noMatches: 'Nincs megfelelő mező vagy elem',
+          linkedAuto: 'A mező constrainthez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
+        },
         globalSettings: {
           app: {
             title: 'Általános',
@@ -480,6 +495,12 @@ export const HU = {
           },
         },
         stitchLines: {
+          renderTarget: {
+            title: '-',
+            onTop: {
+              label: 'Rajzolási felület',
+            },
+          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
           settings: {
             title: 'Varrás',
             stitchMargin: {
@@ -761,6 +782,14 @@ export const HU = {
         },
       },
       enums: {
+        constraints: {
+          blockReason: {
+            'auto-width': 'Az összekötéshez állítsd manuálisra a szélességet.',
+            'auto-height': 'Az összekötéshez állítsd manuálisra a magasságot.',
+            'auto-layout-gap': 'Az összekötéshez állítsd manuálisra a hézagot.',
+            'auto-corner-radius': 'Az összekötéshez állítsd manuálisra a rádiuszokat.',
+          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+        },
         globalSettings: {
           theme: {
             light: 'Világos',
@@ -768,6 +797,21 @@ export const HU = {
           },
         },
         common: {
+          modelType: {
+            'root-panel': 'Modul',
+            'panel': 'Panel',
+            'pocket-cluster': 'Zsebcsoport',
+            'front-pocket': 'Elülső zseb',
+            't-pocket': 'T-zseb',
+            'hole': 'Lyuk',
+            'component-bounds-stitch-line': 'Kontúrvarrás',
+            't-pocket-stitch-line': 'Zsebvarrás',
+            'straight': 'Egyenes zsebnyílás',
+            'recessed': 'Ívelt zsebnyílás',
+            'slanted': 'Ferde zsebnyílás',
+            'optical-illusion': 'Optikai illúziójú zsebnyílás',
+            'equal-constraint': 'Egyenlőségi constraint',
+          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Fent',
@@ -857,6 +901,10 @@ export const HU = {
         },
       },
       emptyStates: {
+        noConstraintFields: {
+          title: 'Még nincsenek összekötött mezők',
+          description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
+        },
         missingFrontPocket: {
           title: 'Hiányzó elülső zseb',
           description: 'A zsebcsoportnak taralmaznia kell legalább egy elülső zsebet.',

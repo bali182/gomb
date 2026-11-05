@@ -1,23 +1,29 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { constraintFieldBlockers } from '../../logic/constraints/constraintFieldBlockers'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { ConstraintFieldInputSchema, ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
+import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 
 export type AddConstraintFieldParams = {
   constraintId: string
-  field: ConstraintFieldSchema
+  field: ConstraintFieldInputSchema
+  modelFactory: ReadonlyModelObjectFactorySchema
 }
 
 export const addConstraintField = (
   subProject: SubProjectSchema,
-  { constraintId, field }: AddConstraintFieldParams,
+  { constraintId, field: input, modelFactory }: AddConstraintFieldParams,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   const constraint = accessor.optional.constraint.byId(constraintId)
+  if (!isDefined(constraint)) {
+    return subProject
+  }
+  const field = modelFactory.createConstraintField({ ...input, forbiddenIds: getSubProjectIds(subProject) })
   const model = accessor.optional.constraint.model(field)
-  if (!isDefined(constraint) || !isDefined(model)) {
+  if (!isDefined(model)) {
     return subProject
   }
   const group = constraintFieldCompatibility[model.type][field.field]

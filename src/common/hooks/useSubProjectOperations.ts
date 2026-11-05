@@ -1,8 +1,14 @@
 import { useCallback, useMemo } from 'react'
+import { addConstraint as addConstraintPure } from '../operations/subProject/addConstraint'
+import { addConstraintField as addConstraintFieldPure } from '../operations/subProject/addConstraintField'
 import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
+import { cloneConstraint as cloneConstraintPure } from '../operations/subProject/cloneConstraint'
+import { deleteConstraint as deleteConstraintPure } from '../operations/subProject/deleteConstraint'
+import { deleteConstraintField as deleteConstraintFieldPure } from '../operations/subProject/deleteConstraintField'
 import { deletePocketOpening as deletePocketOpeningPure } from '../operations/subProject/deletePocketOpening'
 import { updatePocketOpening as updatePocketOpeningPure } from '../operations/subProject/updatePocketOpening'
-import type { ReadonlyModelObjectFactorySchema } from '../schemas/factory'
+import type { ConstraintSchema } from '../schemas/constraints'
+import type { ConstraintFieldInputSchema, ReadonlyModelObjectFactorySchema } from '../schemas/factory'
 import type { NameGeneratorSchema } from '../schemas/idGenerator'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import { NameGenerator } from '../utils/factory/NameGenerator'
@@ -47,6 +53,11 @@ import { useSubProjectHistory } from './useSubProjectHistory'
 import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
+  addConstraint: (type: ConstraintSchema['type']) => void
+  cloneConstraint: (constraintId: string) => void
+  deleteConstraint: (constraintId: string) => void
+  addConstraintField: (constraintId: string, field: ConstraintFieldInputSchema) => void
+  deleteConstraintField: (constraintId: string, fieldId: string) => void
   addPocketOpening: (type: PocketOpeningSchema['type']) => void
   setDefaultPocketOpening: (openingId: string) => void
   updatePocketOpening: (opening: PocketOpeningSchema) => void
@@ -82,6 +93,71 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const modelFactory = useMemo<ReadonlyModelObjectFactorySchema>(
     () => new ReadonlyModelObjectFactory(idGenerator, nameGenerator),
     [idGenerator, nameGenerator],
+  )
+
+  const addConstraint = useCallback(
+    (type: ConstraintSchema['type']): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = addConstraintPure(currentSubProject, { type, modelFactory })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [modelFactory, recordChange, setSubProject, subProject],
+  )
+
+  const cloneConstraint = useCallback(
+    (constraintId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = cloneConstraintPure(currentSubProject, { constraintId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
+  )
+
+  const deleteConstraint = useCallback(
+    (constraintId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = deleteConstraintPure(currentSubProject, { constraintId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
+  )
+
+  const addConstraintField = useCallback(
+    (constraintId: string, field: ConstraintFieldInputSchema): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = addConstraintFieldPure(currentSubProject, { constraintId, field, modelFactory })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [modelFactory, recordChange, setSubProject, subProject],
+  )
+
+  const deleteConstraintField = useCallback(
+    (constraintId: string, fieldId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = deleteConstraintFieldPure(currentSubProject, { constraintId, fieldId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
   )
 
   const addPocketOpening = useCallback(
@@ -407,6 +483,11 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
 
   return useMemo<UseSubProjectOperationsOutput>(
     () => ({
+      addConstraint,
+      cloneConstraint,
+      deleteConstraint,
+      addConstraintField,
+      deleteConstraintField,
       addPocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,
@@ -432,6 +513,11 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       updateStitchLine,
     }),
     [
+      addConstraint,
+      cloneConstraint,
+      deleteConstraint,
+      addConstraintField,
+      deleteConstraintField,
       addPocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,

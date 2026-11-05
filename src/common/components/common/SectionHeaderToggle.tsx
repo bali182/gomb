@@ -1,10 +1,15 @@
+import { Box } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import type { IconType } from 'react-icons'
+import { isDefined } from '../../utils/isDefined'
+import { Tooltip } from './Tooltip'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { MiniButton } from './MiniButton'
 
 type SectionHeaderToggleProps = {
+  disabled?: boolean
+  tooltip?: string
   value: boolean
   onLabel: string
   offLabel: string
@@ -15,6 +20,8 @@ type SectionHeaderToggleProps = {
 
 export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
   value,
+  disabled = false,
+  tooltip,
   onIcon: OnIcon,
   offIcon: OffIcon,
   onLabel,
@@ -22,20 +29,28 @@ export const SectionHeaderToggle: FC<SectionHeaderToggleProps> = ({
   onChange,
 }) => {
   const { isComputing, setEditingInputId } = useEditorContext()
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((): void => {
+    if (disabled || isComputing) {
+      return
+    }
     setEditingInputId(undefined)
     onChange(!value)
-  }, [onChange, setEditingInputId, value])
+  }, [disabled, isComputing, onChange, setEditingInputId, value])
 
   return (
-    <MiniButton
-      readOnly={isComputing}
-      onClick={handleClick}
-      background={value ? 'bg.emphasized' : undefined}
-      variant={value ? 'ghost' : 'subtle'}
-    >
-      {value ? <OnIcon /> : <OffIcon />}
-      {value ? onLabel : offLabel}
-    </MiniButton>
+    <Tooltip disabled={!isDefined(tooltip)} content={tooltip}>
+      <Box display="inline-flex">
+        <MiniButton
+          disabled={disabled}
+          readOnly={isComputing}
+          onClick={handleClick}
+          background={value ? 'bg.emphasized' : undefined}
+          variant={value ? 'ghost' : 'subtle'}
+        >
+          {value ? <OnIcon /> : <OffIcon />}
+          {value ? onLabel : offLabel}
+        </MiniButton>
+      </Box>
+    </Tooltip>
   )
 }

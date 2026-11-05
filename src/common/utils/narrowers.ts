@@ -23,6 +23,7 @@ import type {
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
 } from '../schemas/computed'
+import type { ConstraintSchema } from '../schemas/constraints'
 import type {
   PathArcToSchema,
   PathCloseSchema,
@@ -45,6 +46,7 @@ import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
+    constraint: (input: ModelObjectSchema): input is ConstraintSchema => hasType(input, 'equal-constraint'),
     // Component
     component: (input: ModelObjectSchema): input is ComponentSchema => {
       return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')

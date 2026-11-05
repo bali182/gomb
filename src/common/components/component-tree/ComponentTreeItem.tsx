@@ -10,7 +10,7 @@ import { useSubProject } from '../../hooks/useSubProject'
 import { canAddHole, canAddStitchLine, canMoveComponent } from '../../operations/subProject/utils/componentRules'
 import { isDefined } from '../../utils/isDefined'
 import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
-import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { DropInsideIndicator, ReorderDropIndicator } from './ComponentTreeDropIndicators'
 import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type {
@@ -270,7 +270,11 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
         icon={<Icon />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
-        label={<TreeView.BranchText>{getProjectTreeNodeLabel(node)}</TreeView.BranchText>}
+        label={
+          <TreeView.BranchText asChild>
+            <TreeItemLabel>{getProjectTreeNodeLabel(node)}</TreeItemLabel>
+          </TreeView.BranchText>
+        }
         leading={dragHandle}
         trailing={renderMenu?.(node)}
       />

@@ -19,9 +19,11 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
+import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type { PocketSettingsCopySelectionSchema } from '../schemas/pocketCopy'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
@@ -41,6 +43,7 @@ import type {
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
+import type { HasCustomRenderTarget } from '../schemas/stitching'
 
 import type {
   CardSchemaId,
@@ -258,6 +261,9 @@ export const EN = {
         description: "The pocket's actual shape depends on its dimensions and layout.",
       },
       actions: {
+        constraints: {
+          add: 'Add constraint',
+        },
         pocketOpenings: {
           add: 'Add opening',
           edit: 'Edit opening',
@@ -286,6 +292,14 @@ export const EN = {
         },
       },
       sections: {
+        constraints: {
+          title: 'Constraints',
+          empty: 'Empty',
+          selectModel: 'Choose an object…',
+          selectField: 'Choose a field…',
+          noMatches: 'No matching fields or objects',
+          linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
+        },
         globalSettings: {
           app: {
             title: 'General',
@@ -549,6 +563,12 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasPocketItemSchema>,
         },
         stitchLines: {
+          renderTarget: {
+            title: '-',
+            onTop: {
+              label: 'Render target',
+            },
+          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
           settings: {
             title: 'Stitching',
             stitchMargin: {
@@ -841,6 +861,14 @@ export const EN = {
         },
       },
       enums: {
+        constraints: {
+          blockReason: {
+            'auto-width': 'Switch width to manual to link it.',
+            'auto-height': 'Switch height to manual to link it.',
+            'auto-layout-gap': 'Switch gap to manual to link it.',
+            'auto-corner-radius': 'Switch corner radii to manual to link them.',
+          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+        },
         globalSettings: {
           theme: {
             light: 'Light',
@@ -848,6 +876,21 @@ export const EN = {
           } satisfies EnumTranslationSchema<ThemeSchema>,
         },
         common: {
+          modelType: {
+            'root-panel': 'Module',
+            'panel': 'Panel',
+            'pocket-cluster': 'Pocket cluster',
+            'front-pocket': 'Front pocket',
+            't-pocket': 'T-pocket',
+            'hole': 'Hole',
+            'component-bounds-stitch-line': 'Component stitching',
+            't-pocket-stitch-line': 'Pocket stitching',
+            'straight': 'Straight pocket opening',
+            'recessed': 'Recessed pocket opening',
+            'slanted': 'Slanted pocket opening',
+            'optical-illusion': 'Optical illusion pocket opening',
+            'equal-constraint': 'Equality constraint',
+          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Top',
@@ -937,6 +980,10 @@ export const EN = {
         },
       },
       emptyStates: {
+        noConstraintFields: {
+          title: 'No linked fields yet',
+          description: 'Choose an object and then a field below to start linking.',
+        },
         missingFrontPocket: {
           title: 'Missing front pocket',
           description: 'A pocket cluster must contain at least one front pocket.',

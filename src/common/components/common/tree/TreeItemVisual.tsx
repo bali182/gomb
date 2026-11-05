@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react'
+import { Box, Text, type TextProps } from '@chakra-ui/react'
 import type { FC, ReactNode } from 'react'
 
 type TreeItemVisualProps = {
@@ -28,6 +28,8 @@ export const TreeItemVisual: FC<TreeItemVisualProps> = ({ icon, trigger, label, 
       {icon}
     </Box>
     {label}
-    {trailing}
+    <Box flexShrink="0">{trailing}</Box>
   </Box>
 )
+
+export const TreeItemLabel: FC<TextProps> = (props) => <Text {...props} flex="1" minW="0" truncate />

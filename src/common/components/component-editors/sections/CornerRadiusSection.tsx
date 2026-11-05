@@ -1,6 +1,9 @@
 import { Grid } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import { TbRadiusBottomLeft, TbRadiusBottomRight, TbRadiusTopLeft, TbRadiusTopRight } from 'react-icons/tb'
+import { useEditorContext } from '../../../contexts/EditorContext'
+import { accessors } from '../../../utils/accessors'
+import { isDefined } from '../../../utils/isDefined'
 
 import { PiCar, PiLink, PiLinkBreak, PiPencilLine } from 'react-icons/pi'
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -12,6 +15,13 @@ import { getLabeledIssues } from '../../../utils/issueUtils'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
+
+const cornerRadiusFields: (keyof HasCornerRadiusValuesSchema)[] = [
+  'topLeftRadius',
+  'topRightRadius',
+  'bottomLeftRadius',
+  'bottomRightRadius',
+]
 
 type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
   modelId: string
@@ -31,6 +41,12 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   onChange,
 }: CornerRadiusSectionProps<T>): ReactNode {
   const { t } = useTranslation()
+  const { subProject } = useEditorContext()
+  const accessor = isDefined(subProject) ? accessors.subProject(subProject) : undefined
+  const autoDisabled =
+    !Boolean(editable.autoCornerRadius) &&
+    isDefined(accessor) &&
+    cornerRadiusFields.some((field) => accessor.constraint.byField(modelId, field).length > 0)
 
   const hasAuto = has<Partial<HasAutoCornerRadiusSchema>>(editable, 'autoCornerRadius')
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
@@ -107,6 +123,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
         leftAddon={
           hasAuto ? (
             <SectionHeaderToggle
+              disabled={autoDisabled}
+              tooltip={autoDisabled ? t.project.editors.sections.constraints.linkedAuto : undefined}
               onIcon={PiPencilLine}
               offIcon={PiCar}
               onLabel={t.project.editors.enums.common.autoCornerRadius.false}

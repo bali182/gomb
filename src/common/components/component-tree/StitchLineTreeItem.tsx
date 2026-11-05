@@ -7,7 +7,7 @@ import { getModelIconByType } from '../../utils/getModelIcon'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
-import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { StitchLineTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
@@ -63,7 +63,11 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop
       <TreeItemVisual
         icon={<Icon />}
         isPositioned={false}
-        label={<TreeView.ItemText>{getProjectTreeNodeLabel(node)}</TreeView.ItemText>}
+        label={
+          <TreeView.ItemText asChild>
+            <TreeItemLabel>{getProjectTreeNodeLabel(node)}</TreeItemLabel>
+          </TreeView.ItemText>
+        }
         leading={
           hasDragAndDrop ? (
             <IconButton

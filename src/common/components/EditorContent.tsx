@@ -9,13 +9,14 @@ import {
   SplitterResizeEndDetails,
 } from '@chakra-ui/react'
 import { FC, ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { PiPlus, PiWarningCircle } from 'react-icons/pi'
+import { PiPlus, PiPlusCircle, PiWarningCircle } from 'react-icons/pi'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useMeasurement } from '../hooks/useMeasurement'
 import { useProject } from '../hooks/useProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
+import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import type { HasTargetSchema } from '../schemas/common'
 import type { ProjectSchema } from '../schemas/project'
@@ -26,10 +27,14 @@ import { narrowers } from '../utils/narrowers'
 import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import { ResizableAccordion, type ResizableAccordionState } from './common/resizable-accordion/ResizableAccordion'
-import { ResizableAccordionHeaderIconButton } from './common/resizable-accordion/ResizableAccordionHeaderButtons'
+import {
+  ResizableAccordionHeaderButton,
+  ResizableAccordionHeaderIconButton,
+} from './common/resizable-accordion/ResizableAccordionHeaderButtons'
 import { ResizableAccordionItem } from './common/resizable-accordion/ResizableAccordionItem'
 import { EditorComponentTree, type EditorComponentTreeHandle } from './component-tree/EditorComponentTree'
 import { EditorTreeDragAndDrop } from './component-tree/EditorTreeDragAndDrop'
+import { EditorConstraintTree } from './constraint-tree/EditorConstraintTree'
 import { DrawArea } from './DrawArea'
 import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
@@ -52,13 +57,16 @@ type EditorContentProps = {
 
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
   const { t } = useTranslation()
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const { addConstraint } = useSubProjectOperations()
   const [accordionState, setAccordionState] = useState<ResizableAccordionState>({
     components: { open: true, size: 1 },
     openings: { open: true, size: 1 },
+    constraints: { open: true, size: 1 },
   })
   const { project } = useProject()
   const { setUISettings, settings } = useGlobalSettings()
-  const { selected } = useDrawAreaContext().selection
+  const { selected, clearSelection } = useDrawAreaContext().selection
   const { stopMeasuring } = useMeasurement()
 
   useEffect(() => {
@@ -102,6 +110,11 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     componentTreeRef.current?.expand(target)
   }, [])
 
+  const handleAddConstraint = useCallback((): void => {
+    setEditingInputId(undefined)
+    addConstraint('equal-constraint')
+  }, [addConstraint, setEditingInputId])
+
   return (
     <Flex direction="column" height="100%" minHeight="0" minWidth="0">
       <Splitter.Root
@@ -119,7 +132,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
             {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
             {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
 
-            <Box left="3" position="absolute" right="3" top="3" zIndex="1">
+            <Box left="3" position="absolute" right="3" top="3" zIndex="1" onClickCapture={clearSelection}>
               <Flex alignItems="start" gap="3" justifyContent="space-between" minWidth="0">
                 <Box maxWidth="100%" minWidth="0" width="fit-content">
                   <EditorMenu menu={menu} projects={projects} />
@@ -137,7 +150,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
           <Splitter.ResizeTriggerIndicator />
         </Splitter.ResizeTrigger>
 
-        <Splitter.Panel id="tree" minHeight="0" minWidth="0">
+        <Splitter.Panel id="tree" minHeight="0" minWidth="0" onClickCapture={clearSelection}>
           <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
             <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0" overflow="hidden">
               <EditorTreeDragAndDrop>
@@ -171,6 +184,21 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                     actions={<AddPocketOpeningMenu />}
                   >
                     {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
+                  </ResizableAccordionItem>
+                  <ResizableAccordionItem
+                    id="constraints"
+                    title={t.project.editors.sections.constraints.title}
+                    actions={
+                      <ResizableAccordionHeaderButton
+                        disabled={!isDefined(subProject) || isComputing}
+                        onClick={handleAddConstraint}
+                      >
+                        <PiPlusCircle />
+                        {t.project.editors.actions.constraints.add}
+                      </ResizableAccordionHeaderButton>
+                    }
+                  >
+                    {isDefined(subProject) ? <EditorConstraintTree /> : <EmptyComponentTreeState />}
                   </ResizableAccordionItem>
                 </ResizableAccordion>
               </EditorTreeDragAndDrop>

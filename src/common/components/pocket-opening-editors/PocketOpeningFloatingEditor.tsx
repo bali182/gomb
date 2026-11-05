@@ -23,7 +23,7 @@ export const PocketOpeningFloatingEditor: FC<PocketOpeningFloatingEditorProps> =
   const { subProject } = useSubProject()
   const { opening: editedOpening, editableOpening, validationIssues, setOpening } = useEditablePocketOpening(opening.id)
   return (
-    <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
+    <FloatingEditor anchorElement={anchorElement} onClose={onClose} positioning="to-tree">
       <IdentityFloatingEditorHeader<PocketOpeningSchema>
         editable={editableOpening}
         icon={
