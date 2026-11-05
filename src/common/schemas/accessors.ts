@@ -1,3 +1,5 @@
+import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from './constraints'
+import type { ModelObjectSchema } from './modelObject'
 import {
   ComponentSchema,
   FrontPocketSchema,
@@ -101,7 +103,15 @@ export type SubProjectLimitsAccessorSchema = {
   stitchLine(id: string): StitchLineLimitsSchema
 }
 
+export type ConstraintAccessorSchema = {
+  byId(id: string): ConstraintSchema
+  byModel(modelId: string): ConstraintSchema[]
+  byField(modelId: string, field: ConstraintFieldNameSchema): ConstraintSchema[]
+  model(field: ConstraintFieldSchema): ModelObjectSchema
+}
+
 export type OptionalSubProjectAccessorSchema = {
+  constraint: OptionalAccessorSchema<ConstraintAccessorSchema>
   pocketOpening: OptionalAccessorSchema<PocketOpeningAccessorSchema>
   component: OptionalAccessorSchema<ComponentAccessorSchema>
   stitchLine: OptionalAccessorSchema<StitchLineAccessorSchema>
@@ -109,6 +119,7 @@ export type OptionalSubProjectAccessorSchema = {
 }
 
 export type SubProjectAccessorSchema = {
+  constraint: ConstraintAccessorSchema
   pocketOpening: PocketOpeningAccessorSchema
   component: ComponentAccessorSchema
   stitchLine: StitchLineAccessorSchema
