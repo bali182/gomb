@@ -80,15 +80,36 @@ describe('deleteOrphanedConstraintFields', () => {
     expect(source).toEqual(snapshot)
   })
 
-  it.each([0, 1])('deletes a constraint with %s surviving members', (surviving) => {
+  it.each([0, 1])('preserves a constraint with %s surviving members after cleanup', (surviving) => {
     const source = fixture()
     source.constraints.linked = {
       ...source.constraints.linked,
       fields: [...fields.slice(0, surviving), { ...fields[0], modelId: 'missing' }],
     }
-    expect(
-      deleteOrphanedConstraintFields(source, getComputedSubProject(source, defaultStitchingSettings)).constraints,
-    ).toEqual({})
+    const snapshot = structuredClone(source)
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const result = deleteOrphanedConstraintFields(source, computed)
+    expect(result.constraints.linked).toEqual({
+      ...source.constraints.linked,
+      fields: fields.slice(0, surviving),
+    })
+    expect(Object.keys(result.constraints)).toEqual(['linked'])
+    expect(deleteOrphanedConstraintFields(result, computed)).toBe(result)
+    expect(source).toEqual(snapshot)
+  })
+
+  it.each([0, 1])('preserves references for a valid constraint with %s members', (count) => {
+    const source = fixture()
+    source.constraints.linked = { ...source.constraints.linked, fields: fields.slice(0, count) }
+    expect(deleteOrphanedConstraintFields(source, getComputedSubProject(source, defaultStitchingSettings))).toBe(source)
+  })
+
+  it('preserves an empty constraint through the complete patcher chain', () => {
+    const source = fixture()
+    source.constraints.linked = { ...source.constraints.linked, fields: [] }
+    const result = getPatchedSubProject(source, getComputedSubProject(source, defaultStitchingSettings))
+    expect(result.constraints).toBe(source.constraints)
+    expect(result.constraints.linked.fields).toEqual([])
   })
 
   it('cleans members after patchers remove holes and stitches belonging to a deleted component', () => {
