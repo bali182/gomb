@@ -34,6 +34,11 @@ import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 
+export type ConstraintFieldAdderState = {
+  modelIds: string[]
+  property: ConstraintFieldNameSchema | undefined
+}
+
 export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFieldInputSchema[] => {
   switch (model.type) {
     case 'root-panel': {
@@ -349,10 +354,21 @@ export const getConstraintFieldLabel = (field: ConstraintFieldNameSchema, t: Tra
   return labels[field]
 }
 
-export const getConstraintLabel = (constraint: ConstraintSchema, t: TranslationSchema): string =>
-  constraint.fields.length === 0
-    ? t.project.editors.sections.constraints.empty
-    : constraint.fields.map((field) => getConstraintFieldLabel(field.field, t)).join(' = ')
+export const getConstraintLabel = (constraint: ConstraintSchema, t: TranslationSchema): string => {
+  if (constraint.fields.length === 0) {
+    return t.project.editors.sections.constraints.empty
+  }
+
+  const counts = new Map<ConstraintFieldNameSchema, number>()
+  for (const field of constraint.fields) {
+    counts.set(field.field, (counts.get(field.field) ?? 0) + 1)
+  }
+
+  return Array.from(counts, ([field, count]) => {
+    const label = getConstraintFieldLabel(field, t)
+    return count > 1 ? `${label} (${count})` : label
+  }).join(', ')
+}
 
 export const getConstraintModelPath = (model: ModelObjectSchema, subProject: SubProjectSchema): ModelObjectSchema[] => {
   const accessor = accessors.subProject(subProject)

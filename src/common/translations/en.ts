@@ -1,3 +1,4 @@
+import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
 import type {
@@ -23,7 +24,6 @@ import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
-import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   PocketOpeningSchema,
@@ -293,9 +293,23 @@ export const EN = {
         constraints: {
           title: 'Constraints',
           empty: 'Empty',
-          selectModel: 'Choose an object…',
-          selectField: 'Choose a field…',
-          noMatches: 'No matching fields or objects',
+          addFields: {
+            title: 'Add fields',
+            components: 'Components',
+            pocketOpenings: 'Pocket openings',
+            modelIds: {
+              label: 'Objects',
+              tooltip: 'Select the objects whose property you want to link.',
+              placeholder: 'Choose objects…',
+            },
+            property: {
+              label: 'Property',
+              tooltip: 'Only properties that can be linked on every selected object are listed.',
+              placeholder: 'Choose a property…',
+            },
+            add: 'Add',
+            noMatches: 'No matching fields or objects',
+          } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
         },
         globalSettings: {
@@ -874,21 +888,6 @@ export const EN = {
           } satisfies EnumTranslationSchema<ThemeSchema>,
         },
         common: {
-          modelType: {
-            'root-panel': 'Module',
-            'panel': 'Panel',
-            'pocket-cluster': 'Pocket cluster',
-            'front-pocket': 'Front pocket',
-            't-pocket': 'T-pocket',
-            'hole': 'Hole',
-            'component-bounds-stitch-line': 'Component stitching',
-            't-pocket-stitch-line': 'Pocket stitching',
-            'straight': 'Straight pocket opening',
-            'recessed': 'Recessed pocket opening',
-            'slanted': 'Slanted pocket opening',
-            'optical-illusion': 'Optical illusion pocket opening',
-            'equal-constraint': 'Equality constraint',
-          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Top',

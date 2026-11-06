@@ -1,7 +1,7 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
+import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
-import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type { HasCustomRenderTarget } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
@@ -228,9 +228,23 @@ export const HU = {
         constraints: {
           title: 'Constraintek',
           empty: 'Üres',
-          selectModel: 'Válassz elemet…',
-          selectField: 'Válassz mezőt…',
-          noMatches: 'Nincs megfelelő mező vagy elem',
+          addFields: {
+            title: 'Mezők hozzáadása',
+            components: 'Komponensek',
+            pocketOpenings: 'Zsebnyílások',
+            modelIds: {
+              label: 'Elemek',
+              tooltip: 'Válaszd ki az elemeket, amelyeknek egy tulajdonságát össze szeretnéd kötni.',
+              placeholder: 'Válassz elemeket…',
+            },
+            property: {
+              label: 'Tulajdonság',
+              tooltip: 'Csak a minden kijelölt elemen összeköthető tulajdonságok jelennek meg.',
+              placeholder: 'Válassz tulajdonságot…',
+            },
+            add: 'Hozzáadás',
+            noMatches: 'Nincs megfelelő mező vagy elem',
+          } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'A mező constrainthez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
         },
         globalSettings: {
@@ -796,21 +810,6 @@ export const HU = {
           },
         },
         common: {
-          modelType: {
-            'root-panel': 'Modul',
-            'panel': 'Panel',
-            'pocket-cluster': 'Zsebcsoport',
-            'front-pocket': 'Elülső zseb',
-            't-pocket': 'T-zseb',
-            'hole': 'Lyuk',
-            'component-bounds-stitch-line': 'Kontúrvarrás',
-            't-pocket-stitch-line': 'Zsebvarrás',
-            'straight': 'Egyenes zsebnyílás',
-            'recessed': 'Ívelt zsebnyílás',
-            'slanted': 'Ferde zsebnyílás',
-            'optical-illusion': 'Optikai illúziójú zsebnyílás',
-            'equal-constraint': 'Egyenlőségi constraint',
-          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Fent',

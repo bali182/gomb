@@ -56,7 +56,7 @@ describe('constraint field metadata', () => {
         { id: 'height', type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
       ],
     }
-    expect(getConstraintLabel(constraint, EN)).toBe('Width = Height')
+    expect(getConstraintLabel(constraint, EN)).toBe('Width, Height')
     expect(getConstraintLabel({ ...constraint, fields: [] }, HU)).toBe('Üres')
   })
 
