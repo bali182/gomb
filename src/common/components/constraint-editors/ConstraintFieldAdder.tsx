@@ -13,7 +13,7 @@ import {
   useTagsInput,
   type ListCollection,
 } from '@chakra-ui/react'
-import { useCallback, useEffect, useId, useMemo, useState, type FC } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState, type FC, type ReactNode } from 'react'
 import { PiPlus } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
@@ -25,20 +25,27 @@ import { portalRef } from '../../portalRef'
 import type { SubProjectAccessorSchema } from '../../schemas/accessors'
 import type { ConstraintFieldNameSchema, ConstraintSchema } from '../../schemas/constraints'
 import type { ConstraintFieldInputSchema } from '../../schemas/factory'
-import type { ModelObjectSchema, ModelObjectTypeSchema } from '../../schemas/modelObject'
+import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { accessors } from '../../utils/accessors'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { EditorButton } from '../common/EditorButton'
 import { TooltipIcon } from '../common/TooltipIcon'
+import type { ProjectTreeNode } from '../component-tree/types/nodeTypes'
+import { useComponentTreeCollection } from '../component-tree/utils/useComponentTreeCollection'
 import type { ConstraintFieldAdderState } from './constraintFieldUtils'
 import { getConstraintFieldInputs, getConstraintFieldLabel } from './constraintFieldUtils'
+
+const modelChoicePadding = 2
+const modelChoiceIndent = 4
 
 type ConstraintModelChoice = {
   id: string
   label: string
   model: ModelObjectSchema
+  depth: number
+  disabled: boolean
 }
 
 type ConstraintPropertyChoice = {
@@ -51,6 +58,17 @@ type ConstraintFieldAdderProps = {
   constraint: ConstraintSchema
 }
 
+const getConstraintTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
+  switch (node.kind) {
+    case 'component':
+      return node.component
+    case 'hole':
+      return node.hole
+    case 'stitch-line':
+      return node.stitchLine
+  }
+}
+
 export const ConstraintFieldAdder: FC<ConstraintFieldAdderProps> = ({ constraint }) => {
   const { subProject } = useSubProject()
   const { isComputing, setEditingInputId } = useEditorContext()
@@ -61,6 +79,7 @@ export const ConstraintFieldAdder: FC<ConstraintFieldAdderProps> = ({ constraint
     property: undefined,
   })
   const accessor = useMemo<SubProjectAccessorSchema>(() => accessors.subProject(subProject), [subProject])
+  const componentTree = useComponentTreeCollection(subProject)
 
   const getFields = useCallback(
     (model: ModelObjectSchema): ConstraintFieldInputSchema[] =>
@@ -82,22 +101,30 @@ export const ConstraintFieldAdder: FC<ConstraintFieldAdderProps> = ({ constraint
   )
 
   const modelChoices = useMemo<ConstraintModelChoice[]>(() => {
-    const models = [
-      ...Object.values(subProject.components),
-      ...subProject.holes,
-      ...subProject.stitchLines,
-      ...Object.values(subProject.pocketOpenings),
-    ]
-    return models
-      .filter((model) => getFields(model).length > 0)
-      .map(
-        (model): ConstraintModelChoice => ({
+    const components = componentTree
+      .flatten()
+      .filter((node) => !componentTree.isRootNode(node))
+      .map((node): ConstraintModelChoice => {
+        const model = getConstraintTreeModel(node)
+        return {
           id: model.id,
           model,
           label: narrowers.is.constraint(model) ? '' : model.name,
-        }),
-      )
-  }, [getFields, subProject])
+          depth: componentTree.getDepth(node.id) - 1,
+          disabled: getFields(model).length === 0,
+        }
+      })
+    const openings = Object.values(subProject.pocketOpenings).map(
+      (model): ConstraintModelChoice => ({
+        id: model.id,
+        model,
+        label: model.name,
+        depth: 0,
+        disabled: getFields(model).length === 0,
+      }),
+    )
+    return [...components, ...openings]
+  }, [componentTree, getFields, subProject.pocketOpenings])
 
   const getProperties = useCallback(
     (selected: ConstraintModelChoice[]): ConstraintPropertyChoice[] => {
@@ -208,9 +235,10 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
   const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
   const [search, setSearch] = useState<string>('')
+  const searching = search.trim().length > 0
   const { contains } = useFilter({ sensitivity: 'base' })
   const filtered = useMemo<ConstraintModelChoice[]>(
-    () => choices.filter((item) => contains(item.label, search)),
+    () => choices.filter((item) => contains(item.label, search.trim())),
     [choices, contains, search],
   )
   const collection = useMemo<ListCollection<ConstraintModelChoice>>(
@@ -219,11 +247,8 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
         items: filtered,
         itemToString: (item) => item.label,
         itemToValue: (item) => item.id,
+        isItemDisabled: (item) => item.disabled,
       }),
-    [filtered],
-  )
-  const modelTypes = useMemo<ModelObjectTypeSchema[]>(
-    () => Array.from(new Set(filtered.map((item) => item.model.type))),
     [filtered],
   )
   const id = useId()
@@ -234,7 +259,7 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
     inputValue: search,
     readOnly: isComputing,
     editable: false,
-    validate: (details) => choices.some((item) => item.id === details.inputValue),
+    validate: (details) => choices.some((item) => item.id === details.inputValue && !item.disabled),
     onValueChange: (details) => {
       if (!isComputing) {
         setEditingInputId(undefined)
@@ -249,6 +274,7 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
     multiple: true,
     value,
     inputValue: search,
+    inputBehavior: searching ? 'autohighlight' : 'none',
     openOnClick: true,
     closeOnSelect: false,
     selectionBehavior: 'clear',
@@ -267,6 +293,37 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
       setSearch('')
     }
   }, [value])
+
+  const renderItem = (item: ConstraintModelChoice): ReactNode => {
+    return (
+      <Combobox.Item
+        key={item.id}
+        item={item}
+        position="relative"
+        ps={modelChoicePadding + (searching ? 0 : item.depth * modelChoiceIndent)}
+        _disabled={{ opacity: 1 }}
+      >
+        {!searching &&
+          Array.from({ length: item.depth }, (_, depth) => (
+            <Box
+              key={depth}
+              position="absolute"
+              top="0"
+              bottom="0"
+              insetInlineStart={modelChoicePadding + depth * modelChoiceIndent + modelChoiceIndent / 2}
+              borderInlineStartWidth="1px"
+              borderColor="border"
+              pointerEvents="none"
+            />
+          ))}
+        <HStack gap="2" minW="0" flex="1" color={item.disabled ? 'fg.muted' : undefined}>
+          <Icon as={getModelIcon(item.model, subProject)} flexShrink="0" />
+          <Combobox.ItemText>{item.label}</Combobox.ItemText>
+        </HStack>
+        <Combobox.ItemIndicator />
+      </Combobox.Item>
+    )
+  }
 
   return (
     <Combobox.RootProvider value={combobox} size="sm">
@@ -298,24 +355,22 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
             <Combobox.Content maxH="72" overflowY="auto">
               <Combobox.Empty>{t.project.editors.sections.constraints.addFields.noMatches}</Combobox.Empty>
               <Combobox.List>
-                {modelTypes.map((type) => (
-                  <Combobox.ItemGroup key={type}>
+                {filtered.some((item) => !narrowers.is.pocketOpening(item.model)) && (
+                  <Combobox.ItemGroup>
                     <Combobox.ItemGroupLabel>
-                      {t.project.editors.enums.constraints.modelTypesPlural[type]}
+                      {t.project.editors.sections.constraints.addFields.components}
                     </Combobox.ItemGroupLabel>
-                    {filtered
-                      .filter((item) => item.model.type === type)
-                      .map((item) => (
-                        <Combobox.Item key={item.id} item={item}>
-                          <HStack gap="2">
-                            <Icon as={getModelIcon(item.model, subProject)} />
-                            <Combobox.ItemText>{item.label}</Combobox.ItemText>
-                          </HStack>
-                          <Combobox.ItemIndicator />
-                        </Combobox.Item>
-                      ))}
+                    {filtered.filter((item) => !narrowers.is.pocketOpening(item.model)).map(renderItem)}
                   </Combobox.ItemGroup>
-                ))}
+                )}
+                {filtered.some((item) => narrowers.is.pocketOpening(item.model)) && (
+                  <Combobox.ItemGroup>
+                    <Combobox.ItemGroupLabel>
+                      {t.project.editors.sections.constraints.addFields.pocketOpenings}
+                    </Combobox.ItemGroupLabel>
+                    {filtered.filter((item) => narrowers.is.pocketOpening(item.model)).map(renderItem)}
+                  </Combobox.ItemGroup>
+                )}
               </Combobox.List>
             </Combobox.Content>
           </Combobox.Positioner>

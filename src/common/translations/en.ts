@@ -24,7 +24,6 @@ import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
-import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   PocketOpeningSchema,
@@ -296,6 +295,8 @@ export const EN = {
           empty: 'Empty',
           addFields: {
             title: 'Add fields',
+            components: 'Components',
+            pocketOpenings: 'Pocket openings',
             modelIds: {
               label: 'Objects',
               tooltip: 'Select the objects whose property you want to link.',
@@ -873,21 +874,6 @@ export const EN = {
       },
       enums: {
         constraints: {
-          modelTypesPlural: {
-            'root-panel': 'Modules',
-            'panel': 'Panels',
-            'pocket-cluster': 'Pocket clusters',
-            'front-pocket': 'Front pockets',
-            't-pocket': 'T-pockets',
-            'hole': 'Holes',
-            'component-bounds-stitch-line': 'Component stitch lines',
-            't-pocket-stitch-line': 'Pocket stitch lines',
-            'straight': 'Straight pocket openings',
-            'recessed': 'Recessed pocket openings',
-            'slanted': 'Slanted pocket openings',
-            'optical-illusion': 'Optical illusion pocket openings',
-            'equal-constraint': 'Equality constraints',
-          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           blockReason: {
             'auto-width': 'Switch width to manual to link it.',
             'auto-height': 'Switch height to manual to link it.',

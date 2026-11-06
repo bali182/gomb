@@ -2,7 +2,6 @@ import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
-import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type { HasCustomRenderTarget } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
@@ -231,6 +230,8 @@ export const HU = {
           empty: 'Üres',
           addFields: {
             title: 'Mezők hozzáadása',
+            components: 'Komponensek',
+            pocketOpenings: 'Zsebnyílások',
             modelIds: {
               label: 'Elemek',
               tooltip: 'Válaszd ki az elemeket, amelyeknek egy tulajdonságát össze szeretnéd kötni.',
@@ -795,21 +796,6 @@ export const HU = {
       },
       enums: {
         constraints: {
-          modelTypesPlural: {
-            'root-panel': 'Modulok',
-            'panel': 'Panelek',
-            'pocket-cluster': 'Zsebcsoportok',
-            'front-pocket': 'Elülső zsebek',
-            't-pocket': 'T-zsebek',
-            'hole': 'Lyukak',
-            'component-bounds-stitch-line': 'Kontúrvarrások',
-            't-pocket-stitch-line': 'Zsebvarrások',
-            'straight': 'Egyenes zsebnyílások',
-            'recessed': 'Ívelt zsebnyílások',
-            'slanted': 'Ferde zsebnyílások',
-            'optical-illusion': 'Optikai illúziójú zsebnyílások',
-            'equal-constraint': 'Egyenlőségi constraintek',
-          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           blockReason: {
             'auto-width': 'Az összekötéshez állítsd manuálisra a szélességet.',
             'auto-height': 'Az összekötéshez állítsd manuálisra a magasságot.',
