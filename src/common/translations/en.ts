@@ -1,3 +1,4 @@
+import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
 import type {
@@ -293,9 +294,21 @@ export const EN = {
         constraints: {
           title: 'Constraints',
           empty: 'Empty',
-          selectModel: 'Choose an object…',
-          selectField: 'Choose a field…',
-          noMatches: 'No matching fields or objects',
+          addFields: {
+            title: 'Add fields',
+            modelIds: {
+              label: 'Objects',
+              tooltip: 'Select the objects whose property you want to link.',
+              placeholder: 'Choose objects…',
+            },
+            property: {
+              label: 'Property',
+              tooltip: 'Only properties that can be linked on every selected object are listed.',
+              placeholder: 'Choose a property…',
+            },
+            add: 'Add',
+            noMatches: 'No matching fields or objects',
+          } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
         },
         globalSettings: {
@@ -860,6 +873,21 @@ export const EN = {
       },
       enums: {
         constraints: {
+          modelTypesPlural: {
+            'root-panel': 'Modules',
+            'panel': 'Panels',
+            'pocket-cluster': 'Pocket clusters',
+            'front-pocket': 'Front pockets',
+            't-pocket': 'T-pockets',
+            'hole': 'Holes',
+            'component-bounds-stitch-line': 'Component stitch lines',
+            't-pocket-stitch-line': 'Pocket stitch lines',
+            'straight': 'Straight pocket openings',
+            'recessed': 'Recessed pocket openings',
+            'slanted': 'Slanted pocket openings',
+            'optical-illusion': 'Optical illusion pocket openings',
+            'equal-constraint': 'Equality constraints',
+          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           blockReason: {
             'auto-width': 'Switch width to manual to link it.',
             'auto-height': 'Switch height to manual to link it.',
@@ -874,21 +902,6 @@ export const EN = {
           } satisfies EnumTranslationSchema<ThemeSchema>,
         },
         common: {
-          modelType: {
-            'root-panel': 'Module',
-            'panel': 'Panel',
-            'pocket-cluster': 'Pocket cluster',
-            'front-pocket': 'Front pocket',
-            't-pocket': 'T-pocket',
-            'hole': 'Hole',
-            'component-bounds-stitch-line': 'Component stitching',
-            't-pocket-stitch-line': 'Pocket stitching',
-            'straight': 'Straight pocket opening',
-            'recessed': 'Recessed pocket opening',
-            'slanted': 'Slanted pocket opening',
-            'optical-illusion': 'Optical illusion pocket opening',
-            'equal-constraint': 'Equality constraint',
-          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Top',

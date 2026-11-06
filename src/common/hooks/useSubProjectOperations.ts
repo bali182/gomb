@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { addConstraint as addConstraintPure } from '../operations/subProject/addConstraint'
-import { addConstraintField as addConstraintFieldPure } from '../operations/subProject/addConstraintField'
+import { addConstraintFields as addConstraintFieldsPure } from '../operations/subProject/addConstraintFields'
 import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
 import { deleteConstraint as deleteConstraintPure } from '../operations/subProject/deleteConstraint'
 import { deleteConstraintField as deleteConstraintFieldPure } from '../operations/subProject/deleteConstraintField'
@@ -52,7 +52,7 @@ import { useTranslation } from './useTranslation'
 export type UseSubProjectOperationsOutput = {
   addConstraint: (type: ConstraintSchema['type']) => void
   deleteConstraint: (constraintId: string) => void
-  addConstraintField: (constraintId: string, field: ConstraintFieldInputSchema) => void
+  addConstraintFields: (constraintId: string, fields: ConstraintFieldInputSchema[]) => void
   deleteConstraintField: (constraintId: string, fieldId: string) => void
   addPocketOpening: (type: PocketOpeningSchema['type']) => void
   clonePocketOpening: (openingId: string) => void
@@ -117,10 +117,10 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [recordChange, setSubProject, subProject],
   )
 
-  const addConstraintField = useCallback(
-    (constraintId: string, field: ConstraintFieldInputSchema): void => {
+  const addConstraintFields = useCallback(
+    (constraintId: string, fields: ConstraintFieldInputSchema[]): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const updated = addConstraintFieldPure(currentSubProject, { constraintId, field, modelFactory })
+      const updated = addConstraintFieldsPure(currentSubProject, { constraintId, fields, modelFactory })
       if (updated === currentSubProject) {
         return
       }
@@ -433,7 +433,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     () => ({
       addConstraint,
       deleteConstraint,
-      addConstraintField,
+      addConstraintFields,
       deleteConstraintField,
       addPocketOpening,
       clonePocketOpening,
@@ -462,7 +462,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [
       addConstraint,
       deleteConstraint,
-      addConstraintField,
+      addConstraintFields,
       deleteConstraintField,
       addPocketOpening,
       clonePocketOpening,

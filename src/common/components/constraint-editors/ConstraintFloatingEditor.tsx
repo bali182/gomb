@@ -8,7 +8,7 @@ import { ConstraintActionsMenu } from '../action-menus/ConstraintActionsMenu'
 import { CommonEmptyState } from '../common/CommonEmptyState'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { FloatingEditorHeader } from '../common/FloatingEditorHeader'
-import { ConstraintFieldCombobox } from './ConstraintFieldCombobox'
+import { ConstraintFieldAdder } from './ConstraintFieldAdder'
 import { ConstraintFieldList } from './ConstraintFieldList'
 import { getConstraintLabel } from './constraintFieldUtils'
 
@@ -43,7 +43,7 @@ export const ConstraintFloatingEditor: FC<ConstraintFloatingEditorProps> = ({ co
           )}
         </Box>
         <Box flexShrink="0">
-          <ConstraintFieldCombobox key={constraint.id} constraint={constraint} />
+          <ConstraintFieldAdder key={constraint.id} constraint={constraint} />
         </Box>
       </VStack>
     </FloatingEditor>

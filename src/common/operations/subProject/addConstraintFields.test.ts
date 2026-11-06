@@ -7,7 +7,7 @@ import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { IdGenerator } from '../../utils/random/IdGenerator'
-import { addConstraintField } from './addConstraintField'
+import { addConstraintFields } from './addConstraintFields'
 import { deleteConstraint } from './deleteConstraint'
 import { deleteConstraintField } from './deleteConstraintField'
 
@@ -31,21 +31,20 @@ const fixture = (): SubProjectSchema =>
     constraints: { constraint: { id: 'constraint', type: 'equal-constraint', fields: [] } },
   })
 
-describe('addConstraintField', () => {
-  it('creates members through the factory and accepts matching number fields across models', () => {
+describe('addConstraintFields', () => {
+  it('creates a batch through the factory and accepts compatible number fields across models', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const first = addConstraintField(source, {
+    const result = addConstraintFields(source, {
       constraintId: 'constraint',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
-      modelFactory,
-    })
-    const result = addConstraintField(first, {
-      constraintId: 'constraint',
-      field: { type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
+      fields: [
+        { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+        { type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
+      ],
       modelFactory,
     })
     expect(result.constraints.constraint.fields).toHaveLength(2)
+    expect(new Set(result.constraints.constraint.fields.map((field) => field.id)).size).toBe(2)
     const originalIds = getSubProjectIds(source)
     for (const field of result.constraints.constraint.fields) {
       expect(originalIds.has(field.id)).toBe(false)
@@ -63,78 +62,76 @@ describe('addConstraintField', () => {
     { type: 'panel-constraint-field', modelId: 'panel', field: 'layoutOrientation' },
   ]
   it.each(rejected)(
-    'rejects missing, mistyped, automatic, duplicate or incompatible members: $modelId.$field',
+    'rejects missing, mistyped, automatic, duplicate or incompatible fields: $modelId.$field',
     (field) => {
-      const source = addConstraintField(fixture(), {
+      const source = addConstraintFields(fixture(), {
         constraintId: 'constraint',
-        field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+        fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
         modelFactory,
       })
       const snapshot = structuredClone(source)
-      expect(addConstraintField(source, { constraintId: 'constraint', field, modelFactory })).toBe(source)
+      expect(addConstraintFields(source, { constraintId: 'constraint', fields: [field], modelFactory })).toBe(source)
       expect(source).toEqual(snapshot)
     },
   )
 
   it('only links optional stitching settings with the same setting', () => {
-    const source = addConstraintField(fixture(), {
+    const source = addConstraintFields(fixture(), {
       constraintId: 'constraint',
-      field: { type: 'component-bounds-stitch-line-constraint-field', modelId: 'first-stitch', field: 'stitchMargin' },
+      fields: [
+        { type: 'component-bounds-stitch-line-constraint-field', modelId: 'first-stitch', field: 'stitchMargin' },
+      ],
       modelFactory,
     })
-    const result = addConstraintField(source, {
+    const result = addConstraintFields(source, {
       constraintId: 'constraint',
-      field: { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchMargin' },
+      fields: [
+        { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchMargin' },
+      ],
       modelFactory,
     })
     expect(result.constraints.constraint.fields).toHaveLength(2)
     expect(
-      addConstraintField(source, {
+      addConstraintFields(source, {
         constraintId: 'constraint',
-        field: {
-          type: 'component-bounds-stitch-line-constraint-field',
-          modelId: 'second-stitch',
-          field: 'stitchHoleLength',
-        },
-        modelFactory,
-      }),
-    ).toBe(source)
-    expect(
-      addConstraintField(source, {
-        constraintId: 'constraint',
-        field: { type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+        fields: [
+          {
+            type: 'component-bounds-stitch-line-constraint-field',
+            modelId: 'second-stitch',
+            field: 'stitchHoleLength',
+          },
+          { type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+        ],
         modelFactory,
       }),
     ).toBe(source)
   })
 
   it('rejects a field already belonging to another constraint without changing the source', () => {
-    const first = addConstraintField(fixture(), {
+    const first = addConstraintFields(fixture(), {
       constraintId: 'constraint',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+      fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
       modelFactory,
     })
     const source: SubProjectSchema = {
       ...first,
-      constraints: {
-        ...first.constraints,
-        other: { id: 'other', type: 'equal-constraint', fields: [] },
-      },
+      constraints: { ...first.constraints, other: { id: 'other', type: 'equal-constraint', fields: [] } },
     }
     const snapshot = structuredClone(source)
-    const result = addConstraintField(source, {
-      constraintId: 'other',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
-      modelFactory,
-    })
-    expect(result).toBe(source)
+    expect(
+      addConstraintFields(source, {
+        constraintId: 'other',
+        fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
+        modelFactory,
+      }),
+    ).toBe(source)
     expect(source).toEqual(snapshot)
   })
 
   it('accepts a different compatible field of the same model in another constraint', () => {
-    const first = addConstraintField(fixture(), {
+    const first = addConstraintFields(fixture(), {
       constraintId: 'constraint',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+      fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
       modelFactory,
     })
     const source: SubProjectSchema = {
@@ -148,9 +145,9 @@ describe('addConstraintField', () => {
         },
       },
     }
-    const result = addConstraintField(source, {
+    const result = addConstraintFields(source, {
       constraintId: 'other',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+      fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'height' }],
       modelFactory,
     })
     expect(result.constraints.other.fields).toHaveLength(2)
@@ -159,17 +156,14 @@ describe('addConstraintField', () => {
   })
 
   it.each(['field', 'constraint'])('accepts a field again after its %s is deleted', (removed) => {
-    const first = addConstraintField(fixture(), {
+    const first = addConstraintFields(fixture(), {
       constraintId: 'constraint',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+      fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
       modelFactory,
     })
     const source: SubProjectSchema = {
       ...first,
-      constraints: {
-        ...first.constraints,
-        other: { id: 'other', type: 'equal-constraint', fields: [] },
-      },
+      constraints: { ...first.constraints, other: { id: 'other', type: 'equal-constraint', fields: [] } },
     }
     const snapshot = structuredClone(source)
     const available =
@@ -179,9 +173,9 @@ describe('addConstraintField', () => {
             fieldId: first.constraints.constraint.fields[0].id,
           })
         : deleteConstraint(source, { constraintId: 'constraint' })
-    const result = addConstraintField(available, {
+    const result = addConstraintFields(available, {
       constraintId: 'other',
-      field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+      fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
       modelFactory,
     })
     expect(result.constraints.other.fields).toHaveLength(1)
@@ -192,9 +186,59 @@ describe('addConstraintField', () => {
   it('leaves the source unchanged if the constraint was removed', () => {
     const source = fixture()
     expect(
-      addConstraintField(source, {
+      addConstraintFields(source, {
         constraintId: 'missing',
-        field: { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+        fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
+        modelFactory,
+      }),
+    ).toBe(source)
+  })
+
+  it('skips invalid and duplicate inputs while accepting compatible fields in input order', () => {
+    const source = fixture()
+    const snapshot = structuredClone(source)
+    const result = addConstraintFields(source, {
+      constraintId: 'constraint',
+      fields: [
+        { type: 'panel-constraint-field', modelId: 'missing', field: 'width' },
+        { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+        { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
+        { type: 'panel-constraint-field', modelId: 'auto', field: 'width' },
+        { type: 'panel-constraint-field', modelId: 'panel', field: 'layoutOrientation' },
+        { type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
+      ],
+      modelFactory,
+    })
+    expect(result.constraints.constraint.fields.map((field) => [field.modelId, field.field])).toEqual([
+      ['panel', 'width'],
+      ['hole', 'height'],
+    ])
+    expect(source).toEqual(snapshot)
+  })
+
+  it('keeps optional stitching settings in separate compatibility groups within a batch', () => {
+    const result = addConstraintFields(fixture(), {
+      constraintId: 'constraint',
+      fields: [
+        { type: 'component-bounds-stitch-line-constraint-field', modelId: 'first-stitch', field: 'stitchMargin' },
+        { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchHoleLength' },
+        { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchMargin' },
+      ],
+      modelFactory,
+    })
+    expect(result.constraints.constraint.fields.map((field) => field.field)).toEqual(['stitchMargin', 'stitchMargin'])
+  })
+
+  it('returns the original subproject for an empty or entirely invalid batch', () => {
+    const source = fixture()
+    expect(addConstraintFields(source, { constraintId: 'constraint', fields: [], modelFactory })).toBe(source)
+    expect(
+      addConstraintFields(source, {
+        constraintId: 'constraint',
+        fields: [
+          { type: 'panel-constraint-field', modelId: 'missing', field: 'width' },
+          { type: 'panel-constraint-field', modelId: 'auto', field: 'width' },
+        ],
         modelFactory,
       }),
     ).toBe(source)
