@@ -19,14 +19,20 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import type { HasTargetSchema } from '../schemas/common'
+import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
+import type { TreeSectionsSettingsSchema } from '../schemas/settings'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
 import { CommonEmptyState } from './common/CommonEmptyState'
-import { ResizableAccordion, type ResizableAccordionState } from './common/resizable-accordion/ResizableAccordion'
+import {
+  ResizableAccordion,
+  type ResizableAccordionChangeEvent,
+  type ResizableAccordionHandle,
+} from './common/resizable-accordion/ResizableAccordion'
 import {
   ResizableAccordionHeaderButton,
   ResizableAccordionHeaderIconButton,
@@ -58,16 +64,35 @@ type EditorContentProps = {
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
   const { t } = useTranslation()
   const { isComputing, setEditingInputId } = useEditorContext()
-  const { addConstraint } = useSubProjectOperations()
-  const [accordionState, setAccordionState] = useState<ResizableAccordionState>({
-    components: { open: true, size: 1 },
-    openings: { open: true, size: 1 },
-    constraints: { open: true, size: 1 },
-  })
+  const { addConstraint, addPocketOpening } = useSubProjectOperations()
   const { project } = useProject()
   const { setUISettings, settings } = useGlobalSettings()
+  const [treeSections, setTreeSections] = useState<TreeSectionsSettingsSchema>(() => settings.ui.treeSections)
+  const accordionRef = useRef<ResizableAccordionHandle>(null)
   const { selected, clearSelection } = useDrawAreaContext().selection
   const { stopMeasuring } = useMeasurement()
+
+  const handleTreeSectionsChange = useCallback(
+    (event: ResizableAccordionChangeEvent): void => {
+      const next: TreeSectionsSettingsSchema = {
+        components: event.value.components,
+        openings: event.value.openings,
+        constraints: event.value.constraints,
+      }
+      setTreeSections(next)
+      switch (event.type) {
+        case 'resize-start':
+        case 'resize':
+          return
+        case 'resize-end':
+        case 'resize-cancel':
+        case 'toggle':
+        case 'programmatic':
+          setUISettings({ treeSections: next })
+      }
+    },
+    [setUISettings],
+  )
 
   useEffect(() => {
     if (isDefined(selected)) {
@@ -76,15 +101,14 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   }, [selected, stopMeasuring])
 
   useLayoutEffect(() => {
-    if (!isDefined(selected) || !narrowers.is.pocketOpening(selected)) {
+    if (!isDefined(selected)) {
       return
     }
-    setAccordionState((current: ResizableAccordionState): ResizableAccordionState => {
-      if (current.openings.open) {
-        return current
-      }
-      return { ...current, openings: { ...current.openings, open: true } }
-    })
+    if (narrowers.is.pocketOpening(selected)) {
+      accordionRef.current?.setItemState('openings', { open: true })
+    } else if (narrowers.is.constraint(selected)) {
+      accordionRef.current?.setItemState('constraints', { open: true })
+    }
   }, [selected])
 
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
@@ -113,7 +137,17 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const handleAddConstraint = useCallback((): void => {
     setEditingInputId(undefined)
     addConstraint('equal-constraint')
+    accordionRef.current?.setItemState('constraints', { open: true })
   }, [addConstraint, setEditingInputId])
+
+  const handleAddPocketOpening = useCallback(
+    (type: PocketOpeningSchema['type']): void => {
+      setEditingInputId(undefined)
+      addPocketOpening(type)
+      accordionRef.current?.setItemState('openings', { open: true })
+    },
+    [addPocketOpening, setEditingInputId],
+  )
 
   return (
     <Flex direction="column" height="100%" minHeight="0" minWidth="0">
@@ -154,7 +188,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
           <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
             <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0" overflow="hidden">
               <EditorTreeDragAndDrop>
-                <ResizableAccordion value={accordionState} onValueChange={setAccordionState}>
+                <ResizableAccordion ref={accordionRef} value={treeSections} onValueChange={handleTreeSectionsChange}>
                   <ResizableAccordionItem
                     id="components"
                     title={t.project.tree.title}
@@ -181,7 +215,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                   <ResizableAccordionItem
                     id="openings"
                     title={t.project.editors.tabs.components.pocketOpenings}
-                    actions={<AddPocketOpeningMenu />}
+                    actions={<AddPocketOpeningMenu onAdd={handleAddPocketOpening} />}
                   >
                     {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
                   </ResizableAccordionItem>

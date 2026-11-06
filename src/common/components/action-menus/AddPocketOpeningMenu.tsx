@@ -2,7 +2,6 @@ import { Menu, Portal } from '@chakra-ui/react'
 import { useCallback, type FC, type ReactElement } from 'react'
 import { PiPlusCircle } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
-import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
@@ -33,9 +32,12 @@ const AddPocketOpeningMenuItem: FC<AddPocketOpeningMenuItemProps> = ({ type, onA
   )
 }
 
-export const AddPocketOpeningMenu: FC = () => {
+type AddPocketOpeningMenuProps = {
+  onAdd: (type: PocketOpeningSchema['type']) => void
+}
+
+export const AddPocketOpeningMenu: FC<AddPocketOpeningMenuProps> = ({ onAdd }) => {
   const { subProject, isComputing } = useEditorContext()
-  const { addPocketOpening } = useSubProjectOperations()
   const { t } = useTranslation()
   return (
     <Menu.Root>
@@ -50,7 +52,7 @@ export const AddPocketOpeningMenu: FC = () => {
           <Menu.Content>
             {openingTypes.map(
               (type: PocketOpeningSchema['type']): ReactElement => (
-                <AddPocketOpeningMenuItem key={type} type={type} onAdd={addPocketOpening} />
+                <AddPocketOpeningMenuItem key={type} type={type} onAdd={onAdd} />
               ),
             )}
           </Menu.Content>

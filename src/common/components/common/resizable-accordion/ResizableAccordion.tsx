@@ -3,6 +3,7 @@ import {
   Children,
   isValidElement,
   useCallback,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -10,6 +11,7 @@ import {
   type FC,
   type PointerEvent,
   type ReactNode,
+  type Ref,
 } from 'react'
 import { isDefined } from '../../../utils/isDefined'
 import {
@@ -26,15 +28,25 @@ export type ResizableAccordionItemState = {
 
 export type ResizableAccordionState = Record<string, ResizableAccordionItemState>
 
-export type ResizableAccordionProps = {
+export type ResizableAccordionChangeEvent = {
+  type: 'resize-start' | 'resize' | 'resize-end' | 'resize-cancel' | 'toggle' | 'programmatic'
   value: ResizableAccordionState
-  onValueChange: (value: ResizableAccordionState) => void
+}
+
+export type ResizableAccordionHandle = {
+  setItemState: (id: string, updates: Partial<ResizableAccordionItemState>) => void
+}
+
+export type ResizableAccordionProps = {
+  ref?: Ref<ResizableAccordionHandle>
+  value: ResizableAccordionState
+  onValueChange: (event: ResizableAccordionChangeEvent) => void
   children: ReactNode
 }
 
 type AccordionRuntime = {
   value: ResizableAccordionState
-  onValueChange: (value: ResizableAccordionState) => void
+  onValueChange: (event: ResizableAccordionChangeEvent) => void
   itemIds: string[]
   availableHeight: number
 }
@@ -62,7 +74,7 @@ type AccordionDrag = {
 const MIN_CONTENT_HEIGHT = 48
 
 // Full AI code. No idea how this works, don't try to understand it.
-export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValueChange, children }) => {
+export const ResizableAccordion: FC<ResizableAccordionProps> = ({ ref, value, onValueChange, children }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const headersRef = useRef<Map<string, HTMLDivElement>>(new Map())
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
@@ -83,8 +95,15 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
     }
     return ids
   }, [children])
+  const isAnimatedValue = isDefined(animatedValue) && itemIds.every((id) => value[id] === animatedValue[id])
 
   const runtimeRef = useRef<AccordionRuntime>({ value, onValueChange, itemIds, availableHeight })
+
+  const emitChange = useCallback((event: ResizableAccordionChangeEvent): void => {
+    const current = runtimeRef.current
+    current.value = event.value
+    current.onValueChange(event)
+  }, [])
 
   const cancelFrame = useCallback((): void => {
     if (isDefined(frameRef.current)) {
@@ -93,15 +112,21 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
     }
   }, [])
 
-  const stopDrag = useCallback((): void => {
-    cancelFrame()
-    const drag = dragRef.current
-    dragRef.current = undefined
-    setDraggingId(undefined)
-    if (isDefined(drag) && drag.target.hasPointerCapture(drag.pointerId)) {
-      drag.target.releasePointerCapture(drag.pointerId)
-    }
-  }, [cancelFrame])
+  const stopDrag = useCallback(
+    (type: 'resize-end' | 'resize-cancel' = 'resize-cancel'): void => {
+      cancelFrame()
+      const drag = dragRef.current
+      dragRef.current = undefined
+      setDraggingId(undefined)
+      if (isDefined(drag)) {
+        if (drag.target.hasPointerCapture(drag.pointerId)) {
+          drag.target.releasePointerCapture(drag.pointerId)
+        }
+        emitChange({ type, value: runtimeRef.current.value })
+      }
+    },
+    [cancelFrame, emitChange],
+  )
 
   const measure = useCallback((ids: string[]): AccordionMeasurements | undefined => {
     const container = containerRef.current
@@ -122,35 +147,38 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
     return { availableHeight: Math.max(0, container.clientHeight - headerHeight), headers }
   }, [])
 
-  const resizePair = useCallback((id: string, beforeHeight: number, height: number): void => {
-    const current = runtimeRef.current
-    setAnimatedValue(undefined)
-    setAvailableHeight(height)
-    if (height <= 0) {
-      return
-    }
-    const heights = getContentHeights(current.itemIds, current.value, height)
-    const pair = getResizePair(id, current.itemIds, current.value, heights)
-    if (!isDefined(pair)) {
-      return
-    }
-    const openIds = current.itemIds.filter((itemId: string): boolean => current.value[itemId].open)
-    const minimum = Math.min(MIN_CONTENT_HEIGHT, height / openIds.length)
-    const pairHeight = pair.beforeHeight + pair.afterHeight
-    const nextHeight = Math.max(minimum, Math.min(pairHeight - minimum, beforeHeight))
-    if (Math.abs(nextHeight - pair.beforeHeight) < 0.01) {
-      return
-    }
-    heights[pair.beforeId] = nextHeight
-    heights[pair.afterId] = pairHeight - nextHeight
-    const totalSize = openIds.reduce((sum: number, itemId: string): number => sum + current.value[itemId].size, 0)
-    const nextValue = { ...current.value }
-    // Rebase the weights on the visible heights so constrained siblings keep their size.
-    for (const itemId of openIds) {
-      nextValue[itemId] = { ...current.value[itemId], size: (heights[itemId] / height) * totalSize }
-    }
-    current.onValueChange(nextValue)
-  }, [])
+  const resizePair = useCallback(
+    (id: string, beforeHeight: number, height: number): void => {
+      const current = runtimeRef.current
+      setAnimatedValue(undefined)
+      setAvailableHeight(height)
+      if (height <= 0) {
+        return
+      }
+      const heights = getContentHeights(current.itemIds, current.value, height)
+      const pair = getResizePair(id, current.itemIds, current.value, heights)
+      if (!isDefined(pair)) {
+        return
+      }
+      const openIds = current.itemIds.filter((itemId: string): boolean => current.value[itemId].open)
+      const minimum = Math.min(MIN_CONTENT_HEIGHT, height / openIds.length)
+      const pairHeight = pair.beforeHeight + pair.afterHeight
+      const nextHeight = Math.max(minimum, Math.min(pairHeight - minimum, beforeHeight))
+      if (Math.abs(nextHeight - pair.beforeHeight) < 0.01) {
+        return
+      }
+      heights[pair.beforeId] = nextHeight
+      heights[pair.afterId] = pairHeight - nextHeight
+      const totalSize = openIds.reduce((sum: number, itemId: string): number => sum + current.value[itemId].size, 0)
+      const nextValue = { ...current.value }
+      // Rebase the weights on the visible heights so constrained siblings keep their size.
+      for (const itemId of openIds) {
+        nextValue[itemId] = { ...current.value[itemId], size: (heights[itemId] / height) * totalSize }
+      }
+      emitChange({ type: 'resize', value: nextValue })
+    },
+    [emitChange],
+  )
 
   const updateDrag = useCallback((): void => {
     const drag = dragRef.current
@@ -207,7 +235,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
 
   useLayoutEffect(() => {
     runtimeRef.current = { value, onValueChange, itemIds, availableHeight }
-    if (isDefined(animatedValue) && value !== animatedValue) {
+    if (isDefined(animatedValue) && !isAnimatedValue) {
       setAnimatedValue(undefined)
     }
     const drag = dragRef.current
@@ -218,7 +246,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
         stopDrag()
       }
     }
-  }, [value, onValueChange, itemIds, availableHeight, animatedValue, stopDrag])
+  }, [value, onValueChange, itemIds, availableHeight, animatedValue, isAnimatedValue, stopDrag])
 
   useLayoutEffect(() => {
     const container = containerRef.current
@@ -266,10 +294,31 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
       stopDrag()
       const nextValue = { ...current.value, [id]: { ...current.value[id], open: !current.value[id].open } }
       setAnimatedValue(nextValue)
-      current.onValueChange(nextValue)
+      emitChange({ type: 'toggle', value: nextValue })
     },
-    [stopDrag],
+    [emitChange, stopDrag],
   )
+
+  const setItemState = useCallback(
+    (id: string, updates: Partial<ResizableAccordionItemState>): void => {
+      const current = runtimeRef.current
+      const item = current.value[id]
+      if (!isDefined(item)) {
+        return
+      }
+      const nextItem = { ...item, ...updates }
+      if (item.open === nextItem.open && item.size === nextItem.size) {
+        return
+      }
+      stopDrag()
+      const nextValue = { ...current.value, [id]: nextItem }
+      setAnimatedValue(nextValue)
+      emitChange({ type: 'programmatic', value: nextValue })
+    },
+    [emitChange, stopDrag],
+  )
+
+  useImperativeHandle(ref, () => ({ setItemState }), [setItemState])
 
   const handlePointerDown = useCallback(
     (id: string, event: PointerEvent<HTMLDivElement>): void => {
@@ -297,8 +346,9 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
       }
       setAnimatedValue(undefined)
       setDraggingId(id)
+      emitChange({ type: 'resize-start', value: current.value })
     },
-    [measure],
+    [emitChange, measure],
   )
 
   const handlePointerMove = useCallback(
@@ -324,7 +374,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
         drag.clientY = event.clientY
         updateDrag()
       }
-      stopDrag()
+      stopDrag(event.type === 'pointerup' ? 'resize-end' : 'resize-cancel')
     },
     [cancelFrame, stopDrag, updateDrag],
   )
@@ -354,7 +404,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
   const context = useMemo<ResizableAccordionContextValue>(
     (): ResizableAccordionContextValue => ({
       items,
-      animate: value === animatedValue && !isDefined(draggingId),
+      animate: isAnimatedValue && !isDefined(draggingId),
       draggingId,
       registerHeader,
       toggleItem,
@@ -364,8 +414,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ value, onValue
     }),
     [
       items,
-      value,
-      animatedValue,
+      isAnimatedValue,
       draggingId,
       registerHeader,
       toggleItem,
