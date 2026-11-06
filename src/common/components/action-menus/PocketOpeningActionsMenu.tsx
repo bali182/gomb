@@ -7,7 +7,7 @@ import { portalRef } from '../../portalRef'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { DeleteMenuItem } from './CommonActionsMenuItems'
+import { CloneMenuItem, DeleteMenuItem } from './CommonActionsMenuItems'
 import { SetDefaultPocketOpeningMenuItem } from './PocketOpeningActionsMenuItems'
 
 type PocketOpeningActionsMenuProps = {
@@ -18,7 +18,7 @@ type PocketOpeningActionsMenuProps = {
 
 export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ opening, size, onDelete = noop }) => {
   const { subProject } = useSubProject()
-  const { deletePocketOpening, setDefaultPocketOpening } = useSubProjectOperations()
+  const { clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } = useSubProjectOperations()
   const isDefault = subProject.defaultPocketOpening === opening.id
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -34,6 +34,10 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
     onDelete(opening.id)
   }, [deletePocketOpening, onDelete, opening.id])
 
+  const handleClone = useCallback((): void => {
+    clonePocketOpening(opening.id)
+  }, [clonePocketOpening, opening.id])
+
   return (
     <Box onClick={handleClick}>
       <Menu.Root>
@@ -46,6 +50,7 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
           <Menu.Positioner>
             <Menu.Content>
               <ActionsMenuSection>
+                <CloneMenuItem onSelect={handleClone} />
                 <SetDefaultPocketOpeningMenuItem disabled={isDefault} onSelect={handleSetDefault} />
               </ActionsMenuSection>
               <ActionsMenuSection>

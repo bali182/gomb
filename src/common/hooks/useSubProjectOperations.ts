@@ -22,6 +22,7 @@ import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
 import { cloneComponent as cloneComponentPure } from '../operations/subProject/cloneComponent'
 import { cloneHole as cloneHolePure } from '../operations/subProject/cloneHole'
+import { clonePocketOpening as clonePocketOpeningPure } from '../operations/subProject/clonePocketOpening'
 import { cloneStitchLine as cloneStitchLinePure } from '../operations/subProject/cloneStitchLine'
 import { deleteComponent as deleteComponentPure } from '../operations/subProject/deleteComponent'
 import { deleteHole as deleteHolePure } from '../operations/subProject/deleteHole'
@@ -54,6 +55,7 @@ export type UseSubProjectOperationsOutput = {
   addConstraintField: (constraintId: string, field: ConstraintFieldInputSchema) => void
   deleteConstraintField: (constraintId: string, fieldId: string) => void
   addPocketOpening: (type: PocketOpeningSchema['type']) => void
+  clonePocketOpening: (openingId: string) => void
   setDefaultPocketOpening: (openingId: string) => void
   updatePocketOpening: (opening: PocketOpeningSchema) => void
   deletePocketOpening: (openingId: string) => void
@@ -163,6 +165,19 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       setSubProject({ ...currentSubProject, defaultPocketOpening: openingId })
     },
     [recordChange, setSubProject, subProject],
+  )
+
+  const clonePocketOpening = useCallback(
+    (openingId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = clonePocketOpeningPure(currentSubProject, { openingId, nameGenerator })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [nameGenerator, recordChange, setSubProject, subProject],
   )
 
   const updatePocketOpening = useCallback(
@@ -421,6 +436,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addConstraintField,
       deleteConstraintField,
       addPocketOpening,
+      clonePocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
@@ -449,6 +465,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addConstraintField,
       deleteConstraintField,
       addPocketOpening,
+      clonePocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
