@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from '@chakra-ui/react'
 import type { FC } from 'react'
-import { PiLinkDuotone } from 'react-icons/pi'
+import { PiLink } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ConstraintSchema } from '../../schemas/constraints'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
@@ -22,7 +22,7 @@ export const ConstraintFloatingEditor: FC<ConstraintFloatingEditorProps> = ({ co
   return (
     <FloatingEditor anchorElement={anchorElement} onClose={onClose} positioning="to-tree" maxHeight="80dvh">
       <FloatingEditorHeader
-        icon={<PiLinkDuotone />}
+        icon={<PiLink />}
         menu={<ConstraintActionsMenu constraint={constraint} size="xs" onDelete={onClose} />}
         title={
           <Text fontWeight="bold" textStyle="sm" truncate>
@@ -34,7 +34,7 @@ export const ConstraintFloatingEditor: FC<ConstraintFloatingEditorProps> = ({ co
         <Box minH="0" overflowY="auto">
           {constraint.fields.length === 0 ? (
             <CommonEmptyState
-              icon={<PiLinkDuotone />}
+              icon={<PiLink />}
               title={t.project.editors.emptyStates.noConstraintFields.title}
               description={t.project.editors.emptyStates.noConstraintFields.description}
             />
