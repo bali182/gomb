@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, screen } from 'electron'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import typia from 'typia'
@@ -24,7 +24,19 @@ let mainWindow: BrowserWindow
 
 const createMainWindow = async (projectOpenHandler: BaseProjectOpenHandler): Promise<BrowserWindow> => {
   const settings = await _electronApi.getSettings()
+  const { workArea } = screen.getPrimaryDisplay()
+  const smallerSize = Math.min(workArea.width, workArea.height)
+  const sizeReduction = Math.round(smallerSize * 0.1)
+  const width = workArea.width - sizeReduction
+  const height = workArea.height - sizeReduction
+
   const browserWindow = new BrowserWindow({
+    name: 'main',
+    windowStatePersistence: true,
+    width,
+    height,
+    x: workArea.x + Math.round((workArea.width - width) / 2),
+    y: workArea.y + Math.round((workArea.height - height) / 2),
     backgroundColor: BACKGROUND_COLORS[settings.app.theme],
     titleBarStyle: 'default',
     webPreferences: {
