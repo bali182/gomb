@@ -1,12 +1,14 @@
 import type { AccessorOwnerSchema, SubProjectAccessorSchema } from '../../schemas/accessors'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { ComponentAccessor } from './ComponentAccessor'
+import { ConstraintAccessor } from './ConstraintAccessor'
 import { HoleAccessor } from './HoleAccessor'
 import { OptionalSubProjectAccessor } from './OptionalSubProjectAccessor'
 import { PocketOpeningAccessor } from './PocketOpeningAccessor'
 import { StitchLineAccessor } from './StitchLineAccessor'
 
 export class SubProjectAccessor implements SubProjectAccessorSchema {
+  readonly constraint: ConstraintAccessor
   readonly pocketOpening: PocketOpeningAccessor
   readonly optional: OptionalSubProjectAccessor
   readonly component: ComponentAccessor
@@ -16,6 +18,7 @@ export class SubProjectAccessor implements SubProjectAccessorSchema {
   constructor(public readonly root: SubProjectSchema) {
     const owner: AccessorOwnerSchema = { type: 'sub-project', id: root.id }
     this.optional = new OptionalSubProjectAccessor(root)
+    this.constraint = new ConstraintAccessor(this.optional.constraint, owner)
     this.pocketOpening = new PocketOpeningAccessor(this.optional.pocketOpening, owner)
     this.component = new ComponentAccessor(this.optional.component, owner)
     this.hole = new HoleAccessor(this.optional.hole, owner)

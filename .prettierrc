@@ -8,5 +8,6 @@
   "semi": false,
   "singleAttributePerLine": false,
   "jsxSingleQuote": false,
-  "endOfLine": "auto"
+  "endOfLine": "auto",
+  "quoteProps": "preserve"
 }

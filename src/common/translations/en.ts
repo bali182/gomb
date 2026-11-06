@@ -19,10 +19,11 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { LimitReasonSchema } from '../schemas/limits'
-import type { PocketSettingsCopySelectionSchema } from '../schemas/pocketCopy'
+import type { ModelObjectTypeSchema } from '../schemas/modelObject'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   PocketOpeningSchema,
@@ -41,6 +42,7 @@ import type {
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
+import type { HasCustomRenderTarget } from '../schemas/stitching'
 
 import type {
   CardSchemaId,
@@ -70,7 +72,8 @@ import type {
 
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
-import { CurrencyIdSchema } from '../schemas/currency'
+import type { CurrencyIdSchema } from '../schemas/currency'
+import type { IdPrefixSchema } from '../schemas/idGenerator'
 
 const language: LanguageSchema = 'en-GB'
 
@@ -257,6 +260,9 @@ export const EN = {
         description: "The pocket's actual shape depends on its dimensions and layout.",
       },
       actions: {
+        constraints: {
+          add: 'Add constraint',
+        },
         pocketOpenings: {
           add: 'Add opening',
           edit: 'Edit opening',
@@ -278,13 +284,20 @@ export const EN = {
           addStitching: 'Add stitching',
           addPocketStitching: 'Add pocket stitching',
           exportToPng: 'Export to PNG',
-          copyPocketSettings: 'Copy settings…',
         },
         holes: {
           addStitching: 'Add stitching',
         },
       },
       sections: {
+        constraints: {
+          title: 'Constraints',
+          empty: 'Empty',
+          selectModel: 'Choose an object…',
+          selectField: 'Choose a field…',
+          noMatches: 'No matching fields or objects',
+          linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
+        },
         globalSettings: {
           app: {
             title: 'General',
@@ -548,6 +561,12 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasPocketItemSchema>,
         },
         stitchLines: {
+          renderTarget: {
+            title: '-',
+            onTop: {
+              label: 'Render target',
+            },
+          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
           settings: {
             title: 'Stitching',
             stitchMargin: {
@@ -840,6 +859,14 @@ export const EN = {
         },
       },
       enums: {
+        constraints: {
+          blockReason: {
+            'auto-width': 'Switch width to manual to link it.',
+            'auto-height': 'Switch height to manual to link it.',
+            'auto-layout-gap': 'Switch gap to manual to link it.',
+            'auto-corner-radius': 'Switch corner radii to manual to link them.',
+          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+        },
         globalSettings: {
           theme: {
             light: 'Light',
@@ -847,6 +874,21 @@ export const EN = {
           } satisfies EnumTranslationSchema<ThemeSchema>,
         },
         common: {
+          modelType: {
+            'root-panel': 'Module',
+            'panel': 'Panel',
+            'pocket-cluster': 'Pocket cluster',
+            'front-pocket': 'Front pocket',
+            't-pocket': 'T-pocket',
+            'hole': 'Hole',
+            'component-bounds-stitch-line': 'Component stitching',
+            't-pocket-stitch-line': 'Pocket stitching',
+            'straight': 'Straight pocket opening',
+            'recessed': 'Recessed pocket opening',
+            'slanted': 'Slanted pocket opening',
+            'optical-illusion': 'Optical illusion pocket opening',
+            'equal-constraint': 'Equality constraint',
+          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Top',
@@ -936,6 +978,10 @@ export const EN = {
         },
       },
       emptyStates: {
+        noConstraintFields: {
+          title: 'No linked fields yet',
+          description: 'Choose an object and then a field below to start linking.',
+        },
         missingFrontPocket: {
           title: 'Missing front pocket',
           description: 'A pocket cluster must contain at least one front pocket.',
@@ -961,41 +1007,6 @@ export const EN = {
     },
   },
   dialogs: {
-    pocketCopy: {
-      title: 'Copy pocket settings',
-      positiveAction: 'Copy',
-      sourceHint: 'Copying this',
-      selectAll: {
-        label: 'All',
-        tooltip:
-          'Select or deselect all applicable settings. Selecting all also enables overwriting existing stitching.',
-      } satisfies EditorFieldTranslationSchema,
-      columns: {
-        copyShape: {
-          label: 'Shape',
-          tooltip: 'Copy the T-pocket tab width and taper. Click the header to toggle all applicable target pockets.',
-        },
-        copyOpening: {
-          label: 'Opening',
-          tooltip: 'Copy the opening type and all its settings. Click the header to toggle all target pockets.',
-        },
-        copyPocketItem: {
-          label: 'Contents',
-          tooltip:
-            'Copy the selected item, orientation and both offsets. An empty source clears the target item. Click the header to toggle all target pockets.',
-        },
-        copyStitching: {
-          label: 'Stitching',
-          tooltip:
-            'Copy all bottom stitch lines from the source pocket. Existing stitch lines are kept unless overwrite is selected. Click the header to toggle all applicable target pockets.',
-        },
-        overwriteStitching: {
-          label: 'Overwrite',
-          tooltip:
-            'Replace the target pocket’s existing bottom stitch lines with copies from the source. Available when stitching is selected and the target already has stitching. Click the header to toggle all applicable target pockets.',
-        },
-      } satisfies EditorFieldTranslations<keyof PocketSettingsCopySelectionSchema>,
-    },
     globalSettings: {
       title: 'Settings',
       positiveAction: 'OK',
@@ -1058,16 +1069,33 @@ export const EN = {
     },
   } satisfies Record<string, NativeDialogTranslationSchema>,
   defaultNames: {
-    project: 'Project',
-    rootPanel: 'Module',
-    panel: 'Panel',
-    pocketCluster: 'Pocket cluster',
-    frontPocket: 'Front pocket',
-    tPocket: 'T-pocket',
-    componentBoundsStitchLine: 'Stitching',
-    tPocketStitchLine: 'Pocket stitching',
-    hole: 'Hole',
-  },
+    'project': 'Project',
+    'sub-project': 'Subproject',
+    'root-panel': 'Module',
+    'panel': 'Panel',
+    'pocket-cluster': 'Pocket cluster',
+    'front-pocket': 'Front pocket',
+    't-pocket': 'T-pocket',
+    't-pocket-stitch-line': 'Pocket stitching',
+    'component-bounds-stitch-line': 'Stitching',
+    'hole': 'Hole',
+    'straight-pocket-opening': 'Straight',
+    'recessed-pocket-opening': 'Recessed',
+    'slanted-pocket-opening': 'Slanted',
+    'optical-illusion-pocket-opening': 'Optical illusion',
+    'equal-constraint': 'Equality',
+    'root-panel-constraint-field': 'Field',
+    'panel-constraint-field': 'Field',
+    'pocket-cluster-constraint-field': 'Field',
+    'front-pocket-constraint-field': 'Field',
+    't-pocket-constraint-field': 'Field',
+    'hole-constraint-field': 'Field',
+    'recessed-constraint-field': 'Field',
+    'slanted-constraint-field': 'Field',
+    'optical-illusion-constraint-field': 'Field',
+    'component-bounds-stitch-line-constraint-field': 'Field',
+    't-pocket-stitch-line-constraint-field': 'Field',
+  } satisfies Record<IdPrefixSchema, string>,
   data: {
     pocketItemGroups: {
       cards: 'Cards',

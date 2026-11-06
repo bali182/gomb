@@ -1,18 +1,23 @@
+import type { ComponentSchema } from '../../schemas/components'
+import type { ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
+import type { NameGeneratorSchema } from '../../schemas/idGenerator'
+import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ProjectSchema } from '../../schemas/project'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { cloneComponentTree } from '../subProject/cloneComponentTree'
-import { getUnusedName } from '../subProject/utils/getUnusedName'
+import { getCloneIdMappings } from '../subProject/utils/getCloneIdMappings'
 
 export type CloneSubProjectParams = {
-  getUnusedId: () => string
+  nameGenerator: NameGeneratorSchema
   subProject: SubProjectSchema
 }
 
 export const cloneSubProject = (
   project: ProjectSchema,
-  { getUnusedId, subProject: sourceSubProject }: CloneSubProjectParams,
+  { subProject: sourceSubProject, nameGenerator }: CloneSubProjectParams,
 ): ProjectSchema => {
   const sourceRootPanel = accessors.subProject(sourceSubProject).optional.component.rootPanel()
 
@@ -20,20 +25,14 @@ export const cloneSubProject = (
     return project
   }
 
+  const idMappings = getCloneIdMappings(sourceSubProject)
   const cloneResult = cloneComponentTree({
     subProject: sourceSubProject,
     componentId: sourceSubProject.root,
     settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-    ids: {
-      component: getUnusedId,
-      hole: getUnusedId,
-      stitchLine: getUnusedId,
-    },
-    names: {
-      component: (sourceName) => sourceName,
-      hole: (sourceName) => sourceName,
-      stitchLine: (sourceName) => sourceName,
-    },
+    idMappings,
+    nameGenerator,
+    preserveNames: true,
   })
 
   if (!isDefined(cloneResult)) {
@@ -52,7 +51,13 @@ export const cloneSubProject = (
       .filter(isDefined)
       .map((root) => root.name),
   )
-  const rootName = getUnusedName(sourceRootPanel.name, usedRootNames)
+  const rootName = nameGenerator.getByBaseName(sourceRootPanel.name, usedRootNames)
+  const components = Object.fromEntries(
+    Object.values(cloneResult.clonedComponents).map((component): [string, ComponentSchema] => [
+      component.id,
+      narrowers.is.pocket(component) ? { ...component, openingId: idMappings[component.openingId] } : component,
+    ]),
+  )
 
   return {
     ...project,
@@ -60,19 +65,38 @@ export const cloneSubProject = (
       ...project.subProjects,
       {
         components: {
-          ...cloneResult.clonedComponents,
+          ...components,
           [cloneResult.clonedRootId]: {
             ...clonedRoot,
             name: rootName,
           },
         },
+        constraints: Object.fromEntries(
+          Object.values(sourceSubProject.constraints).map((constraint): [string, ConstraintSchema] => [
+            idMappings[constraint.id],
+            {
+              ...constraint,
+              id: idMappings[constraint.id],
+              fields: constraint.fields.map(
+                (field): ConstraintFieldSchema => ({
+                  ...field,
+                  id: idMappings[field.id],
+                  modelId: idMappings[field.modelId],
+                }),
+              ),
+            },
+          ]),
+        ),
         holes: cloneResult.clonedHoles,
-        id: getUnusedId(),
+        id: idMappings[sourceSubProject.id],
         root: cloneResult.clonedRootId,
         stitchLines: cloneResult.clonedStitchLines,
-        defaultPocketOpening: sourceSubProject.defaultPocketOpening,
+        defaultPocketOpening: idMappings[sourceSubProject.defaultPocketOpening],
         pocketOpenings: Object.fromEntries(
-          Object.entries(sourceSubProject.pocketOpenings).map(([id, opening]) => [id, { ...opening }]),
+          Object.values(sourceSubProject.pocketOpenings).map((opening): [string, PocketOpeningSchema] => [
+            idMappings[opening.id],
+            { ...opening, id: idMappings[opening.id] },
+          ]),
         ),
       },
     ],

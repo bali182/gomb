@@ -1,7 +1,17 @@
 import { useCallback, useMemo } from 'react'
+import { addConstraint as addConstraintPure } from '../operations/subProject/addConstraint'
+import { addConstraintField as addConstraintFieldPure } from '../operations/subProject/addConstraintField'
+import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
+import { deleteConstraint as deleteConstraintPure } from '../operations/subProject/deleteConstraint'
+import { deleteConstraintField as deleteConstraintFieldPure } from '../operations/subProject/deleteConstraintField'
 import { deletePocketOpening as deletePocketOpeningPure } from '../operations/subProject/deletePocketOpening'
 import { updatePocketOpening as updatePocketOpeningPure } from '../operations/subProject/updatePocketOpening'
+import type { ConstraintSchema } from '../schemas/constraints'
+import type { ConstraintFieldInputSchema, ReadonlyModelObjectFactorySchema } from '../schemas/factory'
+import type { NameGeneratorSchema } from '../schemas/idGenerator'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
+import { NameGenerator } from '../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
 
 import { useEditorContext } from '../contexts/EditorContext'
 import {
@@ -12,6 +22,7 @@ import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
 import { cloneComponent as cloneComponentPure } from '../operations/subProject/cloneComponent'
 import { cloneHole as cloneHolePure } from '../operations/subProject/cloneHole'
+import { clonePocketOpening as clonePocketOpeningPure } from '../operations/subProject/clonePocketOpening'
 import { cloneStitchLine as cloneStitchLinePure } from '../operations/subProject/cloneStitchLine'
 import { deleteComponent as deleteComponentPure } from '../operations/subProject/deleteComponent'
 import { deleteHole as deleteHolePure } from '../operations/subProject/deleteHole'
@@ -23,47 +34,38 @@ import { moveStitchLine as moveStitchLinePure } from '../operations/subProject/m
 import { updateComponent as updateComponentPure } from '../operations/subProject/updateComponent'
 import { updateHole as updateHolePure } from '../operations/subProject/updateHole'
 import { updateStitchLine as updateStitchLinePure } from '../operations/subProject/updateStitchLine'
-import { createComponent } from '../operations/subProject/utils/createComponent'
-import { createHole } from '../operations/subProject/utils/createHole'
-import { createPocketOpening } from '../operations/subProject/utils/createPocketOpening'
-import { createStitchLine } from '../operations/subProject/utils/createStitchLine'
-import { getUnusedComponentName } from '../operations/subProject/utils/getUnusedComponentName'
-import { getUnusedHoleName } from '../operations/subProject/utils/getUnusedHoleName'
-import { getUnusedName } from '../operations/subProject/utils/getUnusedName'
 import type { FlipAxisSchema } from '../schemas/common'
-import type { ComponentSchema, PocketSchema } from '../schemas/components'
+import type { ComponentSchema } from '../schemas/components'
 import type { HoleSchema } from '../schemas/hole'
+import type { IdGeneratorSchema } from '../schemas/idGenerator'
 import type { ModelObjectSchema } from '../schemas/modelObject'
-import type { PocketSettingsCopySelectionSchema, PocketSettingsCopyTargetsSchema } from '../schemas/pocketCopy'
 import type { ProjectSchema } from '../schemas/project'
-import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
+import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
-import { getUnusedStitchLineName } from '../utils/getUnusedStitchLineName'
-import { id } from '../utils/id'
 import { isDefined } from '../utils/isDefined'
-import { narrowers } from '../utils/narrowers'
+import { IdGenerator } from '../utils/random/IdGenerator'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useSubProjectHistory } from './useSubProjectHistory'
 import { useTranslation } from './useTranslation'
 
 export type UseSubProjectOperationsOutput = {
-  addPocketOpening: (type: PocketOpeningSchema['type']) => PocketOpeningSchema
+  addConstraint: (type: ConstraintSchema['type']) => void
+  deleteConstraint: (constraintId: string) => void
+  addConstraintField: (constraintId: string, field: ConstraintFieldInputSchema) => void
+  deleteConstraintField: (constraintId: string, fieldId: string) => void
+  addPocketOpening: (type: PocketOpeningSchema['type']) => void
+  clonePocketOpening: (openingId: string) => void
   setDefaultPocketOpening: (openingId: string) => void
   updatePocketOpening: (opening: PocketOpeningSchema) => void
   deletePocketOpening: (openingId: string) => void
-  addComponent: (
-    parentId: string,
-    type: ComponentSchema['type'],
-    position: ComponentInsertionPositionSchema,
-  ) => ComponentSchema
-  addHole: (componentId: string) => HoleSchema
-  addStitchLineToComponent: (componentId: string, type: StitchLineSchema['type']) => StitchLineSchema
-  addStitchLineToHole: (holeId: string) => StitchLineSchema
+  addComponent: (parentId: string, type: ComponentSchema['type'], position: ComponentInsertionPositionSchema) => void
+  addHole: (componentId: string) => void
+  addStitchLineToComponent: (componentId: string, type: StitchLineSchema['type']) => void
+  addStitchLineToHole: (holeId: string) => void
   cloneComponent: (componentId: string) => void
   cloneHole: (holeId: string) => void
   cloneStitchLine: (stitchLineId: string) => void
-  copyPocketSettings: (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>) => void
   flip: (model: ModelObjectSchema, axis: FlipAxisSchema) => void
   deleteComponent: (componentId: string) => void
   deleteHole: (holeId: string) => void
@@ -82,30 +84,72 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const { settings } = useGlobalSettings()
   const { recordChange, recordThrottledChange: recordThrottledUpdate } = useSubProjectHistory()
   const { t } = useTranslation()
+  const idGenerator = useMemo<IdGeneratorSchema>(() => new IdGenerator(), [])
+  const nameGenerator = useMemo<NameGeneratorSchema>(() => new NameGenerator(t.defaultNames), [t.defaultNames])
+  const modelFactory = useMemo<ReadonlyModelObjectFactorySchema>(
+    () => new ReadonlyModelObjectFactory(idGenerator, nameGenerator),
+    [idGenerator, nameGenerator],
+  )
+
+  const addConstraint = useCallback(
+    (type: ConstraintSchema['type']): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = addConstraintPure(currentSubProject, { type, modelFactory })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [modelFactory, recordChange, setSubProject, subProject],
+  )
+
+  const deleteConstraint = useCallback(
+    (constraintId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = deleteConstraintPure(currentSubProject, { constraintId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
+  )
+
+  const addConstraintField = useCallback(
+    (constraintId: string, field: ConstraintFieldInputSchema): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = addConstraintFieldPure(currentSubProject, { constraintId, field, modelFactory })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [modelFactory, recordChange, setSubProject, subProject],
+  )
+
+  const deleteConstraintField = useCallback(
+    (constraintId: string, fieldId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = deleteConstraintFieldPure(currentSubProject, { constraintId, fieldId })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [recordChange, setSubProject, subProject],
+  )
 
   const addPocketOpening = useCallback(
-    (type: PocketOpeningSchema['type']): PocketOpeningSchema => {
+    (type: PocketOpeningSchema['type']): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const opening = createPocketOpening({
-        type,
-        id: id(),
-        name: getUnusedName(
-          t.project.editors.enums.components.pocketOpening[type],
-          new Set(
-            Object.values(currentSubProject.pocketOpenings).map(
-              (candidate: PocketOpeningSchema): string => candidate.name,
-            ),
-          ),
-        ),
-      })
       recordChange(currentSubProject)
-      setSubProject({
-        ...currentSubProject,
-        pocketOpenings: { ...currentSubProject.pocketOpenings, [opening.id]: opening },
-      })
-      return opening
+      setSubProject(addPocketOpeningPure(currentSubProject, { type, modelFactory }))
     },
-    [recordChange, setSubProject, subProject, t],
+    [modelFactory, recordChange, setSubProject, subProject],
   )
 
   const setDefaultPocketOpening = useCallback(
@@ -121,6 +165,19 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       setSubProject({ ...currentSubProject, defaultPocketOpening: openingId })
     },
     [recordChange, setSubProject, subProject],
+  )
+
+  const clonePocketOpening = useCallback(
+    (openingId: string): void => {
+      const currentSubProject = ensureSubProject(subProject)
+      const updated = clonePocketOpeningPure(currentSubProject, { openingId, nameGenerator })
+      if (updated === currentSubProject) {
+        return
+      }
+      recordChange(currentSubProject)
+      setSubProject(updated)
+    },
+    [nameGenerator, recordChange, setSubProject, subProject],
   )
 
   const updatePocketOpening = useCallback(
@@ -150,84 +207,58 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   )
 
   const addComponent = useCallback(
-    (parentId: string, type: ComponentSchema['type'], position: ComponentInsertionPositionSchema): ComponentSchema => {
+    (parentId: string, type: ComponentSchema['type'], position: ComponentInsertionPositionSchema): void => {
       const currentProject = ensureProject(project)
       const currentSubProject = ensureSubProject(subProject)
-      const component = createComponent({
-        type,
-        color: settings.edit.addBaseColor ? currentProject.colorSettings.leatherColor : undefined,
-        id: id(),
-        name: getUnusedComponentName(type, currentSubProject, t.defaultNames),
-        stitchingSettings: currentProject.stitchingSettings,
-        openingId: currentSubProject.defaultPocketOpening,
-      })
-
       recordChange(currentSubProject)
       setSubProject(
         addComponentPure(currentSubProject, {
-          component,
           parentId,
+          type,
           position,
+          modelFactory,
+          color: settings.edit.addBaseColor ? currentProject.colorSettings.leatherColor : undefined,
+          stitchingSettings: currentProject.stitchingSettings,
         }),
       )
-
-      return component
     },
-    [project, recordChange, setSubProject, settings.edit.addBaseColor, subProject, t],
+    [modelFactory, project, recordChange, setSubProject, settings.edit.addBaseColor, subProject],
   )
 
   const addStitchLineToComponent = useCallback(
-    (componentId: string, type: StitchLineSchema['type']): StitchLineSchema => {
+    (componentId: string, type: StitchLineSchema['type']): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const stitchLine = createStitchLine(
-        type,
-        { targetId: componentId, targetType: 'component' },
-        id(),
-        getUnusedStitchLineName(type, currentSubProject, t.defaultNames),
-      )
-
       recordChange(currentSubProject)
-      setSubProject(addStitchLinePure(currentSubProject, { stitchLine }))
-
-      return stitchLine
+      setSubProject(
+        addStitchLinePure(currentSubProject, { type, targetId: componentId, targetType: 'component', modelFactory }),
+      )
     },
-    [recordChange, setSubProject, subProject, t],
+    [modelFactory, recordChange, setSubProject, subProject],
   )
 
   const addStitchLineToHole = useCallback(
-    (holeId: string): StitchLineSchema => {
+    (holeId: string): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const type: ComponentBoundsStitchLineSchema['type'] = 'component-bounds-stitch-line'
-      const stitchLine = createStitchLine(
-        type,
-        { targetId: holeId, targetType: 'hole' },
-        id(),
-        getUnusedStitchLineName(type, currentSubProject, t.defaultNames),
-      )
-
       recordChange(currentSubProject)
-      setSubProject(addStitchLinePure(currentSubProject, { stitchLine }))
-
-      return stitchLine
+      setSubProject(
+        addStitchLinePure(currentSubProject, {
+          type: 'component-bounds-stitch-line',
+          targetId: holeId,
+          targetType: 'hole',
+          modelFactory,
+        }),
+      )
     },
-    [recordChange, setSubProject, subProject, t],
+    [modelFactory, recordChange, setSubProject, subProject],
   )
 
   const addHole = useCallback(
-    (componentId: string): HoleSchema => {
+    (componentId: string): void => {
       const currentSubProject = ensureSubProject(subProject)
-      const hole = createHole({
-        componentId,
-        id: id(),
-        name: getUnusedHoleName(currentSubProject, t.defaultNames),
-      })
-
       recordChange(currentSubProject)
-      setSubProject(addHolePure(currentSubProject, { hole }))
-
-      return hole
+      setSubProject(addHolePure(currentSubProject, { componentId, modelFactory }))
     },
-    [recordChange, setSubProject, subProject, t],
+    [modelFactory, recordChange, setSubProject, subProject],
   )
 
   const cloneComponent = useCallback(
@@ -235,16 +266,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       const currentSubProject = ensureSubProject(subProject)
       const clonedSubProject = cloneComponentPure(currentSubProject, {
         componentId,
-        ids: {
-          component: id,
-          hole: id,
-          stitchLine: id,
-        },
-        names: {
-          component: getUnusedName,
-          hole: getUnusedName,
-          stitchLine: getUnusedName,
-        },
+        nameGenerator,
         settings: {
           cloneComponentTree: true,
           cloneHoles: true,
@@ -255,7 +277,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       recordChange(currentSubProject)
       setSubProject(clonedSubProject)
     },
-    [recordChange, setSubProject, subProject],
+    [nameGenerator, recordChange, setSubProject, subProject],
   )
 
   const deleteComponent = useCallback(
@@ -273,9 +295,14 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       const currentSubProject = ensureSubProject(subProject)
 
       recordChange(currentSubProject)
-      setSubProject(cloneHolePure(currentSubProject, { getUnusedId: id, getUnusedName, holeId }))
+      setSubProject(
+        cloneHolePure(currentSubProject, {
+          nameGenerator,
+          holeId,
+        }),
+      )
     },
-    [recordChange, setSubProject, subProject],
+    [nameGenerator, recordChange, setSubProject, subProject],
   )
 
   const deleteHole = useCallback(
@@ -293,9 +320,14 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       const currentSubProject = ensureSubProject(subProject)
 
       recordChange(currentSubProject)
-      setSubProject(cloneStitchLinePure(currentSubProject, { getUnusedId: id, getUnusedName, stitchLineId }))
+      setSubProject(
+        cloneStitchLinePure(currentSubProject, {
+          nameGenerator,
+          stitchLineId,
+        }),
+      )
     },
-    [recordChange, setSubProject, subProject],
+    [nameGenerator, recordChange, setSubProject, subProject],
   )
 
   const deleteStitchLine = useCallback(
@@ -377,48 +409,6 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [recordChange, setSubProject, subProject],
   )
 
-  const copyPocketSettings = useCallback(
-    (sourcePocketId: string, targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
-      const currentSubProject = ensureSubProject(subProject)
-      const accessor = accessors.subProject(currentSubProject)
-      const source = accessor.component.pocket(sourcePocketId)
-      const cluster = accessor.optional.component.parent(sourcePocketId)
-      if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
-        return
-      }
-
-      const sourceStitchLines = accessor.stitchLine.byOwner(sourcePocketId).filter(narrowers.is.tPocketStitchLine)
-      const updatedSubProject = cluster.children.reduce<SubProjectSchema>((current, pocketId) => {
-        const selection = targets[pocketId]
-        if (pocketId === sourcePocketId || !isDefined(selection)) {
-          return current
-        }
-
-        const target = accessors.subProject(current).component.pocket(pocketId)
-        const updatedPocket = copyPocketFields(source, target, selection)
-        const withPocket =
-          updatedPocket === target ? current : updateComponentPure(current, { component: updatedPocket })
-        if (
-          !selection.copyStitching ||
-          !narrowers.is.tPocket(source) ||
-          !narrowers.is.tPocket(target) ||
-          sourceStitchLines.length === 0
-        ) {
-          return withPocket
-        }
-
-        return copyPocketStitchLines(withPocket, sourceStitchLines, target.id, selection.overwriteStitching)
-      }, currentSubProject)
-
-      if (updatedSubProject === currentSubProject) {
-        return
-      }
-      recordChange(currentSubProject)
-      setSubProject(updatedSubProject)
-    },
-    [recordChange, setSubProject, subProject],
-  )
-
   const updateHole = useCallback(
     (hole: HoleSchema): void => {
       const currentSubProject = ensureSubProject(subProject)
@@ -441,7 +431,12 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
 
   return useMemo<UseSubProjectOperationsOutput>(
     () => ({
+      addConstraint,
+      deleteConstraint,
+      addConstraintField,
+      deleteConstraintField,
       addPocketOpening,
+      clonePocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
@@ -452,7 +447,6 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       cloneComponent,
       cloneHole,
       cloneStitchLine,
-      copyPocketSettings,
       flip,
       deleteComponent,
       deleteHole,
@@ -466,7 +460,12 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       updateStitchLine,
     }),
     [
+      addConstraint,
+      deleteConstraint,
+      addConstraintField,
+      deleteConstraintField,
       addPocketOpening,
+      clonePocketOpening,
       setDefaultPocketOpening,
       updatePocketOpening,
       deletePocketOpening,
@@ -477,7 +476,6 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       cloneComponent,
       cloneHole,
       cloneStitchLine,
-      copyPocketSettings,
       flip,
       deleteComponent,
       deleteHole,
@@ -507,60 +505,4 @@ const ensureSubProject = (subProject: SubProjectSchema | undefined): SubProjectS
   }
 
   return subProject
-}
-
-const copyPocketFields = (
-  source: PocketSchema,
-  target: PocketSchema,
-  selection: PocketSettingsCopySelectionSchema,
-): PocketSchema => {
-  let updatedPocket = target
-  if (selection.copyPocketItem) {
-    updatedPocket = {
-      ...updatedPocket,
-      itemId: source.itemId,
-      itemOrientation: source.itemOrientation,
-      itemCrossAxisOffset: source.itemCrossAxisOffset,
-      itemOpeningOffset: source.itemOpeningOffset,
-    }
-  }
-  if (selection.copyOpening) {
-    updatedPocket = { ...updatedPocket, openingId: source.openingId }
-  }
-  if (selection.copyShape && narrowers.is.tPocket(source) && narrowers.is.tPocket(updatedPocket)) {
-    updatedPocket = {
-      ...updatedPocket,
-      tPocketTabWidth: source.tPocketTabWidth,
-      tPocketTaper: source.tPocketTaper,
-    }
-  }
-  return updatedPocket
-}
-
-const copyPocketStitchLines = (
-  subProject: SubProjectSchema,
-  sourceStitchLines: readonly TPocketStitchLineSchema[],
-  targetPocketId: string,
-  overwrite: boolean,
-): SubProjectSchema => {
-  const existingStitchLines = accessors
-    .subProject(subProject)
-    .stitchLine.byOwner(targetPocketId)
-    .filter(narrowers.is.tPocketStitchLine)
-  const withoutExisting = overwrite
-    ? existingStitchLines.reduce<SubProjectSchema>(
-        (current, stitchLine) => deleteStitchLinePure(current, { stitchLineId: stitchLine.id }),
-        subProject,
-      )
-    : subProject
-
-  return sourceStitchLines.reduce<SubProjectSchema>((current, sourceStitchLine) => {
-    const stitchLine: TPocketStitchLineSchema = {
-      ...sourceStitchLine,
-      id: id(),
-      name: getUnusedName(sourceStitchLine.name, new Set(current.stitchLines.map((candidate) => candidate.name))),
-      targetId: targetPocketId,
-    }
-    return addStitchLinePure(current, { stitchLine })
-  }, withoutExisting)
 }

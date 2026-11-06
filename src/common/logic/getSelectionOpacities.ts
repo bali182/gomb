@@ -22,7 +22,10 @@ export const getSelectionOpacities = (
   isEditingPocketContents: boolean,
 ): SelectionOpacitiesSchema => {
   const relatedComponentIds = getRelatedComponentIds(selection, subProject)
-  const hasSelection = isDefined(selection) && (!narrowers.is.pocketOpening(selection) || relatedComponentIds.size > 0)
+  const hasSelection =
+    isDefined(selection) &&
+    selection.type !== 'equal-constraint' &&
+    (!narrowers.is.pocketOpening(selection) || relatedComponentIds.size > 0)
   const opacities: SelectionOpacitiesSchema = {
     components: {},
     pocketItems: {},
@@ -77,34 +80,43 @@ const getRelatedComponentIds = (
   if (!isDefined(selection)) {
     return new Set<string>()
   }
-  if (narrowers.is.pocketOpening(selection)) {
-    return new Set(
-      Object.values(subProject.components)
-        .filter(
-          (component: ComponentSchema): boolean =>
-            narrowers.is.pocket(component) && component.openingId === selection.id,
-        )
-        .map((component: ComponentSchema): string => component.id),
-    )
+  switch (selection.type) {
+    case 'equal-constraint':
+      return new Set<string>()
+    case 'straight':
+    case 'slanted':
+    case 'recessed':
+    case 'optical-illusion':
+      return new Set(
+        Object.values(subProject.components)
+          .filter(
+            (component: ComponentSchema): boolean =>
+              narrowers.is.pocket(component) && component.openingId === selection.id,
+          )
+          .map((component: ComponentSchema): string => component.id),
+      )
+    case 'root-panel':
+    case 'panel':
+    case 'front-pocket':
+    case 't-pocket':
+      return new Set([selection.id])
+    case 'pocket-cluster':
+      return new Set(getComponentDescendants(selection, subProject))
+    case 'hole':
+      return new Set([selection.componentId])
+    case 'component-bounds-stitch-line':
+    case 't-pocket-stitch-line': {
+      if (narrowers.is.componentBoundsStitchLine(selection) && isDefined(selection.onTop)) {
+        return new Set([selection.onTop])
+      }
+      if (selection.targetType === 'component') {
+        return new Set([selection.targetId])
+      }
+      const accessor = accessors.subProject(subProject)
+      const hole = accessor.optional.hole.byId(selection.targetId)
+      return new Set(isDefined(hole) ? [hole.componentId] : [])
+    }
   }
-  if (narrowers.is.component(selection)) {
-    return new Set(
-      narrowers.is.pocketCluster(selection) ? getComponentDescendants(selection, subProject) : [selection.id],
-    )
-  }
-  if (narrowers.is.hole(selection)) {
-    return new Set([selection.componentId])
-  }
-
-  const source = accessors.subProject(subProject)
-  if (narrowers.is.componentBoundsStitchLine(selection) && isDefined(selection.onTop)) {
-    return new Set([selection.onTop])
-  }
-  if (selection.targetType === 'component') {
-    return new Set([selection.targetId])
-  }
-  const hole = source.optional.hole.byId(selection.targetId)
-  return new Set(isDefined(hole) ? [hole.componentId] : [])
 }
 
 const isRelatedStitchLine = (

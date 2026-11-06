@@ -8,9 +8,17 @@ type FloatingEditorProps = {
   anchorElement: FloatingEditorAnchor
   children: ReactNode
   onClose: () => void
+  positioning?: 'to-svg' | 'to-tree'
+  maxHeight?: string
 }
 
-export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, children, onClose }) => {
+export const FloatingEditor: FC<FloatingEditorProps> = ({
+  anchorElement,
+  children,
+  onClose,
+  positioning = 'to-svg',
+  maxHeight,
+}) => {
   const positioningTarget = useMemo<FloatingEditorAnchor>(
     () => ({
       getBoundingClientRect: anchorElement.getBoundingClientRect,
@@ -32,12 +40,11 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
       }
     },
     positioning: {
-      flip: ['left-start', 'bottom', 'top', 'right-start'],
+      ...(positioning === 'to-tree' ? treePositioning : svgPositioning),
       getAnchorElement: () => positioningTarget,
       gutter: 10,
       overlap: true,
       overflowPadding: 8,
-      placement: 'right-start',
       strategy: 'fixed',
     },
   })
@@ -80,11 +87,53 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({ anchorElement, childre
   return (
     <Popover.RootProvider value={popover}>
       <Popover.Positioner>
-        <Popover.Content onClick={stopPropagation} onMouseUp={stopPropagation} width="450px" zIndex="popover">
+        <Popover.Content
+          onClick={stopPropagation}
+          onMouseUp={stopPropagation}
+          width="450px"
+          maxHeight={maxHeight}
+          display="flex"
+          flexDirection="column"
+          zIndex="popover"
+        >
           <Popover.Arrow />
           {children}
         </Popover.Content>
       </Popover.Positioner>
     </Popover.RootProvider>
   )
+}
+
+const svgPositioning: Popover.RootProps['positioning'] = {
+  placement: 'right-start',
+  flip: [
+    'right',
+    'right-end',
+    'left-start',
+    'left',
+    'left-end',
+    'bottom-start',
+    'bottom',
+    'bottom-end',
+    'top-start',
+    'top',
+    'top-end',
+  ],
+}
+
+const treePositioning: Popover.RootProps['positioning'] = {
+  placement: 'left',
+  flip: [
+    'left-start',
+    'left-end',
+    'top',
+    'top-start',
+    'top-end',
+    'bottom',
+    'bottom-start',
+    'bottom-end',
+    'right',
+    'right-start',
+    'right-end',
+  ],
 }

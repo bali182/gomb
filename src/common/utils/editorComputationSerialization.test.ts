@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
-import { processEditorComputation } from '../logic/processEditorComputation'
+import { defaultStitchingSettings } from '../defaultStates'
+import { processSubProjectComputation } from '../logic/processSubProjectComputation'
 import type {
   EditorComputationCompletedSchema,
   EditorComputationFailedSchema,
@@ -31,24 +32,39 @@ describe('editor computation serialization', () => {
     const subProject = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root', width: 123, height: 80 }) })
     const request: EditorComputationRequestSchema = {
       requestId: 4,
-      project: d.project({ id: 'project', subProjects: [subProject] }),
-      subProjectId: subProject.id,
+      subProject,
+      stitchingSettings: defaultStitchingSettings,
+      previousSubProject: {
+        ...subProject,
+        components: { ...subProject.components, root: { ...subProject.components.root, name: 'Previous root' } },
+      },
     }
     const restoredRequest = deserializeEditorComputation<EditorComputationRequestSchema>(
       serializeEditorComputation(request),
     )
     expect(restoredRequest).toEqual(request)
+    expect(Object.keys(restoredRequest).sort()).toEqual([
+      'previousSubProject',
+      'requestId',
+      'stitchingSettings',
+      'subProject',
+    ])
 
     const response: EditorComputationCompletedSchema = {
       type: 'completed',
       requestId: request.requestId,
-      result: processEditorComputation(restoredRequest),
+      result: processSubProjectComputation(
+        restoredRequest.subProject,
+        restoredRequest.stitchingSettings,
+        restoredRequest.previousSubProject,
+      ),
     }
     const restored = deserializeEditorComputation<EditorComputationCompletedSchema>(
       serializeEditorComputation(response),
     )
     expect(restored).toEqual(response)
     expect(restored.requestId).toBe(4)
+    expect(Object.keys(restored.result).sort()).toEqual(['computedSubProject', 'subProject'])
     expect(BigNumber.isBigNumber(restored.result.computedSubProject.viewBox.width)).toBe(true)
   })
 

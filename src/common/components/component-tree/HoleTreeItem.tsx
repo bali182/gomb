@@ -8,7 +8,7 @@ import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
 import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
-import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { DropInsideIndicator } from './ComponentTreeDropIndicators'
 import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { HoleStitchLineDropData } from './types/dropDataTypes'
@@ -117,7 +117,11 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({ hasDragAndDrop, indexPath,
         icon={<Icon />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
-        label={<TreeView.BranchText>{label}</TreeView.BranchText>}
+        label={
+          <TreeView.BranchText asChild>
+            <TreeItemLabel>{label}</TreeItemLabel>
+          </TreeView.BranchText>
+        }
         leading={dragHandle}
         trailing={renderMenu?.(node)}
       />

@@ -11,6 +11,11 @@ export const createDefaultGlobalSettings = ({ language, theme }: AppSettingsSche
     },
     ui: {
       splitterSizes: ['auto', '350px'],
+      treeSections: {
+        components: { open: true, size: 1 },
+        openings: { open: false, size: 1 },
+        constraints: { open: false, size: 1 },
+      },
     },
     edit: {
       addBaseColor: false,

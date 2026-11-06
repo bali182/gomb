@@ -58,7 +58,7 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireString(subProject, 'defaultPocketOpening')
     m.requireObjectField(subProject, 'components')
     m.requireObjectField(subProject, 'pocketOpenings')
-    return m.applyDefaults<SubProjectSchema>(subProject, { holes: [], stitchLines: [] })
+    return m.applyDefaults<SubProjectSchema>(subProject, { holes: [], stitchLines: [], constraints: {} })
   },
   colorSettings: (input) => {
     return m.applyDefaults<ColorSettingsSchema>(m.requireObject(input), defaultColorSettings)

@@ -1,138 +1,130 @@
 import { describe, expect, it } from 'vitest'
-
 import { d } from '../../testData'
+import { EN } from '../../translations/en'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { cloneComponentTree } from './cloneComponentTree'
-import { getUnusedName } from './utils/getUnusedName'
+import { getCloneIdMappings } from './utils/getCloneIdMappings'
+
+const nameGenerator = new NameGenerator(EN.defaultNames)
 
 describe('cloneComponentTree', () => {
-  it.each([false, true])('clones a cluster without children when it originally has pockets: %s', (hasPockets) => {
-    const cluster = d.pocketCluster({ id: 'cluster', children: hasPockets ? ['t', 'front'] : [] })
-    const source = d.subProject({
-      id: 'sub',
-      root: d.rootPanel({ id: 'root', children: [cluster.id] }),
-      components: [cluster, d.tPocket({ id: 't' }), d.frontPocket({ id: 'front' })],
-      holes: [d.hole({ id: 'front-hole', componentId: 'front' })],
-      stitchLines: [
-        d.tPocketStitchLine({ id: 't-line', targetId: 't', targetType: 'component' }),
-        d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'front-hole', targetType: 'hole' }),
-      ],
-    })
-    const snapshot = structuredClone(source)
-    let componentCount = 0
-    const result = cloneComponentTree({
-      subProject: source,
-      componentId: cluster.id,
-      settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
-      ids: {
-        component: () => `component-copy-${++componentCount}`,
-        hole: () => 'hole-copy',
-        stitchLine: () => 'stitch-copy',
-      },
-      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
-    })
-    expect(result?.clonedRootId).toBe('component-copy-1')
-    expect(Object.keys(result?.clonedComponents ?? {})).toEqual(['component-copy-1'])
-    expect(result?.clonedComponents['component-copy-1']).toMatchObject({ type: 'pocket-cluster', children: [] })
-    expect(result?.clonedHoles).toEqual([])
-    expect(result?.clonedStitchLines).toEqual([])
-    expect(source).toEqual(snapshot)
-  })
-
-  it('clones a root tree with its holes and stitch lines', () => {
-    const root = d.rootPanel({ id: 'root', children: ['pocket-cluster'], name: 'Root' })
-    const pocketCluster = d.pocketCluster({ id: 'pocket-cluster', children: ['panel'], name: 'Pocket cluster' })
-    const panel = d.panel({ id: 'panel', name: 'Panel' })
-    const hole = d.hole({ id: 'hole', componentId: panel.id, name: 'Hole' })
-    const componentStitchLine = d.componentBoundsStitchLine({
-      id: 'component-stitch-line',
-      name: 'Component stitch line',
-      targetId: panel.id,
-      targetType: 'component',
-    })
-    const holeStitchLine = d.componentBoundsStitchLine({
-      id: 'hole-stitch-line',
-      name: 'Hole stitch line',
-      targetId: hole.id,
-      targetType: 'hole',
-    })
-    const subProject = d.subProject({
-      components: [pocketCluster, panel],
-      holes: [hole],
-      id: 'sub-project',
-      root,
-      stitchLines: [componentStitchLine, holeStitchLine],
-    })
-    let componentCounter = 0
-    let holeCounter = 0
-    let stitchLineCounter = 0
-
-    const result = cloneComponentTree({
-      subProject,
-      componentId: root.id,
-      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-      ids: {
-        component: (): string => {
-          componentCounter += 1
-          return `component-clone-${componentCounter}`
-        },
-        hole: (): string => {
-          holeCounter += 1
-          return `hole-clone-${holeCounter}`
-        },
-        stitchLine: (): string => {
-          stitchLineCounter += 1
-          return `stitch-line-clone-${stitchLineCounter}`
-        },
-      },
-      names: {
-        component: getUnusedName,
-        hole: getUnusedName,
-        stitchLine: getUnusedName,
-      },
-    })
-
-    expect(result?.clonedRootId).toBe('component-clone-1')
-    expect(result?.clonedComponents['component-clone-1']).toMatchObject({ children: ['component-clone-2'] })
-    expect(result?.clonedComponents['component-clone-2']).toMatchObject({ children: ['component-clone-3'] })
-    expect(result?.clonedHoles).toMatchObject([{ componentId: 'component-clone-3', id: 'hole-clone-1' }])
-    expect(result?.clonedStitchLines).toMatchObject([
-      { targetId: 'component-clone-3', targetType: 'component' },
-      { targetId: 'hole-clone-1', targetType: 'hole' },
-    ])
-  })
-  it('clones each cluster and pocket stitch once and remaps their separate owners', () => {
+  it.each([false, true])('copies only the cluster when tree copying is disabled, with pockets: %s', (hasPockets) => {
     const source = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root', children: ['cluster'] }),
       components: [
-        d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
+        d.pocketCluster({ id: 'cluster', children: hasPockets ? ['t', 'front'] : [] }),
         d.tPocket({ id: 't' }),
         d.frontPocket({ id: 'front' }),
       ],
-      stitchLines: [
-        d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
-        d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
-      ],
+      holes: [d.hole({ id: 'hole', componentId: 'front' })],
+      stitchLines: [d.tPocketStitchLine({ id: 'stitch', targetId: 't', targetType: 'component' })],
     })
-    const snapshot = structuredClone(source)
-    let componentCount = 0
-    let lineCount = 0
+    const idMappings = getCloneIdMappings(source)
     const result = cloneComponentTree({
       subProject: source,
       componentId: 'cluster',
-      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
-      ids: {
-        component: () => `component-${++componentCount}`,
-        hole: () => 'hole',
-        stitchLine: () => `line-${++lineCount}`,
-      },
-      names: { component: getUnusedName, hole: getUnusedName, stitchLine: getUnusedName },
+      idMappings,
+      nameGenerator,
+      preserveNames: false,
+      settings: { cloneComponentTree: false, cloneHoles: true, cloneStitchLines: true },
     })
-    expect(result?.clonedStitchLines).toHaveLength(2)
+    expect(Object.keys(result?.clonedComponents ?? {})).toEqual([idMappings.cluster])
+    expect(result?.clonedComponents[idMappings.cluster]).toMatchObject({ children: [] })
+    expect(result?.clonedHoles).toEqual([])
+    expect(result?.clonedStitchLines).toEqual([])
+  })
+
+  it('maps internal onTop references and removes external ones even though both have mappings', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['panel', 'outside'] }),
+      components: [d.panel({ id: 'panel', children: ['child'] }), d.panel({ id: 'child' }), d.panel({ id: 'outside' })],
+      holes: [d.hole({ id: 'hole', componentId: 'child' })],
+      stitchLines: [
+        d.componentBoundsStitchLine({ id: 'internal', targetId: 'panel', targetType: 'component', onTop: 'child' }),
+        d.componentBoundsStitchLine({ id: 'external', targetId: 'hole', targetType: 'hole', onTop: 'outside' }),
+      ],
+    })
+    const snapshot = structuredClone(source)
+    const idMappings = getCloneIdMappings(source)
+    const result = cloneComponentTree({
+      subProject: source,
+      componentId: 'panel',
+      idMappings,
+      nameGenerator,
+      preserveNames: false,
+      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+    })
+    expect(idMappings.outside).toMatch(/^panel-/)
+    expect(result?.clonedComponents[idMappings.panel].children).toEqual([idMappings.child])
+    expect(result?.clonedHoles).toMatchObject([{ id: idMappings.hole, componentId: idMappings.child }])
     expect(result?.clonedStitchLines).toMatchObject([
-      { id: 'line-1', targetId: 'component-1', targetType: 'component' },
-      { id: 'line-2', targetId: 'component-2', targetType: 'component' },
+      { id: idMappings.internal, targetId: idMappings.panel, onTop: idMappings.child },
+      { id: idMappings.external, targetId: idMappings.hole, onTop: undefined },
     ])
     expect(source).toEqual(snapshot)
+  })
+
+  it.each([false, true])('handles component, hole and stitch names with preserveNames=%s', (preserveNames) => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      components: [
+        d.panel({ id: 'panel', name: 'Shared 1', children: ['child'] }),
+        d.panel({ id: 'child', name: 'Shared 1' }),
+      ],
+      holes: [
+        d.hole({ id: 'first-hole', componentId: 'panel', name: 'Shared 1' }),
+        d.hole({ id: 'second-hole', componentId: 'child', name: 'Shared 1' }),
+      ],
+      stitchLines: [
+        d.componentBoundsStitchLine({
+          id: 'first-stitch',
+          targetId: 'panel',
+          targetType: 'component',
+          name: 'Shared 1',
+        }),
+        d.componentBoundsStitchLine({
+          id: 'second-stitch',
+          targetId: 'child',
+          targetType: 'component',
+          name: 'Shared 1',
+        }),
+      ],
+    })
+    const snapshot = structuredClone(source)
+    const result = cloneComponentTree({
+      subProject: source,
+      componentId: 'panel',
+      idMappings: getCloneIdMappings(source),
+      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+      nameGenerator,
+      preserveNames,
+    })
+    const expectedNames = preserveNames ? ['Shared 1', 'Shared 1'] : ['Shared 2', 'Shared 3']
+    expect(Object.values(result?.clonedComponents ?? {}).map((component) => component.name)).toEqual(expectedNames)
+    expect(result?.clonedHoles.map((hole) => hole.name)).toEqual(expectedNames)
+    expect(result?.clonedStitchLines.map((stitchLine) => stitchLine.name)).toEqual(expectedNames)
+    expect(source).toEqual(snapshot)
+  })
+
+  it('copies an entire root tree', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      components: [d.panel({ id: 'panel' })],
+    })
+    const idMappings = getCloneIdMappings(source)
+    const result = cloneComponentTree({
+      subProject: source,
+      componentId: 'root',
+      idMappings,
+      nameGenerator,
+      preserveNames: false,
+      settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
+    })
+    expect(result?.clonedRootId).toBe(idMappings.root)
+    expect(result?.clonedComponents[idMappings.root].children).toEqual([idMappings.panel])
   })
 })

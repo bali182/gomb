@@ -1,8 +1,8 @@
-import { Box, IconButton, Text, type SystemStyleObject } from '@chakra-ui/react'
+import { Box, IconButton, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCaretRight, PiDotsSixVertical } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
-import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { TreeDragData } from './types/dragDataTypes'
 import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
@@ -43,7 +43,9 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
           ) : undefined
         }
         label={
-          <Text flex="1">{node.kind === 'pocket-opening' ? node.opening.name : getProjectTreeNodeLabel(node)}</Text>
+          <TreeItemLabel>
+            {node.kind === 'pocket-opening' ? node.opening.name : getProjectTreeNodeLabel(node)}
+          </TreeItemLabel>
         }
         leading={
           <IconButton pointerEvents="none" size="2xs" variant="ghost" _hover={{ bg: 'transparent' }}>

@@ -1,16 +1,18 @@
 import { useCallback, useMemo, useState, type FC } from 'react'
 import { useNavigate } from 'react-router'
+import { NameGenerator } from '../../common/utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../../common/utils/factory/ReadonlyModelObjectFactory'
 
 import { EditDialog } from '../../common/components/EditDialog'
 import { LANGUAGE } from '../../common/constants/language'
 import { useEditableModel } from '../../common/hooks/useEditableModel'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { addSubProject } from '../../common/operations/project/addSubProject'
-import { getUnusedName } from '../../common/operations/subProject/utils/getUnusedName'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { ProjectBasedValidationContextSchema } from '../../common/schemas/validation'
 import { createProject } from '../../common/utils/createProject'
 import { hasValidationErrors } from '../../common/utils/hasValidationErrors'
+import { IdGenerator } from '../../common/utils/random/IdGenerator'
 import { validateProjectSchema } from '../../common/validators/validateProjectSchema'
 import { useProjects } from '../hooks/useProjects'
 import { webAppRoutes } from '../webAppRoutes'
@@ -28,9 +30,9 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
 
   const createEmptyProject = useCallback((): ProjectSchema => {
     return createProject(
-      getUnusedName(t.defaultNames.project, new Set(projects.map((project): string => project.name))),
+      new NameGenerator(t.defaultNames).get('project', new Set(projects.map((project): string => project.name))),
     )
-  }, [projects, t.defaultNames.project])
+  }, [projects, t.defaultNames])
 
   const [project, setProject] = useState<ProjectSchema>(() => createEmptyProject())
 
@@ -64,22 +66,12 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
     }
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
-      baseRootComponentName: t.defaultNames.rootPanel,
-      defaultOpeningName: t.project.editors.enums.components.pocketOpening.straight,
+      modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(t.defaultNames)),
     })
     addProject(createdProject)
     onOpenChange(false)
     navigate(webAppRoutes.subProject(createdProject.id, initialSubProject.id))
-  }, [
-    addProject,
-    context,
-    editableValue,
-    navigate,
-    onOpenChange,
-    project,
-    t.defaultNames.rootPanel,
-    t.project.editors.enums.components.pocketOpening.straight,
-  ])
+  }, [addProject, context, editableValue, navigate, onOpenChange, project, t.defaultNames])
 
   return (
     <EditDialog

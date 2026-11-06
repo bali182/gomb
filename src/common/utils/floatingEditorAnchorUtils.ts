@@ -1,5 +1,6 @@
 import type { HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
+import type { ConstraintSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
@@ -72,6 +73,14 @@ const getPocketOpeningAnchor = (model: PocketOpeningSchema): FloatingEditorAncho
   }
 }
 
+const getConstraintAnchor = (model: ConstraintSchema): FloatingEditorAnchor | undefined => {
+  const element = document.querySelector<HTMLElement>(`[data-constraint-id="${CSS.escape(model.id)}"]`)
+  if (!isDefined(element)) {
+    return undefined
+  }
+  return { contextElement: element, getBoundingClientRect: () => element.getBoundingClientRect() }
+}
+
 const getTargetAnchor = (target: HasTargetSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
   const accessor = accessors.subProject(subProject)
 
@@ -126,6 +135,7 @@ const getUnionBoundingClientRect = (elements: SVGGElement[]): DOMRect | undefine
 }
 
 export const floatingEditorAnchors = {
+  constraint: getConstraintAnchor,
   component: getComponentAnchor,
   stitchLine: getStitchLineAnchor,
   hole: getHoleAnchor,

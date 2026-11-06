@@ -6,6 +6,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
+import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
@@ -58,6 +59,10 @@ export const comparators = {
       a.id === b.id &&
       a.root === b.root &&
       a.defaultPocketOpening === b.defaultPocketOpening &&
+      Object.keys(a.constraints).length === Object.keys(b.constraints).length &&
+      Object.entries(a.constraints).every(
+        ([id, constraint]) => id in b.constraints && comparators.constraint(constraint, b.constraints[id]),
+      ) &&
       Object.keys(a.pocketOpenings).length === Object.keys(b.pocketOpenings).length &&
       Object.entries(a.pocketOpenings).every(
         ([id, opening]) =>
@@ -70,6 +75,13 @@ export const comparators = {
       areArraysEqual(a.holes, b.holes, comparators.hole) &&
       areArraysEqual(a.stitchLines, b.stitchLines, comparators.stitchLine)
     )
+  },
+
+  constraint: (a: ConstraintSchema, b: ConstraintSchema): boolean => {
+    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.constraintField)
+  },
+  constraintField: (a: ConstraintFieldSchema, b: ConstraintFieldSchema): boolean => {
+    return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field
   },
 
   component: (a: ComponentSchema, b: ComponentSchema): boolean => {
@@ -103,11 +115,17 @@ export const comparators = {
       a.name === b.name &&
       a.color === b.color &&
       a.layoutOrientation === b.layoutOrientation &&
+      a.mainAxisAnchor === b.mainAxisAnchor &&
       a.layoutGap === b.layoutGap &&
       a.autoLayoutGap === b.autoLayoutGap &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.width === b.width &&
-      a.height === b.height
+      a.height === b.height &&
+      a.individualRadii === b.individualRadii &&
+      a.topLeftRadius === b.topLeftRadius &&
+      a.topRightRadius === b.topRightRadius &&
+      a.bottomLeftRadius === b.bottomLeftRadius &&
+      a.bottomRightRadius === b.bottomRightRadius
     )
   },
   panel: (a: PanelSchema, b: PanelSchema): boolean => {
@@ -116,6 +134,7 @@ export const comparators = {
       a.name === b.name &&
       a.color === b.color &&
       a.layoutOrientation === b.layoutOrientation &&
+      a.mainAxisAnchor === b.mainAxisAnchor &&
       a.layoutGap === b.layoutGap &&
       a.autoLayoutGap === b.autoLayoutGap &&
       a.offAxisAnchor === b.offAxisAnchor &&
@@ -128,7 +147,12 @@ export const comparators = {
       a.topStretch === b.topStretch &&
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
-      a.leftStretch === b.leftStretch
+      a.leftStretch === b.leftStretch &&
+      a.individualRadii === b.individualRadii &&
+      a.topLeftRadius === b.topLeftRadius &&
+      a.topRightRadius === b.topRightRadius &&
+      a.bottomLeftRadius === b.bottomLeftRadius &&
+      a.bottomRightRadius === b.bottomRightRadius
     )
   },
   pocketOpening: (a: PocketOpeningSchema, b: PocketOpeningSchema): boolean => {
@@ -166,6 +190,7 @@ export const comparators = {
     a.name === b.name &&
     a.color === b.color &&
     a.layoutOrientation === b.layoutOrientation &&
+    a.mainAxisAnchor === b.mainAxisAnchor &&
     a.layoutGap === b.layoutGap &&
     a.autoLayoutGap === b.autoLayoutGap &&
     a.individualRadii === b.individualRadii &&
@@ -228,6 +253,10 @@ export const comparators = {
       a.yOffset === b.yOffset &&
       a.width === b.width &&
       a.height === b.height &&
+      a.individualRadii === b.individualRadii &&
+      a.topLeftRadius === b.topLeftRadius &&
+      a.topRightRadius === b.topRightRadius &&
+      a.bottomLeftRadius === b.bottomLeftRadius &&
       a.bottomRightRadius === b.bottomRightRadius
     )
   },
@@ -253,6 +282,7 @@ export const comparators = {
       a.name === b.name &&
       a.targetType === b.targetType &&
       a.targetId === b.targetId &&
+      a.onTop === b.onTop &&
       a.stitchMargin === b.stitchMargin &&
       a.stitchHoleLength === b.stitchHoleLength &&
       a.stitchHoleDistance === b.stitchHoleDistance &&
@@ -283,7 +313,11 @@ export const comparators = {
       a.topLeftCorner === b.topLeftCorner &&
       a.topRightCorner === b.topRightCorner &&
       a.bottomRightCorner === b.bottomRightCorner &&
-      a.bottomLeftCorner === b.bottomLeftCorner
+      a.bottomLeftCorner === b.bottomLeftCorner &&
+      a.stitchDisconnectedTopLeftCorner === b.stitchDisconnectedTopLeftCorner &&
+      a.stitchDisconnectedTopRightCorner === b.stitchDisconnectedTopRightCorner &&
+      a.stitchDisconnectedBottomLeftCorner === b.stitchDisconnectedBottomLeftCorner &&
+      a.stitchDisconnectedBottomRightCorner === b.stitchDisconnectedBottomRightCorner
     )
   },
   tPocketStitchLine: (a: TPocketStitchLineSchema, b: TPocketStitchLineSchema): boolean => {

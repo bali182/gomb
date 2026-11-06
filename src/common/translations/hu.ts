@@ -1,5 +1,9 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
+import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { ModelObjectTypeSchema } from '../schemas/modelObject'
+import type { HasCustomRenderTarget } from '../schemas/stitching'
+import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { LimitReasonSchema } from '../schemas/limits'
@@ -191,6 +195,9 @@ export const HU = {
         description: 'A zseb tényleges alakja a méreteitől és az elrendezésétől függ.',
       },
       actions: {
+        constraints: {
+          add: 'Constraint hozzáadása',
+        },
         pocketOpenings: {
           add: 'Új zsebnyílás',
           edit: 'Zsebnyílás szerkesztése',
@@ -212,13 +219,20 @@ export const HU = {
           addStitching: 'Varrás hozzáadása',
           addPocketStitching: 'Zsebvarrás hozzáadása',
           exportToPng: 'Exportálás PNG-be',
-          copyPocketSettings: 'Beállítások másolása…',
         },
         holes: {
           addStitching: 'Varrás hozzáadása',
         },
       },
       sections: {
+        constraints: {
+          title: 'Constraintek',
+          empty: 'Üres',
+          selectModel: 'Válassz elemet…',
+          selectField: 'Válassz mezőt…',
+          noMatches: 'Nincs megfelelő mező vagy elem',
+          linkedAuto: 'A mező constrainthez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
+        },
         globalSettings: {
           app: {
             title: 'Általános',
@@ -480,6 +494,12 @@ export const HU = {
           },
         },
         stitchLines: {
+          renderTarget: {
+            title: '-',
+            onTop: {
+              label: 'Rajzolási felület',
+            },
+          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
           settings: {
             title: 'Varrás',
             stitchMargin: {
@@ -761,6 +781,14 @@ export const HU = {
         },
       },
       enums: {
+        constraints: {
+          blockReason: {
+            'auto-width': 'Az összekötéshez állítsd manuálisra a szélességet.',
+            'auto-height': 'Az összekötéshez állítsd manuálisra a magasságot.',
+            'auto-layout-gap': 'Az összekötéshez állítsd manuálisra a hézagot.',
+            'auto-corner-radius': 'Az összekötéshez állítsd manuálisra a rádiuszokat.',
+          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+        },
         globalSettings: {
           theme: {
             light: 'Világos',
@@ -768,6 +796,21 @@ export const HU = {
           },
         },
         common: {
+          modelType: {
+            'root-panel': 'Modul',
+            'panel': 'Panel',
+            'pocket-cluster': 'Zsebcsoport',
+            'front-pocket': 'Elülső zseb',
+            't-pocket': 'T-zseb',
+            'hole': 'Lyuk',
+            'component-bounds-stitch-line': 'Kontúrvarrás',
+            't-pocket-stitch-line': 'Zsebvarrás',
+            'straight': 'Egyenes zsebnyílás',
+            'recessed': 'Ívelt zsebnyílás',
+            'slanted': 'Ferde zsebnyílás',
+            'optical-illusion': 'Optikai illúziójú zsebnyílás',
+            'equal-constraint': 'Egyenlőségi constraint',
+          } satisfies EnumTranslationSchema<ModelObjectTypeSchema>,
           anchor: {
             vertical: {
               start: 'Fent',
@@ -857,6 +900,10 @@ export const HU = {
         },
       },
       emptyStates: {
+        noConstraintFields: {
+          title: 'Még nincsenek összekötött mezők',
+          description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
+        },
         missingFrontPocket: {
           title: 'Hiányzó elülső zseb',
           description: 'A zsebcsoportnak taralmaznia kell legalább egy elülső zsebet.',
@@ -882,43 +929,6 @@ export const HU = {
     },
   },
   dialogs: {
-    pocketCopy: {
-      title: 'Zsebbeállítások másolása',
-      positiveAction: 'Másolás',
-      sourceHint: 'Ezt másolod',
-      selectAll: {
-        label: 'Összes',
-        tooltip:
-          'Minden alkalmazható beállítás kijelölése vagy törlése. Az összes kijelölése a meglévő varrások felülírását is bekapcsolja.',
-      },
-      columns: {
-        copyShape: {
-          label: 'Forma',
-          tooltip:
-            'A T-zseb fülszélességének és keskenyedésének másolása. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
-        },
-        copyOpening: {
-          label: 'Nyílás',
-          tooltip:
-            'A nyílás típusának és minden beállításának másolása. A fejlécre kattintva az összes célzseb kijelölése kapcsolható.',
-        },
-        copyPocketItem: {
-          label: 'Tartalom',
-          tooltip:
-            'Átmásolja a kiválasztott tárgyat, az irányát és mindkét eltolást. Ha a forráson nincs tárgy, a célról is törli. A fejlécre kattintva az összes célzseb kijelölése kapcsolható.',
-        },
-        copyStitching: {
-          label: 'Varrások',
-          tooltip:
-            'A forrászseb összes alsó varrásának másolása. A meglévő varrások megmaradnak, ha nincs felülírás kijelölve. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
-        },
-        overwriteStitching: {
-          label: 'Felülírás',
-          tooltip:
-            'A célzseb meglévő alsó varrásainak lecserélése a forrás másolataira. Akkor választható, ha a varrások másolása ki van jelölve, és a célzseben már van varrás. A fejlécre kattintva az összes alkalmazható célzseb kijelölése kapcsolható.',
-        },
-      },
-    },
     globalSettings: {
       title: 'Beállítások',
       positiveAction: 'OK',
@@ -981,15 +991,32 @@ export const HU = {
     },
   },
   defaultNames: {
-    project: 'Projekt',
-    rootPanel: 'Modul',
-    panel: 'Panel',
-    pocketCluster: 'Zsebcsoport',
-    frontPocket: 'Elülső zseb',
-    tPocket: 'T-zseb',
-    componentBoundsStitchLine: 'Varrás',
-    tPocketStitchLine: 'Zsebvarrás',
-    hole: 'Lyuk',
+    'project': 'Projekt',
+    'sub-project': 'Alprojekt',
+    'root-panel': 'Modul',
+    'panel': 'Panel',
+    'pocket-cluster': 'Zsebcsoport',
+    'front-pocket': 'Elülső zseb',
+    't-pocket': 'T-zseb',
+    't-pocket-stitch-line': 'Zsebvarrás',
+    'component-bounds-stitch-line': 'Varrás',
+    'hole': 'Lyuk',
+    'straight-pocket-opening': 'Egyenes',
+    'recessed-pocket-opening': 'Ívelt',
+    'slanted-pocket-opening': 'Ferde',
+    'optical-illusion-pocket-opening': 'Optikai illúzió',
+    'equal-constraint': 'Egyenlőség',
+    'root-panel-constraint-field': 'Mező',
+    'panel-constraint-field': 'Mező',
+    'pocket-cluster-constraint-field': 'Mező',
+    'front-pocket-constraint-field': 'Mező',
+    't-pocket-constraint-field': 'Mező',
+    'hole-constraint-field': 'Mező',
+    'recessed-constraint-field': 'Mező',
+    'slanted-constraint-field': 'Mező',
+    'optical-illusion-constraint-field': 'Mező',
+    'component-bounds-stitch-line-constraint-field': 'Mező',
+    't-pocket-stitch-line-constraint-field': 'Mező',
   },
   data: {
     pocketItemGroups: {

@@ -6,6 +6,7 @@ import { floatingEditorAnchors } from '../utils/floatingEditorAnchorUtils'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 import { ComponentFloatingEditor } from './component-editors/ComponentFloatingEditor'
+import { ConstraintFloatingEditor } from './constraint-editors/ConstraintFloatingEditor'
 import { HoleFloatingEditor } from './hole-editors/HoleFloatingEditor'
 import { PocketOpeningFloatingEditor } from './pocket-opening-editors/PocketOpeningFloatingEditor'
 import { StitchLineFloatingEditor } from './stitch-line-editors/StitchLineFloatingEditor'
@@ -66,6 +67,17 @@ export const FloatingEditors: FC<FloatingEditorsProps> = ({ onAdd }) => {
     return isDefined(anchorElement) ? (
       <PocketOpeningFloatingEditor
         opening={selection.selected}
+        anchorElement={anchorElement}
+        onClose={selection.clearSelection}
+      />
+    ) : null
+  }
+
+  if (narrowers.is.constraint(selection.selected)) {
+    const anchorElement = floatingEditorAnchors.constraint(selection.selected)
+    return isDefined(anchorElement) ? (
+      <ConstraintFloatingEditor
+        constraint={selection.selected}
         anchorElement={anchorElement}
         onClose={selection.clearSelection}
       />

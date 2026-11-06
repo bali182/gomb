@@ -5,7 +5,7 @@ import { PiDotsSixVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
-import { TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
 import { useTreeDragAndDropContext } from '../component-tree/TreeDragAndDropContext'
 import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { PocketOpeningTreeItemNode } from './types/nodeTypes'
@@ -56,7 +56,11 @@ export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({ node, in
       <TreeItemVisual
         icon={<PocketOpeningIcon type={opening.type} isDefault={subProject?.defaultPocketOpening === opening.id} />}
         isPositioned={false}
-        label={<TreeView.ItemText>{opening.name}</TreeView.ItemText>}
+        label={
+          <TreeView.ItemText asChild>
+            <TreeItemLabel>{opening.name}</TreeItemLabel>
+          </TreeView.ItemText>
+        }
         leading={
           <IconButton
             {...attributes}

@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { useCallback, useId, useMemo, useState, type FC } from 'react'
 import type { IconType } from 'react-icons'
 import { ZERO, ZERO_CORNER_RADIUS } from '../../constants/layout'
-import { defaultFrontPocket, defaultPocketCluster, defaultRootPanel, defaultTPocket } from '../../defaultStates'
+import { defaultStitchingSettings } from '../../defaultStates'
 import { usePath } from '../../hooks/usePath'
 import { useProject } from '../../hooks/useProject'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -17,13 +17,16 @@ import type {
   TPocketSchema,
 } from '../../schemas/components'
 import type { ComputedPocketSchema } from '../../schemas/computed'
+import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
 import type { RectSchema } from '../../schemas/geometry'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { getModelIconByType } from '../../utils/getModelIcon'
-import { id } from '../../utils/id'
 import { narrowers } from '../../utils/narrowers'
+import { IdGenerator } from '../../utils/random/IdGenerator'
 import { OpticalIllusionPocketOpeningStackIcon } from '../icons/OpticalIllusionPocketOpeningStackIcon'
 import { RecessedPocketOpeningStackIcon } from '../icons/RecessedPocketOpeningStackIcon'
 import { SlantedPocketOpeningStackIcon } from '../icons/SlantedPocketOpeningStackIcon'
@@ -74,10 +77,13 @@ export const PocketOpeningEditorPreview: FC<PocketOpeningEditorPreviewProps> = (
   const gradientId = `${previewId}-gradient`
   const maskId = `${previewId}-mask`
 
-  const templates = useMemo<Record<PocketOpeningPreviewMode, SubProjectSchema>>(
-    () => ({ single: createPreviewSubProject('single'), stack: createPreviewSubProject('stack') }),
-    [],
-  )
+  const templates = useMemo<Record<PocketOpeningPreviewMode, SubProjectSchema>>(() => {
+    const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(t.defaultNames))
+    return {
+      single: createPreviewSubProject('single', modelFactory),
+      stack: createPreviewSubProject('stack', modelFactory),
+    }
+  }, [t.defaultNames])
 
   const previewSubProject = useMemo<SubProjectSchema>(() => {
     const template = templates[mode]
@@ -196,27 +202,30 @@ const PocketOpeningPreviewPocket: FC<PocketOpeningPreviewPocketProps> = ({ pocke
   return <path d={pathData} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
 }
 
-const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSchema => {
-  const opening: PocketOpeningSchema = { type: 'straight', id: id(), name: 'Preview opening' }
+const createPreviewSubProject = (
+  mode: PocketOpeningPreviewMode,
+  modelFactory: ReadonlyModelObjectFactorySchema,
+): SubProjectSchema => {
+  const opening: PocketOpeningSchema = {
+    ...modelFactory.createStraightPocketOpening({}),
+    name: 'Preview opening',
+  }
   const frontPocket: FrontPocketSchema = {
-    ...defaultFrontPocket,
-    id: id(),
+    ...modelFactory.createFrontPocket({ openingId: opening.id }),
     name: 'Preview front pocket',
     openingId: opening.id,
   }
   const tPockets: TPocketSchema[] = Array.from(
     { length: mode === 'stack' ? 2 : 0 },
     (): TPocketSchema => ({
-      ...defaultTPocket,
-      id: id(),
+      ...modelFactory.createTPocket({ openingId: opening.id }),
       name: 'Preview T-pocket',
       openingId: opening.id,
     }),
   )
   const pockets = [...tPockets, frontPocket]
   const cluster: PocketClusterSchema = {
-    ...defaultPocketCluster,
-    id: id(),
+    ...modelFactory.createPocketCluster({ stitchingSettings: defaultStitchingSettings }),
     name: 'Preview cluster',
     width: PREVIEW_WIDTH,
     height: PREVIEW_CLUSTER_HEIGHT,
@@ -226,8 +235,7 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
     children: pockets.map((pocket): string => pocket.id),
   }
   const root: RootPanelSchema = {
-    ...defaultRootPanel,
-    id: id(),
+    ...modelFactory.createRootPanel({ stitchingSettings: defaultStitchingSettings }),
     name: 'Preview root',
     width: PREVIEW_WIDTH,
     height: PREVIEW_CLUSTER_HEIGHT,
@@ -235,11 +243,12 @@ const createPreviewSubProject = (mode: PocketOpeningPreviewMode): SubProjectSche
   }
   const components: ComponentSchema[] = [root, cluster, ...pockets]
   return {
-    id: id(),
+    id: new IdGenerator().get('sub-project'),
     root: root.id,
     defaultPocketOpening: opening.id,
     pocketOpenings: { [opening.id]: opening },
     components: Object.fromEntries(components.map((component): [string, ComponentSchema] => [component.id, component])),
+    constraints: {},
     holes: [],
     stitchLines: [],
   }

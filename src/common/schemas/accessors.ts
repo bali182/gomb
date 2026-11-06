@@ -18,8 +18,10 @@ import {
   ComputedStitchLineSchema,
   ComputedTPocketSchema,
 } from './computed'
+import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from './constraints'
 import { HoleSchema } from './hole'
 import { ComponentLimitsSchema, HoleLimitsSchema, StitchLineLimitsSchema } from './limits'
+import type { ModelObjectSchema } from './modelObject'
 import type { PocketOpeningSchema } from './pocketOpening'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from './stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
@@ -101,7 +103,15 @@ export type SubProjectLimitsAccessorSchema = {
   stitchLine(id: string): StitchLineLimitsSchema
 }
 
+export type ConstraintAccessorSchema = {
+  byId(id: string): ConstraintSchema
+  byModel(modelId: string): ConstraintSchema[]
+  byField(modelId: string, field: ConstraintFieldNameSchema): ConstraintSchema[]
+  model(field: ConstraintFieldSchema): ModelObjectSchema
+}
+
 export type OptionalSubProjectAccessorSchema = {
+  constraint: OptionalAccessorSchema<ConstraintAccessorSchema>
   pocketOpening: OptionalAccessorSchema<PocketOpeningAccessorSchema>
   component: OptionalAccessorSchema<ComponentAccessorSchema>
   stitchLine: OptionalAccessorSchema<StitchLineAccessorSchema>
@@ -109,6 +119,7 @@ export type OptionalSubProjectAccessorSchema = {
 }
 
 export type SubProjectAccessorSchema = {
+  constraint: ConstraintAccessorSchema
   pocketOpening: PocketOpeningAccessorSchema
   component: ComponentAccessorSchema
   stitchLine: StitchLineAccessorSchema

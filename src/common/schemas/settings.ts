@@ -58,8 +58,20 @@ export type AppSettingsSchema = {
   language: LanguageSchema
 }
 
+export type TreeSectionStateSchema = {
+  open: boolean
+  size: number
+}
+
+export type TreeSectionsSettingsSchema = {
+  components: TreeSectionStateSchema
+  openings: TreeSectionStateSchema
+  constraints: TreeSectionStateSchema
+}
+
 export type UISettingsSchema = {
   splitterSizes: [number | string, number | string]
+  treeSections: TreeSectionsSettingsSchema
 }
 
 export type EditSettingSchema = {

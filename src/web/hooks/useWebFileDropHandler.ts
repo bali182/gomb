@@ -2,12 +2,11 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 import { ProjectFileDropResultSchema } from '../../common/components/common/FileDropzone'
 import { toaster } from '../../common/components/Toaster'
-import { GOMB_EXTENSION } from '../../common/constants/fileExtensions'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import { ProjectSchema } from '../../common/schemas/project'
-import { id } from '../../common/utils/id'
 import { loadProjectFromContents } from '../../common/utils/loadProjectFromContents'
+import { IdGenerator } from '../../common/utils/random/IdGenerator'
 import { webAppRoutes } from '../webAppRoutes'
 import { useProjects } from './useProjects'
 
@@ -17,7 +16,7 @@ export type UseWebFileDropHandlerOutput = {
 
 export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
   const { t } = useTranslation()
-  const { addProject } = useProjects()
+  const { addProject, projects } = useProjects()
   const navigate = useNavigate()
 
   const onDrop = useCallback(
@@ -48,22 +47,18 @@ export const useWebFileDropHandler = (): UseWebFileDropHandlerOutput => {
         return
       }
 
+      const idGenerator = new IdGenerator()
       const importedProject: ProjectSchema = {
         ...project,
-        id: createImportedProjectId(result.value.name),
+        id: idGenerator.get('project', new Set([project.id, ...projects.map((candidate) => candidate.id)])),
         name: `${project.name} (${result.value.name})`,
       }
 
       addProject(importedProject)
       navigate(webAppRoutes.project(importedProject.id))
     },
-    [addProject, navigate, t],
+    [addProject, navigate, projects, t],
   )
 
   return { onDrop }
-}
-
-const createImportedProjectId = (fileName: string): string => {
-  const nameWithoutExtension = fileName.replace(new RegExp(`\\.${GOMB_EXTENSION}$`, 'i'), '')
-  return `${nameWithoutExtension.replace(/[^a-zA-Z0-9]/g, '')}${id()}`
 }

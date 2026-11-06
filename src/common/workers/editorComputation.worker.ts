@@ -1,4 +1,4 @@
-import { processEditorComputation } from '../logic/processEditorComputation'
+import { processSubProjectComputation } from '../logic/processSubProjectComputation'
 import type { EditorComputationRequestSchema, EditorComputationResponseSchema } from '../schemas/editorComputation'
 import { deserializeEditorComputation, serializeEditorComputation } from '../utils/editorComputationSerialization'
 
@@ -6,7 +6,11 @@ self.addEventListener('message', (event: MessageEvent<string>): void => {
   const request = deserializeEditorComputation<EditorComputationRequestSchema>(event.data)
   let response: EditorComputationResponseSchema
   try {
-    response = { type: 'completed', requestId: request.requestId, result: processEditorComputation(request) }
+    response = {
+      type: 'completed',
+      requestId: request.requestId,
+      result: processSubProjectComputation(request.subProject, request.stitchingSettings, request.previousSubProject),
+    }
   } catch (error) {
     console.error('[worker]', error)
     response = {

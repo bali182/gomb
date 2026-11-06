@@ -3,11 +3,9 @@ import type { ProjectMigration, ProjectMigrationContextSchema } from '../schemas
 import type { ProjectSchema } from '../schemas/project'
 import type { DeepPartialSchema } from '../schemas/utils'
 import { defaultProjectMigrator } from './defaultProjectMigrator'
-import { migratePocketComponents } from './migratePocketComponents'
-import { migratePocketOpenings } from './migratePocketOpenings'
 import { migrateVersionedObject } from './migrationUtils'
 
-const MIGRATIONS: ProjectMigration[] = [migratePocketComponents, migratePocketOpenings]
+const MIGRATIONS: ProjectMigration[] = []
 
 export const migrateProject = (
   input: unknown,
