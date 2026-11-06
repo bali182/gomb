@@ -1,11 +1,17 @@
 import type { LoadableSchema } from './loadable'
 import type { ProjectSchema } from './project'
-import type { ComputedSubProjectSchema } from './subProject'
+import type { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
 
 export type EditorComputationRequestSchema = {
   requestId: number
   project: ProjectSchema
   subProjectId: string
+  previousSubProject?: SubProjectSchema
+}
+
+export type SubProjectComputationResultSchema = {
+  subProject: SubProjectSchema
+  computedSubProject: ComputedSubProjectSchema
 }
 
 export type EditorComputationResultSchema = {

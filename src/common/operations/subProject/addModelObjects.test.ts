@@ -13,7 +13,6 @@ import { addConstraint } from './addConstraint'
 import { addHole } from './addHole'
 import { addPocketOpening } from './addPocketOpening'
 import { addStitchLine } from './addStitchLine'
-import { cloneConstraint } from './cloneConstraint'
 
 const createFactory = () => new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 const fixture = () =>
@@ -139,19 +138,14 @@ describe('model creation in add operations', () => {
     expect(source).toEqual(snapshot)
   })
 
-  it('creates an empty constraint and preserves members when cloning it', () => {
+  it('creates an empty constraint without changing the source', () => {
     const source = fixture()
+    const snapshot = structuredClone(source)
     const result = addConstraint(source, { type: 'equal-constraint', modelFactory: createFactory() })
     const constraint = Object.values(result.constraints)[0]
     expect(constraint).toMatchObject({ type: 'equal-constraint', fields: [] })
     expect(constraint.id).toMatch(/^equal-constraint-/)
-    constraint.fields = [{ id: 'member', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }]
-    const snapshot = structuredClone(result)
-    const cloned = cloneConstraint(result, { constraintId: constraint.id })
-    const copy = Object.values(cloned.constraints).find((item) => item.id !== constraint.id)!
-    expect(copy.fields[0]).toMatchObject({ type: 'panel-constraint-field', modelId: 'panel', field: 'width' })
-    expect(copy.fields[0].id).not.toBe('member')
-    expect(result).toEqual(snapshot)
+    expect(source).toEqual(snapshot)
     expect(source.constraints).toEqual({})
   })
 

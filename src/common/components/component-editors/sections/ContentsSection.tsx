@@ -43,9 +43,6 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
     onChange({
       ...editable,
       itemId: undefined,
-      itemOrientation: 'landscape',
-      itemCrossAxisOffset: '0',
-      itemOpeningOffset: '0',
     })
   }, [editable, onChange])
 

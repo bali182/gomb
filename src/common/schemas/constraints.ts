@@ -275,6 +275,8 @@ export type EqualConstraintSchema = {
 
 export type ConstraintSchema = EqualConstraintSchema
 
+export type ConstraintValueSchema = string | number | boolean | undefined
+
 export type ConstraintCompatibilityGroupSchema =
   // Loose types
   | 'string'

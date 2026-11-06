@@ -137,12 +137,13 @@ export const useEditorComputation = ({
   }, [])
 
   const enqueue = useCallback(
-    (nextProject: ProjectSchema, selectedSubProjectId: string): number => {
+    (nextProject: ProjectSchema, selectedSubProjectId: string, previousSubProject?: SubProjectSchema): number => {
       const runtime = runtimeRef.current
       const request: EditorComputationRequestSchema = {
         requestId: ++runtime.requestId,
         project: nextProject,
         subProjectId: selectedSubProjectId,
+        previousSubProject,
       }
       runtime.error = undefined
       runtime.failedRequest = undefined
@@ -174,7 +175,7 @@ export const useEditorComputation = ({
     if (!isDefined(failedRequest)) {
       return
     }
-    enqueue(failedRequest.project, failedRequest.subProjectId)
+    enqueue(failedRequest.project, failedRequest.subProjectId, failedRequest.previousSubProject)
   }, [enqueue])
 
   useLayoutEffect(() => {
@@ -246,12 +247,13 @@ export const useEditorComputation = ({
       if (!isDefined(currentProject) || !isDefined(selectedSubProjectId)) {
         throw new Error('Editor computation requires a project and selected subproject')
       }
+      const previousSubProject = accessors.project(currentProject).subProject(selectedSubProjectId)
       const updated = typeof update === 'function' ? update(currentProject) : update
       if (updated.id !== currentProject.id) {
         throw new Error('The selected project ID cannot be changed')
       }
       accessors.project(updated).subProject(selectedSubProjectId)
-      return enqueue(updated, selectedSubProjectId)
+      return enqueue(updated, selectedSubProjectId, previousSubProject)
     },
     [enqueue],
   )

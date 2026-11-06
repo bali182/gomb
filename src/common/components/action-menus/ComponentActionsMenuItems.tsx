@@ -1,6 +1,6 @@
 import { Menu } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
-import { PiImage, PiPaintBrushBroad } from 'react-icons/pi'
+import { PiImage } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
@@ -92,15 +92,5 @@ export const ExportComponentPngMenuItem: FC<ExportComponentPngMenuItemProps> = (
       <PiImage />
       <Menu.ItemText>{t.project.editors.actions.components.exportToPng}</Menu.ItemText>
     </Menu.Item>
-  )
-}
-
-export const CopyPocketSettingsMenuItem: FC<ComponentMenuItemProps> = ({ disabled, onSelect }) => {
-  const { t } = useTranslation()
-  return (
-    <EditorActionMenuItem value="copy-pocket-settings" disabled={disabled} onSelect={onSelect}>
-      <PiPaintBrushBroad />
-      <Menu.ItemText>{t.project.editors.actions.components.copyPocketSettings}</Menu.ItemText>
-    </EditorActionMenuItem>
   )
 }

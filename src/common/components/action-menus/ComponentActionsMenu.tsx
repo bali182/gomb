@@ -1,5 +1,5 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
-import { useCallback, useMemo, useState, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
@@ -21,13 +21,11 @@ import {
 import { portalRef } from '../../portalRef'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
 import type { ComponentSchema } from '../../schemas/components'
-import type { PocketSettingsCopyTargetsSchema } from '../../schemas/pocketCopy'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
-import { PocketCopyDialog } from '../pocket-copy/PocketCopyDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
@@ -35,7 +33,6 @@ import {
   AddComponentMenuItem,
   AddComponentStitchLineMenuItem,
   AddHoleMenuItem,
-  CopyPocketSettingsMenuItem,
   ExportComponentPngMenuItem,
 } from './ComponentActionsMenuItems'
 
@@ -68,9 +65,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, copyPocketSettings, flip } =
+  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, flip } =
     useSubProjectOperations()
-  const [isPocketCopyOpen, setPocketCopyOpen] = useState<boolean>(false)
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -189,16 +185,6 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const canClone = narrowers.is.rootPanel(component) || canCloneComponent(component)
   const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component, subProject)
-  const handleOpenPocketCopy = useCallback((): void => {
-    setPocketCopyOpen(true)
-  }, [])
-  const handleCopyPocketSettings = useCallback(
-    (targets: Partial<PocketSettingsCopyTargetsSchema>): void => {
-      copyPocketSettings(component.id, targets)
-      setPocketCopyOpen(false)
-    },
-    [component.id, copyPocketSettings],
-  )
   const handleFlipHorizontal = useCallback((): void => {
     flip(component, 'horizontal')
   }, [component, flip])
@@ -242,11 +228,6 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                   ))}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {!subProjectOnly && narrowers.is.pocket(component) && (
-                  <CopyPocketSettingsMenuItem onSelect={handleOpenPocketCopy} />
-                )}
-              </ActionsMenuSection>
-              <ActionsMenuSection>
                 {!subProjectOnly && (
                   <ExportComponentPngMenuItem
                     disabled={narrowers.is.pocketCluster(component) && component.children.length === 0}
@@ -266,15 +247,6 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      {!subProjectOnly && narrowers.is.pocket(component) && (
-        <PocketCopyDialog
-          subProject={subProject}
-          sourcePocketId={component.id}
-          isOpen={isPocketCopyOpen}
-          onOpenChange={setPocketCopyOpen}
-          onSubmit={handleCopyPocketSettings}
-        />
-      )}
     </Box>
   )
 }

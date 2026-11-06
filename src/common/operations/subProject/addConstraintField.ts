@@ -28,11 +28,7 @@ export const addConstraintField = (
   }
   const group = constraintFieldCompatibility[model.type][field.field]
   const blocked = constraintFieldBlockers[model.type][field.field]?.(model)
-  if (
-    !isDefined(group) ||
-    isDefined(blocked) ||
-    constraint.fields.some((member) => member.modelId === field.modelId && member.field === field.field)
-  ) {
+  if (!isDefined(group) || isDefined(blocked) || accessor.constraint.byField(field.modelId, field.field).length > 0) {
     return subProject
   }
   for (const member of constraint.fields) {

@@ -62,10 +62,7 @@ export const ConstraintFieldCombobox: FC<ConstraintFieldComboboxProps> = ({ cons
       return getConstraintFieldInputs(candidateModel)
         .filter((field) => {
           const group = constraintFieldCompatibility[candidateModel.type][field.field]
-          if (
-            !isDefined(group) ||
-            constraint.fields.some((member) => member.modelId === field.modelId && member.field === field.field)
-          ) {
+          if (!isDefined(group) || accessor.constraint.byField(field.modelId, field.field).length > 0) {
             return false
           }
           return constraint.fields.every((member) => {

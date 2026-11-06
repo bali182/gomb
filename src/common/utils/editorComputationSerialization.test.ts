@@ -33,6 +33,10 @@ describe('editor computation serialization', () => {
       requestId: 4,
       project: d.project({ id: 'project', subProjects: [subProject] }),
       subProjectId: subProject.id,
+      previousSubProject: {
+        ...subProject,
+        components: { ...subProject.components, root: { ...subProject.components.root, name: 'Previous root' } },
+      },
     }
     const restoredRequest = deserializeEditorComputation<EditorComputationRequestSchema>(
       serializeEditorComputation(request),
