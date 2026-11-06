@@ -3,7 +3,7 @@ import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
 import { updateComponent } from '../operations/subProject/updateComponent'
 import type { ComponentSchema } from '../schemas/components'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
-import type { EditorComputationRequestSchema, EditorComputationResultSchema } from '../schemas/editorComputation'
+import type { EditorComputationRequestSchema, SubProjectComputationResultSchema } from '../schemas/editorComputation'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
@@ -11,7 +11,7 @@ import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { narrowers } from '../utils/narrowers'
 import { getComputedSubProject } from './getComputedSubProject'
-import { processEditorComputation } from './processEditorComputation'
+import { processSubProjectComputation } from './processSubProjectComputation'
 
 type ConstraintBenchmarkMode = 'empty' | 'satisfied' | 'edit'
 
@@ -23,19 +23,13 @@ type ConstraintBenchmarkCase = {
 }
 
 // The computation pipeline before constraint resolution was introduced.
-const computeWithoutConstraints = (request: EditorComputationRequestSchema): EditorComputationResultSchema => {
-  const { project, requestId, subProjectId } = request
-  const subProject = accessors.project(project).subProject(subProjectId)
-  const computed = getComputedSubProject(subProject, project.stitchingSettings)
+const computeWithoutConstraints = (request: EditorComputationRequestSchema): SubProjectComputationResultSchema => {
+  const { subProject, stitchingSettings } = request
+  const computed = getComputedSubProject(subProject, stitchingSettings)
   const patched = getPatchedSubProject(subProject, computed)
-  const computedSubProject =
-    patched === subProject ? computed : getComputedSubProject(patched, project.stitchingSettings)
+  const computedSubProject = patched === subProject ? computed : getComputedSubProject(patched, stitchingSettings)
   return {
-    requestId,
-    project: {
-      ...project,
-      subProjects: project.subProjects.map((candidate) => (candidate.id === subProjectId ? patched : candidate)),
-    },
+    subProject: patched,
     computedSubProject,
   }
 }
@@ -170,8 +164,12 @@ const createConstraints = (subProject: SubProjectSchema): Record<string, Constra
 
 const createCase = (scene: SubProjectSchema, mode: ConstraintBenchmarkMode, name: string): ConstraintBenchmarkCase => {
   const project = d.project({ id: 'benchmark-project', subProjects: [scene] })
-  const initial = computeWithoutConstraints({ requestId: 0, project, subProjectId: scene.id })
-  const normalized = accessors.project(initial.project).subProject(scene.id)
+  const initial = computeWithoutConstraints({
+    requestId: 0,
+    subProject: scene,
+    stitchingSettings: project.stitchingSettings,
+  })
+  const normalized = initial.subProject
   const previous = { ...normalized, constraints: mode === 'empty' ? {} : createConstraints(normalized) }
   const pockets = Object.values(previous.components).filter(narrowers.is.tPocket)
   const editedPocket = pockets[pockets.length - 1]
@@ -196,15 +194,15 @@ const createCase = (scene: SubProjectSchema, mode: ConstraintBenchmarkMode, name
       : input
   const request: EditorComputationRequestSchema = {
     requestId: 1,
-    project: { ...project, subProjects: [input] },
-    subProjectId: input.id,
+    subProject: input,
+    stitchingSettings: project.stitchingSettings,
     previousSubProject: previous,
   }
   return {
     name,
     mode,
     request,
-    baselineRequest: { ...request, project: { ...project, subProjects: [baselineInput] } },
+    baselineRequest: { ...request, subProject: baselineInput },
   }
 }
 
@@ -227,16 +225,24 @@ describe.each(cases)('$name / $mode', ({ name, mode, request, baselineRequest })
   it('compares equivalent outputs without mutating either input', async ({ bench }) => {
     const snapshots = JSON.stringify({ request, baselineRequest })
     const expected = computeWithoutConstraints(baselineRequest)
-    const actual = processEditorComputation(request)
+    const actual = processSubProjectComputation(
+      request.subProject,
+      request.stitchingSettings,
+      request.previousSubProject,
+    )
     expect(actual).toEqual(expected)
     expect(JSON.stringify({ request, baselineRequest })).toBe(snapshots)
 
-    let lastResult: EditorComputationResultSchema | undefined
+    let lastResult: SubProjectComputationResultSchema | undefined
     const baseline = bench('Without constraint pipeline', (): void => {
       lastResult = computeWithoutConstraints(baselineRequest)
     })
     const current = bench('With constraint pipeline', (): void => {
-      lastResult = processEditorComputation(request)
+      lastResult = processSubProjectComputation(
+        request.subProject,
+        request.stitchingSettings,
+        request.previousSubProject,
+      )
     })
     const reverse = process.env.POCKET_CONSTRAINT_BENCH_REVERSE === '1'
     const results = reverse
@@ -247,7 +253,7 @@ describe.each(cases)('$name / $mode', ({ name, mode, request, baselineRequest })
 
     const withoutConstraints = results.get('Without constraint pipeline')
     const withConstraints = results.get('With constraint pipeline')
-    const subProject = accessors.project(request.project).subProject(request.subProjectId)
+    const subProject = request.subProject
     console.log(
       'CONSTRAINT_BENCHMARK',
       JSON.stringify({

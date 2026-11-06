@@ -11,7 +11,7 @@ import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getComputedSubProject } from './getComputedSubProject'
-import { processEditorComputation, processSubProjectComputation } from './processEditorComputation'
+import { processSubProjectComputation } from './processSubProjectComputation'
 
 const equal = (id: string, fields: ConstraintFieldSchema[]): EqualConstraintSchema => ({
   id,
@@ -48,31 +48,24 @@ const offsetFixture = (): SubProjectSchema =>
     },
   })
 
-describe('processEditorComputation', () => {
-  it('patches only the selected subproject and returns matching geometry without mutating the input', () => {
+describe('processSubProjectComputation', () => {
+  it('patches the supplied subproject and returns matching geometry without mutating the input', () => {
     const selected = d.subProject({
       id: 'selected',
       root: d.rootPanel({ id: 'root', width: 130, height: 80, children: ['panel'] }),
       components: [d.panel({ id: 'panel', width: 100, height: 50, autoWidth: true, autoHeight: true })],
     })
-    const other = d.subProject({
-      id: 'other',
-      root: d.rootPanel({ id: 'other-root', width: 150, children: ['other-panel'] }),
-      components: [d.panel({ id: 'other-panel', width: 10, autoWidth: true })],
-    })
-    const project = d.project({ id: 'project', subProjects: [selected, other] })
-    const before = structuredClone(project)
-    const result = processEditorComputation({ requestId: 7, project, subProjectId: selected.id })
-    const patched = accessors.project(result.project).subProject(selected.id)
+    const before = structuredClone(selected)
+    const result = processSubProjectComputation(selected, defaultStitchingSettings)
+    const patched = result.subProject
 
-    expect(result.requestId).toBe(7)
+    expect(patched.id).toBe(selected.id)
     expect(accessors.subProject(patched).component.panel('panel')).toMatchObject({ width: 130, height: 80 })
-    expect(result.computedSubProject).toEqual(getComputedSubProject(patched, project.stitchingSettings))
-    expect(accessors.project(result.project).subProject(other.id)).toBe(other)
-    expect(project).toEqual(before)
+    expect(result.computedSubProject).toEqual(getComputedSubProject(patched, defaultStitchingSettings))
+    expect(selected).toEqual(before)
   })
 
-  it('recomputes the selected subproject with changed project stitching settings', () => {
+  it('computes the subproject with the supplied common stitching settings', () => {
     const selected = d.subProject({
       id: 'selected',
       root: d.rootPanel({ id: 'root', width: 120, height: 80, topLeftRadius: 20 }),
@@ -85,23 +78,20 @@ describe('processEditorComputation', () => {
         }),
       ],
     })
-    const project = d.project({
-      id: 'project',
-      subProjects: [selected],
-      stitchingSettings: { ...defaultStitchingSettings, stitchMargin: 8 },
-    })
-    const result = processEditorComputation({ requestId: 2, project, subProjectId: selected.id })
-    const patched = accessors.project(result.project).subProject(selected.id)
+    const stitchingSettings = { ...defaultStitchingSettings, stitchMargin: 8 }
+    const result = processSubProjectComputation(selected, stitchingSettings)
+    const patched = result.subProject
     const stitchLine = accessors.subProject(patched).stitchLine.bounds('stitch')
     const computed = accessors.computedSubProject(result.computedSubProject).stitchLine.byId('stitch')
 
     expect(stitchLine.topLeftRadius).toBe(computed.autoComputedCornerRadius.topLeft.toNumber())
-    expect(result.computedSubProject).toEqual(getComputedSubProject(patched, project.stitchingSettings))
+    expect(result.computedSubProject).toEqual(getComputedSubProject(patched, stitchingSettings))
+    expect(result.computedSubProject).not.toEqual(getComputedSubProject(patched, defaultStitchingSettings))
   })
 
-  it('rejects a request for a nonexistent subproject', () => {
-    const project = d.project({ id: 'project', subProjects: [] })
-    expect(() => processEditorComputation({ requestId: 1, project, subProjectId: 'missing' })).toThrow()
+  it('rejects a subproject whose root component does not exist', () => {
+    const subProject = { ...d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) }), root: 'missing' }
+    expect(() => processSubProjectComputation(subProject, defaultStitchingSettings)).toThrow()
   })
 
   it('keeps the manually edited value when a patcher resets that field', () => {
@@ -110,17 +100,11 @@ describe('processEditorComputation', () => {
     const input = updateStitchLine(previous, {
       stitchLine: { ...accessors.subProject(previous).stitchLine.bounds('stitch'), topStartOffset: 25 },
     })
-    const project = d.project({ id: 'project', subProjects: [input] })
-    const result = processEditorComputation({
-      requestId: 3,
-      project,
-      subProjectId: input.id,
-      previousSubProject: previous,
-    })
-    const subProject = accessors.project(result.project).subProject(input.id)
+    const result = processSubProjectComputation(input, defaultStitchingSettings, previous)
+    const subProject = result.subProject
     expect(accessors.subProject(subProject).hole.byId('hole').xOffset).toBe(25)
     expect(accessors.subProject(subProject).stitchLine.bounds('stitch').topStartOffset).toBe(25)
-    expect(result.computedSubProject).toEqual(getComputedSubProject(subProject, project.stitchingSettings))
+    expect(result.computedSubProject).toEqual(getComputedSubProject(subProject, defaultStitchingSettings))
     expect(accessors.subProject(input).stitchLine.bounds('stitch').topStartOffset).toBe(25)
     expect(accessors.subProject(previous).stitchLine.bounds('stitch').topStartOffset).toBe(15)
   })

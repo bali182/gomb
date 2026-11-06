@@ -30,13 +30,18 @@ type ComputationWaiter = {
   reject: (error: unknown) => void
 }
 
+type ComputationTask = {
+  project: ProjectSchema
+  request: EditorComputationRequestSchema
+}
+
 type ComputationRuntime = {
   sourceProject: ProjectSchema | undefined
   subProjectId: string | undefined
   requestId: number
-  running: EditorComputationRequestSchema | undefined
-  pending: EditorComputationRequestSchema | undefined
-  failedRequest: EditorComputationRequestSchema | undefined
+  running: ComputationTask | undefined
+  pending: ComputationTask | undefined
+  failedTask: ComputationTask | undefined
   lastResult: EditorComputationResultSchema | undefined
   error: unknown
   worker: ReturnType<typeof createEditorComputationWorker> | undefined
@@ -58,7 +63,7 @@ export const useEditorComputation = ({
     requestId: 0,
     running: undefined,
     pending: undefined,
-    failedRequest: undefined,
+    failedTask: undefined,
     lastResult: undefined,
     error: undefined,
     worker: undefined,
@@ -78,28 +83,38 @@ export const useEditorComputation = ({
     }
   }, [])
 
-  const run = useCallback(async (request: EditorComputationRequestSchema): Promise<void> => {
+  const run = useCallback(async (task: ComputationTask): Promise<void> => {
     const runtime = runtimeRef.current
     const worker = runtime.worker
     if (!isDefined(worker)) {
-      runtime.pending = request
+      runtime.pending = task
       return
     }
-    let current = request
+    let current = task
     while (runtime.worker === worker) {
       runtime.running = current
       try {
-        const result = await worker.compute(
-          current,
+        const computed = await worker.compute(
+          current.request,
           (requestId: number): boolean => runtime.worker === worker && runtime.requestId === requestId,
         )
         if (runtime.worker !== worker) {
           return
         }
-        if (isDefined(result) && current.requestId === runtime.requestId) {
+        if (isDefined(computed) && current.request.requestId === runtime.requestId) {
+          const result: EditorComputationResultSchema = {
+            requestId: current.request.requestId,
+            project: {
+              ...current.project,
+              subProjects: current.project.subProjects.map((subProject) =>
+                subProject.id === current.request.subProject.id ? computed.subProject : subProject,
+              ),
+            },
+            computedSubProject: computed.computedSubProject,
+          }
           runtime.lastResult = result
           runtime.error = undefined
-          setState({ requestId: current.requestId, result: Loadable.loaded(result) })
+          setState({ requestId: current.request.requestId, result: Loadable.loaded(result) })
           const waiters = runtime.waiters
           runtime.waiters = []
           for (const waiter of waiters) {
@@ -110,11 +125,11 @@ export const useEditorComputation = ({
         if (runtime.worker !== worker) {
           return
         }
-        if (current.requestId === runtime.requestId) {
-          runtime.failedRequest = current
+        if (current.request.requestId === runtime.requestId) {
+          runtime.failedTask = current
           runtime.error = error
           setState({
-            requestId: current.requestId,
+            requestId: current.request.requestId,
             result: isDefined(runtime.lastResult)
               ? Loadable.failedWith(runtime.lastResult, error)
               : Loadable.failed(error),
@@ -141,12 +156,13 @@ export const useEditorComputation = ({
       const runtime = runtimeRef.current
       const request: EditorComputationRequestSchema = {
         requestId: ++runtime.requestId,
-        project: nextProject,
-        subProjectId: selectedSubProjectId,
+        subProject: accessors.project(nextProject).subProject(selectedSubProjectId),
         previousSubProject,
+        stitchingSettings: nextProject.stitchingSettings,
       }
+      const task: ComputationTask = { project: nextProject, request }
       runtime.error = undefined
-      runtime.failedRequest = undefined
+      runtime.failedTask = undefined
       const lastResult = runtime.lastResult
       setState((current) => {
         if (
@@ -161,9 +177,9 @@ export const useEditorComputation = ({
         }
       })
       if (isDefined(runtime.running)) {
-        runtime.pending = request
+        runtime.pending = task
       } else {
-        void run(request)
+        void run(task)
       }
       return request.requestId
     },
@@ -171,11 +187,11 @@ export const useEditorComputation = ({
   )
 
   const retryComputation = useCallback((): void => {
-    const failedRequest = runtimeRef.current.failedRequest
-    if (!isDefined(failedRequest)) {
+    const failedTask = runtimeRef.current.failedTask
+    if (!isDefined(failedTask)) {
       return
     }
-    enqueue(failedRequest.project, failedRequest.subProjectId, failedRequest.previousSubProject)
+    enqueue(failedTask.project, failedTask.request.subProject.id, failedTask.request.previousSubProject)
   }, [enqueue])
 
   useLayoutEffect(() => {
@@ -187,7 +203,7 @@ export const useEditorComputation = ({
     runtime.subProjectId = subProjectId
 
     if (sourceChanged || selectionChanged) {
-      runtime.failedRequest = undefined
+      runtime.failedTask = undefined
     }
 
     if (sourceChanged) {

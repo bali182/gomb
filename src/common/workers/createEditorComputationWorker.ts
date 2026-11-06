@@ -1,7 +1,7 @@
 import type {
   EditorComputationRequestSchema,
   EditorComputationResponseSchema,
-  EditorComputationResultSchema,
+  SubProjectComputationResultSchema,
 } from '../schemas/editorComputation'
 import { deserializeEditorComputation, serializeEditorComputation } from '../utils/editorComputationSerialization'
 import { isDefined } from '../utils/isDefined'
@@ -10,7 +10,7 @@ import EditorComputationWorker from './editorComputation.worker?worker'
 type PendingComputation = {
   request: EditorComputationRequestSchema
   isCurrent: (requestId: number) => boolean
-  resolve: (result: EditorComputationResultSchema | undefined) => void
+  resolve: (result: SubProjectComputationResultSchema | undefined) => void
   reject: (error: unknown) => void
 }
 
@@ -18,7 +18,7 @@ export const createEditorComputationWorker = (): {
   compute: (
     request: EditorComputationRequestSchema,
     isCurrent: (requestId: number) => boolean,
-  ) => Promise<EditorComputationResultSchema | undefined>
+  ) => Promise<SubProjectComputationResultSchema | undefined>
   terminate: () => void
 } => {
   let worker: Worker | undefined
@@ -59,9 +59,8 @@ export const createEditorComputationWorker = (): {
         case 'completed': {
           const result = response.result
           if (
-            result.requestId !== current.request.requestId ||
-            result.project.id !== current.request.project.id ||
-            result.computedSubProject.id !== current.request.subProjectId
+            result.subProject.id !== current.request.subProject.id ||
+            result.computedSubProject.id !== current.request.subProject.id
           ) {
             throw new Error('Editor computation result does not match its request')
           }
@@ -101,7 +100,7 @@ export const createEditorComputationWorker = (): {
   const compute = (
     request: EditorComputationRequestSchema,
     isCurrent: (requestId: number) => boolean,
-  ): Promise<EditorComputationResultSchema | undefined> => {
+  ): Promise<SubProjectComputationResultSchema | undefined> => {
     if (terminated) {
       return Promise.reject(new Error('Editor computation worker was terminated'))
     }

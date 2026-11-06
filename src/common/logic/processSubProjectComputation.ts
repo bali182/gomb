@@ -1,12 +1,7 @@
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
-import type {
-  EditorComputationRequestSchema,
-  EditorComputationResultSchema,
-  SubProjectComputationResultSchema,
-} from '../schemas/editorComputation'
+import type { SubProjectComputationResultSchema } from '../schemas/editorComputation'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
-import { accessors } from '../utils/accessors'
 import { getSubProjectDiff } from '../utils/getSubProjectDiff'
 import { applyResolution } from './constraints/applyResolution'
 import { getComputedSubProject } from './getComputedSubProject'
@@ -25,22 +20,5 @@ export const processSubProjectComputation = (
   return {
     subProject: resolved,
     computedSubProject: resolved === constrained ? computed : getComputedSubProject(resolved, stitchingSettings),
-  }
-}
-
-export const processEditorComputation = (request: EditorComputationRequestSchema): EditorComputationResultSchema => {
-  const { project, requestId, subProjectId } = request
-  const subProject = accessors.project(project).subProject(subProjectId)
-  const result = processSubProjectComputation(subProject, project.stitchingSettings, request.previousSubProject)
-
-  return {
-    requestId,
-    project: {
-      ...project,
-      subProjects: project.subProjects.map((candidate) =>
-        candidate.id === subProjectId ? result.subProject : candidate,
-      ),
-    },
-    computedSubProject: result.computedSubProject,
   }
 }

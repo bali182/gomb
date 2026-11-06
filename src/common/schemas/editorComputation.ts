@@ -1,12 +1,13 @@
 import type { LoadableSchema } from './loadable'
 import type { ProjectSchema } from './project'
+import type { StitchLineCommonConfigSchema } from './stitching'
 import type { ComputedSubProjectSchema, SubProjectSchema } from './subProject'
 
 export type EditorComputationRequestSchema = {
   requestId: number
-  project: ProjectSchema
-  subProjectId: string
+  subProject: SubProjectSchema
   previousSubProject?: SubProjectSchema
+  stitchingSettings: StitchLineCommonConfigSchema
 }
 
 export type SubProjectComputationResultSchema = {
@@ -23,7 +24,7 @@ export type EditorComputationResultSchema = {
 export type EditorComputationCompletedSchema = {
   type: 'completed'
   requestId: number
-  result: EditorComputationResultSchema
+  result: SubProjectComputationResultSchema
 }
 
 export type EditorComputationFailedSchema = {
