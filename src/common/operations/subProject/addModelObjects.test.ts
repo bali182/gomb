@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import { defaultStitchingSettings } from '../../defaultStates'
+import {
+  defaultComponentBoundsStitchLine,
+  defaultStitchingSettings,
+  defaultTPocketStitchLine,
+} from '../../defaultStates'
+import type { PocketOrientationSchema } from '../../schemas/components'
 import { d } from '../../testData'
 import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
@@ -118,12 +123,107 @@ describe('model creation in add operations', () => {
       modelFactory,
     })
     expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject({
+      ...defaultComponentBoundsStitchLine,
       type: 'component-bounds-stitch-line',
       targetId: 'hole',
       targetType: 'hole',
       name: 'Stitching 2',
     })
     expect(source).toEqual(snapshot)
+  })
+
+  describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
+    'pocket stitching with opening facing %s',
+    (orientation) => {
+      it.each(['cluster', 'front'])('leaves the opening edge and its corners unstitched on %s', (targetId) => {
+        const source = d.subProject({
+          id: 'sub',
+          root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+          components: [
+            d.pocketCluster({ id: 'cluster', orientation, children: ['front'] }),
+            d.frontPocket({ id: 'front', openingId: 'opening' }),
+          ],
+          stitchLines: [d.componentBoundsStitchLine({ id: 'existing', targetType: 'component', targetId })],
+        })
+        const snapshot = structuredClone(source)
+        const result = addStitchLine(source, {
+          type: 'component-bounds-stitch-line',
+          targetId,
+          targetType: 'component',
+          modelFactory: createFactory(),
+        })
+        expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject({
+          type: 'component-bounds-stitch-line',
+          targetId,
+          targetType: 'component',
+          top: orientation !== 'up',
+          right: orientation !== 'right',
+          bottom: orientation !== 'down',
+          left: orientation !== 'left',
+          topLeftCorner: orientation !== 'up' && orientation !== 'left',
+          topRightCorner: orientation !== 'up' && orientation !== 'right',
+          bottomRightCorner: orientation !== 'down' && orientation !== 'right',
+          bottomLeftCorner: orientation !== 'down' && orientation !== 'left',
+        })
+        expect(result.stitchLines[0]).toBe(source.stitchLines[0])
+        expect(source).toEqual(snapshot)
+      })
+    },
+  )
+
+  it.each(['root', 'panel'])('keeps every side and corner enabled when creating stitching on %s', (targetId) => {
+    const result = addStitchLine(fixture(), {
+      type: 'component-bounds-stitch-line',
+      targetType: 'component',
+      targetId,
+      modelFactory: createFactory(),
+    })
+    expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject(defaultComponentBoundsStitchLine)
+  })
+
+  it('keeps every side and corner enabled when creating stitching on a front pocket hole', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', orientation: 'right', children: ['front'] }),
+        d.frontPocket({ id: 'front', openingId: 'opening' }),
+      ],
+      holes: [d.hole({ id: 'hole', componentId: 'front' })],
+    })
+    const result = addStitchLine(source, {
+      type: 'component-bounds-stitch-line',
+      targetType: 'hole',
+      targetId: 'hole',
+      modelFactory: createFactory(),
+    })
+    expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject(defaultComponentBoundsStitchLine)
+  })
+
+  it.each(['cluster', 't-pocket'])('keeps T-pocket stitching defaults when creating stitching on %s', (targetId) => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', orientation: 'right', children: ['t-pocket', 'front'] }),
+        d.tPocket({ id: 't-pocket', openingId: 'opening' }),
+        d.frontPocket({ id: 'front', openingId: 'opening' }),
+      ],
+    })
+    const result = addStitchLine(source, {
+      type: 't-pocket-stitch-line',
+      targetType: 'component',
+      targetId,
+      modelFactory: createFactory(),
+    })
+    expect(result.stitchLines[result.stitchLines.length - 1]).toEqual({
+      ...defaultTPocketStitchLine,
+      type: 't-pocket-stitch-line',
+      targetType: 'component',
+      targetId,
+      id: expect.any(String),
+      name: expect.any(String),
+    })
   })
 
   it('adds an opening using the current names without changing the default reference', () => {
