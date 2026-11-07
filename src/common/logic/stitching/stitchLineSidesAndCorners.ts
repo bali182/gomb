@@ -13,6 +13,14 @@ export const STITCH_LINE_SIDE_AND_CORNER_ORDER: readonly StitchLineSideOrCornerF
   'topLeftCorner',
 ]
 
+export const STITCH_LINE_DIRECTION_SIDES: readonly (keyof HasStitchedSidesSchema)[] = ['top', 'right', 'bottom', 'left']
+export const STITCH_LINE_DIRECTION_CORNERS: readonly (keyof HasStitchedCornersSchema)[] = [
+  'topRightCorner',
+  'bottomRightCorner',
+  'bottomLeftCorner',
+  'topLeftCorner',
+]
+
 export const canToggleStitchLineSideOrCorner = (
   stitchLine: HasStitchedSidesSchema & HasStitchedCornersSchema,
   field: StitchLineSideOrCornerField,

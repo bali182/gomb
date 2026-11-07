@@ -630,8 +630,9 @@ export const EN = {
                 'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. Ignored on a closed route.',
             },
             stitchDirection: {
-              label: 'Direction',
-              tooltip: 'Reverses the punching direction along the entire route.',
+              label: 'Punching direction',
+              tooltip:
+                'Switch between normal and reversed punching direction. The arrow shows the current direction for the selected sides or corner.',
             },
             top: {
               label: 'Top edge',

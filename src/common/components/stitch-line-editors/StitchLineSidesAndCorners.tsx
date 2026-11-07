@@ -1,4 +1,4 @@
-import { Box, Grid } from '@chakra-ui/react'
+import { Grid } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import {
@@ -28,11 +28,13 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
   return (
     <Grid
       aspectRatio="4 / 3"
-      gap="0"
+      gap="2"
       gridTemplateAreas={`"top-left top top-right" "left center right" "bottom-left bottom bottom-right"`}
       gridTemplateColumns="auto minmax(0, 1fr) auto"
       gridTemplateRows="auto minmax(0, 1fr) auto"
       position="relative"
+      minHeight="280px"
+      padding="6"
     >
       <StitchLineCornerToggle
         corner="top-left"
@@ -62,7 +64,6 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         onClick={() => toggle('left')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.left.tooltip}
       />
-      <Box gridArea="center" />
       <StitchLineEdgeToggle
         side="right"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'right')}

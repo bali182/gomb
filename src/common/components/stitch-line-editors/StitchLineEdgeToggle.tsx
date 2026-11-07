@@ -55,7 +55,7 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, 
           aria-pressed={selected}
           cursor={disabled ? 'not-allowed' : 'pointer'}
           disabled={disabled}
-          opacity={disabled ? 0.4 : 1}
+          _disabled={{ opacity: selected ? 1 : 0.4 }}
           onClick={handleClick}
           _hover={hover}
           unstyled
@@ -70,46 +70,38 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, 
 
 const EDGE_BORDER_WIDTH: CssProperties['borderWidth'] = 'medium'
 const EDGE_SEGMENT_SIZE: Tokens['sizes'] = '10'
-const EDGE_HIT_SLOP: Tokens['spacing'] = '4'
+const EDGE_HIT_SLOP: Tokens['spacing'] = '10'
+const EDGE_HIT_AREA_SIZE: Tokens['sizes'] = '20'
 const NEGATIVE_EDGE_HIT_SLOP: Tokens['spacing'] = `-${EDGE_HIT_SLOP}` as Tokens['spacing']
-const EDGE_INSET: Tokens['sizes'] = 'md'
 
 const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
   const layouts: Record<StitchSideSchema, StitchLineSegmentLayout> = {
     bottom: {
-      button: { bottom: NEGATIVE_EDGE_HIT_SLOP, left: 0, position: 'absolute', right: 0, top: 0 },
+      button: { bottom: NEGATIVE_EDGE_HIT_SLOP, height: EDGE_HIT_AREA_SIZE, left: 0, position: 'absolute', right: 0 },
       root: {
         alignSelf: 'end',
         gridArea: 'bottom',
         height: EDGE_SEGMENT_SIZE,
         justifySelf: 'stretch',
-        marginBottom: EDGE_INSET,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0,
         position: 'relative',
         width: '100%',
       },
       visual: {
         borderBottomWidth: EDGE_BORDER_WIDTH,
-        height: EDGE_SEGMENT_SIZE,
+        bottom: EDGE_HIT_SLOP,
+        height: 0,
         left: 0,
         position: 'absolute',
-        top: 0,
         width: '100%',
       },
     },
     left: {
-      button: { bottom: 0, left: NEGATIVE_EDGE_HIT_SLOP, position: 'absolute', right: 0, top: 0 },
+      button: { bottom: 0, left: NEGATIVE_EDGE_HIT_SLOP, position: 'absolute', top: 0, width: EDGE_HIT_AREA_SIZE },
       root: {
         alignSelf: 'stretch',
         gridArea: 'left',
         height: '100%',
         justifySelf: 'start',
-        marginBottom: 0,
-        marginLeft: EDGE_INSET,
-        marginRight: 0,
-        marginTop: 0,
         position: 'relative',
         width: EDGE_SEGMENT_SIZE,
       },
@@ -119,49 +111,41 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
         left: EDGE_HIT_SLOP,
         position: 'absolute',
         top: 0,
-        width: EDGE_SEGMENT_SIZE,
+        width: 0,
       },
     },
     right: {
-      button: { bottom: 0, left: 0, position: 'absolute', right: NEGATIVE_EDGE_HIT_SLOP, top: 0 },
+      button: { bottom: 0, position: 'absolute', right: NEGATIVE_EDGE_HIT_SLOP, top: 0, width: EDGE_HIT_AREA_SIZE },
       root: {
         alignSelf: 'stretch',
         gridArea: 'right',
         height: '100%',
         justifySelf: 'end',
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: EDGE_INSET,
-        marginTop: 0,
         position: 'relative',
         width: EDGE_SEGMENT_SIZE,
       },
       visual: {
         borderRightWidth: EDGE_BORDER_WIDTH,
         height: '100%',
-        left: 0,
+        right: EDGE_HIT_SLOP,
         position: 'absolute',
         top: 0,
-        width: EDGE_SEGMENT_SIZE,
+        width: 0,
       },
     },
     top: {
-      button: { bottom: 0, left: 0, position: 'absolute', right: 0, top: NEGATIVE_EDGE_HIT_SLOP },
+      button: { height: EDGE_HIT_AREA_SIZE, left: 0, position: 'absolute', right: 0, top: NEGATIVE_EDGE_HIT_SLOP },
       root: {
         alignSelf: 'start',
         gridArea: 'top',
         height: EDGE_SEGMENT_SIZE,
         justifySelf: 'stretch',
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: EDGE_INSET,
         position: 'relative',
         width: '100%',
       },
       visual: {
         borderTopWidth: EDGE_BORDER_WIDTH,
-        height: EDGE_SEGMENT_SIZE,
+        height: 0,
         left: 0,
         position: 'absolute',
         top: EDGE_HIT_SLOP,

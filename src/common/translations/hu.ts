@@ -567,8 +567,9 @@ export const HU = {
                 'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Zárt körön nincs hatása.',
             },
             stitchDirection: {
-              label: 'Irány',
-              tooltip: 'Megfordítja a lyukkiosztás irányát a teljes varrásvonalon.',
+              label: 'Lyukasztás iránya',
+              tooltip:
+                'Váltás a normál és a fordított lyukkiosztási irány között. A nyíl a kiválasztott oldalak vagy sarok aktuális haladási irányát mutatja.',
             },
             top: {
               label: 'Felső oldal',

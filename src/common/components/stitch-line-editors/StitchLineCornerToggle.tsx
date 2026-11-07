@@ -62,7 +62,7 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
           disabled={disabled}
           readOnly={isComputing}
           onClick={handleClick}
-          opacity={disabled === true ? 0.4 : 1}
+          _disabled={{ opacity: selected ? 1 : 0.4 }}
           _hover={hover}
           unstyled
           {...layout.button}
@@ -76,9 +76,8 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
 
 const CORNER_BORDER_WIDTH: CssProperties['borderWidth'] = 'medium'
 const CORNER_SEGMENT_SIZE: Tokens['sizes'] = '10'
-const CORNER_HIT_SLOP: Tokens['spacing'] = '4'
+const CORNER_HIT_SLOP: Tokens['spacing'] = '10'
 const NEGATIVE_CORNER_HIT_SLOP: Tokens['spacing'] = `-${CORNER_HIT_SLOP}` as Tokens['spacing']
-const CORNER_INSET: Tokens['sizes'] = 'md'
 const CORNER_RADIUS: Tokens['radii'] = 'md'
 
 const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout => {
@@ -96,10 +95,6 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         gridArea: 'bottom-left',
         height: CORNER_SEGMENT_SIZE,
         justifySelf: 'start',
-        marginBottom: CORNER_INSET,
-        marginLeft: CORNER_INSET,
-        marginRight: 0,
-        marginTop: 0,
         position: 'relative',
         width: CORNER_SEGMENT_SIZE,
       },
@@ -127,10 +122,6 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         gridArea: 'bottom-right',
         height: CORNER_SEGMENT_SIZE,
         justifySelf: 'end',
-        marginBottom: CORNER_INSET,
-        marginLeft: 0,
-        marginRight: CORNER_INSET,
-        marginTop: 0,
         position: 'relative',
         width: CORNER_SEGMENT_SIZE,
       },
@@ -158,10 +149,6 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         gridArea: 'top-left',
         height: CORNER_SEGMENT_SIZE,
         justifySelf: 'start',
-        marginBottom: 0,
-        marginLeft: CORNER_INSET,
-        marginRight: 0,
-        marginTop: CORNER_INSET,
         position: 'relative',
         width: CORNER_SEGMENT_SIZE,
       },
@@ -189,10 +176,6 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         gridArea: 'top-right',
         height: CORNER_SEGMENT_SIZE,
         justifySelf: 'end',
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: CORNER_INSET,
-        marginTop: CORNER_INSET,
         position: 'relative',
         width: CORNER_SEGMENT_SIZE,
       },
