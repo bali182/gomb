@@ -2,10 +2,10 @@ import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
 import { POSITION_EPSILON, STITCH_HOLE_ENDPOINT_EPSILON_MM, TWO, ZERO } from '../../constants/layout'
+import type { StitchCornerPathFragment, StitchPathFragment } from '../../schemas/computed'
 import type { PointSchema } from '../../schemas/geometry'
 import { isDefined } from '../../utils/isDefined'
 import { getPointDistance } from '../geometryUtils'
-import type { StitchCornerPathFragment, StitchPathFragment } from './calculateStitchLinePaths'
 
 const FULL_TURN = Math.PI * 2
 
@@ -21,6 +21,7 @@ export type StitchHoleArcSegment = {
   end: PointSchema
   center: PointSchema
   radius: BigNumber
+  reversed?: boolean
 }
 
 export type StitchHoleSegment = StitchHoleLineSegment | StitchHoleArcSegment
@@ -68,7 +69,8 @@ export const findNextStitchHole = (
     const segmentLength = narrowers.path.is.stitchHoleLineSegment(segment)
       ? getPointDistance(segment.start, segment.end)
       : segment.radius.times(
-          getClockwiseAngleDifference(
+          getArcAngleDifference(
+            segment,
             getPointAngle(segment.center, segment.start),
             getPointAngle(segment.center, segment.end),
           ),
@@ -124,7 +126,8 @@ export const getSegmentTangentRotation = (segment: StitchHoleSegment, point: Poi
     return getRotationFromVector(segment.end.x.minus(segment.start.x), segment.end.y.minus(segment.start.y))
   }
 
-  return getRotationFromVector(point.y.minus(segment.center.y).negated(), point.x.minus(segment.center.x))
+  const rotation = getRotationFromVector(point.y.minus(segment.center.y).negated(), point.x.minus(segment.center.x))
+  return segment.reversed === true ? (rotation + 180) % 360 : rotation
 }
 
 const getCornerCenter = (corner: StitchCornerPathFragment): PointSchema => {
@@ -251,8 +254,8 @@ const getArcProgress = (segment: StitchHoleArcSegment, point: PointSchema): BigN
   const startAngle = getPointAngle(segment.center, segment.start)
   const endAngle = getPointAngle(segment.center, segment.end)
   const pointAngle = getPointAngle(segment.center, point)
-  const arcAngle = getClockwiseAngleDifference(startAngle, endAngle)
-  const pointAngleDifference = getClockwiseAngleDifference(startAngle, pointAngle)
+  const arcAngle = getArcAngleDifference(segment, startAngle, endAngle)
+  const pointAngleDifference = getArcAngleDifference(segment, startAngle, pointAngle)
   const angleEpsilon = POSITION_EPSILON / segment.radius.toNumber()
 
   if (pointAngleDifference > arcAngle + angleEpsilon) {
@@ -264,6 +267,10 @@ const getArcProgress = (segment: StitchHoleArcSegment, point: PointSchema): BigN
 
 const getPointAngle = (center: PointSchema, point: PointSchema): number => {
   return normalizeAngle(Math.atan2(point.y.minus(center.y).toNumber(), point.x.minus(center.x).toNumber()))
+}
+
+const getArcAngleDifference = (segment: StitchHoleArcSegment, from: number, to: number): number => {
+  return segment.reversed === true ? getClockwiseAngleDifference(to, from) : getClockwiseAngleDifference(from, to)
 }
 
 const getClockwiseAngleDifference = (from: number, to: number): number => {

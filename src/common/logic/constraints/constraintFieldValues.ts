@@ -91,10 +91,6 @@ const isCompatibleValue = (group: ConstraintCompatibilityGroupSchema, value: Con
       return value === 'start' || value === 'end'
     case 'enum:stitch-direction':
       return value === 'start-to-end' || value === 'end-to-start'
-    case 'enum:horizontal-stitch-direction':
-      return value === 'left-to-right' || value === 'right-to-left'
-    case 'enum:vertical-stitch-direction':
-      return value === 'top-to-bottom' || value === 'bottom-to-top'
   }
 }
 

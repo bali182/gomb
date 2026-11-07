@@ -288,24 +288,15 @@ export const comparators = {
       a.stitchHoleDistance === b.stitchHoleDistance &&
       a.stitchHoleThickness === b.stitchHoleThickness &&
       a.stitchLineThickness === b.stitchLineThickness &&
-      a.topStartOffset === b.topStartOffset &&
-      a.topEndOffset === b.topEndOffset &&
-      a.rightStartOffset === b.rightStartOffset &&
-      a.rightEndOffset === b.rightEndOffset &&
-      a.bottomStartOffset === b.bottomStartOffset &&
-      a.bottomEndOffset === b.bottomEndOffset &&
-      a.leftStartOffset === b.leftStartOffset &&
-      a.leftEndOffset === b.leftEndOffset &&
       a.autoCornerRadius === b.autoCornerRadius &&
       a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
       a.bottomRightRadius === b.bottomRightRadius &&
-      a.topStitchDirection === b.topStitchDirection &&
-      a.bottomStitchDirection === b.bottomStitchDirection &&
-      a.rightStitchDirection === b.rightStitchDirection &&
-      a.leftStitchDirection === b.leftStitchDirection &&
+      a.startOffset === b.startOffset &&
+      a.endOffset === b.endOffset &&
+      a.stitchDirection === b.stitchDirection &&
       a.top === b.top &&
       a.right === b.right &&
       a.bottom === b.bottom &&
@@ -313,11 +304,7 @@ export const comparators = {
       a.topLeftCorner === b.topLeftCorner &&
       a.topRightCorner === b.topRightCorner &&
       a.bottomRightCorner === b.bottomRightCorner &&
-      a.bottomLeftCorner === b.bottomLeftCorner &&
-      a.stitchDisconnectedTopLeftCorner === b.stitchDisconnectedTopLeftCorner &&
-      a.stitchDisconnectedTopRightCorner === b.stitchDisconnectedTopRightCorner &&
-      a.stitchDisconnectedBottomLeftCorner === b.stitchDisconnectedBottomLeftCorner &&
-      a.stitchDisconnectedBottomRightCorner === b.stitchDisconnectedBottomRightCorner
+      a.bottomLeftCorner === b.bottomLeftCorner
     )
   },
   tPocketStitchLine: (a: TPocketStitchLineSchema, b: TPocketStitchLineSchema): boolean => {

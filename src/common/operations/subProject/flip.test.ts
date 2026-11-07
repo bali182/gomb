@@ -273,12 +273,15 @@ describe.each(axes)('flip: %s', (axis) => {
     expect(result.stitchLines[1]).toBe(otherStitch)
   })
 
-  it('mirrors standard stitch sides, offsets, radii, disconnected corners and individual directions', () => {
+  it('mirrors standard stitch sides, corners, offsets, radii and route direction', () => {
     const root = d.rootPanel({ id: 'root' })
     const stitchLine = d.componentBoundsStitchLine({
       id: 'stitch',
       targetType: 'component',
       targetId: 'root',
+      startOffset: 1,
+      endOffset: 2,
+      stitchDirection: 'start-to-end',
       onTop: 'overlay',
       ...radii,
       autoCornerRadius: false,
@@ -292,22 +295,6 @@ describe.each(axes)('flip: %s', (axis) => {
       topRightCorner: false,
       bottomLeftCorner: false,
       bottomRightCorner: true,
-      stitchDisconnectedTopLeftCorner: true,
-      stitchDisconnectedTopRightCorner: false,
-      stitchDisconnectedBottomLeftCorner: false,
-      stitchDisconnectedBottomRightCorner: true,
-      topStartOffset: 1,
-      topEndOffset: 2,
-      rightStartOffset: 3,
-      rightEndOffset: 4,
-      bottomStartOffset: 5,
-      bottomEndOffset: 6,
-      leftStartOffset: 7,
-      leftEndOffset: 8,
-      topStitchDirection: 'left-to-right',
-      bottomStitchDirection: 'right-to-left',
-      leftStitchDirection: 'top-to-bottom',
-      rightStitchDirection: 'bottom-to-top',
     })
     const original = d.subProject({ id: 'sp', root, stitchLines: [stitchLine] })
     const expected =
@@ -321,22 +308,6 @@ describe.each(axes)('flip: %s', (axis) => {
             topRightCorner: true,
             bottomLeftCorner: true,
             bottomRightCorner: false,
-            stitchDisconnectedTopLeftCorner: false,
-            stitchDisconnectedTopRightCorner: true,
-            stitchDisconnectedBottomLeftCorner: true,
-            stitchDisconnectedBottomRightCorner: false,
-            topStartOffset: 2,
-            topEndOffset: 1,
-            rightStartOffset: 8,
-            rightEndOffset: 7,
-            bottomStartOffset: 6,
-            bottomEndOffset: 5,
-            leftStartOffset: 4,
-            leftEndOffset: 3,
-            topStitchDirection: 'right-to-left',
-            bottomStitchDirection: 'left-to-right',
-            leftStitchDirection: 'bottom-to-top',
-            rightStitchDirection: 'top-to-bottom',
           }
         : {
             top: false,
@@ -347,25 +318,16 @@ describe.each(axes)('flip: %s', (axis) => {
             topRightCorner: true,
             bottomLeftCorner: true,
             bottomRightCorner: false,
-            stitchDisconnectedTopLeftCorner: false,
-            stitchDisconnectedTopRightCorner: true,
-            stitchDisconnectedBottomLeftCorner: true,
-            stitchDisconnectedBottomRightCorner: false,
-            topStartOffset: 6,
-            topEndOffset: 5,
-            rightStartOffset: 4,
-            rightEndOffset: 3,
-            bottomStartOffset: 2,
-            bottomEndOffset: 1,
-            leftStartOffset: 8,
-            leftEndOffset: 7,
-            topStitchDirection: 'right-to-left',
-            bottomStitchDirection: 'left-to-right',
-            leftStitchDirection: 'bottom-to-top',
-            rightStitchDirection: 'top-to-bottom',
           }
     const result = flip(original, stitchLine, axis)
-    expect(result.stitchLines[0]).toEqual({ ...stitchLine, ...mirroredRadii[axis], ...expected })
+    expect(result.stitchLines[0]).toEqual({
+      ...stitchLine,
+      ...mirroredRadii[axis],
+      ...expected,
+      startOffset: 2,
+      endOffset: 1,
+      stitchDirection: 'end-to-start',
+    })
     expect(result.components.root).toBe(root)
   })
 

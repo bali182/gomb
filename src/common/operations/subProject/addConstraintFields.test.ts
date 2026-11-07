@@ -32,6 +32,31 @@ const fixture = (): SubProjectSchema =>
   })
 
 describe('addConstraintFields', () => {
+  it.each([
+    'top',
+    'right',
+    'bottom',
+    'left',
+    'topLeftCorner',
+    'topRightCorner',
+    'bottomRightCorner',
+    'bottomLeftCorner',
+  ])('rejects stitched side/corner field %s', (field) => {
+    const source = fixture()
+    const input = {
+      type: 'component-bounds-stitch-line-constraint-field',
+      modelId: 'first-stitch',
+      field,
+    } as unknown as ConstraintFieldInputSchema
+    const result = addConstraintFields(source, {
+      constraintId: 'constraint',
+      fields: [input],
+      modelFactory,
+    })
+    expect(result).toBe(source)
+    expect(result.constraints.constraint.fields).toEqual([])
+  })
+
   it('creates a batch through the factory and accepts compatible number fields across models', () => {
     const source = fixture()
     const snapshot = structuredClone(source)

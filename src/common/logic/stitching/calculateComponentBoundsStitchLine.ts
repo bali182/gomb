@@ -5,12 +5,10 @@ import type {
 } from '../../schemas/computed'
 import type { ResolvedComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
-import { calculateRouteConnectingStitches } from './calculateRouteConnectingStitches'
-import { calculateRouteDisconnectedCorners } from './calculateRouteDisconnectedCorners'
 import { calculateRouteStitches } from './calculateRouteStitches'
 import { calculateStitchLineBoundingRect } from './calculateStitchLineBoundingRect'
 import { calculateStitchLineHoles } from './calculateStitchLineHoles'
-import { calculateStitchLinePaths } from './calculateStitchLinePaths'
+import { calculateStitchLinePath } from './calculateStitchLinePaths'
 import type { ComponentBoundsStitchLineTarget } from './helperTypes'
 import { getStitchLineAutoCornerRadius } from './stitchLineRadiusUtils'
 
@@ -19,7 +17,8 @@ export const calculateComponentBoundsStitchLine = (
   target: ComponentBoundsStitchLineTarget,
   computedComponents: Record<string, ComputedComponentSchema>,
 ): ComputedStitchLineSchema => {
-  const calculatedPaths = calculateStitchLinePaths(stitchLine, target)
+  const calculatedPath = calculateStitchLinePath(stitchLine, target)
+  const calculatedPaths = isDefined(calculatedPath) ? [calculatedPath] : []
   const points = calculatedPaths.flatMap((calculatedPath) =>
     calculatedPath.fragments.flatMap((fragment) => [fragment.start, fragment.end]),
   )
@@ -32,11 +31,11 @@ export const calculateComponentBoundsStitchLine = (
       targetId: stitchLine.targetId,
       boundingRect: calculateStitchLineBoundingRect(routePoints),
       path: calculatedPath.path,
+      fragments: calculatedPath.fragments,
       holes,
       isClosed: calculatedPath.isClosed,
       stitches: calculateRouteStitches(holes, calculatedPath.isClosed),
       labelPosition: calculatedPath.labelPosition,
-      disconnectedCorners: calculateRouteDisconnectedCorners(stitchLine, calculatedPath, holes),
     }
   })
 
@@ -53,6 +52,5 @@ export const calculateComponentBoundsStitchLine = (
     autoComputedCornerRadius: getStitchLineAutoCornerRadius(stitchLine, target),
     boundingRect: calculateStitchLineBoundingRect(points),
     routes,
-    connectingStitches: calculateRouteConnectingStitches(stitchLine, routes),
   }
 }

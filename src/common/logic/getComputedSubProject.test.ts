@@ -1671,6 +1671,28 @@ describe('cluster T-pocket stitch routes', () => {
     expect(source).toEqual(snapshot)
   })
 
+  it.each([
+    ['up', 'bottom'],
+    ['down', 'top'],
+    ['left', 'right'],
+    ['right', 'left'],
+  ] as const)('preserves the calculated %s pocket edge as a %s fragment', (orientation, side) => {
+    const source = fixture()
+    const cluster = accessors.subProject(source).component.pocketCluster('cluster')
+    source.components[cluster.id] = { ...cluster, orientation }
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const routes = accessors.computedSubProject(computed).stitchLine.tPocket('shared').routes
+    expect(routes).toHaveLength(2)
+    for (const route of routes) {
+      const startCommand = route.path.commands[0]
+      const endCommand = route.path.commands[1]
+      if (!narrowers.path.is.moveTo(startCommand) || !narrowers.path.is.lineTo(endCommand)) {
+        throw new Error('Expected a single straight T-pocket route')
+      }
+      expect(route.fragments).toEqual([{ type: 'side', side, start: startCommand.point, end: endCommand.point }])
+    }
+  })
+
   it.each([['b', 'a', 'front'], ['b', 'front'], ['front']])(
     'follows current children without duplicating the source: %j',
     (...children) => {

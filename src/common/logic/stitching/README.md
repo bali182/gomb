@@ -1,130 +1,93 @@
 # Stitch lines
 
-This document describes the computed geometry behind project stitch lines. The
-editor-facing schemas share one computed output: a set of SVG routes, each with
-its own path and stitch-hole list.
+Component bounds stitch lines stitch one continuous portion of a component or
+hole boundary. T-pocket stitch lines stitch the closed edge of one T-pocket or
+each T-pocket in a cluster. Both retain the common computed `routes` array:
+component bounds produces zero or one route; a cluster can produce several.
 
-`ComponentBoundsStitchLineSchema` describes stitching around selected portions
-of a component boundary. A `PocketClusterStitchLineSchema` describes
-independent stitching along the closed edge of each T-pocket in a pocket
-cluster.
+## Stitched sides and corners
 
-The schema has boolean flags for each component side and corner. In this
-document, an **enabled side** means one of `ComponentBoundsStitchLineSchema.top`, `.right`,
-`.bottom`, or `.left` is `true`. An **enabled corner** means the corresponding
-`topLeftCorner`, `topRightCorner`, `bottomRightCorner`, or `bottomLeftCorner`
-field is `true`. These terms do not refer to UI selection.
-
-## Route paths
-
-A stitch line targets one component. Its outer boundary is taken from the
-computed component bounding rect. The stitch route is inset by
-`stitchMargin` on every side.
-
-Corner radii are resolved with `getNormalizedCornerRadius(component)`. The
-effective radius of a stitch-route corner is:
+`HasStitchedSidesSchema` and `HasStitchedCornersSchema` describe the boundary in
+this canonical clockwise order:
 
 ```text
-max(0, component corner radius - stitchMargin)
+top → topRightCorner → right → bottomRightCorner → bottom → bottomLeftCorner → left → topLeftCorner
 ```
 
-So a 5 mm component radius with a 5 mm margin becomes a sharp stitch-route
-corner. A sharp corner does not emit an SVG arc; adjacent enabled fragments
-meet at the same point.
+Sides and corners can be enabled independently, including an isolated corner.
+The enabled portion must be contiguous. The editor permits additions and
+removals only at its ends; an empty boundary can start anywhere and a complete
+boundary can be broken anywhere. These rules include zero-radius corners:
+geometric contact does not replace an enabled corner.
 
-The perimeter is built in this canonical order:
+`normalizeStitchLineSidesAndCorners` fills gaps by enabling as few sides/corners
+as possible, preserving the longest disabled interval. Ties follow canonical
+order. It never disables an enabled part and leaves an empty boundary empty.
+The geometry uses this normalization before calculation, and the patcher
+persists it in the shared patcher pipeline. Stitched sides and corners cannot
+be linked by constraints. Obsolete constraint entries for these fields are
+ignored during resolution and removed by the constraint patcher.
 
-```text
-top → top-right → right → bottom-right → bottom → bottom-left → left → top-left
-```
+An empty boundary, or a standalone corner with zero effective radius, produces
+no route. A standalone rounded corner produces an arc route.
 
-Enabled sides produce straight fragments. Enabled corners produce arc
-fragments only when their effective radius is positive. A corner by itself is
-ignored: it must have at least one enabled neighbouring side.
+## Geometry and offsets
 
-An explicitly enabled corner is the only thing that connects its two sides.
-Two sides that merely meet at a zero-radius point remain separate routes when
-that corner is not enabled.
+The stitch margin insets a component boundary and expands a hole boundary.
+Existing automatic/custom corner-radius resolution remains in effect.
 
-The `ComponentBoundsStitchLineSchema` `...StartOffset` and `...EndOffset` fields control the
-two ends of a side when that end is not attached to an enabled corner. A
-positive offset extends the side at that end; a negative offset shortens it.
-At an end attached to an enabled corner the offset is ignored, so the side and
-corner meet exactly.
+A positive `startOffset` or `endOffset` extends a canonical endpoint; a negative
+value shortens it. Offsets are applied before `stitchDirection`, so changing the
+direction does not exchange their physical endpoints. An endpoint that is a
+corner ignores its offset; the editor disables that field without erasing it.
 
-Consecutive enabled fragments become one SVG route. A route is considered
-closed when its final point is also its first point; otherwise it is an open
-route. A standalone side is an open route containing exactly one enabled side
-and no enabled corner.
+Negative offsets cannot consume an entire endpoint side or cross a corner.
+Offset limits reserve `POSITION_EPSILON` of positive side length. When both
+ends refer to one side, compression is shared using the same half-length
+allocation rule as stretch limits. Geometry clamps offsets to these limits;
+saved requested values remain intact and receive limit warnings.
 
-## Stitch holes
+On a fully rounded closed boundary, `startOffset` moves the punching start
+forward along the canonical perimeter, wrapping in either sign. The outline
+stays closed; `endOffset` is ignored. Both directions start at this same shifted
+point. A closed boundary containing a sharp corner ignores both offsets.
 
-Holes are computed separately for every SVG route, but use the route's source
-fragments as well as its rendered path. This matters because an enabled sharp
-corner has no SVG command but still changes the punching behaviour.
+## Punching direction, spacing and sharp corners
 
-A standalone side uses its configured `topStitchDirection`,
-`rightStitchDirection`, `bottomStitchDirection`, or `leftStitchDirection`.
-Any route involving an enabled corner follows the canonical perimeter
-direction: top left-to-right, right top-to-bottom, bottom right-to-left, and
-left bottom-to-top.
+`stitchDirection` chooses `start-to-end` or `end-to-start` for the entire route.
+The second direction recalculates the hole positions from the other end; it
+does not just reverse an existing list of holes.
 
-The first hole is placed at the start of a punching traversal. Its rotation
-comes from the tangent of the first line or arc. Every later hole is exactly
-`stitchHoleDistance` away from the previous hole:
+Successive hole centers are spaced by `stitchHoleDistance`, using the first
+forward intersection of the remaining route with a circle around the previous
+hole. Rounded corners continue the same traversal, including counterclockwise
+arcs. The distance is the direct center-to-center distance, not arc length.
 
-1. Draw a circle centred on the previous hole with that radius.
-2. Find the first intersection with the remaining route in the travel
-   direction.
-3. Place the next hole at that intersection.
-4. Stop when there is no forward intersection.
+A sharp corner interrupts the traversal and has a hole at its exact position.
+Its orientation is fixed by its canonical outgoing side: top-right and
+bottom-left match vertical sides; top-left and bottom-right match horizontal
+sides. Reversing travel never changes that corner-hole orientation. Straight
+side holes also keep their physical orientation when travel reverses.
 
-This keeps the centre-to-centre distance exact through rounded corners. After
-the first hole, rotation comes from the direction from the previous hole centre
-to the new hole centre:
+Before reaching a sharp corner, a preceding hole at most half a hole spacing
+from it is removed. Punching continues from the corner with a full hole spacing
+in the new direction. Reversing travel therefore moves the residual spacing to
+the other side of the corner; it does not skip the first hole on the next side.
 
-```text
-normalizeTo0To180(atan2(current.y - previous.y, current.x - previous.x) - 90°)
-```
+For example, on a reversed route that travels up the right side and then left
+along the top, the top-right hole retains the right side's orientation. The
+first top-side hole is one hole spacing to its left. If top-left is rounded,
+the top side, that corner and the left side continue as one traversal.
 
-`[0, 180)` is sufficient because a stitch-hole line is symmetric after 180
-degrees.
-
-### Sharp corners and route ends
-
-A configured corner with an effective radius of zero ends the current punching
-traversal. Before the next side starts, the last hole before that corner is
-removed when it is at most:
-
-```text
-stitchHoleDistance * MINIMUM_STITCH_HOLE_ENDPOINT_DISTANCE_FACTOR
-```
-
-away from the corner point. The current factor is `0.5`. The following side
-then starts a fresh traversal at the corner point.
-
-For an open route, the final hole is simply the last one for which a complete
-forward `stitchHoleDistance` intersection exists. There is no endpoint fill or
-end-spacing adjustment.
-
-For a closed route without sharp corners, the final hole is also checked against
-the route start using the same minimum-distance factor. Too-close final holes
-are removed so the closing point does not create a duplicate or nearly
-overlapping hole.
+An open route has no forced hole at a free final endpoint. Closed routes remove
+a duplicate or too-close final hole at their starting point. Consecutive holes
+are connected by stitches; a closed route also connects last to first. There
+are no separate disconnected-corner or inter-route connecting stitches.
 
 ## T-pocket stitch lines
 
-A pocket-cluster stitch line creates one independent open route for every
-computed T-pocket. It never targets the front pocket and does not connect
-routes between T-pockets.
-
-The canonical direction is left-to-right for `up` and `down` clusters, and
-top-to-bottom for `left` and `right` clusters. The route follows the closed
-edge opposite the pocket opening, inset by `stitchMargin`. Its endpoints come
-from the inset line's intersections with the tapered pocket sides and are
-clamped to the T-pocket bounding rect before offsets are applied.
-
-Positive `startOffset` and `endOffset` extend the canonical route beyond those
-endpoints; negative offsets shorten it. `stitchDirection` chooses whether the
-first hole starts at the canonical start or end. Holes are calculated separately
-for every T-pocket route.
+T-pocket geometry and direction retain their existing behavior. The closed edge
+is inset by the margin and intersects the tapered pocket sides to define its
+canonical endpoints. Positive offsets extend those endpoints and negative ones
+shorten them before direction chooses the punching start. A cluster produces
+one independent route for each computed T-pocket, excluding its front pocket.

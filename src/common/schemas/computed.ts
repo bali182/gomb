@@ -96,19 +96,31 @@ export type ComputedHoleSchema = BaseComputedSchema &
     highlightPath: PathSchema
   }
 
-export type ComputedStitchRouteDisconnectedCornerSchema = {
+export type StitchSidePathFragment = {
+  type: 'side'
   side: StitchSideSchema
-  hole: ComputedStitchHoleSchema
+  start: PointSchema
+  end: PointSchema
 }
+
+export type StitchCornerPathFragment = {
+  type: 'corner'
+  corner: StitchCornerSchema
+  start: PointSchema
+  end: PointSchema
+  radius: BigNumber
+}
+
+export type StitchPathFragment = StitchSidePathFragment | StitchCornerPathFragment
 
 export type ComputedStitchRouteSchema = HasTargetSchema &
   HasBoundingRectSchema & {
     path: PathSchema
+    fragments: StitchPathFragment[]
     holes: ComputedStitchHoleSchema[]
     isClosed: boolean
     stitches: ComputedStitchSchema[]
     labelPosition: StitchSideSchema
-    disconnectedCorners: Record<StitchCornerSchema, ComputedStitchRouteDisconnectedCornerSchema | undefined>
   }
 
 export type ComputedStitchLineSchema = HasTargetSchema &
@@ -119,5 +131,4 @@ export type ComputedStitchLineSchema = HasTargetSchema &
     onTop: string
     autoComputedCornerRadius: CornerRadiusSchema
     routes: ComputedStitchRouteSchema[]
-    connectingStitches: ComputedStitchSchema[]
   }

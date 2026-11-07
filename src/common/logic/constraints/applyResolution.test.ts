@@ -213,19 +213,6 @@ describe('applyResolution before patching', () => {
     expect(accessors.subProject(result).component.panel('a').mainAxisAnchor).toBe('end')
   })
 
-  it('propagates boolean values across different stitch-line controls', () => {
-    const before = fixture({
-      linked: equal('linked', [
-        { id: 'top', type: 'component-bounds-stitch-line-constraint-field', modelId: 's1', field: 'top' },
-        { id: 'left', type: 'component-bounds-stitch-line-constraint-field', modelId: 's2', field: 'left' },
-      ]),
-    })
-    const input = updateStitchLine(before, {
-      stitchLine: { ...accessors.subProject(before).stitchLine.bounds('s2'), left: false },
-    })
-    expect(accessors.subProject(resolveEdit(before, input)).stitchLine.bounds('s1').top).toBe(false)
-  })
-
   it('clears linked item references while retaining each pocket orientation and offsets', () => {
     const before = d.subProject({
       id: 'sub',

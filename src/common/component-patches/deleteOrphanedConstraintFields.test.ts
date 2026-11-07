@@ -130,3 +130,20 @@ describe('deleteOrphanedConstraintFields', () => {
     expect(source).toEqual(original)
   })
 })
+
+describe('obsolete constraint fields', () => {
+  it('removes fields absent from the current model schema', () => {
+    const source = fixture()
+    const obsolete = {
+      id: 'obsolete',
+      type: 'component-bounds-stitch-line-constraint-field',
+      modelId: 'bounds',
+      field: 'topStartOffset',
+    } as unknown as ConstraintFieldSchema
+    source.constraints.linked = { ...source.constraints.linked, fields: [fields[0], obsolete] }
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const result = deleteOrphanedConstraintFields(source, computed)
+    expect(result.constraints.linked.fields).toEqual([fields[0]])
+    expect(source.constraints.linked.fields).toHaveLength(2)
+  })
+})

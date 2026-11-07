@@ -65,7 +65,12 @@ export type OpticalIllusionPocketOpeningLimitsReasonSchema =
   /** Both rounded transitions consume the diagonal's length. A transition consuming more than half yields to the other up to halfway, preventing overlap. */
   | 'optical-illusion-pocket-opening-radii-share-slanted-length'
 
+export type ComponentBoundsStitchLineLimitsReasonSchema =
+  /** Endpoint offsets must leave a positive length on their straight side. */
+  'stitch-offset-exceeds-side-length'
+
 export type LimitReasonSchema =
+  | ComponentBoundsStitchLineLimitsReasonSchema
   | OpticalIllusionPocketOpeningLimitsReasonSchema
   | CornerRadiusLimitReasonSchema
   | RecessedPocketOpeningLimitsReasonSchema

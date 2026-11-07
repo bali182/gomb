@@ -8,8 +8,6 @@ import {
 } from './common'
 
 export type StitchDirectionSchema = 'start-to-end' | 'end-to-start'
-export type HorizontalStitchDirectionSchema = 'left-to-right' | 'right-to-left'
-export type VerticalStitchDirectionSchema = 'top-to-bottom' | 'bottom-to-top'
 export type StitchSideSchema = 'top' | 'right' | 'bottom' | 'left'
 export type StitchCornerSchema = 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'
 
@@ -19,23 +17,6 @@ export type StitchLineCommonConfigSchema = {
   stitchHoleDistance: number
   stitchHoleThickness: number
   stitchLineThickness: number
-}
-
-export type HasDirectionalOffsetsSchema = {
-  // Offsets of the sides we stitch. What are these used for?
-  // For example when stitching the side of a panel to another (forming a pocket)
-  // we can start stitching in between the top of the back panel and the front one, forming a stronger stitch.
-  topStartOffset: number
-  topEndOffset: number
-
-  rightStartOffset: number
-  rightEndOffset: number
-
-  bottomStartOffset: number
-  bottomEndOffset: number
-
-  leftStartOffset: number
-  leftEndOffset: number
 }
 
 // Are we stitching the given side?
@@ -54,39 +35,21 @@ export type HasStitchedCornersSchema = {
   bottomLeftCorner: boolean
 }
 
-// Even if the corners are turned off (HasStitchedCornersSchema) stitches are drawn between the unconnected points of stitch holes
-export type HasStitchedUnconnectedCornersSchema = {
-  stitchDisconnectedTopLeftCorner: boolean
-  stitchDisconnectedTopRightCorner: boolean
-  stitchDisconnectedBottomLeftCorner: boolean
-  stitchDisconnectedBottomRightCorner: boolean
-}
-
-export type HasHorizontalDirectionsSchema = {
-  // Stitching direction for sides. Can only be changed if the sides are not connected by a corner.
-  topStitchDirection: HorizontalStitchDirectionSchema
-  bottomStitchDirection: HorizontalStitchDirectionSchema
-}
-
-export type HasVerticalDirectionsSchema = {
-  // Stitching direction for sides. Can only be changed if the sides are not connected by a corner.
-  rightStitchDirection: VerticalStitchDirectionSchema
-  leftStitchDirection: VerticalStitchDirectionSchema
-}
-
 export type HasCustomRenderTarget = {
   onTop?: string
 }
 
-export type ComponentBoundsStitchLineOwnSchema = HasDirectionalOffsetsSchema &
+export type HasStitchDirectionSchema = {
+  stitchDirection: StitchDirectionSchema
+}
+
+export type ComponentBoundsStitchLineOwnSchema = HasBasicOffsetsSchema &
   HasAutoCornerRadiusSchema &
   HasCornerRadiusSchema &
-  HasVerticalDirectionsSchema &
-  HasHorizontalDirectionsSchema &
   HasStitchedCornersSchema &
   HasStitchedSidesSchema &
-  HasStitchedUnconnectedCornersSchema &
-  HasCustomRenderTarget
+  HasCustomRenderTarget &
+  HasStitchDirectionSchema
 
 export type ComponentBoundsStitchLineSchema = HasTypeSchema<'component-bounds-stitch-line'> &
   HasIdentitySchema &
@@ -99,9 +62,7 @@ export type HasBasicOffsetsSchema = {
   endOffset: number
 }
 
-export type TPocketStitchLineOwnSchema = HasBasicOffsetsSchema & {
-  stitchDirection: StitchDirectionSchema
-}
+export type TPocketStitchLineOwnSchema = HasBasicOffsetsSchema & HasStitchDirectionSchema
 
 export type TPocketStitchLineSchema = HasTypeSchema<'t-pocket-stitch-line'> &
   HasIdentitySchema &

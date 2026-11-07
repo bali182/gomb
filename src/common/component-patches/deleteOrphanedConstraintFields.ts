@@ -1,6 +1,8 @@
+import { constraintFieldCompatibility } from '../data/constraintFieldCompatibility'
 import type { ConstraintSchema } from '../schemas/constraints'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
+import { has } from '../utils/has'
 import { isDefined } from '../utils/isDefined'
 
 export const deleteOrphanedConstraintFields = (
@@ -12,7 +14,10 @@ export const deleteOrphanedConstraintFields = (
   let hasChanged = false
 
   for (const [id, constraint] of Object.entries(subProject.constraints)) {
-    const fields = constraint.fields.filter((field) => isDefined(accessor.optional.constraint.model(field)))
+    const fields = constraint.fields.filter((field) => {
+      const model = accessor.optional.constraint.model(field)
+      return isDefined(model) && has(constraintFieldCompatibility[model.type], field.field)
+    })
     if (fields.length !== constraint.fields.length) {
       constraints[id] = { ...constraint, fields }
       hasChanged = true

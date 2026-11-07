@@ -19,13 +19,14 @@ type StitchLineSegmentLayout = {
 }
 
 type StitchLineEdgeToggleProps = {
+  disabled: boolean
   onClick: () => void
   selected: boolean
   side: StitchSideSchema
   tooltip: string
 }
 
-export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side, tooltip }) => {
+export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, onClick, selected, side, tooltip }) => {
   const { isComputing, setEditingInputId } = useEditorContext()
   const handleClick = useCallback((): void => {
     setEditingInputId(undefined)
@@ -41,9 +42,9 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
     () => (selected ? SELECTED_HOVER_BORDER_COLOR : UNSELECTED_HOVER_BORDER_COLOR),
     [selected],
   )
-  const hover = useMemo<SystemStyleObject>(
-    () => ({ '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor } }),
-    [hoverBorderColor],
+  const hover = useMemo<SystemStyleObject | undefined>(
+    () => (disabled ? undefined : { '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor } }),
+    [disabled, hoverBorderColor],
   )
 
   return (
@@ -52,7 +53,9 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
         <EditorButton
           readOnly={isComputing}
           aria-pressed={selected}
-          cursor="pointer"
+          cursor={disabled ? 'not-allowed' : 'pointer'}
+          disabled={disabled}
+          opacity={disabled ? 0.4 : 1}
           onClick={handleClick}
           _hover={hover}
           unstyled
