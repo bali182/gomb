@@ -20,6 +20,16 @@ removals only at its ends; an empty boundary can start anywhere and a complete
 boundary can be broken anywhere. These rules include zero-radius corners:
 geometric contact does not replace an enabled corner.
 
+An unselected side adjacent to a selected side remains enabled even when the
+connecting corner is disabled. The same applies to adjacent corners with a
+disabled connecting side. Clicking either emits one update containing the
+chosen element and, only if needed for continuity, the minimum number of
+connecting elements of the other kind. It does not enable additional elements
+of the chosen kind or unnecessarily close the boundary. Equal repairs use the
+normalizer's canonical tie-breaking order. An element opposite the only
+selected element of the same kind remains unavailable, and removal rules are
+unchanged.
+
 `normalizeStitchLineSidesAndCorners` fills gaps by enabling as few sides/corners
 as possible, preserving the longest disabled interval. Ties follow canonical
 order. It never disables an enabled part and leaves an empty boundary empty.

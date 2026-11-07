@@ -1,6 +1,14 @@
 import type { HasStitchedCornersSchema, HasStitchedSidesSchema } from '../../schemas/stitching'
+import { isDefined } from '../../utils/isDefined'
 
 export type StitchLineSideOrCornerField = keyof HasStitchedSidesSchema | keyof HasStitchedCornersSchema
+
+type StitchLineNeighbors = {
+  directNeighbors: [StitchLineSideOrCornerField, StitchLineSideOrCornerField]
+  sameKindNeighbors: [StitchLineSideOrCornerField, StitchLineSideOrCornerField]
+}
+
+type StitchLineGapsByStart = Partial<Record<StitchLineSideOrCornerField, StitchLineSideOrCornerField[]>>
 
 export const STITCH_LINE_SIDE_AND_CORNER_ORDER: readonly StitchLineSideOrCornerField[] = [
   'top',
@@ -21,54 +29,106 @@ export const STITCH_LINE_DIRECTION_CORNERS: readonly (keyof HasStitchedCornersSc
   'topLeftCorner',
 ]
 
+const STITCH_LINE_NEIGHBORS: Record<StitchLineSideOrCornerField, StitchLineNeighbors> = {
+  top: {
+    directNeighbors: ['topLeftCorner', 'topRightCorner'],
+    sameKindNeighbors: ['left', 'right'],
+  },
+  topRightCorner: {
+    directNeighbors: ['top', 'right'],
+    sameKindNeighbors: ['topLeftCorner', 'bottomRightCorner'],
+  },
+  right: {
+    directNeighbors: ['topRightCorner', 'bottomRightCorner'],
+    sameKindNeighbors: ['top', 'bottom'],
+  },
+  bottomRightCorner: {
+    directNeighbors: ['right', 'bottom'],
+    sameKindNeighbors: ['topRightCorner', 'bottomLeftCorner'],
+  },
+  bottom: {
+    directNeighbors: ['bottomRightCorner', 'bottomLeftCorner'],
+    sameKindNeighbors: ['right', 'left'],
+  },
+  bottomLeftCorner: {
+    directNeighbors: ['bottom', 'left'],
+    sameKindNeighbors: ['bottomRightCorner', 'topLeftCorner'],
+  },
+  left: {
+    directNeighbors: ['bottomLeftCorner', 'topLeftCorner'],
+    sameKindNeighbors: ['bottom', 'top'],
+  },
+  topLeftCorner: {
+    directNeighbors: ['left', 'top'],
+    sameKindNeighbors: ['bottomLeftCorner', 'topRightCorner'],
+  },
+}
+
 export const canToggleStitchLineSideOrCorner = (
   stitchLine: HasStitchedSidesSchema & HasStitchedCornersSchema,
   field: StitchLineSideOrCornerField,
 ): boolean => {
-  const updated = { ...stitchLine, [field]: !stitchLine[field] }
-  let starts = 0
-  for (let index = 0; index < STITCH_LINE_SIDE_AND_CORNER_ORDER.length; index += 1) {
-    const current = STITCH_LINE_SIDE_AND_CORNER_ORDER[index]
-    const previous = STITCH_LINE_SIDE_AND_CORNER_ORDER[(index + 7) % 8]
-    if (updated[current] && !updated[previous]) {
-      starts += 1
-    }
+  const sidesAndCorners = STITCH_LINE_SIDE_AND_CORNER_ORDER.filter((field) => stitchLine[field])
+  if (sidesAndCorners.length === 0 || sidesAndCorners.length === STITCH_LINE_SIDE_AND_CORNER_ORDER.length) {
+    return true
   }
-  return starts <= 1
+
+  const [previous, next] = STITCH_LINE_NEIGHBORS[field].directNeighbors
+  const [previousSameKind, nextSameKind] = STITCH_LINE_NEIGHBORS[field].sameKindNeighbors
+  if (stitchLine[field]) {
+    return !stitchLine[previous] || !stitchLine[next]
+  }
+
+  return stitchLine[previous] || stitchLine[next] || stitchLine[previousSameKind] || stitchLine[nextSameKind]
 }
 
 export const normalizeStitchLineSidesAndCorners = <T extends HasStitchedSidesSchema & HasStitchedCornersSchema>(
   stitchLine: T,
 ): T => {
-  if (STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => !stitchLine[field])) {
+  const stitchedFields = STITCH_LINE_SIDE_AND_CORNER_ORDER.filter((field) => stitchLine[field])
+  if (stitchedFields.length === 0 || stitchedFields.length === STITCH_LINE_SIDE_AND_CORNER_ORDER.length) {
     return stitchLine
   }
-  let longestGapStart = 0
-  let longestGapLength = 0
-  let missingCount = 0
-  for (let index = 0; index < STITCH_LINE_SIDE_AND_CORNER_ORDER.length; index += 1) {
-    if (stitchLine[STITCH_LINE_SIDE_AND_CORNER_ORDER[index]]) {
+
+  const gapsByStart: StitchLineGapsByStart = {}
+  const firstStitchedField = stitchedFields[0]
+  let currentGap: StitchLineSideOrCornerField[] | undefined
+  for (
+    let field = STITCH_LINE_NEIGHBORS[firstStitchedField].directNeighbors[1];
+    field !== firstStitchedField;
+    field = STITCH_LINE_NEIGHBORS[field].directNeighbors[1]
+  ) {
+    if (stitchLine[field]) {
+      currentGap = undefined
       continue
     }
-    missingCount += 1
-    let length = 0
-    while (length < 8 && !stitchLine[STITCH_LINE_SIDE_AND_CORNER_ORDER[(index + length) % 8]]) {
-      length += 1
+    if (!isDefined(currentGap)) {
+      currentGap = []
+      gapsByStart[field] = currentGap
     }
-    if (length > longestGapLength) {
-      longestGapStart = index
-      longestGapLength = length
-    }
+    currentGap.push(field)
   }
-  if (missingCount === longestGapLength) {
+
+  const gaps = STITCH_LINE_SIDE_AND_CORNER_ORDER.reduce<StitchLineSideOrCornerField[][]>((gaps, field) => {
+    const gap = gapsByStart[field]
+    if (isDefined(gap)) {
+      gaps.push(gap)
+    }
+    return gaps
+  }, [])
+  if (gaps.length <= 1) {
     return stitchLine
   }
-  const updated = { ...stitchLine }
-  for (let index = 0; index < STITCH_LINE_SIDE_AND_CORNER_ORDER.length; index += 1) {
-    const distanceFromGapStart = (index - longestGapStart + 8) % 8
-    if (distanceFromGapStart >= longestGapLength) {
-      updated[STITCH_LINE_SIDE_AND_CORNER_ORDER[index]] = true
+
+  const longestGap = gaps.reduce((longest, gap) => (gap.length > longest.length ? gap : longest))
+  const normalized = { ...stitchLine }
+  for (const gap of gaps) {
+    if (gap === longestGap) {
+      continue
+    }
+    for (const field of gap) {
+      normalized[field] = true
     }
   }
-  return updated
+  return normalized
 }
