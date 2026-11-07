@@ -559,12 +559,12 @@ export const HU = {
             startOffset: {
               label: 'Kezdő eltolás',
               tooltip:
-                'A pozitív érték hosszabbít, a negatív rövidít. Sarokvégponton inaktív. Teljesen lekerekített zárt körön a kezdőpontot tolja el a kerület mentén.',
+                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Teljesen lekerekített zárt körön a kezdőpontot tolja el a kerület mentén.',
             },
             endOffset: {
               label: 'Végeltolás',
               tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Zárt körön nincs hatása.',
             },
             stitchDirection: {
               label: 'Irány',
@@ -1191,8 +1191,8 @@ export const HU = {
   },
   limits: {
     reasons: {
-      'stitch-offset-exceeds-side-length': (value: string): string =>
-        `Az eltolás után pozitív oldalhossznak kell maradnia (legkisebb eltolás: ${value} mm).`,
+      'stitch-offset-exceeds-route-length': (value: string): string =>
+        `Az eltolások után a létező varrásvonalból pozitív hossznak kell maradnia (legkisebb eltolás: ${value} mm).`,
       'cluster-size-and-pocket-count': (value: string): string =>
         `A zsebcsoport mérete és a zsebek száma miatt a lépésköz legfeljebb ${value} mm.`,
       't-pocket-tab-width-exceeds-half-width': (value: string): string =>

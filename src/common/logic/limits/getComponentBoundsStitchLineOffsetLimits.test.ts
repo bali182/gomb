@@ -48,8 +48,8 @@ describe('component bounds offset limits', () => {
     expect(limits({ endOffset: -20 }).startOffset?.min?.value.toNumber()).toBeCloseTo(-80 + POSITION_EPSILON, 12)
   })
 
-  it('does not expose a limit for a corner endpoint or a closed boundary', () => {
-    expect(limits({ topLeftCorner: true }).startOffset).toBeUndefined()
+  it('limits corner endpoints as well, but leaves closed boundaries unchanged', () => {
+    expect(limits({ topLeftCorner: true }).startOffset?.min?.value.toNumber()).toBeCloseTo(-100 + POSITION_EPSILON, 12)
     expect(limits({ topLeftCorner: true }).endOffset).toBeDefined()
     expect(
       limits({
@@ -64,9 +64,31 @@ describe('component bounds offset limits', () => {
     ).toEqual({ type: 'component-bounds-stitch-line' })
   })
 
-  it('limits separate endpoint sides independently', () => {
+  it('shares the full route length across endpoint sides', () => {
     const result = limits({ right: true, topRightCorner: true, endOffset: -1000 })
-    expect(result.startOffset?.min?.value.toNumber()).toBeCloseTo(-100 + POSITION_EPSILON, 12)
-    expect(result.endOffset?.min?.value.toNumber()).toBeCloseTo(-80 + POSITION_EPSILON, 12)
+    expect(result.startOffset?.min?.value.toNumber()).toBeCloseTo((-180 + POSITION_EPSILON) / 2, 12)
+    expect(result.endOffset?.min?.value.toNumber()).toBeCloseTo(-180 + POSITION_EPSILON, 12)
+  })
+
+  it('uses actual rounded-corner arc length in the shared allowance', () => {
+    const result = limits({ right: true, topRightCorner: true, autoCornerRadius: false, topRightRadius: 10 })
+    const length = 90 + 5 * Math.PI + 70
+    expect(result.startOffset?.min?.value.toNumber()).toBeCloseTo(-length + POSITION_EPSILON, 10)
+    expect(result.endOffset?.min?.value.toNumber()).toBeCloseTo(-length + POSITION_EPSILON, 10)
+  })
+
+  it('allows consuming the opposite positive extension', () => {
+    expect(limits({ endOffset: 30 }).startOffset?.min?.value.toNumber()).toBeCloseTo(-130 + POSITION_EPSILON, 12)
+    expect(limits({ startOffset: 30 }).endOffset?.min?.value.toNumber()).toBeCloseTo(-130 + POSITION_EPSILON, 12)
+  })
+
+  it('clamps negative offsets to zero for an isolated sharp corner', () => {
+    const result = limits({ top: false, topRightCorner: true, startOffset: -10, endOffset: -20 })
+    expect(result.startOffset?.min?.value.isZero()).toBe(true)
+    expect(result.endOffset?.min?.value.isZero()).toBe(true)
+    expect(result.startOffset?.min?.reason).toBe('stitch-offset-exceeds-route-length')
+    expect(result.startOffset?.min?.severity).toBe('warning')
+    const extended = limits({ top: false, topRightCorner: true, endOffset: 20 })
+    expect(extended.startOffset?.min?.value.toNumber()).toBeCloseTo(-20 + POSITION_EPSILON, 12)
   })
 })

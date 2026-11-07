@@ -622,12 +622,12 @@ export const EN = {
             startOffset: {
               label: 'Start offset',
               tooltip:
-                'Positive values extend this end; negative values shorten it. Disabled at corner endpoints. On a fully rounded closed route, start offset shifts the punching start around the perimeter.',
+                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. On a fully rounded closed route, start offset shifts the punching start around the perimeter.',
             },
             endOffset: {
               label: 'End offset',
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
+                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. Ignored on a closed route.',
             },
             stitchDirection: {
               label: 'Direction',
@@ -1256,8 +1256,8 @@ export const EN = {
   },
   limits: {
     reasons: {
-      'stitch-offset-exceeds-side-length': (value: string): string =>
-        `The offset must leave a positive side length (minimum offset: ${value} mm).`,
+      'stitch-offset-exceeds-route-length': (value: string): string =>
+        `The offsets must leave a positive route length when geometry exists (minimum offset: ${value} mm).`,
       'cluster-size-and-pocket-count': (value: string): string =>
         `The cluster size and pocket count limit the spacing to ${value} mm.`,
       't-pocket-tab-width-exceeds-half-width': (value: string): string =>

@@ -5,6 +5,7 @@ import { EditorSwitch } from '../../common/EditorSwitch'
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
+import { STITCH_LINE_SIDE_AND_CORNER_ORDER } from '../../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema } from '../../../schemas/stitching'
@@ -32,15 +33,13 @@ export const StitchSidesAndCornersSection = ({
   const { computedSubProject } = useSubProject()
   const accessor = accessors.computedSubProject(computedSubProject)
   const route = accessor.optional.stitchLine.bounds(value.id)?.routes[0]
-  const first = route?.fragments[0]
-  const last = route?.fragments[route.fragments.length - 1]
+  const hasStitchedSidesOrCorners = STITCH_LINE_SIDE_AND_CORNER_ORDER.some((field) => editable[field])
   const startDisabled =
-    !isDefined(route) ||
-    (route.isClosed
-      ? route.fragments.some((fragment) => narrowers.path.is.cornerFragment(fragment) && fragment.radius.isZero())
-      : !isDefined(first) || !narrowers.path.is.sideFragment(first))
+    !hasStitchedSidesOrCorners ||
+    (route?.isClosed === true &&
+      route.fragments.some((fragment) => narrowers.path.is.cornerFragment(fragment) && fragment.radius.isZero()))
 
-  const endDisabled = !isDefined(route) || route.isClosed || !isDefined(last) || !narrowers.path.is.sideFragment(last)
+  const endDisabled = !hasStitchedSidesOrCorners || route?.isClosed === true
 
   const handleStartOffsetChange = useCallback(
     (startOffset: string): void => {

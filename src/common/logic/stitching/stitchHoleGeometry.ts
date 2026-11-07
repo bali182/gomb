@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { narrowers } from '../../utils/narrowers'
 
 import { POSITION_EPSILON, STITCH_HOLE_ENDPOINT_EPSILON_MM, TWO, ZERO } from '../../constants/layout'
-import type { StitchCornerPathFragment, StitchPathFragment } from '../../schemas/computed'
+import type { StitchPathFragment } from '../../schemas/computed'
 import type { PointSchema } from '../../schemas/geometry'
 import { isDefined } from '../../utils/isDefined'
 import { getPointDistance } from '../geometryUtils'
@@ -48,7 +48,7 @@ export const createStitchHoleSegments = (fragments: StitchPathFragment[]): Stitc
           type: 'arc',
           start: fragment.start,
           end: fragment.end,
-          center: getCornerCenter(fragment),
+          center: fragment.center,
           radius: fragment.radius,
         },
       ]
@@ -128,19 +128,6 @@ export const getSegmentTangentRotation = (segment: StitchHoleSegment, point: Poi
 
   const rotation = getRotationFromVector(point.y.minus(segment.center.y).negated(), point.x.minus(segment.center.x))
   return segment.reversed === true ? (rotation + 180) % 360 : rotation
-}
-
-const getCornerCenter = (corner: StitchCornerPathFragment): PointSchema => {
-  switch (corner.corner) {
-    case 'top-right':
-      return { x: corner.end.x.minus(corner.radius), y: corner.start.y.plus(corner.radius) }
-    case 'bottom-right':
-      return { x: corner.start.x.minus(corner.radius), y: corner.end.y.minus(corner.radius) }
-    case 'bottom-left':
-      return { x: corner.start.x, y: corner.end.y }
-    case 'top-left':
-      return { x: corner.end.x, y: corner.start.y }
-  }
 }
 
 const getSegmentCircleIntersections = (

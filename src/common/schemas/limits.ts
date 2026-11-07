@@ -66,8 +66,8 @@ export type OpticalIllusionPocketOpeningLimitsReasonSchema =
   | 'optical-illusion-pocket-opening-radii-share-slanted-length'
 
 export type ComponentBoundsStitchLineLimitsReasonSchema =
-  /** Endpoint offsets must leave a positive length on their straight side. */
-  'stitch-offset-exceeds-side-length'
+  /** Endpoint offsets share the route length and must leave a positive remainder when geometry exists. */
+  'stitch-offset-exceeds-route-length'
 
 export type LimitReasonSchema =
   | ComponentBoundsStitchLineLimitsReasonSchema

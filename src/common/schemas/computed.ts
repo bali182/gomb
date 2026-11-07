@@ -108,6 +108,7 @@ export type StitchCornerPathFragment = {
   corner: StitchCornerSchema
   start: PointSchema
   end: PointSchema
+  center: PointSchema
   radius: BigNumber
 }
 

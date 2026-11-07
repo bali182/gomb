@@ -45,6 +45,7 @@ export const getComponentBoundsStitchLineGeometry = (
       type: 'corner',
       corner: 'top-right',
       radius: radius.topRight,
+      center: { x: right.minus(radius.topRight), y: top.plus(radius.topRight) },
       start: {
         x: right.minus(radius.topRight),
         y: top,
@@ -70,6 +71,7 @@ export const getComponentBoundsStitchLineGeometry = (
       type: 'corner',
       corner: 'bottom-right',
       radius: radius.bottomRight,
+      center: { x: right.minus(radius.bottomRight), y: bottom.minus(radius.bottomRight) },
       start: {
         x: right,
         y: bottom.minus(radius.bottomRight),
@@ -95,6 +97,7 @@ export const getComponentBoundsStitchLineGeometry = (
       type: 'corner',
       corner: 'bottom-left',
       radius: radius.bottomLeft,
+      center: { x: left.plus(radius.bottomLeft), y: bottom.minus(radius.bottomLeft) },
       start: {
         x: left.plus(radius.bottomLeft),
         y: bottom,
@@ -120,6 +123,7 @@ export const getComponentBoundsStitchLineGeometry = (
       type: 'corner',
       corner: 'top-left',
       radius: radius.topLeft,
+      center: { x: left.plus(radius.topLeft), y: top.plus(radius.topLeft) },
       start: {
         x: left,
         y: top.plus(radius.topLeft),
@@ -169,12 +173,19 @@ const getStitchLineBoundingRect = (
   }
 }
 
-const calculateStitchRouteLabelPosition = (fragments: StitchPathFragment[], isClosed: boolean): StitchSideSchema => {
+export const calculateStitchRouteLabelPosition = (
+  fragments: StitchPathFragment[],
+  isClosed: boolean,
+): StitchSideSchema => {
   if (isClosed) {
     return 'top'
   }
 
-  const sideFragments = fragments.filter(narrowers.path.is.sideFragment)
+  const sideFragments = fragments
+    .filter(narrowers.path.is.sideFragment)
+    .filter(
+      (fragment, index, sides) => sides.findIndex((sideFragment) => sideFragment.side === fragment.side) === index,
+    )
 
   switch (sideFragments.length) {
     case 1:
@@ -182,7 +193,7 @@ const calculateStitchRouteLabelPosition = (fragments: StitchPathFragment[], isCl
     case 2: {
       const fragment = sideFragments.filter((f) => f.side === 'top' || f.side === 'bottom')[0]
       if (!isDefined(fragment)) {
-        throw new Error('No horizontal fragment found')
+        return sideFragments[0].side
       }
       return fragment.side
     }
