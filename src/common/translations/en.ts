@@ -119,8 +119,9 @@ export const EN = {
         description: 'The project you want to open does not exist.',
       },
       openFailed: {
-        title: 'Project not found',
-        description: 'Failed to open project.',
+        title: 'Failed to open project',
+        description:
+          'The project file could not be read or processed. Its contents may be damaged or incompatible with this version.',
         back: 'Back',
       },
     },

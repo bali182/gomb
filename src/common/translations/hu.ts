@@ -59,7 +59,8 @@ export const HU = {
       },
       openFailed: {
         title: 'Hiba!',
-        description: 'A projekt megnyitása nem sikerült.',
+        description:
+          'A projektfájl olvasása vagy feldolgozása nem sikerült. A tartalma sérült vagy ezzel a verzióval nem kompatibilis lehet.',
         back: 'Vissza',
       },
     },
