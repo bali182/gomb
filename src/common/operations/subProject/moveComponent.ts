@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, MoveComponentParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, MoveComponentParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -7,7 +7,7 @@ import { canMoveComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export const moveComponent = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { beforeComponentId, id, targetParentId }: MoveComponentParamsSchema,
 ): SubProjectSchema => {
   if (!canMoveComponent(subProject, { beforeComponentId, id, targetParentId })) {

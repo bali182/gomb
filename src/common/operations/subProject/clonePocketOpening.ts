@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, ClonePocketOpeningParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, ClonePocketOpeningParamsSchema } from '../../schemas/operations'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -6,7 +6,7 @@ import { isDefined } from '../../utils/isDefined'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export const clonePocketOpening = (
-  { subProject, id: idGenerator, name: nameGenerator }: BaseOperationParamsSchema,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseSubProjectOperationParamsSchema,
   { id: openingId }: ClonePocketOpeningParamsSchema,
 ): SubProjectSchema => {
   const source = accessors.subProject(subProject).optional.pocketOpening.byId(openingId)

@@ -1,9 +1,9 @@
-import type { AddPocketOpeningParamsSchema, BaseOperationParamsSchema } from '../../schemas/operations'
+import type { AddPocketOpeningParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 
 export const addPocketOpening = (
-  { subProject, readonlyFactory }: BaseOperationParamsSchema,
+  { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
   { type }: AddPocketOpeningParamsSchema,
 ): SubProjectSchema => {
   const opening = readonlyFactory.createPocketOpening({

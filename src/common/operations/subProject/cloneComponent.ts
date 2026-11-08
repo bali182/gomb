@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, CloneComponentParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, CloneComponentParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -7,7 +7,7 @@ import { canCloneComponent } from './utils/componentRules'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export const cloneComponent = (
-  { subProject, id: idGenerator, name: nameGenerator }: BaseOperationParamsSchema,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseSubProjectOperationParamsSchema,
   { id: componentId }: CloneComponentParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)

@@ -1,10 +1,10 @@
-import type { BaseOperationParamsSchema, UpdatePocketOpeningParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, UpdatePocketOpeningParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 
 export const updatePocketOpening = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { opening }: UpdatePocketOpeningParamsSchema,
 ): SubProjectSchema => {
   const current = accessors.subProject(subProject).optional.pocketOpening.byId(opening.id)

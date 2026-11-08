@@ -13,7 +13,7 @@ import type {
   RootPanelSchema,
 } from '../../schemas/components'
 import type { HoleSchema } from '../../schemas/hole'
-import type { BaseOperationParamsSchema, FlipParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, FlipParamsSchema } from '../../schemas/operations'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -22,7 +22,10 @@ import { narrowers } from '../../utils/narrowers'
 import { updateHole } from './updateHole'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
-export const flip = (base: BaseOperationParamsSchema, { model, axis }: FlipParamsSchema): SubProjectSchema => {
+export const flip = (
+  base: BaseSubProjectOperationParamsSchema,
+  { model, axis }: FlipParamsSchema,
+): SubProjectSchema => {
   const { subProject } = base
   const accessor = accessors.subProject(subProject)
   switch (model.type) {

@@ -1,4 +1,4 @@
-import { AddComponentParamsSchema, BaseOperationParamsSchema } from '../../schemas/operations'
+import { AddComponentParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
@@ -6,7 +6,7 @@ import { isDefined } from '../../utils/isDefined'
 import { getInsertionIndex } from './utils/getInsertionIndex'
 
 export const addComponent = (
-  { subProject, project, settings, readonlyFactory }: BaseOperationParamsSchema,
+  { subProject, project, settings, readonlyFactory }: BaseSubProjectOperationParamsSchema,
   { parentId, position, type, color }: AddComponentParamsSchema,
 ): SubProjectSchema => {
   const parent = accessors.subProject(subProject).optional.component.byId(parentId)

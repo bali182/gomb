@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, MoveStitchLineParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, MoveStitchLineParamsSchema } from '../../schemas/operations'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -7,7 +7,7 @@ import { narrowers } from '../../utils/narrowers'
 import { canAddStitchLine } from './utils/componentRules'
 
 export const moveStitchLine = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   params: MoveStitchLineParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)

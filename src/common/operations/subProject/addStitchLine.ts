@@ -1,6 +1,6 @@
 import type { StitchLineSideOrCornerField } from '../../logic/stitching/stitchLineSidesAndCorners'
 import type { PocketOrientationSchema } from '../../schemas/components'
-import type { AddStitchLineParamsSchema, BaseOperationParamsSchema } from '../../schemas/operations'
+import type { AddStitchLineParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -16,7 +16,7 @@ const POCKET_OPENING_STITCH_FIELDS: Record<PocketOrientationSchema, readonly Sti
 }
 
 export const addStitchLine = (
-  { subProject, readonlyFactory }: BaseOperationParamsSchema,
+  { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
   params: AddStitchLineParamsSchema,
 ): SubProjectSchema => {
   const forbiddenIds = getSubProjectIds(subProject)

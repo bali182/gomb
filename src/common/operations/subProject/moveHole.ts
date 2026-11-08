@@ -1,12 +1,12 @@
 import { HoleSchema } from '../../schemas/hole'
-import type { BaseOperationParamsSchema, MoveHoleParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, MoveHoleParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { canAddHole } from './utils/componentRules'
 
 export const moveHole = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { id, targetComponentId }: MoveHoleParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)

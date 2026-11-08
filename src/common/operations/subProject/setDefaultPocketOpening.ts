@@ -1,10 +1,10 @@
-import type { BaseOperationParamsSchema, SetDefaultPocketOpeningParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, SetDefaultPocketOpeningParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 
 export const setDefaultPocketOpening = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { id }: SetDefaultPocketOpeningParamsSchema,
 ): SubProjectSchema => {
   if (

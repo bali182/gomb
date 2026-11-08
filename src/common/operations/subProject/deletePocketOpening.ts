@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, DeletePocketOpeningParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, DeletePocketOpeningParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -6,7 +6,7 @@ import { narrowers } from '../../utils/narrowers'
 import { updateComponents } from '../../utils/updateComponents'
 
 export const deletePocketOpening = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { id }: DeletePocketOpeningParamsSchema,
 ): SubProjectSchema => {
   if (

@@ -1,10 +1,10 @@
-import type { BaseOperationParamsSchema, DeleteConstraintFieldParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, DeleteConstraintFieldParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 
 export const deleteConstraintField = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { constraintId, id }: DeleteConstraintFieldParamsSchema,
 ): SubProjectSchema => {
   const constraint = accessors.subProject(subProject).optional.constraint.byId(constraintId)

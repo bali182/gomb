@@ -11,9 +11,12 @@ import { GlobalSettingsSchema } from './settings'
 import { StitchLineSchema } from './stitching'
 import { SubProjectSchema } from './subProject'
 
-export type SubProjectOperationSchema<Params> = (base: BaseOperationParamsSchema, params: Params) => SubProjectSchema
+export type SubProjectOperationSchema<Params> = (
+  base: BaseSubProjectOperationParamsSchema,
+  params: Params,
+) => SubProjectSchema
 
-export type BaseOperationParamsSchema = {
+export type BaseSubProjectOperationParamsSchema = {
   project: ProjectSchema
   subProject: SubProjectSchema
   settings: GlobalSettingsSchema

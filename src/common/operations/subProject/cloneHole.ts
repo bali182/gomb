@@ -1,10 +1,10 @@
 import type { HoleSchema } from '../../schemas/hole'
-import type { BaseOperationParamsSchema, CloneHoleParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, CloneHoleParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export const cloneHole = (
-  { subProject, id: idGenerator, name: nameGenerator }: BaseOperationParamsSchema,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseSubProjectOperationParamsSchema,
   { id: holeId }: CloneHoleParamsSchema,
 ): SubProjectSchema => {
   const sourceHoleIndex = subProject.holes.findIndex((hole) => hole.id === holeId)

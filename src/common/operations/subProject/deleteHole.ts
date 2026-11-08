@@ -1,8 +1,8 @@
-import type { BaseOperationParamsSchema, DeleteHoleParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, DeleteHoleParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 
 export const deleteHole = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { id }: DeleteHoleParamsSchema,
 ): SubProjectSchema => {
   return {

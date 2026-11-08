@@ -1,8 +1,8 @@
-import type { BaseOperationParamsSchema, UpdateStitchLineParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, UpdateStitchLineParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
 export const updateStitchLine = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { stitchLine }: UpdateStitchLineParamsSchema,
 ): SubProjectSchema => {
   return {

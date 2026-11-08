@@ -36,7 +36,7 @@ import type {
   AddHoleParamsSchema,
   AddPocketOpeningParamsSchema,
   AddStitchLineParamsSchema,
-  BaseOperationParamsSchema,
+  BaseSubProjectOperationParamsSchema,
   CloneComponentParamsSchema,
   CloneHoleParamsSchema,
   ClonePocketOpeningParamsSchema,
@@ -112,7 +112,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   )
 
   const createBaseOperationParams = useCallback(
-    (project: ProjectSchema, subProject: SubProjectSchema): BaseOperationParamsSchema => ({
+    (project: ProjectSchema, subProject: SubProjectSchema): BaseSubProjectOperationParamsSchema => ({
       project,
       subProject,
       settings,

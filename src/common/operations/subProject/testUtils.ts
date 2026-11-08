@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { EN } from '../../translations/en'
@@ -10,8 +10,8 @@ import { IdGenerator } from '../../utils/random/IdGenerator'
 
 export const createBaseOperationParams = (
   subProject: SubProjectSchema,
-  overrides: Partial<BaseOperationParamsSchema> = {},
-): BaseOperationParamsSchema => {
+  overrides: Partial<BaseSubProjectOperationParamsSchema> = {},
+): BaseSubProjectOperationParamsSchema => {
   const id = new IdGenerator()
   const name = new NameGenerator(EN.defaultNames)
   return {

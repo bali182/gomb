@@ -1,8 +1,8 @@
-import type { BaseOperationParamsSchema, UpdateHoleParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, UpdateHoleParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
 export const updateHole = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { hole }: UpdateHoleParamsSchema,
 ): SubProjectSchema => {
   return {

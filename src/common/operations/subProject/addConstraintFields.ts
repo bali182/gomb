@@ -1,14 +1,14 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { constraintFieldBlockers } from '../../logic/constraints/constraintFieldBlockers'
 import type { ConstraintFieldSchema } from '../../schemas/constraints'
-import type { AddConstraintFieldsParamsSchema, BaseOperationParamsSchema } from '../../schemas/operations'
+import type { AddConstraintFieldsParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 
 export const addConstraintFields = (
-  { subProject, readonlyFactory }: BaseOperationParamsSchema,
+  { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
   { constraintId, fields: inputs }: AddConstraintFieldsParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)

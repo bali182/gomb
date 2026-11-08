@@ -1,4 +1,4 @@
-import type { BaseOperationParamsSchema, DeleteComponentParamsSchema } from '../../schemas/operations'
+import type { BaseSubProjectOperationParamsSchema, DeleteComponentParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -6,7 +6,7 @@ import { canDeleteComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export const deleteComponent = (
-  { subProject }: BaseOperationParamsSchema,
+  { subProject }: BaseSubProjectOperationParamsSchema,
   { id }: DeleteComponentParamsSchema,
 ): SubProjectSchema => {
   const component = accessors.subProject(subProject).optional.component.byId(id)
