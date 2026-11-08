@@ -1,13 +1,14 @@
 import type { ConstraintFieldSchema } from '../../../schemas/constraints'
-import type { IdPrefixSchema } from '../../../schemas/idGenerator'
+import type { IdGeneratorSchema, IdPrefixSchema } from '../../../schemas/idGenerator'
 import type { ModelObjectSchema } from '../../../schemas/modelObject'
 import type { SubProjectSchema } from '../../../schemas/subProject'
 import { getSubProjectIds } from '../../../utils/idCollectorUtils'
-import { IdGenerator } from '../../../utils/random/IdGenerator'
 
-export const getCloneIdMappings = (subProject: SubProjectSchema): Record<string, string> => {
+export const getCloneIdMappings = (
+  subProject: SubProjectSchema,
+  idGenerator: IdGeneratorSchema,
+): Record<string, string> => {
   const ids = getSubProjectIds(subProject)
-  const idGenerator = new IdGenerator()
 
   const entries: [string, string][] = [
     [subProject.id, idGenerator.get('sub-project', ids)],

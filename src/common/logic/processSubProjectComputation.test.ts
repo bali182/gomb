@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { createBaseOperationParams } from '../operations/subProject/testUtils'
 
 import { defaultStitchingSettings } from '../defaultStates'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
@@ -96,8 +97,8 @@ describe('processSubProjectComputation', () => {
 
   it('keeps the manually edited value when a patcher resets that field', () => {
     const source = offsetFixture()
-    const previous = updateHole(source, { hole: { ...source.holes[0], xOffset: 15 } })
-    const input = updateStitchLine(previous, {
+    const previous = updateHole(createBaseOperationParams(source), { hole: { ...source.holes[0], xOffset: 15 } })
+    const input = updateStitchLine(createBaseOperationParams(previous), {
       stitchLine: { ...accessors.subProject(previous).stitchLine.bounds('stitch'), startOffset: 25 },
     })
     const result = processSubProjectComputation(input, defaultStitchingSettings, previous)
@@ -111,7 +112,7 @@ describe('processSubProjectComputation', () => {
 
   it('preserves offsets when their endpoint is temporarily inactive', () => {
     const source = offsetFixture()
-    const input = updateHole(source, { hole: { ...source.holes[0], xOffset: 15 } })
+    const input = updateHole(createBaseOperationParams(source), { hole: { ...source.holes[0], xOffset: 15 } })
     const result = processSubProjectComputation(input, defaultStitchingSettings, input)
     expect(accessors.subProject(result.subProject).hole.byId('hole').xOffset).toBe(15)
     expect(accessors.subProject(result.subProject).stitchLine.bounds('stitch').startOffset).toBe(15)
@@ -150,7 +151,7 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const input = updateHole(before, { hole: { ...before.holes[1], topLeftRadius: 60 } })
+    const input = updateHole(createBaseOperationParams(before), { hole: { ...before.holes[1], topLeftRadius: 60 } })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(result.subProject.holes.map((hole) => hole.topLeftRadius)).toEqual([60, 60])
     expect(result.computedSubProject.holes.large.cornerRadius.topLeft.toNumber()).toBe(30)
@@ -188,7 +189,10 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const mirrored = flip(before, accessors.subProject(before).component.rootPanel(), 'horizontal')
+    const mirrored = flip(createBaseOperationParams(before), {
+      model: accessors.subProject(before).component.rootPanel(),
+      axis: 'horizontal',
+    })
     const result = processSubProjectComputation(mirrored, defaultStitchingSettings, before)
     expect(accessors.subProject(result.subProject).component.panel('a').topLeftRadius).toBe(20)
     expect(accessors.subProject(result.subProject).component.panel('b').topLeftRadius).toBe(20)
@@ -220,7 +224,7 @@ describe('processSubProjectComputation', () => {
         size: equal('size', [{ id: 'panel-width', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }]),
       },
     })
-    const input = deleteComponent(before, { componentId: 'panel' })
+    const input = deleteComponent(createBaseOperationParams(before), { id: 'panel' })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(
       result.subProject.stitchLines.map(
@@ -247,7 +251,7 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const input = deletePocketOpening(before, { openingId: 'removed' })
+    const input = deletePocketOpening(createBaseOperationParams(before), { id: 'removed' })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(accessors.subProject(result.subProject).component.tPocket('a').openingId).toBe(before.defaultPocketOpening)
     expect(accessors.subProject(result.subProject).component.tPocket('b').openingId).toBe(before.defaultPocketOpening)

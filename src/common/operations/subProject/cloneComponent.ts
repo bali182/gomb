@@ -1,20 +1,14 @@
-import type { NameGeneratorSchema } from '../../schemas/idGenerator'
+import type { BaseOperationParamsSchema, CloneComponentParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
-import { cloneComponentTree, type CloneComponentSettings } from './cloneComponentTree'
+import { cloneComponentTree } from './utils/cloneComponentTree'
 import { canCloneComponent } from './utils/componentRules'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
-export type CloneComponentParams = {
-  componentId: string
-  nameGenerator: NameGeneratorSchema
-  settings: CloneComponentSettings
-}
-
 export const cloneComponent = (
-  subProject: SubProjectSchema,
-  { componentId, nameGenerator, settings }: CloneComponentParams,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseOperationParamsSchema,
+  { id: componentId }: CloneComponentParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   const sourceComponent = accessor.optional.component.byId(componentId)
@@ -35,11 +29,11 @@ export const cloneComponent = (
     return subProject
   }
 
-  const idMappings = getCloneIdMappings(subProject)
+  const idMappings = getCloneIdMappings(subProject, idGenerator)
   const cloneResult = cloneComponentTree({
     subProject,
     componentId,
-    settings,
+    settings: { cloneComponentTree: true, cloneHoles: true, cloneStitchLines: true },
     idMappings,
     nameGenerator,
     preserveNames: false,

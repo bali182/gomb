@@ -1,13 +1,9 @@
-import { StitchLineSchema } from '../../schemas/stitching'
+import type { BaseOperationParamsSchema, UpdateStitchLineParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
-export type UpdateStitchLineParams = {
-  stitchLine: StitchLineSchema
-}
-
 export const updateStitchLine = (
-  subProject: SubProjectSchema,
-  { stitchLine }: UpdateStitchLineParams,
+  { subProject }: BaseOperationParamsSchema,
+  { stitchLine }: UpdateStitchLineParamsSchema,
 ): SubProjectSchema => {
   return {
     ...subProject,

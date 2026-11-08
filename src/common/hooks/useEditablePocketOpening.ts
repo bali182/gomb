@@ -31,7 +31,10 @@ export const useEditablePocketOpening = (openingId: string): UseEditablePocketOp
     () => ({ project, subProject, computedSubProject, language: LANGUAGE, t: t.validation }),
     [project, subProject, computedSubProject, t.validation],
   )
-  const commit = useCallback((value: PocketOpeningSchema): void => updatePocketOpening(value), [updatePocketOpening])
+  const commit = useCallback(
+    (value: PocketOpeningSchema): void => updatePocketOpening({ opening: value }),
+    [updatePocketOpening],
+  )
   const { editableValue, validationIssues, setValue } = useEditableModel({
     value: opening,
     context,

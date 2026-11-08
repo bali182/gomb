@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { EN } from '../../translations/en'
-import { NameGenerator } from '../../utils/factory/NameGenerator'
-import { getProjectIds } from '../../utils/idCollectorUtils'
-
-import { defaultStitchingSettings } from '../../defaultStates'
+import { defaultSlantedPocketOpening, defaultStitchingSettings } from '../../defaultStates'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { d } from '../../testData'
+import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
+import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { cloneSubProject } from './cloneSubProject'
+
+import { getProjectIds } from '../../utils/idCollectorUtils'
 
 const nameGenerator = new NameGenerator(EN.defaultNames)
 
@@ -207,4 +207,71 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
     expect(originalIds.has(id)).toBe(false)
   }
   expect(project).toEqual(snapshot)
+})
+
+const openingFixture = () => {
+  const opening = {
+    type: 'slanted' as const,
+    ...defaultSlantedPocketOpening,
+    id: 'shared',
+    name: 'Slanted',
+    offset: 1000,
+  }
+  const defaultOpening = { id: 'custom-default', name: 'Default', type: 'straight' } as const
+  const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
+  const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
+  const t = d.tPocket({ id: 't', openingId: opening.id })
+  const front = d.frontPocket({ id: 'front', openingId: opening.id })
+  const original = d.subProject({
+    id: 'sub',
+    root,
+    components: [cluster, t, front],
+    pocketOpenings: [opening, defaultOpening],
+  })
+  const subProject = {
+    ...original,
+    defaultPocketOpening: defaultOpening.id,
+  }
+  return {
+    subProject,
+    opening,
+    defaultOpening,
+    t,
+    front,
+    root,
+    cluster,
+    originalDefaultOpeningId: original.defaultPocketOpening,
+  }
+}
+
+it('retains unused definitions and the default reference when duplicating a subproject', () => {
+  const { subProject } = openingFixture()
+  const unused = { type: 'slanted' as const, ...defaultSlantedPocketOpening, id: 'unused', name: 'Unused' }
+  const source = { ...subProject, pocketOpenings: { ...subProject.pocketOpenings, unused } }
+  const result = cloneSubProject(d.project({ id: 'project', subProjects: [source] }), {
+    subProject: source,
+    nameGenerator,
+  })
+  const cloned = result.subProjects[1]
+  expect(cloned.defaultPocketOpening).not.toBe(source.defaultPocketOpening)
+  expect(cloned.pocketOpenings[cloned.defaultPocketOpening]).toMatchObject({ name: 'Default' })
+  expect(Object.values(cloned.pocketOpenings).map(({ id: _id, ...opening }) => opening)).toEqual(
+    Object.values(source.pocketOpenings).map(({ id: _id, ...opening }) => opening),
+  )
+  for (const opening of Object.values(cloned.pocketOpenings)) {
+    const id = opening.id
+    expect(id.startsWith(`${opening.type}-pocket-opening-`)).toBe(true)
+    expect(Object.keys(source.pocketOpenings)).not.toContain(id)
+  }
+  expect(cloned.pocketOpenings).not.toBe(source.pocketOpenings)
+  const copiedShared = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Slanted')
+  expect(Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Unused')).toEqual({
+    ...unused,
+    id: expect.stringMatching(/^slanted-pocket-opening-/),
+  })
+  for (const pocket of Object.values(cloned.components)) {
+    if (pocket.type === 't-pocket' || pocket.type === 'front-pocket') {
+      expect(pocket.openingId).toBe(copiedShared?.id)
+    }
+  }
 })

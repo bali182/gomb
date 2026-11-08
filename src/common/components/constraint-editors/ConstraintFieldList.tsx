@@ -1,5 +1,5 @@
 import { Box, Breadcrumb, HStack, Icon, Text, VStack } from '@chakra-ui/react'
-import { Fragment, useMemo, type FC, type ReactElement } from 'react'
+import { Fragment, useCallback, useMemo, type FC, type ReactElement } from 'react'
 import { PiLink, PiSlidersHorizontal, PiTrash } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -83,6 +83,10 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
   const { t } = useTranslation()
   const accessor = accessors.subProject(subProject)
   const model = accessor.optional.constraint.model(field)
+  const handleDelete = useCallback(() => {
+    deleteConstraintField({ constraintId, id: field.id })
+  }, [constraintId, deleteConstraintField, field.id])
+
   if (!isDefined(model)) {
     return null
   }
@@ -102,13 +106,7 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
           ))}
         </Breadcrumb.List>
       </Breadcrumb.Root>
-      <EditorIconButton
-        readOnly={isComputing}
-        size="xs"
-        variant="ghost"
-        flexShrink="0"
-        onClick={() => deleteConstraintField(constraintId, field.id)}
-      >
+      <EditorIconButton readOnly={isComputing} size="xs" variant="ghost" flexShrink="0" onClick={handleDelete}>
         <PiTrash />
       </EditorIconButton>
     </HStack>

@@ -10,6 +10,7 @@ import { IdGenerator } from '../../utils/random/IdGenerator'
 import { addConstraintFields } from './addConstraintFields'
 import { deleteConstraint } from './deleteConstraint'
 import { deleteConstraintField } from './deleteConstraintField'
+import { createBaseOperationParams } from './testUtils'
 
 const modelFactory: ReadonlyModelObjectFactorySchema = new ReadonlyModelObjectFactory(
   new IdGenerator(),
@@ -48,10 +49,9 @@ describe('addConstraintFields', () => {
       modelId: 'first-stitch',
       field,
     } as unknown as ConstraintFieldInputSchema
-    const result = addConstraintFields(source, {
+    const result = addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [input],
-      modelFactory,
     })
     expect(result).toBe(source)
     expect(result.constraints.constraint.fields).toEqual([])
@@ -60,13 +60,12 @@ describe('addConstraintFields', () => {
   it('creates a batch through the factory and accepts compatible number fields across models', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = addConstraintFields(source, {
+    const result = addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [
         { type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
         { type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
       ],
-      modelFactory,
     })
     expect(result.constraints.constraint.fields).toHaveLength(2)
     expect(new Set(result.constraints.constraint.fields.map((field) => field.id)).size).toBe(2)
@@ -89,35 +88,37 @@ describe('addConstraintFields', () => {
   it.each(rejected)(
     'rejects missing, mistyped, automatic, duplicate or incompatible fields: $modelId.$field',
     (field) => {
-      const source = addConstraintFields(fixture(), {
+      const source = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
         constraintId: 'constraint',
         fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-        modelFactory,
       })
       const snapshot = structuredClone(source)
-      expect(addConstraintFields(source, { constraintId: 'constraint', fields: [field], modelFactory })).toBe(source)
+      expect(
+        addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
+          constraintId: 'constraint',
+          fields: [field],
+        }),
+      ).toBe(source)
       expect(source).toEqual(snapshot)
     },
   )
 
   it('only links optional stitching settings with the same setting', () => {
-    const source = addConstraintFields(fixture(), {
+    const source = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [
         { type: 'component-bounds-stitch-line-constraint-field', modelId: 'first-stitch', field: 'stitchMargin' },
       ],
-      modelFactory,
     })
-    const result = addConstraintFields(source, {
+    const result = addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [
         { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchMargin' },
       ],
-      modelFactory,
     })
     expect(result.constraints.constraint.fields).toHaveLength(2)
     expect(
-      addConstraintFields(source, {
+      addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
         constraintId: 'constraint',
         fields: [
           {
@@ -127,16 +128,14 @@ describe('addConstraintFields', () => {
           },
           { type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
         ],
-        modelFactory,
       }),
     ).toBe(source)
   })
 
   it('rejects a field already belonging to another constraint without changing the source', () => {
-    const first = addConstraintFields(fixture(), {
+    const first = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-      modelFactory,
     })
     const source: SubProjectSchema = {
       ...first,
@@ -144,20 +143,18 @@ describe('addConstraintFields', () => {
     }
     const snapshot = structuredClone(source)
     expect(
-      addConstraintFields(source, {
+      addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
         constraintId: 'other',
         fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-        modelFactory,
       }),
     ).toBe(source)
     expect(source).toEqual(snapshot)
   })
 
   it('accepts a different compatible field of the same model in another constraint', () => {
-    const first = addConstraintFields(fixture(), {
+    const first = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-      modelFactory,
     })
     const source: SubProjectSchema = {
       ...first,
@@ -170,10 +167,9 @@ describe('addConstraintFields', () => {
         },
       },
     }
-    const result = addConstraintFields(source, {
+    const result = addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       constraintId: 'other',
       fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'height' }],
-      modelFactory,
     })
     expect(result.constraints.other.fields).toHaveLength(2)
     expect(result.constraints.other.fields[1]).toMatchObject({ modelId: 'panel', field: 'height' })
@@ -181,10 +177,9 @@ describe('addConstraintFields', () => {
   })
 
   it.each(['field', 'constraint'])('accepts a field again after its %s is deleted', (removed) => {
-    const first = addConstraintFields(fixture(), {
+    const first = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-      modelFactory,
     })
     const source: SubProjectSchema = {
       ...first,
@@ -193,15 +188,14 @@ describe('addConstraintFields', () => {
     const snapshot = structuredClone(source)
     const available =
       removed === 'field'
-        ? deleteConstraintField(source, {
+        ? deleteConstraintField(createBaseOperationParams(source), {
             constraintId: 'constraint',
-            fieldId: first.constraints.constraint.fields[0].id,
+            id: first.constraints.constraint.fields[0].id,
           })
-        : deleteConstraint(source, { constraintId: 'constraint' })
-    const result = addConstraintFields(available, {
+        : deleteConstraint(createBaseOperationParams(source), { id: 'constraint' })
+    const result = addConstraintFields(createBaseOperationParams(available, { readonlyFactory: modelFactory }), {
       constraintId: 'other',
       fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-      modelFactory,
     })
     expect(result.constraints.other.fields).toHaveLength(1)
     expect(result.constraints.other.fields[0]).toMatchObject({ modelId: 'panel', field: 'width' })
@@ -211,10 +205,9 @@ describe('addConstraintFields', () => {
   it('leaves the source unchanged if the constraint was removed', () => {
     const source = fixture()
     expect(
-      addConstraintFields(source, {
+      addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
         constraintId: 'missing',
         fields: [{ type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],
-        modelFactory,
       }),
     ).toBe(source)
   })
@@ -222,7 +215,7 @@ describe('addConstraintFields', () => {
   it('skips invalid and duplicate inputs while accepting compatible fields in input order', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = addConstraintFields(source, {
+    const result = addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [
         { type: 'panel-constraint-field', modelId: 'missing', field: 'width' },
@@ -232,7 +225,6 @@ describe('addConstraintFields', () => {
         { type: 'panel-constraint-field', modelId: 'panel', field: 'layoutOrientation' },
         { type: 'hole-constraint-field', modelId: 'hole', field: 'height' },
       ],
-      modelFactory,
     })
     expect(result.constraints.constraint.fields.map((field) => [field.modelId, field.field])).toEqual([
       ['panel', 'width'],
@@ -242,29 +234,32 @@ describe('addConstraintFields', () => {
   })
 
   it('keeps optional stitching settings in separate compatibility groups within a batch', () => {
-    const result = addConstraintFields(fixture(), {
+    const result = addConstraintFields(createBaseOperationParams(fixture(), { readonlyFactory: modelFactory }), {
       constraintId: 'constraint',
       fields: [
         { type: 'component-bounds-stitch-line-constraint-field', modelId: 'first-stitch', field: 'stitchMargin' },
         { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchHoleLength' },
         { type: 'component-bounds-stitch-line-constraint-field', modelId: 'second-stitch', field: 'stitchMargin' },
       ],
-      modelFactory,
     })
     expect(result.constraints.constraint.fields.map((field) => field.field)).toEqual(['stitchMargin', 'stitchMargin'])
   })
 
   it('returns the original subproject for an empty or entirely invalid batch', () => {
     const source = fixture()
-    expect(addConstraintFields(source, { constraintId: 'constraint', fields: [], modelFactory })).toBe(source)
     expect(
-      addConstraintFields(source, {
+      addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
+        constraintId: 'constraint',
+        fields: [],
+      }),
+    ).toBe(source)
+    expect(
+      addConstraintFields(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
         constraintId: 'constraint',
         fields: [
           { type: 'panel-constraint-field', modelId: 'missing', field: 'width' },
           { type: 'panel-constraint-field', modelId: 'auto', field: 'width' },
         ],
-        modelFactory,
       }),
     ).toBe(source)
   })

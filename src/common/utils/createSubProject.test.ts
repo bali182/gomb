@@ -1,11 +1,15 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { d } from '../testData'
 import { EN } from '../translations/en'
+import { HU } from '../translations/hu'
+import { accessors } from './accessors'
 import { createProject } from './createProject'
 import { createSubProject } from './createSubProject'
 import { NameGenerator } from './factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from './factory/ReadonlyModelObjectFactory'
 import { IdGenerator } from './random/IdGenerator'
+
+import { vi } from 'vitest'
 
 const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 
@@ -50,4 +54,22 @@ describe('createSubProject', () => {
       createRoot.mockRestore()
     }
   })
+})
+
+it('creates independent straight defaults using the factory language', () => {
+  const first = createSubProject({
+    project: createProject('Project'),
+    modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(HU.defaultNames)),
+  })
+  const second = createSubProject({
+    project: createProject('Project'),
+    modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames)),
+  })
+  expect(first.defaultPocketOpening).not.toBe(second.defaultPocketOpening)
+  expect(accessors.subProject(first).pocketOpening.defaultOpening()).toEqual({
+    id: first.defaultPocketOpening,
+    name: 'Egyenes 1',
+    type: 'straight',
+  })
+  expect(first.pocketOpenings[first.defaultPocketOpening]).not.toBe(second.pocketOpenings[second.defaultPocketOpening])
 })

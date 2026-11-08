@@ -1,11 +1,10 @@
-import { HoleSchema } from '../../schemas/hole'
+import type { BaseOperationParamsSchema, UpdateHoleParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
-export type UpdateHoleParams = {
-  hole: HoleSchema
-}
-
-export const updateHole = (subProject: SubProjectSchema, { hole }: UpdateHoleParams): SubProjectSchema => {
+export const updateHole = (
+  { subProject }: BaseOperationParamsSchema,
+  { hole }: UpdateHoleParamsSchema,
+): SubProjectSchema => {
   return {
     ...subProject,
     holes: subProject.holes.map((candidate) => (candidate.id === hole.id ? hole : candidate)),

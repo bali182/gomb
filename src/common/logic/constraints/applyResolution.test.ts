@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { createBaseOperationParams } from '../../operations/subProject/testUtils'
 import { updateComponent } from '../../operations/subProject/updateComponent'
 import { updateStitchLine } from '../../operations/subProject/updateStitchLine'
 import type {
@@ -42,7 +43,7 @@ const fixture = (constraints: Record<string, EqualConstraintSchema>): SubProject
     constraints,
   })
 const setWidth = (subProject: SubProjectSchema, id: string, width: number): SubProjectSchema =>
-  updateComponent(subProject, {
+  updateComponent(createBaseOperationParams(subProject), {
     component: { ...accessors.subProject(subProject).component.panel(id), width },
   })
 const resolveEdit = (before: SubProjectSchema, after: SubProjectSchema): SubProjectSchema =>
@@ -67,8 +68,12 @@ describe('applyResolution before patching', () => {
   it('propagates multiple equal writes, but resolves conflicting writes from the first current field', () => {
     const before = fixture({ linked: equal('linked', [field('a'), field('a', 'height'), field('b')]) })
     const panel = accessors.subProject(before).component.panel('a')
-    const identical = updateComponent(before, { component: { ...panel, width: 20, height: 20 } })
-    const different = updateComponent(before, { component: { ...panel, width: 20, height: 30 } })
+    const identical = updateComponent(createBaseOperationParams(before), {
+      component: { ...panel, width: 20, height: 20 },
+    })
+    const different = updateComponent(createBaseOperationParams(before), {
+      component: { ...panel, width: 20, height: 30 },
+    })
     expect(accessors.subProject(resolveEdit(before, identical)).component.panel('b').width).toBe(20)
     const result = resolveEdit(before, different)
     expect(accessors.subProject(result).component.panel('a').height).toBe(20)
@@ -80,7 +85,7 @@ describe('applyResolution before patching', () => {
       widths: equal('widths', [field('a'), field('b')]),
       heights: equal('heights', [field('a', 'height'), field('c', 'height')]),
     })
-    const input = updateComponent(setWidth(before, 'b', 30), {
+    const input = updateComponent(createBaseOperationParams(setWidth(before, 'b', 30)), {
       component: { ...accessors.subProject(before).component.panel('c'), height: 40 },
     })
     const panel = accessors.subProject(resolveEdit(before, input)).component.panel('a')
@@ -140,8 +145,10 @@ describe('applyResolution before patching', () => {
 
   it('does not treat a model subtype change as a field edit when adding a binding', () => {
     const source = fixture({ linked: equal('linked', [field('a')]) })
-    const before = updateComponent(setWidth(source, 'a', 25), { component: d.frontPocket({ id: 'b' }) })
-    const edited = updateComponent(before, { component: d.panel({ id: 'b', width: 99 }) })
+    const before = updateComponent(createBaseOperationParams(setWidth(source, 'a', 25)), {
+      component: d.frontPocket({ id: 'b' }),
+    })
+    const edited = updateComponent(createBaseOperationParams(before), { component: d.panel({ id: 'b', width: 99 }) })
     const input: SubProjectSchema = {
       ...edited,
       constraints: { linked: equal('linked', [field('b'), field('a')]) },
@@ -178,11 +185,11 @@ describe('applyResolution before patching', () => {
 
   it('returns the same subproject when only unrelated fields change or models are cloned', () => {
     const before = fixture({ linked: equal('linked', [field('a'), field('b')]) })
-    const input = updateComponent(before, {
+    const input = updateComponent(createBaseOperationParams(before), {
       component: { ...accessors.subProject(before).component.panel('b'), name: 'Renamed' },
     })
     expect(resolveEdit(before, input)).toBe(input)
-    const cloned = updateComponent(input, {
+    const cloned = updateComponent(createBaseOperationParams(input), {
       component: { ...accessors.subProject(input).component.panel('a'), id: 'copy' },
     })
     expect(resolveEdit(input, cloned)).toBe(cloned)
@@ -196,17 +203,19 @@ describe('applyResolution before patching', () => {
     const before = fixture({ linked: equal('linked', fields) })
     const stitchLine = { ...accessors.subProject(before).stitchLine.bounds('s2') }
     delete stitchLine.stitchMargin
-    const input = updateStitchLine(before, { stitchLine })
+    const input = updateStitchLine(createBaseOperationParams(before), { stitchLine })
     const result = resolveEdit(before, input)
     expect(accessors.subProject(result).stitchLine.bounds('s1')).not.toHaveProperty('stitchMargin')
     expect(getConstraintFieldValue(accessors.subProject(result).constraint.model(fields[1]), fields[1])).toBeUndefined()
-    const explicit = updateStitchLine(result, { stitchLine: { ...stitchLine, stitchMargin: undefined } })
+    const explicit = updateStitchLine(createBaseOperationParams(result), {
+      stitchLine: { ...stitchLine, stitchMargin: undefined },
+    })
     expect(resolveEdit(result, explicit)).toBe(explicit)
   })
 
   it('propagates enums across compatible field names', () => {
     const before = fixture({ linked: equal('linked', [field('a', 'mainAxisAnchor'), field('b', 'offAxisAnchor')]) })
-    const input = updateComponent(before, {
+    const input = updateComponent(createBaseOperationParams(before), {
       component: { ...accessors.subProject(before).component.panel('b'), offAxisAnchor: 'end' },
     })
     const result = resolveEdit(before, input)
@@ -241,7 +250,7 @@ describe('applyResolution before patching', () => {
         ]),
       },
     })
-    const input = updateComponent(before, {
+    const input = updateComponent(createBaseOperationParams(before), {
       component: { ...accessors.subProject(before).component.tPocket('a'), itemId: undefined },
     })
     const result = resolveEdit(before, input)
@@ -284,10 +293,10 @@ describe('applyResolution after patching', () => {
     const before = fixture({ linked: equal('linked', fields) })
     const stitchLine = { ...accessors.subProject(before).stitchLine.bounds('s2') }
     delete stitchLine.stitchMargin
-    const edited = updateStitchLine(before, { stitchLine })
+    const edited = updateStitchLine(createBaseOperationParams(before), { stitchLine })
     const inputDiff = getSubProjectDiff(before, edited)
     const input = applyResolution({ input: edited, target: edited, inputDiff })
-    const patched = updateStitchLine(input, {
+    const patched = updateStitchLine(createBaseOperationParams(input), {
       stitchLine: { ...accessors.subProject(input).stitchLine.bounds('s2'), stitchMargin: 15 },
     })
     const result = applyResolution({ input, target: patched, inputDiff, patchDiff: getSubProjectDiff(input, patched) })

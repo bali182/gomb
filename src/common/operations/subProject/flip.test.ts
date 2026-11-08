@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { narrowers } from '../../utils/narrowers'
+import { createBaseOperationParams } from './testUtils'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultStitchingSettings } from '../../defaultStates'
@@ -33,12 +34,17 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layo
       const front = d.frontPocket({ id: 'front', layoutOrientation, mainAxisAnchor })
       const original = d.subProject({ id: 'sp', root, components: [panel, cluster, front] })
       const mirrored: Record<AnchorSchema, AnchorSchema> = { start: 'end', middle: 'middle', end: 'start' }
-      const result = accessors.subProject(flip(original, root, axis))
+      const result = accessors.subProject(flip(createBaseOperationParams(original), { model: root, axis: axis }))
       const expected = layoutOrientation === axis ? mirrored[mainAxisAnchor] : mainAxisAnchor
       expect(result.component.rootPanel().mainAxisAnchor).toBe(expected)
       expect(result.component.panel('panel').mainAxisAnchor).toBe(expected)
       expect(result.component.frontPocket('front').mainAxisAnchor).toBe(expected)
-      expect(flip(flip(original, root, axis), root, axis)).toEqual(original)
+      expect(
+        flip(createBaseOperationParams(flip(createBaseOperationParams(original), { model: root, axis: axis })), {
+          model: root,
+          axis: axis,
+        }),
+      ).toEqual(original)
     })
 
     it.each([30, 80])('reflects the computed positions of unequal children with second size %s', (secondSize) => {
@@ -55,7 +61,10 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layo
       const b = d.panel({ id: 'b', width: secondSize, height: secondSize, autoWidth: false, autoHeight: false })
       const original = d.subProject({ id: 'sp', root, components: [a, b] })
       const before = getComputedSubProject(original, defaultStitchingSettings)
-      const after = getComputedSubProject(flip(original, root, layoutOrientation), defaultStitchingSettings)
+      const after = getComputedSubProject(
+        flip(createBaseOperationParams(original), { model: root, axis: layoutOrientation }),
+        defaultStitchingSettings,
+      )
       const position = layoutOrientation === 'horizontal' ? 'x' : 'y'
       const size = layoutOrientation === 'horizontal' ? 'width' : 'height'
       for (const child of [a, b]) {
@@ -172,7 +181,7 @@ describe.each(axes)('flip: %s', (axis) => {
       axis === 'horizontal'
         ? { topStretch: -2, rightStretch: 7, bottomStretch: 5, leftStretch: 3 }
         : { topStretch: 5, rightStretch: 3, bottomStretch: -2, leftStretch: 7 }
-    const result = flip(original, panel, axis)
+    const result = flip(createBaseOperationParams(original), { model: panel, axis: axis })
     expect(result.components.panel).toEqual({
       ...panel,
       ...mirroredRadii[axis],
@@ -185,7 +194,7 @@ describe.each(axes)('flip: %s', (axis) => {
   it('mirrors root-panel radii and layout alignment while preserving its dimensions', () => {
     const root = d.rootPanel({ id: 'root', ...radii, individualRadii: true, width: 170, height: 110, layoutGap: 6 })
     const original = d.subProject({ id: 'sp', root })
-    expect(flip(original, root, axis).components.root).toEqual({
+    expect(flip(createBaseOperationParams(original), { model: root, axis: axis }).components.root).toEqual({
       ...root,
       ...mirroredRadii[axis],
       mainAxisAnchor: axis === root.layoutOrientation ? 'end' : 'start',
@@ -200,7 +209,7 @@ describe.each(axes)('flip: %s', (axis) => {
       const b = d.panel({ id: 'b', offAxisAnchor: 'middle' })
       const c = d.pocketCluster({ id: 'c', offAxisAnchor: 'end' })
       const original = d.subProject({ id: 'sp', root, components: [a, b, c] })
-      const result = accessors.subProject(flip(original, root, axis))
+      const result = accessors.subProject(flip(createBaseOperationParams(original), { model: root, axis: axis }))
       expect(result.component.rootPanel().children).toEqual(
         axis === layoutOrientation ? ['c', 'b', 'a'] : ['a', 'b', 'c'],
       )
@@ -227,7 +236,7 @@ describe.each(axes)('flip: %s', (axis) => {
         grandchild: d.panel({ id: 'grandchild', offAxisAnchor: 'start', ...radii }),
       },
     }
-    const result = accessors.subProject(flip(original, front, axis))
+    const result = accessors.subProject(flip(createBaseOperationParams(original), { model: front, axis: axis }))
     expect(result.component.frontPocket('front').children).toEqual(['sibling', 'panel'])
     expect(result.component.panel('grandchild').offAxisAnchor).toBe('end')
     expect(result.component.panel('grandchild')).toMatchObject(mirroredRadii[axis])
@@ -253,7 +262,11 @@ describe.each(axes)('flip: %s', (axis) => {
       axis === 'horizontal'
         ? { xAnchor: expected, xOffset: anchor === 'middle' ? -11 : 11 }
         : { yAnchor: expected, yOffset: anchor === 'middle' ? 17 : -17 }
-    expect(flip(original, hole, axis).holes[0]).toEqual({ ...hole, ...mirroredRadii[axis], ...position })
+    expect(flip(createBaseOperationParams(original), { model: hole, axis: axis }).holes[0]).toEqual({
+      ...hole,
+      ...mirroredRadii[axis],
+      ...position,
+    })
   })
 
   it('mirrors hole-targeted stitching without changing the owner or unrelated stitching', () => {
@@ -267,7 +280,7 @@ describe.each(axes)('flip: %s', (axis) => {
       ...radii,
     })
     const original = d.subProject({ id: 'sp', root, holes: [hole], stitchLines: [ownStitch, otherStitch] })
-    const result = flip(original, hole, axis)
+    const result = flip(createBaseOperationParams(original), { model: hole, axis: axis })
     expect(result.components.root).toBe(root)
     expect(result.stitchLines[0]).toMatchObject(mirroredRadii[axis])
     expect(result.stitchLines[1]).toBe(otherStitch)
@@ -319,7 +332,7 @@ describe.each(axes)('flip: %s', (axis) => {
             bottomLeftCorner: true,
             bottomRightCorner: false,
           }
-    const result = flip(original, stitchLine, axis)
+    const result = flip(createBaseOperationParams(original), { model: stitchLine, axis: axis })
     expect(result.stitchLines[0]).toEqual({
       ...stitchLine,
       ...mirroredRadii[axis],
@@ -370,7 +383,7 @@ describe.each(axes)('flip: %s', (axis) => {
       holes: [ownHole, outsideHole],
       stitchLines: [componentStitch, holeStitch, outsideStitch, outsideHoleStitch],
     })
-    const result = flip(original, selected, axis)
+    const result = flip(createBaseOperationParams(original), { model: selected, axis: axis })
     expect(result.components.child).toMatchObject(mirroredRadii[axis])
     expect(result.components.outside).toBe(outside)
     expect(result.components.root).toBe(root)
@@ -407,18 +420,18 @@ describe.each(axes)('flip: %s', (axis) => {
       stitchLines: [stitchLine, holeStitch],
     })
 
-    const componentResult = flip(original, component, axis)
+    const componentResult = flip(createBaseOperationParams(original), { model: component, axis: axis })
     expect(componentResult.components.shared).toMatchObject(mirroredRadii[axis])
     expect(componentResult.holes[0]).toBe(hole)
     expect(componentResult.stitchLines).toEqual(original.stitchLines)
 
-    const holeResult = flip(original, hole, axis)
+    const holeResult = flip(createBaseOperationParams(original), { model: hole, axis: axis })
     expect(holeResult.components.shared).toBe(component)
     expect(holeResult.holes[0]).toMatchObject(mirroredRadii[axis])
     expect(holeResult.stitchLines[0]).toBe(stitchLine)
     expect(holeResult.stitchLines[1]).toMatchObject(mirroredRadii[axis])
 
-    const stitchResult = flip(original, stitchLine, axis)
+    const stitchResult = flip(createBaseOperationParams(original), { model: stitchLine, axis: axis })
     expect(stitchResult.components.shared).toBe(component)
     expect(stitchResult.holes[0]).toBe(hole)
     expect(stitchResult.stitchLines[1]).toBe(holeStitch)
@@ -428,7 +441,9 @@ describe.each(axes)('flip: %s', (axis) => {
   it('uses the current stored model instead of stale values supplied by a caller', () => {
     const original = createClusterSubProject('up')
     const stale = d.rootPanel({ id: 'root', ...radii, topLeftRadius: 99, children: [] })
-    expect(flip(original, stale, axis)).toEqual(flip(original, original.components.root, axis))
+    expect(flip(createBaseOperationParams(original), { model: stale, axis: axis })).toEqual(
+      flip(createBaseOperationParams(original), { model: original.components.root, axis: axis }),
+    )
   })
 
   it('flips only the selected stitch-line type regardless of source order', () => {
@@ -441,7 +456,7 @@ describe.each(axes)('flip: %s', (axis) => {
       ...radii,
     })
     const original = { ...source, stitchLines: [boundsStitch, pocketStitch] }
-    const pocketResult = flip(original, pocketStitch, axis)
+    const pocketResult = flip(createBaseOperationParams(original), { model: pocketStitch, axis: axis })
     expect(pocketResult.stitchLines[0]).toBe(boundsStitch)
     expect(pocketResult.stitchLines[1]).toEqual({
       ...pocketStitch,
@@ -451,7 +466,7 @@ describe.each(axes)('flip: %s', (axis) => {
     })
 
     const reordered = { ...original, stitchLines: [pocketStitch, boundsStitch] }
-    const boundsResult = flip(reordered, boundsStitch, axis)
+    const boundsResult = flip(createBaseOperationParams(reordered), { model: boundsStitch, axis: axis })
     expect(boundsResult.stitchLines[0]).toBe(pocketStitch)
     expect(boundsResult.stitchLines[1]).toMatchObject({
       type: 'component-bounds-stitch-line',
@@ -473,14 +488,14 @@ describe.each(orientationCases)(
       }
       const original = { ...fixture, components: { ...fixture.components, cluster } }
       const before = structuredClone(original)
-      const result = flip(original, cluster, axis)
+      const result = flip(createBaseOperationParams(original), { model: cluster, axis: axis })
       const flippedCluster = accessors.subProject(result).component.pocketCluster(cluster.id)
       expect(flippedCluster).toMatchObject({
         ...mirroredRadii[axis],
         individualRadii: true,
         orientation: expectedOrientation,
       })
-      expect(flip(result, flippedCluster, axis)).toEqual(original)
+      expect(flip(createBaseOperationParams(result), { model: flippedCluster, axis: axis })).toEqual(original)
       expect(original).toEqual(before)
     })
 
@@ -511,7 +526,10 @@ describe.each(orientationCases)(
       }
       const snapshot = structuredClone(original)
       const source = accessors.subProject(original)
-      const clusterResult = flip(original, source.component.pocketCluster('cluster'), axis)
+      const clusterResult = flip(createBaseOperationParams(original), {
+        model: source.component.pocketCluster('cluster'),
+        axis: axis,
+      })
       const accessor = accessors.subProject(clusterResult)
       expect(accessor.stitchLine.tPocket('shared')).toMatchObject({
         targetId: 'cluster',
@@ -525,7 +543,9 @@ describe.each(orientationCases)(
         targetId: 'cluster',
       })
       expect(accessor.stitchLine.tPocket('unrelated')).toBe(unrelated)
-      const pocketResult = accessors.subProject(flip(original, source.component.tPocket('t'), axis))
+      const pocketResult = accessors.subProject(
+        flip(createBaseOperationParams(original), { model: source.component.tPocket('t'), axis: axis }),
+      )
       expect(pocketResult.stitchLine.tPocket('shared')).toBe(shared)
       const beforeGeometry = accessors.computedSubProject(getComputedSubProject(original, defaultStitchingSettings))
       const afterGeometry = accessors.computedSubProject(getComputedSubProject(clusterResult, defaultStitchingSettings))
@@ -558,14 +578,21 @@ describe.each(orientationCases)(
           ).toBe(true)
         }
       }
-      expect(flip(clusterResult, accessor.component.pocketCluster('cluster'), axis)).toEqual(original)
+      expect(
+        flip(createBaseOperationParams(clusterResult), {
+          model: accessor.component.pocketCluster('cluster'),
+          axis: axis,
+        }),
+      ).toEqual(original)
       expect(original).toEqual(snapshot)
     })
 
     it('mirrors cluster layout and contents while preserving opening references and pocket order', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)
-      const result = accessors.subProject(flip(original, source.component.pocketCluster('cluster'), axis))
+      const result = accessors.subProject(
+        flip(createBaseOperationParams(original), { model: source.component.pocketCluster('cluster'), axis: axis }),
+      )
       expect(result.component.pocketCluster('cluster')).toMatchObject({
         orientation: expectedOrientation,
         children: ['t', 'front'],
@@ -606,7 +633,7 @@ describe.each(orientationCases)(
         }
         const cluster = accessors.subProject(original).component.pocketCluster('cluster')
         const before = getComputedSubProject(original, defaultStitchingSettings)
-        const flipped = flip(original, cluster, axis)
+        const flipped = flip(createBaseOperationParams(original), { model: cluster, axis: axis })
         const after = getComputedSubProject(flipped, defaultStitchingSettings)
         const beforeSource = accessors.computedSubProject(before)
         const afterSource = accessors.computedSubProject(after)
@@ -636,13 +663,17 @@ describe.each(orientationCases)(
     it('preserves the opening when flipping an independently selected pocket', () => {
       const original = createClusterSubProject(orientation)
       const source = accessors.subProject(original)
-      const tResult = accessors.subProject(flip(original, source.component.tPocket('t'), axis))
+      const tResult = accessors.subProject(
+        flip(createBaseOperationParams(original), { model: source.component.tPocket('t'), axis: axis }),
+      )
       expect(tResult.component.tPocket('t').openingId).toBe(source.component.tPocket('t').openingId)
       expect(tResult.pocketOpening.byId('t-opening')).toBe(source.pocketOpening.byId('t-opening'))
       expect(tResult.component.tPocket('t').itemCrossAxisOffset).toBe(swapsEnds ? -9 : 9)
       expect(tResult.component.pocketCluster('cluster')).toBe(source.component.pocketCluster('cluster'))
       expect(tResult.component.frontPocket('front')).toBe(source.component.frontPocket('front'))
-      const frontResult = accessors.subProject(flip(original, source.component.frontPocket('front'), axis))
+      const frontResult = accessors.subProject(
+        flip(createBaseOperationParams(original), { model: source.component.frontPocket('front'), axis: axis }),
+      )
       expect(frontResult.component.frontPocket('front')).toEqual({
         ...source.component.frontPocket('front'),
         itemCrossAxisOffset: swapsEnds ? 4 : -4,
@@ -659,7 +690,7 @@ describe.each(orientationCases)(
         const source = accessors.subProject(fixture)
         const stitchLine = { ...source.stitchLine.tPocket('t-stitch'), stitchDirection }
         const original = { ...fixture, stitchLines: [stitchLine] }
-        const result = flip(original, stitchLine, axis)
+        const result = flip(createBaseOperationParams(original), { model: stitchLine, axis: axis })
         expect(result.components).toBe(original.components)
         expect(result.stitchLines[0]).toEqual(
           swapsEnds
@@ -688,7 +719,9 @@ describe.each(orientationCases)(
         },
       }
       const source = accessors.subProject(original)
-      const result = accessors.subProject(flip(original, source.component.pocketCluster('cluster'), axis))
+      const result = accessors.subProject(
+        flip(createBaseOperationParams(original), { model: source.component.pocketCluster('cluster'), axis: axis }),
+      )
       const rect: RectSchema = {
         x: new BigNumber(11),
         y: new BigNumber(17),
@@ -757,7 +790,9 @@ describe.each(orientationCases)(
             front: { ...source.component.frontPocket('front'), openingId: opening.id },
           },
         }
-        const result = accessors.subProject(flip(current, source.component.pocketCluster('cluster'), axis))
+        const result = accessors.subProject(
+          flip(createBaseOperationParams(current), { model: source.component.pocketCluster('cluster'), axis: axis }),
+        )
         expect(result.pocketOpening.byId(result.component.tPocket('t').openingId)).toBe(opening)
         expect(result.pocketOpening.byId(result.component.frontPocket('front').openingId)).toBe(opening)
       }
@@ -772,8 +807,8 @@ describe.each(orientationCases)(
       const snapshot = structuredClone(original)
       const models = [...Object.values(original.components), ...original.holes, ...original.stitchLines]
       for (const model of models) {
-        const flipped = flip(original, model, axis)
-        expect(flip(flipped, model, axis)).toEqual(snapshot)
+        const flipped = flip(createBaseOperationParams(original), { model: model, axis: axis })
+        expect(flip(createBaseOperationParams(flipped), { model: model, axis: axis })).toEqual(snapshot)
         expect(original).toEqual(snapshot)
       }
     })
@@ -804,15 +839,18 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical
       const t = d.tPocket({ id: 't', openingId: opening.id })
       const front = d.frontPocket({ id: 'front', openingId: opening.id })
       const source = d.subProject({ id: 'sub', root, components: [cluster, t, front], pocketOpenings: [opening] })
-      const pocketFlip = flip(source, t, axis)
+      const pocketFlip = flip(createBaseOperationParams(source), { model: t, axis: axis })
       expect(pocketFlip.pocketOpenings).toBe(source.pocketOpenings)
       expect(accessors.subProject(pocketFlip).component.tPocket('t').openingId).toBe(opening.id)
-      const clusterFlip = flip(source, cluster, axis)
+      const clusterFlip = flip(createBaseOperationParams(source), { model: cluster, axis: axis })
       expect(clusterFlip.pocketOpenings).toBe(source.pocketOpenings)
       expect(accessors.subProject(clusterFlip).component.tPocket('t').openingId).toBe(opening.id)
-      expect(flip(clusterFlip, accessors.subProject(clusterFlip).component.pocketCluster('cluster'), axis)).toEqual(
-        source,
-      )
+      expect(
+        flip(createBaseOperationParams(clusterFlip), {
+          model: accessors.subProject(clusterFlip).component.pocketCluster('cluster'),
+          axis: axis,
+        }),
+      ).toEqual(source)
     })
   })
 })
@@ -834,6 +872,6 @@ it.each(axes)('leaves a constraint and its target models unchanged when flipped 
     },
   })
   const snapshot = structuredClone(source)
-  expect(flip(source, source.constraints.linked, axis)).toBe(source)
+  expect(flip(createBaseOperationParams(source), { model: source.constraints.linked, axis: axis })).toBe(source)
   expect(source).toEqual(snapshot)
 })

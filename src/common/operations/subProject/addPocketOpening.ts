@@ -1,18 +1,12 @@
-import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
-import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
+import type { AddPocketOpeningParamsSchema, BaseOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 
-export type AddPocketOpeningParams = {
-  type: PocketOpeningSchema['type']
-  modelFactory: ReadonlyModelObjectFactorySchema
-}
-
 export const addPocketOpening = (
-  subProject: SubProjectSchema,
-  { type, modelFactory }: AddPocketOpeningParams,
+  { subProject, readonlyFactory }: BaseOperationParamsSchema,
+  { type }: AddPocketOpeningParamsSchema,
 ): SubProjectSchema => {
-  const opening = modelFactory.createPocketOpening({
+  const opening = readonlyFactory.createPocketOpening({
     type,
     forbiddenIds: getSubProjectIds(subProject),
     forbiddenNames: new Set(Object.values(subProject.pocketOpenings).map((opening) => opening.name)),

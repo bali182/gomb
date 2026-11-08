@@ -18,6 +18,7 @@ import { addConstraint } from './addConstraint'
 import { addHole } from './addHole'
 import { addPocketOpening } from './addPocketOpening'
 import { addStitchLine } from './addStitchLine'
+import { createBaseOperationParams } from './testUtils'
 
 const createFactory = () => new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 const fixture = () =>
@@ -33,19 +34,34 @@ const fixture = () =>
   })
 
 describe('model creation in add operations', () => {
+  it.each([false, true])('uses the default leather color only when enabled: %s', (addBaseColor) => {
+    const source = fixture()
+    const base = createBaseOperationParams(source)
+    base.settings.edit.addBaseColor = addBaseColor
+    base.project.colorSettings.leatherColor = 'blue'
+    const result = addComponent(base, { parentId: 'root', type: 'panel', position: 'end' })
+    const added = result.components[result.components.root.children[result.components.root.children.length - 1]]
+    expect(added.color).toBe(addBaseColor ? 'blue' : undefined)
+  })
+
+  it('gives an explicit color precedence over the default leather color', () => {
+    const source = fixture()
+    const base = createBaseOperationParams(source)
+    base.settings.edit.addBaseColor = true
+    base.project.colorSettings.leatherColor = 'blue'
+    const result = addComponent(base, { parentId: 'root', type: 'panel', position: 'end', color: 'red' })
+    expect(result.components[result.components.root.children[result.components.root.children.length - 1]].color).toBe(
+      'red',
+    )
+  })
+
   it('generates component names from the current snapshot when reusing a readonly factory', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
     const modelFactory = createFactory()
-    const params = {
-      type: 'panel' as const,
-      parentId: 'root',
-      position: 'end' as const,
-      stitchingSettings: defaultStitchingSettings,
-      modelFactory,
-    }
-    const first = addComponent(source, params)
-    const second = addComponent(first, params)
+    const params = { type: 'panel' as const, parentId: 'root', position: 'end' as const }
+    const first = addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), params)
+    const second = addComponent(createBaseOperationParams(first, { readonlyFactory: modelFactory }), params)
     const firstId = first.components.root.children[first.components.root.children.length - 1]
     const secondId = second.components.root.children[second.components.root.children.length - 1]
     expect(first.components[firstId]).toMatchObject({ type: 'panel', name: 'Panel 3' })
@@ -59,13 +75,11 @@ describe('model creation in add operations', () => {
     const source = fixture()
     const modelFactory = createFactory()
     const createComponent = vi.spyOn(modelFactory, 'createComponent')
-    const result = addComponent(source, {
+    const result = addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       parentId: 'cluster',
       type: 't-pocket',
       position: 'end',
-      modelFactory,
       color: 'red',
-      stitchingSettings: defaultStitchingSettings,
     })
     const pocket = accessors.subProject(result).component.tPocket(result.components.cluster.children[0])
     expect(pocket).toMatchObject({ openingId: source.defaultPocketOpening, color: 'red', name: 'T-pocket 1' })
@@ -81,15 +95,14 @@ describe('model creation in add operations', () => {
     const source = fixture()
     const modelFactory = createFactory()
     const createComponent = vi.spyOn(modelFactory, 'createComponent')
-    const params = {
-      parentId: 'root',
-      type: 'panel' as const,
-      position: -1,
-      modelFactory,
-      stitchingSettings: defaultStitchingSettings,
-    }
-    expect(addComponent(source, params)).toBe(source)
-    expect(() => addComponent(source, { ...params, parentId: 'missing' })).toThrow('Missing parent')
+    const params = { parentId: 'root', type: 'panel' as const, position: -1 }
+    expect(addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), params)).toBe(source)
+    expect(() =>
+      addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
+        ...params,
+        parentId: 'missing',
+      }),
+    ).toThrow('Missing parent')
     expect(createComponent).not.toHaveBeenCalled()
   })
 
@@ -98,7 +111,7 @@ describe('model creation in add operations', () => {
     const snapshot = structuredClone(source)
     const modelFactory = createFactory()
     const createHole = vi.spyOn(modelFactory, 'createHole')
-    const result = addHole(source, { componentId: 'panel', modelFactory })
+    const result = addHole(createBaseOperationParams(source, { readonlyFactory: modelFactory }), { targetId: 'panel' })
     expect(result.holes[result.holes.length - 1]).toMatchObject({ componentId: 'panel', name: 'Hole 2' })
     expect(createHole).toHaveBeenCalledWith(expect.objectContaining({ forbiddenIds: getSubProjectIds(source) }))
     expect(source).toEqual(snapshot)
@@ -108,7 +121,9 @@ describe('model creation in add operations', () => {
     const source = fixture()
     const modelFactory = createFactory()
     const createHole = vi.spyOn(modelFactory, 'createHole')
-    expect(addHole(source, { componentId: 'cluster', modelFactory })).toBe(source)
+    expect(addHole(createBaseOperationParams(source, { readonlyFactory: modelFactory }), { targetId: 'cluster' })).toBe(
+      source,
+    )
     expect(createHole).not.toHaveBeenCalled()
   })
 
@@ -116,11 +131,9 @@ describe('model creation in add operations', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
     const modelFactory = createFactory()
-    const result = addStitchLine(source, {
-      type: 'component-bounds-stitch-line',
+    const result = addStitchLine(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
       targetId: 'hole',
       targetType: 'hole',
-      modelFactory,
     })
     expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject({
       ...defaultComponentBoundsStitchLine,
@@ -146,11 +159,10 @@ describe('model creation in add operations', () => {
           stitchLines: [d.componentBoundsStitchLine({ id: 'existing', targetType: 'component', targetId })],
         })
         const snapshot = structuredClone(source)
-        const result = addStitchLine(source, {
+        const result = addStitchLine(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
           type: 'component-bounds-stitch-line',
           targetId,
           targetType: 'component',
-          modelFactory: createFactory(),
         })
         expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject({
           type: 'component-bounds-stitch-line',
@@ -172,11 +184,10 @@ describe('model creation in add operations', () => {
   )
 
   it.each(['root', 'panel'])('keeps every side and corner enabled when creating stitching on %s', (targetId) => {
-    const result = addStitchLine(fixture(), {
+    const result = addStitchLine(createBaseOperationParams(fixture(), { readonlyFactory: createFactory() }), {
       type: 'component-bounds-stitch-line',
       targetType: 'component',
       targetId,
-      modelFactory: createFactory(),
     })
     expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject(defaultComponentBoundsStitchLine)
   })
@@ -191,11 +202,9 @@ describe('model creation in add operations', () => {
       ],
       holes: [d.hole({ id: 'hole', componentId: 'front' })],
     })
-    const result = addStitchLine(source, {
-      type: 'component-bounds-stitch-line',
+    const result = addStitchLine(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
       targetType: 'hole',
       targetId: 'hole',
-      modelFactory: createFactory(),
     })
     expect(result.stitchLines[result.stitchLines.length - 1]).toMatchObject(defaultComponentBoundsStitchLine)
   })
@@ -210,11 +219,10 @@ describe('model creation in add operations', () => {
         d.frontPocket({ id: 'front', openingId: 'opening' }),
       ],
     })
-    const result = addStitchLine(source, {
+    const result = addStitchLine(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
       type: 't-pocket-stitch-line',
       targetType: 'component',
       targetId,
-      modelFactory: createFactory(),
     })
     expect(result.stitchLines[result.stitchLines.length - 1]).toEqual({
       ...defaultTPocketStitchLine,
@@ -229,7 +237,9 @@ describe('model creation in add operations', () => {
   it('adds an opening using the current names without changing the default reference', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = addPocketOpening(source, { type: 'straight', modelFactory: createFactory() })
+    const result = addPocketOpening(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
+      type: 'straight',
+    })
     const added = Object.values(result.pocketOpenings).find(
       (opening) => !Object.prototype.hasOwnProperty.call(source.pocketOpenings, opening.id),
     )
@@ -241,7 +251,9 @@ describe('model creation in add operations', () => {
   it('creates an empty constraint without changing the source', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = addConstraint(source, { type: 'equal-constraint', modelFactory: createFactory() })
+    const result = addConstraint(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
+      type: 'equal-constraint',
+    })
     const constraint = Object.values(result.constraints)[0]
     expect(constraint).toMatchObject({ type: 'equal-constraint', fields: [] })
     expect(constraint.id).toMatch(/^equal-constraint-/)

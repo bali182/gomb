@@ -3,6 +3,7 @@ import { d } from '../../testData'
 import { EN } from '../../translations/en'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { cloneStitchLine } from './cloneStitchLine'
+import { createBaseOperationParams } from './testUtils'
 
 const nameGenerator = new NameGenerator(EN.defaultNames)
 
@@ -39,7 +40,7 @@ describe('cloneStitchLine', () => {
       ],
     })
     const snapshot = structuredClone(source)
-    const result = cloneStitchLine(source, { stitchLineId: 'stitch', nameGenerator })
+    const result = cloneStitchLine(createBaseOperationParams(source, { name: nameGenerator }), { id: 'stitch' })
     expect(result.stitchLines).toHaveLength(2)
     expect(result.stitchLines[0]).toBe(source.stitchLines[0])
     expect(result.stitchLines[1]).toEqual({
@@ -54,6 +55,6 @@ describe('cloneStitchLine', () => {
   })
   it('retains the source for an unknown stitch line', () => {
     const source = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) })
-    expect(cloneStitchLine(source, { stitchLineId: 'missing', nameGenerator })).toBe(source)
+    expect(cloneStitchLine(createBaseOperationParams(source, { name: nameGenerator }), { id: 'missing' })).toBe(source)
   })
 })

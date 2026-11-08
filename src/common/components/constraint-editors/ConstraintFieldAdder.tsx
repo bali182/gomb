@@ -181,7 +181,7 @@ export const ConstraintFieldAdder: FC<ConstraintFieldAdderProps> = ({ constraint
       return
     }
     setEditingInputId(undefined)
-    addConstraintFields(constraint.id, selectedProperty.fields)
+    addConstraintFields({ constraintId: constraint.id, fields: selectedProperty.fields })
     setSelection({ modelIds: [], property: undefined })
   }, [addConstraintFields, constraint.id, isComputing, selectedProperty, setEditingInputId])
 

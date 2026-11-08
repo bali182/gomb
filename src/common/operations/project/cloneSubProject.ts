@@ -7,7 +7,8 @@ import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
-import { cloneComponentTree } from '../subProject/cloneComponentTree'
+import { IdGenerator } from '../../utils/random/IdGenerator'
+import { cloneComponentTree } from '../subProject/utils/cloneComponentTree'
 import { getCloneIdMappings } from '../subProject/utils/getCloneIdMappings'
 
 export type CloneSubProjectParams = {
@@ -25,7 +26,7 @@ export const cloneSubProject = (
     return project
   }
 
-  const idMappings = getCloneIdMappings(sourceSubProject)
+  const idMappings = getCloneIdMappings(sourceSubProject, new IdGenerator())
   const cloneResult = cloneComponentTree({
     subProject: sourceSubProject,
     componentId: sourceSubProject.root,

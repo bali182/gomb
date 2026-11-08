@@ -1,4 +1,4 @@
-import type { HasComponentTargetSchema, HasHoleTargetSchema } from '../../schemas/common'
+import type { BaseOperationParamsSchema, MoveStitchLineParamsSchema } from '../../schemas/operations'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -6,19 +6,12 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { canAddStitchLine } from './utils/componentRules'
 
-export type MoveStitchLineToComponentParams = HasComponentTargetSchema & {
-  stitchLineId: string
-}
-
-export type MoveStitchLineToHoleParams = HasHoleTargetSchema & {
-  stitchLineId: string
-}
-
-export type MoveStitchLineParams = MoveStitchLineToHoleParams | MoveStitchLineToComponentParams
-
-export const moveStitchLine = (subProject: SubProjectSchema, params: MoveStitchLineParams): SubProjectSchema => {
+export const moveStitchLine = (
+  { subProject }: BaseOperationParamsSchema,
+  params: MoveStitchLineParamsSchema,
+): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const stitchLine = accessor.optional.stitchLine.byId(params.stitchLineId)
+  const stitchLine = accessor.optional.stitchLine.byId(params.id)
 
   if (!isDefined(stitchLine)) {
     return subProject

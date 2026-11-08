@@ -1,5 +1,5 @@
 import { Button } from '@chakra-ui/react'
-import { useMemo, type FC } from 'react'
+import { useCallback, useMemo, type FC } from 'react'
 import { PiWarningCircle } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -37,6 +37,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   const { t } = useTranslation()
   const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
+  const accessor = accessors.subProject(subProject)
   const { addComponent } = useSubProjectOperations()
   const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
     switch (component.orientation) {
@@ -50,10 +51,16 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         return ['topRightRadius', 'bottomRightRadius']
     }
   }, [component.orientation])
-  const accessor = accessors.subProject(subProject)
+
   const hasFront = component.children.some((id) => {
     return isDefined(accessor.optional.component.frontPocket(id))
   })
+
+  const handleAdd = useCallback(
+    () => () => addComponent({ parentId: component.id, type: 'front-pocket', position: 'end' }),
+    [addComponent, component.id],
+  )
+
   if (!hasFront) {
     return (
       <CommonEmptyState
@@ -61,7 +68,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         title={t.project.editors.emptyStates.missingFrontPocket.title}
         description={t.project.editors.emptyStates.missingFrontPocket.description}
         content={
-          <Button disabled={isComputing} size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
+          <Button disabled={isComputing} size="xs" onClick={handleAdd}>
             {t.project.editors.emptyStates.missingFrontPocket.action}
           </Button>
         }

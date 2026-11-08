@@ -7,6 +7,7 @@ import { accessors } from '../../utils/accessors'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { clonePocketOpening } from './clonePocketOpening'
+import { createBaseOperationParams } from './testUtils'
 
 const nameGenerator = new NameGenerator(EN.defaultNames)
 const openings: PocketOpeningSchema[] = [
@@ -50,7 +51,7 @@ describe('clonePocketOpening', () => {
   it.each(openings)('copies $type with a new ID and name', (opening) => {
     const source = fixture(opening)
     const snapshot = structuredClone(source)
-    const result = clonePocketOpening(source, { openingId: opening.id, nameGenerator })
+    const result = clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), { id: opening.id })
     const originalIds = getSubProjectIds(source)
     const copies = Object.values(result.pocketOpenings).filter((opening) => !originalIds.has(opening.id))
     expect(copies).toHaveLength(1)
@@ -82,7 +83,7 @@ describe('clonePocketOpening', () => {
         occupied: { id: 'occupied', type: 'straight', name: 'Opening 2' },
       },
     }
-    const result = clonePocketOpening(source, { openingId: opening.id, nameGenerator })
+    const result = clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), { id: opening.id })
     const originalIds = getSubProjectIds(source)
     const copies = Object.values(result.pocketOpenings).filter((opening) => !originalIds.has(opening.id))
     expect(copies).toHaveLength(1)
@@ -92,7 +93,9 @@ describe('clonePocketOpening', () => {
 
   it('clones the default opening without changing which opening is the default', () => {
     const source = fixture(openings[0])
-    const result = clonePocketOpening(source, { openingId: source.defaultPocketOpening, nameGenerator })
+    const result = clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), {
+      id: source.defaultPocketOpening,
+    })
     expect(Object.keys(result.pocketOpenings)).toHaveLength(Object.keys(source.pocketOpenings).length + 1)
     expect(result.defaultPocketOpening).toBe(source.defaultPocketOpening)
     expect(result.pocketOpenings[source.defaultPocketOpening]).toBe(source.pocketOpenings[source.defaultPocketOpening])
@@ -122,7 +125,9 @@ describe('clonePocketOpening', () => {
       },
     }
     const snapshot = structuredClone(source)
-    const result = clonePocketOpening(source, { openingId: openings[1].id, nameGenerator })
+    const result = clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), {
+      id: openings[1].id,
+    })
     expect(result.constraints).toBe(source.constraints)
     expect(result.components).toBe(source.components)
     expect(source).toEqual(snapshot)
@@ -131,7 +136,9 @@ describe('clonePocketOpening', () => {
   it('returns the same subproject for a missing source', () => {
     const source = fixture(openings[0])
     const snapshot = structuredClone(source)
-    expect(clonePocketOpening(source, { openingId: 'missing', nameGenerator })).toBe(source)
+    expect(clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), { id: 'missing' })).toBe(
+      source,
+    )
     expect(source).toEqual(snapshot)
   })
 })

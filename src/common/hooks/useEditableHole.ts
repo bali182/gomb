@@ -34,7 +34,7 @@ export const useEditableHole = (holeId: string): UseEditableHoleResult => {
   )
   const commit = useCallback(
     (updatedHole: HoleSchema): void => {
-      updateHole(updatedHole)
+      updateHole({ hole: updatedHole })
     },
     [updateHole],
   )

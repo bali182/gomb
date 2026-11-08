@@ -37,7 +37,7 @@ export const useEditableComponent = (componentId: string): UseEditableComponentR
 
   const commit = useCallback(
     (updatedComponent: ComponentSchema): void => {
-      updateComponent(updatedComponent)
+      updateComponent({ component: updatedComponent })
     },
     [updateComponent],
   )

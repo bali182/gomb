@@ -65,8 +65,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLineToComponent, cloneComponent, deleteComponent, flip } =
-    useSubProjectOperations()
+  const { addComponent, addHole, addStitchLine, cloneComponent, deleteComponent, flip } = useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -111,7 +110,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const handleAddChild = useCallback(
     (type: ComponentSchema['type']): void => {
-      addComponent(component.id, type, type === 't-pocket' ? 'start' : 'end')
+      addComponent({ parentId: component.id, type, position: type === 't-pocket' ? 'start' : 'end' })
       onAddChild({ targetId: component.id, targetType: 'component' }, type)
     },
     [addComponent, component.id, onAddChild],
@@ -124,7 +123,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         break
       }
       default: {
-        deleteComponent(component.id)
+        deleteComponent({ id: component.id })
         onDelete(component.id)
         break
       }
@@ -140,7 +139,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
       case 't-pocket':
       case 'panel':
       case 'pocket-cluster': {
-        cloneComponent(component.id)
+        cloneComponent({ id: component.id })
         break
       }
     }
@@ -148,14 +147,14 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
 
   const handleAddStitchLine = useCallback(
     (type: StitchLineSchema['type']): void => {
-      addStitchLineToComponent(component.id, type)
+      addStitchLine({ targetType: 'component', targetId: component.id, type })
       onAddStitchLine({ targetId: component.id, targetType: 'component' }, type)
     },
-    [addStitchLineToComponent, component.id, onAddStitchLine],
+    [addStitchLine, component.id, onAddStitchLine],
   )
 
   const handleAddHole = useCallback((): void => {
-    addHole(component.id)
+    addHole({ targetId: component.id })
     onAddHole({ targetId: component.id, targetType: 'component' })
   }, [addHole, component.id, onAddHole])
 
@@ -186,10 +185,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const canClone = narrowers.is.rootPanel(component) || canCloneComponent(component)
   const canDelete = narrowers.is.rootPanel(component) || canDeleteComponent(component, subProject)
   const handleFlipHorizontal = useCallback((): void => {
-    flip(component, 'horizontal')
+    flip({ model: component, axis: 'horizontal' })
   }, [component, flip])
   const handleFlipVertical = useCallback((): void => {
-    flip(component, 'vertical')
+    flip({ model: component, axis: 'vertical' })
   }, [component, flip])
   return (
     <Box onClick={handleActionsClick}>

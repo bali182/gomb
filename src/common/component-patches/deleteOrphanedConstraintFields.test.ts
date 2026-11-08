@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
+import { createBaseOperationParams } from '../operations/subProject/testUtils'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { EN } from '../translations/en'
@@ -120,7 +121,7 @@ describe('deleteOrphanedConstraintFields', () => {
   it('cleans members after patchers remove holes and stitches belonging to a deleted component', () => {
     const source = fixture()
     const original = structuredClone(source)
-    const deleted = deleteComponent(source, { componentId: 'panel' })
+    const deleted = deleteComponent(createBaseOperationParams(source), { id: 'panel' })
     const result = getPatchedSubProject(deleted, getComputedSubProject(deleted, defaultStitchingSettings))
     expect(result.holes).toEqual([])
     expect(result.stitchLines.map((stitchLine) => stitchLine.id)).not.toContain('bounds')
