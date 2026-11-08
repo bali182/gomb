@@ -558,12 +558,12 @@ export const HU = {
           sidesAndCorners: {
             title: 'Varrásvonal',
             startOffset: {
-              label: 'Kezdő eltolás',
+              label: 'Eltolás',
               tooltip:
                 'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Teljesen lekerekített zárt körön a kezdőpontot tolja el a kerület mentén.',
             },
             endOffset: {
-              label: 'Végeltolás',
+              label: 'Eltolás',
               tooltip:
                 'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Zárt körön nincs hatása.',
             },

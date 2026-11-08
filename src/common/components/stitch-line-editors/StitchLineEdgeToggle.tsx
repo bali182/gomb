@@ -1,16 +1,23 @@
-import { Box, type CssProperties, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
-import { useCallback, useMemo, type FC } from 'react'
+import { Box, type CssProperties, type SystemStyleObject } from '@chakra-ui/react'
+import { useCallback, useMemo, useRef, type FC } from 'react'
 import { useEditorContext } from '../../contexts/EditorContext'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
 import { EditorButton } from '../common/EditorButton'
-import { Tooltip } from '../common/Tooltip'
+import { Tooltip, type TooltipProps } from '../common/Tooltip'
 import {
   SELECTED_BORDER_COLOR,
   SELECTED_HOVER_BORDER_COLOR,
   UNSELECTED_BORDER_COLOR,
   UNSELECTED_HOVER_BORDER_COLOR,
 } from './colors'
+import {
+  STITCH_LINE_HIT_AREA_HEIGHT,
+  STITCH_LINE_HIT_AREA_WIDTH,
+  STITCH_LINE_PADDING_X,
+  STITCH_LINE_PADDING_Y,
+  STITCH_LINE_SEGMENT_SIZE,
+} from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSegmentLayout = {
   button: SystemStyleObject
@@ -28,11 +35,21 @@ type StitchLineEdgeToggleProps = {
 
 export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, onClick, selected, side, tooltip }) => {
   const { isComputing, setEditingInputId } = useEditorContext()
+  const visualRef = useRef<HTMLDivElement>(null)
   const handleClick = useCallback((): void => {
     setEditingInputId(undefined)
     onClick()
   }, [onClick, setEditingInputId])
   const layout = useMemo<StitchLineSegmentLayout>(() => getSideLayout(side), [side])
+  const positioning = useMemo<TooltipProps['positioning']>(
+    () => ({
+      getAnchorElement: (): HTMLDivElement | null => visualRef.current,
+      placement: SIDE_TOOLTIP_PLACEMENTS[side],
+      gutter: 4,
+      flip: false,
+    }),
+    [side],
+  )
 
   const borderColor = useMemo<CssProperties['borderColor']>(
     () => (selected ? SELECTED_BORDER_COLOR : UNSELECTED_BORDER_COLOR),
@@ -48,7 +65,7 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, 
   )
 
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={tooltip} positioning={positioning}>
       <Box {...layout.root}>
         <EditorButton
           readOnly={isComputing}
@@ -61,7 +78,7 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, 
           unstyled
           {...layout.button}
         >
-          <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
+          <Box ref={visualRef} borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
         </EditorButton>
       </Box>
     </Tooltip>
@@ -69,26 +86,35 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, 
 }
 
 const EDGE_BORDER_WIDTH: CssProperties['borderWidth'] = 'medium'
-const EDGE_SEGMENT_SIZE: Tokens['sizes'] = '10'
-const EDGE_HIT_SLOP: Tokens['spacing'] = '10'
-const EDGE_HIT_AREA_SIZE: Tokens['sizes'] = '20'
-const NEGATIVE_EDGE_HIT_SLOP: Tokens['spacing'] = `-${EDGE_HIT_SLOP}` as Tokens['spacing']
+
+const SIDE_TOOLTIP_PLACEMENTS: Record<StitchSideSchema, StitchSideSchema> = {
+  top: 'bottom',
+  right: 'left',
+  bottom: 'top',
+  left: 'right',
+}
 
 const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
   const layouts: Record<StitchSideSchema, StitchLineSegmentLayout> = {
     bottom: {
-      button: { bottom: NEGATIVE_EDGE_HIT_SLOP, height: EDGE_HIT_AREA_SIZE, left: 0, position: 'absolute', right: 0 },
+      button: {
+        bottom: `-${STITCH_LINE_PADDING_Y}`,
+        height: STITCH_LINE_HIT_AREA_HEIGHT,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+      },
       root: {
         alignSelf: 'end',
         gridArea: 'bottom',
-        height: EDGE_SEGMENT_SIZE,
+        height: STITCH_LINE_SEGMENT_SIZE,
         justifySelf: 'stretch',
         position: 'relative',
         width: '100%',
       },
       visual: {
         borderBottomWidth: EDGE_BORDER_WIDTH,
-        bottom: EDGE_HIT_SLOP,
+        bottom: STITCH_LINE_PADDING_Y,
         height: 0,
         left: 0,
         position: 'absolute',
@@ -96,49 +122,67 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
       },
     },
     left: {
-      button: { bottom: 0, left: NEGATIVE_EDGE_HIT_SLOP, position: 'absolute', top: 0, width: EDGE_HIT_AREA_SIZE },
+      button: {
+        bottom: 0,
+        left: `-${STITCH_LINE_PADDING_X}`,
+        position: 'absolute',
+        top: 0,
+        width: STITCH_LINE_HIT_AREA_WIDTH,
+      },
       root: {
         alignSelf: 'stretch',
         gridArea: 'left',
         height: '100%',
         justifySelf: 'start',
         position: 'relative',
-        width: EDGE_SEGMENT_SIZE,
+        width: STITCH_LINE_SEGMENT_SIZE,
       },
       visual: {
         borderLeftWidth: EDGE_BORDER_WIDTH,
         height: '100%',
-        left: EDGE_HIT_SLOP,
+        left: STITCH_LINE_PADDING_X,
         position: 'absolute',
         top: 0,
         width: 0,
       },
     },
     right: {
-      button: { bottom: 0, position: 'absolute', right: NEGATIVE_EDGE_HIT_SLOP, top: 0, width: EDGE_HIT_AREA_SIZE },
+      button: {
+        bottom: 0,
+        position: 'absolute',
+        right: `-${STITCH_LINE_PADDING_X}`,
+        top: 0,
+        width: STITCH_LINE_HIT_AREA_WIDTH,
+      },
       root: {
         alignSelf: 'stretch',
         gridArea: 'right',
         height: '100%',
         justifySelf: 'end',
         position: 'relative',
-        width: EDGE_SEGMENT_SIZE,
+        width: STITCH_LINE_SEGMENT_SIZE,
       },
       visual: {
         borderRightWidth: EDGE_BORDER_WIDTH,
         height: '100%',
-        right: EDGE_HIT_SLOP,
+        right: STITCH_LINE_PADDING_X,
         position: 'absolute',
         top: 0,
         width: 0,
       },
     },
     top: {
-      button: { height: EDGE_HIT_AREA_SIZE, left: 0, position: 'absolute', right: 0, top: NEGATIVE_EDGE_HIT_SLOP },
+      button: {
+        height: STITCH_LINE_HIT_AREA_HEIGHT,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: `-${STITCH_LINE_PADDING_Y}`,
+      },
       root: {
         alignSelf: 'start',
         gridArea: 'top',
-        height: EDGE_SEGMENT_SIZE,
+        height: STITCH_LINE_SEGMENT_SIZE,
         justifySelf: 'stretch',
         position: 'relative',
         width: '100%',
@@ -148,7 +192,7 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
         height: 0,
         left: 0,
         position: 'absolute',
-        top: EDGE_HIT_SLOP,
+        top: STITCH_LINE_PADDING_Y,
         width: '100%',
       },
     },

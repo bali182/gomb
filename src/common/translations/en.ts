@@ -621,12 +621,12 @@ export const EN = {
           sidesAndCorners: {
             title: 'Seam line',
             startOffset: {
-              label: 'Start offset',
+              label: 'Offset',
               tooltip:
                 'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. On a fully rounded closed route, start offset shifts the punching start around the perimeter.',
             },
             endOffset: {
-              label: 'End offset',
+              label: 'Offset',
               tooltip:
                 'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. Ignored on a closed route.',
             },

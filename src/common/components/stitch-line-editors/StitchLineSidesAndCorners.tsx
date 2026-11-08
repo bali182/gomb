@@ -1,5 +1,5 @@
 import { Grid } from '@chakra-ui/react'
-import { useCallback, type FC } from 'react'
+import { useCallback, type FC, type ReactNode } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import {
   canToggleStitchLineSideOrCorner,
@@ -10,13 +10,24 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { StitchLineCornerToggle } from './StitchLineCornerToggle'
 import { StitchLineEdgeToggle } from './StitchLineEdgeToggle'
+import { StitchLineEditorsOverlay, type StitchLineOffsetEditorRenderer } from './StitchLineEditorsOverlay'
+import { STITCH_LINE_PADDING_X, STITCH_LINE_PADDING_Y } from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSidesAndCornersProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
+  startOffsetEditor?: StitchLineOffsetEditorRenderer
+  endOffsetEditor?: StitchLineOffsetEditorRenderer
+  directionEditor?: ReactNode
 }
 
-export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ editable, onChange }) => {
+export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
+  editable,
+  onChange,
+  startOffsetEditor,
+  endOffsetEditor,
+  directionEditor,
+}) => {
   const { t } = useTranslation()
   const toggle = useCallback(
     (field: StitchLineSideOrCornerField): void => {
@@ -34,8 +45,11 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
       gridTemplateColumns="auto minmax(0, 1fr) auto"
       gridTemplateRows="auto minmax(0, 1fr) auto"
       position="relative"
-      minHeight="280px"
-      padding="6"
+      width="100%"
+      minWidth="0"
+      minHeight="80"
+      px={STITCH_LINE_PADDING_X}
+      py={STITCH_LINE_PADDING_Y}
     >
       <StitchLineCornerToggle
         corner="top-left"
@@ -92,6 +106,12 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ 
         selected={editable.bottomRightCorner}
         onClick={() => toggle('bottomRightCorner')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomRightCorner.tooltip}
+      />
+      <StitchLineEditorsOverlay
+        editable={editable}
+        startOffsetEditor={startOffsetEditor}
+        endOffsetEditor={endOffsetEditor}
+        directionEditor={directionEditor}
       />
     </Grid>
   )

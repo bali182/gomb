@@ -1,4 +1,4 @@
-import { Box, HStack, Text, VStack } from '@chakra-ui/react'
+import { Text, VStack } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { useSubProject } from '../../../hooks/useSubProject'
@@ -11,8 +11,8 @@ import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
+import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
-import { Tooltip } from '../../common/Tooltip'
 import { StitchLineDirectionControl } from '../StitchLineDirectionControl'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
 
@@ -72,11 +72,12 @@ export const StitchSidesAndCornersSection = ({
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.stitchLines.sidesAndCorners.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionFullWidthContent issue={stitchingIssues}>
-        <Box position="relative">
-          <StitchLineSidesAndCorners editable={editable} onChange={onChange} />
-          <VStack position="absolute" inset="0" justifyContent="center" gap="5" pointerEvents="none">
-            <VStack gap="1.5" pointerEvents="auto">
+      <SectionGroup.SectionFullWidthContent issue={stitchingIssues} padded={false}>
+        <StitchLineSidesAndCorners
+          editable={editable}
+          onChange={onChange}
+          directionEditor={
+            <VStack gap="1.5">
               <StitchLineDirectionControl
                 value={editable}
                 disabled={!isDefined(route) || route.fragments.length === 0}
@@ -86,42 +87,42 @@ export const StitchSidesAndCornersSection = ({
                 {t.project.editors.sections.stitchLines.sidesAndCorners.stitchDirection.label}
               </Text>
             </VStack>
-            <HStack gap="4" alignItems="start" pointerEvents="auto">
-              <VStack gap="1.5" width="100px">
-                <EditorNumberInput
-                  modelId={editable.id}
-                  disabled={startDisabled}
-                  field="startOffset"
-                  issue={issues.startOffset}
-                  onChange={handleStartOffsetChange}
-                  unit="mm"
-                  value={editable.startOffset}
-                />
-                <Tooltip content={t.project.editors.sections.stitchLines.sidesAndCorners.startOffset.tooltip}>
-                  <Text color="fg.muted" textStyle="xs" textAlign="center">
-                    {t.project.editors.sections.stitchLines.sidesAndCorners.startOffset.label}
-                  </Text>
-                </Tooltip>
-              </VStack>
-              <VStack gap="1.5" width="100px">
-                <EditorNumberInput
-                  modelId={editable.id}
-                  disabled={endDisabled}
-                  field="endOffset"
-                  issue={issues.endOffset}
-                  onChange={handleEndOffsetChange}
-                  unit="mm"
-                  value={editable.endOffset}
-                />
-                <Tooltip content={t.project.editors.sections.stitchLines.sidesAndCorners.endOffset.tooltip}>
-                  <Text color="fg.muted" textStyle="xs" textAlign="center">
-                    {t.project.editors.sections.stitchLines.sidesAndCorners.endOffset.label}
-                  </Text>
-                </Tooltip>
-              </VStack>
-            </HStack>
-          </VStack>
-        </Box>
+          }
+          startOffsetEditor={
+            startDisabled
+              ? undefined
+              : (arrowPosition: NumberInputArrowPosition | undefined): ReactNode => (
+                  <VStack width="24">
+                    <EditorNumberInput
+                      modelId={editable.id}
+                      field="startOffset"
+                      issue={issues.startOffset}
+                      onChange={handleStartOffsetChange}
+                      unit="mm"
+                      value={editable.startOffset}
+                      arrowPosition={arrowPosition}
+                    />
+                  </VStack>
+                )
+          }
+          endOffsetEditor={
+            endDisabled
+              ? undefined
+              : (arrowPosition: NumberInputArrowPosition | undefined): ReactNode => (
+                  <VStack width="24">
+                    <EditorNumberInput
+                      modelId={editable.id}
+                      field="endOffset"
+                      issue={issues.endOffset}
+                      onChange={handleEndOffsetChange}
+                      unit="mm"
+                      value={editable.endOffset}
+                      arrowPosition={arrowPosition}
+                    />
+                  </VStack>
+                )
+          }
+        />
       </SectionGroup.SectionFullWidthContent>
     </SectionGroup.Section>
   )
