@@ -913,9 +913,15 @@ export const EN = {
           description: 'Choose an object and then a field below to start linking.',
         },
         missingFrontPocket: {
-          title: 'Missing front pocket',
-          description: 'A pocket cluster must contain at least one front pocket.',
-          action: 'Add front pocket',
+          title: 'Empty pocket cluster',
+          description:
+            'An empty pocket cluster has no physical parts. Add as many pockets as you like to create a functional pocket layout.',
+          actions: {
+            one: '1 Pocket',
+            two: '2 Pockets',
+            three: '3 Pockets',
+          },
+          additionalDescription: 'You can change the number of pockets at any time in the tree or this editor.',
         },
       } satisfies Record<string, EmptyStateTranslationSchema>,
     },

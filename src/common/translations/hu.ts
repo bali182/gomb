@@ -848,9 +848,15 @@ export const HU = {
           description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
         },
         missingFrontPocket: {
-          title: 'Hiányzó elülső zseb',
-          description: 'A zsebcsoportnak taralmaznia kell legalább egy elülső zsebet.',
-          action: 'Elülső zseb hozzáadása',
+          title: 'Üres zsebzsoport',
+          description:
+            'Egy üres zsebcsoport nem tartalmaz anyagdarabot. Adj hozzá tetszőleges számú zsebet a rendeltetésszerű használathoz.',
+          actions: {
+            one: '1 Zseb',
+            two: '2 Zseb',
+            three: '3 Zseb',
+          },
+          additionalDescription: 'A zsebek száma később bármikor módosítható a fában vagy ebben a szerkesztőben.',
         },
       },
     },
