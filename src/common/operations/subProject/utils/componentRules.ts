@@ -1,10 +1,10 @@
 import type { ComponentSchema } from '../../../schemas/components'
+import type { MoveComponentParamsSchema } from '../../../schemas/operations'
 import type { StitchLineSchema } from '../../../schemas/stitching'
 import type { SubProjectSchema } from '../../../schemas/subProject'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
-import type { MoveComponentParams } from '../moveComponent'
 import { getComponentDescendants } from './getComponentDescendants'
 
 export const canAddChild = (
@@ -77,9 +77,9 @@ export const canAddStitchLine = (
   return true
 }
 
-export const canMoveComponent = (subProject: SubProjectSchema, params: MoveComponentParams): boolean => {
+export const canMoveComponent = (subProject: SubProjectSchema, params: MoveComponentParamsSchema): boolean => {
   const accessor = accessors.subProject(subProject)
-  const component = accessor.optional.component.byId(params.componentId)
+  const component = accessor.optional.component.byId(params.id)
   const parent = accessor.optional.component.byId(params.targetParentId)
   if (
     !isDefined(component) ||

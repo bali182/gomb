@@ -1,21 +1,15 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { constraintFieldBlockers } from '../../logic/constraints/constraintFieldBlockers'
 import type { ConstraintFieldSchema } from '../../schemas/constraints'
-import type { ConstraintFieldInputSchema, ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
+import type { AddConstraintFieldsParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 
-export type AddConstraintFieldsParams = {
-  constraintId: string
-  fields: ConstraintFieldInputSchema[]
-  modelFactory: ReadonlyModelObjectFactorySchema
-}
-
 export const addConstraintFields = (
-  subProject: SubProjectSchema,
-  { constraintId, fields: inputs, modelFactory }: AddConstraintFieldsParams,
+  { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
+  { constraintId, fields: inputs }: AddConstraintFieldsParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
   const constraint = accessor.optional.constraint.byId(constraintId)
@@ -25,7 +19,7 @@ export const addConstraintFields = (
   const forbiddenIds = getSubProjectIds(subProject)
   const fields: ConstraintFieldSchema[] = [...constraint.fields]
   for (const input of inputs) {
-    const field = modelFactory.createConstraintField({ ...input, forbiddenIds })
+    const field = readonlyFactory.createConstraintField({ ...input, forbiddenIds })
     const model = accessor.optional.constraint.model(field)
     if (!isDefined(model)) {
       continue

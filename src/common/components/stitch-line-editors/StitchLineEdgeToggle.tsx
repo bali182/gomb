@@ -1,16 +1,21 @@
-import { Box, type CssProperties, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
-import { useCallback, useMemo, type FC } from 'react'
+import { Box, type CssProperties, type SystemStyleObject } from '@chakra-ui/react'
+import { useCallback, useMemo, useRef, type FC } from 'react'
 import { useEditorContext } from '../../contexts/EditorContext'
 
 import type { StitchSideSchema } from '../../schemas/stitching'
 import { EditorButton } from '../common/EditorButton'
-import { Tooltip } from '../common/Tooltip'
+import { Tooltip, type TooltipProps } from '../common/Tooltip'
 import {
   SELECTED_BORDER_COLOR,
   SELECTED_HOVER_BORDER_COLOR,
   UNSELECTED_BORDER_COLOR,
   UNSELECTED_HOVER_BORDER_COLOR,
 } from './colors'
+import {
+  STITCH_LINE_PADDING_X,
+  STITCH_LINE_PADDING_Y,
+  STITCH_LINE_SEGMENT_SIZE,
+} from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSegmentLayout = {
   button: SystemStyleObject
@@ -19,19 +24,30 @@ type StitchLineSegmentLayout = {
 }
 
 type StitchLineEdgeToggleProps = {
+  disabled: boolean
   onClick: () => void
   selected: boolean
   side: StitchSideSchema
   tooltip: string
 }
 
-export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, selected, side, tooltip }) => {
+export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ disabled, onClick, selected, side, tooltip }) => {
   const { isComputing, setEditingInputId } = useEditorContext()
+  const visualRef = useRef<HTMLDivElement>(null)
   const handleClick = useCallback((): void => {
     setEditingInputId(undefined)
     onClick()
   }, [onClick, setEditingInputId])
   const layout = useMemo<StitchLineSegmentLayout>(() => getSideLayout(side), [side])
+  const positioning = useMemo<TooltipProps['positioning']>(
+    () => ({
+      getAnchorElement: (): HTMLDivElement | null => visualRef.current,
+      placement: SIDE_TOOLTIP_PLACEMENTS[side],
+      gutter: 4,
+      flip: false,
+    }),
+    [side],
+  )
 
   const borderColor = useMemo<CssProperties['borderColor']>(
     () => (selected ? SELECTED_BORDER_COLOR : UNSELECTED_BORDER_COLOR),
@@ -41,24 +57,26 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
     () => (selected ? SELECTED_HOVER_BORDER_COLOR : UNSELECTED_HOVER_BORDER_COLOR),
     [selected],
   )
-  const hover = useMemo<SystemStyleObject>(
-    () => ({ '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor } }),
-    [hoverBorderColor],
+  const hover = useMemo<SystemStyleObject | undefined>(
+    () => (disabled ? undefined : { '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor } }),
+    [disabled, hoverBorderColor],
   )
 
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={tooltip} positioning={positioning}>
       <Box {...layout.root}>
         <EditorButton
           readOnly={isComputing}
           aria-pressed={selected}
-          cursor="pointer"
+          cursor={disabled ? 'not-allowed' : 'pointer'}
+          disabled={disabled}
+          _disabled={{ opacity: selected ? 1 : 0.4 }}
           onClick={handleClick}
           _hover={hover}
           unstyled
           {...layout.button}
         >
-          <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
+          <Box ref={visualRef} borderColor={borderColor} data-stitch-line-visual="" {...layout.visual} />
         </EditorButton>
       </Box>
     </Tooltip>
@@ -66,102 +84,113 @@ export const StitchLineEdgeToggle: FC<StitchLineEdgeToggleProps> = ({ onClick, s
 }
 
 const EDGE_BORDER_WIDTH: CssProperties['borderWidth'] = 'medium'
-const EDGE_SEGMENT_SIZE: Tokens['sizes'] = '10'
-const EDGE_HIT_SLOP: Tokens['spacing'] = '4'
-const NEGATIVE_EDGE_HIT_SLOP: Tokens['spacing'] = `-${EDGE_HIT_SLOP}` as Tokens['spacing']
-const EDGE_INSET: Tokens['sizes'] = 'md'
+
+const SIDE_TOOLTIP_PLACEMENTS: Record<StitchSideSchema, StitchSideSchema> = {
+  top: 'bottom',
+  right: 'left',
+  bottom: 'top',
+  left: 'right',
+}
 
 const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
   const layouts: Record<StitchSideSchema, StitchLineSegmentLayout> = {
     bottom: {
-      button: { bottom: NEGATIVE_EDGE_HIT_SLOP, left: 0, position: 'absolute', right: 0, top: 0 },
+      button: {
+        bottom: `-${STITCH_LINE_PADDING_Y}`,
+        height: `calc({spacing.${STITCH_LINE_PADDING_Y}} * 2)`,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+      },
       root: {
         alignSelf: 'end',
         gridArea: 'bottom',
-        height: EDGE_SEGMENT_SIZE,
+        height: STITCH_LINE_SEGMENT_SIZE,
         justifySelf: 'stretch',
-        marginBottom: EDGE_INSET,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0,
         position: 'relative',
         width: '100%',
       },
       visual: {
         borderBottomWidth: EDGE_BORDER_WIDTH,
-        height: EDGE_SEGMENT_SIZE,
+        bottom: STITCH_LINE_PADDING_Y,
+        height: 0,
         left: 0,
         position: 'absolute',
-        top: 0,
         width: '100%',
       },
     },
     left: {
-      button: { bottom: 0, left: NEGATIVE_EDGE_HIT_SLOP, position: 'absolute', right: 0, top: 0 },
+      button: {
+        bottom: 0,
+        left: `-${STITCH_LINE_PADDING_X}`,
+        position: 'absolute',
+        top: 0,
+        width: `calc({spacing.${STITCH_LINE_PADDING_X}} * 2)`,
+      },
       root: {
         alignSelf: 'stretch',
         gridArea: 'left',
         height: '100%',
         justifySelf: 'start',
-        marginBottom: 0,
-        marginLeft: EDGE_INSET,
-        marginRight: 0,
-        marginTop: 0,
         position: 'relative',
-        width: EDGE_SEGMENT_SIZE,
+        width: STITCH_LINE_SEGMENT_SIZE,
       },
       visual: {
         borderLeftWidth: EDGE_BORDER_WIDTH,
         height: '100%',
-        left: EDGE_HIT_SLOP,
+        left: STITCH_LINE_PADDING_X,
         position: 'absolute',
         top: 0,
-        width: EDGE_SEGMENT_SIZE,
+        width: 0,
       },
     },
     right: {
-      button: { bottom: 0, left: 0, position: 'absolute', right: NEGATIVE_EDGE_HIT_SLOP, top: 0 },
+      button: {
+        bottom: 0,
+        position: 'absolute',
+        right: `-${STITCH_LINE_PADDING_X}`,
+        top: 0,
+        width: `calc({spacing.${STITCH_LINE_PADDING_X}} * 2)`,
+      },
       root: {
         alignSelf: 'stretch',
         gridArea: 'right',
         height: '100%',
         justifySelf: 'end',
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: EDGE_INSET,
-        marginTop: 0,
         position: 'relative',
-        width: EDGE_SEGMENT_SIZE,
+        width: STITCH_LINE_SEGMENT_SIZE,
       },
       visual: {
         borderRightWidth: EDGE_BORDER_WIDTH,
         height: '100%',
-        left: 0,
+        right: STITCH_LINE_PADDING_X,
         position: 'absolute',
         top: 0,
-        width: EDGE_SEGMENT_SIZE,
+        width: 0,
       },
     },
     top: {
-      button: { bottom: 0, left: 0, position: 'absolute', right: 0, top: NEGATIVE_EDGE_HIT_SLOP },
+      button: {
+        height: `calc({spacing.${STITCH_LINE_PADDING_Y}} * 2)`,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: `-${STITCH_LINE_PADDING_Y}`,
+      },
       root: {
         alignSelf: 'start',
         gridArea: 'top',
-        height: EDGE_SEGMENT_SIZE,
+        height: STITCH_LINE_SEGMENT_SIZE,
         justifySelf: 'stretch',
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: EDGE_INSET,
         position: 'relative',
         width: '100%',
       },
       visual: {
         borderTopWidth: EDGE_BORDER_WIDTH,
-        height: EDGE_SEGMENT_SIZE,
+        height: 0,
         left: 0,
         position: 'absolute',
-        top: EDGE_HIT_SLOP,
+        top: STITCH_LINE_PADDING_Y,
         width: '100%',
       },
     },

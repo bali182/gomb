@@ -6,6 +6,7 @@ import { useNumberEditorStepContext } from '../../contexts/NumberEditorStepConte
 import type { IssueSchema, SeveritySchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from './EditorIconButton'
+import { NumberInputArrow, type NumberInputArrowPosition } from './NumberInputArrow'
 
 export type NumberInputProps = {
   value: string | undefined
@@ -21,6 +22,7 @@ export type NumberInputProps = {
   step?: number
   size?: InputProps['size']
   opacity?: number
+  arrowPosition?: NumberInputArrowPosition
 }
 
 const issueBorderColors: Partial<Record<SeveritySchema, Tokens['colors']>> = {
@@ -43,6 +45,7 @@ export const NumberInput: FC<NumberInputProps> = ({
   placeholder,
   isResetEnabled,
   opacity,
+  arrowPosition,
 }) => {
   const issueBorderColor = isDefined(issue) ? issueBorderColors[issue.severity] : undefined
   const { step } = useNumberEditorStepContext()
@@ -106,6 +109,20 @@ export const NumberInput: FC<NumberInputProps> = ({
         )}
       </HStack>
     ) : undefined
+
+  if (isDefined(arrowPosition)) {
+    return (
+      <NumberInputArrow
+        position={arrowPosition}
+        startAddon={startAddon}
+        endAddon={resolvedEndAddon}
+        size={size}
+        opacity={opacity}
+      >
+        {input}
+      </NumberInputArrow>
+    )
+  }
 
   if (!isDefined(startAddon) && !isDefined(resolvedEndAddon)) {
     return input

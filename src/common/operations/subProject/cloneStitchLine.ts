@@ -1,16 +1,11 @@
-import type { NameGeneratorSchema } from '../../schemas/idGenerator'
+import type { BaseSubProjectOperationParamsSchema, CloneStitchLineParamsSchema } from '../../schemas/operations'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
-export type CloneStitchLineParams = {
-  stitchLineId: string
-  nameGenerator: NameGeneratorSchema
-}
-
 export const cloneStitchLine = (
-  subProject: SubProjectSchema,
-  { stitchLineId, nameGenerator }: CloneStitchLineParams,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseSubProjectOperationParamsSchema,
+  { id: stitchLineId }: CloneStitchLineParamsSchema,
 ): SubProjectSchema => {
   const sourceStitchLineIndex = subProject.stitchLines.findIndex((stitchLine) => stitchLine.id === stitchLineId)
 
@@ -18,7 +13,7 @@ export const cloneStitchLine = (
     return subProject
   }
 
-  const idMappings = getCloneIdMappings(subProject)
+  const idMappings = getCloneIdMappings(subProject, idGenerator)
   const sourceStitchLine = subProject.stitchLines[sourceStitchLineIndex]
   const usedNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
   const clonedStitchLine: StitchLineSchema = {

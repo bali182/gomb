@@ -1,3 +1,5 @@
+import { format, register } from 'timeago.js'
+import en from 'timeago.js/lib/lang/en_US'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
@@ -21,9 +23,16 @@ import type {
   TPocketSchema,
 } from '../schemas/components'
 import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
+import type { IdPrefixSchema } from '../schemas/idGenerator'
 import type { LimitReasonSchema } from '../schemas/limits'
+import type {
+  CardSchemaId,
+  PocketItemOrientationSchema,
+  TranslatedPocketItemGroupIdSchema,
+} from '../schemas/pocketItem'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   PocketOpeningSchema,
@@ -42,20 +51,12 @@ import type {
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
-import type { HasCustomRenderTarget } from '../schemas/stitching'
-
 import type {
-  CardSchemaId,
-  PocketItemOrientationSchema,
-  TranslatedPocketItemGroupIdSchema,
-} from '../schemas/pocketItem'
-import type {
-  HasDirectionalOffsetsSchema,
-  HasHorizontalDirectionsSchema,
+  HasBasicOffsetsSchema,
+  HasCustomRenderTarget,
+  HasStitchDirectionSchema,
   HasStitchedCornersSchema,
   HasStitchedSidesSchema,
-  HasStitchedUnconnectedCornersSchema,
-  HasVerticalDirectionsSchema,
   StitchLineCommonConfigSchema,
   TPocketStitchLineOwnSchema,
 } from '../schemas/stitching'
@@ -69,11 +70,6 @@ import type {
   NativeDialogTranslationSchema,
   SectionTranslationSchema,
 } from '../schemas/translation'
-
-import { format, register } from 'timeago.js'
-import en from 'timeago.js/lib/lang/en_US'
-import type { CurrencyIdSchema } from '../schemas/currency'
-import type { IdPrefixSchema } from '../schemas/idGenerator'
 
 const language: LanguageSchema = 'en-GB'
 
@@ -123,8 +119,9 @@ export const EN = {
         description: 'The project you want to open does not exist.',
       },
       openFailed: {
-        title: 'Project not found',
-        description: 'Failed to open project.',
+        title: 'Failed to open project',
+        description:
+          'The project file could not be read or processed. Its contents may be damaged or incompatible with this version.',
         back: 'Back',
       },
     },
@@ -623,6 +620,21 @@ export const EN = {
           } satisfies SectionTranslationSchema<TPocketStitchLineOwnSchema>,
           sidesAndCorners: {
             title: 'Seam line',
+            startOffset: {
+              label: 'Offset',
+              tooltip:
+                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. On a fully rounded closed route, start offset shifts the punching start around the perimeter.',
+            },
+            endOffset: {
+              label: 'Offset',
+              tooltip:
+                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. Ignored on a closed route.',
+            },
+            stitchDirection: {
+              label: 'Punching direction',
+              tooltip:
+                'Switch between normal and reversed punching direction. The arrow shows the current direction for the selected sides or corner.',
+            },
             top: {
               label: 'Top edge',
               tooltip: 'Turns stitching on or off along the top edge.',
@@ -655,89 +667,8 @@ export const EN = {
               label: 'Bottom-left corner',
               tooltip: 'Turns stitching on or off at the bottom-left corner.',
             },
-            stitchDisconnectedTopLeftCorner: {
-              label: 'Top-left corner bridging stitch',
-              tooltip:
-                'Adds a stitch across this corner when the top and left edges are stitched but the corner is not.',
-            },
-            stitchDisconnectedTopRightCorner: {
-              label: 'Top-right corner bridging stitch',
-              tooltip:
-                'Adds a stitch across this corner when the top and right edges are stitched but the corner is not.',
-            },
-            stitchDisconnectedBottomLeftCorner: {
-              label: 'Bottom-left corner bridging stitch',
-              tooltip:
-                'Adds a stitch across this corner when the bottom and left edges are stitched but the corner is not.',
-            },
-            stitchDisconnectedBottomRightCorner: {
-              label: 'Bottom-right corner bridging stitch',
-              tooltip:
-                'Adds a stitch across this corner when the bottom and right edges are stitched but the corner is not.',
-            },
-            topStitchDirection: {
-              label: 'Top edge stitch direction',
-              tooltip: 'Changes which way the stitch line runs along the top edge.',
-            },
-            rightStitchDirection: {
-              label: 'Right edge stitch direction',
-              tooltip: 'Changes which way the stitch line runs along the right edge.',
-            },
-            bottomStitchDirection: {
-              label: 'Bottom edge stitch direction',
-              tooltip: 'Changes which way the stitch line runs along the bottom edge.',
-            },
-            leftStitchDirection: {
-              label: 'Left edge stitch direction',
-              tooltip: 'Changes which way the stitch line runs along the left edge.',
-            },
-            topStartOffset: {
-              label: 'Top edge start offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            topEndOffset: {
-              label: 'Top edge end offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            rightStartOffset: {
-              label: 'Right edge start offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            rightEndOffset: {
-              label: 'Right edge end offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            bottomStartOffset: {
-              label: 'Bottom edge start offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            bottomEndOffset: {
-              label: 'Bottom edge end offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            leftStartOffset: {
-              label: 'Left edge start offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
-            leftEndOffset: {
-              label: 'Left edge end offset',
-              tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
-            },
           } satisfies SectionTranslationSchema<
-            HasDirectionalOffsetsSchema &
-              HasStitchedSidesSchema &
-              HasStitchedCornersSchema &
-              HasStitchedUnconnectedCornersSchema &
-              HasHorizontalDirectionsSchema &
-              HasVerticalDirectionsSchema
+            HasStitchedSidesSchema & HasStitchedCornersSchema & HasBasicOffsetsSchema & HasStitchDirectionSchema
           >,
         },
         holes: {
@@ -982,9 +913,15 @@ export const EN = {
           description: 'Choose an object and then a field below to start linking.',
         },
         missingFrontPocket: {
-          title: 'Missing front pocket',
-          description: 'A pocket cluster must contain at least one front pocket.',
-          action: 'Add front pocket',
+          title: 'Empty pocket cluster',
+          description:
+            'An empty pocket cluster has no physical parts. Add as many pockets as you like to create a functional pocket layout.',
+          actions: {
+            one: '1 Pocket',
+            two: '2 Pockets',
+            three: '3 Pockets',
+          },
+          additionalDescription: 'You can change the number of pockets at any time in the tree or this editor.',
         },
       } satisfies Record<string, EmptyStateTranslationSchema>,
     },
@@ -1327,6 +1264,8 @@ export const EN = {
   },
   limits: {
     reasons: {
+      'stitch-offset-exceeds-route-length': (value: string): string =>
+        `The offsets must leave a positive route length when geometry exists (minimum offset: ${value} mm).`,
       'cluster-size-and-pocket-count': (value: string): string =>
         `The cluster size and pocket count limit the spacing to ${value} mm.`,
       't-pocket-tab-width-exceeds-half-width': (value: string): string =>

@@ -136,14 +136,14 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
 
   const handleAddConstraint = useCallback((): void => {
     setEditingInputId(undefined)
-    addConstraint('equal-constraint')
+    addConstraint({ type: 'equal-constraint' })
     accordionRef.current?.setItemState('constraints', { open: true })
   }, [addConstraint, setEditingInputId])
 
   const handleAddPocketOpening = useCallback(
     (type: PocketOpeningSchema['type']): void => {
       setEditingInputId(undefined)
-      addPocketOpening(type)
+      addPocketOpening({ type })
       accordionRef.current?.setItemState('openings', { open: true })
     },
     [addPocketOpening, setEditingInputId],

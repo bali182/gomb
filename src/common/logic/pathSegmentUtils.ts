@@ -3,9 +3,17 @@ import { narrowers } from '../utils/narrowers'
 
 import { POSITION_EPSILON, TWO, ZERO } from '../constants/layout'
 import type { PathArcToSchema, PointSchema } from '../schemas/geometry'
+import { getPointDistance } from './geometryUtils'
 import type { ArcPathSegment, LinePathSegment, PathSegment } from './pathSegmentTypes'
 
 const TWO_PI = Math.PI * 2
+
+export const getPathSegmentLength = (segment: PathSegment): BigNumber => {
+  if (narrowers.path.is.lineSegment(segment)) {
+    return getPointDistance(segment.start, segment.end)
+  }
+  return segment.radius.times(Math.abs(segment.sweepAngle))
+}
 
 export const createArcPathSegment = (start: PointSchema, command: PathArcToSchema): ArcPathSegment => {
   const chordDx = command.point.x.minus(start.x)
@@ -199,7 +207,11 @@ export const doLinePathSegmentsOverlap = (first: LinePathSegment, second: LinePa
   return doRangesOverlap(first.start.y, first.end.y, second.start.y, second.end.y)
 }
 
-const getPathSegmentRange = (segment: PathSegment, startProgress: BigNumber, endProgress: BigNumber): PathSegment => {
+export const getPathSegmentRange = (
+  segment: PathSegment,
+  startProgress: BigNumber,
+  endProgress: BigNumber,
+): PathSegment => {
   const start = getPointOnPathSegment(segment, startProgress)
   const end = getPointOnPathSegment(segment, endProgress)
 

@@ -11,6 +11,7 @@ export type EmptyStateTranslationSchema = {
   title: string
   description?: string
   action?: string
+  [key: string]: unknown
 }
 
 export type NativeDialogTranslationSchema = {

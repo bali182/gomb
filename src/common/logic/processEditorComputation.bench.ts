@@ -1,6 +1,5 @@
 import { describe, expect, it, type BenchCompareOptions } from 'vitest'
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
-import { updateComponent } from '../operations/subProject/updateComponent'
 import type { ComponentSchema } from '../schemas/components'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import type { EditorComputationRequestSchema, SubProjectComputationResultSchema } from '../schemas/editorComputation'
@@ -173,12 +172,14 @@ const createCase = (scene: SubProjectSchema, mode: ConstraintBenchmarkMode, name
   const previous = { ...normalized, constraints: mode === 'empty' ? {} : createConstraints(normalized) }
   const pockets = Object.values(previous.components).filter(narrowers.is.tPocket)
   const editedPocket = pockets[pockets.length - 1]
-  const input =
+  const editedComponent: ComponentSchema =
     mode === 'satisfied'
-      ? updateComponent(previous, {
-          component: { ...accessors.subProject(previous).component.rootPanel(), name: 'Renamed root' },
-        })
-      : updateComponent(previous, { component: { ...editedPocket, tPocketTabWidth: 10 } })
+      ? { ...accessors.subProject(previous).component.rootPanel(), name: 'Renamed root' }
+      : { ...editedPocket, tPocketTabWidth: 10 }
+  const input: SubProjectSchema = {
+    ...previous,
+    components: { ...previous.components, [editedComponent.id]: editedComponent },
+  }
   // Pre-apply the expected propagation only to the control input, outside timing.
   const baselineInput =
     mode === 'edit'

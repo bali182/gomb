@@ -1,11 +1,11 @@
-import type { ComponentSchema } from '../../schemas/components'
-import type { HoleSchema } from '../../schemas/hole'
-import type { NameGeneratorSchema } from '../../schemas/idGenerator'
-import type { StitchLineSchema } from '../../schemas/stitching'
-import type { SubProjectSchema } from '../../schemas/subProject'
-import { accessors } from '../../utils/accessors'
-import { isDefined } from '../../utils/isDefined'
-import { narrowers } from '../../utils/narrowers'
+import type { ComponentSchema } from '../../../schemas/components'
+import type { HoleSchema } from '../../../schemas/hole'
+import type { NameGeneratorSchema } from '../../../schemas/idGenerator'
+import type { StitchLineSchema } from '../../../schemas/stitching'
+import type { SubProjectSchema } from '../../../schemas/subProject'
+import { accessors } from '../../../utils/accessors'
+import { isDefined } from '../../../utils/isDefined'
+import { narrowers } from '../../../utils/narrowers'
 
 export type CloneComponentSettings = {
   cloneComponentTree: boolean
@@ -44,12 +44,12 @@ export const cloneComponentTree = ({
   }
 
   const componentsToClone: ComponentSchema[] = []
-  const isValidTree = settings.cloneComponentTree
-    ? collectClonedComponents(subProject, sourceComponent, componentsToClone, new Set<string>())
-    : collectCloneRoot(sourceComponent, componentsToClone)
-
-  if (!isValidTree) {
-    return undefined
+  if (settings.cloneComponentTree) {
+    if (!collectClonedComponents(subProject, sourceComponent, componentsToClone, new Set<string>())) {
+      return undefined
+    }
+  } else {
+    componentsToClone.push(sourceComponent)
   }
 
   const clonedRootId = idMappings[componentId]
@@ -90,11 +90,6 @@ export const cloneComponentTree = ({
       preserveNames,
     ),
   }
-}
-
-const collectCloneRoot = (component: ComponentSchema, collectedComponents: ComponentSchema[]): boolean => {
-  collectedComponents.push(component)
-  return true
 }
 
 const collectClonedComponents = (

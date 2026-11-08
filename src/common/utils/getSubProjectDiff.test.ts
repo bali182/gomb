@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { createBaseOperationParams } from '../operations/subProject/testUtils'
 import { updateComponent } from '../operations/subProject/updateComponent'
 import type { EqualConstraintSchema } from '../schemas/constraints'
 import { d } from '../testData'
@@ -39,7 +40,7 @@ describe('getSubProjectDiff', () => {
     const before = fixture()
     const snapshot = structuredClone(before)
     const panel = { ...accessors.subProject(before).component.panel('panel'), width: 25 }
-    const after = updateComponent(before, { component: panel })
+    const after = updateComponent(createBaseOperationParams(before), { component: panel })
     const diff = getSubProjectDiff(before, after)
     expect(Object.keys(diff.components)).toEqual(['panel'])
     expect(diff.components.panel.before).toBe(before.components.panel)

@@ -1,9 +1,4 @@
 import type { ArcPathSegment, LinePathSegment, PathSegment } from '../logic/pathSegmentTypes'
-import type {
-  StitchCornerPathFragment,
-  StitchPathFragment,
-  StitchSidePathFragment,
-} from '../logic/stitching/calculateStitchLinePaths'
 import type { StitchHoleLineSegment, StitchHoleSegment } from '../logic/stitching/stitchHoleGeometry'
 import type { HasTypeSchema } from '../schemas/common'
 import type {
@@ -22,6 +17,9 @@ import type {
   ComputedPocketClusterSchema,
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
+  StitchCornerPathFragment,
+  StitchPathFragment,
+  StitchSidePathFragment,
 } from '../schemas/computed'
 import type { ConstraintSchema } from '../schemas/constraints'
 import type {

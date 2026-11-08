@@ -39,7 +39,11 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
       switch (dropData.kind) {
         case 'component-reorder': {
           if (dragData.kind === 'component') {
-            operations.moveComponent(dragData.componentId, dropData.targetParentId, dropData.beforeComponentId)
+            operations.moveComponent({
+              id: dragData.componentId,
+              targetParentId: dropData.targetParentId,
+              beforeComponentId: dropData.beforeComponentId,
+            })
             return true
           }
           return false
@@ -49,10 +53,14 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
             case 'component':
               return false
             case 'hole':
-              operations.moveHole(dragData.holeId, dropData.componentId)
+              operations.moveHole({ id: dragData.holeId, targetComponentId: dropData.componentId })
               return true
             case 'stitch-line':
-              operations.moveStitchLineToComponent(dragData.stitchLineId, dropData.componentId)
+              operations.moveStitchLine({
+                id: dragData.stitchLineId,
+                targetType: 'component',
+                targetId: dropData.componentId,
+              })
               return true
             case 'pocket-opening': {
               if (!isDefined(subProject)) {
@@ -65,7 +73,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
                 return false
               }
               if (component.openingId !== opening.id) {
-                operations.updateComponent({ ...component, openingId: opening.id })
+                operations.updateComponent({ component: { ...component, openingId: opening.id } })
               }
               return true
             }
@@ -73,7 +81,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
         }
         case 'hole-stitch-line': {
           if (dragData.kind === 'stitch-line' && dragData.stitchLineType === 'component-bounds-stitch-line') {
-            operations.moveStitchLineToHole(dragData.stitchLineId, dropData.holeId)
+            operations.moveStitchLine({ id: dragData.stitchLineId, targetType: 'hole', targetId: dropData.holeId })
             return true
           }
           return false

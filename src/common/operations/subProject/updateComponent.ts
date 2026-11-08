@@ -1,13 +1,9 @@
-import { ComponentSchema } from '../../schemas/components'
+import type { BaseSubProjectOperationParamsSchema, UpdateComponentParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
-export type UpdateComponentParams = {
-  component: ComponentSchema
-}
-
 export const updateComponent = (
-  subProject: SubProjectSchema,
-  { component }: UpdateComponentParams,
+  { subProject }: BaseSubProjectOperationParamsSchema,
+  { component }: UpdateComponentParamsSchema,
 ): SubProjectSchema => {
   return {
     ...subProject,

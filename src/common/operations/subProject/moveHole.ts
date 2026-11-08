@@ -1,20 +1,16 @@
 import { HoleSchema } from '../../schemas/hole'
+import type { BaseSubProjectOperationParamsSchema, MoveHoleParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { canAddHole } from './utils/componentRules'
 
-export type MoveHoleParams = {
-  holeId: string
-  targetComponentId: string
-}
-
 export const moveHole = (
-  subProject: SubProjectSchema,
-  { holeId, targetComponentId }: MoveHoleParams,
+  { subProject }: BaseSubProjectOperationParamsSchema,
+  { id, targetComponentId }: MoveHoleParamsSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const hole = accessor.optional.hole.byId(holeId)
+  const hole = accessor.optional.hole.byId(id)
   const target = accessor.optional.component.byId(targetComponentId)
 
   if (!isDefined(hole) || !isDefined(target) || hole.componentId === targetComponentId) {
@@ -28,6 +24,6 @@ export const moveHole = (
 
   return {
     ...subProject,
-    holes: subProject.holes.map((candidate) => (candidate.id === holeId ? newHole : candidate)),
+    holes: subProject.holes.map((candidate) => (candidate.id === id ? newHole : candidate)),
   }
 }

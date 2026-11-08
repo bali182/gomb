@@ -1,12 +1,12 @@
+import type { BaseSubProjectOperationParamsSchema, DeleteHoleParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 
-export type DeleteHoleParams = {
-  holeId: string
-}
-
-export const deleteHole = (subProject: SubProjectSchema, { holeId }: DeleteHoleParams): SubProjectSchema => {
+export const deleteHole = (
+  { subProject }: BaseSubProjectOperationParamsSchema,
+  { id }: DeleteHoleParamsSchema,
+): SubProjectSchema => {
   return {
     ...subProject,
-    holes: subProject.holes.filter((hole) => hole.id !== holeId),
+    holes: subProject.holes.filter((hole) => hole.id !== id),
   }
 }

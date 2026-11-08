@@ -21,7 +21,7 @@ export const ConstraintActionsMenu: FC<ConstraintActionsMenuProps> = ({ constrai
   }, [])
 
   const handleDelete = useCallback((): void => {
-    deleteConstraint(constraint.id)
+    deleteConstraint({ id: constraint.id })
     onDelete(constraint.id)
   }, [constraint.id, deleteConstraint, onDelete])
 

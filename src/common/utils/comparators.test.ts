@@ -88,14 +88,13 @@ describe('input model comparators', () => {
     expect(comparators.frontPocket(front, { ...front, mainAxisAnchor: 'end' })).toBe(false)
   })
 
-  it('detects render-target and disconnected-corner changes', () => {
+  it('detects render-target, offset and route direction changes', () => {
     const stitchLine = d.componentBoundsStitchLine({ id: 'stitch', targetId: 'root', targetType: 'component' })
     const variants = [
       { ...stitchLine, onTop: 'panel' },
-      { ...stitchLine, stitchDisconnectedTopLeftCorner: !stitchLine.stitchDisconnectedTopLeftCorner },
-      { ...stitchLine, stitchDisconnectedTopRightCorner: !stitchLine.stitchDisconnectedTopRightCorner },
-      { ...stitchLine, stitchDisconnectedBottomLeftCorner: !stitchLine.stitchDisconnectedBottomLeftCorner },
-      { ...stitchLine, stitchDisconnectedBottomRightCorner: !stitchLine.stitchDisconnectedBottomRightCorner },
+      { ...stitchLine, startOffset: 1 },
+      { ...stitchLine, endOffset: 2 },
+      { ...stitchLine, stitchDirection: 'end-to-start' as const },
     ]
     for (const variant of variants) {
       expect(comparators.stitchLine(stitchLine, variant)).toBe(false)

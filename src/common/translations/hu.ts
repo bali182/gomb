@@ -59,7 +59,8 @@ export const HU = {
       },
       openFailed: {
         title: 'Hiba!',
-        description: 'A projekt megnyitása nem sikerült.',
+        description:
+          'A projektfájl olvasása vagy feldolgozása nem sikerült. A tartalma sérült vagy ezzel a verzióval nem kompatibilis lehet.',
         back: 'Vissza',
       },
     },
@@ -556,6 +557,21 @@ export const HU = {
           },
           sidesAndCorners: {
             title: 'Varrásvonal',
+            startOffset: {
+              label: 'Eltolás',
+              tooltip:
+                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Teljesen lekerekített zárt körön a kezdőpontot tolja el a kerület mentén.',
+            },
+            endOffset: {
+              label: 'Eltolás',
+              tooltip:
+                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Zárt körön nincs hatása.',
+            },
+            stitchDirection: {
+              label: 'Lyukasztás iránya',
+              tooltip:
+                'Váltás a normál és a fordított lyukkiosztási irány között. A nyíl a kiválasztott oldalak vagy sarok aktuális haladási irányát mutatja.',
+            },
             top: {
               label: 'Felső oldal',
               tooltip: 'Be vagy kikapcsolja a varrást a felső élen.',
@@ -587,78 +603,6 @@ export const HU = {
             bottomLeftCorner: {
               label: 'Bal alsó sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a bal alsó sarokban.',
-            },
-            stitchDisconnectedTopLeftCorner: {
-              label: 'Bal felső sarok áthidaló öltése',
-              tooltip: 'Öltést ad a sarokhoz, ha a felső és bal él varrott, de maga a sarok nem.',
-            },
-            stitchDisconnectedTopRightCorner: {
-              label: 'Jobb felső sarok áthidaló öltése',
-              tooltip: 'Öltést ad a sarokhoz, ha a felső és jobb él varrott, de maga a sarok nem.',
-            },
-            stitchDisconnectedBottomLeftCorner: {
-              label: 'Bal alsó sarok áthidaló öltése',
-              tooltip: 'Öltést ad a sarokhoz, ha az alsó és bal él varrott, de maga a sarok nem.',
-            },
-            stitchDisconnectedBottomRightCorner: {
-              label: 'Jobb alsó sarok áthidaló öltése',
-              tooltip: 'Öltést ad a sarokhoz, ha az alsó és jobb él varrott, de maga a sarok nem.',
-            },
-            topStitchDirection: {
-              label: 'Felső oldal varrásiránya',
-              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a felső élen.',
-            },
-            rightStitchDirection: {
-              label: 'Jobb oldal varrásiránya',
-              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a jobb élen.',
-            },
-            bottomStitchDirection: {
-              label: 'Alsó oldal varrásiránya',
-              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal az alsó élen.',
-            },
-            leftStitchDirection: {
-              label: 'Bal oldal varrásiránya',
-              tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a bal élen.',
-            },
-            topStartOffset: {
-              label: 'Felső oldal kezdőeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            topEndOffset: {
-              label: 'Felső oldal végeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            rightStartOffset: {
-              label: 'Jobb oldal kezdőeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            rightEndOffset: {
-              label: 'Jobb oldal végeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            bottomStartOffset: {
-              label: 'Alsó oldal kezdőeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            bottomEndOffset: {
-              label: 'Alsó oldal végeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            leftStartOffset: {
-              label: 'Bal oldal kezdőeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
-            },
-            leftEndOffset: {
-              label: 'Bal oldal végeltolása',
-              tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
             },
           },
         },
@@ -904,9 +848,15 @@ export const HU = {
           description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
         },
         missingFrontPocket: {
-          title: 'Hiányzó elülső zseb',
-          description: 'A zsebcsoportnak taralmaznia kell legalább egy elülső zsebet.',
-          action: 'Elülső zseb hozzáadása',
+          title: 'Üres zsebzsoport',
+          description:
+            'Egy üres zsebcsoport nem tartalmaz anyagdarabot. Adj hozzá tetszőleges számú zsebet a rendeltetésszerű használathoz.',
+          actions: {
+            one: '1 Zseb',
+            two: '2 Zseb',
+            three: '3 Zseb',
+          },
+          additionalDescription: 'A zsebek száma később bármikor módosítható a fában vagy ebben a szerkesztőben.',
         },
       },
     },
@@ -1249,6 +1199,8 @@ export const HU = {
   },
   limits: {
     reasons: {
+      'stitch-offset-exceeds-route-length': (value: string): string =>
+        `Az eltolások után a létező varrásvonalból pozitív hossznak kell maradnia (legkisebb eltolás: ${value} mm).`,
       'cluster-size-and-pocket-count': (value: string): string =>
         `A zsebcsoport mérete és a zsebek száma miatt a lépésköz legfeljebb ${value} mm.`,
       't-pocket-tab-width-exceeds-half-width': (value: string): string =>

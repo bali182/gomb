@@ -1,3 +1,4 @@
+import type { BaseSubProjectOperationParamsSchema, MoveComponentParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -5,21 +6,15 @@ import { narrowers } from '../../utils/narrowers'
 import { canMoveComponent } from './utils/componentRules'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
-export type MoveComponentParams = {
-  componentId: string
-  targetParentId: string
-  beforeComponentId: string | undefined
-}
-
 export const moveComponent = (
-  subProject: SubProjectSchema,
-  { beforeComponentId, componentId, targetParentId }: MoveComponentParams,
+  { subProject }: BaseSubProjectOperationParamsSchema,
+  { beforeComponentId, id, targetParentId }: MoveComponentParamsSchema,
 ): SubProjectSchema => {
-  if (!canMoveComponent(subProject, { beforeComponentId, componentId, targetParentId })) {
+  if (!canMoveComponent(subProject, { beforeComponentId, id, targetParentId })) {
     return subProject
   }
   const accessor = accessors.subProject(subProject)
-  const movedComponent = accessor.optional.component.byId(componentId)
+  const movedComponent = accessor.optional.component.byId(id)
   const targetParent = accessor.optional.component.byId(targetParentId)
 
   if (!isDefined(movedComponent) || narrowers.is.rootPanel(movedComponent) || !isDefined(targetParent)) {
@@ -30,15 +25,15 @@ export const moveComponent = (
     return subProject
   }
 
-  const sourceParent = accessor.optional.component.parent(componentId)
+  const sourceParent = accessor.optional.component.parent(id)
 
   if (!isDefined(sourceParent)) {
     return subProject
   }
 
-  const sourceChildren = removeChild(sourceParent.children, componentId)
+  const sourceChildren = removeChild(sourceParent.children, id)
   const targetChildren = sourceParent.id === targetParent.id ? sourceChildren : targetParent.children
-  const updatedTargetChildren = insertChildBefore(targetChildren, componentId, beforeComponentId)
+  const updatedTargetChildren = insertChildBefore(targetChildren, id, beforeComponentId)
 
   if (!isDefined(updatedTargetChildren)) {
     return subProject

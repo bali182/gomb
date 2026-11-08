@@ -26,16 +26,16 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
   }, [])
 
   const handleSetDefault = useCallback((): void => {
-    setDefaultPocketOpening(opening.id)
+    setDefaultPocketOpening({ id: opening.id })
   }, [opening.id, setDefaultPocketOpening])
 
   const handleDelete = useCallback((): void => {
-    deletePocketOpening(opening.id)
+    deletePocketOpening({ id: opening.id })
     onDelete(opening.id)
   }, [deletePocketOpening, onDelete, opening.id])
 
   const handleClone = useCallback((): void => {
-    clonePocketOpening(opening.id)
+    clonePocketOpening({ id: opening.id })
   }, [clonePocketOpening, opening.id])
 
   return (

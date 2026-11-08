@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
+import { createBaseOperationParams } from '../operations/subProject/testUtils'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { EN } from '../translations/en'
@@ -120,7 +121,7 @@ describe('deleteOrphanedConstraintFields', () => {
   it('cleans members after patchers remove holes and stitches belonging to a deleted component', () => {
     const source = fixture()
     const original = structuredClone(source)
-    const deleted = deleteComponent(source, { componentId: 'panel' })
+    const deleted = deleteComponent(createBaseOperationParams(source), { id: 'panel' })
     const result = getPatchedSubProject(deleted, getComputedSubProject(deleted, defaultStitchingSettings))
     expect(result.holes).toEqual([])
     expect(result.stitchLines.map((stitchLine) => stitchLine.id)).not.toContain('bounds')
@@ -128,5 +129,22 @@ describe('deleteOrphanedConstraintFields', () => {
       fields.map((field) => field.modelId).filter((id) => !['panel', 'hole', 'bounds'].includes(id)),
     )
     expect(source).toEqual(original)
+  })
+})
+
+describe('obsolete constraint fields', () => {
+  it('removes fields absent from the current model schema', () => {
+    const source = fixture()
+    const obsolete = {
+      id: 'obsolete',
+      type: 'component-bounds-stitch-line-constraint-field',
+      modelId: 'bounds',
+      field: 'topStartOffset',
+    } as unknown as ConstraintFieldSchema
+    source.constraints.linked = { ...source.constraints.linked, fields: [fields[0], obsolete] }
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const result = deleteOrphanedConstraintFields(source, computed)
+    expect(result.constraints.linked.fields).toEqual([fields[0]])
+    expect(source.constraints.linked.fields).toHaveLength(2)
   })
 })

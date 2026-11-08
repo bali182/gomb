@@ -1,4 +1,4 @@
-import { Tooltip as ChakraTooltip, Portal } from '@chakra-ui/react'
+import { Tooltip as ChakraTooltip, Portal, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC, Ref } from 'react'
 import { portalRef } from '../../portalRef'
 
@@ -7,6 +7,10 @@ export type TooltipProps = ChakraTooltip.RootProps & {
   contentProps?: ChakraTooltip.ContentProps
   disabled?: boolean
   ref?: Ref<HTMLDivElement>
+}
+
+const CLOSED_TOOLTIP_STYLE: SystemStyleObject = {
+  visibility: 'hidden',
 }
 
 export const Tooltip: FC<TooltipProps> = ({ children, disabled, content, contentProps, ref, ...tooltipRootProps }) => {
@@ -19,7 +23,7 @@ export const Tooltip: FC<TooltipProps> = ({ children, disabled, content, content
       <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
       <Portal container={portalRef}>
         <ChakraTooltip.Positioner>
-          <ChakraTooltip.Content animationDuration="50ms" ref={ref} {...contentProps}>
+          <ChakraTooltip.Content animationDuration="50ms" _closed={CLOSED_TOOLTIP_STYLE} ref={ref} {...contentProps}>
             <ChakraTooltip.Arrow>
               <ChakraTooltip.ArrowTip />
             </ChakraTooltip.Arrow>

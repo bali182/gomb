@@ -38,7 +38,7 @@ export const useEditableStitchLine = (stitchLineId: string): UseEditableStitchLi
 
   const commit = useCallback(
     (updatedStitchLine: StitchLineSchema): void => {
-      updateStitchLine(updatedStitchLine)
+      updateStitchLine({ stitchLine: updatedStitchLine })
     },
     [updateStitchLine],
   )

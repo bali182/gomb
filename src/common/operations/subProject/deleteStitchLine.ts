@@ -1,15 +1,12 @@
+import type { BaseSubProjectOperationParamsSchema, DeleteStitchLineParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 
-export type DeleteStitchLineParams = {
-  stitchLineId: string
-}
-
 export const deleteStitchLine = (
-  subProject: SubProjectSchema,
-  { stitchLineId }: DeleteStitchLineParams,
+  { subProject }: BaseSubProjectOperationParamsSchema,
+  { id }: DeleteStitchLineParamsSchema,
 ): SubProjectSchema => {
   return {
     ...subProject,
-    stitchLines: subProject.stitchLines.filter((stitchLine) => stitchLine.id !== stitchLineId),
+    stitchLines: subProject.stitchLines.filter((stitchLine) => stitchLine.id !== id),
   }
 }

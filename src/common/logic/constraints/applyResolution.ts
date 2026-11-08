@@ -4,6 +4,7 @@ import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import type { ChangeSchema, SubProjectDiffSchema } from '../../schemas/subProjectDiff'
 import { accessors } from '../../utils/accessors'
+import { has } from '../../utils/has'
 import { isDefined } from '../../utils/isDefined'
 import { getConstraintFieldValue, setConstraintFieldValue } from './constraintFieldValues'
 
@@ -23,7 +24,10 @@ export const applyResolution = ({ input, target, inputDiff, patchDiff }: ApplyRe
   const accessor = accessors.subProject(target)
   let result = target
   for (const constraint of constraints) {
-    const fields = constraint.fields.filter((field) => isDefined(accessor.optional.constraint.model(field)))
+    const fields = constraint.fields.filter((field) => {
+      const model = accessor.optional.constraint.model(field)
+      return isDefined(model) && has(constraintFieldCompatibility[model.type], field.field)
+    })
     // 0 or 1 field in the constraint. Since it has nothing to constrain to, it doesn't do anything.
     if (fields.length < 2) {
       continue

@@ -25,20 +25,20 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
   }, [])
 
   const handleDelete = useCallback((): void => {
-    deleteStitchLine(stitchLine.id)
+    deleteStitchLine({ id: stitchLine.id })
     onDelete(stitchLine.id)
   }, [deleteStitchLine, stitchLine.id, onDelete])
 
   const handleClone = useCallback((): void => {
-    cloneStitchLine(stitchLine.id)
+    cloneStitchLine({ id: stitchLine.id })
   }, [cloneStitchLine, stitchLine.id])
 
   const handleFlipHorizontal = useCallback((): void => {
-    flip(stitchLine, 'horizontal')
+    flip({ model: stitchLine, axis: 'horizontal' })
   }, [stitchLine, flip])
 
   const handleFlipVertical = useCallback((): void => {
-    flip(stitchLine, 'vertical')
+    flip({ model: stitchLine, axis: 'vertical' })
   }, [stitchLine, flip])
 
   return (

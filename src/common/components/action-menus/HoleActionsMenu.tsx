@@ -18,31 +18,31 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
-  const { addStitchLineToHole, cloneHole, deleteHole, flip } = useSubProjectOperations()
+  const { addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
   }, [])
 
   const handleAddStitchLine = useCallback((): void => {
-    addStitchLineToHole(hole.id)
+    addStitchLine({ targetType: 'hole', targetId: hole.id })
     onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
-  }, [addStitchLineToHole, hole.id, onAddStitchLine])
+  }, [addStitchLine, hole.id, onAddStitchLine])
 
   const handleClone = useCallback((): void => {
-    cloneHole(hole.id)
+    cloneHole({ id: hole.id })
   }, [cloneHole, hole.id])
 
   const handleDelete = useCallback((): void => {
-    deleteHole(hole.id)
+    deleteHole({ id: hole.id })
     onDelete(hole.id)
   }, [deleteHole, hole.id, onDelete])
 
   const handleFlipHorizontal = useCallback((): void => {
-    flip(hole, 'horizontal')
+    flip({ model: hole, axis: 'horizontal' })
   }, [hole, flip])
   const handleFlipVertical = useCallback((): void => {
-    flip(hole, 'vertical')
+    flip({ model: hole, axis: 'vertical' })
   }, [hole, flip])
 
   return (

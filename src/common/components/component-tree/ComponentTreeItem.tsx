@@ -116,7 +116,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
         return false
       }
       return canMoveComponent(subProject, {
-        componentId: activeDragData.componentId,
+        id: activeDragData.componentId,
         targetParentId: position === 'inside' ? component.id : (node.parentId ?? component.id),
         beforeComponentId:
           position === 'before' ? component.id : position === 'after' ? node.nextSiblingId : insideBeforeComponentId,

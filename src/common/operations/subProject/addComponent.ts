@@ -1,36 +1,28 @@
-import { ComponentSchema, type HasColorSchema } from '../../schemas/components'
-import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
-import type { StitchLineCommonConfigSchema } from '../../schemas/stitching'
+import { AddComponentParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
+import { getInsertionIndex } from './utils/getInsertionIndex'
 
-export type ComponentInsertionPositionSchema = 'start' | 'end' | number
-
-export type AddComponentParams = HasColorSchema & {
-  parentId: string
-  type: ComponentSchema['type']
-  stitchingSettings: StitchLineCommonConfigSchema
-  modelFactory: ReadonlyModelObjectFactorySchema
-  position: ComponentInsertionPositionSchema
-}
-
-export const addComponent = (subProject: SubProjectSchema, params: AddComponentParams): SubProjectSchema => {
-  const parent = accessors.subProject(subProject).optional.component.byId(params.parentId)
+export const addComponent = (
+  { subProject, project, settings, readonlyFactory }: BaseSubProjectOperationParamsSchema,
+  { parentId, position, type, color }: AddComponentParamsSchema,
+): SubProjectSchema => {
+  const parent = accessors.subProject(subProject).optional.component.byId(parentId)
 
   if (!isDefined(parent)) {
     throw new Error('Missing parent')
   }
 
-  const insertionIndex = getInsertionIndex(params.position, parent.children.length)
+  const insertionIndex = getInsertionIndex(position, parent.children.length)
   if (!Number.isInteger(insertionIndex) || insertionIndex < 0 || insertionIndex > parent.children.length) {
     return subProject
   }
-  const component = params.modelFactory.createComponent({
-    type: params.type,
-    color: params.color,
-    stitchingSettings: params.stitchingSettings,
+  const component = readonlyFactory.createComponent({
+    type,
+    color: color ?? (settings.edit.addBaseColor ? project.colorSettings.leatherColor : undefined),
+    stitchingSettings: project.stitchingSettings,
     openingId: subProject.defaultPocketOpening,
     forbiddenIds: getSubProjectIds(subProject),
     forbiddenNames: new Set(Object.values(subProject.components).map((component) => component.name)),
@@ -45,16 +37,5 @@ export const addComponent = (subProject: SubProjectSchema, params: AddComponentP
       },
       [component.id]: component,
     },
-  }
-}
-
-const getInsertionIndex = (position: ComponentInsertionPositionSchema, childCount: number): number => {
-  switch (position) {
-    case 'start':
-      return 0
-    case 'end':
-      return childCount
-    default:
-      return position
   }
 }

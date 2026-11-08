@@ -1,24 +1,19 @@
-import type { NameGeneratorSchema } from '../../schemas/idGenerator'
+import type { BaseSubProjectOperationParamsSchema, ClonePocketOpeningParamsSchema } from '../../schemas/operations'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
-export type ClonePocketOpeningParams = {
-  openingId: string
-  nameGenerator: NameGeneratorSchema
-}
-
 export const clonePocketOpening = (
-  subProject: SubProjectSchema,
-  { openingId, nameGenerator }: ClonePocketOpeningParams,
+  { subProject, id: idGenerator, name: nameGenerator }: BaseSubProjectOperationParamsSchema,
+  { id: openingId }: ClonePocketOpeningParamsSchema,
 ): SubProjectSchema => {
   const source = accessors.subProject(subProject).optional.pocketOpening.byId(openingId)
   if (!isDefined(source)) {
     return subProject
   }
-  const idMappings = getCloneIdMappings(subProject)
+  const idMappings = getCloneIdMappings(subProject, idGenerator)
   const usedNames = new Set(Object.values(subProject.pocketOpenings).map((opening) => opening.name))
   const cloned: PocketOpeningSchema = {
     ...source,

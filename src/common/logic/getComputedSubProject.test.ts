@@ -1,9 +1,15 @@
-import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { defaultSlantedPocketOpening, defaultStitchingSettings } from '../defaultStates'
+import type { SubProjectSchema } from '../schemas/subProject'
+import { d } from '../testData'
+import { accessors } from '../utils/accessors'
 import { narrowers } from '../utils/narrowers'
+import { getComputedSubProject } from './getComputedSubProject'
+
+import BigNumber from 'bignumber.js'
 
 import { POSITION_EPSILON } from '../constants/layout'
-import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
+import { defaultExportParams } from '../defaultStates'
 import type { AnchorSchema } from '../schemas/common'
 import type {
   LayoutOrientationSchema,
@@ -15,13 +21,9 @@ import type {
 import type { ComputedComponentSchema } from '../schemas/computed'
 import type { PathSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
-import type { SubProjectSchema } from '../schemas/subProject'
-import { d } from '../testData'
-import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { translateExportElement } from './exports/exportGeometryUtils'
 import { getExportElementsForComponent } from './exports/getExportElements'
-import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
 import { getClosedPathLoops, getPathSegments } from './pathSegments'
 import { getPathSegmentMidpoint } from './pathSegmentUtils'
@@ -1671,6 +1673,28 @@ describe('cluster T-pocket stitch routes', () => {
     expect(source).toEqual(snapshot)
   })
 
+  it.each([
+    ['up', 'bottom'],
+    ['down', 'top'],
+    ['left', 'right'],
+    ['right', 'left'],
+  ] as const)('preserves the calculated %s pocket edge as a %s fragment', (orientation, side) => {
+    const source = fixture()
+    const cluster = accessors.subProject(source).component.pocketCluster('cluster')
+    source.components[cluster.id] = { ...cluster, orientation }
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const routes = accessors.computedSubProject(computed).stitchLine.tPocket('shared').routes
+    expect(routes).toHaveLength(2)
+    for (const route of routes) {
+      const startCommand = route.path.commands[0]
+      const endCommand = route.path.commands[1]
+      if (!narrowers.path.is.moveTo(startCommand) || !narrowers.path.is.lineTo(endCommand)) {
+        throw new Error('Expected a single straight T-pocket route')
+      }
+      expect(route.fragments).toEqual([{ type: 'side', side, start: startCommand.point, end: endCommand.point }])
+    }
+  })
+
   it.each([['b', 'a', 'front'], ['b', 'front'], ['front']])(
     'follows current children without duplicating the source: %j',
     (...children) => {
@@ -1697,4 +1721,91 @@ describe('cluster T-pocket stitch routes', () => {
     expect(computed).toBeDefined()
     expect(computed?.routes.map((route) => route.targetId)).toEqual(['b'])
   })
+})
+
+const pocketFixture = () => {
+  const first = d.pocketCluster({ id: 'first', children: ['a', 'front-a'] })
+  const second = d.pocketCluster({ id: 'second', children: ['b', 'front-b'] })
+  return d.subProject({
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', children: ['first', 'second'] }),
+    components: [
+      first,
+      second,
+      d.tPocket({ id: 'a' }),
+      d.tPocket({ id: 'b' }),
+      d.frontPocket({ id: 'front-a', children: ['child'] }),
+      d.frontPocket({ id: 'front-b' }),
+      d.panel({ id: 'child' }),
+    ],
+  })
+}
+
+const openingFixture = () => {
+  const opening = {
+    type: 'slanted' as const,
+    ...defaultSlantedPocketOpening,
+    id: 'shared',
+    name: 'Slanted',
+    offset: 1000,
+  }
+  const defaultOpening = { id: 'custom-default', name: 'Default', type: 'straight' } as const
+  const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
+  const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
+  const t = d.tPocket({ id: 't', openingId: opening.id })
+  const front = d.frontPocket({ id: 'front', openingId: opening.id })
+  const original = d.subProject({
+    id: 'sub',
+    root,
+    components: [cluster, t, front],
+    pocketOpenings: [opening, defaultOpening],
+  })
+  const subProject = {
+    ...original,
+    defaultPocketOpening: defaultOpening.id,
+  }
+  return {
+    subProject,
+    opening,
+    defaultOpening,
+    t,
+    front,
+    root,
+    cluster,
+    originalDefaultOpeningId: original.defaultPocketOpening,
+  }
+}
+
+it('keeps cluster stitching empty after its last T-pocket is removed', () => {
+  const source = pocketFixture()
+  source.components.first.children = ['front-a']
+  delete source.components.a
+  source.stitchLines = [d.tPocketStitchLine({ id: 'line', targetId: 'first', targetType: 'component' })]
+  const snapshot = structuredClone(source)
+  const computed = getComputedSubProject(source, defaultStitchingSettings)
+  expect(computed.stitchLines.line.routes).toEqual([])
+  expect(source).toEqual(snapshot)
+})
+
+it('computes independent local limits for pockets sharing one opening definition', () => {
+  const { subProject, opening } = openingFixture()
+  const source = {
+    ...subProject,
+    pocketOpenings: { ...subProject.pocketOpenings, [opening.id]: { ...opening, offset: 900 } },
+  }
+  const snapshot = structuredClone(source)
+  const computed = getComputedSubProject(source, defaultStitchingSettings)
+  const tLimits = computed.limits.components.t
+  const frontLimits = computed.limits.components.front
+  if (
+    tLimits.type !== 't-pocket' ||
+    frontLimits.type !== 'front-pocket' ||
+    tLimits.opening.type !== 'slanted' ||
+    frontLimits.opening.type !== 'slanted'
+  ) {
+    throw new Error('Unexpected limits')
+  }
+  expect(tLimits.opening.offset?.max?.value.toNumber()).toBeGreaterThan(0)
+  expect(tLimits.opening.offset?.max?.value.lt(frontLimits.opening.offset?.max?.value ?? 0)).toBe(true)
+  expect(source).toEqual(snapshot)
 })

@@ -13,8 +13,8 @@ import type {
   RootPanelSchema,
 } from '../../schemas/components'
 import type { HoleSchema } from '../../schemas/hole'
-import type { ModelObjectSchema } from '../../schemas/modelObject'
-import type { StitchLineSchema } from '../../schemas/stitching'
+import type { BaseSubProjectOperationParamsSchema, FlipParamsSchema } from '../../schemas/operations'
+import type { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -23,10 +23,10 @@ import { updateHole } from './updateHole'
 import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export const flip = (
-  subProject: SubProjectSchema,
-  model: ModelObjectSchema,
-  axis: FlipAxisSchema,
+  base: BaseSubProjectOperationParamsSchema,
+  { model, axis }: FlipParamsSchema,
 ): SubProjectSchema => {
+  const { subProject } = base
   const accessor = accessors.subProject(subProject)
   switch (model.type) {
     case 'straight':
@@ -48,7 +48,7 @@ export const flip = (
       return subProject
     case 'hole': {
       const hole = accessor.hole.byId(model.id)
-      const updated = updateHole(subProject, { hole: flipHole(hole, axis) })
+      const updated = updateHole(base, { hole: flipHole(hole, axis) })
       return {
         ...updated,
         stitchLines: subProject.stitchLines.map((stitchLine) =>
@@ -212,65 +212,37 @@ const flipStitchLine = (
         stitchDirection: stitchLine.stitchDirection === 'start-to-end' ? 'end-to-start' : 'start-to-end',
       }
     }
-    case 'component-bounds-stitch-line':
+    case 'component-bounds-stitch-line': {
+      const flipped: ComponentBoundsStitchLineSchema = {
+        ...stitchLine,
+        ...flipCornerRadii(stitchLine, axis),
+        startOffset: stitchLine.endOffset,
+        endOffset: stitchLine.startOffset,
+        stitchDirection: stitchLine.stitchDirection === 'start-to-end' ? 'end-to-start' : 'start-to-end',
+      }
       switch (axis) {
         case 'horizontal':
           return {
-            ...stitchLine,
-            ...flipCornerRadii(stitchLine, axis),
-            bottomEndOffset: stitchLine.bottomStartOffset,
-            bottomLeftCorner: stitchLine.bottomRightCorner,
-            bottomRightCorner: stitchLine.bottomLeftCorner,
-            bottomStartOffset: stitchLine.bottomEndOffset,
-            bottomStitchDirection:
-              stitchLine.bottomStitchDirection === 'left-to-right' ? 'right-to-left' : 'left-to-right',
+            ...flipped,
             left: stitchLine.right,
-            leftEndOffset: stitchLine.rightStartOffset,
-            leftStartOffset: stitchLine.rightEndOffset,
-            leftStitchDirection: stitchLine.rightStitchDirection,
             right: stitchLine.left,
-            rightEndOffset: stitchLine.leftStartOffset,
-            rightStartOffset: stitchLine.leftEndOffset,
-            rightStitchDirection: stitchLine.leftStitchDirection,
-            topEndOffset: stitchLine.topStartOffset,
             topLeftCorner: stitchLine.topRightCorner,
             topRightCorner: stitchLine.topLeftCorner,
-            topStartOffset: stitchLine.topEndOffset,
-            topStitchDirection: stitchLine.topStitchDirection === 'left-to-right' ? 'right-to-left' : 'left-to-right',
-            stitchDisconnectedTopLeftCorner: stitchLine.stitchDisconnectedTopRightCorner,
-            stitchDisconnectedTopRightCorner: stitchLine.stitchDisconnectedTopLeftCorner,
-            stitchDisconnectedBottomLeftCorner: stitchLine.stitchDisconnectedBottomRightCorner,
-            stitchDisconnectedBottomRightCorner: stitchLine.stitchDisconnectedBottomLeftCorner,
+            bottomLeftCorner: stitchLine.bottomRightCorner,
+            bottomRightCorner: stitchLine.bottomLeftCorner,
           }
         case 'vertical':
           return {
-            ...stitchLine,
-            ...flipCornerRadii(stitchLine, axis),
-            bottom: stitchLine.top,
-            bottomEndOffset: stitchLine.topStartOffset,
-            bottomLeftCorner: stitchLine.topLeftCorner,
-            bottomRightCorner: stitchLine.topRightCorner,
-            bottomStartOffset: stitchLine.topEndOffset,
-            bottomStitchDirection: stitchLine.topStitchDirection,
-            leftEndOffset: stitchLine.leftStartOffset,
-            leftStartOffset: stitchLine.leftEndOffset,
-            leftStitchDirection: stitchLine.leftStitchDirection === 'top-to-bottom' ? 'bottom-to-top' : 'top-to-bottom',
-            rightEndOffset: stitchLine.rightStartOffset,
-            rightStartOffset: stitchLine.rightEndOffset,
-            rightStitchDirection:
-              stitchLine.rightStitchDirection === 'top-to-bottom' ? 'bottom-to-top' : 'top-to-bottom',
+            ...flipped,
             top: stitchLine.bottom,
-            topEndOffset: stitchLine.bottomStartOffset,
+            bottom: stitchLine.top,
             topLeftCorner: stitchLine.bottomLeftCorner,
             topRightCorner: stitchLine.bottomRightCorner,
-            topStartOffset: stitchLine.bottomEndOffset,
-            topStitchDirection: stitchLine.bottomStitchDirection,
-            stitchDisconnectedTopLeftCorner: stitchLine.stitchDisconnectedBottomLeftCorner,
-            stitchDisconnectedTopRightCorner: stitchLine.stitchDisconnectedBottomRightCorner,
-            stitchDisconnectedBottomLeftCorner: stitchLine.stitchDisconnectedTopLeftCorner,
-            stitchDisconnectedBottomRightCorner: stitchLine.stitchDisconnectedTopRightCorner,
+            bottomLeftCorner: stitchLine.topLeftCorner,
+            bottomRightCorner: stitchLine.topRightCorner,
           }
       }
+    }
   }
 }
 

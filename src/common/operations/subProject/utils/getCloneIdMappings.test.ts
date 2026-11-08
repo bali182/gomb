@@ -30,7 +30,8 @@ describe('getCloneIdMappings', () => {
     const snapshot = structuredClone(source)
     const sourceIds = getProjectIds({ subProjects: [source] })
     const reserve = vi.spyOn(IdGenerator.prototype, 'getAndForbid')
-    const mapping = getCloneIdMappings(source)
+    const idGenerator = new IdGenerator()
+    const mapping = getCloneIdMappings(source, idGenerator)
     expect(new Set(Object.keys(mapping))).toEqual(sourceIds)
     expect(new Set(Object.values(mapping)).size).toBe(sourceIds.size)
     expect(mapping[source.id]).toMatch(/^sub-project-/)
@@ -59,7 +60,7 @@ describe('getCloneIdMappings', () => {
     (duplicateId) => {
       const source = fixture()
       source.holes[0].id = duplicateId
-      expect(() => getCloneIdMappings(source)).toThrow('Duplicate source IDs in clone mapping')
+      expect(() => getCloneIdMappings(source, new IdGenerator())).toThrow('Duplicate source IDs in clone mapping')
     },
   )
 })

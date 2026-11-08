@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { POSITION_EPSILON } from '../../constants/layout'
 import type { PointSchema } from '../../schemas/geometry'
-import { findNextStitchHole, type StitchHoleLineSegment } from './stitchHoleGeometry'
+import { findNextStitchHole, type StitchHoleArcSegment, type StitchHoleLineSegment } from './stitchHoleGeometry'
 
 const point = (x: BigNumber.Value, y: BigNumber.Value): PointSchema => ({
   x: new BigNumber(x),
@@ -44,5 +44,29 @@ describe('findNextStitchHole coordinate precision', () => {
     const next = findNextStitchHole(start, new BigNumber(4), [segment], { segmentIndex: 0, point: start })
 
     expect(next?.center.x.toString()).toBe(expected)
+  })
+})
+
+describe('reversed stitch hole arcs', () => {
+  it('searches along the short counterclockwise arc', () => {
+    const segment: StitchHoleArcSegment = {
+      type: 'arc',
+      center: point(0, 0),
+      radius: new BigNumber(10),
+      start: point(0, 10),
+      end: point(10, 0),
+      reversed: true,
+    }
+    const next = findNextStitchHole(segment.start, new BigNumber(5), [segment], {
+      segmentIndex: 0,
+      point: segment.start,
+    })
+    expect(next?.center.x.toNumber()).toBeCloseTo(Math.sqrt(25 - 1.25 ** 2), 10)
+    expect(next?.center.y.toNumber()).toBeCloseTo(8.75, 10)
+    const outside = findNextStitchHole(segment.start, new BigNumber(15), [segment], {
+      segmentIndex: 0,
+      point: segment.start,
+    })
+    expect(outside).toBeUndefined()
   })
 })

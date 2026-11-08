@@ -1,18 +1,13 @@
-import { Button } from '@chakra-ui/react'
 import { useMemo, type FC } from 'react'
-import { PiWarningCircle } from 'react-icons/pi'
-import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
-import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
-import { useTranslation } from '../../hooks/useTranslation'
 import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
-import { CommonEmptyState } from '../common/CommonEmptyState'
 import { SectionGroup } from '../common/SectionGroup'
+import { PocketClusterEmptyState } from './PocketClusterEmptyState'
 import { AnchorSection } from './sections/AnchorSection'
 import { AutoSizeSection } from './sections/AutoSizeSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
@@ -34,10 +29,8 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
   onChange,
   parent,
 }) => {
-  const { t } = useTranslation()
-  const { isComputing } = useEditorContext()
   const { subProject } = useSubProject()
-  const { addComponent } = useSubProjectOperations()
+  const accessor = accessors.subProject(subProject)
   const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
     switch (component.orientation) {
       case 'up':
@@ -50,23 +43,13 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         return ['topRightRadius', 'bottomRightRadius']
     }
   }, [component.orientation])
-  const accessor = accessors.subProject(subProject)
+
   const hasFront = component.children.some((id) => {
     return isDefined(accessor.optional.component.frontPocket(id))
   })
+
   if (!hasFront) {
-    return (
-      <CommonEmptyState
-        icon={<PiWarningCircle />}
-        title={t.project.editors.emptyStates.missingFrontPocket.title}
-        description={t.project.editors.emptyStates.missingFrontPocket.description}
-        content={
-          <Button disabled={isComputing} size="xs" onClick={() => addComponent(component.id, 'front-pocket', 'end')}>
-            {t.project.editors.emptyStates.missingFrontPocket.action}
-          </Button>
-        }
-      />
-    )
+    return <PocketClusterEmptyState clusterId={component.id} />
   }
   return (
     <SectionGroup.Root>

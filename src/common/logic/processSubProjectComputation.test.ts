@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { createBaseOperationParams } from '../operations/subProject/testUtils'
 
 import { defaultStitchingSettings } from '../defaultStates'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
@@ -32,7 +33,7 @@ const offsetFixture = (): SubProjectSchema =>
         topLeftCorner: false,
         topRightCorner: false,
         autoCornerRadius: false,
-        topStartOffset: 15,
+        startOffset: 15,
       }),
     ],
     constraints: {
@@ -42,7 +43,7 @@ const offsetFixture = (): SubProjectSchema =>
           id: 'stitch-offset',
           type: 'component-bounds-stitch-line-constraint-field',
           modelId: 'stitch',
-          field: 'topStartOffset',
+          field: 'startOffset',
         },
       ]),
     },
@@ -96,25 +97,25 @@ describe('processSubProjectComputation', () => {
 
   it('keeps the manually edited value when a patcher resets that field', () => {
     const source = offsetFixture()
-    const previous = updateHole(source, { hole: { ...source.holes[0], xOffset: 15 } })
-    const input = updateStitchLine(previous, {
-      stitchLine: { ...accessors.subProject(previous).stitchLine.bounds('stitch'), topStartOffset: 25 },
+    const previous = updateHole(createBaseOperationParams(source), { hole: { ...source.holes[0], xOffset: 15 } })
+    const input = updateStitchLine(createBaseOperationParams(previous), {
+      stitchLine: { ...accessors.subProject(previous).stitchLine.bounds('stitch'), startOffset: 25 },
     })
     const result = processSubProjectComputation(input, defaultStitchingSettings, previous)
     const subProject = result.subProject
     expect(accessors.subProject(subProject).hole.byId('hole').xOffset).toBe(25)
-    expect(accessors.subProject(subProject).stitchLine.bounds('stitch').topStartOffset).toBe(25)
+    expect(accessors.subProject(subProject).stitchLine.bounds('stitch').startOffset).toBe(25)
     expect(result.computedSubProject).toEqual(getComputedSubProject(subProject, defaultStitchingSettings))
-    expect(accessors.subProject(input).stitchLine.bounds('stitch').topStartOffset).toBe(25)
-    expect(accessors.subProject(previous).stitchLine.bounds('stitch').topStartOffset).toBe(15)
+    expect(accessors.subProject(input).stitchLine.bounds('stitch').startOffset).toBe(25)
+    expect(accessors.subProject(previous).stitchLine.bounds('stitch').startOffset).toBe(15)
   })
 
-  it('propagates a real patcher reset when no linked input field was edited', () => {
+  it('preserves offsets when their endpoint is temporarily inactive', () => {
     const source = offsetFixture()
-    const input = updateHole(source, { hole: { ...source.holes[0], xOffset: 15 } })
+    const input = updateHole(createBaseOperationParams(source), { hole: { ...source.holes[0], xOffset: 15 } })
     const result = processSubProjectComputation(input, defaultStitchingSettings, input)
-    expect(accessors.subProject(result.subProject).hole.byId('hole').xOffset).toBe(0)
-    expect(accessors.subProject(result.subProject).stitchLine.bounds('stitch').topStartOffset).toBe(0)
+    expect(accessors.subProject(result.subProject).hole.byId('hole').xOffset).toBe(15)
+    expect(accessors.subProject(result.subProject).stitchLine.bounds('stitch').startOffset).toBe(15)
   })
 
   it('keeps equal saved radii while computing independent local limits', () => {
@@ -150,7 +151,7 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const input = updateHole(before, { hole: { ...before.holes[1], topLeftRadius: 60 } })
+    const input = updateHole(createBaseOperationParams(before), { hole: { ...before.holes[1], topLeftRadius: 60 } })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(result.subProject.holes.map((hole) => hole.topLeftRadius)).toEqual([60, 60])
     expect(result.computedSubProject.holes.large.cornerRadius.topLeft.toNumber()).toBe(30)
@@ -188,7 +189,10 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const mirrored = flip(before, accessors.subProject(before).component.rootPanel(), 'horizontal')
+    const mirrored = flip(createBaseOperationParams(before), {
+      model: accessors.subProject(before).component.rootPanel(),
+      axis: 'horizontal',
+    })
     const result = processSubProjectComputation(mirrored, defaultStitchingSettings, before)
     expect(accessors.subProject(result.subProject).component.panel('a').topLeftRadius).toBe(20)
     expect(accessors.subProject(result.subProject).component.panel('b').topLeftRadius).toBe(20)
@@ -220,7 +224,7 @@ describe('processSubProjectComputation', () => {
         size: equal('size', [{ id: 'panel-width', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }]),
       },
     })
-    const input = deleteComponent(before, { componentId: 'panel' })
+    const input = deleteComponent(createBaseOperationParams(before), { id: 'panel' })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(
       result.subProject.stitchLines.map(
@@ -247,10 +251,38 @@ describe('processSubProjectComputation', () => {
         ]),
       },
     })
-    const input = deletePocketOpening(before, { openingId: 'removed' })
+    const input = deletePocketOpening(createBaseOperationParams(before), { id: 'removed' })
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(accessors.subProject(result.subProject).component.tPocket('a').openingId).toBe(before.defaultPocketOpening)
     expect(accessors.subProject(result.subProject).component.tPocket('b').openingId).toBe(before.defaultPocketOpening)
     expect(result.subProject.pocketOpenings).not.toHaveProperty('removed')
+  })
+})
+
+describe('obsolete stitch constraint fields', () => {
+  it.each([
+    'topStartOffset',
+    'top',
+    'right',
+    'bottom',
+    'left',
+    'topLeftCorner',
+    'topRightCorner',
+    'bottomRightCorner',
+    'bottomLeftCorner',
+  ])('ignores obsolete %s before resolving constraints and removes it afterward', (field) => {
+    const source = offsetFixture()
+    const obsolete = {
+      id: 'old',
+      type: 'component-bounds-stitch-line-constraint-field',
+      modelId: 'stitch',
+      field,
+    } as unknown as ConstraintFieldSchema
+    source.constraints.linked = {
+      ...source.constraints.linked,
+      fields: [obsolete, source.constraints.linked.fields[0]],
+    }
+    const result = processSubProjectComputation(source, defaultStitchingSettings)
+    expect(result.subProject.constraints.linked.fields).toEqual([source.constraints.linked.fields[1]])
   })
 })

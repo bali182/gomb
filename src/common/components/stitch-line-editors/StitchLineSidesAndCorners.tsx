@@ -1,358 +1,117 @@
-import { Box, Grid } from '@chakra-ui/react'
-import { useCallback, type FC } from 'react'
-
+import { Grid } from '@chakra-ui/react'
+import { useCallback, type FC, type ReactNode } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
+import {
+  canToggleStitchLineSideOrCorner,
+  normalizeStitchLineSidesAndCorners,
+  type StitchLineSideOrCornerField,
+} from '../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../schemas/editable'
-import type { IssuesSchema } from '../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { StitchLineCornerToggle } from './StitchLineCornerToggle'
-import { StitchLineDirectionSwitch } from './StitchLineDirectionSwitch'
-import { StitchLineDisconnectedCornerSwitch } from './StitchLineDisconnectedCornerSwitch'
 import { StitchLineEdgeToggle } from './StitchLineEdgeToggle'
-import { StitchLineOffsetInput, type StitchLineOffsetField } from './StitchLineOffsetInput'
+import { StitchLineEditorsOverlay } from './StitchLineEditorsOverlay'
+import { STITCH_LINE_PADDING_X, STITCH_LINE_PADDING_Y } from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSidesAndCornersProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  issues: IssuesSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
+  startOffsetEditor?: ReactNode
+  endOffsetEditor?: ReactNode
+  directionEditor?: ReactNode
 }
 
-type StitchLineSideFields = 'top' | 'right' | 'bottom' | 'left'
-type StitchLineCornerFields = 'topLeftCorner' | 'topRightCorner' | 'bottomRightCorner' | 'bottomLeftCorner'
-type StitchLineDisconnectedCornerFields =
-  | 'stitchDisconnectedTopLeftCorner'
-  | 'stitchDisconnectedTopRightCorner'
-  | 'stitchDisconnectedBottomRightCorner'
-  | 'stitchDisconnectedBottomLeftCorner'
-type StitchLineSideOrCornerFields = StitchLineCornerFields | StitchLineSideFields
-
-type StitchLineSideCornersSchema = {
-  first: StitchLineCornerFields
-  second: StitchLineCornerFields
-}
-
-type StitchLineOffsetConnectionSchema = {
-  corner: StitchLineCornerFields
-  side: StitchLineSideFields
-}
-
-type CornerSidesSchema = {
-  first: StitchLineSideFields
-  second: StitchLineSideFields
-}
-
-const cornerSides: Record<StitchLineCornerFields, CornerSidesSchema> = {
-  bottomLeftCorner: { first: 'bottom', second: 'left' },
-  bottomRightCorner: { first: 'bottom', second: 'right' },
-  topLeftCorner: { first: 'top', second: 'left' },
-  topRightCorner: { first: 'top', second: 'right' },
-}
-
-const disconnectedCornerFields: Record<StitchLineCornerFields, StitchLineDisconnectedCornerFields> = {
-  bottomLeftCorner: 'stitchDisconnectedBottomLeftCorner',
-  bottomRightCorner: 'stitchDisconnectedBottomRightCorner',
-  topLeftCorner: 'stitchDisconnectedTopLeftCorner',
-  topRightCorner: 'stitchDisconnectedTopRightCorner',
-}
-
-const sideCorners: Record<StitchLineSideFields, StitchLineSideCornersSchema> = {
-  bottom: { first: 'bottomLeftCorner', second: 'bottomRightCorner' },
-  left: { first: 'bottomLeftCorner', second: 'topLeftCorner' },
-  right: { first: 'bottomRightCorner', second: 'topRightCorner' },
-  top: { first: 'topLeftCorner', second: 'topRightCorner' },
-}
-
-const offsetConnections: Record<StitchLineOffsetField, StitchLineOffsetConnectionSchema> = {
-  bottomEndOffset: { corner: 'bottomLeftCorner', side: 'bottom' },
-  bottomStartOffset: { corner: 'bottomRightCorner', side: 'bottom' },
-  leftEndOffset: { corner: 'topLeftCorner', side: 'left' },
-  leftStartOffset: { corner: 'bottomLeftCorner', side: 'left' },
-  rightEndOffset: { corner: 'bottomRightCorner', side: 'right' },
-  rightStartOffset: { corner: 'topRightCorner', side: 'right' },
-  topEndOffset: { corner: 'topRightCorner', side: 'top' },
-  topStartOffset: { corner: 'topLeftCorner', side: 'top' },
-}
-
-export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({ editable, issues, onChange }) => {
+export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
+  editable,
+  onChange,
+  startOffsetEditor,
+  endOffsetEditor,
+  directionEditor,
+}) => {
   const { t } = useTranslation()
   const toggle = useCallback(
-    (field: StitchLineSideOrCornerFields): void => {
-      onChange({ ...editable, [field]: !editable[field] })
+    (field: StitchLineSideOrCornerField): void => {
+      if (canToggleStitchLineSideOrCorner(editable, field)) {
+        onChange(normalizeStitchLineSidesAndCorners({ ...editable, [field]: !editable[field] }))
+      }
     },
     [editable, onChange],
   )
-
-  const isCornerDisabled = useCallback(
-    (corner: StitchLineCornerFields): boolean => {
-      const sides = cornerSides[corner]
-
-      return !editable[sides.first] && !editable[sides.second]
-    },
-    [editable],
-  )
-
-  const isDirectionDisabled = useCallback(
-    (side: StitchLineSideFields): boolean => {
-      const corners = sideCorners[side]
-
-      return !editable[side] || editable[corners.first] || editable[corners.second]
-    },
-    [editable],
-  )
-
-  const isDisconnectedCornerDisabled = useCallback(
-    (corner: StitchLineCornerFields): boolean => {
-      const sides = cornerSides[corner]
-
-      return editable[corner] || !editable[sides.first] || !editable[sides.second]
-    },
-    [editable],
-  )
-
-  const isOffsetDisabled = useCallback(
-    (field: StitchLineOffsetField): boolean => {
-      const connection = offsetConnections[field]
-
-      return !editable[connection.side] || editable[connection.corner]
-    },
-    [editable],
-  )
-
-  const handleOffsetChange = useCallback(
-    (field: StitchLineOffsetField, value: string): void => {
-      onChange({ ...editable, [field]: value })
-    },
-    [editable, onChange],
-  )
-
-  const handleDisconnectedCornerChange = useCallback(
-    (field: StitchLineDisconnectedCornerFields, checked: boolean): void => {
-      onChange({ ...editable, [field]: checked })
-    },
-    [editable, onChange],
-  )
-
   return (
     <Grid
+      aspectRatio="4 / 3"
       gap="2"
-      gridTemplateAreas={`
-        ". left-start-offset top-direction right-start-offset ."
-        "top-start-offset canvas canvas canvas top-end-offset"
-        "left-direction canvas canvas canvas right-direction"
-        "bottom-start-offset canvas canvas canvas bottom-end-offset"
-        ". left-end-offset bottom-direction right-end-offset ."
-      `}
-      gridTemplateColumns="auto auto minmax(0, 1fr) auto auto"
-      gridTemplateRows="auto auto auto auto auto"
+      gridTemplateAreas={`"top-left top top-right" "left center right" "bottom-left bottom bottom-right"`}
+      gridTemplateColumns="auto minmax(0, 1fr) auto"
+      gridTemplateRows="auto minmax(0, 1fr) auto"
+      position="relative"
+      width="100%"
+      minWidth="0"
+      minHeight="64"
+      px={STITCH_LINE_PADDING_X}
+      py={STITCH_LINE_PADDING_Y}
     >
-      <Grid
-        aspectRatio="4 / 3"
-        gap="0"
-        gridArea="canvas"
-        gridTemplateAreas={`
-          "top-left top top-right"
-          "left center right"
-          "bottom-left bottom bottom-right"
-        `}
-        gridTemplateColumns="auto minmax(0, 1fr) auto"
-        gridTemplateRows="auto minmax(0, 1fr) auto"
-        position="relative"
-      >
-        <StitchLineCornerToggle
-          corner="top-left"
-          disabled={isCornerDisabled('topLeftCorner')}
-          selected={editable.topLeftCorner}
-          onClick={() => toggle('topLeftCorner')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topLeftCorner.tooltip}
-        />
-        <StitchLineEdgeToggle
-          selected={editable.top}
-          side="top"
-          onClick={() => toggle('top')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.top.tooltip}
-        />
-        <StitchLineCornerToggle
-          corner="top-right"
-          disabled={isCornerDisabled('topRightCorner')}
-          selected={editable.topRightCorner}
-          onClick={() => toggle('topRightCorner')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topRightCorner.tooltip}
-        />
-        <StitchLineEdgeToggle
-          selected={editable.left}
-          side="left"
-          onClick={() => toggle('left')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.left.tooltip}
-        />
-        <Box gridArea="center" />
-        <StitchLineEdgeToggle
-          selected={editable.right}
-          side="right"
-          onClick={() => toggle('right')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.right.tooltip}
-        />
-        <StitchLineCornerToggle
-          corner="bottom-left"
-          disabled={isCornerDisabled('bottomLeftCorner')}
-          selected={editable.bottomLeftCorner}
-          onClick={() => toggle('bottomLeftCorner')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomLeftCorner.tooltip}
-        />
-        <StitchLineEdgeToggle
-          selected={editable.bottom}
-          side="bottom"
-          onClick={() => toggle('bottom')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottom.tooltip}
-        />
-        <StitchLineCornerToggle
-          corner="bottom-right"
-          disabled={isCornerDisabled('bottomRightCorner')}
-          selected={editable.bottomRightCorner}
-          onClick={() => toggle('bottomRightCorner')}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomRightCorner.tooltip}
-        />
-        <StitchLineDisconnectedCornerSwitch
-          checked={editable[disconnectedCornerFields.topLeftCorner]}
-          corner="top-left"
-          disabled={isDisconnectedCornerDisabled('topLeftCorner')}
-          onCheckedChange={(checked) => handleDisconnectedCornerChange(disconnectedCornerFields.topLeftCorner, checked)}
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.stitchDisconnectedTopLeftCorner.tooltip}
-        />
-        <StitchLineDisconnectedCornerSwitch
-          checked={editable[disconnectedCornerFields.topRightCorner]}
-          corner="top-right"
-          disabled={isDisconnectedCornerDisabled('topRightCorner')}
-          onCheckedChange={(checked) =>
-            handleDisconnectedCornerChange(disconnectedCornerFields.topRightCorner, checked)
-          }
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.stitchDisconnectedTopRightCorner.tooltip}
-        />
-        <StitchLineDisconnectedCornerSwitch
-          checked={editable[disconnectedCornerFields.bottomLeftCorner]}
-          corner="bottom-left"
-          disabled={isDisconnectedCornerDisabled('bottomLeftCorner')}
-          onCheckedChange={(checked) =>
-            handleDisconnectedCornerChange(disconnectedCornerFields.bottomLeftCorner, checked)
-          }
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.stitchDisconnectedBottomLeftCorner.tooltip}
-        />
-        <StitchLineDisconnectedCornerSwitch
-          checked={editable[disconnectedCornerFields.bottomRightCorner]}
-          corner="bottom-right"
-          disabled={isDisconnectedCornerDisabled('bottomRightCorner')}
-          onCheckedChange={(checked) =>
-            handleDisconnectedCornerChange(disconnectedCornerFields.bottomRightCorner, checked)
-          }
-          tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.stitchDisconnectedBottomRightCorner.tooltip}
-        />
-      </Grid>
-      <StitchLineDirectionSwitch
-        checked={editable.topStitchDirection === 'left-to-right'}
-        disabled={isDirectionDisabled('top')}
+      <StitchLineCornerToggle
+        corner="top-left"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'topLeftCorner')}
+        selected={editable.topLeftCorner}
+        onClick={() => toggle('topLeftCorner')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topLeftCorner.tooltip}
+      />
+      <StitchLineEdgeToggle
         side="top"
-        onCheckedChange={(checked) =>
-          onChange({ ...editable, topStitchDirection: checked ? 'left-to-right' : 'right-to-left' })
-        }
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topStitchDirection.tooltip}
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'top')}
+        selected={editable.top}
+        onClick={() => toggle('top')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.top.tooltip}
       />
-      <StitchLineDirectionSwitch
-        checked={editable.rightStitchDirection === 'top-to-bottom'}
-        disabled={isDirectionDisabled('right')}
-        side="right"
-        onCheckedChange={(checked) =>
-          onChange({ ...editable, rightStitchDirection: checked ? 'top-to-bottom' : 'bottom-to-top' })
-        }
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.rightStitchDirection.tooltip}
+      <StitchLineCornerToggle
+        corner="top-right"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'topRightCorner')}
+        selected={editable.topRightCorner}
+        onClick={() => toggle('topRightCorner')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topRightCorner.tooltip}
       />
-      <StitchLineDirectionSwitch
-        checked={editable.bottomStitchDirection === 'right-to-left'}
-        disabled={isDirectionDisabled('bottom')}
-        side="bottom"
-        onCheckedChange={(checked) =>
-          onChange({ ...editable, bottomStitchDirection: checked ? 'right-to-left' : 'left-to-right' })
-        }
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomStitchDirection.tooltip}
-      />
-      <StitchLineDirectionSwitch
-        checked={editable.leftStitchDirection === 'bottom-to-top'}
-        disabled={isDirectionDisabled('left')}
+      <StitchLineEdgeToggle
         side="left"
-        onCheckedChange={(checked) =>
-          onChange({ ...editable, leftStitchDirection: checked ? 'bottom-to-top' : 'top-to-bottom' })
-        }
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.leftStitchDirection.tooltip}
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'left')}
+        selected={editable.left}
+        onClick={() => toggle('left')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.left.tooltip}
       />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('leftStartOffset')}
-        field="leftStartOffset"
-        issue={issues.leftStartOffset}
-        value={editable.leftStartOffset}
-        onChange={(value) => handleOffsetChange('leftStartOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.leftStartOffset.tooltip}
+      <StitchLineEdgeToggle
+        side="right"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'right')}
+        selected={editable.right}
+        onClick={() => toggle('right')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.right.tooltip}
       />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('topStartOffset')}
-        field="topStartOffset"
-        issue={issues.topStartOffset}
-        value={editable.topStartOffset}
-        onChange={(value) => handleOffsetChange('topStartOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topStartOffset.tooltip}
+      <StitchLineCornerToggle
+        corner="bottom-left"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'bottomLeftCorner')}
+        selected={editable.bottomLeftCorner}
+        onClick={() => toggle('bottomLeftCorner')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomLeftCorner.tooltip}
       />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('topEndOffset')}
-        field="topEndOffset"
-        issue={issues.topEndOffset}
-        value={editable.topEndOffset}
-        onChange={(value) => handleOffsetChange('topEndOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topEndOffset.tooltip}
+      <StitchLineEdgeToggle
+        side="bottom"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'bottom')}
+        selected={editable.bottom}
+        onClick={() => toggle('bottom')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottom.tooltip}
       />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('rightStartOffset')}
-        field="rightStartOffset"
-        issue={issues.rightStartOffset}
-        value={editable.rightStartOffset}
-        onChange={(value) => handleOffsetChange('rightStartOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.rightStartOffset.tooltip}
+      <StitchLineCornerToggle
+        corner="bottom-right"
+        disabled={!canToggleStitchLineSideOrCorner(editable, 'bottomRightCorner')}
+        selected={editable.bottomRightCorner}
+        onClick={() => toggle('bottomRightCorner')}
+        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomRightCorner.tooltip}
       />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('rightEndOffset')}
-        field="rightEndOffset"
-        issue={issues.rightEndOffset}
-        value={editable.rightEndOffset}
-        onChange={(value) => handleOffsetChange('rightEndOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.rightEndOffset.tooltip}
-      />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('bottomStartOffset')}
-        field="bottomStartOffset"
-        issue={issues.bottomStartOffset}
-        value={editable.bottomStartOffset}
-        onChange={(value) => handleOffsetChange('bottomStartOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomStartOffset.tooltip}
-      />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('bottomEndOffset')}
-        field="bottomEndOffset"
-        issue={issues.bottomEndOffset}
-        value={editable.bottomEndOffset}
-        onChange={(value) => handleOffsetChange('bottomEndOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomEndOffset.tooltip}
-      />
-      <StitchLineOffsetInput
-        modelId={editable.id}
-        disabled={isOffsetDisabled('leftEndOffset')}
-        field="leftEndOffset"
-        issue={issues.leftEndOffset}
-        value={editable.leftEndOffset}
-        onChange={(value) => handleOffsetChange('leftEndOffset', value)}
-        tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.leftEndOffset.tooltip}
+      <StitchLineEditorsOverlay
+        editable={editable}
+        startOffsetEditor={startOffsetEditor}
+        endOffsetEditor={endOffsetEditor}
+        directionEditor={directionEditor}
       />
     </Grid>
   )

@@ -1,6 +1,6 @@
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { getComponentStitchLineTypes } from '../../operations/subProject/utils/componentRules'
-import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
+import type { ComponentSchema, PocketClusterSchema, PocketOrientationSchema } from '../../schemas/components'
 import type {
   ComputedComponentSchema,
   ComputedStitchLineSchema,
@@ -95,7 +95,6 @@ const calculateComputedTPocketStitchLine = (
     onTop: component.id,
     autoComputedCornerRadius: ZERO_CORNER_RADIUS,
     boundingRect,
-    connectingStitches: [],
     routes,
   }
 }
@@ -109,23 +108,44 @@ const calculatePocketStitchRoute = (
   if (!isDefined(calculated)) {
     return undefined
   }
-  const labelPosition: StitchSideSchema =
-    cluster.orientation === 'up' ? 'top' : cluster.orientation === 'down' ? 'bottom' : cluster.orientation
+  const labelPosition = getPocketStitchLabelPosition(cluster.orientation)
   const holes = calculateTPocketStitchHoles(stitchLine, calculated.line)
+  const side = getPocketStitchSide(cluster.orientation)
   return {
     targetType: 'component',
     targetId: pocket.componentId,
     boundingRect: calculateStitchLineBoundingRect([calculated.line.start, calculated.line.end]),
     path: calculated.path,
+    fragments: [{ type: 'side', side, start: calculated.line.start, end: calculated.line.end }],
     holes,
     isClosed: false,
     stitches: calculateRouteStitches(holes, false),
     labelPosition,
-    disconnectedCorners: {
-      'top-left': undefined,
-      'top-right': undefined,
-      'bottom-right': undefined,
-      'bottom-left': undefined,
-    },
+  }
+}
+
+const getPocketStitchSide = (orientation: PocketOrientationSchema): StitchSideSchema => {
+  switch (orientation) {
+    case 'up':
+      return 'bottom'
+    case 'down':
+      return 'top'
+    case 'left':
+      return 'right'
+    case 'right':
+      return 'left'
+  }
+}
+
+const getPocketStitchLabelPosition = (orientation: PocketOrientationSchema): StitchSideSchema => {
+  switch (orientation) {
+    case 'up':
+      return 'top'
+    case 'down':
+      return 'bottom'
+    case 'left':
+      return 'left'
+    case 'right':
+      return 'right'
   }
 }

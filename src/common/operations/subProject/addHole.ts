@@ -1,21 +1,19 @@
-import type { ReadonlyModelObjectFactorySchema } from '../../schemas/factory'
+import type { AddHoleParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 
-export type AddHoleParams = {
-  componentId: string
-  modelFactory: ReadonlyModelObjectFactorySchema
-}
-
-export const addHole = (subProject: SubProjectSchema, params: AddHoleParams): SubProjectSchema => {
-  const cluster = accessors.subProject(subProject).optional.component.pocketCluster(params.componentId)
+export const addHole = (
+  { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
+  params: AddHoleParamsSchema,
+): SubProjectSchema => {
+  const cluster = accessors.subProject(subProject).optional.component.pocketCluster(params.targetId)
   if (isDefined(cluster)) {
     return subProject
   }
-  const hole = params.modelFactory.createHole({
-    componentId: params.componentId,
+  const hole = readonlyFactory.createHole({
+    componentId: params.targetId,
     forbiddenIds: getSubProjectIds(subProject),
     forbiddenNames: new Set(subProject.holes.map((hole) => hole.name)),
   })

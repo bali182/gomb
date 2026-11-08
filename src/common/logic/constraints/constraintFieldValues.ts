@@ -1,9 +1,5 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { pocketItems } from '../../data/pocketItems'
-import { updateComponent } from '../../operations/subProject/updateComponent'
-import { updateHole } from '../../operations/subProject/updateHole'
-import { updatePocketOpening } from '../../operations/subProject/updatePocketOpening'
-import { updateStitchLine } from '../../operations/subProject/updateStitchLine'
 import type {
   ConstraintCompatibilityGroupSchema,
   ConstraintFieldNameSchema,
@@ -91,10 +87,6 @@ const isCompatibleValue = (group: ConstraintCompatibilityGroupSchema, value: Con
       return value === 'start' || value === 'end'
     case 'enum:stitch-direction':
       return value === 'start-to-end' || value === 'end-to-start'
-    case 'enum:horizontal-stitch-direction':
-      return value === 'left-to-right' || value === 'right-to-left'
-    case 'enum:vertical-stitch-direction':
-      return value === 'top-to-bottom' || value === 'bottom-to-top'
   }
 }
 
@@ -195,17 +187,29 @@ const replaceModel = (subProject: SubProjectSchema, updated: ModelObjectSchema):
     case 'pocket-cluster':
     case 'front-pocket':
     case 't-pocket':
-      return updateComponent(subProject, { component: updated })
+      return {
+        ...subProject,
+        components: { ...subProject.components, [updated.id]: updated },
+      }
     case 'hole':
-      return updateHole(subProject, { hole: updated })
+      return {
+        ...subProject,
+        holes: subProject.holes.map((hole) => (hole.id === updated.id ? updated : hole)),
+      }
     case 'component-bounds-stitch-line':
     case 't-pocket-stitch-line':
-      return updateStitchLine(subProject, { stitchLine: updated })
+      return {
+        ...subProject,
+        stitchLines: subProject.stitchLines.map((stitchLine) => (stitchLine.id === updated.id ? updated : stitchLine)),
+      }
     case 'straight':
     case 'recessed':
     case 'slanted':
     case 'optical-illusion':
-      return updatePocketOpening(subProject, { opening: updated })
+      return {
+        ...subProject,
+        pocketOpenings: { ...subProject.pocketOpenings, [updated.id]: updated },
+      }
     case 'equal-constraint':
       return subProject
   }
