@@ -37,14 +37,17 @@ const getStitchLineAnchor = (
   model: StitchLineSchema,
   subProject: SubProjectSchema,
 ): FloatingEditorAnchor | undefined => {
-  const fallbackAnchor = getTargetAnchor(model, subProject)
+  const targetAnchor = getTargetAnchor(model, subProject)
 
-  if (!isDefined(fallbackAnchor)) {
+  if (!isDefined(targetAnchor)) {
     return undefined
   }
 
-  return getFallbackAnchor(fallbackAnchor, () => {
-    return getUnionBoundingClientRect(getStitchLineRouteElements(model.id))
+  return getFallbackAnchor(targetAnchor, () => {
+    return getBoundingClientRect([
+      targetAnchor.getBoundingClientRect(),
+      ...getStitchLineRouteElements(model.id).map((e) => e.getBoundingClientRect()),
+    ])
   })
 }
 
@@ -111,27 +114,23 @@ const getFallbackAnchor = (
   }
 }
 
-const getUnionBoundingClientRect = (elements: SVGGElement[]): DOMRect | undefined => {
-  const firstRect = elements[0]?.getBoundingClientRect()
+const getBoundingClientRect = (rects: DOMRect[]): DOMRect | undefined => {
+  return rects.reduce<DOMRect | undefined>((bounds, rect) => {
+    if (!isDefined(bounds)) {
+      return DOMRect.fromRect(rect)
+    }
 
-  if (!isDefined(firstRect)) {
-    return undefined
-  }
+    const left = Math.min(bounds.left, rect.left)
+    const top = Math.min(bounds.top, rect.top)
+    const right = Math.max(bounds.right, rect.right)
+    const bottom = Math.max(bounds.bottom, rect.bottom)
 
-  let left = firstRect.left
-  let top = firstRect.top
-  let right = firstRect.right
-  let bottom = firstRect.bottom
-
-  for (const element of elements.slice(1)) {
-    const rect = element.getBoundingClientRect()
-    left = Math.min(left, rect.left)
-    top = Math.min(top, rect.top)
-    right = Math.max(right, rect.right)
-    bottom = Math.max(bottom, rect.bottom)
-  }
-
-  return new DOMRect(left, top, right - left, bottom - top)
+    bounds.x = left
+    bounds.y = top
+    bounds.width = right - left
+    bounds.height = bottom - top
+    return bounds
+  }, undefined)
 }
 
 export const floatingEditorAnchors = {
