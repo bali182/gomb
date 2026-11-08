@@ -10,14 +10,14 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { StitchLineCornerToggle } from './StitchLineCornerToggle'
 import { StitchLineEdgeToggle } from './StitchLineEdgeToggle'
-import { StitchLineEditorsOverlay, type StitchLineOffsetEditorRenderer } from './StitchLineEditorsOverlay'
+import { StitchLineEditorsOverlay } from './StitchLineEditorsOverlay'
 import { STITCH_LINE_PADDING_X, STITCH_LINE_PADDING_Y } from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSidesAndCornersProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
   onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
-  startOffsetEditor?: StitchLineOffsetEditorRenderer
-  endOffsetEditor?: StitchLineOffsetEditorRenderer
+  startOffsetEditor?: ReactNode
+  endOffsetEditor?: ReactNode
   directionEditor?: ReactNode
 }
 
@@ -47,7 +47,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
       position="relative"
       width="100%"
       minWidth="0"
-      minHeight="80"
+      minHeight="64"
       px={STITCH_LINE_PADDING_X}
       py={STITCH_LINE_PADDING_Y}
     >

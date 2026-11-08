@@ -1,5 +1,7 @@
 import { Box, InputGroup, type InputProps, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
-import type { FC, ReactElement, ReactNode } from 'react'
+import { useMemo, type FC, type ReactElement, type ReactNode } from 'react'
+
+import { isDefined } from '../../utils/isDefined'
 
 export type NumberInputArrowPosition =
   | 'top'
@@ -17,7 +19,6 @@ type NumberInputArrowProps = {
   startAddon?: ReactNode
   endAddon?: ReactNode
   size: InputProps['size']
-  borderColor: Tokens['colors'] | undefined
   opacity?: number
 }
 
@@ -27,19 +28,27 @@ export const NumberInputArrow: FC<NumberInputArrowProps> = ({
   startAddon,
   endAddon,
   size,
-  borderColor,
   opacity,
 }) => {
+  const arrowFillColor = useMemo<Tokens['colors']>(() => {
+    if (position === 'left' || position === 'top-left' || position === 'bottom-left') {
+      return isDefined(startAddon) ? 'bg.muted' : 'bg.panel'
+    }
+    if (position === 'right' || position === 'top-right' || position === 'bottom-right') {
+      return isDefined(endAddon) ? 'bg.muted' : 'bg.panel'
+    }
+    return 'bg.panel'
+  }, [position, startAddon, endAddon])
+
   return (
     <Box
       position="relative"
       width="100%"
       background="bg.panel"
-      borderTopLeftRadius={position === 'top-left' ? 0 : 'md'}
-      borderTopRightRadius={position === 'top-right' ? 0 : 'md'}
-      borderBottomLeftRadius={position === 'bottom-left' ? 0 : 'md'}
-      borderBottomRightRadius={position === 'bottom-right' ? 0 : 'md'}
-      boxShadow="sm"
+      borderTopLeftRadius={position === 'top-left' ? 0 : 'l2'}
+      borderTopRightRadius={position === 'top-right' ? 0 : 'l2'}
+      borderBottomLeftRadius={position === 'bottom-left' ? 0 : 'l2'}
+      borderBottomRightRadius={position === 'bottom-right' ? 0 : 'l2'}
       pointerEvents="auto"
       isolation="isolate"
       opacity={opacity}
@@ -48,7 +57,7 @@ export const NumberInputArrow: FC<NumberInputArrowProps> = ({
         position="absolute"
         inset="0"
         borderWidth="1px"
-        borderColor={borderColor ?? 'border'}
+        borderColor="transparent"
         borderRadius="inherit"
         pointerEvents="none"
         zIndex="1"
@@ -63,31 +72,26 @@ export const NumberInputArrow: FC<NumberInputArrowProps> = ({
             pointerEvents: 'none',
             zIndex: -1,
           },
+          '&::before': { color: 'border' },
+          '&::after': { color: arrowFillColor },
           ...NUMBER_INPUT_ARROW_STYLES[position],
         }}
       />
       <InputGroup
+        borderRadius="inherit"
+        isolation="auto"
         startAddon={startAddon}
         startAddonProps={{
           size,
           px: '1.5',
-          borderWidth: 0,
-          borderInlineEndWidth: '1px',
-          borderRadius: 0,
-          background: 'transparent',
-          marginInlineEnd: 0,
+          borderRadius: 'inherit',
         }}
         endAddon={endAddon}
         endAddonProps={{
           size,
           px: 0,
-          borderWidth: 0,
-          borderInlineStartWidth: '1px',
-          borderRadius: 0,
-          background: 'transparent',
-          marginInlineEnd: 0,
+          borderRadius: 'inherit',
         }}
-        _focusWithin={{ zIndex: 2 }}
       >
         {children}
       </InputGroup>
@@ -105,14 +109,14 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: `0 5px ${OFFSET_ARROW_LENGTH}px 5px`,
-      borderBottomColor: 'inherit',
+      borderBottomColor: 'currentColor',
     },
     _after: {
       top: `-${OFFSET_ARROW_LENGTH - 2}px`,
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: `0 4px ${OFFSET_ARROW_INNER_LENGTH}px 4px`,
-      borderBottomColor: 'bg.panel',
+      borderBottomColor: 'currentColor',
     },
   },
   right: {
@@ -121,14 +125,14 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: `5px 0 5px ${OFFSET_ARROW_LENGTH}px`,
-      borderLeftColor: 'inherit',
+      borderLeftColor: 'currentColor',
     },
     _after: {
       left: 'calc(100% - 1px)',
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: `4px 0 4px ${OFFSET_ARROW_INNER_LENGTH}px`,
-      borderLeftColor: 'bg.panel',
+      borderLeftColor: 'currentColor',
     },
   },
   bottom: {
@@ -137,14 +141,14 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: `${OFFSET_ARROW_LENGTH}px 5px 0 5px`,
-      borderTopColor: 'inherit',
+      borderTopColor: 'currentColor',
     },
     _after: {
       bottom: `-${OFFSET_ARROW_LENGTH - 2}px`,
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: `${OFFSET_ARROW_INNER_LENGTH}px 4px 0 4px`,
-      borderTopColor: 'bg.panel',
+      borderTopColor: 'currentColor',
     },
   },
   left: {
@@ -153,14 +157,14 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: `5px ${OFFSET_ARROW_LENGTH}px 5px 0`,
-      borderRightColor: 'inherit',
+      borderRightColor: 'currentColor',
     },
     _after: {
       right: 'calc(100% - 1px)',
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: `4px ${OFFSET_ARROW_INNER_LENGTH}px 4px 0`,
-      borderRightColor: 'bg.panel',
+      borderRightColor: 'currentColor',
     },
   },
   'top-left': {
@@ -168,13 +172,13 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       top: '-1px',
       right: '100%',
       borderWidth: `${OFFSET_ARROW_LENGTH}px 0 0 ${OFFSET_ARROW_LENGTH}px`,
-      borderTopColor: 'inherit',
+      borderTopColor: 'currentColor',
     },
     _after: {
       top: 0,
       right: 'calc(100% - 1px)',
       borderWidth: `${OFFSET_ARROW_INNER_LENGTH}px 0 0 ${OFFSET_ARROW_INNER_LENGTH}px`,
-      borderTopColor: 'bg.panel',
+      borderTopColor: 'currentColor',
     },
   },
   'top-right': {
@@ -182,13 +186,13 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       top: '-1px',
       left: '100%',
       borderWidth: `${OFFSET_ARROW_LENGTH}px ${OFFSET_ARROW_LENGTH}px 0 0`,
-      borderTopColor: 'inherit',
+      borderTopColor: 'currentColor',
     },
     _after: {
       top: 0,
       left: 'calc(100% - 1px)',
       borderWidth: `${OFFSET_ARROW_INNER_LENGTH}px ${OFFSET_ARROW_INNER_LENGTH}px 0 0`,
-      borderTopColor: 'bg.panel',
+      borderTopColor: 'currentColor',
     },
   },
   'bottom-left': {
@@ -196,13 +200,13 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       bottom: '-1px',
       right: '100%',
       borderWidth: `0 0 ${OFFSET_ARROW_LENGTH}px ${OFFSET_ARROW_LENGTH}px`,
-      borderBottomColor: 'inherit',
+      borderBottomColor: 'currentColor',
     },
     _after: {
       bottom: 0,
       right: 'calc(100% - 1px)',
       borderWidth: `0 0 ${OFFSET_ARROW_INNER_LENGTH}px ${OFFSET_ARROW_INNER_LENGTH}px`,
-      borderBottomColor: 'bg.panel',
+      borderBottomColor: 'currentColor',
     },
   },
   'bottom-right': {
@@ -210,13 +214,13 @@ const NUMBER_INPUT_ARROW_STYLES: Record<NumberInputArrowPosition, SystemStyleObj
       bottom: '-1px',
       left: '100%',
       borderWidth: `0 ${OFFSET_ARROW_LENGTH}px ${OFFSET_ARROW_LENGTH}px 0`,
-      borderBottomColor: 'inherit',
+      borderBottomColor: 'currentColor',
     },
     _after: {
       bottom: 0,
       left: 'calc(100% - 1px)',
       borderWidth: `0 ${OFFSET_ARROW_INNER_LENGTH}px ${OFFSET_ARROW_INNER_LENGTH}px 0`,
-      borderBottomColor: 'bg.panel',
+      borderBottomColor: 'currentColor',
     },
   },
 }

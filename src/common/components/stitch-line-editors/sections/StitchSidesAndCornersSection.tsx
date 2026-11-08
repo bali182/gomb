@@ -3,7 +3,10 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { STITCH_LINE_SIDE_AND_CORNER_ORDER } from '../../../logic/stitching/stitchLineSidesAndCorners'
+import {
+  STITCH_LINE_SIDE_AND_CORNER_ORDER,
+  type StitchLineSideOrCornerField,
+} from '../../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchDirectionSchema } from '../../../schemas/stitching'
@@ -14,7 +17,9 @@ import { EditorNumberInput } from '../../common/EditorNumberInput'
 import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
 import { StitchLineDirectionControl } from '../StitchLineDirectionControl'
+import { StitchLineOffsetIcon } from '../StitchLineOffsetIcon'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
+import { getStitchLineOffsetArrowPosition, getStitchLineOffsetPosition } from '../stitchLineOffsetEditorUtils'
 
 type StitchSidesAndCornersSectionProps = {
   value: ComponentBoundsStitchLineSchema
@@ -34,12 +39,37 @@ export const StitchSidesAndCornersSection = ({
   const accessor = accessors.computedSubProject(computedSubProject)
   const route = accessor.optional.stitchLine.bounds(value.id)?.routes[0]
   const hasStitchedSidesOrCorners = STITCH_LINE_SIDE_AND_CORNER_ORDER.some((field) => editable[field])
+  const isClosed = useMemo<boolean>(
+    () => STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => editable[field]),
+    [editable],
+  )
   const startDisabled =
     !hasStitchedSidesOrCorners ||
-    (route?.isClosed === true &&
+    (isClosed &&
+      isDefined(route) &&
       route.fragments.some((fragment) => narrowers.path.is.cornerFragment(fragment) && fragment.radius.isZero()))
 
-  const endDisabled = !hasStitchedSidesOrCorners || route?.isClosed === true
+  const endDisabled = !hasStitchedSidesOrCorners || isClosed
+
+  const startPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'start'),
+    [editable],
+  )
+
+  const endPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'end'),
+    [editable],
+  )
+
+  const startArrowPosition = useMemo<NumberInputArrowPosition | undefined>(
+    () => getStitchLineOffsetArrowPosition(startPosition, endPosition, 'start'),
+    [startPosition, endPosition],
+  )
+
+  const endArrowPosition = useMemo<NumberInputArrowPosition | undefined>(
+    () => getStitchLineOffsetArrowPosition(endPosition, startPosition, 'end'),
+    [endPosition, startPosition],
+  )
 
   const handleDirectionChange = useCallback(
     (direction: StitchDirectionSchema): void => {
@@ -62,17 +92,12 @@ export const StitchSidesAndCornersSection = ({
     [editable, onChange],
   )
 
-  const stitchingIssues = useMemo(
-    () => [issues.stitchDirection, issues.startOffset, issues.endOffset].filter(isDefined),
-    [issues.endOffset, issues.startOffset, issues.stitchDirection],
-  )
-
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.stitchLines.sidesAndCorners.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionFullWidthContent issue={stitchingIssues} padded={false}>
+      <SectionGroup.SectionFullWidthContent padded={false}>
         <StitchLineSidesAndCorners
           editable={editable}
           onChange={onChange}
@@ -89,38 +114,40 @@ export const StitchSidesAndCornersSection = ({
             </VStack>
           }
           startOffsetEditor={
-            startDisabled
-              ? undefined
-              : (arrowPosition: NumberInputArrowPosition | undefined): ReactNode => (
-                  <VStack width="24">
-                    <EditorNumberInput
-                      modelId={editable.id}
-                      field="startOffset"
-                      issue={issues.startOffset}
-                      onChange={handleStartOffsetChange}
-                      unit="mm"
-                      value={editable.startOffset}
-                      arrowPosition={arrowPosition}
-                    />
-                  </VStack>
-                )
+            startDisabled || !isDefined(startPosition) ? undefined : (
+              <VStack width="32">
+                <EditorNumberInput
+                  modelId={editable.id}
+                  field="startOffset"
+                  issue={issues.startOffset}
+                  onChange={handleStartOffsetChange}
+                  startAddon={
+                    <StitchLineOffsetIcon position={startPosition} endpoint="start" isClosed={isClosed} boxSize="5" />
+                  }
+                  unit="mm"
+                  value={editable.startOffset}
+                  arrowPosition={startArrowPosition}
+                />
+              </VStack>
+            )
           }
           endOffsetEditor={
-            endDisabled
-              ? undefined
-              : (arrowPosition: NumberInputArrowPosition | undefined): ReactNode => (
-                  <VStack width="24">
-                    <EditorNumberInput
-                      modelId={editable.id}
-                      field="endOffset"
-                      issue={issues.endOffset}
-                      onChange={handleEndOffsetChange}
-                      unit="mm"
-                      value={editable.endOffset}
-                      arrowPosition={arrowPosition}
-                    />
-                  </VStack>
-                )
+            endDisabled || !isDefined(endPosition) ? undefined : (
+              <VStack width="32">
+                <EditorNumberInput
+                  modelId={editable.id}
+                  field="endOffset"
+                  issue={issues.endOffset}
+                  onChange={handleEndOffsetChange}
+                  startAddon={
+                    <StitchLineOffsetIcon position={endPosition} endpoint="end" isClosed={isClosed} boxSize="5" />
+                  }
+                  unit="mm"
+                  value={editable.endOffset}
+                  arrowPosition={endArrowPosition}
+                />
+              </VStack>
+            )
           }
         />
       </SectionGroup.SectionFullWidthContent>

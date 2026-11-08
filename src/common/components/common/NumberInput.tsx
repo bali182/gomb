@@ -117,7 +117,6 @@ export const NumberInput: FC<NumberInputProps> = ({
         startAddon={startAddon}
         endAddon={resolvedEndAddon}
         size={size}
-        borderColor={issueBorderColor}
         opacity={opacity}
       >
         {input}

@@ -7,14 +7,12 @@ import {
 import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
-import type { NumberInputArrowPosition } from '../common/NumberInputArrow'
-
-export type StitchLineOffsetEditorRenderer = (arrowPosition: NumberInputArrowPosition | undefined) => ReactNode
+import { getStitchLineOffsetPosition } from './stitchLineOffsetEditorUtils'
 
 type StitchLineEditorsOverlayProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  startOffsetEditor?: StitchLineOffsetEditorRenderer
-  endOffsetEditor?: StitchLineOffsetEditorRenderer
+  startOffsetEditor?: ReactNode
+  endOffsetEditor?: ReactNode
   directionEditor?: ReactNode
 }
 
@@ -24,33 +22,15 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
   endOffsetEditor,
   directionEditor,
 }) => {
-  const startPosition = useMemo<StitchLineSideOrCornerField | undefined>(() => {
-    const startField = STITCH_LINE_SIDE_AND_CORNER_ORDER.find((field, index, fields) => {
-      const previous = fields[(index + fields.length - 1) % fields.length]
-      return editable[field] && !editable[previous]
-    })
-    if (isDefined(startField)) {
-      return startField
-    }
-    if (editable.top) {
-      return 'top'
-    }
-    return undefined
-  }, [editable])
+  const startPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'start'),
+    [editable],
+  )
 
-  const endPosition = useMemo<StitchLineSideOrCornerField | undefined>(() => {
-    const endField = STITCH_LINE_SIDE_AND_CORNER_ORDER.find((field, index, fields) => {
-      const next = fields[(index + 1) % fields.length]
-      return editable[field] && !editable[next]
-    })
-    if (isDefined(endField)) {
-      return endField
-    }
-    if (editable.topLeftCorner) {
-      return 'topLeftCorner'
-    }
-    return undefined
-  }, [editable])
+  const endPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'end'),
+    [editable],
+  )
 
   const isClosed = useMemo<boolean>(
     () => STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => editable[field]),
@@ -71,7 +51,6 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
     startPosition !== 'left'
   const startLayout = isDefined(startPosition) ? STITCH_LINE_OFFSET_LAYOUTS[startPosition] : undefined
   const endLayout = isDefined(endPosition) ? STITCH_LINE_OFFSET_LAYOUTS[endPosition] : undefined
-  const sharedStartArrow = startPosition === 'topLeftCorner' || startPosition === 'bottomRightCorner'
 
   return (
     <Grid
@@ -98,8 +77,8 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
               startPosition === 'bottomLeftCorner' || startPosition === 'bottomRightCorner' ? 'row-reverse' : 'row'
             }
           >
-            {startOffsetEditor?.(sharedStartArrow ? STITCH_LINE_OFFSET_ARROW_POSITIONS[startPosition] : undefined)}
-            {endOffsetEditor?.(sharedStartArrow ? undefined : STITCH_LINE_OFFSET_ARROW_POSITIONS[startPosition])}
+            {startOffsetEditor}
+            {endOffsetEditor}
           </HStack>
         </Box>
       )}
@@ -108,12 +87,12 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
           gridArea={isClosed ? startLayout.area : startLayout.startArea}
           {...(isClosed ? startLayout.container : startLayout.startContainer)}
         >
-          {startOffsetEditor(STITCH_LINE_OFFSET_ARROW_POSITIONS[startPosition])}
+          {startOffsetEditor}
         </Box>
       )}
       {!sharedCorner && isDefined(endPosition) && isDefined(endLayout) && isDefined(endOffsetEditor) && (
         <Box gridArea={endLayout.endArea} {...endLayout.endContainer}>
-          {endOffsetEditor(STITCH_LINE_OFFSET_ARROW_POSITIONS[endPosition])}
+          {endOffsetEditor}
         </Box>
       )}
     </Grid>
@@ -130,17 +109,6 @@ type StitchLineOffsetLayout = {
 }
 
 const STITCH_LINE_OFFSET_EDITOR_INSET: Tokens['spacing'] = '11'
-
-const STITCH_LINE_OFFSET_ARROW_POSITIONS: Record<StitchLineSideOrCornerField, NumberInputArrowPosition> = {
-  top: 'top',
-  right: 'right',
-  bottom: 'bottom',
-  left: 'left',
-  topLeftCorner: 'top-left',
-  topRightCorner: 'top-right',
-  bottomLeftCorner: 'bottom-left',
-  bottomRightCorner: 'bottom-right',
-}
 
 const STITCH_LINE_OFFSET_LAYOUTS: Record<StitchLineSideOrCornerField, StitchLineOffsetLayout> = {
   top: {

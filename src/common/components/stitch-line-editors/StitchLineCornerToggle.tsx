@@ -11,7 +11,11 @@ import {
   UNSELECTED_BORDER_COLOR,
   UNSELECTED_HOVER_BORDER_COLOR,
 } from './colors'
-import { STITCH_LINE_SEGMENT_SIZE } from './stitchLineSidesAndCornersLayout'
+import {
+  STITCH_LINE_PADDING_X,
+  STITCH_LINE_PADDING_Y,
+  STITCH_LINE_SEGMENT_SIZE,
+} from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSegmentLayout = {
   button: SystemStyleObject
@@ -98,8 +102,6 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
 }
 
 const CORNER_BORDER_WIDTH: CssProperties['borderWidth'] = 'medium'
-const CORNER_HIT_SLOP: Tokens['spacing'] = '10'
-const NEGATIVE_CORNER_HIT_SLOP: Tokens['spacing'] = `-${CORNER_HIT_SLOP}` as Tokens['spacing']
 const CORNER_RADIUS: Tokens['radii'] = 'md'
 
 const CORNER_TOOLTIP_POSITIONING: Record<StitchCornerSchema, TooltipProps['positioning']> = {
@@ -113,8 +115,8 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
   const layouts: Record<StitchCornerSchema, StitchLineSegmentLayout> = {
     'bottom-left': {
       button: {
-        bottom: NEGATIVE_CORNER_HIT_SLOP,
-        left: NEGATIVE_CORNER_HIT_SLOP,
+        bottom: `-${STITCH_LINE_PADDING_Y}`,
+        left: `-${STITCH_LINE_PADDING_X}`,
         position: 'absolute',
         right: 0,
         top: 0,
@@ -132,7 +134,7 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         borderBottomWidth: CORNER_BORDER_WIDTH,
         borderLeftWidth: CORNER_BORDER_WIDTH,
         height: STITCH_LINE_SEGMENT_SIZE,
-        left: CORNER_HIT_SLOP,
+        left: STITCH_LINE_PADDING_X,
         position: 'absolute',
         top: 0,
         width: STITCH_LINE_SEGMENT_SIZE,
@@ -140,10 +142,10 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
     },
     'bottom-right': {
       button: {
-        bottom: NEGATIVE_CORNER_HIT_SLOP,
+        bottom: `-${STITCH_LINE_PADDING_Y}`,
         left: 0,
         position: 'absolute',
-        right: NEGATIVE_CORNER_HIT_SLOP,
+        right: `-${STITCH_LINE_PADDING_X}`,
         top: 0,
       },
       root: {
@@ -168,10 +170,10 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
     'top-left': {
       button: {
         bottom: 0,
-        left: NEGATIVE_CORNER_HIT_SLOP,
+        left: `-${STITCH_LINE_PADDING_X}`,
         position: 'absolute',
         right: 0,
-        top: NEGATIVE_CORNER_HIT_SLOP,
+        top: `-${STITCH_LINE_PADDING_Y}`,
       },
       root: {
         alignSelf: 'start',
@@ -186,9 +188,9 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         borderTopLeftRadius: CORNER_RADIUS,
         borderTopWidth: CORNER_BORDER_WIDTH,
         height: STITCH_LINE_SEGMENT_SIZE,
-        left: CORNER_HIT_SLOP,
+        left: STITCH_LINE_PADDING_X,
         position: 'absolute',
-        top: CORNER_HIT_SLOP,
+        top: STITCH_LINE_PADDING_Y,
         width: STITCH_LINE_SEGMENT_SIZE,
       },
     },
@@ -197,8 +199,8 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         bottom: 0,
         left: 0,
         position: 'absolute',
-        right: NEGATIVE_CORNER_HIT_SLOP,
-        top: NEGATIVE_CORNER_HIT_SLOP,
+        right: `-${STITCH_LINE_PADDING_X}`,
+        top: `-${STITCH_LINE_PADDING_Y}`,
       },
       root: {
         alignSelf: 'start',
@@ -215,7 +217,7 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
         height: STITCH_LINE_SEGMENT_SIZE,
         left: 0,
         position: 'absolute',
-        top: CORNER_HIT_SLOP,
+        top: STITCH_LINE_PADDING_Y,
         width: STITCH_LINE_SEGMENT_SIZE,
       },
     },
