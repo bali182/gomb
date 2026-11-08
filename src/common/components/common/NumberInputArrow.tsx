@@ -1,4 +1,11 @@
-import { Box, InputGroup, type InputProps, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
+import {
+  Box,
+  InputGroup,
+  InputPropsProvider,
+  type InputProps,
+  type SystemStyleObject,
+  type Tokens,
+} from '@chakra-ui/react'
 import { useMemo, type FC, type ReactElement, type ReactNode } from 'react'
 
 import { isDefined } from '../../utils/isDefined'
@@ -60,7 +67,7 @@ export const NumberInputArrow: FC<NumberInputArrowProps> = ({
         borderColor="transparent"
         borderRadius="inherit"
         pointerEvents="none"
-        zIndex="1"
+        zIndex={NUMBER_INPUT_ARROW_Z_INDEX}
         css={{
           '&::before, &::after': {
             content: '""',
@@ -77,26 +84,34 @@ export const NumberInputArrow: FC<NumberInputArrowProps> = ({
           ...NUMBER_INPUT_ARROW_STYLES[position],
         }}
       />
-      <InputGroup
-        borderRadius="inherit"
-        isolation="auto"
-        startAddon={startAddon}
-        startAddonProps={{
-          size,
-          px: '1.5',
-          borderRadius: 'inherit',
-        }}
-        endAddon={endAddon}
-        endAddonProps={{
-          size,
-          px: 0,
-          borderRadius: 'inherit',
-        }}
-      >
-        {children}
-      </InputGroup>
+      <InputPropsProvider value={NUMBER_INPUT_ARROW_INPUT_PROPS}>
+        <InputGroup
+          borderRadius="inherit"
+          isolation="auto"
+          startAddon={startAddon}
+          startAddonProps={{
+            size,
+            px: '1.5',
+            borderRadius: 'inherit',
+          }}
+          endAddon={endAddon}
+          endAddonProps={{
+            size,
+            px: 0,
+            borderRadius: 'inherit',
+          }}
+        >
+          {children}
+        </InputGroup>
+      </InputPropsProvider>
     </Box>
   )
+}
+
+const NUMBER_INPUT_ARROW_Z_INDEX: number = 1
+const NUMBER_INPUT_FOCUS_Z_INDEX: number = 2
+const NUMBER_INPUT_ARROW_INPUT_PROPS: InputProps = {
+  _focusVisible: { zIndex: `${NUMBER_INPUT_FOCUS_Z_INDEX}!` },
 }
 
 const OFFSET_ARROW_LENGTH = 8

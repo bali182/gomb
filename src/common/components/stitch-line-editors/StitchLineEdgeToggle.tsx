@@ -12,8 +12,6 @@ import {
   UNSELECTED_HOVER_BORDER_COLOR,
 } from './colors'
 import {
-  STITCH_LINE_HIT_AREA_HEIGHT,
-  STITCH_LINE_HIT_AREA_WIDTH,
   STITCH_LINE_PADDING_X,
   STITCH_LINE_PADDING_Y,
   STITCH_LINE_SEGMENT_SIZE,
@@ -99,7 +97,7 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
     bottom: {
       button: {
         bottom: `-${STITCH_LINE_PADDING_Y}`,
-        height: STITCH_LINE_HIT_AREA_HEIGHT,
+        height: `calc({spacing.${STITCH_LINE_PADDING_Y}} * 2)`,
         left: 0,
         position: 'absolute',
         right: 0,
@@ -127,7 +125,7 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
         left: `-${STITCH_LINE_PADDING_X}`,
         position: 'absolute',
         top: 0,
-        width: STITCH_LINE_HIT_AREA_WIDTH,
+        width: `calc({spacing.${STITCH_LINE_PADDING_X}} * 2)`,
       },
       root: {
         alignSelf: 'stretch',
@@ -152,7 +150,7 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
         position: 'absolute',
         right: `-${STITCH_LINE_PADDING_X}`,
         top: 0,
-        width: STITCH_LINE_HIT_AREA_WIDTH,
+        width: `calc({spacing.${STITCH_LINE_PADDING_X}} * 2)`,
       },
       root: {
         alignSelf: 'stretch',
@@ -173,7 +171,7 @@ const getSideLayout = (side: StitchSideSchema): StitchLineSegmentLayout => {
     },
     top: {
       button: {
-        height: STITCH_LINE_HIT_AREA_HEIGHT,
+        height: `calc({spacing.${STITCH_LINE_PADDING_Y}} * 2)`,
         left: 0,
         position: 'absolute',
         right: 0,

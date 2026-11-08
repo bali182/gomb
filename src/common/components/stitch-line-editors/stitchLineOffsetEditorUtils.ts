@@ -1,12 +1,29 @@
+import { getCornerRadius } from '../../logic/cornerRadiusUtils'
+import { getAdjustedCornerRadius } from '../../logic/getAdjustedCornerRadius'
 import {
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
   type StitchLineSideOrCornerField,
 } from '../../logic/stitching/stitchLineSidesAndCorners'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
+import type { CornerRadiusSchema } from '../../schemas/geometry'
+import type { CornerRadiusLimitsSchema } from '../../schemas/limits'
 import type { HasStitchedCornersSchema, HasStitchedSidesSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import type { NumberInputArrowPosition } from '../common/NumberInputArrow'
 
 export type StitchLineOffsetEndpoint = 'start' | 'end'
+
+export const getStitchLineOffsetCornerRadius = (
+  autoCornerRadius: boolean,
+  value: HasCornerRadiusSchema,
+  autoComputedCornerRadius: CornerRadiusSchema | undefined,
+  limits: CornerRadiusLimitsSchema | undefined,
+): CornerRadiusSchema | undefined => {
+  if (autoCornerRadius) {
+    return autoComputedCornerRadius
+  }
+  return getAdjustedCornerRadius(getCornerRadius(value), limits ?? {})
+}
 
 export const getStitchLineOffsetPosition = (
   value: HasStitchedSidesSchema & HasStitchedCornersSchema,

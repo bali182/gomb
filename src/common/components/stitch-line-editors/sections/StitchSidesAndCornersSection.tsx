@@ -8,18 +8,22 @@ import {
   type StitchLineSideOrCornerField,
 } from '../../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../../schemas/editable'
+import type { CornerRadiusSchema } from '../../../schemas/geometry'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchDirectionSchema } from '../../../schemas/stitching'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
-import { narrowers } from '../../../utils/narrowers'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
 import { StitchLineDirectionControl } from '../StitchLineDirectionControl'
 import { StitchLineOffsetIcon } from '../StitchLineOffsetIcon'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
-import { getStitchLineOffsetArrowPosition, getStitchLineOffsetPosition } from '../stitchLineOffsetEditorUtils'
+import {
+  getStitchLineOffsetArrowPosition,
+  getStitchLineOffsetCornerRadius,
+  getStitchLineOffsetPosition,
+} from '../stitchLineOffsetEditorUtils'
 
 type StitchSidesAndCornersSectionProps = {
   value: ComponentBoundsStitchLineSchema
@@ -43,11 +47,26 @@ export const StitchSidesAndCornersSection = ({
     () => STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => editable[field]),
     [editable],
   )
+  const cornerRadius = useMemo<CornerRadiusSchema | undefined>(() => {
+    const accessor = accessors.computedSubProject(computedSubProject)
+    const computedStitchLine = accessor.optional.stitchLine.bounds(value.id)
+    const limits = accessor.optional.limits.stitchLine(value.id)
+    return getStitchLineOffsetCornerRadius(
+      editable.autoCornerRadius,
+      value,
+      computedStitchLine?.autoComputedCornerRadius,
+      limits?.type === value.type ? limits : undefined,
+    )
+  }, [computedSubProject, editable.autoCornerRadius, value])
+
   const startDisabled =
     !hasStitchedSidesOrCorners ||
     (isClosed &&
-      isDefined(route) &&
-      route.fragments.some((fragment) => narrowers.path.is.cornerFragment(fragment) && fragment.radius.isZero()))
+      (!isDefined(cornerRadius) ||
+        cornerRadius.topLeft.isZero() ||
+        cornerRadius.topRight.isZero() ||
+        cornerRadius.bottomLeft.isZero() ||
+        cornerRadius.bottomRight.isZero()))
 
   const endDisabled = !hasStitchedSidesOrCorners || isClosed
 

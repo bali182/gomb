@@ -1,4 +1,4 @@
-import { Box, Grid, HStack, SystemStyleObject, type Tokens } from '@chakra-ui/react'
+import { Box, Grid, HStack, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
 import { useMemo, type FC, type ReactNode } from 'react'
 import {
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
@@ -8,6 +8,11 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import { getStitchLineOffsetPosition } from './stitchLineOffsetEditorUtils'
+import {
+  STITCH_LINE_EDITOR_CLEARANCE,
+  STITCH_LINE_PADDING_X,
+  STITCH_LINE_PADDING_Y,
+} from './stitchLineSidesAndCornersLayout'
 
 type StitchLineEditorsOverlayProps = {
   editable: EditableSchema<ComponentBoundsStitchLineSchema>
@@ -56,8 +61,8 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
     <Grid
       position="absolute"
       inset="0"
-      px="10"
-      py="7"
+      px={`calc({spacing.${STITCH_LINE_PADDING_X}} + {spacing.${STITCH_LINE_EDITOR_CLEARANCE}})`}
+      py={`calc({spacing.${STITCH_LINE_PADDING_Y}} + {spacing.${STITCH_LINE_EDITOR_CLEARANCE}})`}
       minWidth="0"
       gridTemplateAreas={`"top-left top top-right" "left center right" "bottom-left bottom bottom-right"`}
       gridTemplateColumns="minmax(0, 1fr) max-content minmax(0, 1fr)"

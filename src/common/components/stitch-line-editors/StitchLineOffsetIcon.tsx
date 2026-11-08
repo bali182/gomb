@@ -15,23 +15,30 @@ type StitchLineOffsetIconProps = Omit<IconProps, 'position'> & {
 }
 
 export const StitchLineOffsetIcon: FC<StitchLineOffsetIconProps> = ({ position, endpoint, isClosed, ...props }) => {
-  const OffsetIcon = useMemo<IconType>(() => {
-    if (isClosed) {
-      return StitchLineOffsetClosedIcon
-    }
+  const isCorner = useMemo<boolean>(() => {
     switch (position) {
       case 'top':
       case 'right':
       case 'bottom':
       case 'left':
-        return StitchLineDirectionSideIcon
+        return false
       case 'topRightCorner':
       case 'bottomRightCorner':
       case 'bottomLeftCorner':
       case 'topLeftCorner':
-        return StitchLineDirectionCornerIcon
+        return true
     }
-  }, [position, isClosed])
+  }, [position])
+
+  const OffsetIcon = useMemo<IconType>(() => {
+    if (isClosed) {
+      return StitchLineOffsetClosedIcon
+    }
+    if (isCorner) {
+      return StitchLineDirectionCornerIcon
+    }
+    return StitchLineDirectionSideIcon
+  }, [isCorner, isClosed])
 
   const transform = useMemo<string>(() => {
     if (isClosed) {
@@ -41,11 +48,11 @@ export const StitchLineOffsetIcon: FC<StitchLineOffsetIconProps> = ({ position, 
     if (endpoint === 'end') {
       return `translate(128 128) rotate(${rotationAngle}) translate(-128 -128)`
     }
-    if (OffsetIcon === StitchLineDirectionCornerIcon) {
+    if (isCorner) {
       return `translate(128 128) rotate(${rotationAngle + 90}) scale(-1 1) translate(-128 -128)`
     }
     return `translate(128 128) rotate(${rotationAngle}) scale(-1 1) translate(-128 -128)`
-  }, [position, endpoint, isClosed, OffsetIcon])
+  }, [position, endpoint, isClosed, isCorner])
 
   return (
     <Icon asChild={false} viewBox="0 0 256 256" fill="none" {...props}>
