@@ -87,7 +87,7 @@ export const StitchSidesAndCornersSection = ({
               </Text>
             </VStack>
             <HStack gap="4" alignItems="start" pointerEvents="auto">
-              <VStack gap="1.5" width="104px">
+              <VStack gap="1.5" width="100px">
                 <EditorNumberInput
                   modelId={editable.id}
                   disabled={startDisabled}
@@ -103,7 +103,7 @@ export const StitchSidesAndCornersSection = ({
                   </Text>
                 </Tooltip>
               </VStack>
-              <VStack gap="1.5" width="104px">
+              <VStack gap="1.5" width="100px">
                 <EditorNumberInput
                   modelId={editable.id}
                   disabled={endDisabled}
