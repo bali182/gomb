@@ -9,10 +9,9 @@ import { StitchLine } from './StitchLine'
 
 type StitchLinesProps = {
   componentId: string
-  maskId?: string
 }
 
-export const StitchLines: FC<StitchLinesProps> = ({ componentId, maskId }) => {
+export const StitchLines: FC<StitchLinesProps> = ({ componentId }) => {
   const { project } = useProject()
   const { subProject, computedSubProject } = useSubProject()
   const accessor = accessors.subProject(subProject)
@@ -30,12 +29,7 @@ export const StitchLines: FC<StitchLinesProps> = ({ componentId, maskId }) => {
         const resolvedStitchLine = getResolvedStitchLine(stitchLine, project.stitchingSettings)
 
         return (
-          <StitchLine
-            computedStitchLine={computedStitchLine}
-            key={stitchLine.id}
-            stitchLine={resolvedStitchLine}
-            maskId={maskId}
-          />
+          <StitchLine computedStitchLine={computedStitchLine} key={stitchLine.id} stitchLine={resolvedStitchLine} />
         )
       })}
     </>

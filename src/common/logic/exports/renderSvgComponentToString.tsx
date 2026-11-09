@@ -5,6 +5,7 @@ import { accessors } from '../../utils/accessors'
 import { Panel } from '../../components/svg/Panel'
 import { Pocket } from '../../components/svg/Pocket'
 import { PocketCluster } from '../../components/svg/PocketCluster'
+import { PocketItemStitchMask } from '../../components/svg/PocketItemStitchMask'
 import { RootPanel } from '../../components/svg/RootPanel'
 import {
   MILLIMETERS_PER_INCH,
@@ -85,6 +86,7 @@ export const renderSvgComponentToString = ({
             viewBox={getViewBox(boundingRect, 0)}
           >
             <defs>
+              {context.isShowingPocketItems && <PocketItemStitchMask componentId={componentId} />}
               <filter
                 id="export-shadow"
                 filterUnits="userSpaceOnUse"

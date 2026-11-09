@@ -1,4 +1,4 @@
-import { useCallback, useId, type FC, type MouseEvent } from 'react'
+import { useCallback, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
@@ -9,7 +9,6 @@ import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
 import { PocketClusterSelectionLabel } from './PocketClusterSelectionLabel'
-import { PocketStitchMask } from './PocketStitchMask'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 
@@ -19,8 +18,7 @@ type PocketClusterProps = {
 }
 
 export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLevel }) => {
-  const maskId = useId()
-  const { componentStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
+  const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
 
   const cluster = useComponent<PocketClusterSchema>(componentId)
@@ -49,7 +47,6 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
 
   return (
     <>
-      {isShowingPocketItems && <PocketStitchMask id={maskId} componentId={componentId} nestingLevel={nestingLevel} />}
       <g data-component-id={componentId} onClick={isInteractive ? onClick : undefined}>
         {(isEmpty ? isInteractive : active) && (
           <path
@@ -70,7 +67,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <StitchLines componentId={componentId} maskId={isShowingPocketItems ? maskId : undefined} />
+      <StitchLines componentId={componentId} />
       <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )
