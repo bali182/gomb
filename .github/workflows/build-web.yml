@@ -35,8 +35,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          VITE_BASE_PATH: /gomb/
 
       - name: Add SPA fallback
         run: cp dist/index.html dist/404.html

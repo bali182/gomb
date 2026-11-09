@@ -7,7 +7,7 @@ export default defineConfig(({ command, mode }) => {
   const base = command === 'build' ? (env.VITE_BASE_PATH ?? '/') : '/'
 
   return {
-    ...createViteConfig({ appEntry: '/index.tsx', base, isElectron: false, port: 3000 }),
+    ...createViteConfig({ appEntry: '/index.tsx', base, env, isElectron: false, port: 3000 }),
     build: {
       emptyOutDir: true,
       outDir: resolve('dist'),

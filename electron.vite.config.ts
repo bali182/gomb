@@ -1,7 +1,7 @@
 import typia from '@typia/unplugin/vite'
 import { defineConfig } from 'electron-vite'
 import { resolve } from 'node:path'
-import type { Plugin } from 'vite'
+import { loadEnv, type Plugin } from 'vite'
 import { version } from './package.json'
 import { electronBuildTargets } from './src/electron/electron-api/buildPaths'
 import { createViteConfig } from './vite.common'
@@ -43,12 +43,14 @@ const productionContentSecurityPolicy = `
   object-src 'none';
 `
 
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   const contentSecurityPolicy = command === 'serve' ? developmentContentSecurityPolicy : productionContentSecurityPolicy
   const rendererConfig = createViteConfig({
     appEntry: '/index.tsx',
     base: './',
     contentSecurityPolicy,
+    env,
     isElectron: true,
     port: 4000,
   })

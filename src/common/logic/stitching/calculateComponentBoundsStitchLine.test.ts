@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultComponentBoundsStitchLine, defaultStitchingSettings } from '../../defaultStates'
 import type { ComputedStitchHoleSchema, ComputedStitchLineSchema } from '../../schemas/computed'
@@ -9,9 +9,23 @@ import { narrowers } from '../../utils/narrowers'
 import { getPointDistance } from '../geometryUtils'
 import { getPathSegments } from '../pathSegments'
 import { getPathSegmentLength } from '../pathSegmentUtils'
+import {
+  adjustStitchLineHoleRotations,
+  CLOSED_STITCH_HOLE_DISTANCE_TOLERANCE_MM,
+} from './adjustStitchLineHoleRotations'
 import { calculateComponentBoundsStitchLine } from './calculateComponentBoundsStitchLine'
+import { getStitchHoleLine } from './getStitchHoleLine'
 import type { ComponentBoundsStitchLineTarget } from './helperTypes'
 import { getStitchPathFragmentsLength } from './stitchLineFragmentGeometry'
+
+const { featureFlags } = vi.hoisted(() => ({ featureFlags: { roundedStitchHoleRotationAdjustment: true } }))
+vi.mock('../../featureFlags', () => ({ featureFlags }))
+vi.mock('./adjustStitchLineHoleRotations', { spy: true })
+
+beforeEach(() => {
+  featureFlags.roundedStitchHoleRotationAdjustment = true
+  vi.mocked(adjustStitchLineHoleRotations).mockClear()
+})
 
 const target: ComponentBoundsStitchLineTarget = {
   componentId: 'root',
@@ -48,6 +62,42 @@ const centers = (holes: ComputedStitchHoleSchema[]): number[][] =>
   holes.map((hole) => [hole.center.x.toNumber(), hole.center.y.toNumber()])
 
 describe('component bounds stitch routes', () => {
+  it.each(['start-to-end', 'end-to-start'] as const)(
+    'only adjusts hole angles when the feature is enabled: %s',
+    (stitchDirection) => {
+      const value = {
+        right: true,
+        topRightCorner: true,
+        topRightRadius: 20,
+        stitchHoleDistance: 7,
+        stitchHoleLength: 2,
+        stitchDirection,
+      }
+      const adjusted = calculate(value).routes[0]
+      expect(adjustStitchLineHoleRotations).toHaveBeenCalledTimes(1)
+      vi.mocked(adjustStitchLineHoleRotations).mockClear()
+      featureFlags.roundedStitchHoleRotationAdjustment = false
+      const unadjusted = calculate(value).routes[0]
+      const tangents = calculate({ ...value, stitchHoleLength: 0 }).routes[0]
+      expect(adjustStitchLineHoleRotations).not.toHaveBeenCalled()
+      expect(unadjusted.holes.map(({ rotation }) => rotation)).toEqual(tangents.holes.map(({ rotation }) => rotation))
+      const { holes: adjustedHoles, stitches: adjustedStitches, ...adjustedGeometry } = adjusted
+      const { holes: unadjustedHoles, stitches: unadjustedStitches, ...unadjustedGeometry } = unadjusted
+      expect(adjustedGeometry).toEqual(unadjustedGeometry)
+      expect(centers(adjustedHoles)).toEqual(centers(unadjustedHoles))
+      expect(adjustedHoles.some((hole, index) => hole.rotation !== unadjustedHoles[index].rotation)).toBe(true)
+      expect(adjustedStitches).toHaveLength(unadjustedStitches.length)
+      for (let index = 0; index < adjustedHoles.length; index += 1) {
+        expect(Object.keys(adjustedHoles[index]).sort()).toEqual(['center', 'line', 'rotation'])
+        expect(Object.keys(unadjustedHoles[index]).sort()).toEqual(['center', 'line', 'rotation'])
+        expect(getPointDistance(adjustedHoles[index].line.start, adjustedHoles[index].line.end).toNumber()).toBeCloseTo(
+          getPointDistance(unadjustedHoles[index].line.start, unadjustedHoles[index].line.end).toNumber(),
+          10,
+        )
+      }
+    },
+  )
+
   it('returns no routes for an empty boundary or a standalone sharp corner', () => {
     expect(calculate({ top: false }).routes).toEqual([])
     expect(calculate({ top: false, topLeftCorner: true }).routes).toEqual([])
@@ -71,12 +121,13 @@ describe('component bounds stitch routes', () => {
     }
   })
 
-  it('keeps the physical hole orientation at shared arc points when reversing travel', () => {
+  it('keeps the initial tangent orientations at shared arc points when no hole length needs correction', () => {
     const value = {
       top: false,
       topLeftCorner: true,
       topLeftRadius: 20,
       stitchHoleDistance: Math.sqrt(800),
+      stitchHoleLength: 0,
     }
     const forward = calculate(value).routes[0]
     const reverse = calculate({ ...value, stitchDirection: 'end-to-start' }).routes[0]
@@ -92,7 +143,7 @@ describe('component bounds stitch routes', () => {
     }
   })
 
-  it.each([false, true])('uses local tangents across straight sides and rounded corners with closed=%s', (closed) => {
+  it.each([false, true])('retains local tangent orientations for zero-length holes with closed=%s', (closed) => {
     for (const direction of ['start-to-end', 'end-to-start'] as const) {
       const route = calculate({
         right: true,
@@ -107,6 +158,7 @@ describe('component bounds stitch routes', () => {
         bottomRightRadius: 20,
         bottomLeftRadius: 20,
         stitchHoleDistance: 7,
+        stitchHoleLength: 0,
         stitchDirection: direction,
       }).routes[0]
       expect(route.isClosed).toBe(closed)
@@ -120,6 +172,83 @@ describe('component bounds stitch routes', () => {
         const expectedRotation = (radialAngle + (direction === 'end-to-start' ? 180 : 0) + 360) % 360
         const difference = ((hole.rotation - expectedRotation + 540) % 360) - 180
         expect(difference).toBeCloseTo(0, 9)
+      }
+    }
+  })
+
+  it.each([
+    { name: 'standalone arc', top: false, right: false, bottom: false, closed: false, startOffset: 0 },
+    { name: 'trimmed arc', top: false, right: false, bottom: false, closed: false, startOffset: -5 },
+    { name: 'side-arc-side', top: true, right: true, bottom: true, closed: false, startOffset: 0 },
+    { name: 'closed from a side', top: true, right: true, bottom: true, closed: true, startOffset: 7 },
+    { name: 'closed from an arc', top: true, right: true, bottom: true, closed: true, startOffset: 65 },
+  ])('corrects rounded hole angles without changing the layout: $name', (testCase) => {
+    const distance = 7
+    const length = 2
+    const firstStraight = getStitchHoleLine({ x: new BigNumber(0), y: new BigNumber(0) }, 270, length)
+    const secondStraight = getStitchHoleLine({ x: new BigNumber(distance), y: new BigNumber(0) }, 270, length)
+    const targetLength = getPointDistance(firstStraight.end, secondStraight.start).toNumber()
+    for (const direction of ['start-to-end', 'end-to-start'] as const) {
+      const value: Partial<ResolvedComponentBoundsStitchLineSchema> = {
+        top: testCase.top,
+        right: testCase.right,
+        bottom: testCase.bottom,
+        left: testCase.closed,
+        topLeftCorner: testCase.closed,
+        topRightCorner: true,
+        bottomRightCorner: testCase.bottom,
+        bottomLeftCorner: testCase.closed,
+        topLeftRadius: 20,
+        topRightRadius: 20,
+        bottomRightRadius: 20,
+        bottomLeftRadius: 20,
+        stitchHoleDistance: distance,
+        startOffset: testCase.startOffset,
+        stitchDirection: direction,
+      }
+      const initial = calculate({ ...value, stitchHoleLength: 0 }).routes[0]
+      const route = calculate({ ...value, stitchHoleLength: length }).routes[0]
+      expect(centers(route.holes)).toEqual(centers(initial.holes))
+      expect(route.fragments).toEqual(initial.fragments)
+      expect(route.isClosed).toBe(testCase.closed)
+      expect(route.stitches).toHaveLength(route.holes.length - (route.isClosed ? 0 : 1))
+      const lastIndex = route.holes.length - 1
+      const preserveClosingStitch =
+        route.isClosed &&
+        getPointDistance(route.holes[lastIndex].center, route.holes[0].center)
+          .minus(distance)
+          .abs()
+          .gt(CLOSED_STITCH_HOLE_DISTANCE_TOLERANCE_MM)
+      let correctedCount = 0
+      for (let index = 0; index < route.holes.length; index += 1) {
+        const hole = route.holes[index]
+        expect(getPointDistance(hole.line.start, hole.line.end).toNumber()).toBeCloseTo(length, 10)
+        const x = hole.center.x.toNumber()
+        const y = hole.center.y.toNumber()
+        const onArc = x > 0 && x < 100 && y > 0 && y < 80
+        if (!onArc || index === 0 || (preserveClosingStitch && index === lastIndex)) {
+          expect(hole.rotation).toBe(initial.holes[index].rotation)
+          continue
+        }
+        const previous = route.holes[index - 1]
+        const centerDistance = getPointDistance(previous.line.end, hole.center).toNumber()
+        const minimumLength = Math.abs(centerDistance - length / 2)
+        const maximumLength = centerDistance + length / 2
+        const expectedLength = Math.max(minimumLength, Math.min(maximumLength, targetLength))
+        expect(getPointDistance(previous.line.end, hole.line.start).toNumber()).toBeCloseTo(expectedLength, 9)
+        if (Math.abs(hole.rotation - initial.holes[index].rotation) > 1e-9) {
+          correctedCount += 1
+        }
+      }
+      expect(correctedCount).toBeGreaterThan(0)
+      if (preserveClosingStitch) {
+        const firstOriginalLine = getStitchHoleLine(initial.holes[0].center, initial.holes[0].rotation, length)
+        const lastOriginalLine = getStitchHoleLine(
+          initial.holes[lastIndex].center,
+          initial.holes[lastIndex].rotation,
+          length,
+        )
+        expect(route.stitches[lastIndex].line).toEqual({ start: lastOriginalLine.end, end: firstOriginalLine.start })
       }
     }
   })
