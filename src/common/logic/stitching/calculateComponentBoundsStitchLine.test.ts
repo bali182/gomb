@@ -71,6 +71,59 @@ describe('component bounds stitch routes', () => {
     }
   })
 
+  it('keeps the physical hole orientation at shared arc points when reversing travel', () => {
+    const value = {
+      top: false,
+      topLeftCorner: true,
+      topLeftRadius: 20,
+      stitchHoleDistance: Math.sqrt(800),
+    }
+    const forward = calculate(value).routes[0]
+    const reverse = calculate({ ...value, stitchDirection: 'end-to-start' }).routes[0]
+    expect(forward.holes).toHaveLength(2)
+    expect(reverse.holes).toHaveLength(2)
+    for (let index = 0; index < forward.holes.length; index += 1) {
+      const forwardHole = forward.holes[index]
+      const reverseHole = reverse.holes[reverse.holes.length - 1 - index]
+      expect(getPointDistance(forwardHole.center, reverseHole.center).toNumber()).toBeCloseTo(0, 9)
+      expect((reverseHole.rotation - forwardHole.rotation + 360) % 360).toBeCloseTo(180, 9)
+      expect(getPointDistance(forwardHole.line.start, reverseHole.line.end).toNumber()).toBeCloseTo(0, 9)
+      expect(getPointDistance(forwardHole.line.end, reverseHole.line.start).toNumber()).toBeCloseTo(0, 9)
+    }
+  })
+
+  it.each([false, true])('uses local tangents across straight sides and rounded corners with closed=%s', (closed) => {
+    for (const direction of ['start-to-end', 'end-to-start'] as const) {
+      const route = calculate({
+        right: true,
+        bottom: true,
+        left: closed,
+        topLeftCorner: closed,
+        topRightCorner: true,
+        bottomRightCorner: true,
+        bottomLeftCorner: closed,
+        topLeftRadius: 20,
+        topRightRadius: 20,
+        bottomRightRadius: 20,
+        bottomLeftRadius: 20,
+        stitchHoleDistance: 7,
+        stitchDirection: direction,
+      }).routes[0]
+      expect(route.isClosed).toBe(closed)
+      expect(route.holes.length).toBeGreaterThan(20)
+      for (const hole of route.holes) {
+        const x = hole.center.x.toNumber()
+        const y = hole.center.y.toNumber()
+        const radialX = x - Math.max(20, Math.min(80, x))
+        const radialY = y - Math.max(20, Math.min(60, y))
+        const radialAngle = (Math.atan2(radialY, radialX) * 180) / Math.PI
+        const expectedRotation = (radialAngle + (direction === 'end-to-start' ? 180 : 0) + 360) % 360
+        const difference = ((hole.rotation - expectedRotation + 540) % 360) - 180
+        expect(difference).toBeCloseTo(0, 9)
+      }
+    }
+  })
+
   it('applies offsets to canonical endpoints before choosing the punching direction', () => {
     const value = { startOffset: 20, endOffset: -10, stitchHoleDistance: 25 }
     const forward = calculate(value).routes[0]

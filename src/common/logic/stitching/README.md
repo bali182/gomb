@@ -94,6 +94,11 @@ forward intersection of the remaining route with a circle around the previous
 hole. Rounded corners continue the same traversal, including counterclockwise
 arcs. The distance is the direct center-to-center distance, not arc length.
 
+Every hole on a rounded corner uses the local arc tangent at its center to
+determine its orientation, including the first hole. Reversing travel preserves
+the physical hole orientation at the same point; the 180-degree rotation swaps
+its endpoints so stitches connect in the travel direction.
+
 A sharp corner interrupts the traversal and has a hole at its exact position.
 Its orientation is fixed by its canonical outgoing side: top-right and
 bottom-left match vertical sides; top-left and bottom-right match horizontal

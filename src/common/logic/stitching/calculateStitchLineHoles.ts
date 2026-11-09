@@ -12,7 +12,6 @@ import {
   createStitchHoleSegments,
   findNextStitchHole,
   getSegmentTangentRotation,
-  getStitchHoleRotation,
   type StitchHoleSegment,
 } from './stitchHoleGeometry'
 
@@ -129,7 +128,8 @@ const calculateTraversalHoles = (
   let cursor = { segmentIndex: 0, point: previous.center }
   let next = findNextStitchHole(previous.center, distance, traversal.segments, cursor)
   while (isDefined(next)) {
-    const hole = createHole(next.center, getStitchHoleRotation(previous.center, next.center), length)
+    const segment = traversal.segments[next.cursor.segmentIndex]
+    const hole = createHole(next.center, getSegmentTangentRotation(segment, next.center), length)
     holes.push(hole)
     previous = hole
     cursor = next.cursor
