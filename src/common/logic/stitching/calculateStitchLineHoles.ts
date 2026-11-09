@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { featureFlags } from '../../featureFlags'
 import type { ComputedStitchHoleSchema, StitchCornerPathFragment, StitchPathFragment } from '../../schemas/computed'
 import type { PointSchema } from '../../schemas/geometry'
 import type { ResolvedComponentBoundsStitchLineSchema } from '../../schemas/stitching'
@@ -6,13 +7,13 @@ import { arePointsEqual } from '../../utils/arePointsEqual'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { getPointDistance } from '../geometryUtils'
+import { adjustStitchLineHoleRotations } from './adjustStitchLineHoleRotations'
 import type { CalculatedStitchLinePath } from './calculateStitchLinePaths'
 import { getStitchHoleLine } from './getStitchHoleLine'
 import {
   createStitchHoleSegments,
   findNextStitchHole,
   getSegmentTangentRotation,
-  getStitchHoleRotation,
   type StitchHoleSegment,
 } from './stitchHoleGeometry'
 
@@ -52,9 +53,12 @@ export const calculateStitchLineHoles = (
       },
     ]
   }
+  const roundedHoles = featureFlags.roundedStitchHoleRotationAdjustment
+    ? new Set<ComputedStitchHoleSchema>()
+    : undefined
   const holes: ComputedStitchHoleSchema[] = []
   for (const traversal of traversals) {
-    const traversalHoles = calculateTraversalHoles(traversal, distance, stitchLine.stitchHoleLength)
+    const traversalHoles = calculateTraversalHoles(traversal, distance, stitchLine.stitchHoleLength, roundedHoles)
     for (const hole of traversalHoles) {
       const previous = holes[holes.length - 1]
       if (!isDefined(previous) || !arePointsEqual(previous.center, hole.center)) {
@@ -69,6 +73,15 @@ export const calculateStitchLineHoles = (
       holes.pop()
       last = holes[holes.length - 1]
     }
+  }
+  if (isDefined(roundedHoles)) {
+    return adjustStitchLineHoleRotations(
+      holes,
+      roundedHoles,
+      stitchLine.stitchHoleDistance,
+      stitchLine.stitchHoleLength,
+      calculatedPath.isClosed,
+    )
   }
   return holes
 }
@@ -116,6 +129,7 @@ const calculateTraversalHoles = (
   traversal: StitchHoleTraversal,
   distance: BigNumber,
   length: number,
+  roundedHoles?: Set<ComputedStitchHoleSchema>,
 ): ComputedStitchHoleSchema[] => {
   const firstSegment = traversal.segments[0]
   if (!isDefined(firstSegment)) {
@@ -124,12 +138,20 @@ const calculateTraversalHoles = (
   const rotation = isDefined(traversal.startCorner)
     ? getSharpCornerRotation(traversal.startCorner, traversal.reversed)
     : getSegmentTangentRotation(firstSegment, firstSegment.start)
-  const holes = [createHole(firstSegment.start, rotation, length)]
-  let previous = holes[0]
+  const firstHole = createHole(
+    firstSegment.start,
+    rotation,
+    length,
+    isDefined(traversal.startCorner) ? undefined : firstSegment,
+    roundedHoles,
+  )
+  const holes = [firstHole]
+  let previous = firstHole
   let cursor = { segmentIndex: 0, point: previous.center }
   let next = findNextStitchHole(previous.center, distance, traversal.segments, cursor)
   while (isDefined(next)) {
-    const hole = createHole(next.center, getStitchHoleRotation(previous.center, next.center), length)
+    const segment = traversal.segments[next.cursor.segmentIndex]
+    const hole = createHole(next.center, getSegmentTangentRotation(segment, next.center), length, segment, roundedHoles)
     holes.push(hole)
     previous = hole
     cursor = next.cursor
@@ -145,11 +167,19 @@ const calculateTraversalHoles = (
   return holes
 }
 
-const createHole = (center: PointSchema, rotation: number, length: number): ComputedStitchHoleSchema => ({
-  center,
-  rotation,
-  line: getStitchHoleLine(center, rotation, length),
-})
+const createHole = (
+  center: PointSchema,
+  rotation: number,
+  length: number,
+  segment?: StitchHoleSegment,
+  roundedHoles?: Set<ComputedStitchHoleSchema>,
+): ComputedStitchHoleSchema => {
+  const hole: ComputedStitchHoleSchema = { center, rotation, line: getStitchHoleLine(center, rotation, length) }
+  if (isDefined(roundedHoles) && isDefined(segment) && !narrowers.path.is.stitchHoleLineSegment(segment)) {
+    roundedHoles.add(hole)
+  }
+  return hole
+}
 
 const getSharpCornerRotation = (corner: StitchCornerPathFragment, reversed: boolean): number => {
   let rotation: number

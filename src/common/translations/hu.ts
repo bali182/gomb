@@ -197,7 +197,7 @@ export const HU = {
       },
       actions: {
         constraints: {
-          add: 'Constraint hozzáadása',
+          add: 'Kényszer hozzáadása',
         },
         pocketOpenings: {
           add: 'Új zsebnyílás',
@@ -227,7 +227,7 @@ export const HU = {
       },
       sections: {
         constraints: {
-          title: 'Constraintek',
+          title: 'Kényszerek',
           empty: 'Üres',
           addFields: {
             title: 'Mezők hozzáadása',
@@ -246,7 +246,7 @@ export const HU = {
             add: 'Hozzáadás',
             noMatches: 'Nincs megfelelő mező vagy elem',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
-          linkedAuto: 'A mező constrainthez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
+          linkedAuto: 'A mező kényszerhez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
         },
         globalSettings: {
           app: {
@@ -483,11 +483,11 @@ export const HU = {
           contents: {
             title: 'Tartalom',
             itemId: {
-              label: 'Tárgy',
+              label: 'Tartalom',
               tooltip: 'Kiválasztja a zsebben megjelenő tárgyat.',
             },
             itemOrientation: {
-              label: 'Irány',
+              label: 'Tartalom forgatása',
               tooltip:
                 'A tárgy fektetett vagy állított megjelenését állítja a képernyőn, a zseb nyílásának irányától függetlenül.',
             },

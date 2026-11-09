@@ -12,6 +12,7 @@ import {
   useFilter,
   useTagsInput,
   type ListCollection,
+  type Tokens,
 } from '@chakra-ui/react'
 import { useCallback, useEffect, useId, useMemo, useState, type FC, type ReactNode } from 'react'
 import { PiPlus } from 'react-icons/pi'
@@ -37,8 +38,8 @@ import { useComponentTreeCollection } from '../component-tree/utils/useComponent
 import type { ConstraintFieldAdderState } from './constraintFieldUtils'
 import { getConstraintFieldInputs, getConstraintFieldLabel } from './constraintFieldUtils'
 
-const modelChoicePadding = 2
-const modelChoiceIndent = 4
+const modelChoicePadding: Tokens['spacing'] = '2'
+const modelChoiceIndent: Tokens['spacing'] = '4'
 
 type ConstraintModelChoice = {
   id: string
@@ -295,27 +296,26 @@ const ConstraintModelCombobox: FC<ConstraintModelComboboxProps> = ({ choices, va
   }, [value])
 
   const renderItem = (item: ConstraintModelChoice): ReactNode => {
+    const paddingInlineStart = `calc({spacing.${modelChoicePadding}} + ${searching ? 0 : item.depth} * {spacing.${modelChoiceIndent}})`
+
     return (
-      <Combobox.Item
-        key={item.id}
-        item={item}
-        position="relative"
-        ps={modelChoicePadding + (searching ? 0 : item.depth * modelChoiceIndent)}
-        _disabled={{ opacity: 1 }}
-      >
+      <Combobox.Item key={item.id} item={item} position="relative" ps={paddingInlineStart} _disabled={{ opacity: 1 }}>
         {!searching &&
-          Array.from({ length: item.depth }, (_, depth) => (
-            <Box
-              key={depth}
-              position="absolute"
-              top="0"
-              bottom="0"
-              insetInlineStart={modelChoicePadding + depth * modelChoiceIndent + modelChoiceIndent / 2}
-              borderInlineStartWidth="1px"
-              borderColor="border"
-              pointerEvents="none"
-            />
-          ))}
+          Array.from({ length: item.depth }, (_, depth) => {
+            const insetInlineStart = `calc({spacing.${modelChoicePadding}} + ${depth} * {spacing.${modelChoiceIndent}} + {spacing.${modelChoiceIndent}} / 2)`
+            return (
+              <Box
+                key={depth}
+                position="absolute"
+                top="0"
+                bottom="0"
+                insetInlineStart={insetInlineStart}
+                borderInlineStartWidth="1px"
+                borderColor="border"
+                pointerEvents="none"
+              />
+            )
+          })}
         <HStack gap="2" minW="0" flex="1" color={item.disabled ? 'fg.muted' : undefined}>
           <Icon as={getModelIcon(item.model, subProject)} flexShrink="0" />
           <Combobox.ItemText>{item.label}</Combobox.ItemText>

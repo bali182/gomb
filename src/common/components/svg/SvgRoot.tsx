@@ -1,9 +1,11 @@
 import { CSSProperties } from 'react'
 import { VIEWBOX_PADDING } from '../../constants/drawing'
+import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useMeasurement } from '../../hooks/useMeasurement'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getViewBox } from '../../utils/getViewBox'
 import { MeasurementOverlay } from './MeasurementOverlay'
+import { PocketItemStitchMask } from './PocketItemStitchMask'
 import { RootPanel } from './RootPanel'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
@@ -12,6 +14,7 @@ const noOutline: CSSProperties = {
 }
 
 export const SvgRoot = () => {
+  const { isShowingPocketItems } = useDrawAreaContext()
   const { isMeasuring } = useMeasurement()
   const { computedSubProject: computedProject } = useSubProject()
 
@@ -26,6 +29,7 @@ export const SvgRoot = () => {
       style={{ display: 'block' }}
       viewBox={viewBox}
     >
+      <defs>{isShowingPocketItems && <PocketItemStitchMask componentId={computedProject.root} />}</defs>
       <RootPanel componentId={computedProject.root} nestingLevel={0} />
       <g ref={svgLabelsPortalRef} pointerEvents="none" style={noOutline} />
       {isMeasuring && <MeasurementOverlay />}

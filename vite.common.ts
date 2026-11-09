@@ -2,11 +2,14 @@ import typia from '@typia/unplugin/vite'
 import react from '@vitejs/plugin-react'
 import type { Plugin, UserConfig } from 'vite'
 import svgr from 'vite-plugin-svgr'
+import type { FeatureFlagsSchema } from './src/common/schemas/featureFlags'
+import { parseFeatureFlag } from './src/common/utils/parseFeatureFlag'
 
 export type ViteConfigOptions = {
   appEntry: string
   base: string
   contentSecurityPolicy?: string
+  env: Record<string, string>
   isElectron: boolean
   port: number
 }
@@ -48,12 +51,20 @@ export const createViteConfig = ({
   appEntry,
   base,
   contentSecurityPolicy: csp,
+  env,
   isElectron,
   port,
 }: ViteConfigOptions): Omit<UserConfig, 'build'> => {
+  const featureFlags: FeatureFlagsSchema = {
+    roundedStitchHoleRotationAdjustment: parseFeatureFlag(
+      'FEATURE_FLAG_ROUNDED_STITCH_HOLE_ROTATION_ADJUSTMENT',
+      env.FEATURE_FLAG_ROUNDED_STITCH_HOLE_ROTATION_ADJUSTMENT,
+    ),
+  }
   return {
     base,
     define: {
+      'import.meta.env.FEATURE_FLAGS': JSON.stringify(featureFlags),
       'import.meta.env.VITE_IS_ELECTRON': JSON.stringify(isElectron ? 'true' : 'false'),
     },
     plugins: [

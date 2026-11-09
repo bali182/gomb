@@ -94,6 +94,36 @@ forward intersection of the remaining route with a circle around the previous
 hole. Rounded corners continue the same traversal, including counterclockwise
 arcs. The distance is the direct center-to-center distance, not arc length.
 
+Every hole on a rounded corner initially uses the local arc tangent at its
+center to determine its orientation, including the first hole. At this stage,
+reversing travel preserves the physical hole orientation at the same point;
+the 180-degree rotation swaps its endpoints so stitches connect in the travel
+direction.
+
+When `FEATURE_FLAG_ROUNDED_STITCH_HOLE_ROTATION_ADJUSTMENT` is enabled, a second
+pass after duplicate and closing-hole removal adjusts only rounded corner holes.
+The flag defaults to `false`; disabled, all holes retain their initial orientations.
+The adjustment target is the visible stitch length between two holes on a
+straight side. Each hole is rotated using a direct circle intersection against
+the already finalized previous hole's outgoing endpoint. Of the two solutions,
+the one closest to the initial tangent orientation is used. If the target length
+is unreachable, the nearest reachable length is used instead. There is no
+iterative angle search. Centers, hole lengths, straight-side holes and sharp
+corner holes remain unchanged. The first hole anchors the pass, including when
+an open route starts on an arc. The outgoing stitch to a fixed straight-side
+hole is not guaranteed to reach the target length.
+
+On a closed route, the first hole also remains fixed. If the last-to-first
+center distance differs from `stitchHoleDistance` by more than
+`CLOSED_STITCH_HOLE_DISTANCE_TOLERANCE_MM` (initially 0.2 mm), the last hole also
+remains fixed, preserving the original closing stitch. The check uses the final
+centers and therefore applies equally to both travel directions and shifted
+starts on straight sides or arcs. Only when the flag is enabled, a temporary Set
+records references to rounded-corner holes during generation. The adjustment
+uses membership in this Set without storing segment metadata or wrappers on
+computed holes. When disabled, generation directly returns the computed holes
+without allocating this Set or unpacking an intermediate representation.
+
 A sharp corner interrupts the traversal and has a hole at its exact position.
 Its orientation is fixed by its canonical outgoing side: top-right and
 bottom-left match vertical sides; top-left and bottom-right match horizontal

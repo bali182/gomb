@@ -1,5 +1,6 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
+import { POCKET_ITEM_STITCH_MASK_ID } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
@@ -15,7 +16,7 @@ type StitchLineRouteProps = {
 }
 
 export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine }) => {
-  const { isInteractive, selection, stitchLineStyles } = useDrawAreaContext()
+  const { isInteractive, isShowingPocketItems, selection, stitchLineStyles } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const pathData = usePath(route.path)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
@@ -48,6 +49,7 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
 
   return (
     <g
+      mask={isShowingPocketItems && !isStitchLineActive ? `url(#${POCKET_ITEM_STITCH_MASK_ID})` : undefined}
       data-stitch-line-id={stitchLine.id}
       onClick={isInteractive ? handleClick : undefined}
       onPointerEnter={isInteractive ? handlePointerEnter : undefined}
