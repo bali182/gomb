@@ -878,6 +878,103 @@ export const HU = {
     },
   },
   dialogs: {
+    cloneComponent: {
+      title: 'Komponens duplikálása',
+      positiveAction: 'Duplikálás',
+      sections: {
+        children: {
+          title: 'Komponensek',
+          options: {
+            clone: {
+              label: 'Duplikálás',
+              tooltip: 'A komponens duplikálása. A gyerekkomponensek külön választhatók ki.',
+              headerTooltip: 'A listában szereplő összes komponens duplikálása.',
+            },
+            ignore: {
+              label: 'Kihagyás',
+              tooltip: 'A komponens és a hozzá tartozó összes gyerekkomponens kihagyása.',
+              headerTooltip:
+                'Az összes kihagyható komponens kihagyása. A kiinduló komponens és a kijelölt zsebcsoportok elülső zsebei kijelölve maradnak.',
+            },
+          },
+        },
+        holes: {
+          title: 'Lyukak',
+          options: {
+            clone: {
+              label: 'Duplikálás',
+              tooltip: 'A lyuk duplikálása a lemásolt komponensen.',
+              headerTooltip: 'A kijelölt komponensekhez tartozó összes felsorolt lyuk duplikálása.',
+            },
+            ignore: {
+              label: 'Kihagyás',
+              tooltip: 'A lyuk kihagyása.',
+              headerTooltip: 'Az összes felsorolt lyuk kihagyása.',
+            },
+          },
+        },
+        stitchLines: {
+          title: 'Varrásvonalak',
+          options: {
+            clone: {
+              label: 'Duplikálás',
+              tooltip: 'A varrásvonal duplikálása.',
+              headerTooltip: 'A kijelölt komponensekhez és lyukakhoz tartozó összes felsorolt varrásvonal duplikálása.',
+            },
+            ignore: {
+              label: 'Kihagyás',
+              tooltip: 'A varrásvonal kihagyása.',
+              headerTooltip: 'Az összes felsorolt varrásvonal kihagyása.',
+            },
+          },
+        },
+        pocketOpenings: {
+          title: 'Zsebnyílások',
+          options: {
+            clone: {
+              label: 'Duplikálás',
+              tooltip: 'A zsebnyílás duplikálása. Az ezt használó zsebek másolatai az új nyílást kapják.',
+              headerTooltip:
+                'Az összes felsorolt zsebnyílás duplikálása a lemásolt zsebek számára. Minden közösen használt nyílásról csak egy másolat készül.',
+            },
+            'keep-original': {
+              label: 'Eredeti',
+              tooltip: 'Az ezt a nyílást használó zsebek másolatai is az eredeti zsebnyílást használják.',
+              headerTooltip:
+                'Minden lemásolt zseb megtartja az eredeti zsebnyílását. A zsebnyílásokról nem készül másolat.',
+            },
+            'set-to-default': {
+              label: 'Alap',
+              tooltip: 'Az ezt a nyílást használó zsebek másolatai az alapértelmezett zsebnyílást kapják.',
+              headerTooltip:
+                'Minden lemásolt zseb az alapértelmezett zsebnyílást kapja. A zsebnyílásokról nem készül másolat.',
+            },
+          },
+        },
+        constraints: {
+          title: 'Kényszerek',
+          options: {
+            ignore: {
+              label: 'Kihagyás',
+              tooltip: 'A kényszer nem vonatkozik a lemásolt elemekre.',
+              headerTooltip: 'A kényszerek kihagyása. A lemásolt elemekre nem vonatkoznak kényszerek.',
+            },
+            'constrain-separately': {
+              label: 'Újhoz',
+              tooltip: 'A kényszer duplikálása az általa összekapcsolt elemek másolatai között.',
+              headerTooltip:
+                'Minden meglévő kényszerről külön másolat készül, amely az eredetileg összekapcsolt elemek másolatait köti össze.',
+            },
+            'add-to-existing': {
+              label: 'Meglévőhöz',
+              tooltip: 'A lemásolt elemek összekapcsolása az eredetiekkel a meglévő kényszer segítségével.',
+              headerTooltip:
+                'A lemásolt elemek összekapcsolása az eredetiekkel az összes alkalmazható meglévő kényszer segítségével.',
+            },
+          },
+        },
+      },
+    },
     globalSettings: {
       title: 'Beállítások',
       positiveAction: 'OK',

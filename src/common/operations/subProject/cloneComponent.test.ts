@@ -8,6 +8,7 @@ import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { narrowers } from '../../utils/narrowers'
 import { cloneComponent } from './cloneComponent'
 import { createBaseOperationParams } from './testUtils'
+import { createCloneComponentParams } from './utils/cloneComponentSelection'
 
 import { getProjectIds } from '../../utils/idCollectorUtils'
 
@@ -52,7 +53,10 @@ describe('cloneComponent', () => {
     const snapshot = structuredClone(source)
     const project = d.project({ id: 'project', subProjects: [source] })
     const sourceIds = getProjectIds(project)
-    const result = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'panel' })
+    const result = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'panel'),
+    )
     expect(result.constraints).toBe(source.constraints)
     const copyId = result.components.root.children[1]
     const copy = result.components[copyId]
@@ -81,7 +85,10 @@ describe('cloneComponent', () => {
 
   it('reserves names for every copied entity', () => {
     const source = fixture()
-    const result = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'panel' })
+    const result = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'panel'),
+    )
     const copy = result.components[result.components.root.children[1]]
     expect(copy.name).toBe('Shared 1')
     expect(result.components[copy.children[0]].name).toBe('Shared 2')
@@ -96,13 +103,23 @@ describe('cloneComponent', () => {
 
   it.each(['root', 'missing'])('does not clone %s', (componentId) => {
     const source = fixture()
-    expect(cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: componentId })).toBe(source)
+    expect(
+      cloneComponent(
+        createBaseOperationParams(source, { name: nameGenerator }),
+        createCloneComponentParams(source, componentId),
+      ),
+    ).toBe(source)
   })
 
   it.each(['missing', 'panel'])('does not clone an invalid tree referencing %s', (childId) => {
     const source = fixture()
     source.components.child.children = [childId]
-    expect(cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'panel' })).toBe(source)
+    expect(
+      cloneComponent(
+        createBaseOperationParams(source, { name: nameGenerator }),
+        createCloneComponentParams(source, 'panel'),
+      ),
+    ).toBe(source)
   })
 
   it('copies a cluster tree and preserves the shared opening references', () => {
@@ -133,7 +150,10 @@ describe('cloneComponent', () => {
         d.tPocketStitchLine({ id: 'local', targetId: 't', targetType: 'component' }),
       ],
     })
-    const result = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'cluster' })
+    const result = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'cluster'),
+    )
     const accessor = accessors.subProject(result)
     const cluster = accessor.component.pocketCluster(result.components.root.children[1])
     expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe('opening')
@@ -145,7 +165,10 @@ describe('cloneComponent', () => {
       cluster.children[0],
     ])
 
-    const pocketCopy = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 't' })
+    const pocketCopy = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 't'),
+    )
     const copyId = pocketCopy.components.cluster.children[1]
     expect(pocketCopy.stitchLines).toHaveLength(3)
     expect(pocketCopy.stitchLines[0]).toBe(source.stitchLines[0])
@@ -176,7 +199,10 @@ const pocketFixture = () => {
 describe('cloneComponent pocket trees', () => {
   it('copies pockets and their nested children', () => {
     const source = pocketFixture()
-    const result = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'first' })
+    const result = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'first'),
+    )
     const rootId = result.components.root.children[1]
     const copy = result.components[rootId]
     expect(copy.type).toBe('pocket-cluster')
@@ -190,7 +216,10 @@ describe('cloneComponent pocket trees', () => {
     const source = pocketFixture()
     const before = structuredClone(source)
 
-    const result = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'first' })
+    const result = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'first'),
+    )
     const copyId = result.components.root.children[1]
     expect(result.components.root.children).toEqual(['first', copyId, 'second'])
     expect(result.components[copyId].type).toBe('pocket-cluster')
@@ -218,7 +247,10 @@ describe('cloneComponent pocket trees', () => {
       pocketOpenings: { ...original.pocketOpenings, [opening.id]: opening },
       components: { ...original.components, a: { ...a, openingId: opening.id } },
     }
-    const cloned = cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'first' })
+    const cloned = cloneComponent(
+      createBaseOperationParams(source, { name: nameGenerator }),
+      createCloneComponentParams(source, 'first'),
+    )
     const copiedCluster = cloned.components[cloned.components.root.children[1]]
     const copiedPocket = narrowers.assert.tPocket(cloned.components[copiedCluster.children[0]])
     expect(copiedPocket.openingId).toBe(opening.id)
@@ -230,7 +262,159 @@ describe('cloneComponent pocket trees', () => {
     source.components.first.children = ['front-a']
     delete source.components.a
     const snapshot = structuredClone(source)
-    expect(cloneComponent(createBaseOperationParams(source, { name: nameGenerator }), { id: 'front-a' })).toBe(source)
+    expect(
+      cloneComponent(
+        createBaseOperationParams(source, { name: nameGenerator }),
+        createCloneComponentParams(source, 'front-a'),
+      ),
+    ).toBe(source)
     expect(source).toEqual(snapshot)
+  })
+})
+
+describe('selective component cloning', () => {
+  it('omits deselected subtrees, holes and stitch lines without modifying the input', () => {
+    const source = fixture()
+    const snapshot = structuredClone(source)
+    const params = createCloneComponentParams(source, 'panel')
+    params.children.child.action = 'ignore'
+    params.holes['hole-panel'].action = 'ignore'
+    params.stitchLines['stitch-panel'].action = 'ignore'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    const copy = result.components[result.components.root.children[1]]
+    expect(copy.children).toEqual([])
+    expect(Object.keys(result.components)).toHaveLength(Object.keys(source.components).length + 1)
+    expect(result.holes).toBe(source.holes)
+    expect(result.stitchLines).toBe(source.stitchLines)
+    expect(source).toEqual(snapshot)
+  })
+
+  it('preserves internal and external onTop references without cloning their targets', () => {
+    const source = fixture()
+    source.stitchLines = [
+      d.componentBoundsStitchLine({ id: 'internal', targetId: 'panel', targetType: 'component', onTop: 'child' }),
+      d.componentBoundsStitchLine({ id: 'external', targetId: 'panel', targetType: 'component', onTop: 'outside' }),
+    ]
+    const params = createCloneComponentParams(source, 'panel')
+    params.children.child.action = 'ignore'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    expect(
+      result.stitchLines.slice(-2).map((stitchLine) => narrowers.assert.componentBoundsStitchLine(stitchLine).onTop),
+    ).toEqual(['child', 'outside'])
+    expect(Object.keys(result.components)).toHaveLength(Object.keys(source.components).length + 1)
+  })
+
+  it.each(['keep-original', 'clone', 'set-to-default'] as const)(
+    'applies the %s opening action to shared pocket openings',
+    (action) => {
+      const source = { ...pocketFixture() }
+      const openingId = narrowers.assert.tPocket(source.components.a).openingId
+      source.components['front-a'] = { ...narrowers.assert.frontPocket(source.components['front-a']), openingId }
+      const params = createCloneComponentParams(source, 'first')
+      params.pocketOpenings[openingId] = { action }
+      const result = cloneComponent(createBaseOperationParams(source), params)
+      const cluster = result.components[result.components.root.children[1]]
+      const first = narrowers.assert.tPocket(result.components[cluster.children[0]])
+      const front = narrowers.assert.frontPocket(result.components[cluster.children[1]])
+      expect(front.openingId).toBe(first.openingId)
+      if (action === 'clone') {
+        expect(first.openingId).not.toBe(openingId)
+        expect(Object.keys(result.pocketOpenings)).toHaveLength(Object.keys(source.pocketOpenings).length + 1)
+        expect(result.pocketOpenings[first.openingId]).toMatchObject({
+          ...source.pocketOpenings[openingId],
+          id: first.openingId,
+          name: expect.any(String),
+        })
+      } else {
+        expect(first.openingId).toBe(action === 'keep-original' ? openingId : source.defaultPocketOpening)
+        expect(result.pocketOpenings).toBe(source.pocketOpenings)
+      }
+    },
+  )
+
+  it('adds one new field to an existing constraint while retaining the original fields', () => {
+    const source = fixture()
+    const params = createCloneComponentParams(source, 'panel')
+    params.children.child.action = 'ignore'
+    params.constraints.linked.action = 'add-to-existing'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    const copyId = result.components.root.children[1]
+    expect(Object.keys(result.constraints)).toEqual(['linked'])
+    expect(result.constraints.linked.fields.slice(0, 2)).toEqual(source.constraints.linked.fields)
+    expect(result.constraints.linked.fields[2]).toMatchObject({
+      modelId: copyId,
+      field: 'width',
+      type: 'panel-constraint-field',
+    })
+    expect(result.constraints.linked.fields[2].id).not.toBe('panel-field')
+    expect(source.constraints.linked.fields).toHaveLength(2)
+  })
+
+  it('creates a separate constraint containing only fields of cloned models with new IDs', () => {
+    const source = fixture()
+    const params = createCloneComponentParams(source, 'panel')
+    params.constraints.linked.action = 'constrain-separately'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    const copy = result.components[result.components.root.children[1]]
+    const constraint = Object.values(result.constraints).find((candidate) => candidate.id !== 'linked')
+    expect(constraint).toMatchObject({
+      type: 'equal-constraint',
+      fields: [
+        { modelId: copy.id, field: 'width' },
+        { modelId: copy.children[0], field: 'height' },
+      ],
+    })
+    expect(result.constraints.linked).toBe(source.constraints.linked)
+    expect(constraint?.fields.map((field) => field.id)).not.toContain('panel-field')
+    expect(constraint?.fields.map((field) => field.id)).not.toContain('child-field')
+  })
+
+  it('remaps cloned hole, stitch line and opening constraint fields to the new models', () => {
+    const source = { ...pocketFixture() }
+    const openingId = narrowers.assert.tPocket(source.components.a).openingId
+    source.pocketOpenings[openingId] = { id: openingId, type: 'slanted', name: 'Opening', offset: 2, side: 'start' }
+    source.holes = [d.hole({ id: 'hole', componentId: 'a' })]
+    source.stitchLines = [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole' })]
+    source.constraints.owned = {
+      id: 'owned',
+      type: 'equal-constraint',
+      fields: [
+        { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
+        {
+          id: 'stitch-field',
+          type: 'component-bounds-stitch-line-constraint-field',
+          modelId: 'stitch',
+          field: 'stitchMargin',
+        },
+        { id: 'opening-field', type: 'slanted-constraint-field', modelId: openingId, field: 'offset' },
+      ],
+    }
+    const params = createCloneComponentParams(source, 'first')
+    params.pocketOpenings[openingId] = { action: 'clone' }
+    params.constraints.owned.action = 'constrain-separately'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    const constraint = Object.values(result.constraints).find((candidate) => candidate.id !== 'owned')
+    const clonedOpening = Object.values(result.pocketOpenings).find(
+      (opening) => !Object.keys(source.pocketOpenings).includes(opening.id),
+    )
+    expect(constraint?.fields.map((field) => field.modelId)).toEqual([
+      result.holes[1].id,
+      result.stitchLines[1].id,
+      clonedOpening?.id,
+    ])
+  })
+
+  it('normalizes forced front-pocket exclusion and invalid separate constraints in operation input', () => {
+    const source = pocketFixture()
+    const params = createCloneComponentParams(source, 'first')
+    params.children['front-a'].action = 'ignore'
+    const result = cloneComponent(createBaseOperationParams(source), params)
+    const cluster = result.components[result.components.root.children[1]]
+    expect(cluster.children.map((id) => result.components[id].type)).toEqual(['t-pocket', 'front-pocket'])
+    const panels = fixture()
+    const panelParams = createCloneComponentParams(panels, 'panel')
+    panelParams.children.child.action = 'ignore'
+    panelParams.constraints.linked.action = 'constrain-separately'
+    expect(cloneComponent(createBaseOperationParams(panels), panelParams).constraints).toBe(panels.constraints)
   })
 })

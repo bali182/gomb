@@ -1,5 +1,6 @@
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
+import { CloneSectionKey } from '../components/clone-component-dialog/types'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
@@ -28,6 +29,11 @@ import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from
 import type { HasAnchorsSchema } from '../schemas/hole'
 import type { IdPrefixSchema } from '../schemas/idGenerator'
 import type { LimitReasonSchema } from '../schemas/limits'
+import {
+  ClonePocketOpeningActionSchema,
+  CloneRelatedConstraintActionSchema,
+  CloneRelatedModelActionSchema,
+} from '../schemas/operations'
 import type {
   CardSchemaId,
   PocketItemOrientationSchema,
@@ -62,6 +68,7 @@ import type {
 } from '../schemas/stitching'
 import type { ThemeSchema } from '../schemas/theme'
 import type {
+  CloneComponentDialogSectionTranslationSchema,
   DialogTranslationSchema,
   EditorFieldTranslationSchema,
   EditorFieldTranslations,
@@ -943,6 +950,102 @@ export const EN = {
     },
   },
   dialogs: {
+    cloneComponent: {
+      title: 'Clone component',
+      positiveAction: 'Clone',
+      sections: {
+        children: {
+          title: 'Components',
+          options: {
+            clone: {
+              label: 'Clone',
+              tooltip: 'Clone this component. Its children can be selected separately.',
+              headerTooltip: 'Clone all components in this list.',
+            },
+            ignore: {
+              label: 'Skip',
+              tooltip: 'Skip this component and its descendants.',
+              headerTooltip:
+                'Skip all optional components. The source component and front pockets of selected pocket clusters remain selected.',
+            },
+          },
+        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedModelActionSchema>,
+        holes: {
+          title: 'Holes',
+          options: {
+            clone: {
+              label: 'Clone',
+              tooltip: 'Clone this hole on its cloned component.',
+              headerTooltip: 'Clone all listed holes belonging to the selected components.',
+            },
+            ignore: {
+              label: 'Skip',
+              tooltip: 'Skip this hole.',
+              headerTooltip: 'Skip all listed holes.',
+            },
+          },
+        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedModelActionSchema>,
+        stitchLines: {
+          title: 'Stitch lines',
+          options: {
+            clone: {
+              label: 'Clone',
+              tooltip: 'Clone this stitch line.',
+              headerTooltip: 'Clone all listed stitch lines belonging to selected components and holes.',
+            },
+            ignore: {
+              label: 'Skip',
+              tooltip: 'Skip this stitch line.',
+              headerTooltip: 'Skip all listed stitch lines.',
+            },
+          },
+        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedModelActionSchema>,
+        pocketOpenings: {
+          title: 'Pocket openings',
+          options: {
+            clone: {
+              label: 'Clone',
+              tooltip: 'Clone this pocket opening and assign it to the cloned pockets that use it.',
+              headerTooltip:
+                'Clone all listed pocket openings and assign them to the cloned pockets. Each shared opening is cloned once.',
+            },
+            'keep-original': {
+              label: 'Original',
+              tooltip: 'Keep the original pocket opening assigned to the cloned pockets that use it.',
+              headerTooltip:
+                'Keep the original pocket openings assigned to all cloned pockets. No pocket openings are cloned.',
+            },
+            'set-to-default': {
+              label: 'Default',
+              tooltip: 'Assign the default pocket opening to the cloned pockets that use this opening.',
+              headerTooltip: 'Assign the default pocket opening to all cloned pockets. No pocket openings are cloned.',
+            },
+          },
+        } satisfies CloneComponentDialogSectionTranslationSchema<ClonePocketOpeningActionSchema>,
+        constraints: {
+          title: 'Constraints',
+          options: {
+            ignore: {
+              label: 'Skip',
+              tooltip: 'Do not apply this constraint to the cloned elements.',
+              headerTooltip: 'Do not copy any constraints. The cloned elements will be unconstrained.',
+            },
+            'constrain-separately': {
+              label: 'To new',
+              tooltip:
+                'Duplicate this constraint, and use it on the cloned counterparts of the elements it belongs to.',
+              headerTooltip:
+                'Create separate constraints for each existing constraint, and use them on the cloned counterparts of the elements they currently belong to.',
+            },
+            'add-to-existing': {
+              label: 'To existing',
+              tooltip: 'Use this existing constraint to link the cloned elements to their originals.',
+              headerTooltip: 'Use all applicable existing constraints to link the cloned elements to their originals.',
+            },
+          },
+        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedConstraintActionSchema>,
+      } satisfies Record<CloneSectionKey, CloneComponentDialogSectionTranslationSchema>,
+    },
     globalSettings: {
       title: 'Settings',
       positiveAction: 'OK',

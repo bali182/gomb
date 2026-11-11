@@ -26,6 +26,17 @@ export type EditorFieldTranslationSchema = {
   placeholder?: string
 }
 
+export type CloneComponenActionTranslationSchema = {
+  label: string
+  tooltip: string
+  headerTooltip: string
+}
+
+export type CloneComponentDialogSectionTranslationSchema<K extends string = string> = {
+  title: string
+  options: Record<K, CloneComponenActionTranslationSchema>
+}
+
 export type EditorFieldTranslations<T extends string> = Record<T, EditorFieldTranslationSchema>
 
 export type SectionTranslationSchema<T> = { title: string } & EditorFieldTranslations<Extract<keyof T, string>> &

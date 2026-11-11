@@ -81,8 +81,29 @@ export type AddStitchLineToComponentParamsSchema = {
 
 export type AddStitchLineParamsSchema = AddStitchLineToHoleParamsSchema | AddStitchLineToComponentParamsSchema
 
+export type CloneRelatedModelActionSchema = 'clone' | 'ignore'
+export type CloneRelatedConstraintActionSchema = 'constrain-separately' | 'add-to-existing' | 'ignore'
+export type ClonePocketOpeningActionSchema = 'keep-original' | 'clone' | 'set-to-default'
+
+export type CloneRelatedModelSchema = {
+  action: CloneRelatedModelActionSchema
+}
+
+export type CloneRelatedConstraintSchema = {
+  action: CloneRelatedConstraintActionSchema
+}
+
+export type CloneRelatedPocketOpeningSchema = {
+  action: ClonePocketOpeningActionSchema
+}
+
 export type CloneComponentParamsSchema = {
-  id: string
+  rootId: string
+  children: Record<string, CloneRelatedModelSchema>
+  holes: Record<string, CloneRelatedModelSchema>
+  stitchLines: Record<string, CloneRelatedModelSchema>
+  pocketOpenings: Record<string, CloneRelatedPocketOpeningSchema>
+  constraints: Record<string, CloneRelatedConstraintSchema>
 }
 
 export type CloneHoleParamsSchema = {
