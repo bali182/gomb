@@ -1,5 +1,5 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
-import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, useState, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
@@ -26,6 +26,7 @@ import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
+import { CloneComponentDialog } from '../clone-component-dialog/CloneComponentDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
@@ -59,13 +60,14 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   onAddStitchLine = noop,
   onDelete = noop,
 }) => {
+  const [isCloneDialogOpen, setCloneDialogOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLine, cloneComponent, deleteComponent, flip } = useSubProjectOperations()
+  const { addComponent, addHole, addStitchLine, deleteComponent, flip } = useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -139,11 +141,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
       case 't-pocket':
       case 'panel':
       case 'pocket-cluster': {
-        cloneComponent({ id: component.id })
+        setCloneDialogOpen(true)
         break
       }
     }
-  }, [cloneComponent, cloneSubProject, component.id, component.type, subProject])
+  }, [cloneSubProject, component.type, subProject])
 
   const handleAddStitchLine = useCallback(
     (type: StitchLineSchema['type']): void => {
@@ -246,6 +248,14 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
+      {isCloneDialogOpen && (
+        <CloneComponentDialog
+          component={component}
+          subProject={subProject}
+          isOpen={isCloneDialogOpen}
+          onOpenChange={setCloneDialogOpen}
+        />
+      )}
     </Box>
   )
 }
