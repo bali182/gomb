@@ -15,20 +15,28 @@ top → topRightCorner → right → bottomRightCorner → bottom → bottomLeft
 ```
 
 Sides and corners can be enabled independently, including an isolated corner.
-The enabled portion must be contiguous. The editor permits additions and
-removals only at its ends; an empty boundary can start anywhere and a complete
-boundary can be broken anywhere. These rules include zero-radius corners:
+The enabled portion must be contiguous. The editor permits additions at its
+ends; an empty boundary can start anywhere and a complete boundary can be broken
+anywhere. Removing an endpoint disables only that element. An internal element
+can also be removed when it directly neighbors an endpoint; each neighboring
+endpoint is disabled with it, using the selection before the click. Removing the
+middle of a three-element selection therefore clears all three. Other internal
+elements remain unavailable for removal. These rules include zero-radius corners:
 geometric contact does not replace an enabled corner.
 
 An unselected side adjacent to a selected side remains enabled even when the
 connecting corner is disabled. The same applies to adjacent corners with a
 disabled connecting side. Clicking either emits one update containing the
 chosen element and, only if needed for continuity, the minimum number of
-connecting elements of the other kind. It does not enable additional elements
-of the chosen kind or unnecessarily close the boundary. Equal repairs use the
-normalizer's canonical tie-breaking order. An element opposite the only
-selected element of the same kind remains unavailable, and removal rules are
-unchanged.
+connecting elements of the other kind. If exactly three consecutive elements
+are missing, clicking the middle one enables all three and closes the boundary.
+Otherwise, it does not enable additional elements of the chosen kind or
+unnecessarily close the boundary. Equal repairs use the normalizer's canonical
+tie-breaking order. An element opposite the only selected element of the same
+kind remains unavailable.
+
+`toggleStitchLineSideOrCorner` applies these click-specific additions and removals
+in one update; `canToggleStitchLineSideOrCorner` controls their availability.
 
 `normalizeStitchLineSidesAndCorners` fills gaps by enabling as few sides/corners
 as possible, preserving the longest disabled interval. Ties follow canonical

@@ -3,8 +3,8 @@ import { useCallback, useMemo, type FC, type ReactNode } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import {
   canToggleStitchLineSideOrCorner,
-  normalizeStitchLineSidesAndCorners,
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
+  toggleStitchLineSideOrCorner,
   type StitchLineSideOrCornerField,
 } from '../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../schemas/editable'
@@ -76,7 +76,7 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
   const toggle = useCallback(
     (field: StitchLineSideOrCornerField): void => {
       if (canToggleStitchLineSideOrCorner(editable, field)) {
-        onChange(normalizeStitchLineSidesAndCorners({ ...editable, [field]: !editable[field] }))
+        onChange(toggleStitchLineSideOrCorner(editable, field))
       }
     },
     [editable, onChange],
