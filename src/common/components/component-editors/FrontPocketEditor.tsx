@@ -66,7 +66,11 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
             issues={issues}
             onChange={onChange}
           />
-          <PocketOpeningSection openingId={editable.openingId} onOpeningIdChange={handleOpeningIdChange} />
+          <PocketOpeningSection
+            pocketId={component.id}
+            openingId={editable.openingId}
+            onOpeningIdChange={handleOpeningIdChange}
+          />
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value={PocketEditorTabs.contents} pt={0}>

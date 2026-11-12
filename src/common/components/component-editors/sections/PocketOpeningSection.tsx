@@ -3,6 +3,7 @@ import { useCallback, type FC } from 'react'
 import { PiCaretDown, PiPencilSimple } from 'react-icons/pi'
 import { useDrawAreaContext } from '../../../contexts/DrawAreaContext'
 import { useEditorContext } from '../../../contexts/EditorContext'
+import { usePocketOpeningEditorReference } from '../../../hooks/usePocketOpeningEditorReference'
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
@@ -14,23 +15,26 @@ import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketOpeningSectionProps = {
+  pocketId: string
   openingId: string
   onOpeningIdChange: (openingId: string) => void
 }
 
-export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({ openingId, onOpeningIdChange }) => {
+export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({ pocketId, openingId, onOpeningIdChange }) => {
   const { subProject } = useSubProject()
   const { selection } = useDrawAreaContext()
   const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
   const opening = accessors.subProject(subProject).pocketOpening.byId(openingId)
+  const { setPocketReference } = usePocketOpeningEditorReference(openingId)
 
   const OpeningIcon = getModelIconByType(opening.type)
 
   const handleEditOpening = useCallback((): void => {
     setEditingInputId(undefined)
+    setPocketReference(pocketId)
     selection.select(opening)
-  }, [opening, selection, setEditingInputId])
+  }, [opening, pocketId, selection, setEditingInputId, setPocketReference])
 
   const handleOpeningChange = useCallback(
     (details: MenuValueChangeDetails): void => {
