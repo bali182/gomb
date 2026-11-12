@@ -31,8 +31,9 @@ export const calculateTPocketStitchLine = (
   if (!isDefined(start) || !isDefined(end) || arePointsEqual(start, end)) {
     return undefined
   }
-  const startOffset = new BigNumber(stitchLine.startOffset)
-  const endOffset = new BigNumber(stitchLine.endOffset)
+  const reversed = stitchLine.stitchDirection === 'end-to-start'
+  const startOffset = new BigNumber(reversed ? stitchLine.endOffset : stitchLine.startOffset)
+  const endOffset = new BigNumber(reversed ? stitchLine.startOffset : stitchLine.endOffset)
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const line: LineSchema = isVertical
     ? { start: { x: start.x.minus(startOffset), y: start.y }, end: { x: end.x.plus(endOffset), y: end.y } }

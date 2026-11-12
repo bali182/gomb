@@ -42,7 +42,7 @@ export const calculateStitchLineHoles = (
   } else {
     let segments = createStitchHoleSegments(calculatedPath.fragments)
     if (calculatedPath.isClosed) {
-      segments = shiftClosedSegments(segments, stitchLine.startOffset)
+      segments = shiftClosedSegments(segments, reversed ? -stitchLine.startOffset : stitchLine.startOffset)
     }
     traversals = [
       {

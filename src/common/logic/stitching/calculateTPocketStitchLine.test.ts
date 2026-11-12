@@ -8,7 +8,9 @@ import type { ComputedTPocketSchema } from '../../schemas/computed'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ResolvedTPocketStitchLineSchema } from '../../schemas/stitching'
 import { d } from '../../testData'
+import { isDefined } from '../../utils/isDefined'
 import { createPocketCalculator } from '../pockets/createPocketCalculator'
+import { calculateTPocketStitchHoles } from './calculateTPocketStitchHoles'
 import { calculateTPocketStitchLine } from './calculateTPocketStitchLine'
 
 const createFixture = (opening: PocketOpeningSchema, orientation: PocketOrientationSchema = 'up') => {
@@ -84,6 +86,41 @@ describe('calculateTPocketStitchLine', () => {
       const axis = orientation === 'up' || orientation === 'down' ? 'x' : 'y'
       expect(offset?.line.start[axis].toNumber()).toBeCloseTo((result?.line.start[axis].toNumber() ?? 0) - 2, 9)
       expect(offset?.line.end[axis].toNumber()).toBeCloseTo((result?.line.end[axis].toNumber() ?? 0) + 3, 9)
+    },
+  )
+
+  it.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
+    'applies offsets at the punching start and end facing %s',
+    (orientation) => {
+      const { cluster, pocket, stitchLine } = createFixture(
+        { id: 'opening', name: 'Opening', type: 'straight' },
+        orientation,
+      )
+      const original = calculateTPocketStitchLine(stitchLine, cluster, pocket)
+      if (!isDefined(original)) {
+        throw new Error('Expected a stitch span')
+      }
+      const axis = orientation === 'up' || orientation === 'down' ? 'x' : 'y'
+      for (const stitchDirection of ['start-to-end', 'end-to-start'] as const) {
+        for (const startOffset of [-2, 2]) {
+          const directed = { ...stitchLine, stitchDirection, startOffset, endOffset: -3 }
+          const result = calculateTPocketStitchLine(directed, cluster, pocket)
+          if (!isDefined(result)) {
+            throw new Error('Expected an offset stitch span')
+          }
+          const reversed = stitchDirection === 'end-to-start'
+          expect(result.line.start[axis].toNumber()).toBeCloseTo(
+            original.line.start[axis].toNumber() - (reversed ? -3 : startOffset),
+            9,
+          )
+          expect(result.line.end[axis].toNumber()).toBeCloseTo(
+            original.line.end[axis].toNumber() + (reversed ? startOffset : -3),
+            9,
+          )
+          const holes = calculateTPocketStitchHoles(directed, result.line)
+          expect(holes[0].center).toEqual(reversed ? result.line.end : result.line.start)
+        }
+      }
     },
   )
 

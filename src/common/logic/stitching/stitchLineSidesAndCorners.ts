@@ -76,10 +76,41 @@ export const canToggleStitchLineSideOrCorner = (
   const [previous, next] = STITCH_LINE_NEIGHBORS[field].directNeighbors
   const [previousSameKind, nextSameKind] = STITCH_LINE_NEIGHBORS[field].sameKindNeighbors
   if (stitchLine[field]) {
-    return !stitchLine[previous] || !stitchLine[next]
+    return !stitchLine[previous] || !stitchLine[next] || !stitchLine[previousSameKind] || !stitchLine[nextSameKind]
   }
 
   return stitchLine[previous] || stitchLine[next] || stitchLine[previousSameKind] || stitchLine[nextSameKind]
+}
+
+export const toggleStitchLineSideOrCorner = <T extends HasStitchedSidesSchema & HasStitchedCornersSchema>(
+  stitchLine: T,
+  field: StitchLineSideOrCornerField,
+): T => {
+  if (!canToggleStitchLineSideOrCorner(stitchLine, field)) {
+    return stitchLine
+  }
+
+  const updated = { ...stitchLine, [field]: !stitchLine[field] }
+  const [previous, next] = STITCH_LINE_NEIGHBORS[field].directNeighbors
+  if (stitchLine[field]) {
+    if (stitchLine[previous] && stitchLine[next]) {
+      const [previousSameKind, nextSameKind] = STITCH_LINE_NEIGHBORS[field].sameKindNeighbors
+      if (!stitchLine[previousSameKind]) {
+        updated[previous] = false
+      }
+      if (!stitchLine[nextSameKind]) {
+        updated[next] = false
+      }
+    }
+    return updated
+  }
+
+  const missingFields = STITCH_LINE_SIDE_AND_CORNER_ORDER.filter((candidate) => !stitchLine[candidate])
+  if (missingFields.length === 3 && !stitchLine[previous] && !stitchLine[next]) {
+    updated[previous] = true
+    updated[next] = true
+  }
+  return normalizeStitchLineSidesAndCorners(updated)
 }
 
 export const normalizeStitchLineSidesAndCorners = <T extends HasStitchedSidesSchema & HasStitchedCornersSchema>(

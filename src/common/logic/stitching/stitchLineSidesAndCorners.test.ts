@@ -4,6 +4,7 @@ import {
   canToggleStitchLineSideOrCorner,
   normalizeStitchLineSidesAndCorners,
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
+  toggleStitchLineSideOrCorner,
 } from './stitchLineSidesAndCorners'
 
 const sidesAndCorners = (mask: number): HasStitchedSidesSchema & HasStitchedCornersSchema => ({
@@ -66,26 +67,51 @@ describe('stitched sides and corners', () => {
     expect(toMask(normalized)).toBe(255 ^ (1 | 2))
   })
 
-  it('permits contiguous toggles and additions beside selected elements of the same kind for every valid boundary', () => {
+  it('applies the permitted additions and removals for every valid boundary without mutating the input', () => {
     for (const mask of validMasks) {
+      const endpointMask = STITCH_LINE_SIDE_AND_CORNER_ORDER.reduce((endpoints, _, index) => {
+        const bit = 1 << index
+        return (mask & bit) !== 0 && validMasks.has(mask ^ bit) ? endpoints | bit : endpoints
+      }, 0)
       for (const [index, field] of STITCH_LINE_SIDE_AND_CORNER_ORDER.entries()) {
-        const updatedMask = mask ^ (1 << index)
-        const adjacentElements = (1 << ((index + 2) % 8)) | (1 << ((index + 6) % 8))
-        const addsAdjacentElement = (mask & (1 << index)) === 0 && (mask & adjacentElements) !== 0
-        const expected = validMasks.has(updatedMask) || addsAdjacentElement
-        expect(canToggleStitchLineSideOrCorner(sidesAndCorners(mask), field), `mask ${mask}, field ${field}`).toBe(
-          expected,
-        )
-        if (expected) {
-          const updated = normalizeStitchLineSidesAndCorners(sidesAndCorners(updatedMask))
-          expect(validMasks.has(toMask(updated)), `mask ${mask}, field ${field}`).toBe(true)
-          const sameKindMask = index % 2 === 0 ? 0b01010101 : 0b10101010
-          expect(toMask(updated) & sameKindMask, `extra changes for mask ${mask}, field ${field}`).toBe(
-            updatedMask & sameKindMask,
-          )
-          if (validMasks.has(updatedMask)) {
-            expect(toMask(updated)).toBe(updatedMask)
-          }
+        const bit = 1 << index
+        const selected = (mask & bit) !== 0
+        const updatedMask = mask ^ bit
+        const adjacentMask = (1 << ((index + 1) % 8)) | (1 << ((index + 7) % 8))
+        const adjacentEndpoints = adjacentMask & endpointMask
+        const sameKindNeighbors = (1 << ((index + 2) % 8)) | (1 << ((index + 6) % 8))
+        const canExtend = !selected && (mask & sameKindNeighbors) !== 0
+        const canRemoveWithEndpoint = selected && adjacentEndpoints !== 0
+        const expected = validMasks.has(updatedMask) || canExtend || canRemoveWithEndpoint
+        const input = sidesAndCorners(mask)
+        const before = { ...input }
+        const context = `mask ${mask}, field ${field}`
+        expect(canToggleStitchLineSideOrCorner(input, field), context).toBe(expected)
+        const updated = toggleStitchLineSideOrCorner(input, field)
+        const actual = toMask(updated)
+        expect(input, context).toEqual(before)
+        if (!expected) {
+          expect(updated, context).toBe(input)
+          continue
+        }
+        expect(validMasks.has(actual), context).toBe(true)
+        expect(updated[field], context).toBe(!selected)
+        const sameKindMask = index % 2 === 0 ? 0b01010101 : 0b10101010
+        expect(actual & sameKindMask, context).toBe(updatedMask & sameKindMask)
+        if (validMasks.has(updatedMask)) {
+          expect(actual, context).toBe(updatedMask)
+        } else if (selected) {
+          expect(actual, context).toBe(updatedMask & ~adjacentEndpoints)
+        } else if (countBits(mask) === 5 && (mask & adjacentMask) === 0) {
+          expect(actual, context).toBe(255)
+        } else {
+          expect(actual, context).toBe(toMask(normalizeStitchLineSidesAndCorners(sidesAndCorners(updatedMask))))
+        }
+        expect(countBits(actual ^ mask), context).toBeLessThanOrEqual(3)
+        if (selected) {
+          expect(actual & mask, context).toBe(actual)
+        } else {
+          expect(actual & mask, context).toBe(mask)
         }
       }
     }
@@ -98,7 +124,7 @@ describe('stitched sides and corners', () => {
       const connectorIndex = (index + direction + 8) % 8
       const field = STITCH_LINE_SIDE_AND_CORNER_ORDER[adjacentIndex]
       expect(canToggleStitchLineSideOrCorner(input, field)).toBe(true)
-      const updated = normalizeStitchLineSidesAndCorners({ ...input, [field]: true })
+      const updated = toggleStitchLineSideOrCorner(input, field)
       expect(toMask(updated)).toBe((1 << index) | (1 << adjacentIndex) | (1 << connectorIndex))
     }
     expect(canToggleStitchLineSideOrCorner(input, STITCH_LINE_SIDE_AND_CORNER_ORDER[(index + 4) % 8])).toBe(false)
@@ -107,8 +133,7 @@ describe('stitched sides and corners', () => {
   it('leaves corners unchanged when adding a side already produces a contiguous boundary', () => {
     const input = sidesAndCorners(1 | 2)
     expect(canToggleStitchLineSideOrCorner(input, 'right')).toBe(true)
-    const updated = { ...input, right: true }
-    expect(normalizeStitchLineSidesAndCorners(updated)).toBe(updated)
+    expect(toMask(toggleStitchLineSideOrCorner(input, 'right'))).toBe(1 | 2 | 4)
   })
 
   it('adds only one connecting corner when enabling the fourth side needs a repair', () => {
@@ -123,8 +148,7 @@ describe('stitched sides and corners', () => {
   it('leaves sides unchanged when adding a corner already produces a contiguous boundary', () => {
     const input = sidesAndCorners(2 | 4)
     expect(canToggleStitchLineSideOrCorner(input, 'bottomRightCorner')).toBe(true)
-    const updated = { ...input, bottomRightCorner: true }
-    expect(normalizeStitchLineSidesAndCorners(updated)).toBe(updated)
+    expect(toMask(toggleStitchLineSideOrCorner(input, 'bottomRightCorner'))).toBe(2 | 4 | 8)
   })
 
   it('adds only one connecting side when enabling the fourth corner needs a repair', () => {
@@ -136,13 +160,36 @@ describe('stitched sides and corners', () => {
     expect(toMask(updated)).toBe(255 ^ 1)
   })
 
-  it('keeps isolated corners and forbids removing an internal side', () => {
-    expect(normalizeStitchLineSidesAndCorners(sidesAndCorners(128)).topLeftCorner).toBe(true)
-    const topWithCorners = sidesAndCorners(128 | 1 | 2)
-    expect(canToggleStitchLineSideOrCorner(topWithCorners, 'top')).toBe(false)
-    expect(canToggleStitchLineSideOrCorner(topWithCorners, 'topLeftCorner')).toBe(true)
-    expect(canToggleStitchLineSideOrCorner(topWithCorners, 'topRightCorner')).toBe(true)
-    const topAndRight = sidesAndCorners(1 | 2 | 4)
-    expect(canToggleStitchLineSideOrCorner(topAndRight, 'topRightCorner')).toBe(false)
+  it.each([0, 1, 2, 3, 4, 5, 6, 7])('handles removals and closing gaps around index %i', (index) => {
+    const field = STITCH_LINE_SIDE_AND_CORNER_ORDER[index]
+    const previous = 1 << ((index + 7) % 8)
+    const current = 1 << index
+    const next = 1 << ((index + 1) % 8)
+    const afterNext = 1 << ((index + 2) % 8)
+    const beforePrevious = 1 << ((index + 6) % 8)
+    const triple = previous | current | next
+
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(current | next), field))).toBe(next)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(previous | current), field))).toBe(previous)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(current), field))).toBe(0)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(triple), field))).toBe(0)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(triple | afterNext), field))).toBe(next | afterNext)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(triple | beforePrevious), field))).toBe(
+      previous | beforePrevious,
+    )
+
+    const internal = sidesAndCorners(triple | beforePrevious | afterNext)
+    expect(canToggleStitchLineSideOrCorner(internal, field)).toBe(false)
+    expect(toggleStitchLineSideOrCorner(internal, field)).toBe(internal)
+
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(255 ^ triple), field))).toBe(255)
+    expect(toMask(toggleStitchLineSideOrCorner(sidesAndCorners(255), field))).toBe(255 ^ current)
+  })
+
+  it('preserves unrelated fields when toggling', () => {
+    const input = { ...sidesAndCorners(1 | 2 | 4), id: 'stitch-line', startOffset: 5 }
+    const updated = toggleStitchLineSideOrCorner(input, 'topRightCorner')
+    expect(updated).toEqual({ ...sidesAndCorners(0), id: 'stitch-line', startOffset: 5 })
+    expect(input).toEqual({ ...sidesAndCorners(1 | 2 | 4), id: 'stitch-line', startOffset: 5 })
   })
 })

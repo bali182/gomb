@@ -543,12 +543,12 @@ export const HU = {
             startOffset: {
               label: 'Kezdő eltolás',
               tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+                'A lyukasztás indulási végét mozgatja, ahol az első öltéslyuk van. A pozitív érték hosszabbít, a negatív rövidít.',
             },
             endOffset: {
               label: 'Végeltolás',
               tooltip:
-                'A varrásvonal ezen végét mozgatja. A pozitív érték hosszabbá, a negatív rövidebbé teszi a vonalat.',
+                'A lyukasztás befejezési végét mozgatja, ahol nem kötelező öltéslyuknak lennie. A pozitív érték hosszabbít, a negatív rövidít.',
             },
             stitchDirection: {
               label: 'Irány',
@@ -560,12 +560,12 @@ export const HU = {
             startOffset: {
               label: 'Eltolás',
               tooltip:
-                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Teljesen lekerekített zárt körön a kezdőpontot tolja el a kerület mentén.',
+                'A lyukasztás indulási végét állítja, ahol az első öltéslyuk van. A pozitív érték egyenesen hosszabbít, a negatív oldalakon és sarkokon át rövidít, a vonal hossza mentén. Teljesen lekerekített zárt körön a pozitív érték a lyukasztás irányába, a negatív azzal ellentétesen tolja a kezdőpontot.',
             },
             endOffset: {
               label: 'Eltolás',
               tooltip:
-                'A pozitív érték egyenesen hosszabbít. A negatív érték oldalakon és sarkokon át rövidít, az egyenes és az ívek hossza mentén mérve. Zárt körön nincs hatása.',
+                'A lyukasztás befejezési végét állítja, ahol nem kötelező öltéslyuknak lennie. A pozitív érték egyenesen hosszabbít, a negatív oldalakon és sarkokon át rövidít, a vonal hossza mentén. Zárt körön nincs hatása.',
             },
             stitchDirection: {
               label: 'Lyukasztás iránya',

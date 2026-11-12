@@ -1,5 +1,5 @@
 import { Box, Grid, HStack, type SystemStyleObject, type Tokens } from '@chakra-ui/react'
-import { useMemo, type FC, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type FC, type ReactNode } from 'react'
 import {
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
   type StitchLineSideOrCornerField,
@@ -7,7 +7,7 @@ import {
 import type { EditableSchema } from '../../schemas/editable'
 import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
-import { getStitchLineOffsetPosition } from './stitchLineOffsetEditorUtils'
+import { getStitchLineOffsetCanonicalEndpoint, getStitchLineOffsetPosition } from './stitchLineOffsetEditorUtils'
 import {
   STITCH_LINE_EDITOR_CLEARANCE,
   STITCH_LINE_PADDING_X,
@@ -54,8 +54,39 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
     startPosition !== 'right' &&
     startPosition !== 'bottom' &&
     startPosition !== 'left'
+  const startCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'start')
+  const endCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'end')
   const startLayout = isDefined(startPosition) ? STITCH_LINE_OFFSET_LAYOUTS[startPosition] : undefined
   const endLayout = isDefined(endPosition) ? STITCH_LINE_OFFSET_LAYOUTS[endPosition] : undefined
+
+  const sharedCornerFlexDirection = useMemo<CSSProperties['flexDirection']>(() => {
+    const isBottomCorner = startPosition === 'bottomLeftCorner' || startPosition === 'bottomRightCorner'
+    return isBottomCorner !== (startCanonicalEndpoint === 'end') ? 'row-reverse' : 'row'
+  }, [startPosition, startCanonicalEndpoint])
+
+  const startOffsetGridArea = useMemo<string | undefined>(() => {
+    if (isClosed) {
+      return startLayout?.area
+    }
+    return startCanonicalEndpoint === 'start' ? startLayout?.startArea : startLayout?.endArea
+  }, [startLayout, isClosed, startCanonicalEndpoint])
+
+  const startOffsetContainerStyles = useMemo<SystemStyleObject | undefined>(() => {
+    if (isClosed) {
+      return startLayout?.container
+    }
+    return startCanonicalEndpoint === 'start' ? startLayout?.startContainer : startLayout?.endContainer
+  }, [startLayout, isClosed, startCanonicalEndpoint])
+
+  const endOffsetGridArea = useMemo<string | undefined>(
+    () => (endCanonicalEndpoint === 'start' ? endLayout?.startArea : endLayout?.endArea),
+    [endLayout, endCanonicalEndpoint],
+  )
+
+  const endOffsetContainerStyles = useMemo<SystemStyleObject | undefined>(
+    () => (endCanonicalEndpoint === 'start' ? endLayout?.startContainer : endLayout?.endContainer),
+    [endLayout, endCanonicalEndpoint],
+  )
 
   return (
     <Grid
@@ -74,29 +105,19 @@ export const StitchLineEditorsOverlay: FC<StitchLineEditorsOverlayProps> = ({
       </Box>
       {sharedCorner && isDefined(startPosition) && isDefined(startLayout) && (
         <Box gridArea={startLayout.area} {...startLayout.container}>
-          <HStack
-            gap="2"
-            alignItems="start"
-            pointerEvents="auto"
-            flexDirection={
-              startPosition === 'bottomLeftCorner' || startPosition === 'bottomRightCorner' ? 'row-reverse' : 'row'
-            }
-          >
+          <HStack gap="2" alignItems="start" pointerEvents="auto" flexDirection={sharedCornerFlexDirection}>
             {startOffsetEditor}
             {endOffsetEditor}
           </HStack>
         </Box>
       )}
       {!sharedCorner && isDefined(startPosition) && isDefined(startLayout) && isDefined(startOffsetEditor) && (
-        <Box
-          gridArea={isClosed ? startLayout.area : startLayout.startArea}
-          {...(isClosed ? startLayout.container : startLayout.startContainer)}
-        >
+        <Box gridArea={startOffsetGridArea} {...startOffsetContainerStyles}>
           {startOffsetEditor}
         </Box>
       )}
       {!sharedCorner && isDefined(endPosition) && isDefined(endLayout) && isDefined(endOffsetEditor) && (
-        <Box gridArea={endLayout.endArea} {...endLayout.endContainer}>
+        <Box gridArea={endOffsetGridArea} {...endOffsetContainerStyles}>
           {endOffsetEditor}
         </Box>
       )}

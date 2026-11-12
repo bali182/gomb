@@ -7,11 +7,26 @@ import {
 import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { CornerRadiusSchema } from '../../schemas/geometry'
 import type { CornerRadiusLimitsSchema } from '../../schemas/limits'
-import type { HasStitchedCornersSchema, HasStitchedSidesSchema } from '../../schemas/stitching'
+import type {
+  HasStitchDirectionSchema,
+  HasStitchedCornersSchema,
+  HasStitchedSidesSchema,
+  StitchDirectionSchema,
+} from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import type { NumberInputArrowPosition } from '../common/NumberInputArrow'
 
 export type StitchLineOffsetEndpoint = 'start' | 'end'
+
+export const getStitchLineOffsetCanonicalEndpoint = (
+  stitchDirection: StitchDirectionSchema,
+  endpoint: StitchLineOffsetEndpoint,
+): StitchLineOffsetEndpoint => {
+  if (stitchDirection === 'start-to-end') {
+    return endpoint
+  }
+  return endpoint === 'start' ? 'end' : 'start'
+}
 
 export const getStitchLineOffsetCornerRadius = (
   autoCornerRadius: boolean,
@@ -26,11 +41,12 @@ export const getStitchLineOffsetCornerRadius = (
 }
 
 export const getStitchLineOffsetPosition = (
-  value: HasStitchedSidesSchema & HasStitchedCornersSchema,
+  value: HasStitchedSidesSchema & HasStitchedCornersSchema & HasStitchDirectionSchema,
   endpoint: StitchLineOffsetEndpoint,
 ): StitchLineSideOrCornerField | undefined => {
+  const canonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(value.stitchDirection, endpoint)
   const position = STITCH_LINE_SIDE_AND_CORNER_ORDER.find((field, index, fields) => {
-    const adjacentIndex = endpoint === 'start' ? index + fields.length - 1 : index + 1
+    const adjacentIndex = canonicalEndpoint === 'start' ? index + fields.length - 1 : index + 1
     const adjacent = fields[adjacentIndex % fields.length]
     return value[field] && !value[adjacent]
   })

@@ -613,12 +613,12 @@ export const EN = {
             startOffset: {
               label: 'Start offset',
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
+                'Moves the punching start, where the first stitch hole is placed. Positive values extend the line. Negative values shorten it.',
             },
             endOffset: {
               label: 'End offset',
               tooltip:
-                'Moves this end of the stitch line. Positive values make the line longer. Negative values make it shorter.',
+                'Moves the punching end, where a stitch hole is not required. Positive values extend the line. Negative values shorten it.',
             },
             stitchDirection: {
               label: 'Direction',
@@ -630,12 +630,12 @@ export const EN = {
             startOffset: {
               label: 'Offset',
               tooltip:
-                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. On a fully rounded closed route, start offset shifts the punching start around the perimeter.',
+                'Adjusts the punching start, where the first stitch hole is placed. Positive values extend it in a straight line. Negative values shorten the route across sides and corners along its length. On a fully rounded closed route, positive values shift the start in the punching direction and negative values shift it against that direction.',
             },
             endOffset: {
               label: 'Offset',
               tooltip:
-                'Positive values extend this end in a straight line. Negative values shorten the route across sides and corners, measured along the line and arcs. Ignored on a closed route.',
+                'Adjusts the punching end, where a stitch hole is not required. Positive values extend it in a straight line. Negative values shorten the route across sides and corners along its length. Ignored on a closed route.',
             },
             stitchDirection: {
               label: 'Punching direction',

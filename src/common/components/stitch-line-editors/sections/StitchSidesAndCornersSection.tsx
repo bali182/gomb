@@ -21,6 +21,7 @@ import { StitchLineOffsetIcon } from '../StitchLineOffsetIcon'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
 import {
   getStitchLineOffsetArrowPosition,
+  getStitchLineOffsetCanonicalEndpoint,
   getStitchLineOffsetCornerRadius,
   getStitchLineOffsetPosition,
 } from '../stitchLineOffsetEditorUtils'
@@ -80,14 +81,17 @@ export const StitchSidesAndCornersSection = ({
     [editable],
   )
 
+  const startCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'start')
+  const endCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'end')
+
   const startArrowPosition = useMemo<NumberInputArrowPosition | undefined>(
-    () => getStitchLineOffsetArrowPosition(startPosition, endPosition, 'start'),
-    [startPosition, endPosition],
+    () => getStitchLineOffsetArrowPosition(startPosition, endPosition, startCanonicalEndpoint),
+    [startPosition, endPosition, startCanonicalEndpoint],
   )
 
   const endArrowPosition = useMemo<NumberInputArrowPosition | undefined>(
-    () => getStitchLineOffsetArrowPosition(endPosition, startPosition, 'end'),
-    [endPosition, startPosition],
+    () => getStitchLineOffsetArrowPosition(endPosition, startPosition, endCanonicalEndpoint),
+    [endPosition, startPosition, endCanonicalEndpoint],
   )
 
   const handleDirectionChange = useCallback(
@@ -141,7 +145,12 @@ export const StitchSidesAndCornersSection = ({
                   issue={issues.startOffset}
                   onChange={handleStartOffsetChange}
                   startAddon={
-                    <StitchLineOffsetIcon position={startPosition} endpoint="start" isClosed={isClosed} boxSize="5" />
+                    <StitchLineOffsetIcon
+                      position={startPosition}
+                      endpoint={startCanonicalEndpoint}
+                      isClosed={isClosed}
+                      boxSize="5"
+                    />
                   }
                   unit="mm"
                   value={editable.startOffset}
@@ -159,7 +168,12 @@ export const StitchSidesAndCornersSection = ({
                   issue={issues.endOffset}
                   onChange={handleEndOffsetChange}
                   startAddon={
-                    <StitchLineOffsetIcon position={endPosition} endpoint="end" isClosed={isClosed} boxSize="5" />
+                    <StitchLineOffsetIcon
+                      position={endPosition}
+                      endpoint={endCanonicalEndpoint}
+                      isClosed={isClosed}
+                      boxSize="5"
+                    />
                   }
                   unit="mm"
                   value={editable.endOffset}
