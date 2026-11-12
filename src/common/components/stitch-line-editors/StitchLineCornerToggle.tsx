@@ -2,7 +2,8 @@ import { Box, type CssProperties, type SystemStyleObject, type Tokens } from '@c
 import { useCallback, useMemo, useRef, type FC } from 'react'
 import { useEditorContext } from '../../contexts/EditorContext'
 
-import type { StitchCornerSchema } from '../../schemas/stitching'
+import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
+import { isDefined } from '../../utils/isDefined'
 import { EditorButton } from '../common/EditorButton'
 import { Tooltip, type TooltipProps } from '../common/Tooltip'
 import {
@@ -11,6 +12,8 @@ import {
   UNSELECTED_BORDER_COLOR,
   UNSELECTED_HOVER_BORDER_COLOR,
 } from './colors'
+import { StitchLineEndpointMarker } from './StitchLineEndpointMarker'
+import type { StitchLineOffsetEndpoint } from './stitchLineOffsetEditorUtils'
 import {
   STITCH_LINE_PADDING_X,
   STITCH_LINE_PADDING_Y,
@@ -21,6 +24,10 @@ type StitchLineSegmentLayout = {
   button: SystemStyleObject
   root: SystemStyleObject
   visual: SystemStyleObject
+  startMarkerPosition: SystemStyleObject
+  endMarkerPosition: SystemStyleObject
+  startMarkerDirection: StitchSideSchema
+  endMarkerDirection: StitchSideSchema
 }
 
 type StitchLineCornerToggleProps = {
@@ -29,6 +36,8 @@ type StitchLineCornerToggleProps = {
   onClick: () => void
   selected: boolean
   tooltip: string
+  startMarker?: StitchLineOffsetEndpoint
+  endMarker?: StitchLineOffsetEndpoint
 }
 
 export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
@@ -37,6 +46,8 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
   onClick,
   selected,
   tooltip,
+  startMarker,
+  endMarker,
 }) => {
   const { isComputing, setEditingInputId } = useEditorContext()
   const tooltipAnchorRef = useRef<HTMLDivElement>(null)
@@ -64,7 +75,10 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
     [selected],
   )
   const hover = useMemo<SystemStyleObject | undefined>(
-    () => (disabled === true ? undefined : { '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor } }),
+    () =>
+      disabled === true
+        ? undefined
+        : { '& > [data-stitch-line-visual]': { borderColor: hoverBorderColor, color: hoverBorderColor } },
     [disabled, hoverBorderColor],
   )
 
@@ -82,7 +96,17 @@ export const StitchLineCornerToggle: FC<StitchLineCornerToggleProps> = ({
           unstyled
           {...layout.button}
         >
-          <Box borderColor={borderColor} data-stitch-line-visual="" {...layout.visual}>
+          <Box borderColor={borderColor} color={borderColor} data-stitch-line-visual="" {...layout.visual}>
+            {isDefined(startMarker) && (
+              <Box position="absolute" pointerEvents="none" {...layout.startMarkerPosition}>
+                <StitchLineEndpointMarker endpoint={startMarker} direction={layout.startMarkerDirection} />
+              </Box>
+            )}
+            {isDefined(endMarker) && (
+              <Box position="absolute" pointerEvents="none" {...layout.endMarkerPosition}>
+                <StitchLineEndpointMarker endpoint={endMarker} direction={layout.endMarkerDirection} />
+              </Box>
+            )}
             <Box
               ref={tooltipAnchorRef}
               aria-hidden="true"
@@ -114,6 +138,10 @@ const CORNER_TOOLTIP_POSITIONING: Record<StitchCornerSchema, TooltipProps['posit
 const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout => {
   const layouts: Record<StitchCornerSchema, StitchLineSegmentLayout> = {
     'bottom-left': {
+      startMarkerPosition: { left: '100%', top: 'calc(100% + 1.5px)' },
+      endMarkerPosition: { left: '-1.5px', top: 0 },
+      startMarkerDirection: 'right',
+      endMarkerDirection: 'top',
       button: {
         bottom: `-${STITCH_LINE_PADDING_Y}`,
         left: `-${STITCH_LINE_PADDING_X}`,
@@ -141,6 +169,10 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
       },
     },
     'bottom-right': {
+      startMarkerPosition: { left: 'calc(100% + 1.5px)', top: 0 },
+      endMarkerPosition: { left: 0, top: 'calc(100% + 1.5px)' },
+      startMarkerDirection: 'top',
+      endMarkerDirection: 'left',
       button: {
         bottom: `-${STITCH_LINE_PADDING_Y}`,
         left: 0,
@@ -168,6 +200,10 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
       },
     },
     'top-left': {
+      startMarkerPosition: { left: '-1.5px', top: '100%' },
+      endMarkerPosition: { left: '100%', top: '-1.5px' },
+      startMarkerDirection: 'bottom',
+      endMarkerDirection: 'right',
       button: {
         bottom: 0,
         left: `-${STITCH_LINE_PADDING_X}`,
@@ -195,6 +231,10 @@ const getCornerLayout = (corner: StitchCornerSchema): StitchLineSegmentLayout =>
       },
     },
     'top-right': {
+      startMarkerPosition: { left: 0, top: '-1.5px' },
+      endMarkerPosition: { left: 'calc(100% + 1.5px)', top: '100%' },
+      startMarkerDirection: 'left',
+      endMarkerDirection: 'bottom',
       button: {
         bottom: 0,
         left: 0,

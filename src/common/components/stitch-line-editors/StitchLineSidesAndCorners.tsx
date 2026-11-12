@@ -1,9 +1,10 @@
 import { Grid } from '@chakra-ui/react'
-import { useCallback, type FC, type ReactNode } from 'react'
+import { useCallback, useMemo, type FC, type ReactNode } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import {
   canToggleStitchLineSideOrCorner,
   normalizeStitchLineSidesAndCorners,
+  STITCH_LINE_SIDE_AND_CORNER_ORDER,
   type StitchLineSideOrCornerField,
 } from '../../logic/stitching/stitchLineSidesAndCorners'
 import type { EditableSchema } from '../../schemas/editable'
@@ -11,6 +12,11 @@ import type { ComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { StitchLineCornerToggle } from './StitchLineCornerToggle'
 import { StitchLineEdgeToggle } from './StitchLineEdgeToggle'
 import { StitchLineEditorsOverlay } from './StitchLineEditorsOverlay'
+import {
+  getStitchLineOffsetCanonicalEndpoint,
+  getStitchLineOffsetPosition,
+  type StitchLineOffsetEndpoint,
+} from './stitchLineOffsetEditorUtils'
 import { STITCH_LINE_PADDING_X, STITCH_LINE_PADDING_Y } from './stitchLineSidesAndCornersLayout'
 
 type StitchLineSidesAndCornersProps = {
@@ -29,6 +35,44 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
   directionEditor,
 }) => {
   const { t } = useTranslation()
+  const isClosed = useMemo<boolean>(
+    () => STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => editable[field]),
+    [editable],
+  )
+  const startPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'start'),
+    [editable],
+  )
+  const endPosition = useMemo<StitchLineSideOrCornerField | undefined>(
+    () => getStitchLineOffsetPosition(editable, 'end'),
+    [editable],
+  )
+  const startCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'start')
+  const endCanonicalEndpoint = getStitchLineOffsetCanonicalEndpoint(editable.stitchDirection, 'end')
+  const getEndpointMarker = useCallback(
+    (
+      field: StitchLineSideOrCornerField,
+      canonicalEndpoint: StitchLineOffsetEndpoint,
+    ): StitchLineOffsetEndpoint | undefined => {
+      if (isClosed) {
+        if (
+          (field === 'top' && canonicalEndpoint === 'start') ||
+          (field === 'topLeftCorner' && canonicalEndpoint === 'end')
+        ) {
+          return canonicalEndpoint === startCanonicalEndpoint ? 'start' : 'end'
+        }
+        return undefined
+      }
+      if (field === startPosition && canonicalEndpoint === startCanonicalEndpoint) {
+        return 'start'
+      }
+      if (field === endPosition && canonicalEndpoint === endCanonicalEndpoint) {
+        return 'end'
+      }
+      return undefined
+    },
+    [isClosed, startPosition, endPosition, startCanonicalEndpoint, endCanonicalEndpoint],
+  )
   const toggle = useCallback(
     (field: StitchLineSideOrCornerField): void => {
       if (canToggleStitchLineSideOrCorner(editable, field)) {
@@ -55,6 +99,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         corner="top-left"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'topLeftCorner')}
         selected={editable.topLeftCorner}
+        startMarker={getEndpointMarker('topLeftCorner', 'start')}
+        endMarker={getEndpointMarker('topLeftCorner', 'end')}
         onClick={() => toggle('topLeftCorner')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topLeftCorner.tooltip}
       />
@@ -62,6 +108,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         side="top"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'top')}
         selected={editable.top}
+        startMarker={getEndpointMarker('top', 'start')}
+        endMarker={getEndpointMarker('top', 'end')}
         onClick={() => toggle('top')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.top.tooltip}
       />
@@ -69,6 +117,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         corner="top-right"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'topRightCorner')}
         selected={editable.topRightCorner}
+        startMarker={getEndpointMarker('topRightCorner', 'start')}
+        endMarker={getEndpointMarker('topRightCorner', 'end')}
         onClick={() => toggle('topRightCorner')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.topRightCorner.tooltip}
       />
@@ -76,6 +126,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         side="left"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'left')}
         selected={editable.left}
+        startMarker={getEndpointMarker('left', 'start')}
+        endMarker={getEndpointMarker('left', 'end')}
         onClick={() => toggle('left')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.left.tooltip}
       />
@@ -83,6 +135,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         side="right"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'right')}
         selected={editable.right}
+        startMarker={getEndpointMarker('right', 'start')}
+        endMarker={getEndpointMarker('right', 'end')}
         onClick={() => toggle('right')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.right.tooltip}
       />
@@ -90,6 +144,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         corner="bottom-left"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'bottomLeftCorner')}
         selected={editable.bottomLeftCorner}
+        startMarker={getEndpointMarker('bottomLeftCorner', 'start')}
+        endMarker={getEndpointMarker('bottomLeftCorner', 'end')}
         onClick={() => toggle('bottomLeftCorner')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomLeftCorner.tooltip}
       />
@@ -97,6 +153,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         side="bottom"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'bottom')}
         selected={editable.bottom}
+        startMarker={getEndpointMarker('bottom', 'start')}
+        endMarker={getEndpointMarker('bottom', 'end')}
         onClick={() => toggle('bottom')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottom.tooltip}
       />
@@ -104,6 +162,8 @@ export const StitchLineSidesAndCorners: FC<StitchLineSidesAndCornersProps> = ({
         corner="bottom-right"
         disabled={!canToggleStitchLineSideOrCorner(editable, 'bottomRightCorner')}
         selected={editable.bottomRightCorner}
+        startMarker={getEndpointMarker('bottomRightCorner', 'start')}
+        endMarker={getEndpointMarker('bottomRightCorner', 'end')}
         onClick={() => toggle('bottomRightCorner')}
         tooltip={t.project.editors.sections.stitchLines.sidesAndCorners.bottomRightCorner.tooltip}
       />
