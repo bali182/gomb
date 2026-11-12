@@ -25,6 +25,11 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
     this.parent = this.parent.bind(this)
+    this.pockets = this.pockets.bind(this)
+    this.tPockets = this.tPockets.bind(this)
+    this.frontPockets = this.frontPockets.bind(this)
+    this.panels = this.panels.bind(this)
+    this.pocketClusters = this.pocketClusters.bind(this)
   }
 
   byId(id: string): ComponentSchema {
@@ -61,5 +66,25 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
 
   parent(id: string): ComponentSchema {
     return this.requireResult(this.optional.parent(id), 'parent')
+  }
+
+  pockets(): PocketSchema[] {
+    return this.optional.pockets()
+  }
+
+  tPockets(): TPocketSchema[] {
+    return this.optional.tPockets()
+  }
+
+  frontPockets(): FrontPocketSchema[] {
+    return this.optional.frontPockets()
+  }
+
+  panels(): PanelSchema[] {
+    return this.optional.panels()
+  }
+
+  pocketClusters(): PocketClusterSchema[] {
+    return this.optional.pocketClusters()
   }
 }
