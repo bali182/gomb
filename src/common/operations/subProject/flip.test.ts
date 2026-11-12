@@ -337,8 +337,8 @@ describe.each(axes)('flip: %s', (axis) => {
       ...stitchLine,
       ...mirroredRadii[axis],
       ...expected,
-      startOffset: 2,
-      endOffset: 1,
+      startOffset: 1,
+      endOffset: 2,
       stitchDirection: 'end-to-start',
     })
     expect(result.components.root).toBe(root)
@@ -460,8 +460,8 @@ describe.each(axes)('flip: %s', (axis) => {
     expect(pocketResult.stitchLines[0]).toBe(boundsStitch)
     expect(pocketResult.stitchLines[1]).toEqual({
       ...pocketStitch,
-      startOffset: 7,
-      endOffset: 2,
+      startOffset: 2,
+      endOffset: 7,
       stitchDirection: 'end-to-start',
     })
 
@@ -533,8 +533,8 @@ describe.each(orientationCases)(
       const accessor = accessors.subProject(clusterResult)
       expect(accessor.stitchLine.tPocket('shared')).toMatchObject({
         targetId: 'cluster',
-        startOffset: swapsEnds ? 7 : 2,
-        endOffset: swapsEnds ? 2 : 7,
+        startOffset: 2,
+        endOffset: 7,
         stitchDirection: swapsEnds ? 'end-to-start' : 'start-to-end',
       })
       expect(accessor.stitchLine.tPocket('shared')).toEqual({
@@ -612,8 +612,8 @@ describe.each(orientationCases)(
       })
       expect(result.component.byId('outside')).toBe(original.components.outside)
       expect(result.stitchLine.tPocket('t-stitch')).toMatchObject({
-        startOffset: swapsEnds ? 7 : 2,
-        endOffset: swapsEnds ? 2 : 7,
+        startOffset: 2,
+        endOffset: 7,
         stitchDirection: swapsEnds ? 'end-to-start' : 'start-to-end',
       })
     })
@@ -696,8 +696,8 @@ describe.each(orientationCases)(
           swapsEnds
             ? {
                 ...stitchLine,
-                startOffset: 7,
-                endOffset: 2,
+                startOffset: 2,
+                endOffset: 7,
                 stitchDirection: stitchDirection === 'start-to-end' ? 'end-to-start' : 'start-to-end',
               }
             : stitchLine,

@@ -253,7 +253,7 @@ describe('component bounds stitch routes', () => {
     }
   })
 
-  it('applies offsets to canonical endpoints before choosing the punching direction', () => {
+  it('applies offsets to the punching start and end in either direction', () => {
     const value = { startOffset: 20, endOffset: -10, stitchHoleDistance: 25 }
     const forward = calculate(value).routes[0]
     const reverse = calculate({ ...value, stitchDirection: 'end-to-start' }).routes[0]
@@ -265,13 +265,13 @@ describe('component bounds stitch routes', () => {
       [80, 0],
     ])
     expect(centers(reverse.holes)).toEqual([
-      [90, 0],
-      [65, 0],
-      [40, 0],
-      [15, 0],
-      [-10, 0],
+      [120, 0],
+      [95, 0],
+      [70, 0],
+      [45, 0],
+      [20, 0],
     ])
-    expect(forward.boundingRect).toEqual(reverse.boundingRect)
+    expect(forward.boundingRect.width).toEqual(reverse.boundingRect.width)
     expect(forward.fragments).toEqual([
       {
         type: 'side',
@@ -280,7 +280,50 @@ describe('component bounds stitch routes', () => {
         end: { x: new BigNumber(90), y: new BigNumber(0) },
       },
     ])
-    expect(reverse.fragments).toEqual(forward.fragments)
+    expect(reverse.fragments).toEqual([
+      {
+        type: 'side',
+        side: 'top',
+        start: { x: new BigNumber(10), y: new BigNumber(0) },
+        end: { x: new BigNumber(120), y: new BigNumber(0) },
+      },
+    ])
+  })
+
+  it('trims from the reversed punching start across sharp and rounded corners', () => {
+    const sharp = calculate({
+      right: true,
+      topRightCorner: true,
+      stitchDirection: 'end-to-start',
+      startOffset: -90,
+      endOffset: 12,
+    }).routes[0]
+    expect(sharp.fragments).toHaveLength(1)
+    expect(centers(sharp.holes)[0]).toEqual([90, 0])
+    expect(sharp.fragments[0].start.x.toNumber()).toBe(-12)
+
+    const rounded = calculate({
+      right: true,
+      topRightCorner: true,
+      topRightRadius: 10,
+      stitchDirection: 'end-to-start',
+      startOffset: -75,
+    }).routes[0]
+    expect(rounded.fragments).toHaveLength(2)
+    const firstHole = rounded.holes[0]
+    expect(firstHole.center.x.toNumber()).toBeCloseTo(90 + 10 * Math.cos(0.5), 10)
+    expect(firstHole.center.y.toNumber()).toBeCloseTo(10 - 10 * Math.sin(0.5), 10)
+    expect(rounded.fragments[1]).toMatchObject({ type: 'corner', radius: new BigNumber(10) })
+  })
+
+  it('limits reversed shortening while retaining the opposite extension', () => {
+    const value = { stitchDirection: 'end-to-start' as const, startOffset: -120, endOffset: 30 }
+    const route = calculate(value).routes[0]
+    expect(centers(route.holes)[0]).toEqual([-20, 0])
+    expect(route.fragments[0].start.x.toNumber()).toBe(-30)
+    expect(getStitchPathFragmentsLength(route.fragments).toNumber()).toBeCloseTo(10, 10)
+    const clamped = calculate({ ...value, startOffset: -1000 }).routes[0]
+    expect(getStitchPathFragmentsLength(clamped.fragments).toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
   })
 
   it('extends a corner endpoint in its adjacent side direction without moving the corner', () => {
@@ -382,10 +425,27 @@ describe('component bounds stitch routes', () => {
       bottomRightRadius: 10,
       stitchHoleDistance: 6,
     }
+    const perimeter = 280 + 20 * Math.PI
     for (const direction of ['start-to-end', 'end-to-start'] as const) {
       const route = calculate({ ...value, startOffset: 7, stitchDirection: direction }).routes[0]
       expect(route.isClosed).toBe(true)
-      expect(centers(route.holes)[0]).toEqual([17, 0])
+      const firstHole = route.holes[0]
+      if (direction === 'start-to-end') {
+        expect(centers(route.holes)[0]).toEqual([17, 0])
+      } else {
+        expect(firstHole.center.x.toNumber()).toBeCloseTo(10 - 10 * Math.sin(0.7), 9)
+        expect(firstHole.center.y.toNumber()).toBeCloseTo(10 - 10 * Math.cos(0.7), 9)
+      }
+      const wrappedStart = calculate({ ...value, startOffset: perimeter + 7, stitchDirection: direction }).routes[0]
+        .holes[0].center
+      expect(getPointDistance(wrappedStart, firstHole.center).toNumber()).toBeCloseTo(0, 9)
+      const negative = calculate({ ...value, startOffset: -7, stitchDirection: direction }).routes[0]
+      const opposite = calculate({
+        ...value,
+        startOffset: 7,
+        stitchDirection: direction === 'start-to-end' ? 'end-to-start' : 'start-to-end',
+      }).routes[0]
+      expect(negative.holes[0].center).toEqual(opposite.holes[0].center)
       expect(
         calculate({ ...value, startOffset: 7, endOffset: 999, stitchDirection: direction }).routes[0].holes,
       ).toEqual(route.holes)
@@ -394,7 +454,6 @@ describe('component bounds stitch routes', () => {
       ).toBeGreaterThan(3)
       expect(route.stitches).toHaveLength(route.holes.length)
     }
-    const perimeter = 280 + 20 * Math.PI
     const wrapped = calculate({ ...value, startOffset: perimeter + 7 }).routes[0]
     expect(wrapped.holes[0].center.x.toNumber()).toBeCloseTo(17, 9)
     const onArc = calculate({ ...value, startOffset: 85 }).routes[0]

@@ -31,7 +31,10 @@ export const calculateStitchLinePath = (
   if (!geometry.isClosed) {
     const startOffset = clamp(new BigNumber(stitchLine.startOffset), limits.startOffset?.min?.value)
     const endOffset = clamp(new BigNumber(stitchLine.endOffset), limits.endOffset?.min?.value)
-    fragments = offsetStitchLineFragments(fragments, startOffset, endOffset)
+    fragments =
+      stitchLine.stitchDirection === 'start-to-end'
+        ? offsetStitchLineFragments(fragments, startOffset, endOffset)
+        : offsetStitchLineFragments(fragments, endOffset, startOffset)
   }
   if (!fragments.some((fragment) => getStitchPathFragmentLength(fragment).gt(ZERO))) {
     return undefined

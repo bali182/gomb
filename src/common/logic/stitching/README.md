@@ -47,9 +47,12 @@ standalone rounded corner produces an arc route.
 The stitch margin insets a component boundary and expands a hole boundary.
 Existing automatic/custom corner-radius resolution remains in effect.
 
-A positive `startOffset` or `endOffset` extends a canonical endpoint; a negative
-value shortens it. Offsets are applied before `stitchDirection`, so changing the
-direction does not exchange their physical endpoints. Positive offsets never
+A positive `startOffset` or `endOffset` extends an endpoint; a negative value
+shortens it. `startOffset` always applies at the punching start, where the first
+hole is placed; `endOffset` applies at the final endpoint, where a hole is not
+forced. `stitchDirection` maps these offsets to the canonical endpoints: normal
+travel uses start/end, reversed travel uses end/start. Changing direction only
+updates `stitchDirection`, leaving both saved offset values unchanged. Positive offsets never
 turn: a side continues straight, and a corner gains a straight extension along
 its adjacent side at that endpoint. A top-right corner extends left at its
 canonical start and down at its canonical end, including with zero radius.
@@ -79,9 +82,10 @@ label position follows that remaining geometry. Offset editors remain available
 at corner endpoints and on an isolated zero-radius corner.
 
 On a fully rounded closed boundary, `startOffset` moves the punching start
-forward along the canonical perimeter, wrapping in either sign. The outline
-stays closed; `endOffset` is ignored. Both directions start at this same shifted
-point. A closed boundary containing a sharp corner ignores both offsets.
+along the perimeter in the punching direction for positive values and against
+it for negative values, wrapping in either sign. Both directions measure from
+the same canonical starting point. The outline stays closed; `endOffset` is
+ignored. A closed boundary containing a sharp corner ignores both offsets.
 
 ## Punching direction, spacing and sharp corners
 
@@ -149,6 +153,15 @@ are no separate disconnected-corner or inter-route connecting stitches.
 
 T-pocket geometry and direction retain their existing behavior. The closed edge
 is inset by the margin and intersects the tapered pocket sides to define its
-canonical endpoints. Positive offsets extend those endpoints and negative ones
-shorten them before direction chooses the punching start. A cluster produces
+canonical endpoints. `stitchDirection` determines which endpoint receives
+`startOffset` and which receives `endOffset`, following the same punching-start
+semantics as component bounds. Positive offsets extend those endpoints and
+negative ones shorten them. A cluster produces
 one independent route for each computed T-pocket, excluding its front pocket.
+
+## Mirroring
+
+Mirroring retains both saved offset values. Component bounds stitch lines mirror
+their selected sides, corners and radii and reverse the punching direction.
+T-pocket stitch lines reverse direction only when mirroring exchanges their
+canonical endpoints. This keeps start/end offsets attached to their punching roles.

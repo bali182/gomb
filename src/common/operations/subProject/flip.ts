@@ -207,8 +207,6 @@ const flipStitchLine = (
       }
       return {
         ...stitchLine,
-        startOffset: stitchLine.endOffset,
-        endOffset: stitchLine.startOffset,
         stitchDirection: stitchLine.stitchDirection === 'start-to-end' ? 'end-to-start' : 'start-to-end',
       }
     }
@@ -216,8 +214,6 @@ const flipStitchLine = (
       const flipped: ComponentBoundsStitchLineSchema = {
         ...stitchLine,
         ...flipCornerRadii(stitchLine, axis),
-        startOffset: stitchLine.endOffset,
-        endOffset: stitchLine.startOffset,
         stitchDirection: stitchLine.stitchDirection === 'start-to-end' ? 'end-to-start' : 'start-to-end',
       }
       switch (axis) {
