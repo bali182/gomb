@@ -62,15 +62,7 @@ export const FloatingEditors: FC<FloatingEditorsProps> = ({ onAdd }) => {
   }
 
   if (narrowers.is.pocketOpening(selection.selected)) {
-    const anchorElement = floatingEditorAnchors.pocketOpening(selection.selected)
-
-    return isDefined(anchorElement) ? (
-      <PocketOpeningFloatingEditor
-        opening={selection.selected}
-        anchorElement={anchorElement}
-        onClose={selection.clearSelection}
-      />
-    ) : null
+    return <PocketOpeningFloatingEditor opening={selection.selected} onClose={selection.clearSelection} />
   }
 
   if (narrowers.is.constraint(selection.selected)) {

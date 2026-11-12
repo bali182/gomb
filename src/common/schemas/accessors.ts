@@ -52,6 +52,11 @@ export type ComponentAccessorSchema = {
   tPocket(id: string): TPocketSchema
   frontPocket(id: string): FrontPocketSchema
   parent(id: string): ComponentSchema
+  pockets(): PocketSchema[]
+  tPockets(): TPocketSchema[]
+  frontPockets(): FrontPocketSchema[]
+  panels(): PanelSchema[]
+  pocketClusters(): PocketClusterSchema[]
 }
 
 export type StitchLineAccessorSchema = {

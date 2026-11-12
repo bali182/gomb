@@ -45,6 +45,7 @@ export const FloatingEditor: FC<FloatingEditorProps> = ({
       gutter: 10,
       overlap: true,
       overflowPadding: 8,
+      arrowPadding: 14,
       strategy: 'fixed',
     },
   })

@@ -15,13 +15,12 @@ import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 
 import { formatHex8, parse } from 'culori'
+import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { getSelectionOpacities, type SelectionOpacitiesSchema } from '../logic/getSelectionOpacities'
 import type {
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
-  DrawAreaExportIdentifiers,
-  DrawAreaExportTextStyles,
   DrawAreaHoleStyles,
   DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
@@ -31,49 +30,6 @@ import type {
 } from '../schemas/drawArea'
 import { StitchLineSchema } from '../schemas/stitching'
 import { useSubProjectSelection } from './useSubProjectSelection'
-
-const applyOpacity = (color: string, opacity: number): string => {
-  if (opacity === 1) {
-    return color
-  }
-  const parsed = parse(color)
-  if (!isDefined(parsed)) {
-    return color
-  }
-  return formatHex8({ ...parsed, alpha: (parsed.alpha ?? 1) * opacity })
-}
-
-const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): string | undefined => {
-  if (!isDefined(color)) {
-    return undefined
-  }
-
-  const parsed = parse(color)
-  if (!isDefined(parsed)) {
-    return undefined
-  }
-
-  const channel = maskColor === 'black' ? 0 : 1
-  return formatHex8({ mode: 'rgb', r: channel, g: channel, b: channel, alpha: parsed.alpha ?? 1 })
-}
-
-const exportIdentifiers: DrawAreaExportIdentifiers = {
-  getElementId: produce(undefined),
-  getNameText: produce(undefined),
-  getParentNameText: produce(undefined),
-  getStitchLineId: produce(undefined),
-}
-
-const exportTextStyles: DrawAreaExportTextStyles = {
-  getNameTextColor: produce(undefined),
-  getNameTextFontFamily: produce(undefined),
-  getNameTextFontSize: produce(undefined),
-  getDimensionsText: produce(undefined),
-  getDimensionsTextColor: produce(undefined),
-  getDimensionsTextFontFamily: produce(undefined),
-  getDimensionsTextFontSize: produce(undefined),
-  getNameDimensionsGap: produce(undefined),
-}
 
 const markerStyles: DrawAreaMarkerStyles = {
   getColor: produce(undefined),
@@ -282,9 +238,9 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       componentStyles,
       pocketItemStyles,
       stitchLineStyles,
-      exportTextStyles,
+      exportTextStyles: defaultDrawAreaContext.exportTextStyles,
       markerStyles,
-      exportIdentifiers,
+      exportIdentifiers: defaultDrawAreaContext.exportIdentifiers,
       labelStyles,
     }),
     [
@@ -300,4 +256,29 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   )
 
   return drawAreaContextValue
+}
+
+const applyOpacity = (color: string, opacity: number): string => {
+  if (opacity === 1) {
+    return color
+  }
+  const parsed = parse(color)
+  if (!isDefined(parsed)) {
+    return color
+  }
+  return formatHex8({ ...parsed, alpha: (parsed.alpha ?? 1) * opacity })
+}
+
+const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): string | undefined => {
+  if (!isDefined(color)) {
+    return undefined
+  }
+
+  const parsed = parse(color)
+  if (!isDefined(parsed)) {
+    return undefined
+  }
+
+  const channel = maskColor === 'black' ? 0 : 1
+  return formatHex8({ mode: 'rgb', r: channel, g: channel, b: channel, alpha: parsed.alpha ?? 1 })
 }
