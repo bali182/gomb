@@ -18,7 +18,7 @@ export const PocketOrientationSelect: FC<PocketOrientationSelectProps> = ({ valu
     <EditorSelect
       disabled={disabled}
       labels={t.project.editors.enums.components.pocketOrientation}
-      items={anchorValues}
+      items={values}
       icons={icons}
       value={value}
       onChange={onChange}
@@ -26,8 +26,9 @@ export const PocketOrientationSelect: FC<PocketOrientationSelectProps> = ({ valu
   )
 }
 
-const anchorValues: PocketOrientationSchema[] = ['up', 'down', 'left', 'right']
+const values: PocketOrientationSchema[] = ['up', 'down', 'left', 'right']
 
+// TODO ICONS!!!
 const icons: Record<PocketOrientationSchema, IconType> = {
   up: PiCaretDown,
   down: PiCaretUp,

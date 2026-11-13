@@ -18,7 +18,7 @@ export const LayoutOrientationSelect: FC<LayoutOrientationSelectProps> = ({ valu
     <EditorSelect
       disabled={disabled}
       labels={t.project.editors.enums.components.layoutOrientation}
-      items={anchorValues}
+      items={values}
       icons={icons}
       value={value}
       onChange={onChange}
@@ -26,7 +26,7 @@ export const LayoutOrientationSelect: FC<LayoutOrientationSelectProps> = ({ valu
   )
 }
 
-const anchorValues: LayoutOrientationSchema[] = ['horizontal', 'vertical']
+const values: LayoutOrientationSchema[] = ['horizontal', 'vertical']
 
 const icons: Record<LayoutOrientationSchema, IconType> = {
   horizontal: PiColumns,

@@ -150,7 +150,7 @@ export const defaultSlantedPocketOpening: SlantedPocketOpeningOwnSchema = {
 }
 
 export const defaultHasPocketItem: HasPocketItemSchema = {
-  itemOrientation: 'landscape',
+  itemOrientation: 'portrait',
   itemCrossAxisOffset: 0,
   itemOpeningOffset: 0,
 }

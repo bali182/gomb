@@ -1,18 +1,18 @@
-import { HStack, SegmentGroup, Text } from '@chakra-ui/react'
+import { HStack, Text } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
-import { PiInfo, PiRectangle } from 'react-icons/pi'
+import { PiInfo } from 'react-icons/pi'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
-import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 import { Tooltip } from '../../common/Tooltip'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasPocketItemSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
-import type { PocketItemIdSchema } from '../../../schemas/pocketItem'
+import type { PocketItemIdSchema, PocketItemOrientationSchema } from '../../../schemas/pocketItem'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { PocketItemCombobox } from '../../common/PocketItemCombobox'
+import { PocketItemOrientationSelect } from '../../common/PocketItemOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type ContentsSectionProps<T extends HasPocketItemSchema> = {
@@ -61,8 +61,8 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
   )
 
   const handleOrientationChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, itemOrientation: details.value })
+    (orientation: PocketItemOrientationSchema): void => {
+      onChange({ ...editable, orientation })
     },
     [editable, onChange],
   )
@@ -100,24 +100,11 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         {t.project.editors.sections.components.contents.itemOrientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.itemOrientation}>
-        <EditorSegmentGroup
+        <PocketItemOrientationSelect
           disabled={!hasItem}
-          onValueChange={handleOrientationChange}
-          size="sm"
+          onChange={handleOrientationChange}
           value={editable.itemOrientation}
-        >
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="landscape">
-            <SegmentGroup.ItemHiddenInput />
-            <PiRectangle />
-            {t.project.editors.enums.components.itemOrientation.landscape}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="portrait">
-            <SegmentGroup.ItemHiddenInput />
-            <PiRectangle style={{ transform: 'rotate(90deg)' }} />
-            {t.project.editors.enums.components.itemOrientation.portrait}
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle

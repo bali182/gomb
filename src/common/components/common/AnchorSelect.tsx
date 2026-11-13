@@ -30,18 +30,11 @@ export const AnchorSelect: FC<AnchorSelectProps> = ({ value, disabled, orientati
   const icons = iconsByLayout[orientation]
 
   return (
-    <EditorSelect
-      disabled={disabled}
-      labels={labels}
-      items={anchorValues}
-      icons={icons}
-      value={value}
-      onChange={onChange}
-    />
+    <EditorSelect disabled={disabled} labels={labels} items={values} icons={icons} value={value} onChange={onChange} />
   )
 }
 
-const anchorValues: AnchorSchema[] = ['start', 'middle', 'end']
+const values: AnchorSchema[] = ['start', 'middle', 'end']
 
 const iconsByLayout: Record<LayoutOrientationSchema, Record<AnchorSchema, IconType>> = {
   horizontal: {
