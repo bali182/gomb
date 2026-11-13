@@ -7,8 +7,10 @@ import type {
   ConstraintValueSchema,
 } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
+import { PocketItemIdSchema } from '../../schemas/pocketItem'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
+import { has } from '../../utils/has'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 
@@ -66,9 +68,7 @@ const isCompatibleValue = (group: ConstraintCompatibilityGroupSchema, value: Con
     case 'reference:component':
       return !isDefined(value) || typeof value === 'string'
     case 'reference:pocket-item':
-      return (
-        !isDefined(value) || (typeof value === 'string' && Object.prototype.hasOwnProperty.call(pocketItems, value))
-      )
+      return !isDefined(value) || (typeof value === 'string' && has(pocketItems, value as PocketItemIdSchema))
     case 'field:stitch-margin':
     case 'field:stitch-hole-length':
     case 'field:stitch-hole-distance':

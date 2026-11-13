@@ -52,11 +52,12 @@ export type ComponentAccessorSchema = {
   tPocket(id: string): TPocketSchema
   frontPocket(id: string): FrontPocketSchema
   parent(id: string): ComponentSchema
-  pockets(): PocketSchema[]
-  tPockets(): TPocketSchema[]
-  frontPockets(): FrontPocketSchema[]
-  panels(): PanelSchema[]
-  pocketClusters(): PocketClusterSchema[]
+  components(): readonly ComponentSchema[]
+  pockets(): readonly PocketSchema[]
+  tPockets(): readonly TPocketSchema[]
+  frontPockets(): readonly FrontPocketSchema[]
+  panels(): readonly PanelSchema[]
+  pocketClusters(): readonly PocketClusterSchema[]
 }
 
 export type StitchLineAccessorSchema = {
@@ -70,6 +71,7 @@ export type StitchLineAccessorSchema = {
 export type PocketOpeningAccessorSchema = {
   byId(id: string): PocketOpeningSchema
   defaultOpening(): PocketOpeningSchema
+  pocketOpenings(): readonly PocketOpeningSchema[]
 }
 
 export type HoleAccessorSchema = {
@@ -113,6 +115,7 @@ export type ConstraintAccessorSchema = {
   byModel(modelId: string): ConstraintSchema[]
   byField(modelId: string, field: ConstraintFieldNameSchema): ConstraintSchema[]
   model(field: ConstraintFieldSchema): ModelObjectSchema
+  constraints(): readonly ConstraintSchema[]
 }
 
 export type OptionalSubProjectAccessorSchema = {

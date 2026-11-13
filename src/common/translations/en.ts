@@ -1,7 +1,6 @@
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
 import { CloneSectionKey } from '../components/clone-component-dialog/types'
-import type { AutoDimensionMode } from '../components/common/AutoDimensionEditor'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
@@ -16,6 +15,7 @@ import type {
   HasXYOffsetSchema,
 } from '../schemas/common'
 import type {
+  AutoDimensionModeSchema,
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
@@ -137,7 +137,11 @@ export const EN = {
   project: {
     computing: 'Computing…',
     tree: {
-      title: 'Components',
+      sections: {
+        components: 'Components',
+        pocketOpenings: 'Pocket openings',
+        constraints: 'Constraints',
+      },
       noModuleSelected: {
         title: 'No module selected',
         description: 'Select or create a module.',
@@ -250,7 +254,6 @@ export const EN = {
           layout: 'Layout',
           contents: 'Contents',
           pockets: 'Pockets',
-          pocketOpenings: 'Pocket openings',
         },
         stitchLines: {
           settings: 'Settings',
@@ -266,10 +269,10 @@ export const EN = {
       },
       actions: {
         constraints: {
-          add: 'Add constraint',
+          add: 'Create',
         },
         pocketOpenings: {
-          add: 'Add opening',
+          add: 'Create',
           edit: 'Edit opening',
           setDefault: 'Set as default',
         },
@@ -830,7 +833,7 @@ export const EN = {
           autoDimension: {
             auto: 'Auto',
             manual: 'Manual',
-          } satisfies EnumTranslationSchema<AutoDimensionMode>,
+          } satisfies EnumTranslationSchema<AutoDimensionModeSchema>,
           anchor: {
             vertical: {
               start: 'Top',

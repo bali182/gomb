@@ -14,11 +14,11 @@ import { narrowers } from '../narrowers'
 
 export class OptionalComponentAccessor implements OptionalAccessorSchema<ComponentAccessorSchema> {
   private readonly parents = new Map<string, ComponentSchema>()
-  private readonly components: ComponentSchema[]
+  private readonly allComponents: ComponentSchema[]
 
   constructor(private readonly root: SubProjectSchema) {
-    this.components = Object.values(root.components)
-    for (const parent of this.components) {
+    this.allComponents = Object.values(root.components)
+    for (const parent of this.allComponents) {
       for (const childId of parent.children) {
         if (!this.parents.has(childId)) {
           this.parents.set(childId, parent)
@@ -83,23 +83,27 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
     return this.parents.get(id)
   }
 
-  pockets(): PocketSchema[] {
-    return this.components.filter(narrowers.is.pocket)
+  components(): readonly ComponentSchema[] {
+    return this.allComponents
   }
 
-  tPockets(): TPocketSchema[] {
-    return this.components.filter(narrowers.is.tPocket)
+  pockets(): readonly PocketSchema[] {
+    return this.allComponents.filter(narrowers.is.pocket)
   }
 
-  frontPockets(): FrontPocketSchema[] {
-    return this.components.filter(narrowers.is.frontPocket)
+  tPockets(): readonly TPocketSchema[] {
+    return this.allComponents.filter(narrowers.is.tPocket)
   }
 
-  panels(): PanelSchema[] {
-    return this.components.filter(narrowers.is.panel)
+  frontPockets(): readonly FrontPocketSchema[] {
+    return this.allComponents.filter(narrowers.is.frontPocket)
   }
 
-  pocketClusters(): PocketClusterSchema[] {
-    return this.components.filter(narrowers.is.pocketCluster)
+  panels(): readonly PanelSchema[] {
+    return this.allComponents.filter(narrowers.is.panel)
+  }
+
+  pocketClusters(): readonly PocketClusterSchema[] {
+    return this.allComponents.filter(narrowers.is.pocketCluster)
   }
 }

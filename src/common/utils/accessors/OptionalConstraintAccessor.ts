@@ -6,15 +6,22 @@ import type {
   PocketOpeningAccessorSchema,
   StitchLineAccessorSchema,
 } from '../../schemas/accessors'
-import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
+import type {
+  ConstraintFieldNameSchema,
+  ConstraintFieldSchema,
+  ConstraintSchema,
+  EqualConstraintSchema,
+} from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { has } from '../has'
 import { isDefined } from '../isDefined'
 import { narrowers } from '../narrowers'
 
 export class OptionalConstraintAccessor implements OptionalAccessorSchema<ConstraintAccessorSchema> {
   private readonly constraintsByModel = new Map<string, ConstraintSchema[]>()
   private readonly constraintsByField = new Map<string, Map<ConstraintFieldNameSchema, ConstraintSchema[]>>()
+  private readonly allConstraints: ConstraintSchema[]
 
   constructor(
     private readonly root: SubProjectSchema,
@@ -23,7 +30,8 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
     private readonly stitchLine: OptionalAccessorSchema<StitchLineAccessorSchema>,
     private readonly pocketOpening: OptionalAccessorSchema<PocketOpeningAccessorSchema>,
   ) {
-    for (const constraint of Object.values(root.constraints)) {
+    this.allConstraints = Object.values(root.constraints)
+    for (const constraint of this.allConstraints) {
       for (const field of constraint.fields) {
         const byModel = this.constraintsByModel.get(field.modelId) ?? []
         if (!byModel.includes(constraint)) {
@@ -47,7 +55,7 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
   }
 
   byId(id: string): ConstraintSchema | undefined {
-    return Object.prototype.hasOwnProperty.call(this.root.constraints, id) ? this.root.constraints[id] : undefined
+    return has(this.root.constraints, id) ? this.root.constraints[id] : undefined
   }
 
   byModel(modelId: string): ConstraintSchema[] {
@@ -89,5 +97,9 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
         return isDefined(opening) && narrowers.is.opticalIllusionPocketOpening(opening) ? opening : undefined
       }
     }
+  }
+
+  constraints(): readonly EqualConstraintSchema[] {
+    return this.allConstraints
   }
 }

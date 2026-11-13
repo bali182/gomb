@@ -116,6 +116,8 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     () => (isDefined(subProjectId) ? accessors.project(project).optional.subProject(subProjectId) : undefined),
     [project, subProjectId],
   )
+  const accessor = useMemo(() => (isDefined(subProject) ? accessors.subProject(subProject) : undefined), [subProject])
+
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
       setUISettings({ splitterSizes: [size[0], size[1]] })
@@ -191,7 +193,10 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                 <ResizableAccordion ref={accordionRef} value={treeSections} onValueChange={handleTreeSectionsChange}>
                   <ResizableAccordionItem
                     id="components"
-                    title={t.project.tree.title}
+                    title={titleWithItemCount(
+                      t.project.tree.sections.components,
+                      accessor?.component?.components?.()?.length,
+                    )}
                     actions={
                       <HStack gap="1">
                         <ResizableAccordionHeaderIconButton disabled={!isDefined(subProject)} onClick={handleExpandAll}>
@@ -214,14 +219,20 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                   </ResizableAccordionItem>
                   <ResizableAccordionItem
                     id="openings"
-                    title={t.project.editors.tabs.components.pocketOpenings}
+                    title={titleWithItemCount(
+                      t.project.tree.sections.pocketOpenings,
+                      accessor?.pocketOpening?.pocketOpenings?.()?.length,
+                    )}
                     actions={<AddPocketOpeningMenu onAdd={handleAddPocketOpening} />}
                   >
                     {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
                   </ResizableAccordionItem>
                   <ResizableAccordionItem
                     id="constraints"
-                    title={t.project.editors.sections.constraints.title}
+                    title={titleWithItemCount(
+                      t.project.tree.sections.constraints,
+                      accessor?.constraint?.constraints?.()?.length,
+                    )}
                     actions={
                       <ResizableAccordionHeaderButton
                         disabled={!isDefined(subProject) || isComputing}
@@ -306,4 +317,11 @@ const EmptyComponentTreeState: FC = () => {
       icon={<PiWarningCircle />}
     />
   )
+}
+
+const titleWithItemCount = (title: string, itemCount?: number): string => {
+  if (!isDefined(itemCount)) {
+    return title
+  }
+  return `${title} (${itemCount})`
 }

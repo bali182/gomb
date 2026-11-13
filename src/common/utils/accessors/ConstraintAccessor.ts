@@ -26,4 +26,7 @@ export class ConstraintAccessor extends BaseStrictAccessor implements Constraint
   model(field: ConstraintFieldSchema): ModelObjectSchema {
     return this.requireResult(this.optional.model(field), 'constraint field model')
   }
+  constraints(): readonly ConstraintSchema[] {
+    return this.optional.constraints()
+  }
 }

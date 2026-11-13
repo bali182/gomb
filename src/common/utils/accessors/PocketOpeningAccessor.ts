@@ -19,4 +19,8 @@ export class PocketOpeningAccessor extends BaseStrictAccessor implements PocketO
   defaultOpening(): PocketOpeningSchema {
     return this.requireResult(this.optional.defaultOpening(), 'default pocket opening')
   }
+
+  pocketOpenings(): readonly PocketOpeningSchema[] {
+    return this.optional.pocketOpenings()
+  }
 }

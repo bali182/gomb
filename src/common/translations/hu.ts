@@ -68,7 +68,11 @@ export const HU = {
   project: {
     computing: 'Számítás folyamatban…',
     tree: {
-      title: 'Elemek',
+      sections: {
+        components: 'Elemek',
+        pocketOpenings: 'Zsebnyílások',
+        constraints: 'Kényszerek',
+      },
       noModuleSelected: {
         title: 'Nincs kiválasztott modul',
         description: 'Válassz vagy hozz létre egy modult.',
@@ -181,7 +185,6 @@ export const HU = {
           layout: 'Elrendezés',
           contents: 'Tartalom',
           pockets: 'Zsebek',
-          pocketOpenings: 'Zsebnyílások',
         },
         stitchLines: {
           settings: 'Beállítások',
@@ -197,10 +200,10 @@ export const HU = {
       },
       actions: {
         constraints: {
-          add: 'Kényszer hozzáadása',
+          add: 'Létrehozás',
         },
         pocketOpenings: {
-          add: 'Új zsebnyílás',
+          add: 'Létrehozás',
           edit: 'Zsebnyílás szerkesztése',
           setDefault: 'Beállítás alapértelmezettként',
         },

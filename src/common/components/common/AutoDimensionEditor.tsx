@@ -5,6 +5,7 @@ import type { IconType } from 'react-icons'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
+import { AutoDimensionModeSchema } from '../../schemas/components'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import type { IssueSchema } from '../../schemas/issues'
 import { accessors } from '../../utils/accessors'
@@ -12,8 +13,6 @@ import { isDefined } from '../../utils/isDefined'
 import { EditorNumberInput } from './EditorNumberInput'
 import { EditorSelectWrapper } from './EditorSelectWrapper'
 import { Tooltip } from './Tooltip'
-
-export type AutoDimensionMode = 'auto' | 'manual'
 
 type AutoDimensionEditorProps = {
   modelId: string
@@ -57,16 +56,16 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
     )
   }, [auto, field, modelId, subProject])
 
-  const collection = useMemo<ListCollection<AutoDimensionMode>>(
+  const collection = useMemo<ListCollection<AutoDimensionModeSchema>>(
     () =>
-      createListCollection<AutoDimensionMode>({
+      createListCollection<AutoDimensionModeSchema>({
         items: ['auto', 'manual'],
-        itemToValue: (mode: AutoDimensionMode): string => mode,
-        itemToString: (mode: AutoDimensionMode): string => t.project.editors.enums.common.autoDimension[mode],
+        itemToValue: (mode: AutoDimensionModeSchema): string => mode,
+        itemToString: (mode: AutoDimensionModeSchema): string => t.project.editors.enums.common.autoDimension[mode],
       }),
     [t],
   )
-  const positioning = useMemo<Select.RootProps<AutoDimensionMode>['positioning']>(
+  const positioning = useMemo<Select.RootProps<AutoDimensionModeSchema>['positioning']>(
     () => ({
       strategy: 'fixed',
       placement: 'bottom-start',
@@ -85,7 +84,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   }, [auto])
 
   const handleModeChange = useCallback(
-    (details: Select.ValueChangeDetails<AutoDimensionMode>): void => {
+    (details: Select.ValueChangeDetails<AutoDimensionModeSchema>): void => {
       const mode = details.items[0]
       if (isComputing || autoDisabled || !isDefined(mode)) {
         return
@@ -124,7 +123,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
       unit={unit}
       value={auto ? '' : value}
       startAddon={
-        <EditorSelectWrapper<AutoDimensionMode>
+        <EditorSelectWrapper<AutoDimensionModeSchema>
           collection={collection}
           value={selectedValue}
           onValueChange={handleModeChange}
@@ -156,7 +155,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
           <Portal container={portalRef}>
             <Select.Positioner>
               <Select.Content width="full">
-                {collection.items.map((mode: AutoDimensionMode) => (
+                {collection.items.map((mode: AutoDimensionModeSchema) => (
                   <Select.Item key={mode} item={mode}>
                     <Icon size="sm">{mode === 'auto' ? <AutoIcon /> : <ManualIcon />}</Icon>
                     <Select.ItemText>{t.project.editors.enums.common.autoDimension[mode]}</Select.ItemText>

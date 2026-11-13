@@ -68,23 +68,27 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     return this.requireResult(this.optional.parent(id), 'parent')
   }
 
-  pockets(): PocketSchema[] {
+  components(): readonly ComponentSchema[] {
+    return this.optional.components()
+  }
+
+  pockets(): readonly PocketSchema[] {
     return this.optional.pockets()
   }
 
-  tPockets(): TPocketSchema[] {
+  tPockets(): readonly TPocketSchema[] {
     return this.optional.tPockets()
   }
 
-  frontPockets(): FrontPocketSchema[] {
+  frontPockets(): readonly FrontPocketSchema[] {
     return this.optional.frontPockets()
   }
 
-  panels(): PanelSchema[] {
+  panels(): readonly PanelSchema[] {
     return this.optional.panels()
   }
 
-  pocketClusters(): PocketClusterSchema[] {
+  pocketClusters(): readonly PocketClusterSchema[] {
     return this.optional.pocketClusters()
   }
 }
