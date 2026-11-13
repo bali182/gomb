@@ -1,6 +1,6 @@
 import typia from '@typia/unplugin/vite'
 import react from '@vitejs/plugin-react'
-import type { Plugin, UserConfig } from 'vite'
+import type { BuildEnvironmentOptions, Plugin, UserConfig } from 'vite'
 import svgr from 'vite-plugin-svgr'
 import type { FeatureFlagsSchema } from './src/common/schemas/featureFlags'
 import { parseFeatureFlag } from './src/common/utils/parseFeatureFlag'
@@ -78,5 +78,13 @@ export const createViteConfig = ({
       port,
       strictPort: true,
     },
+  }
+}
+
+export const createMinifyOptions = (): BuildEnvironmentOptions => {
+  return {
+    minify: 'esbuild',
+    sourcemap: true,
+    cssMinify: 'esbuild',
   }
 }
