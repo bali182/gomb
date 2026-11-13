@@ -1,6 +1,7 @@
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
 import { CloneSectionKey } from '../components/clone-component-dialog/types'
+import type { AutoDimensionMode } from '../components/common/AutoDimensionEditor'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
@@ -826,6 +827,10 @@ export const EN = {
           } satisfies EnumTranslationSchema<ThemeSchema>,
         },
         common: {
+          autoDimension: {
+            auto: 'Auto',
+            manual: 'Manual',
+          } satisfies EnumTranslationSchema<AutoDimensionMode>,
           anchor: {
             vertical: {
               start: 'Top',
