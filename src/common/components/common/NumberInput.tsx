@@ -1,5 +1,5 @@
 import { Box, HStack, Input, InputGroup, Separator, type InputProps, type Tokens } from '@chakra-ui/react'
-import { useEffect, useRef, type FC, type ReactNode } from 'react'
+import { useEffect, useRef, type FC, type ReactNode, type RefObject } from 'react'
 import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import { useNumberEditorStepContext } from '../../contexts/NumberEditorStepContext'
@@ -9,6 +9,8 @@ import { EditorIconButton } from './EditorIconButton'
 import { NumberInputArrow, type NumberInputArrowPosition } from './NumberInputArrow'
 
 export type NumberInputProps = {
+  inputRef?: RefObject<HTMLInputElement | null>
+  groupRef?: RefObject<HTMLDivElement | null>
   value: string | undefined
   issue: IssueSchema | undefined
   placeholder?: string
@@ -46,10 +48,13 @@ export const NumberInput: FC<NumberInputProps> = ({
   isResetEnabled,
   opacity,
   arrowPosition,
+  inputRef: externalInputRef,
+  groupRef,
 }) => {
   const issueBorderColor = isDefined(issue) ? issueBorderColors[issue.severity] : undefined
   const { step } = useNumberEditorStepContext()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const internalInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = externalInputRef ?? internalInputRef
 
   // React leaves defaultValue unchanged while a number input is focused, but the browser uses it as the native step base.
   useEffect(() => {
@@ -58,7 +63,7 @@ export const NumberInput: FC<NumberInputProps> = ({
     if (isDefined(inputElement)) {
       inputElement.defaultValue = value ?? ''
     }
-  }, [value])
+  }, [inputRef, value])
 
   const input = (
     <Input
@@ -130,6 +135,7 @@ export const NumberInput: FC<NumberInputProps> = ({
 
   return (
     <InputGroup
+      ref={groupRef}
       endAddon={resolvedEndAddon}
       endAddonProps={{ size, px: 0 }}
       startAddon={startAddon}

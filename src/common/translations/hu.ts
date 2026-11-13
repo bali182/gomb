@@ -754,6 +754,10 @@ export const HU = {
           },
         },
         common: {
+          autoDimension: {
+            auto: 'Auto',
+            manual: 'Kézi',
+          },
           anchor: {
             vertical: {
               start: 'Fent',

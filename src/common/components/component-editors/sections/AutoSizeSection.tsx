@@ -96,12 +96,11 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
           field="width"
           auto={editable.autoWidth}
           autoIcon={PiArrowsHorizontal}
-          placeholder={t.project.editors.sections.components.autoSize.width.placeholder}
+          autoValue={component.width}
           issue={issues.width}
           manualIcon={PiRuler}
           onAutoChange={handleAutoWidthChange}
           onValueChange={handleWidthChange}
-          step={1}
           unit="mm"
           value={editable.width}
         />
@@ -116,12 +115,11 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
           field="height"
           auto={editable.autoHeight}
           autoIcon={PiArrowsVertical}
-          placeholder={t.project.editors.sections.components.autoSize.height.placeholder}
+          autoValue={component.height}
           issue={issues.height}
           manualIcon={PiRuler}
           onAutoChange={handleAutoHeightChange}
           onValueChange={handleHeightChange}
-          step={1}
           unit="mm"
           value={editable.height}
         />

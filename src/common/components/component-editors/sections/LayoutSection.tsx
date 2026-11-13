@@ -176,7 +176,7 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
           field="layoutGap"
           auto={editable.autoLayoutGap}
           autoIcon={editable.layoutOrientation === 'horizontal' ? PiArrowsHorizontal : PiArrowsVertical}
-          placeholder={t.project.editors.sections.components.layout.layoutGap.placeholder}
+          autoValue={component.layoutGap}
           issue={issues.layoutGap}
           manualIcon={PiRuler}
           onAutoChange={handleAutoLayoutGapChange}
