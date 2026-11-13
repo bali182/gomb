@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PiYoutubeLogoFill } from 'react-icons/pi'
-import { EditorSelect } from '../common/EditorSelect'
+import { EditorSelectWrapper } from '../common/EditorSelectWrapper'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
@@ -88,7 +88,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
         {t.project.editors.sections.components.opticalIllusionPocketOpening.direction.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.direction}>
-        <EditorSelect
+        <EditorSelectWrapper
           collection={collection}
           value={selectedValue}
           onValueChange={handleDirectionChange}
@@ -117,7 +117,7 @@ export const OpticalIllusionPocketOpeningFields: FC<OpticalIllusionPocketOpening
               ))}
             </Select.Content>
           </Select.Positioner>
-        </EditorSelect>
+        </EditorSelectWrapper>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle
         tooltip={t.project.editors.sections.components.opticalIllusionPocketOpening.startInset.tooltip}

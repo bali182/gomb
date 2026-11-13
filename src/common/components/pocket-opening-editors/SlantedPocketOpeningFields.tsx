@@ -1,6 +1,6 @@
 import { Select, createListCollection, type ListCollection, type SelectValueChangeDetails } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
-import { EditorSelect } from '../common/EditorSelect'
+import { EditorSelectWrapper } from '../common/EditorSelectWrapper'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
@@ -59,7 +59,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
         {t.project.editors.sections.components.slantedPocketOpening.side.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.side}>
-        <EditorSelect
+        <EditorSelectWrapper
           collection={collection}
           value={selectedValue}
           onValueChange={handleSideChange}
@@ -88,7 +88,7 @@ export const SlantedPocketOpeningFields: FC<SlantedPocketOpeningFieldsProps> = (
               ))}
             </Select.Content>
           </Select.Positioner>
-        </EditorSelect>
+        </EditorSelectWrapper>
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.slantedPocketOpening.offset.tooltip}>
         {t.project.editors.sections.components.slantedPocketOpening.offset.label}

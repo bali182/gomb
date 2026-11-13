@@ -845,6 +845,9 @@ export const HU = {
         stitchHoleDistance: {
           noMatchingValues: 'Nincs egyező érték.',
         },
+        selects: {
+          notApplicable: 'Nem alkalmazható…',
+        },
       },
       emptyStates: {
         noConstraintFields: {
@@ -1071,12 +1074,12 @@ export const HU = {
   data: {
     pocketItemGroups: {
       cards: 'Kártyák',
-      'african-banknotes': 'Bankjegyek – Afrika',
-      'asian-banknotes': 'Bankjegyek – Ázsia',
-      'european-banknotes': 'Bankjegyek – Európa',
-      'north-american-banknotes': 'Bankjegyek – Észak-Amerika',
-      'oceanian-banknotes': 'Bankjegyek – Ausztrália és Óceánia',
-      'south-american-banknotes': 'Bankjegyek – Dél-Amerika',
+      'african-banknotes': 'Bankjegyek - Afrika',
+      'asian-banknotes': 'Bankjegyek - Ázsia',
+      'european-banknotes': 'Bankjegyek - Európa',
+      'north-american-banknotes': 'Bankjegyek - Észak-Amerika',
+      'oceanian-banknotes': 'Bankjegyek - Ausztrália és Óceánia',
+      'south-american-banknotes': 'Bankjegyek - Dél-Amerika',
     },
     colors: {
       black: 'Fekete',

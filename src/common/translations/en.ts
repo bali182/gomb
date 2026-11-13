@@ -918,6 +918,9 @@ export const EN = {
         stitchHoleDistance: {
           noMatchingValues: 'No matching values.',
         },
+        selects: {
+          notApplicable: 'Not applicable…',
+        },
       },
       emptyStates: {
         noConstraintFields: {
@@ -1143,12 +1146,12 @@ export const EN = {
   data: {
     pocketItemGroups: {
       cards: 'Cards',
-      'african-banknotes': 'Banknotes – Africa',
-      'asian-banknotes': 'Banknotes – Asia',
-      'european-banknotes': 'Banknotes – Europe',
-      'north-american-banknotes': 'Banknotes – North America',
-      'oceanian-banknotes': 'Banknotes – Australia and Oceania',
-      'south-american-banknotes': 'Banknotes – South America',
+      'african-banknotes': 'Banknotes - Africa',
+      'asian-banknotes': 'Banknotes - Asia',
+      'european-banknotes': 'Banknotes - Europe',
+      'north-american-banknotes': 'Banknotes - North America',
+      'oceanian-banknotes': 'Banknotes - Australia and Oceania',
+      'south-american-banknotes': 'Banknotes - South America',
     } satisfies Record<TranslatedPocketItemGroupIdSchema, string>,
     colors: {
       black: 'Black',
@@ -1318,7 +1321,7 @@ export const EN = {
       TJS: 'Tajikistani Somoni',
       TMT: 'Turkmenistani Manat',
       TND: 'Tunisian Dinar',
-      TOP: 'Tongan Paʻanga',
+      TOP: "Tongan Pa'anga",
       TRY: 'Turkish Lira',
       TTD: 'Trinidad & Tobago Dollar',
       TWD: 'New Taiwan Dollar',

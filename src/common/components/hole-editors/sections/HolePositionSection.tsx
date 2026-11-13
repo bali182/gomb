@@ -1,20 +1,11 @@
-import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
-import {
-  PiAlignBottomSimple,
-  PiAlignCenterHorizontalSimple,
-  PiAlignCenterVerticalSimple,
-  PiAlignLeftSimple,
-  PiAlignRightSimple,
-  PiAlignTopSimple,
-} from 'react-icons/pi'
-import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { HasAnchorsSchema } from '../../../schemas/hole'
 import type { IssuesSchema } from '../../../schemas/issues'
+import { AnchorSelect } from '../../common/AnchorSelect'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
@@ -33,14 +24,14 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
 }: HolePositionSectionProps<T>): ReactNode {
   const { t } = useTranslation()
   const handleXAnchorChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, xAnchor: details.value as AnchorSchema })
+    (xAnchor: AnchorSchema): void => {
+      onChange({ ...editable, xAnchor })
     },
     [editable, onChange],
   )
   const handleYAnchorChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, yAnchor: details.value as AnchorSchema })
+    (yAnchor: AnchorSchema): void => {
+      onChange({ ...editable, yAnchor })
     },
     [editable, onChange],
   )
@@ -64,21 +55,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
         {t.project.editors.sections.holes.position.xAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xAnchor}>
-        <EditorSegmentGroup onValueChange={handleXAnchorChange} size="sm" value={editable.xAnchor}>
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="start">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignLeftSimple /> {t.project.editors.enums.common.anchor.horizontal.start}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="middle">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignCenterHorizontalSimple /> {t.project.editors.enums.common.anchor.horizontal.middle}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="end">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignRightSimple /> {t.project.editors.enums.common.anchor.horizontal.end}
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        <AnchorSelect onChange={handleXAnchorChange} value={editable.xAnchor} orientation="horizontal" />
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xOffset.tooltip}>
         {t.project.editors.sections.holes.position.xOffset.label}
@@ -97,21 +74,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
         {t.project.editors.sections.holes.position.yAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yAnchor}>
-        <EditorSegmentGroup onValueChange={handleYAnchorChange} size="sm" value={editable.yAnchor}>
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="start">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignTopSimple /> {t.project.editors.enums.common.anchor.vertical.start}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="middle">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignCenterVerticalSimple /> {t.project.editors.enums.common.anchor.vertical.middle}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="end">
-            <SegmentGroup.ItemHiddenInput />
-            <PiAlignBottomSimple /> {t.project.editors.enums.common.anchor.vertical.end}
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        <AnchorSelect onChange={handleYAnchorChange} value={editable.yAnchor} orientation="vertical" />
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yOffset.tooltip}>
         {t.project.editors.sections.holes.position.yOffset.label}
