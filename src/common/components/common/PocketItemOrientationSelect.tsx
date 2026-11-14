@@ -1,8 +1,9 @@
 import { FC } from 'react'
 import { IconType } from 'react-icons'
-import { PiRectangle } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import { PocketItemOrientationSchema } from '../../schemas/pocketItem'
+import { PocketItemOrientationLandscapeIcon } from '../icons/PocketItemOrientationLandscapeIcon'
+import { PocketItemOrientationPortraitIcon } from '../icons/PocketItemOrientationPortraitIcon'
 import { EditorSelect } from './EditorSelect'
 
 type PocketItemOrientationSelectProps = {
@@ -28,8 +29,7 @@ export const PocketItemOrientationSelect: FC<PocketItemOrientationSelectProps> =
 
 const values: PocketItemOrientationSchema[] = ['portrait', 'landscape']
 
-// TODO ICONS!!!
 const icons: Record<PocketItemOrientationSchema, IconType> = {
-  portrait: PiRectangle,
-  landscape: PiRectangle,
+  portrait: PocketItemOrientationPortraitIcon,
+  landscape: PocketItemOrientationLandscapeIcon,
 }

@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type FC } from 'react'
 import type { IconType } from 'react-icons'
-import { PiArrowCounterClockwise, PiCreditCard, PiMoney, PiRectangle } from 'react-icons/pi'
+import { PiArrowCounterClockwise, PiCreditCard, PiEmpty, PiMoney } from 'react-icons/pi'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { pocketItems } from '../../data/pocketItems'
@@ -51,7 +51,7 @@ export const PocketItemCombobox: FC<PocketItemComboboxProps> = ({
   const { contains } = useFilter({ sensitivity: 'base' })
   const isInvalid = isDefined(issue) && issue.severity === 'error'
   const selectedItem = isDefined(value) ? pocketItems[value] : undefined
-  const selectedIcon = isDefined(selectedItem) ? itemIcons[selectedItem.type] : PiRectangle
+  const selectedIcon = isDefined(selectedItem) ? itemIcons[selectedItem.type] : PiEmpty
 
   const filter = useCallback(
     (item: TranslatedPocketItemSchema): boolean => {

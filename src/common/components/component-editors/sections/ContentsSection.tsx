@@ -61,8 +61,8 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
   )
 
   const handleOrientationChange = useCallback(
-    (orientation: PocketItemOrientationSchema): void => {
-      onChange({ ...editable, orientation })
+    (itemOrientation: PocketItemOrientationSchema): void => {
+      onChange({ ...editable, itemOrientation })
     },
     [editable, onChange],
   )
