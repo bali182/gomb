@@ -95,7 +95,7 @@ export const createChunks = (): Record<string, string[]> => {
     'react-dom-server': ['react-dom/server'],
     'react-router': ['react-router'],
     'ui': ['@chakra-ui/react', '@emotion/react', '@dnd-kit/core'],
-    'icons': ['react-icons/pi', 'react-icons/tb', 'country-flag-icons/react/1x1'],
+    'icons': ['react-icons/pi', 'country-flag-icons/react/1x1'],
     'react-pdf-renderer': ['@react-pdf/renderer'],
     'math': ['cavalier-contours-js', 'bignumber.js'],
     'state': ['jotai', 'jotai-family'],
