@@ -1,122 +1,101 @@
-import type {
-  TreeCollection,
-  TreeViewExpandedChangeDetails,
-  TreeViewNodeRenderProps,
-  TreeViewSelectionChangeDetails,
-} from '@chakra-ui/react'
-import { useCallback, useMemo, type FC, type ReactNode } from 'react'
-import {
-  SubProjectSelectionContext,
-  type SubProjectSelectionContextValue,
-} from '../../contexts/SubProjectSelectionContext'
-import { isDefined } from '../../utils/isDefined'
-import { narrowers } from '../../utils/narrowers'
-import { Tree } from '../common/tree/Tree'
+import type { TreeCollection } from '@chakra-ui/react'
+import { useCallback, type FC, type ReactNode } from 'react'
+import type { SubProjectSchema } from '../../schemas/subProject'
+import { Tree, type TreeNodeRenderProps } from '../common/tree/Tree'
 import { ComponentTreeItem } from './ComponentTreeItem'
+import { EditorComponentTreeItem } from './EditorComponentTreeItem'
+import { EditorHoleTreeItem } from './EditorHoleTreeItem'
+import { EditorStitchLineTreeItem } from './EditorStitchLineTreeItem'
 import { HoleTreeItem } from './HoleTreeItem'
 import { StitchLineTreeItem } from './StitchLineTreeItem'
 import type { ProjectTreeNode } from './types/nodeTypes'
-import { getComponentNodeId, getHoleNodeId, getStitchLineNodeId } from './utils/treeNodeIds'
 
 export type ComponentTreeProps = {
-  expandedNodeIds: string[]
   collection: TreeCollection<ProjectTreeNode>
-  selection: SubProjectSelectionContextValue
+  subProject: SubProjectSchema
+  selection: string[]
+  onSelectionChange: (selection: string[]) => void
+  selectionMode: 'single' | 'multiple'
+  isNodeSelectable?: (node: ProjectTreeNode) => boolean
+  expandedNodeIds: string[]
+  onExpandedChange: (nodeIds: string[]) => void
   hasDragAndDrop: boolean
   renderMenu?: (node: ProjectTreeNode) => ReactNode
-  setExpandedNodeIds: (nodeIds: string[]) => void
 }
 
 export const ComponentTree: FC<ComponentTreeProps> = ({
   collection,
+  subProject,
+  selection,
+  onSelectionChange,
+  selectionMode,
+  isNodeSelectable,
   expandedNodeIds,
+  onExpandedChange,
   hasDragAndDrop,
   renderMenu,
-  selection,
-  setExpandedNodeIds,
 }) => {
-  const selectedValue = useMemo<string[]>((): string[] => {
-    if (!isDefined(selection.selected)) {
-      return []
-    }
-    if (narrowers.is.component(selection.selected)) {
-      return [getComponentNodeId(selection.selected.id)]
-    }
-    if (narrowers.is.stitchLine(selection.selected)) {
-      return [getStitchLineNodeId(selection.selected.id)]
-    }
-    if (narrowers.is.hole(selection.selected)) {
-      return [getHoleNodeId(selection.selected.id)]
-    }
-    return []
-  }, [selection.selected])
-
-  const handleExpandedChange = useCallback(
-    (details: TreeViewExpandedChangeDetails<ProjectTreeNode>): void => {
-      setExpandedNodeIds(details.expandedValue)
-    },
-    [setExpandedNodeIds],
-  )
-
-  const handleSelectionChange = useCallback(
-    (details: TreeViewSelectionChangeDetails<ProjectTreeNode>): void => {
-      const selectedNode = details.selectedNodes[0]
-      if (!isDefined(selectedNode)) {
-        return
-      }
-      switch (selectedNode.kind) {
-        case 'component':
-          return selection.select(selectedNode.component)
-        case 'stitch-line':
-          return selection.select(selectedNode.stitchLine)
-        case 'hole':
-          return selection.select(selectedNode.hole)
-      }
-    },
-    [selection],
-  )
-
   const renderNode = useCallback(
-    ({ indexPath, node, nodeState }: TreeViewNodeRenderProps<ProjectTreeNode>): ReactNode => {
+    ({ indexPath, node, nodeState, isSelectable, onSelect }: TreeNodeRenderProps<ProjectTreeNode>): ReactNode => {
       switch (node.kind) {
         case 'component':
-          return (
-            <ComponentTreeItem
-              indexPath={indexPath}
+          return hasDragAndDrop ? (
+            <EditorComponentTreeItem
               node={node}
+              indexPath={indexPath}
               nodeState={nodeState}
-              hasDragAndDrop={hasDragAndDrop}
+              subProject={subProject}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
+              renderMenu={renderMenu}
+            />
+          ) : (
+            <ComponentTreeItem
+              node={node}
+              subProject={subProject}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
               renderMenu={renderMenu}
             />
           )
         case 'hole':
-          return (
-            <HoleTreeItem hasDragAndDrop={hasDragAndDrop} indexPath={indexPath} node={node} renderMenu={renderMenu} />
-          )
-        case 'stitch-line':
-          return (
-            <StitchLineTreeItem
-              hasDragAndDrop={hasDragAndDrop}
-              indexPath={indexPath}
+          return hasDragAndDrop ? (
+            <EditorHoleTreeItem
               node={node}
+              indexPath={indexPath}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
               renderMenu={renderMenu}
             />
+          ) : (
+            <HoleTreeItem node={node} isSelectable={isSelectable} onSelect={onSelect} renderMenu={renderMenu} />
+          )
+        case 'stitch-line':
+          return hasDragAndDrop ? (
+            <EditorStitchLineTreeItem
+              node={node}
+              indexPath={indexPath}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
+              renderMenu={renderMenu}
+            />
+          ) : (
+            <StitchLineTreeItem node={node} isSelectable={isSelectable} onSelect={onSelect} renderMenu={renderMenu} />
           )
       }
     },
-    [hasDragAndDrop, renderMenu],
+    [hasDragAndDrop, renderMenu, subProject],
   )
-
   return (
-    <SubProjectSelectionContext.Provider value={selection}>
-      <Tree<ProjectTreeNode>
-        collection={collection}
-        expandedValue={expandedNodeIds}
-        onExpandedChange={handleExpandedChange}
-        onSelectionChange={handleSelectionChange}
-        selectedValue={selectedValue}
-        renderNode={renderNode}
-      />
-    </SubProjectSelectionContext.Provider>
+    <Tree<ProjectTreeNode>
+      collection={collection}
+      selection={selection}
+      onSelectionChange={onSelectionChange}
+      selectionMode={selectionMode}
+      isNodeSelectable={isNodeSelectable}
+      expandedNodeIds={expandedNodeIds}
+      onExpandedChange={onExpandedChange}
+      renderNode={renderNode}
+    />
   )
 }

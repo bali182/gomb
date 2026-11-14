@@ -1,82 +1,77 @@
-import { IconButton, TreeView } from '@chakra-ui/react'
-import { useDraggable } from '@dnd-kit/core'
-import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
-import { PiDotsSixVertical } from 'react-icons/pi'
-import { useEditorContext } from '../../contexts/EditorContext'
-import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { isDefined } from '../../utils/isDefined'
+import { TreeView, type TreeViewItemProps } from '@chakra-ui/react'
+import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
-import { useTreeDragAndDropContext } from '../component-tree/TreeDragAndDropContext'
 import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { PocketOpeningTreeItemNode } from './types/nodeTypes'
 
-type PocketOpeningTreeItemProps = {
+type PocketOpeningTreeItemControlProps = TreeViewItemProps & RefAttributes<HTMLDivElement>
+
+export type PocketOpeningTreeItemProps = {
   node: PocketOpeningTreeItemNode
-  indexPath: number[]
-  renderMenu: (node: PocketOpeningTreeItemNode) => ReactNode
+  defaultPocketOpeningId: string
+  isSelectable: boolean
+  onSelect: () => void
+  controlProps?: PocketOpeningTreeItemControlProps
+  dragHandle?: ReactNode
+  dropIndicators?: ReactNode
+  renderMenu?: (node: PocketOpeningTreeItemNode) => ReactNode
 }
 
-export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({ node, indexPath, renderMenu }) => {
-  const { opening } = node
-  const { isComputing, subProject } = useEditorContext()
-  const selection = useSubProjectSelectionContext()
-  const { activeDragData } = useTreeDragAndDropContext()
-  const isActiveOpening = activeDragData?.kind === 'pocket-opening' && activeDragData.openingId === opening.id
-  const isDisabledForActiveDrag = isDefined(activeDragData) && !isActiveOpening
+export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({
+  node,
+  isSelectable,
+  onSelect,
+  controlProps,
+  dragHandle,
+  dropIndicators,
+  renderMenu,
+  defaultPocketOpeningId,
+}) => {
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>): void => {
+      event.stopPropagation()
+      onSelect()
+    },
+    [onSelect],
+  )
 
-  const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({
-    id: node.id,
-    disabled: isComputing,
-    data: { kind: 'pocket-opening', openingId: opening.id, node, indexPath },
-  })
-
-  const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-    event.stopPropagation()
-  }, [])
-
-  const handlePointerEnter = useCallback((): void => {
-    selection.hover(opening)
-  }, [opening, selection])
-
-  const handlePointerLeave = useCallback((): void => {
-    selection.clearHover()
-  }, [selection])
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>): void => {
+      if (event.target !== event.currentTarget) {
+        return
+      }
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault()
+        event.stopPropagation()
+        onSelect()
+      }
+    },
+    [onSelect],
+  )
 
   return (
     <TreeView.Item
-      ref={setNodeRef}
-      data-pocket-opening-id={opening.id}
-      h="9"
+      {...controlProps}
+      data-pocket-opening-id={node.opening.id}
+      aria-disabled={!isSelectable}
+      opacity={!isSelectable ? 0.4 : controlProps?.opacity}
+      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       py="0"
-      cursor={isDisabledForActiveDrag ? 'not-allowed' : undefined}
-      opacity={isDisabledForActiveDrag ? 0.4 : undefined}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
+      h="9"
     >
+      {dropIndicators}
       <TreeItemVisual
-        icon={<PocketOpeningIcon type={opening.type} isDefault={subProject?.defaultPocketOpening === opening.id} />}
+        icon={<PocketOpeningIcon type={node.opening.type} isDefault={defaultPocketOpeningId === node.opening.id} />}
         isPositioned={false}
         label={
           <TreeView.ItemText asChild>
-            <TreeItemLabel>{opening.name}</TreeItemLabel>
+            <TreeItemLabel>{node.opening.name}</TreeItemLabel>
           </TreeView.ItemText>
         }
-        leading={
-          <IconButton
-            {...attributes}
-            {...listeners}
-            ref={setActivatorNodeRef}
-            disabled={isComputing}
-            cursor={isDragging ? 'grabbing' : 'grab'}
-            size="2xs"
-            variant="ghost"
-            onClick={handleDragHandleClick}
-            _hover={{ bg: 'transparent' }}
-          >
-            <PiDotsSixVertical />
-          </IconButton>
-        }
-        trailing={renderMenu(node)}
+        leading={dragHandle}
+        trailing={renderMenu?.(node)}
       />
     </TreeView.Item>
   )

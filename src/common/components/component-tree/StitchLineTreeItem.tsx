@@ -1,65 +1,67 @@
-import { IconButton, TreeView } from '@chakra-ui/react'
-import { useDraggable } from '@dnd-kit/core'
-import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
-import { PiDotsSixVertical } from 'react-icons/pi'
+import { TreeView, type TreeViewItemProps } from '@chakra-ui/react'
+import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
 import { getModelIconByType } from '../../utils/getModelIcon'
-
-import { useEditorContext } from '../../contexts/EditorContext'
-import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
-import { isDefined } from '../../utils/isDefined'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
-import { useTreeDragAndDropContext } from './TreeDragAndDropContext'
 import type { StitchLineTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
-type StitchLineTreeItemProps = {
-  hasDragAndDrop: boolean
-  indexPath: number[]
+type StitchLineTreeItemControlProps = TreeViewItemProps & RefAttributes<HTMLDivElement>
+
+export type StitchLineTreeItemProps = {
   node: StitchLineTreeNode
+  isSelectable: boolean
+  onSelect: () => void
+  controlProps?: StitchLineTreeItemControlProps
+  dragHandle?: ReactNode
+  dropIndicators?: ReactNode
   renderMenu?: (node: StitchLineTreeNode) => ReactNode
 }
 
-export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop, indexPath, node, renderMenu }) => {
-  const { activeDragData } = useTreeDragAndDropContext()
-  const selection = useSubProjectSelectionContext()
-  const { isComputing } = useEditorContext()
-  const { stitchLine } = node
-  const Icon = getModelIconByType(stitchLine.type)
-  const isActiveStitchLine = activeDragData?.kind === 'stitch-line' && activeDragData.stitchLineId === stitchLine.id
-  const isDisabledForActiveDrag = isDefined(activeDragData) && !isActiveStitchLine
-  const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-    event.stopPropagation()
-  }, [])
-  const handlePointerEnter = useCallback((): void => {
-    selection.hover(stitchLine)
-  }, [selection, stitchLine])
+export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
+  node,
+  isSelectable,
+  onSelect,
+  controlProps,
+  dragHandle,
+  dropIndicators,
+  renderMenu,
+}) => {
+  const Icon = getModelIconByType(node.stitchLine.type)
 
-  const handlePointerLeave = useCallback((): void => {
-    selection.clearHover()
-  }, [selection])
-
-  const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef } = useDraggable({
-    data: {
-      indexPath,
-      kind: 'stitch-line',
-      node,
-      stitchLineId: stitchLine.id,
-      stitchLineType: stitchLine.type,
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>): void => {
+      event.stopPropagation()
+      onSelect()
     },
-    disabled: !hasDragAndDrop || isComputing,
-    id: node.id,
-  })
+    [onSelect],
+  )
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>): void => {
+      if (event.target !== event.currentTarget) {
+        return
+      }
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault()
+        event.stopPropagation()
+        onSelect()
+      }
+    },
+    [onSelect],
+  )
 
   return (
     <TreeView.Item
-      cursor={isDisabledForActiveDrag ? 'not-allowed' : undefined}
-      opacity={isDisabledForActiveDrag ? 0.4 : undefined}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      ref={setNodeRef}
+      {...controlProps}
+      aria-disabled={!isSelectable}
+      opacity={!isSelectable ? 0.4 : controlProps?.opacity}
+      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       py="0"
       h="9"
     >
+      {dropIndicators}
       <TreeItemVisual
         icon={<Icon />}
         isPositioned={false}
@@ -68,23 +70,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({ hasDragAndDrop
             <TreeItemLabel>{getProjectTreeNodeLabel(node)}</TreeItemLabel>
           </TreeView.ItemText>
         }
-        leading={
-          hasDragAndDrop ? (
-            <IconButton
-              {...attributes}
-              {...listeners}
-              cursor={isDragging ? 'grabbing' : 'grab'}
-              disabled={isComputing}
-              onClick={handleDragHandleClick}
-              ref={setActivatorNodeRef}
-              size="2xs"
-              variant="ghost"
-              _hover={{ bg: 'transparent' }}
-            >
-              <PiDotsSixVertical />
-            </IconButton>
-          ) : null
-        }
+        leading={dragHandle}
         trailing={renderMenu?.(node)}
       />
     </TreeView.Item>
