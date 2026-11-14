@@ -197,16 +197,27 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
       onResetData={handleReset}
       onSubmit={handleSubmit}
       size="xl"
+      height="2xl"
+      scrollable={false}
+      sectionDividers
     >
       <Splitter.Root
         panels={panels}
         defaultSize={defaultSplitterSizes}
         orientation="horizontal"
-        height="60vh"
+        flex="1"
         minHeight="0"
         minWidth="0"
       >
-        <Splitter.Panel id="models" minHeight="0" minWidth="0" overflowY="auto" px="3">
+        <Splitter.Panel
+          id="models"
+          minHeight="0"
+          minWidth="0"
+          style={{ overflow: 'auto' }}
+          bg="bg.subtle"
+          px="3"
+          py="3"
+        >
           {!isPocketOpeningSource ? (
             <ComponentTree
               collection={componentTree}
@@ -231,10 +242,11 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
             />
           )}
         </Splitter.Panel>
-        <Splitter.ResizeTrigger id="models:properties" my="2">
+        <Splitter.ResizeTrigger id="models:properties">
+          <Splitter.ResizeTriggerSeparator />
           <Splitter.ResizeTriggerIndicator />
         </Splitter.ResizeTrigger>
-        <Splitter.Panel id="properties" minHeight="0" minWidth="0" overflowY="auto" px="5">
+        <Splitter.Panel id="properties" minHeight="0" minWidth="0" style={{ overflow: 'auto' }} px="5" py="3">
           {selectedModels.length < 2 ? (
             <CommonEmptyState
               icon={<PiLink />}

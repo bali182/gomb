@@ -13,6 +13,9 @@ type EditDialogProps = PropsWithChildren & {
   submit: string
   canSubmit: boolean
   size?: DialogRootProps['size']
+  height?: Dialog.ContentProps['height']
+  scrollable?: boolean
+  sectionDividers?: boolean
   loading?: boolean
   hasCancel?: boolean
   onOpenChange: (isOpen: boolean) => void
@@ -29,6 +32,9 @@ export const EditDialog: FC<EditDialogProps> = ({
   submit,
   children,
   size = 'lg',
+  height,
+  scrollable = true,
+  sectionDividers = false,
   loading = false,
   description,
   hasCancel = true,
@@ -65,21 +71,29 @@ export const EditDialog: FC<EditDialogProps> = ({
       <Portal container={portalRef}>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content>
+          <Dialog.Content height={height} overflow="hidden">
             <Dialog.CloseTrigger asChild>
               <IconButton size="sm" variant="ghost">
                 <PiX />
               </IconButton>
             </Dialog.CloseTrigger>
-            <Dialog.Header>
+            <Dialog.Header borderBottomWidth={sectionDividers ? '1px' : undefined} borderColor="border" flexShrink="0">
               <VStack align="stretch" gap="2">
                 <Dialog.Title>{title}</Dialog.Title>
                 {isDefined(description) && <Dialog.Description>{description}</Dialog.Description>}
               </VStack>
             </Dialog.Header>
             <form onSubmit={handleSubmit} style={formStyle}>
-              <Dialog.Body px="0">{children}</Dialog.Body>
-              <Dialog.Footer>
+              <Dialog.Body
+                display={scrollable ? undefined : 'flex'}
+                minHeight="0"
+                overflow={scrollable ? 'auto' : 'hidden'}
+                p={scrollable ? undefined : '0'}
+                px="0"
+              >
+                {children}
+              </Dialog.Body>
+              <Dialog.Footer borderTopWidth={sectionDividers ? '1px' : undefined} borderColor="border" flexShrink="0">
                 {hasCancel && (
                   <Dialog.ActionTrigger asChild>
                     <Button variant="outline">{t.dialogs.editDialog.negativeAction}</Button>
