@@ -1,13 +1,21 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
+import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import {
+  CloneMenuItem,
+  CreateConstraintsMenuItem,
+  DeleteMenuItem,
+  FlipHorizontalMenuItem,
+  FlipVerticalMenuItem,
+} from './CommonActionsMenuItems'
 
 type StitchLineActionsMenuProps = {
   stitchLine: StitchLineSchema
@@ -18,6 +26,8 @@ type StitchLineActionsMenuProps = {
 }
 
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
+  const { openDialog } = useEditorDialogsContext()
+  const { subProject } = useSubProject()
   const { cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -28,6 +38,10 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
     deleteStitchLine({ id: stitchLine.id })
     onDelete(stitchLine.id)
   }, [deleteStitchLine, stitchLine.id, onDelete])
+
+  const handleCreateConstraints = useCallback((): void => {
+    openDialog({ type: 'create-constraints', source: stitchLine, subProject })
+  }, [openDialog, stitchLine, subProject])
 
   const handleClone = useCallback((): void => {
     cloneStitchLine({ id: stitchLine.id })
@@ -57,6 +71,7 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>

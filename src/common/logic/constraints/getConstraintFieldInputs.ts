@@ -234,7 +234,6 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'straight':
-    case 'equal-constraint':
       return []
   }
 }

@@ -8,9 +8,8 @@ import { useTranslation } from '../../hooks/useTranslation'
 import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
-import { narrowers } from '../../utils/narrowers'
 import { EditorIconButton } from '../common/EditorIconButton'
-import { getConstraintFieldLabel, getConstraintLabel, getConstraintModelPath } from './constraintFieldUtils'
+import { getConstraintFieldLabel, getConstraintModelPath } from './constraintFieldUtils'
 
 type ConstraintFieldListProps = {
   constraint: ConstraintSchema
@@ -80,7 +79,6 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
   const { subProject } = useSubProject()
   const { isComputing } = useEditorContext()
   const { deleteConstraintField } = useSubProjectOperations()
-  const { t } = useTranslation()
   const accessor = accessors.subProject(subProject)
   const model = accessor.optional.constraint.model(field)
   const handleDelete = useCallback(() => {
@@ -100,7 +98,7 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
             <Fragment key={item.id}>
               {index > 0 && <Breadcrumb.Separator />}
               <Breadcrumb.Item>
-                <Text as="span">{narrowers.is.constraint(item) ? getConstraintLabel(item, t) : item.name}</Text>
+                <Text as="span">{item.name}</Text>
               </Breadcrumb.Item>
             </Fragment>
           ))}

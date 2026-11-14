@@ -125,7 +125,6 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
     stitchDirection: 'enum:stitch-direction',
   },
   'straight': {},
-  'equal-constraint': {},
 }
 
 export const constraintFieldCompatibility: ConstraintFieldCompatibilitySchema = definitions

@@ -84,9 +84,6 @@ export const getConstraintLabel = (constraint: ConstraintSchema, t: TranslationS
 
 export const getConstraintModelPath = (model: ModelObjectSchema, subProject: SubProjectSchema): ModelObjectSchema[] => {
   const accessor = accessors.subProject(subProject)
-  if (narrowers.is.constraint(model)) {
-    return []
-  }
   if (narrowers.is.pocketOpening(model)) {
     return [model]
   }

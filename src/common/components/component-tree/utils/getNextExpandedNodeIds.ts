@@ -1,13 +1,12 @@
 import { getComponentAncestorIds } from '../../../operations/subProject/utils/getComponentAncestorIds'
-import type { ModelObjectSchema } from '../../../schemas/modelObject'
-import type { SubProjectSchema } from '../../../schemas/subProject'
+import type { SubProjectItemSchema, SubProjectSchema } from '../../../schemas/subProject'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { getComponentNodeId, getHoleNodeId } from './treeNodeIds'
 
 export const getNextExpandedNodeIds = (
-  selection: ModelObjectSchema,
+  selection: SubProjectItemSchema,
   subProject: SubProjectSchema,
   expandedIds: string[],
 ): string[] => {

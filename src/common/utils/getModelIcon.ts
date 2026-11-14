@@ -13,9 +13,8 @@ import { SlantedTPocketIcon } from '../components/icons/SlantedTPocketIcon'
 import { StraightFrontPocketIcon } from '../components/icons/StraightFrontPocketIcon'
 import { StraightPocketOpeningIcon } from '../components/icons/StraightPocketOpeningIcon'
 import { StraightTPocketIcon } from '../components/icons/StraightTPocketIcon'
-import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
-import type { SubProjectSchema } from '../schemas/subProject'
+import type { SubProjectItemSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from './accessors'
 
 const frontPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
@@ -32,7 +31,7 @@ const tPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
   slanted: SlantedTPocketIcon,
 }
 
-export const getModelIcon = (model: ModelObjectSchema, subProject: SubProjectSchema): IconType => {
+export const getModelIcon = (model: SubProjectItemSchema, subProject: SubProjectSchema): IconType => {
   switch (model.type) {
     case 'front-pocket':
       return frontPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
@@ -43,7 +42,7 @@ export const getModelIcon = (model: ModelObjectSchema, subProject: SubProjectSch
   }
 }
 
-export const getModelIconByType = (type: ModelObjectSchema['type']): IconType => {
+export const getModelIconByType = (type: SubProjectItemSchema['type']): IconType => {
   switch (type) {
     case 'equal-constraint':
       return PiLink

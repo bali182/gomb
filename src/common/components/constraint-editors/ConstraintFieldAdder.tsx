@@ -111,7 +111,7 @@ export const ConstraintFieldAdder: FC<ConstraintFieldAdderProps> = ({ constraint
         return {
           id: model.id,
           model,
-          label: narrowers.is.constraint(model) ? '' : model.name,
+          label: model.name,
           depth: componentTree.getDepth(node.id) - 1,
           disabled: getFields(model).length === 0,
         }

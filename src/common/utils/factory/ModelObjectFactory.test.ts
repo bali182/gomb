@@ -16,7 +16,7 @@ import type {
   ReadonlyModelObjectFactorySchema,
 } from '../../schemas/factory'
 import type { IdPrefixSchema } from '../../schemas/idGenerator'
-import type { ModelObjectSchema } from '../../schemas/modelObject'
+import type { SubProjectItemSchema } from '../../schemas/subProject'
 import { IdGenerator } from '../random/IdGenerator'
 import { ModelObjectFactory } from './ModelObjectFactory'
 import { NameGenerator } from './NameGenerator'
@@ -25,7 +25,7 @@ import { ReadonlyModelObjectFactory } from './ReadonlyModelObjectFactory'
 type FactoryCaseParamsSchema = HasForbiddenIdsSchema & HasForbiddenNamesSchema
 
 type FactorySchema = ReadonlyModelObjectFactorySchema | ModelObjectFactorySchema
-type FactoryResultSchema = ModelObjectSchema | ConstraintFieldSchema
+type FactoryResultSchema = SubProjectItemSchema | ConstraintFieldSchema
 type FactoryCaseSchema = {
   label: string
   prefix: IdPrefixSchema

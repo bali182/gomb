@@ -1,7 +1,6 @@
 import type { ConstraintFieldSchema } from '../../../schemas/constraints'
 import type { IdGeneratorSchema, IdPrefixSchema } from '../../../schemas/idGenerator'
-import type { ModelObjectSchema } from '../../../schemas/modelObject'
-import type { SubProjectSchema } from '../../../schemas/subProject'
+import type { SubProjectItemSchema, SubProjectSchema } from '../../../schemas/subProject'
 import { getSubProjectIds } from '../../../utils/idCollectorUtils'
 
 export const getCloneIdMappings = (
@@ -43,7 +42,7 @@ export const getCloneIdMappings = (
   return idMappings
 }
 
-const getModelIdPrefix = (model: ModelObjectSchema | ConstraintFieldSchema): IdPrefixSchema => {
+const getModelIdPrefix = (model: SubProjectItemSchema | ConstraintFieldSchema): IdPrefixSchema => {
   switch (model.type) {
     case 'straight':
       return 'straight-pocket-opening'

@@ -27,7 +27,6 @@ const models: ModelObjectSchema[] = [
   modelFactory.createOpticalIllusionPocketOpening({}),
   modelFactory.createComponentBoundsStitchLine({ targetId: 'panel', targetType: 'component' }),
   modelFactory.createTPocketStitchLine({ targetId: 'pocket', targetType: 'component' }),
-  modelFactory.createEqualConstraint({}),
 ]
 
 describe('constraint field metadata', () => {

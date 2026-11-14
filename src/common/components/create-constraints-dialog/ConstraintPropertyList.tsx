@@ -4,7 +4,6 @@ import { useTranslation } from '../../hooks/useTranslation'
 import type { CommonConstraintProperty } from '../../logic/constraints/constraintCreationUtils'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { isDefined } from '../../utils/isDefined'
-import { narrowers } from '../../utils/narrowers'
 import { getConstraintFieldLabel } from '../constraint-editors/constraintFieldUtils'
 
 type ConstraintPropertyListProps = {
@@ -73,14 +72,12 @@ const ConstraintPropertyItem: FC<ConstraintPropertyItemProps> = ({ property, sel
           <VStack key={blocker.model.id} align="stretch" gap="1">
             {blocker.alreadyConstrained && (
               <Text textStyle="xs" color="fg.muted">
-                {narrowers.is.constraint(blocker.model) ? '' : blocker.model.name}:{' '}
-                {t.dialogs.createConstraints.alreadyConstrained}
+                {blocker.model.name}: {t.dialogs.createConstraints.alreadyConstrained}
               </Text>
             )}
             {isDefined(blocker.autoReason) && (
               <Text textStyle="xs" color="fg.muted">
-                {narrowers.is.constraint(blocker.model) ? '' : blocker.model.name}:{' '}
-                {t.project.editors.enums.constraints.blockReason[blocker.autoReason]}
+                {blocker.model.name}: {t.project.editors.enums.constraints.blockReason[blocker.autoReason]}
               </Text>
             )}
           </VStack>

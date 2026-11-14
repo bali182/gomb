@@ -44,6 +44,7 @@ import { EditorTreeDragAndDrop } from './component-tree/EditorTreeDragAndDrop'
 import { EditorConstraintTree } from './constraint-tree/EditorConstraintTree'
 import { DrawArea } from './DrawArea'
 import { EditorMenu } from './editor-menu/EditorMenu'
+import { EditorDialogsProvider } from './EditorDialogsProvider'
 import { EditorSubProjectTabs } from './EditorSubProjectTabs'
 import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
@@ -171,138 +172,143 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   }, [accessor])
 
   return (
-    <Flex direction="column" height="100%" minHeight="0" minWidth="0">
-      <Splitter.Root
-        defaultSize={settings.ui.splitterSizes}
-        flex="1"
-        minHeight="0"
-        minWidth="0"
-        orientation="horizontal"
-        onResizeEnd={handleResizeEnd}
-        panels={panels}
-      >
-        <Splitter.Panel id="draw-area" minHeight="0" minWidth="0">
-          <Box height="100%" minHeight="0" minWidth="0" overflow="hidden" position="relative">
-            {isDefined(subProject) && <DrawArea />}
-            {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
-            {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
+    <EditorDialogsProvider>
+      <Flex direction="column" height="100%" minHeight="0" minWidth="0">
+        <Splitter.Root
+          defaultSize={settings.ui.splitterSizes}
+          flex="1"
+          minHeight="0"
+          minWidth="0"
+          orientation="horizontal"
+          onResizeEnd={handleResizeEnd}
+          panels={panels}
+        >
+          <Splitter.Panel id="draw-area" minHeight="0" minWidth="0">
+            <Box height="100%" minHeight="0" minWidth="0" overflow="hidden" position="relative">
+              {isDefined(subProject) && <DrawArea />}
+              {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
+              {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
 
-            <Box left="3" position="absolute" right="3" top="3" zIndex="1" onClickCapture={clearSelection}>
-              <Flex alignItems="start" gap="3" justifyContent="space-between" minWidth="0">
-                <Box maxWidth="100%" minWidth="0" width="fit-content">
-                  <EditorMenu menu={menu} projects={projects} />
-                </Box>
-                <GlobalSettingsButton />
-              </Flex>
+              <Box left="3" position="absolute" right="3" top="3" zIndex="1" onClickCapture={clearSelection}>
+                <Flex alignItems="start" gap="3" justifyContent="space-between" minWidth="0">
+                  <Box maxWidth="100%" minWidth="0" width="fit-content">
+                    <EditorMenu menu={menu} projects={projects} />
+                  </Box>
+                  <GlobalSettingsButton />
+                </Flex>
+              </Box>
+
+              {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
+              <SubProjectComputationFeedback />
             </Box>
+          </Splitter.Panel>
 
-            {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
-            <SubProjectComputationFeedback />
-          </Box>
-        </Splitter.Panel>
+          <Splitter.ResizeTrigger id="draw-area:tree" mt="3" mb="3">
+            <Splitter.ResizeTriggerIndicator />
+          </Splitter.ResizeTrigger>
 
-        <Splitter.ResizeTrigger id="draw-area:tree" mt="3" mb="3">
-          <Splitter.ResizeTriggerIndicator />
-        </Splitter.ResizeTrigger>
-
-        <Splitter.Panel id="tree" minHeight="0" minWidth="0" onClickCapture={clearSelection}>
-          <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
-            <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0" overflow="hidden">
-              <EditorTreeDragAndDrop>
-                <ResizableAccordion ref={accordionRef} value={treeSections} onValueChange={handleTreeSectionsChange}>
-                  <ResizableAccordionItem
-                    id="components"
-                    title={
-                      <HStack gap="2">
-                        {t.project.tree.sections.components}
-                        {isDefined(itemCounts) && (
-                          <Badge bg="bg" variant="surface">
-                            {itemCounts.components}
-                          </Badge>
-                        )}
-                      </HStack>
-                    }
-                    actions={
-                      <HStack gap="1">
-                        <ResizableAccordionHeaderIconButton disabled={!isDefined(subProject)} onClick={handleExpandAll}>
-                          <ExpandAllIcon />
-                        </ResizableAccordionHeaderIconButton>
-                        <ResizableAccordionHeaderIconButton
-                          disabled={!isDefined(subProject)}
-                          onClick={handleCollapseAll}
+          <Splitter.Panel id="tree" minHeight="0" minWidth="0" onClickCapture={clearSelection}>
+            <Box height="100%" minHeight="0" minWidth="0" pb="3" pr="3" pt="3">
+              <Card.Root bg="bg.panel" height="100%" minHeight="0" minWidth="0" overflow="hidden">
+                <EditorTreeDragAndDrop>
+                  <ResizableAccordion ref={accordionRef} value={treeSections} onValueChange={handleTreeSectionsChange}>
+                    <ResizableAccordionItem
+                      id="components"
+                      title={
+                        <HStack gap="2">
+                          {t.project.tree.sections.components}
+                          {isDefined(itemCounts) && (
+                            <Badge bg="bg" variant="surface">
+                              {itemCounts.components}
+                            </Badge>
+                          )}
+                        </HStack>
+                      }
+                      actions={
+                        <HStack gap="1">
+                          <ResizableAccordionHeaderIconButton
+                            disabled={!isDefined(subProject)}
+                            onClick={handleExpandAll}
+                          >
+                            <ExpandAllIcon />
+                          </ResizableAccordionHeaderIconButton>
+                          <ResizableAccordionHeaderIconButton
+                            disabled={!isDefined(subProject)}
+                            onClick={handleCollapseAll}
+                          >
+                            <CollapseAllIcon />
+                          </ResizableAccordionHeaderIconButton>
+                        </HStack>
+                      }
+                    >
+                      {isDefined(subProject) ? (
+                        <EditorComponentTree ref={componentTreeRef} />
+                      ) : (
+                        <EmptyComponentTreeState />
+                      )}
+                    </ResizableAccordionItem>
+                    <ResizableAccordionItem
+                      id="openings"
+                      title={
+                        <HStack gap="2">
+                          {t.project.tree.sections.pocketOpenings}
+                          {isDefined(itemCounts) && (
+                            <Badge bg="bg" variant="surface">
+                              {itemCounts.pocketOpenings}
+                            </Badge>
+                          )}
+                        </HStack>
+                      }
+                      actions={<AddPocketOpeningMenu onAdd={handleAddPocketOpening} />}
+                    >
+                      {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
+                    </ResizableAccordionItem>
+                    <ResizableAccordionItem
+                      id="constraints"
+                      title={
+                        <HStack gap="2">
+                          {t.project.tree.sections.constraints}
+                          {isDefined(itemCounts) && (
+                            <Badge bg="bg" variant="surface">
+                              {itemCounts.constraints}
+                            </Badge>
+                          )}
+                        </HStack>
+                      }
+                      actions={
+                        <ResizableAccordionHeaderButton
+                          disabled={!isDefined(subProject) || isComputing}
+                          onClick={handleAddConstraint}
                         >
-                          <CollapseAllIcon />
-                        </ResizableAccordionHeaderIconButton>
-                      </HStack>
-                    }
-                  >
-                    {isDefined(subProject) ? (
-                      <EditorComponentTree ref={componentTreeRef} />
-                    ) : (
-                      <EmptyComponentTreeState />
-                    )}
-                  </ResizableAccordionItem>
-                  <ResizableAccordionItem
-                    id="openings"
-                    title={
-                      <HStack gap="2">
-                        {t.project.tree.sections.pocketOpenings}
-                        {isDefined(itemCounts) && (
-                          <Badge bg="bg" variant="surface">
-                            {itemCounts.pocketOpenings}
-                          </Badge>
-                        )}
-                      </HStack>
-                    }
-                    actions={<AddPocketOpeningMenu onAdd={handleAddPocketOpening} />}
-                  >
-                    {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
-                  </ResizableAccordionItem>
-                  <ResizableAccordionItem
-                    id="constraints"
-                    title={
-                      <HStack gap="2">
-                        {t.project.tree.sections.constraints}
-                        {isDefined(itemCounts) && (
-                          <Badge bg="bg" variant="surface">
-                            {itemCounts.constraints}
-                          </Badge>
-                        )}
-                      </HStack>
-                    }
-                    actions={
-                      <ResizableAccordionHeaderButton
-                        disabled={!isDefined(subProject) || isComputing}
-                        onClick={handleAddConstraint}
-                      >
-                        <PiPlusCircle />
-                        {t.project.editors.actions.constraints.add}
-                      </ResizableAccordionHeaderButton>
-                    }
-                  >
-                    {isDefined(subProject) ? <EditorConstraintTree /> : <EmptyComponentTreeState />}
-                  </ResizableAccordionItem>
-                </ResizableAccordion>
-              </EditorTreeDragAndDrop>
-            </Card.Root>
-          </Box>
-        </Splitter.Panel>
-      </Splitter.Root>
+                          <PiPlusCircle />
+                          {t.project.editors.actions.constraints.add}
+                        </ResizableAccordionHeaderButton>
+                      }
+                    >
+                      {isDefined(subProject) ? <EditorConstraintTree /> : <EmptyComponentTreeState />}
+                    </ResizableAccordionItem>
+                  </ResizableAccordion>
+                </EditorTreeDragAndDrop>
+              </Card.Root>
+            </Box>
+          </Splitter.Panel>
+        </Splitter.Root>
 
-      <Box
-        bg="bg.panel"
-        borderColor="border"
-        borderTopWidth="1px"
-        flexShrink="0"
-        overflowX="auto"
-        overflowY="hidden"
-        width="100%"
-      >
-        <Box minWidth="100%" width="max-content">
-          <EditorSubProjectTabs />
+        <Box
+          bg="bg.panel"
+          borderColor="border"
+          borderTopWidth="1px"
+          flexShrink="0"
+          overflowX="auto"
+          overflowY="hidden"
+          width="100%"
+        >
+          <Box minWidth="100%" width="max-content">
+            <EditorSubProjectTabs />
+          </Box>
         </Box>
-      </Box>
-    </Flex>
+      </Flex>
+    </EditorDialogsProvider>
   )
 }
 

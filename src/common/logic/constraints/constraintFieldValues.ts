@@ -210,7 +210,5 @@ const replaceModel = (subProject: SubProjectSchema, updated: ModelObjectSchema):
         ...subProject,
         pocketOpenings: { ...subProject.pocketOpenings, [updated.id]: updated },
       }
-    case 'equal-constraint':
-      return subProject
   }
 }

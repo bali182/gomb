@@ -8,11 +8,9 @@ import {
   getValidConstraintPropertySelection,
   type CommonConstraintProperty,
 } from '../../logic/constraints/constraintCreationUtils'
-import type { ComponentSchema } from '../../schemas/components'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { AddConstraintWithFieldsParamsSchema } from '../../schemas/operations'
-import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -20,7 +18,7 @@ import { CommonEmptyState } from '../common/CommonEmptyState'
 import { ComponentTree } from '../component-tree/ComponentTree'
 import type { ProjectTreeNode } from '../component-tree/types/nodeTypes'
 import { getNextExpandedNodeIds } from '../component-tree/utils/getNextExpandedNodeIds'
-import { getComponentNodeId } from '../component-tree/utils/treeNodeIds'
+import { getComponentNodeId, getHoleNodeId, getStitchLineNodeId } from '../component-tree/utils/treeNodeIds'
 import { useComponentTreeCollection } from '../component-tree/utils/useComponentTreeCollection'
 import { EditDialog } from '../EditDialog'
 import { PocketOpeningTree } from '../pocket-opening-tree/PocketOpeningTree'
@@ -32,7 +30,7 @@ import {
 import { ConstraintPropertyList } from './ConstraintPropertyList'
 
 type CreateConstraintsDialogProps = {
-  source: ComponentSchema | PocketOpeningSchema
+  source: ModelObjectSchema
   subProject: SubProjectSchema
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
@@ -60,6 +58,19 @@ const getProjectTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
   }
 }
 
+const getSourceNodeId = (source: ModelObjectSchema): string => {
+  if (narrowers.is.component(source)) {
+    return getComponentNodeId(source.id)
+  }
+  if (narrowers.is.hole(source)) {
+    return getHoleNodeId(source.id)
+  }
+  if (narrowers.is.stitchLine(source)) {
+    return getStitchLineNodeId(source.id)
+  }
+  return getPocketOpeningNodeId(source.id)
+}
+
 export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
   source,
   subProject,
@@ -70,17 +81,17 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
   const { addConstraints } = useSubProjectOperations()
   const componentTree = useComponentTreeCollection(subProject)
   const openingTree = usePocketOpeningTreeCollection(subProject.pocketOpenings)
-  const isComponentSource = narrowers.is.component(source)
-  const selectionEmptyState = isComponentSource
-    ? t.project.editors.emptyStates.selectConstraintComponent
-    : t.project.editors.emptyStates.selectConstraintOpening
-  const sourceNodeId = isComponentSource ? getComponentNodeId(source.id) : getPocketOpeningNodeId(source.id)
+  const isPocketOpeningSource = narrowers.is.pocketOpening(source)
+  const selectionEmptyState = isPocketOpeningSource
+    ? t.project.editors.emptyStates.selectConstraintOpening
+    : t.project.editors.emptyStates.selectConstraintComponent
+  const sourceNodeId = getSourceNodeId(source)
   const [selection, setSelection] = useState<CreateConstraintsSelection>({ nodeIds: [sourceNodeId], fields: [] })
   const [expandedNodeIds, setExpandedNodeIds] = useState<string[]>(() => getNextExpandedNodeIds(source, subProject, []))
 
   const modelsByNodeId = useMemo<Map<string, ModelObjectSchema>>(() => {
     const models = new Map<string, ModelObjectSchema>()
-    if (isComponentSource) {
+    if (!isPocketOpeningSource) {
       for (const node of componentTree.flatten()) {
         if (!componentTree.isRootNode(node)) {
           models.set(node.id, getProjectTreeModel(node))
@@ -94,7 +105,7 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
       }
     }
     return models
-  }, [componentTree, openingTree, isComponentSource])
+  }, [componentTree, openingTree, isPocketOpeningSource])
 
   const selectedModels = useMemo<ModelObjectSchema[]>(
     () => selection.nodeIds.map((nodeId) => modelsByNodeId.get(nodeId)).filter(isDefined),
@@ -196,7 +207,7 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
         minWidth="0"
       >
         <Splitter.Panel id="models" minHeight="0" minWidth="0" overflowY="auto" px="3">
-          {isComponentSource ? (
+          {!isPocketOpeningSource ? (
             <ComponentTree
               collection={componentTree}
               subProject={subProject}

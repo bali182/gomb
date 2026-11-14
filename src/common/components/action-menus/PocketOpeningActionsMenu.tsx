@@ -1,12 +1,12 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
-import { useCallback, useState, type FC, type MouseEvent } from 'react'
+import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
+import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { noop } from '../../utils/noop'
-import { CreateConstraintsDialog } from '../create-constraints-dialog/CreateConstraintsDialog'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { CloneMenuItem, CreateConstraintsMenuItem, DeleteMenuItem } from './CommonActionsMenuItems'
 import { SetDefaultPocketOpeningMenuItem } from './PocketOpeningActionsMenuItems'
@@ -18,7 +18,7 @@ type PocketOpeningActionsMenuProps = {
 }
 
 export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ opening, size, onDelete = noop }) => {
-  const [isConstraintsDialogOpen, setConstraintsDialogOpen] = useState<boolean>(false)
+  const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
   const { clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } = useSubProjectOperations()
   const isDefault = subProject.defaultPocketOpening === opening.id
@@ -37,8 +37,8 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
   }, [deletePocketOpening, onDelete, opening.id])
 
   const handleCreateConstraints = useCallback((): void => {
-    setConstraintsDialogOpen(true)
-  }, [])
+    openDialog({ type: 'create-constraints', source: opening, subProject })
+  }, [openDialog, opening, subProject])
 
   const handleClone = useCallback((): void => {
     clonePocketOpening({ id: opening.id })
@@ -67,14 +67,6 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      {isConstraintsDialogOpen && (
-        <CreateConstraintsDialog
-          source={opening}
-          subProject={subProject}
-          isOpen={isConstraintsDialogOpen}
-          onOpenChange={setConstraintsDialogOpen}
-        />
-      )}
     </Box>
   )
 }
