@@ -11,21 +11,15 @@ import type {
   SlantedPocketOpeningSchema,
   StraightPocketOpeningSchema,
 } from '../../schemas/pocketOpening'
-import { isDefined } from '../../utils/isDefined'
-import { SectionGroup } from '../common/SectionGroup'
-import { OpticalIllusionPocketOpeningFields } from './OpticalIllusionPocketOpeningFields'
-import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
-import { RecessedPocketOpeningFields } from './RecessedPocketOpeningFields'
-import { SlantedPocketOpeningFields } from './SlantedPocketOpeningFields'
-import { StraightPocketOpeningFields } from './StraightPocketOpeningFields'
+import { OpticalIllusionPocketOpeningEditor } from './OpticalIllusionPocketOpeningEditor'
+import { RecessedPocketOpeningEditor } from './RecessedPocketOpeningEditor'
+import { SlantedPocketOpeningEditor } from './SlantedPocketOpeningEditor'
+import { StraightPocketOpeningEditor } from './StraightPocketOpeningEditor'
 
-type PocketOpeningFieldsProps = {
+type PocketOpeningEditorProps = {
   editable: EditableSchema<PocketOpeningSchema>
   issues: IssuesSchema<PocketOpeningSchema>
   onChange: (updated: EditableSchema<PocketOpeningSchema>) => void
-}
-
-type PocketOpeningEditorProps = PocketOpeningFieldsProps & {
   opening: PocketOpeningSchema
   referencePocket: PocketSchema | undefined
 }
@@ -40,30 +34,19 @@ export const PocketOpeningEditor: FC<PocketOpeningEditorProps> = ({
   const limitIssues = usePocketOpeningLimitIssues(opening, referencePocket)
   const issues = useCombinedIssues<PocketOpeningSchema>(incomingIssues, limitIssues)
 
-  return (
-    <SectionGroup.Root>
-      {!isDefined(referencePocket) && <PocketOpeningEditorPreview opening={opening} />}
-      <SectionGroup.Section>
-        <PocketOpeningFields editable={editable} issues={issues} onChange={onChange} />
-      </SectionGroup.Section>
-    </SectionGroup.Root>
-  )
-}
-
-export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, issues, onChange }) => {
   switch (editable.type) {
     case 'straight':
       return (
-        <StraightPocketOpeningFields
-          editable={editable}
-          issues={issues as IssuesSchema<StraightPocketOpeningSchema>}
-          onChange={onChange}
+        <StraightPocketOpeningEditor
+          opening={opening as StraightPocketOpeningSchema}
+          referencePocket={referencePocket}
         />
       )
     case 'recessed':
       return (
-        <RecessedPocketOpeningFields
-          modelId={editable.id}
+        <RecessedPocketOpeningEditor
+          opening={opening as RecessedPocketOpeningSchema}
+          referencePocket={referencePocket}
           editable={editable}
           issues={issues as IssuesSchema<RecessedPocketOpeningSchema>}
           onChange={onChange}
@@ -71,8 +54,9 @@ export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, is
       )
     case 'slanted':
       return (
-        <SlantedPocketOpeningFields
-          modelId={editable.id}
+        <SlantedPocketOpeningEditor
+          opening={opening as SlantedPocketOpeningSchema}
+          referencePocket={referencePocket}
           editable={editable}
           issues={issues as IssuesSchema<SlantedPocketOpeningSchema>}
           onChange={onChange}
@@ -80,8 +64,9 @@ export const PocketOpeningFields: FC<PocketOpeningFieldsProps> = ({ editable, is
       )
     case 'optical-illusion':
       return (
-        <OpticalIllusionPocketOpeningFields
-          modelId={editable.id}
+        <OpticalIllusionPocketOpeningEditor
+          opening={opening as OpticalIllusionPocketOpeningSchema}
+          referencePocket={referencePocket}
           editable={editable}
           issues={issues as IssuesSchema<OpticalIllusionPocketOpeningSchema>}
           onChange={onChange}

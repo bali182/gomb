@@ -1,13 +1,11 @@
-import { SegmentGroup } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
-import { PiCaretDown, PiCaretLeft, PiCaretRight, PiCaretUp } from 'react-icons/pi'
-import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { PocketClusterSchema } from '../../../schemas/components'
+import type { PocketClusterSchema, PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
+import { PocketOrientationSelect } from '../../common/PocketOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
 
 type PocketsSectionProps = {
@@ -20,15 +18,8 @@ type PocketsSectionProps = {
 export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onChange }) => {
   const { t } = useTranslation()
   const handleOrientationChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails) => {
-      if (details.value !== 'up' && details.value !== 'down' && details.value !== 'left' && details.value !== 'right') {
-        return
-      }
-
-      onChange({
-        ...editable,
-        orientation: details.value,
-      })
+    (orientation: PocketOrientationSchema) => {
+      onChange({ ...editable, orientation })
     },
     [editable, onChange],
   )
@@ -50,25 +41,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
         {t.project.editors.sections.components.pockets.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
-        <EditorSegmentGroup onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="up">
-            <SegmentGroup.ItemHiddenInput />
-            <PiCaretDown />
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="down">
-            <SegmentGroup.ItemHiddenInput />
-            <PiCaretUp />
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="left">
-            <SegmentGroup.ItemHiddenInput />
-            <PiCaretRight />
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="right">
-            <SegmentGroup.ItemHiddenInput />
-            <PiCaretLeft />
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        <PocketOrientationSelect onChange={handleOrientationChange} value={editable.orientation} />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.pockets.pocketStep.tooltip}>

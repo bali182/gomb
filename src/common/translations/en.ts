@@ -1,7 +1,6 @@
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
 import { CloneSectionKey } from '../components/clone-component-dialog/types'
-import type { AutoDimensionMode } from '../components/common/AutoDimensionEditor'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
@@ -16,6 +15,7 @@ import type {
   HasXYOffsetSchema,
 } from '../schemas/common'
 import type {
+  AutoDimensionModeSchema,
   HasAutoDimensionsSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
@@ -41,10 +41,12 @@ import type {
   TranslatedPocketItemGroupIdSchema,
 } from '../schemas/pocketItem'
 import type {
-  OpticalIllusionPocketOpeningOwnSchema,
+  OpticalIllusionPocketOpeningCornerRadiusSchema,
+  OpticalIllusionPocketOpeningGeometrySchema,
   PocketOpeningSchema,
   PocketOpeningSideSchema,
-  RecessedPocketOpeningOwnSchema,
+  RecessedPocketOpeningCornerRadiusSchema,
+  RecessedPocketOpeningGeometrySchema,
   SlantedPocketOpeningOwnSchema,
 } from '../schemas/pocketOpening'
 import type {
@@ -72,7 +74,6 @@ import type {
   CloneComponentDialogSectionTranslationSchema,
   DialogTranslationSchema,
   EditorFieldTranslationSchema,
-  EditorFieldTranslations,
   EmptyStateTranslationSchema,
   EnumTranslationSchema,
   NativeDialogTranslationSchema,
@@ -137,7 +138,11 @@ export const EN = {
   project: {
     computing: 'Computing…',
     tree: {
-      title: 'Components',
+      sections: {
+        components: 'Components',
+        pocketOpenings: 'Pocket openings',
+        constraints: 'Constraints',
+      },
       noModuleSelected: {
         title: 'No module selected',
         description: 'Select or create a module.',
@@ -250,7 +255,6 @@ export const EN = {
           layout: 'Layout',
           contents: 'Contents',
           pockets: 'Pockets',
-          pocketOpenings: 'Pocket openings',
         },
         stitchLines: {
           settings: 'Settings',
@@ -266,10 +270,10 @@ export const EN = {
       },
       actions: {
         constraints: {
-          add: 'Add constraint',
+          add: 'Create',
         },
         pocketOpenings: {
-          add: 'Add opening',
+          add: 'Create',
           edit: 'Edit opening',
           setDefault: 'Set as default',
         },
@@ -498,59 +502,77 @@ export const EN = {
             straightDescription: 'Straight pocket openings have no additional settings.',
           },
           recessedPocketOpening: {
-            outerInset: {
-              label: 'Outer inset',
-              tooltip: 'Distance from either opening edge to the outer corner, in mm.',
-            },
-            innerOffset: {
-              label: 'Inner offset',
-              tooltip:
-                'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
-            },
-            depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
-            outerRadius: {
-              label: 'Outer radius',
-              tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
-            },
-            innerRadius: {
-              label: 'Inner radius',
-              tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
-            },
-          } satisfies EditorFieldTranslations<keyof RecessedPocketOpeningOwnSchema>,
+            geometry: {
+              title: 'Geometry',
+              outerInset: {
+                label: 'Outer inset',
+                tooltip: 'Distance from either opening edge to the outer corner, in mm.',
+              },
+              innerOffset: {
+                label: 'Inner offset',
+                tooltip:
+                  'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
+              },
+              depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
+            } satisfies SectionTranslationSchema<RecessedPocketOpeningGeometrySchema>,
+            cornerRadius: {
+              title: 'Corner radius',
+              outerRadius: {
+                label: 'Outer radius',
+                tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
+              },
+              innerRadius: {
+                label: 'Inner radius',
+                tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
+              },
+            } satisfies SectionTranslationSchema<RecessedPocketOpeningCornerRadiusSchema>,
+          },
           opticalIllusionPocketOpeningCredit: {
             designBy: 'Design by',
           },
           opticalIllusionPocketOpening: {
-            direction: {
-              label: 'Lower side',
-              tooltip: 'Selects the lower end of the opening; the shape rotates with the cluster.',
-            },
-            startInset: {
-              label: 'Start inset',
-              tooltip:
-                'Distance from the lower-side edge to the start of the diagonal at the front pocket, in mm. Uses the whole cluster.',
-            },
-            endInset: {
-              label: 'End inset',
-              tooltip:
-                'Distance from the upper-side edge to the end of the diagonal at the back pocket, in mm. Uses the whole cluster.',
-            },
-            leadingRadius: {
-              label: 'Leading radius',
-              tooltip: 'Radius where the leading straight section turns into the diagonal, in mm.',
-            },
-            trailingRadius: {
-              label: 'Trailing radius',
-              tooltip: 'Radius where the diagonal turns into the trailing straight section, in mm.',
-            },
-          } satisfies EditorFieldTranslations<keyof OpticalIllusionPocketOpeningOwnSchema>,
+            geometry: {
+              title: 'Geometry',
+              direction: {
+                label: 'Lower side',
+                tooltip: 'Selects the lower end of the opening; the shape rotates with the cluster.',
+              },
+              startInset: {
+                label: 'Start inset',
+                tooltip:
+                  'Distance from the lower-side edge to the start of the diagonal at the front pocket, in mm. Uses the whole cluster.',
+              },
+              endInset: {
+                label: 'End inset',
+                tooltip:
+                  'Distance from the upper-side edge to the end of the diagonal at the back pocket, in mm. Uses the whole cluster.',
+              },
+            } satisfies SectionTranslationSchema<OpticalIllusionPocketOpeningGeometrySchema>,
+            cornerRadius: {
+              title: 'Corner radius',
+              leadingRadius: {
+                label: 'Leading radius',
+                tooltip: 'Radius where the leading straight section turns into the diagonal, in mm.',
+              },
+              trailingRadius: {
+                label: 'Trailing radius',
+                tooltip: 'Radius where the diagonal turns into the trailing straight section, in mm.',
+              },
+            } satisfies SectionTranslationSchema<OpticalIllusionPocketOpeningCornerRadiusSchema>,
+          },
           slantedPocketOpening: {
-            offset: { label: 'Offset', tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.' },
-            side: {
-              label: 'Lower side',
-              tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
-            },
-          } satisfies EditorFieldTranslations<keyof SlantedPocketOpeningOwnSchema>,
+            geometry: {
+              title: 'Geometry',
+              side: {
+                label: 'Lower side',
+                tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
+              },
+              offset: {
+                label: 'Offset',
+                tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.',
+              },
+            } satisfies SectionTranslationSchema<SlantedPocketOpeningOwnSchema>,
+          },
           contents: {
             title: 'Contents',
             itemId: {
@@ -830,7 +852,7 @@ export const EN = {
           autoDimension: {
             auto: 'Auto',
             manual: 'Manual',
-          } satisfies EnumTranslationSchema<AutoDimensionMode>,
+          } satisfies EnumTranslationSchema<AutoDimensionModeSchema>,
           anchor: {
             vertical: {
               start: 'Top',
@@ -917,6 +939,9 @@ export const EN = {
         },
         stitchHoleDistance: {
           noMatchingValues: 'No matching values.',
+        },
+        selects: {
+          notApplicable: 'Not applicable…',
         },
       },
       emptyStates: {
@@ -1143,12 +1168,12 @@ export const EN = {
   data: {
     pocketItemGroups: {
       cards: 'Cards',
-      'african-banknotes': 'Banknotes – Africa',
-      'asian-banknotes': 'Banknotes – Asia',
-      'european-banknotes': 'Banknotes – Europe',
-      'north-american-banknotes': 'Banknotes – North America',
-      'oceanian-banknotes': 'Banknotes – Australia and Oceania',
-      'south-american-banknotes': 'Banknotes – South America',
+      'african-banknotes': 'Banknotes - Africa',
+      'asian-banknotes': 'Banknotes - Asia',
+      'european-banknotes': 'Banknotes - Europe',
+      'north-american-banknotes': 'Banknotes - North America',
+      'oceanian-banknotes': 'Banknotes - Australia and Oceania',
+      'south-american-banknotes': 'Banknotes - South America',
     } satisfies Record<TranslatedPocketItemGroupIdSchema, string>,
     colors: {
       black: 'Black',
@@ -1318,7 +1343,7 @@ export const EN = {
       TJS: 'Tajikistani Somoni',
       TMT: 'Turkmenistani Manat',
       TND: 'Tunisian Dinar',
-      TOP: 'Tongan Paʻanga',
+      TOP: "Tongan Pa'anga",
       TRY: 'Turkish Lira',
       TTD: 'Trinidad & Tobago Dollar',
       TWD: 'New Taiwan Dollar',

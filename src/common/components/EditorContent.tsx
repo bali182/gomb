@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Card,
@@ -55,6 +56,13 @@ const panels: SplitterPanelData[] = [
   { id: 'draw-area', collapsible: false },
   { id: 'tree', resizeBehavior: 'preserve-pixel-size', maxSize: 50 },
 ]
+
+type ItemCounts = {
+  components: number | undefined
+  pocketOpenings: number | undefined
+  constraints: number | undefined
+}
+
 type EditorContentProps = {
   menu: ReactElement
   projects: readonly ProjectSchema[]
@@ -116,6 +124,8 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     () => (isDefined(subProjectId) ? accessors.project(project).optional.subProject(subProjectId) : undefined),
     [project, subProjectId],
   )
+  const accessor = useMemo(() => (isDefined(subProject) ? accessors.subProject(subProject) : undefined), [subProject])
+
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
       setUISettings({ splitterSizes: [size[0], size[1]] })
@@ -148,6 +158,17 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     },
     [addPocketOpening, setEditingInputId],
   )
+
+  const itemCounts = useMemo<ItemCounts | undefined>(() => {
+    if (!isDefined(accessor)) {
+      return undefined
+    }
+    return {
+      components: accessor.component.components().length,
+      constraints: accessor.constraint.constraints().length,
+      pocketOpenings: accessor.pocketOpening.pocketOpenings().length,
+    }
+  }, [accessor])
 
   return (
     <Flex direction="column" height="100%" minHeight="0" minWidth="0">
@@ -191,7 +212,16 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                 <ResizableAccordion ref={accordionRef} value={treeSections} onValueChange={handleTreeSectionsChange}>
                   <ResizableAccordionItem
                     id="components"
-                    title={t.project.tree.title}
+                    title={
+                      <HStack gap="2">
+                        {t.project.tree.sections.components}
+                        {isDefined(itemCounts) && (
+                          <Badge bg="bg" variant="surface">
+                            {itemCounts.components}
+                          </Badge>
+                        )}
+                      </HStack>
+                    }
                     actions={
                       <HStack gap="1">
                         <ResizableAccordionHeaderIconButton disabled={!isDefined(subProject)} onClick={handleExpandAll}>
@@ -214,14 +244,32 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                   </ResizableAccordionItem>
                   <ResizableAccordionItem
                     id="openings"
-                    title={t.project.editors.tabs.components.pocketOpenings}
+                    title={
+                      <HStack gap="2">
+                        {t.project.tree.sections.pocketOpenings}
+                        {isDefined(itemCounts) && (
+                          <Badge bg="bg" variant="surface">
+                            {itemCounts.pocketOpenings}
+                          </Badge>
+                        )}
+                      </HStack>
+                    }
                     actions={<AddPocketOpeningMenu onAdd={handleAddPocketOpening} />}
                   >
                     {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
                   </ResizableAccordionItem>
                   <ResizableAccordionItem
                     id="constraints"
-                    title={t.project.editors.sections.constraints.title}
+                    title={
+                      <HStack gap="2">
+                        {t.project.tree.sections.constraints}
+                        {isDefined(itemCounts) && (
+                          <Badge bg="bg" variant="surface">
+                            {itemCounts.constraints}
+                          </Badge>
+                        )}
+                      </HStack>
+                    }
                     actions={
                       <ResizableAccordionHeaderButton
                         disabled={!isDefined(subProject) || isComputing}

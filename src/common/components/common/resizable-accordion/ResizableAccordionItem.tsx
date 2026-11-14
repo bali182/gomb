@@ -78,7 +78,9 @@ export const ResizableAccordionItem: FC<ResizableAccordionItemProps> = ({ id, ti
           >
             <PiCaretRight />
           </Box>
-          <Text truncate>{title}</Text>
+          <Text as="div" truncate>
+            {title}
+          </Text>
         </Button>
         {isDefined(actions) && (
           <Box flexShrink="0" pr="1">

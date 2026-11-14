@@ -1,16 +1,15 @@
-import typia from 'typia'
-
 import { migrateGlobalSettings } from '../../common/migrations/migrateGlobalSettings'
 import { migrateProject } from '../../common/migrations/migrateProject'
 import type { ProjectMigrationContextSchema } from '../../common/schemas/migration'
 import type { ProjectSchema } from '../../common/schemas/project'
 import type { GlobalSettingsSchema } from '../../common/schemas/settings'
+import { assertAndPruneGlobalSettingsSchema, assertAndPruneProjectSchema } from '../../common/typia'
 
 type StorageKey = 'global-settings' | 'projects'
 
 export const readGlobalSettingsFromStorage = (defaultValue: GlobalSettingsSchema): GlobalSettingsSchema => {
   return safeReadStorage<GlobalSettingsSchema>('global-settings', defaultValue, (raw) =>
-    typia.misc.createAssertPrune<GlobalSettingsSchema>()(migrateGlobalSettings(raw, defaultValue)),
+    assertAndPruneGlobalSettingsSchema(migrateGlobalSettings(raw, defaultValue)),
   )
 }
 
@@ -23,7 +22,7 @@ export const readProjectsFromStorage = (context: ProjectMigrationContextSchema):
     if (!Array.isArray(raw)) {
       throw new Error('Expected projects array')
     }
-    return typia.misc.createAssertPrune<ProjectSchema[]>()(raw.map((project) => migrateProject(project, context)))
+    return raw.map((project) => assertAndPruneProjectSchema(migrateProject(project, context)))
   })
 }
 

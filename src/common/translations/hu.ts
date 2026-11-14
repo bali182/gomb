@@ -68,7 +68,11 @@ export const HU = {
   project: {
     computing: 'Számítás folyamatban…',
     tree: {
-      title: 'Elemek',
+      sections: {
+        components: 'Elemek',
+        pocketOpenings: 'Zsebnyílások',
+        constraints: 'Kényszerek',
+      },
       noModuleSelected: {
         title: 'Nincs kiválasztott modul',
         description: 'Válassz vagy hozz létre egy modult.',
@@ -181,7 +185,6 @@ export const HU = {
           layout: 'Elrendezés',
           contents: 'Tartalom',
           pockets: 'Zsebek',
-          pocketOpenings: 'Zsebnyílások',
         },
         stitchLines: {
           settings: 'Beállítások',
@@ -197,10 +200,10 @@ export const HU = {
       },
       actions: {
         constraints: {
-          add: 'Kényszer hozzáadása',
+          add: 'Létrehozás',
         },
         pocketOpenings: {
-          add: 'Új zsebnyílás',
+          add: 'Létrehozás',
           edit: 'Zsebnyílás szerkesztése',
           setDefault: 'Beállítás alapértelmezettként',
         },
@@ -406,7 +409,7 @@ export const HU = {
               tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártyák vagy bankjegyek behelyezéséhez.',
             },
             pocketStep: {
-              label: 'Zsebek eltolása',
+              label: 'Eltolás',
               tooltip: 'Az egymást követő zsebek egymáshoz képesti eltolását állítja be.',
             },
           },
@@ -428,56 +431,72 @@ export const HU = {
             straightDescription: 'Az egyenes zsebnyílásnak nincsenek további beállításai.',
           },
           recessedPocketOpening: {
-            outerInset: {
-              label: 'Külső betolás',
-              tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
+            geometry: {
+              title: 'Geometria',
+              outerInset: {
+                label: 'Külső betolás',
+                tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
+              },
+              innerOffset: {
+                label: 'Belső eltolás',
+                tooltip:
+                  'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
+              },
+              depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
             },
-            innerOffset: {
-              label: 'Belső eltolás',
-              tooltip: 'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
+            cornerRadius: {
+              title: 'Lekerekítés',
+              outerRadius: {
+                label: 'Külső sugár',
+                tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
+              },
+              innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
             },
-            depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
-            outerRadius: {
-              label: 'Külső sugár',
-              tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
-            },
-            innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
           },
           opticalIllusionPocketOpeningCredit: {
             designBy: 'Tervező:',
           },
           opticalIllusionPocketOpening: {
-            direction: {
-              label: 'Alacsonyabb oldal',
-              tooltip: 'A nyílás alacsonyabb végét választja ki; a forma a clusterrel együtt fordul.',
+            geometry: {
+              title: 'Geometria',
+              direction: {
+                label: 'Alacsonyabb oldal',
+                tooltip: 'A nyílás alacsonyabb végét választja ki; a forma a clusterrel együtt fordul.',
+              },
+              startInset: {
+                label: 'Kezdő betolás',
+                tooltip:
+                  'Az átló kezdetének távolsága az alacsonyabb oldali széltől a front pocketnél, mm-ben. A teljes clusterre vonatkozik.',
+              },
+              endInset: {
+                label: 'Záró betolás',
+                tooltip:
+                  'Az átló végének távolsága a magasabb oldali széltől a leghátsó pocketnél, mm-ben. A teljes clusterre vonatkozik.',
+              },
             },
-            startInset: {
-              label: 'Kezdő betolás',
-              tooltip:
-                'Az átló kezdetének távolsága az alacsonyabb oldali széltől a front pocketnél, mm-ben. A teljes clusterre vonatkozik.',
-            },
-            endInset: {
-              label: 'Záró betolás',
-              tooltip:
-                'Az átló végének távolsága a magasabb oldali széltől a leghátsó pocketnél, mm-ben. A teljes clusterre vonatkozik.',
-            },
-            leadingRadius: {
-              label: 'Kezdő sugár',
-              tooltip: 'A kezdő egyenesből a ferde szakaszba vezető átmenet sugara, mm-ben.',
-            },
-            trailingRadius: {
-              label: 'Záró sugár',
-              tooltip: 'A ferde szakaszból a záró egyenesbe vezető átmenet sugara, mm-ben.',
+            cornerRadius: {
+              title: 'Lekerekítés',
+              leadingRadius: {
+                label: 'Kezdő sugár',
+                tooltip: 'A kezdő egyenesből a ferde szakaszba vezető átmenet sugara, mm-ben.',
+              },
+              trailingRadius: {
+                label: 'Záró sugár',
+                tooltip: 'A ferde szakaszból a záró egyenesbe vezető átmenet sugara, mm-ben.',
+              },
             },
           },
           slantedPocketOpening: {
-            offset: {
-              label: 'Eltérés',
-              tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',
-            },
-            side: {
-              label: 'Alacsonyabb oldal',
-              tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
+            geometry: {
+              title: 'Geometria',
+              side: {
+                label: 'Alacsonyabb oldal',
+                tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
+              },
+              offset: {
+                label: 'Eltérés',
+                tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',
+              },
             },
           },
           contents: {
@@ -845,6 +864,9 @@ export const HU = {
         stitchHoleDistance: {
           noMatchingValues: 'Nincs egyező érték.',
         },
+        selects: {
+          notApplicable: 'Nem alkalmazható…',
+        },
       },
       emptyStates: {
         noConstraintFields: {
@@ -1071,12 +1093,12 @@ export const HU = {
   data: {
     pocketItemGroups: {
       cards: 'Kártyák',
-      'african-banknotes': 'Bankjegyek – Afrika',
-      'asian-banknotes': 'Bankjegyek – Ázsia',
-      'european-banknotes': 'Bankjegyek – Európa',
-      'north-american-banknotes': 'Bankjegyek – Észak-Amerika',
-      'oceanian-banknotes': 'Bankjegyek – Ausztrália és Óceánia',
-      'south-american-banknotes': 'Bankjegyek – Dél-Amerika',
+      'african-banknotes': 'Bankjegyek - Afrika',
+      'asian-banknotes': 'Bankjegyek - Ázsia',
+      'european-banknotes': 'Bankjegyek - Európa',
+      'north-american-banknotes': 'Bankjegyek - Észak-Amerika',
+      'oceanian-banknotes': 'Bankjegyek - Ausztrália és Óceánia',
+      'south-american-banknotes': 'Bankjegyek - Dél-Amerika',
     },
     colors: {
       black: 'Fekete',

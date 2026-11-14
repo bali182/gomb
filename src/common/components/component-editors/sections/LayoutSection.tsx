@@ -1,31 +1,20 @@
-import { HStack, SegmentGroup, Text } from '@chakra-ui/react'
+import { HStack, Text } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
-import {
-  PiAlignBottomSimple,
-  PiAlignCenterHorizontalSimple,
-  PiAlignCenterVerticalSimple,
-  PiAlignLeftSimple,
-  PiAlignRightSimple,
-  PiAlignTopSimple,
-  PiArrowsHorizontal,
-  PiArrowsVertical,
-  PiColumns,
-  PiInfo,
-  PiRows,
-  PiRuler,
-} from 'react-icons/pi'
-import { EditorSegmentGroup } from '../../common/EditorSegmentGroup'
+import { PiArrowsHorizontal, PiArrowsVertical, PiInfo, PiRuler } from 'react-icons/pi'
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { ComponentSchema, HasLayoutSchema } from '../../../schemas/components'
+import { AnchorSchema } from '../../../schemas/common'
+import type { ComponentSchema, HasLayoutSchema, LayoutOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { EditorFieldTranslationSchema } from '../../../schemas/translation'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
+import { AnchorSelect } from '../../common/AnchorSelect'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
+import { LayoutOrientationSelect } from '../../common/LayoutOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
 import { Tooltip } from '../../common/Tooltip'
 
@@ -67,20 +56,15 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
     return undefined
   }, [component, subProject, editable.layoutOrientation, editable.autoLayoutGap, t])
 
-  const anchorLabels =
-    editable.layoutOrientation === 'horizontal'
-      ? t.project.editors.enums.common.anchor.horizontal
-      : t.project.editors.enums.common.anchor.vertical
-
   const handleMainAxisAnchorChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, mainAxisAnchor: details.value })
+    (mainAxisAnchor: AnchorSchema): void => {
+      onChange({ ...editable, mainAxisAnchor })
     },
     [editable, onChange],
   )
   const handleOrientationChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails) => {
-      onChange({ ...editable, layoutOrientation: details.value })
+    (layoutOrientation: LayoutOrientationSchema) => {
+      onChange({ ...editable, layoutOrientation })
     },
     [editable, onChange],
   )
@@ -121,50 +105,19 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
         {t.project.editors.sections.components.layout.layoutOrientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layoutOrientation}>
-        <EditorSegmentGroup onValueChange={handleOrientationChange} size="sm" value={editable.layoutOrientation}>
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="horizontal">
-            <SegmentGroup.ItemHiddenInput />
-            <PiColumns /> {t.project.editors.enums.components.layoutOrientation.horizontal}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="vertical">
-            <SegmentGroup.ItemHiddenInput />
-            <PiRows /> {t.project.editors.enums.components.layoutOrientation.vertical}
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        <LayoutOrientationSelect value={editable.layoutOrientation} onChange={handleOrientationChange} />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.mainAxisAnchor.tooltip}>
         {t.project.editors.sections.components.layout.mainAxisAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.mainAxisAnchor}>
-        <EditorSegmentGroup
+        <AnchorSelect
           disabled={isDefined(fillTranslation)}
-          onValueChange={handleMainAxisAnchorChange}
-          size="sm"
+          orientation={editable.layoutOrientation}
+          onChange={handleMainAxisAnchorChange}
           value={isDefined(fillTranslation) ? null : editable.mainAxisAnchor}
-        >
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="start">
-            <SegmentGroup.ItemHiddenInput />
-            {editable.layoutOrientation === 'horizontal' ? <PiAlignLeftSimple /> : <PiAlignTopSimple />}
-            {anchorLabels.start}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="middle">
-            <SegmentGroup.ItemHiddenInput />
-            {editable.layoutOrientation === 'horizontal' ? (
-              <PiAlignCenterHorizontalSimple />
-            ) : (
-              <PiAlignCenterVerticalSimple />
-            )}
-            {anchorLabels.middle}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="end">
-            <SegmentGroup.ItemHiddenInput />
-            {editable.layoutOrientation === 'horizontal' ? <PiAlignRightSimple /> : <PiAlignBottomSimple />}
-            {anchorLabels.end}
-          </SegmentGroup.Item>
-        </EditorSegmentGroup>
+        />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.layoutGap.tooltip}>

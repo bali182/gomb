@@ -1,9 +1,9 @@
 import { nativeTheme } from 'electron'
 import { readFile } from 'node:fs/promises'
-import typia from 'typia'
 
 import { migrateGlobalSettings } from '../../../common/migrations/migrateGlobalSettings'
 import type { GlobalSettingsSchema } from '../../../common/schemas/settings'
+import { assertAndPruneGlobalSettingsSchema } from '../../../common/typia'
 import { createDefaultGlobalSettings } from '../../../common/utils/createDefaultGlobalSettings'
 import { getElectronDefaultLanguage } from './getElectronDefaultLanguage'
 import { getSettingsFilePath } from './utils'
@@ -18,10 +18,7 @@ export const getSettings = async (): Promise<GlobalSettingsSchema> => {
     const contents = await readFile(getSettingsFilePath(), 'utf8')
     const settings: unknown = JSON.parse(contents)
     const migratedSettings = migrateGlobalSettings(settings, defaults)
-
-    if (typia.misc.createIsPrune<GlobalSettingsSchema>()(migratedSettings)) {
-      return migratedSettings
-    }
+    return assertAndPruneGlobalSettingsSchema(migratedSettings)
   } catch (error) {
     console.error('Unable to read Electron settings:', error)
   }

@@ -33,6 +33,9 @@ export type HasAutoDimensionsSchema = HasSizeSchema & {
 
 export type LayoutOrientationSchema = 'horizontal' | 'vertical'
 
+// Used only on UI, not in actual model
+export type AutoDimensionModeSchema = 'auto' | 'manual'
+
 /** A plain panel. Can have children (stuff placed on top of it) */
 export type RootPanelSchema = HasTypeSchema<'root-panel'> &
   BaseComponentSchema &
