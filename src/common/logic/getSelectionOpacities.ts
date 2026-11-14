@@ -1,8 +1,7 @@
 import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
 import type { ComponentSchema } from '../schemas/components'
-import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { StitchLineSchema } from '../schemas/stitching'
-import type { SubProjectSchema } from '../schemas/subProject'
+import type { SubProjectItemSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -17,7 +16,7 @@ export type SelectionOpacitiesSchema = {
 }
 
 export const getSelectionOpacities = (
-  selection: ModelObjectSchema | undefined,
+  selection: SubProjectItemSchema | undefined,
   subProject: SubProjectSchema,
   isEditingPocketContents: boolean,
 ): SelectionOpacitiesSchema => {
@@ -74,7 +73,7 @@ export const getSelectionOpacities = (
 }
 
 const getRelatedComponentIds = (
-  selection: ModelObjectSchema | undefined,
+  selection: SubProjectItemSchema | undefined,
   subProject: SubProjectSchema,
 ): ReadonlySet<string> => {
   if (!isDefined(selection)) {
@@ -121,7 +120,7 @@ const getRelatedComponentIds = (
 
 const isRelatedStitchLine = (
   stitchLine: StitchLineSchema,
-  selection: ModelObjectSchema,
+  selection: SubProjectItemSchema,
   relatedComponentIds: ReadonlySet<string>,
   subProject: SubProjectSchema,
 ): boolean => {

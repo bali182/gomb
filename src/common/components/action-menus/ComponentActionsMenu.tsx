@@ -1,7 +1,8 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
-import { useCallback, useMemo, useState, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
+import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
 import { useEditorDrawArea } from '../../hooks/useEditorDrawArea'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { useOptionalSubProject } from '../../hooks/useOptionalSubProject'
@@ -26,10 +27,15 @@ import { SubProjectSchema } from '../../schemas/subProject'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
-import { CloneComponentDialog } from '../clone-component-dialog/CloneComponentDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import {
+  CloneMenuItem,
+  CreateConstraintsMenuItem,
+  DeleteMenuItem,
+  FlipHorizontalMenuItem,
+  FlipVerticalMenuItem,
+} from './CommonActionsMenuItems'
 import {
   AddComponentMenuItem,
   AddComponentStitchLineMenuItem,
@@ -60,7 +66,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   onAddStitchLine = noop,
   onDelete = noop,
 }) => {
-  const [isCloneDialogOpen, setCloneDialogOpen] = useState<boolean>(false)
+  const { openDialog } = useEditorDialogsContext()
   const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
@@ -132,6 +138,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
   }, [onDelete, component.id, component.type, deleteComponent, deleteRoot])
 
+  const handleCreateConstraints = useCallback((): void => {
+    openDialog({ type: 'create-constraints', source: component, subProject })
+  }, [openDialog, component, subProject])
+
   const handleClone = useCallback((): void => {
     switch (component.type) {
       case 'root-panel': {
@@ -141,11 +151,11 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
       case 't-pocket':
       case 'panel':
       case 'pocket-cluster': {
-        setCloneDialogOpen(true)
+        openDialog({ type: 'clone-component', component, subProject })
         break
       }
     }
-  }, [cloneSubProject, component.type, subProject])
+  }, [cloneSubProject, component, openDialog, subProject])
 
   const handleAddStitchLine = useCallback(
     (type: StitchLineSchema['type']): void => {
@@ -241,6 +251,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
                 <CloneMenuItem disabled={!canClone} onSelect={handleClone} />
                 <DeleteMenuItem disabled={!canDelete} onSelect={handleDelete} />
               </ActionsMenuSection>
@@ -248,14 +259,6 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      {isCloneDialogOpen && (
-        <CloneComponentDialog
-          component={component}
-          subProject={subProject}
-          isOpen={isCloneDialogOpen}
-          onOpenChange={setCloneDialogOpen}
-        />
-      )}
     </Box>
   )
 }

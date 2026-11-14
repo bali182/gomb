@@ -1,13 +1,21 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
+import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import {
+  CloneMenuItem,
+  CreateConstraintsMenuItem,
+  DeleteMenuItem,
+  FlipHorizontalMenuItem,
+  FlipVerticalMenuItem,
+} from './CommonActionsMenuItems'
 import { AddHoleStitchLineMenuItem } from './HoleActionsMenuItems'
 
 type HoleActionsMenuProps = {
@@ -18,6 +26,8 @@ type HoleActionsMenuProps = {
 }
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
+  const { openDialog } = useEditorDialogsContext()
+  const { subProject } = useSubProject()
   const { addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -28,6 +38,10 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     addStitchLine({ targetType: 'hole', targetId: hole.id })
     onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
   }, [addStitchLine, hole.id, onAddStitchLine])
+
+  const handleCreateConstraints = useCallback((): void => {
+    openDialog({ type: 'create-constraints', source: hole, subProject })
+  }, [openDialog, hole, subProject])
 
   const handleClone = useCallback((): void => {
     cloneHole({ id: hole.id })
@@ -64,6 +78,7 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>

@@ -31,7 +31,6 @@ import type {
 } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
 import type { IssueSchema } from '../schemas/issues'
-import type { ModelObjectSchema } from '../schemas/modelObject'
 import type {
   OpticalIllusionPocketOpeningSchema,
   PocketOpeningSchema,
@@ -40,34 +39,35 @@ import type {
   StraightPocketOpeningSchema,
 } from '../schemas/pocketOpening'
 import type { ComponentBoundsStitchLineSchema, StitchLineSchema, TPocketStitchLineSchema } from '../schemas/stitching'
+import type { SubProjectItemSchema } from '../schemas/subProject'
 import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
-    constraint: (input: ModelObjectSchema): input is ConstraintSchema => hasType(input, 'equal-constraint'),
+    constraint: (input: SubProjectItemSchema): input is ConstraintSchema => hasType(input, 'equal-constraint'),
     // Component
-    component: (input: ModelObjectSchema): input is ComponentSchema => {
+    component: (input: SubProjectItemSchema): input is ComponentSchema => {
       return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')
     },
-    rootPanel: (input: ModelObjectSchema): input is RootPanelSchema => {
+    rootPanel: (input: SubProjectItemSchema): input is RootPanelSchema => {
       return hasType(input, 'root-panel')
     },
-    panel: (input: ModelObjectSchema): input is PanelSchema => {
+    panel: (input: SubProjectItemSchema): input is PanelSchema => {
       return hasType(input, 'panel')
     },
-    pocketCluster: (input: ModelObjectSchema): input is PocketClusterSchema => {
+    pocketCluster: (input: SubProjectItemSchema): input is PocketClusterSchema => {
       return hasType(input, 'pocket-cluster')
     },
-    pocket: (input: ModelObjectSchema): input is PocketSchema => {
+    pocket: (input: SubProjectItemSchema): input is PocketSchema => {
       return hasOneOfType(input, 'front-pocket', 't-pocket')
     },
-    frontPocket: (input: ModelObjectSchema): input is FrontPocketSchema => {
+    frontPocket: (input: SubProjectItemSchema): input is FrontPocketSchema => {
       return hasType(input, 'front-pocket')
     },
-    tPocket: (input: ModelObjectSchema): input is TPocketSchema => {
+    tPocket: (input: SubProjectItemSchema): input is TPocketSchema => {
       return hasType(input, 't-pocket')
     },
-    pocketOpening: (input: ModelObjectSchema): input is PocketOpeningSchema => {
+    pocketOpening: (input: SubProjectItemSchema): input is PocketOpeningSchema => {
       return hasOneOfType(input, 'straight', 'slanted', 'recessed', 'optical-illusion')
     },
     straightPocketOpening: (input: PocketOpeningSchema): input is StraightPocketOpeningSchema => {
@@ -99,17 +99,17 @@ export const narrowers = {
       return hasType(input, 'computed-t-pocket')
     },
     // Stitch line
-    stitchLine: (input: ModelObjectSchema): input is StitchLineSchema => {
+    stitchLine: (input: SubProjectItemSchema): input is StitchLineSchema => {
       return hasOneOfType(input, 'component-bounds-stitch-line', 't-pocket-stitch-line')
     },
-    componentBoundsStitchLine: (input: ModelObjectSchema): input is ComponentBoundsStitchLineSchema => {
+    componentBoundsStitchLine: (input: SubProjectItemSchema): input is ComponentBoundsStitchLineSchema => {
       return hasType(input, 'component-bounds-stitch-line')
     },
-    tPocketStitchLine: (input: ModelObjectSchema): input is TPocketStitchLineSchema => {
+    tPocketStitchLine: (input: SubProjectItemSchema): input is TPocketStitchLineSchema => {
       return hasType(input, 't-pocket-stitch-line')
     },
     // Hole
-    hole: (input: ModelObjectSchema): input is HoleSchema => {
+    hole: (input: SubProjectItemSchema): input is HoleSchema => {
       return hasType(input, 'hole')
     },
     // Issue
@@ -154,22 +154,22 @@ export const narrowers = {
   },
   assert: {
     // Component
-    rootPanel: (input: ModelObjectSchema): RootPanelSchema => {
+    rootPanel: (input: SubProjectItemSchema): RootPanelSchema => {
       return assertType(input, 'root-panel')
     },
-    panel: (input: ModelObjectSchema): PanelSchema => {
+    panel: (input: SubProjectItemSchema): PanelSchema => {
       return assertType(input, 'panel')
     },
-    pocketCluster: (input: ModelObjectSchema): PocketClusterSchema => {
+    pocketCluster: (input: SubProjectItemSchema): PocketClusterSchema => {
       return assertType(input, 'pocket-cluster')
     },
-    pocket: (input: ModelObjectSchema): PocketSchema => {
+    pocket: (input: SubProjectItemSchema): PocketSchema => {
       return assertOneOf(input, 'front-pocket', 't-pocket')
     },
-    frontPocket: (input: ModelObjectSchema): FrontPocketSchema => {
+    frontPocket: (input: SubProjectItemSchema): FrontPocketSchema => {
       return assertType(input, 'front-pocket')
     },
-    tPocket: (input: ModelObjectSchema): TPocketSchema => {
+    tPocket: (input: SubProjectItemSchema): TPocketSchema => {
       return assertType(input, 't-pocket')
     },
     // Computed component
@@ -189,10 +189,10 @@ export const narrowers = {
       return assertType(input, 'computed-t-pocket')
     },
     // Stitch line
-    componentBoundsStitchLine: (input: ModelObjectSchema): ComponentBoundsStitchLineSchema => {
+    componentBoundsStitchLine: (input: SubProjectItemSchema): ComponentBoundsStitchLineSchema => {
       return assertType(input, 'component-bounds-stitch-line')
     },
-    tPocketStitchLine: (input: ModelObjectSchema): TPocketStitchLineSchema => {
+    tPocketStitchLine: (input: SubProjectItemSchema): TPocketStitchLineSchema => {
       return assertType(input, 't-pocket-stitch-line')
     },
   },

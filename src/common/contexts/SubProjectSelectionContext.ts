@@ -1,20 +1,20 @@
 import { createContext, useContext } from 'react'
-import type { ModelObjectSchema } from '../schemas/modelObject'
+import type { SubProjectItemSchema } from '../schemas/subProject'
 import { noop } from '../utils/noop'
 import { produce } from '../utils/produce'
 
 export type SubProjectSelectionContextValue = {
-  selected: ModelObjectSchema | undefined
-  hovered: ModelObjectSchema | undefined
+  selected: SubProjectItemSchema | undefined
+  hovered: SubProjectItemSchema | undefined
 
-  select: (selection: ModelObjectSchema) => void
-  hover: (selection: ModelObjectSchema) => void
+  select: (selection: SubProjectItemSchema) => void
+  hover: (selection: SubProjectItemSchema) => void
 
   clearSelection: () => void
   clearHover: () => void
 
-  isSelected: (model: ModelObjectSchema) => boolean
-  isHovered: (model: ModelObjectSchema) => boolean
+  isSelected: (model: SubProjectItemSchema) => boolean
+  isHovered: (model: SubProjectItemSchema) => boolean
 }
 
 export const defaultSubProjectSelection: SubProjectSelectionContextValue = {

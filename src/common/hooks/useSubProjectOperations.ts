@@ -4,6 +4,7 @@ import { addComponent as addComponentPure } from '../operations/subProject/addCo
 import { addComponents as addComponentsPure } from '../operations/subProject/addComponents'
 import { addConstraint as addConstraintPure } from '../operations/subProject/addConstraint'
 import { addConstraintFields as addConstraintFieldsPure } from '../operations/subProject/addConstraintFields'
+import { addConstraints as addConstraintsPure } from '../operations/subProject/addConstraints'
 import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
@@ -33,6 +34,7 @@ import type {
   AddComponentsParamsSchema,
   AddConstraintFieldsParamsSchema,
   AddConstraintParamsSchema,
+  AddConstraintsParamsSchema,
   AddHoleParamsSchema,
   AddPocketOpeningParamsSchema,
   AddStitchLineParamsSchema,
@@ -74,6 +76,7 @@ export type UseSubProjectOperationsOutput = {
   addComponent: (params: AddComponentParamsSchema) => void
   addComponents: (params: AddComponentsParamsSchema) => void
   addConstraint: (params: AddConstraintParamsSchema) => void
+  addConstraints: (params: AddConstraintsParamsSchema) => void
   addConstraintFields: (params: AddConstraintFieldsParamsSchema) => void
   addHole: (params: AddHoleParamsSchema) => void
   addPocketOpening: (params: AddPocketOpeningParamsSchema) => void
@@ -173,6 +176,13 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
   const addConstraint = useCallback(
     (params: AddConstraintParamsSchema): void => {
       executeOperation(addConstraintPure, params)
+    },
+    [executeOperation],
+  )
+
+  const addConstraints = useCallback(
+    (params: AddConstraintsParamsSchema): void => {
+      executeOperation(addConstraintsPure, params)
     },
     [executeOperation],
   )
@@ -343,6 +353,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addComponent,
       addComponents,
       addConstraint,
+      addConstraints,
       addConstraintFields,
       addHole,
       addPocketOpening,
@@ -371,6 +382,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addComponent,
       addComponents,
       addConstraint,
+      addConstraints,
       addConstraintFields,
       addHole,
       addPocketOpening,

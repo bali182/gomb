@@ -1,6 +1,6 @@
 import { useCallback, useMemo, type ReactNode } from 'react'
 
-import { HStack } from '@chakra-ui/react'
+import { HStack, Icon } from '@chakra-ui/react'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink, PiLinkBreak } from 'react-icons/pi'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasStretchSchema, HasStretchValuesSchema } from '../../../schemas/common'
@@ -114,7 +114,7 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
             field="topStretch"
             issue={issues.topStretch}
             onChange={handleStretchChange('topStretch')}
-            startAddon={<PiArrowLineUp />}
+            startAddon={<Icon as={PiArrowLineUp} size="sm" />}
             unit="mm"
             value={editable.topStretch}
           />
@@ -123,7 +123,7 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
             field="bottomStretch"
             issue={issues.bottomStretch}
             onChange={handleStretchChange('bottomStretch')}
-            startAddon={<PiArrowLineDown />}
+            startAddon={<Icon as={PiArrowLineDown} size="sm" />}
             unit="mm"
             value={editable.bottomStretch}
           />
@@ -140,7 +140,7 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
             field="leftStretch"
             issue={issues.leftStretch}
             onChange={handleStretchChange('leftStretch')}
-            startAddon={<PiArrowLineLeft />}
+            startAddon={<Icon as={PiArrowLineLeft} size="sm" />}
             unit="mm"
             value={editable.leftStretch}
           />
@@ -149,7 +149,7 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
             field="rightStretch"
             issue={issues.rightStretch}
             onChange={handleStretchChange('rightStretch')}
-            startAddon={<PiArrowLineRight />}
+            startAddon={<Icon as={PiArrowLineRight} size="sm" />}
             unit="mm"
             value={editable.rightStretch}
           />

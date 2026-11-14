@@ -1,4 +1,4 @@
-import { Tabs } from '@chakra-ui/react'
+import { Icon, Tabs } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
@@ -8,6 +8,8 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { EditorNumberInput } from '../common/EditorNumberInput'
 import { SectionGroup } from '../common/SectionGroup'
+import { TPocketTabWidthIcon } from '../icons/TPocketTabWidthIcon'
+import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
 import { ContentsSection } from './sections/ContentsSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
 type TPocketEditorProps = {
@@ -58,6 +60,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
               <EditorNumberInput
                 modelId={editable.id}
                 field="tPocketTabWidth"
+                startAddon={<Icon as={TPocketTabWidthIcon} size="sm" />}
                 unit="mm"
                 value={editable.tPocketTabWidth}
                 issue={issues.tPocketTabWidth}
@@ -71,6 +74,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
               <EditorNumberInput
                 modelId={editable.id}
                 field="tPocketTaper"
+                startAddon={<Icon as={TPocketTaperIcon} size="sm" />}
                 unit="mm"
                 value={editable.tPocketTaper}
                 issue={issues.tPocketTaper}

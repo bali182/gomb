@@ -1,6 +1,6 @@
 import { Menu, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
-import { PiCopy, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
+import { PiCopy, PiLink, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import { EditorActionMenuItem } from '../common/EditorActionMenuItem'
 
@@ -53,6 +53,16 @@ export const FlipVerticalMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSele
     <EditorActionMenuItem value="flip-vertical" disabled={disabled} onSelect={onSelect}>
       <PiSquareSplitVertical />
       <Menu.ItemText>{t.project.editors.actions.common.flipVertical}</Menu.ItemText>
+    </EditorActionMenuItem>
+  )
+}
+
+export const CreateConstraintsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
+  const { t } = useTranslation()
+  return (
+    <EditorActionMenuItem value="create-constraints" disabled={disabled} onSelect={onSelect}>
+      <PiLink />
+      <Menu.ItemText>{t.project.editors.actions.common.createConstraints}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }

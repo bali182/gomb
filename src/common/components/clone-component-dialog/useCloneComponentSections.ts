@@ -95,7 +95,7 @@ export const useCloneComponentSections = (
   const createModelRow = useCallback(
     (model: ModelObjectSchema): CloneDialogRow => ({
       id: model.id,
-      name: narrowers.is.constraint(model) ? getConstraintLabel(model, t) : model.name,
+      name: model.name,
       components: getConstraintModelPath(model, subProject).filter(narrowers.is.component),
       action: narrowers.is.hole(model)
         ? (params.holes[model.id]?.action ?? 'clone')
@@ -103,7 +103,7 @@ export const useCloneComponentSections = (
       disabled: false,
       disabledActions: [],
     }),
-    [t, subProject, params.holes, params.stitchLines],
+    [subProject, params.holes, params.stitchLines],
   )
 
   const sections = useMemo<CloneSection[]>((): CloneSection[] => {

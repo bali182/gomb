@@ -73,7 +73,7 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         rightAddon={
           !settings.view.pocketItemsVisible && (
             <Tooltip content={t.project.editors.sections.components.contents.itemsHidden.tooltip}>
-              <HStack gap="1" color="fg.info">
+              <HStack gap="1" color="fg.muted">
                 <PiInfo />
                 <Text textStyle="xs">{t.project.editors.sections.components.contents.itemsHidden.label}</Text>
               </HStack>

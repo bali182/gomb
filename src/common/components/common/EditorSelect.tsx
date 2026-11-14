@@ -1,6 +1,15 @@
-import { createListCollection, Icon, ListCollection, Select, SelectRootProps } from '@chakra-ui/react'
+import {
+  createListCollection,
+  Icon,
+  InputGroup,
+  ListCollection,
+  Select,
+  SelectRootProps,
+  type InputGroupProps,
+} from '@chakra-ui/react'
 import { ReactElement, useCallback, useMemo } from 'react'
 import { IconType } from 'react-icons'
+import { PiEmpty } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
@@ -28,7 +37,7 @@ export const EditorSelect = <T extends string>({
   onChange,
 }: EditorSelectProps<T>): ReactElement => {
   const { t } = useTranslation()
-  const selectedValue = useMemo(() => (isDefined(value) ? [value] : []), [value])
+  const selectedValue = useMemo<T[]>(() => (isDefined(value) ? [value] : []), [value])
 
   const collection = useMemo<ListCollection<T>>(
     () =>
@@ -41,7 +50,7 @@ export const EditorSelect = <T extends string>({
   )
 
   const handleChange = useCallback(
-    (details: Select.ValueChangeDetails<T>) => {
+    (details: Select.ValueChangeDetails<T>): void => {
       const [value] = details.items
       if (isDefined(value)) {
         onChange(value)
@@ -50,7 +59,7 @@ export const EditorSelect = <T extends string>({
     [onChange],
   )
 
-  const SelectedIcon: IconType | undefined = isDefined(value) && isDefined(icons) ? icons[value] : undefined
+  const SelectedIcon: IconType = (isDefined(value) ? icons?.[value] : undefined) ?? PiEmpty
 
   return (
     <EditorSelectWrapper
@@ -65,19 +74,16 @@ export const EditorSelect = <T extends string>({
       invalid={issue?.severity === 'error'}
     >
       <Select.HiddenSelect />
-      <Select.Control>
-        <Select.Trigger justifyContent="flex-start" gap="2">
-          {isDefined(SelectedIcon) && (
-            <Icon size="sm">
-              <SelectedIcon />
-            </Icon>
-          )}
-          <Select.ValueText placeholder={placeholder ?? t.project.editors.controls.selects.notApplicable} />
-        </Select.Trigger>
-        <Select.IndicatorGroup>
-          <Select.Indicator />
-        </Select.IndicatorGroup>
-      </Select.Control>
+      <InputGroup startAddon={<Icon as={SelectedIcon} size="sm" />} startAddonProps={startAddonProps} minW="0">
+        <Select.Control flex="1" minW="0">
+          <Select.Trigger borderLeftRadius="0" justifyContent="flex-start">
+            <Select.ValueText placeholder={placeholder ?? t.project.editors.controls.selects.notApplicable} />
+          </Select.Trigger>
+          <Select.IndicatorGroup>
+            <Select.Indicator />
+          </Select.IndicatorGroup>
+        </Select.Control>
+      </InputGroup>
       <Select.Positioner>
         <Select.Content width="full">
           {collection.items.map((value) => {
@@ -104,3 +110,5 @@ const positioning: SelectRootProps['positioning'] = {
   strategy: 'fixed',
   sameWidth: true,
 }
+
+const startAddonProps: InputGroupProps['startAddonProps'] = { px: '1.5', size: 'xs' }

@@ -4,8 +4,11 @@ import type { ConstraintSchema } from './constraints'
 import type { RectSchema } from './geometry'
 import type { HoleSchema } from './hole'
 import type { SubProjectLimitsSchema } from './limits'
+import type { ModelObjectSchema } from './modelObject'
 import type { PocketOpeningSchema } from './pocketOpening'
 import type { StitchLineSchema } from './stitching'
+
+export type SubProjectItemSchema = ModelObjectSchema | ConstraintSchema
 
 export type SubProjectSchema = {
   id: string

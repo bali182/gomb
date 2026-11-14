@@ -2,8 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 
 import type { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
 import type { HasTypeSchema } from '../schemas/common'
-import type { ModelObjectSchema } from '../schemas/modelObject'
-import type { SubProjectSchema } from '../schemas/subProject'
+import type { SubProjectItemSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -25,19 +24,19 @@ export const useSubProjectSelection = (subProject: SubProjectSchema): SubProject
   const [selectionInternal, setSelectionInternal] = useState<SelectionSchema | undefined>()
   const [hoveredInternal, setHoveredInternal] = useState<SelectionSchema | undefined>()
 
-  const selected = useMemo<ModelObjectSchema | undefined>(() => {
+  const selected = useMemo<SubProjectItemSchema | undefined>(() => {
     return getModelObject(selectionInternal, subProject)
   }, [selectionInternal, subProject])
 
-  const hovered = useMemo<ModelObjectSchema | undefined>(() => {
+  const hovered = useMemo<SubProjectItemSchema | undefined>(() => {
     return getModelObject(hoveredInternal, subProject)
   }, [hoveredInternal, subProject])
 
-  const select = useCallback((model: ModelObjectSchema): void => {
+  const select = useCallback((model: SubProjectItemSchema): void => {
     setSelectionInternal(getSelectionSchema(model))
   }, [])
 
-  const hover = useCallback((model: ModelObjectSchema): void => {
+  const hover = useCallback((model: SubProjectItemSchema): void => {
     setHoveredInternal(getSelectionSchema(model))
   }, [])
 
@@ -50,14 +49,14 @@ export const useSubProjectSelection = (subProject: SubProjectSchema): SubProject
   }, [])
 
   const isSelected = useCallback(
-    (model: ModelObjectSchema): boolean => {
+    (model: SubProjectItemSchema): boolean => {
       return isDefined(selected) && selected.type === model.type && selected.id === model.id
     },
     [selected],
   )
 
   const isHovered = useCallback(
-    (model: ModelObjectSchema): boolean => {
+    (model: SubProjectItemSchema): boolean => {
       return isDefined(hovered) && hovered.type === model.type && hovered.id === model.id
     },
     [hovered],
@@ -78,7 +77,7 @@ export const useSubProjectSelection = (subProject: SubProjectSchema): SubProject
   )
 }
 
-const getSelectionSchema = (model: ModelObjectSchema): SelectionSchema | undefined => {
+const getSelectionSchema = (model: SubProjectItemSchema): SelectionSchema | undefined => {
   if (narrowers.is.component(model)) {
     return { type: 'component', componentId: model.id }
   }
@@ -100,7 +99,7 @@ const getSelectionSchema = (model: ModelObjectSchema): SelectionSchema | undefin
 const getModelObject = (
   selection: SelectionSchema | undefined,
   subProject: SubProjectSchema,
-): ModelObjectSchema | undefined => {
+): SubProjectItemSchema | undefined => {
   if (!isDefined(selection)) {
     return undefined
   }

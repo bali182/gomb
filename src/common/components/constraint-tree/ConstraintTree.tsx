@@ -1,4 +1,4 @@
-import type { TreeCollection, TreeViewNodeRenderProps, TreeViewSelectionChangeDetails } from '@chakra-ui/react'
+import type { TreeCollection } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC, type ReactNode } from 'react'
 import {
   SubProjectSelectionContext,
@@ -6,7 +6,7 @@ import {
 } from '../../contexts/SubProjectSelectionContext'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
-import { Tree } from '../common/tree/Tree'
+import { Tree, type TreeNodeRenderProps } from '../common/tree/Tree'
 import { ConstraintTreeItem } from './ConstraintTreeItem'
 import type { ConstraintTreeItemNode, ConstraintTreeNode } from './types/nodeTypes'
 import { getConstraintNodeId } from './utils/useConstraintTreeCollection'
@@ -26,22 +26,23 @@ export const ConstraintTree: FC<ConstraintTreeProps> = ({ collection, selection,
   )
 
   const handleSelectionChange = useCallback(
-    (details: TreeViewSelectionChangeDetails<ConstraintTreeNode>): void => {
-      const node = details.selectedNodes[0]
+    (nodeIds: string[]): void => {
+      const nodeId = nodeIds[0]
+      const node = isDefined(nodeId) ? collection.findNode(nodeId) : undefined
       if (isDefined(node) && node.kind === 'constraint') {
         selection.select(node.constraint)
       }
     },
-    [selection],
+    [collection, selection],
   )
 
   const renderNode = useCallback(
-    ({ node }: TreeViewNodeRenderProps<ConstraintTreeNode>): ReactNode => {
+    ({ node, onSelect }: TreeNodeRenderProps<ConstraintTreeNode>): ReactNode => {
       switch (node.kind) {
         case 'root':
           return null
         case 'constraint':
-          return <ConstraintTreeItem key={node.id} node={node} renderMenu={renderMenu} />
+          return <ConstraintTreeItem key={node.id} node={node} onSelect={onSelect} renderMenu={renderMenu} />
       }
     },
     [renderMenu],
@@ -51,7 +52,8 @@ export const ConstraintTree: FC<ConstraintTreeProps> = ({ collection, selection,
     <SubProjectSelectionContext.Provider value={selection}>
       <Tree<ConstraintTreeNode>
         collection={collection}
-        selectedValue={selectedValue}
+        selection={selectedValue}
+        selectionMode="single"
         onSelectionChange={handleSelectionChange}
         renderNode={renderNode}
       />

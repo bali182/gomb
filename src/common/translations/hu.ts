@@ -209,6 +209,7 @@ export const HU = {
         },
         common: {
           clone: 'Duplikálás',
+          createConstraints: 'Mezők összekötése',
           delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',
@@ -236,17 +237,17 @@ export const HU = {
             title: 'Mezők hozzáadása',
             components: 'Komponensek',
             pocketOpenings: 'Zsebnyílások',
-            modelIds: {
-              label: 'Elemek',
-              tooltip: 'Válaszd ki az elemeket, amelyeknek egy tulajdonságát össze szeretnéd kötni.',
-              placeholder: 'Válassz elemeket…',
+            modelId: {
+              label: 'Elem',
+              tooltip: 'Válaszd ki az elemet, amelynek egy tulajdonságát össze szeretnéd kötni.',
+              placeholder: 'Válassz elemet…',
             },
             property: {
               label: 'Tulajdonság',
-              tooltip: 'Csak a minden kijelölt elemen összeköthető tulajdonságok jelennek meg.',
-              placeholder: 'Válassz tulajdonságot…',
+              tooltip: 'Csak a kényszerhez illő, szabad tulajdonságok jelennek meg.',
+              placeholder: 'Mező…',
             },
-            add: 'Hozzáadás',
+            add: 'Hozzáad',
             noMatches: 'Nincs megfelelő mező vagy elem',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'A mező kényszerhez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
@@ -869,6 +870,14 @@ export const HU = {
         },
       },
       emptyStates: {
+        selectConstraintComponent: {
+          title: 'Válassz még egy komponenst',
+          description: 'Válassz még egy komponenst, lyukat vagy varrásvonalat a közös mezők kiválasztásához.',
+        },
+        selectConstraintOpening: {
+          title: 'Válassz még egy zsebnyílást',
+          description: 'Válassz még egy zsebnyílást a közös mezők kiválasztásához.',
+        },
         noConstraintFields: {
           title: 'Még nincsenek összekötött mezők',
           description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
@@ -904,6 +913,13 @@ export const HU = {
     },
   },
   dialogs: {
+    createConstraints: {
+      title: 'Kényszerek létrehozása',
+      commonProperties: 'Közös mezők',
+      alreadyConstrained: 'Ez a mező már egy kényszer része.',
+      affectedModels: (names: string): string => `Érintett elemek: ${names}.`,
+      positiveAction: (count: number): string => `${count} kényszer létrehozása`,
+    },
     cloneComponent: {
       title: 'Komponens duplikálása',
       positiveAction: 'Duplikálás',
