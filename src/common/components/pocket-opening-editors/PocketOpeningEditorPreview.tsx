@@ -118,7 +118,17 @@ export const PocketOpeningEditorPreview: FC<PocketOpeningEditorPreviewProps> = (
   }, [])
 
   return (
-    <Box bg="bg.emphasized" gridColumn="1 / -1" height="48" overflow="hidden" position="relative" width="full">
+    <Box
+      bg="bg.emphasized"
+      borderBottomWidth="thin"
+      borderColor="border.emphasized"
+      gridColumn="1 / -1"
+      height="48"
+      mb="-3"
+      overflow="hidden"
+      position="relative"
+      width="full"
+    >
       <chakra.svg
         display="block"
         width="full"

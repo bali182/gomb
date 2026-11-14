@@ -4,15 +4,21 @@ export type PocketOpeningSideSchema = 'start' | 'end'
 
 export type StraightPocketOpeningSchema = HasTypeSchema<'straight'> & HasIdentitySchema
 
-export type RecessedPocketOpeningOwnSchema = {
+export type RecessedPocketOpeningGeometrySchema = {
   /** Distance inward from either opening edge, in mm. */
   outerInset: number
   /** Distance outward from the opening center, in mm. */
   innerOffset: number
-  outerRadius: number
-  innerRadius: number
   depth: number
 }
+
+export type RecessedPocketOpeningCornerRadiusSchema = {
+  outerRadius: number
+  innerRadius: number
+}
+
+export type RecessedPocketOpeningOwnSchema = RecessedPocketOpeningGeometrySchema &
+  RecessedPocketOpeningCornerRadiusSchema
 
 export type RecessedPocketOpeningSchema = HasTypeSchema<'recessed'> & HasIdentitySchema & RecessedPocketOpeningOwnSchema
 
@@ -25,13 +31,19 @@ export type SlantedPocketOpeningOwnSchema = {
 
 export type SlantedPocketOpeningSchema = HasTypeSchema<'slanted'> & HasIdentitySchema & SlantedPocketOpeningOwnSchema
 
-export type OpticalIllusionPocketOpeningOwnSchema = {
+export type OpticalIllusionPocketOpeningGeometrySchema = {
   direction: PocketOpeningSideSchema
   startInset: number
   endInset: number
+}
+
+export type OpticalIllusionPocketOpeningCornerRadiusSchema = {
   leadingRadius: number
   trailingRadius: number
 }
+
+export type OpticalIllusionPocketOpeningOwnSchema = OpticalIllusionPocketOpeningGeometrySchema &
+  OpticalIllusionPocketOpeningCornerRadiusSchema
 
 export type OpticalIllusionPocketOpeningSchema = HasTypeSchema<'optical-illusion'> &
   HasIdentitySchema &
