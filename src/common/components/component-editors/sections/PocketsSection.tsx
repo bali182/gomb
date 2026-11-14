@@ -1,5 +1,6 @@
 import { useCallback, type FC } from 'react'
 
+import { Icon } from '@chakra-ui/react'
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { PocketClusterSchema, PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
@@ -7,6 +8,7 @@ import type { IssuesSchema } from '../../../schemas/issues'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { PocketOrientationSelect } from '../../common/PocketOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
+import { StraightPocketOpeningStackIcon } from '../../icons/StraightPocketOpeningStackIcon'
 
 type PocketsSectionProps = {
   component: PocketClusterSchema
@@ -55,6 +57,7 @@ export const PocketsSection: FC<PocketsSectionProps> = ({ editable, issues, onCh
           onChange={handlePocketStepChange}
           unit="mm"
           value={editable.pocketStep}
+          startAddon={<Icon as={StraightPocketOpeningStackIcon} size="sm" />}
         />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>

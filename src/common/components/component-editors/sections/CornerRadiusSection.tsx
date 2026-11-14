@@ -1,4 +1,4 @@
-import { Grid } from '@chakra-ui/react'
+import { Grid, Icon } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import { useEditorContext } from '../../../contexts/EditorContext'
 import { accessors } from '../../../utils/accessors'
@@ -162,7 +162,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             field="topLeftRadius"
             issue={disabled ? undefined : issues.topLeftRadius}
             onChange={handleIndividualRadiusChange('topLeftRadius')}
-            startAddon={<RadiusTopLeftIcon />}
+            startAddon={<Icon as={RadiusTopLeftIcon} size="sm" />}
             unit="mm"
             disabled={disabled || disabledFields?.includes('topLeftRadius')}
             value={disabled ? '' : editable.topLeftRadius}
@@ -175,7 +175,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             field="topRightRadius"
             issue={disabled ? undefined : issues.topRightRadius}
             onChange={handleIndividualRadiusChange('topRightRadius')}
-            startAddon={<RadiusTopRightIcon />}
+            startAddon={<Icon as={RadiusTopRightIcon} size="sm" />}
             unit="mm"
             disabled={disabled || disabledFields?.includes('topRightRadius')}
             value={disabled ? '' : editable.topRightRadius}
@@ -188,7 +188,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             field="bottomLeftRadius"
             issue={disabled ? undefined : issues.bottomLeftRadius}
             onChange={handleIndividualRadiusChange('bottomLeftRadius')}
-            startAddon={<RadiusBottomLeftIcon />}
+            startAddon={<Icon as={RadiusBottomLeftIcon} size="sm" />}
             unit="mm"
             disabled={disabled || disabledFields?.includes('bottomLeftRadius')}
             value={disabled ? '' : editable.bottomLeftRadius}
@@ -201,7 +201,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             field="bottomRightRadius"
             issue={disabled ? undefined : issues.bottomRightRadius}
             onChange={handleIndividualRadiusChange('bottomRightRadius')}
-            startAddon={<RadiusBottomRightIcon />}
+            startAddon={<Icon as={RadiusBottomRightIcon} size="sm" />}
             unit="mm"
             disabled={disabled || disabledFields?.includes('bottomRightRadius')}
             value={disabled ? '' : editable.bottomRightRadius}

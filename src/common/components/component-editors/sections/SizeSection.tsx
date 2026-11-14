@@ -1,3 +1,4 @@
+import { Icon } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -6,6 +7,8 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
+import { HeightIcon } from '../../icons/HeightIcon'
+import { WidthIcon } from '../../icons/WidthIcon'
 
 type SizeSectionProps<T> = {
   modelId: string
@@ -45,6 +48,7 @@ export function SizeSection<T extends HasSizeSchema>({
         <EditorNumberInput
           modelId={modelId}
           field="width"
+          startAddon={<Icon as={WidthIcon} size="sm" />}
           issue={issues.width}
           onChange={handleWidthChange}
           unit="mm"
@@ -59,6 +63,7 @@ export function SizeSection<T extends HasSizeSchema>({
         <EditorNumberInput
           modelId={modelId}
           field="height"
+          startAddon={<Icon as={HeightIcon} size="sm" />}
           issue={issues.height}
           onChange={handleHeightChange}
           unit="mm"
