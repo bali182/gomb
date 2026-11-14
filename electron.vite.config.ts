@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { loadEnv, type Plugin } from 'vite'
 import { version } from './package.json'
 import { electronBuildTargets } from './src/electron/electron-api/buildPaths'
-import { createMinifyOptions, createViteConfig } from './vite.common'
+import { createChunks, createMinifyOptions, createViteConfig } from './vite.common'
 
 const appTitle = (version: string): Plugin => {
   return {
@@ -93,6 +93,13 @@ export default defineConfig(({ command, mode }) => {
         outDir: resolve(electronBuildTargets.renderer.outputDirectory),
         rollupOptions: {
           input: resolve(electronBuildTargets.renderer.sourcePath),
+          ...(command === 'build'
+            ? {
+                output: {
+                  manualChunks: createChunks(),
+                },
+              }
+            : undefined),
         },
       },
     },

@@ -10,9 +10,9 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { useCallback, useMemo, useState, type FC, type ReactNode } from 'react'
-import typia from 'typia'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
+import { isTreeDragData, isTreeDropData } from '../../typia'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -98,7 +98,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
         return
       }
       const dragData: unknown = active.data.current
-      if (typia.is<TreeDragData>(dragData)) {
+      if (isTreeDragData(dragData)) {
         setActiveDragData(dragData)
       }
     },
@@ -122,7 +122,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
       }
       const dragData: unknown = active.data.current
       const dropData: unknown = over.data.current
-      if (!typia.is<TreeDragData>(dragData) || !typia.is<TreeDropData>(dropData)) {
+      if (!isTreeDragData(dragData) || !isTreeDropData(dropData)) {
         return
       }
       if (handleDrop(dragData, dropData)) {

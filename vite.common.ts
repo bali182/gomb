@@ -88,3 +88,17 @@ export const createMinifyOptions = (): BuildEnvironmentOptions => {
     cssMinify: 'esbuild',
   }
 }
+
+export const createChunks = (): Record<string, string[]> => {
+  return {
+    'react-core': ['react', 'react-dom/client'],
+    'react-dom-server': ['react-dom/server'],
+    'react-router': ['react-router'],
+    'ui': ['@chakra-ui/react', '@emotion/react', '@dnd-kit/core'],
+    'icons': ['react-icons/pi', 'react-icons/tb', 'country-flag-icons/react/1x1'],
+    'react-pdf-renderer': ['@react-pdf/renderer'],
+    'math': ['cavalier-contours-js', 'bignumber.js'],
+    'state': ['jotai', 'jotai-family'],
+    'utils': ['fflate', 'markdown-to-jsx/react', 'validator', 'culori', '@internationalized/number'],
+  }
+}

@@ -4,7 +4,6 @@ import type { ProjectSchema } from '../../schemas/project'
 import type { ExportSettingsSchema } from '../../schemas/settings'
 import type { TranslationSchema } from '../../translations/translationSchema'
 import { getComputedProject } from '../getComputedProject'
-import { exportPdf } from './exportPdf'
 import { exportPng } from './exportPng'
 import { exportSvg } from './exportSvg'
 import { getExportElements } from './getExportElements'
@@ -34,9 +33,11 @@ export const exportProject = async ({
   const pageSize = getExportPageSize(settings)
   const exportParams: ExportParamsSchema = { layout, pageSize, context, projectName: project.name, translation }
   switch (settings.format) {
-    case 'pdf':
+    case 'pdf': {
+      const { exportPdf } = await import('./exportPdf')
       await exportPdf(exportParams)
       break
+    }
     case 'svg':
       exportSvg(exportParams)
       break
