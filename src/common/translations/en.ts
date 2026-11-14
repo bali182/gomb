@@ -993,6 +993,7 @@ export const EN = {
       title: 'Create constraints',
       commonProperties: 'Common properties',
       alreadyConstrained: 'This property already belongs to a constraint.',
+      affectedModels: (names: string): string => `Affected elements: ${names}.`,
       positiveAction: (count: number): string => `Create ${count} constraints`,
     },
     cloneComponent: {

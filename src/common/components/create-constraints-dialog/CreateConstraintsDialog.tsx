@@ -45,7 +45,7 @@ const panels: Splitter.PanelData[] = [
   { id: 'models', resizeBehavior: 'preserve-pixel-size', minSize: 15, maxSize: 70 },
   { id: 'properties', minSize: 30 },
 ]
-const defaultSplitterSizes: (number | string)[] = ['350px', 'auto']
+const defaultSplitterSizes: (number | string)[] = ['300px', 'auto']
 
 const getProjectTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
   switch (node.kind) {
@@ -152,16 +152,18 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
 
   const isComponentNodeSelectable = useCallback(
     (node: ProjectTreeNode): boolean =>
-      selection.nodeIds.includes(node.id) ||
-      getCommonConstraintProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0,
-    [selection.nodeIds, selectedModels, subProject],
+      node.id !== sourceNodeId &&
+      (selection.nodeIds.includes(node.id) ||
+        getCommonConstraintProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0),
+    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
   )
   const isOpeningNodeSelectable = useCallback(
     (node: PocketOpeningTreeNode): boolean =>
       node.kind === 'pocket-opening' &&
+      node.id !== sourceNodeId &&
       (selection.nodeIds.includes(node.id) ||
         getCommonConstraintProperties(subProject, [...selectedModels, node.opening]).length > 0),
-    [selection.nodeIds, selectedModels, subProject],
+    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
   )
 
   const handlePropertySelectionChange = useCallback(

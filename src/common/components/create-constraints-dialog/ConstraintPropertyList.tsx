@@ -1,7 +1,10 @@
 import { Checkbox, Text, VStack } from '@chakra-ui/react'
-import { useCallback, type FC } from 'react'
+import { useCallback, useMemo, type FC } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { CommonConstraintProperty } from '../../logic/constraints/constraintCreationUtils'
+import type {
+  CommonConstraintProperty,
+  ConstraintPropertyBlocker,
+} from '../../logic/constraints/constraintCreationUtils'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { isDefined } from '../../utils/isDefined'
 import { getConstraintFieldLabel } from '../constraint-editors/constraintFieldUtils'
@@ -42,6 +45,19 @@ type ConstraintPropertyItemProps = {
 const ConstraintPropertyItem: FC<ConstraintPropertyItemProps> = ({ property, selected, onSelectionChange }) => {
   const { t } = useTranslation()
   const disabled = property.blockers.length > 0
+  const constrainedModelNames = useMemo<string[]>(
+    () => property.blockers.filter((blocker) => blocker.alreadyConstrained).map((blocker) => blocker.model.name),
+    [property.blockers],
+  )
+  const automaticBlockers = useMemo<ConstraintPropertyBlocker[]>(
+    () => property.blockers.filter((blocker) => isDefined(blocker.autoReason)),
+    [property.blockers],
+  )
+  const automaticModelNames = useMemo<string[]>(
+    () => automaticBlockers.map((blocker) => blocker.model.name),
+    [automaticBlockers],
+  )
+  const autoReason = automaticBlockers[0]?.autoReason
   const handleCheckedChange = useCallback(
     (details: Checkbox.CheckedChangeDetails): void => {
       onSelectionChange(property.field, details.checked === true)
@@ -68,20 +84,18 @@ const ConstraintPropertyItem: FC<ConstraintPropertyItemProps> = ({ property, sel
       <Checkbox.HiddenInput />
       <VStack align="stretch" gap="1" flex="1" minW="0">
         <Checkbox.Label>{getConstraintFieldLabel(property.field, t)}</Checkbox.Label>
-        {property.blockers.map((blocker) => (
-          <VStack key={blocker.model.id} align="stretch" gap="1">
-            {blocker.alreadyConstrained && (
-              <Text textStyle="xs" color="fg.muted">
-                {blocker.model.name}: {t.dialogs.createConstraints.alreadyConstrained}
-              </Text>
-            )}
-            {isDefined(blocker.autoReason) && (
-              <Text textStyle="xs" color="fg.muted">
-                {blocker.model.name}: {t.project.editors.enums.constraints.blockReason[blocker.autoReason]}
-              </Text>
-            )}
-          </VStack>
-        ))}
+        {constrainedModelNames.length > 0 && (
+          <Text textStyle="xs" color="fg.muted">
+            {t.dialogs.createConstraints.alreadyConstrained}{' '}
+            {t.dialogs.createConstraints.affectedModels(constrainedModelNames.join(', '))}
+          </Text>
+        )}
+        {isDefined(autoReason) && (
+          <Text textStyle="xs" color="fg.muted">
+            {t.project.editors.enums.constraints.blockReason[autoReason]}{' '}
+            {t.dialogs.createConstraints.affectedModels(automaticModelNames.join(', '))}
+          </Text>
+        )}
       </VStack>
       <Checkbox.Control flexShrink="0">
         <Checkbox.Indicator />

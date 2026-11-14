@@ -1,7 +1,7 @@
 import type { TreeCollection } from '@chakra-ui/react'
 import { useCallback, type FC, type ReactNode } from 'react'
 import type { SubProjectSchema } from '../../schemas/subProject'
-import { Tree, type TreeNodeRenderProps } from '../common/tree/Tree'
+import { Tree, type TreeNodeRenderProps, type TreeSelectionMode } from '../common/tree/Tree'
 import { ComponentTreeItem } from './ComponentTreeItem'
 import { EditorComponentTreeItem } from './EditorComponentTreeItem'
 import { EditorHoleTreeItem } from './EditorHoleTreeItem'
@@ -15,7 +15,7 @@ export type ComponentTreeProps = {
   subProject: SubProjectSchema
   selection: string[]
   onSelectionChange: (selection: string[]) => void
-  selectionMode: 'single' | 'multiple'
+  selectionMode: TreeSelectionMode
   isNodeSelectable?: (node: ProjectTreeNode) => boolean
   expandedNodeIds: string[]
   onExpandedChange: (nodeIds: string[]) => void
@@ -36,7 +36,14 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
   renderMenu,
 }) => {
   const renderNode = useCallback(
-    ({ indexPath, node, nodeState, isSelectable, onSelect }: TreeNodeRenderProps<ProjectTreeNode>): ReactNode => {
+    ({
+      indexPath,
+      node,
+      nodeState,
+      selectionMode,
+      isSelectable,
+      onSelect,
+    }: TreeNodeRenderProps<ProjectTreeNode>): ReactNode => {
       switch (node.kind) {
         case 'component':
           return hasDragAndDrop ? (
@@ -45,6 +52,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
               indexPath={indexPath}
               nodeState={nodeState}
               subProject={subProject}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               renderMenu={renderMenu}
@@ -53,6 +61,7 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
             <ComponentTreeItem
               node={node}
               subProject={subProject}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               renderMenu={renderMenu}
@@ -63,24 +72,38 @@ export const ComponentTree: FC<ComponentTreeProps> = ({
             <EditorHoleTreeItem
               node={node}
               indexPath={indexPath}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               renderMenu={renderMenu}
             />
           ) : (
-            <HoleTreeItem node={node} isSelectable={isSelectable} onSelect={onSelect} renderMenu={renderMenu} />
+            <HoleTreeItem
+              node={node}
+              selectionMode={selectionMode}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
+              renderMenu={renderMenu}
+            />
           )
         case 'stitch-line':
           return hasDragAndDrop ? (
             <EditorStitchLineTreeItem
               node={node}
               indexPath={indexPath}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               renderMenu={renderMenu}
             />
           ) : (
-            <StitchLineTreeItem node={node} isSelectable={isSelectable} onSelect={onSelect} renderMenu={renderMenu} />
+            <StitchLineTreeItem
+              node={node}
+              selectionMode={selectionMode}
+              isSelectable={isSelectable}
+              onSelect={onSelect}
+              renderMenu={renderMenu}
+            />
           )
       }
     },

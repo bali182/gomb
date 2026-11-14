@@ -917,6 +917,7 @@ export const HU = {
       title: 'Kényszerek létrehozása',
       commonProperties: 'Közös mezők',
       alreadyConstrained: 'Ez a mező már egy kényszer része.',
+      affectedModels: (names: string): string => `Érintett elemek: ${names}.`,
       positiveAction: (count: number): string => `${count} kényszer létrehozása`,
     },
     cloneComponent: {

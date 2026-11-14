@@ -1,6 +1,6 @@
 import type { TreeCollection } from '@chakra-ui/react'
 import { useCallback, type FC, type ReactNode } from 'react'
-import { Tree, type TreeNodeRenderProps } from '../common/tree/Tree'
+import { Tree, type TreeNodeRenderProps, type TreeSelectionMode } from '../common/tree/Tree'
 import { EditorPocketOpeningTreeItem } from './EditorPocketOpeningTreeItem'
 import { PocketOpeningTreeItem } from './PocketOpeningTreeItem'
 import type { PocketOpeningTreeItemNode, PocketOpeningTreeNode } from './types/nodeTypes'
@@ -9,7 +9,7 @@ type PocketOpeningTreeProps = {
   collection: TreeCollection<PocketOpeningTreeNode>
   selection: string[]
   onSelectionChange: (selection: string[]) => void
-  selectionMode: 'single' | 'multiple'
+  selectionMode: TreeSelectionMode
   isNodeSelectable?: (node: PocketOpeningTreeNode) => boolean
   defaultPocketOpeningId: string
   hasDragAndDrop: boolean
@@ -27,7 +27,13 @@ export const PocketOpeningTree: FC<PocketOpeningTreeProps> = ({
   renderMenu,
 }) => {
   const renderNode = useCallback(
-    ({ node, indexPath, isSelectable, onSelect }: TreeNodeRenderProps<PocketOpeningTreeNode>): ReactNode => {
+    ({
+      node,
+      indexPath,
+      selectionMode,
+      isSelectable,
+      onSelect,
+    }: TreeNodeRenderProps<PocketOpeningTreeNode>): ReactNode => {
       switch (node.kind) {
         case 'root':
           return null
@@ -36,6 +42,7 @@ export const PocketOpeningTree: FC<PocketOpeningTreeProps> = ({
             <EditorPocketOpeningTreeItem
               node={node}
               indexPath={indexPath}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               defaultPocketOpeningId={defaultPocketOpeningId}
@@ -44,6 +51,7 @@ export const PocketOpeningTree: FC<PocketOpeningTreeProps> = ({
           ) : (
             <PocketOpeningTreeItem
               node={node}
+              selectionMode={selectionMode}
               isSelectable={isSelectable}
               onSelect={onSelect}
               defaultPocketOpeningId={defaultPocketOpeningId}

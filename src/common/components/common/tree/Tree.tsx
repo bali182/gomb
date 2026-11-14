@@ -6,6 +6,7 @@ import {
   type TreeViewExpandedChangeDetails,
   type TreeViewNodeProviderProps,
   type TreeViewNodeRenderProps,
+  type TreeViewRootProps,
   type TreeViewSelectionChangeDetails,
   type UseTreeViewReturn,
 } from '@chakra-ui/react'
@@ -20,10 +21,12 @@ const branchContentProps: TreeViewBranchContentProps = {
   _closed: { animationName: 'collapse-height' },
 }
 
+export type TreeSelectionMode = NonNullable<TreeViewRootProps['selectionMode']>
+
 export type TreeProps<T> = {
   collection: TreeCollection<T>
   selection: string[]
-  selectionMode: 'single' | 'multiple'
+  selectionMode: TreeSelectionMode
   expandedNodeIds?: string[]
   onSelectionChange: (selection: string[]) => void
   onExpandedChange?: (nodeIds: string[]) => void
@@ -32,6 +35,7 @@ export type TreeProps<T> = {
 }
 
 export type TreeNodeRenderProps<T> = TreeViewNodeRenderProps<T> & {
+  selectionMode: TreeSelectionMode
   isSelectable: boolean
   onSelect: () => void
 }
@@ -52,7 +56,12 @@ export const Tree = <T,>({
         const node = collection.findNode(id)
         return isDefined(node) && (selection.includes(id) || (isNodeSelectable?.(node) ?? true))
       })
-      onSelectionChange(selectionMode === 'single' ? selectedIds.slice(0, 1) : selectedIds)
+      const disabledSelectedIds = selection.filter((id) => {
+        const node = collection.findNode(id)
+        return isDefined(node) && !(isNodeSelectable?.(node) ?? true)
+      })
+      const nextSelection = Array.from(new Set([...disabledSelectedIds, ...selectedIds]))
+      onSelectionChange(selectionMode === 'single' ? nextSelection.slice(0, 1) : nextSelection)
     },
     [collection, selection, selectionMode, isNodeSelectable, onSelectionChange],
   )
@@ -100,13 +109,16 @@ export const Tree = <T,>({
       const id = props.nodeState.value
       const isSelectable = isNodeSelectable?.(props.node) ?? true
       const onSelect = (): void => {
+        if (!isSelectable) {
+          return
+        }
         if (selectionMode === 'multiple' && selection.includes(id)) {
           onSelectionChange(selection.filter((selectedId) => selectedId !== id))
-        } else if (isSelectable) {
+        } else {
           onSelectionChange(selectionMode === 'single' ? [id] : [...selection, id])
         }
       }
-      return renderNode({ ...props, isSelectable, onSelect })
+      return renderNode({ ...props, selectionMode, isSelectable, onSelect })
     },
     [selection, selectionMode, isNodeSelectable, onSelectionChange, renderNode],
   )

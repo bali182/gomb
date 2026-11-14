@@ -1,8 +1,11 @@
 import { TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
+import { PiCheck } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import type { TreeSelectionMode } from '../common/tree/Tree'
 import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { disabledTreeItemStyles, multipleSelectedTreeItemStyles } from '../common/tree/treeItemStyles'
 import type { ComponentTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
@@ -12,6 +15,7 @@ type ComponentTreeItemControlProps = TreeViewBranchControlProps & RefAttributes<
 export type ComponentTreeItemProps = {
   node: ComponentTreeNode
   subProject: SubProjectSchema
+  selectionMode: TreeSelectionMode
   isSelectable: boolean
   onSelect: () => void
   controlProps?: ComponentTreeItemControlProps
@@ -22,6 +26,7 @@ export type ComponentTreeItemProps = {
 
 export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   node,
+  selectionMode,
   isSelectable,
   onSelect,
   controlProps,
@@ -63,7 +68,9 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
       {...controlProps}
       aria-disabled={!isSelectable}
       opacity={!isSelectable ? 0.4 : controlProps?.opacity}
-      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      cursor={controlProps?.cursor}
+      _selected={selectionMode === 'multiple' ? multipleSelectedTreeItemStyles : undefined}
+      _disabled={disabledTreeItemStyles}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       py="0"
@@ -80,7 +87,15 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
           </TreeView.BranchText>
         }
         leading={dragHandle}
-        trailing={renderMenu?.(node)}
+        trailing={
+          selectionMode === 'multiple' ? (
+            <TreeView.ItemIndicator>
+              <PiCheck />
+            </TreeView.ItemIndicator>
+          ) : (
+            renderMenu?.(node)
+          )
+        }
       />
     </TreeView.BranchControl>
   )

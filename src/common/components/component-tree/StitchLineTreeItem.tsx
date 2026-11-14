@@ -1,7 +1,10 @@
 import { TreeView, type TreeViewItemProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
+import { PiCheck } from 'react-icons/pi'
 import { getModelIconByType } from '../../utils/getModelIcon'
+import type { TreeSelectionMode } from '../common/tree/Tree'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { disabledTreeItemStyles, multipleSelectedTreeItemStyles } from '../common/tree/treeItemStyles'
 import type { StitchLineTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
@@ -9,6 +12,7 @@ type StitchLineTreeItemControlProps = TreeViewItemProps & RefAttributes<HTMLDivE
 
 export type StitchLineTreeItemProps = {
   node: StitchLineTreeNode
+  selectionMode: TreeSelectionMode
   isSelectable: boolean
   onSelect: () => void
   controlProps?: StitchLineTreeItemControlProps
@@ -19,6 +23,7 @@ export type StitchLineTreeItemProps = {
 
 export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
   node,
+  selectionMode,
   isSelectable,
   onSelect,
   controlProps,
@@ -55,7 +60,9 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
       {...controlProps}
       aria-disabled={!isSelectable}
       opacity={!isSelectable ? 0.4 : controlProps?.opacity}
-      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      cursor={controlProps?.cursor}
+      _selected={selectionMode === 'multiple' ? multipleSelectedTreeItemStyles : undefined}
+      _disabled={disabledTreeItemStyles}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       py="0"
@@ -71,7 +78,15 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
           </TreeView.ItemText>
         }
         leading={dragHandle}
-        trailing={renderMenu?.(node)}
+        trailing={
+          selectionMode === 'multiple' ? (
+            <TreeView.ItemIndicator>
+              <PiCheck />
+            </TreeView.ItemIndicator>
+          ) : (
+            renderMenu?.(node)
+          )
+        }
       />
     </TreeView.Item>
   )

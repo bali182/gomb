@@ -1,6 +1,9 @@
 import { TreeView, type TreeViewItemProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
+import { PiCheck } from 'react-icons/pi'
+import type { TreeSelectionMode } from '../common/tree/Tree'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { disabledTreeItemStyles, multipleSelectedTreeItemStyles } from '../common/tree/treeItemStyles'
 import { PocketOpeningIcon } from '../pocket-opening-editors/PocketOpeningIcon'
 import type { PocketOpeningTreeItemNode } from './types/nodeTypes'
 
@@ -9,6 +12,7 @@ type PocketOpeningTreeItemControlProps = TreeViewItemProps & RefAttributes<HTMLD
 export type PocketOpeningTreeItemProps = {
   node: PocketOpeningTreeItemNode
   defaultPocketOpeningId: string
+  selectionMode: TreeSelectionMode
   isSelectable: boolean
   onSelect: () => void
   controlProps?: PocketOpeningTreeItemControlProps
@@ -19,6 +23,7 @@ export type PocketOpeningTreeItemProps = {
 
 export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({
   node,
+  selectionMode,
   isSelectable,
   onSelect,
   controlProps,
@@ -55,7 +60,9 @@ export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({
       data-pocket-opening-id={node.opening.id}
       aria-disabled={!isSelectable}
       opacity={!isSelectable ? 0.4 : controlProps?.opacity}
-      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      cursor={controlProps?.cursor}
+      _selected={selectionMode === 'multiple' ? multipleSelectedTreeItemStyles : undefined}
+      _disabled={disabledTreeItemStyles}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       py="0"
@@ -71,7 +78,15 @@ export const PocketOpeningTreeItem: FC<PocketOpeningTreeItemProps> = ({
           </TreeView.ItemText>
         }
         leading={dragHandle}
-        trailing={renderMenu?.(node)}
+        trailing={
+          selectionMode === 'multiple' ? (
+            <TreeView.ItemIndicator>
+              <PiCheck />
+            </TreeView.ItemIndicator>
+          ) : (
+            renderMenu?.(node)
+          )
+        }
       />
     </TreeView.Item>
   )

@@ -1,8 +1,11 @@
 import { TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
+import { PiCheck } from 'react-icons/pi'
 import { getModelIconByType } from '../../utils/getModelIcon'
+import type { TreeSelectionMode } from '../common/tree/Tree'
 import { TreeBranchTrigger } from '../common/tree/TreeBranchTrigger'
 import { TreeItemLabel, TreeItemVisual } from '../common/tree/TreeItemVisual'
+import { disabledTreeItemStyles, multipleSelectedTreeItemStyles } from '../common/tree/treeItemStyles'
 import type { HoleTreeNode } from './types/nodeTypes'
 import { getProjectTreeNodeLabel } from './utils/getProjectTreeNodeLabel'
 
@@ -10,6 +13,7 @@ type HoleTreeItemControlProps = TreeViewBranchControlProps & RefAttributes<HTMLD
 
 export type HoleTreeItemProps = {
   node: HoleTreeNode
+  selectionMode: TreeSelectionMode
   isSelectable: boolean
   onSelect: () => void
   controlProps?: HoleTreeItemControlProps
@@ -20,6 +24,7 @@ export type HoleTreeItemProps = {
 
 export const HoleTreeItem: FC<HoleTreeItemProps> = ({
   node,
+  selectionMode,
   isSelectable,
   onSelect,
   controlProps,
@@ -60,7 +65,9 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
       {...controlProps}
       aria-disabled={!isSelectable}
       opacity={!isSelectable ? 0.4 : controlProps?.opacity}
-      cursor={!isSelectable ? 'not-allowed' : controlProps?.cursor}
+      cursor={controlProps?.cursor}
+      _selected={selectionMode === 'multiple' ? multipleSelectedTreeItemStyles : undefined}
+      _disabled={disabledTreeItemStyles}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       py="0"
@@ -77,7 +84,15 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
           </TreeView.BranchText>
         }
         leading={dragHandle}
-        trailing={renderMenu?.(node)}
+        trailing={
+          selectionMode === 'multiple' ? (
+            <TreeView.ItemIndicator>
+              <PiCheck />
+            </TreeView.ItemIndicator>
+          ) : (
+            renderMenu?.(node)
+          )
+        }
       />
     </TreeView.BranchControl>
   )
