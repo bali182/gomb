@@ -307,15 +307,15 @@ export const EN = {
             title: 'Add fields',
             components: 'Components',
             pocketOpenings: 'Pocket openings',
-            modelIds: {
-              label: 'Objects',
-              tooltip: 'Select the objects whose property you want to link.',
-              placeholder: 'Choose objects…',
+            modelId: {
+              label: 'Object',
+              tooltip: 'Select the object whose property you want to link.',
+              placeholder: 'Choose an object…',
             },
             property: {
               label: 'Property',
-              tooltip: 'Only properties that can be linked on every selected object are listed.',
-              placeholder: 'Choose a property…',
+              tooltip: 'Only available properties compatible with this constraint are listed.',
+              placeholder: 'Field…',
             },
             add: 'Add',
             noMatches: 'No matching fields or objects',

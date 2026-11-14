@@ -7,7 +7,7 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 
 export type ConstraintFieldAdderState = {
-  modelIds: string[]
+  modelId: string | undefined
   property: ConstraintFieldNameSchema | undefined
 }
 
