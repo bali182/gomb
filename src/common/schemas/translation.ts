@@ -1,7 +1,7 @@
 export type DialogTranslationSchema = {
   title?: string
   description?: string
-  positiveAction?: string
+  positiveAction?: string | ((count: number) => string)
   negativeAction?: string
   errors?: Record<string, string>
   [key: string]: unknown

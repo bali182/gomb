@@ -27,9 +27,16 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
 import { CloneComponentDialog } from '../clone-component-dialog/CloneComponentDialog'
+import { CreateConstraintsDialog } from '../create-constraints-dialog/CreateConstraintsDialog'
 import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { CloneMenuItem, DeleteMenuItem, FlipHorizontalMenuItem, FlipVerticalMenuItem } from './CommonActionsMenuItems'
+import {
+  CloneMenuItem,
+  CreateConstraintsMenuItem,
+  DeleteMenuItem,
+  FlipHorizontalMenuItem,
+  FlipVerticalMenuItem,
+} from './CommonActionsMenuItems'
 import {
   AddComponentMenuItem,
   AddComponentStitchLineMenuItem,
@@ -61,6 +68,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   onDelete = noop,
 }) => {
   const [isCloneDialogOpen, setCloneDialogOpen] = useState<boolean>(false)
+  const [isConstraintsDialogOpen, setConstraintsDialogOpen] = useState<boolean>(false)
   const { t } = useTranslation()
   const { project } = useProject()
   const { settings } = useGlobalSettings()
@@ -131,6 +139,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
       }
     }
   }, [onDelete, component.id, component.type, deleteComponent, deleteRoot])
+
+  const handleCreateConstraints = useCallback((): void => {
+    setConstraintsDialogOpen(true)
+  }, [])
 
   const handleClone = useCallback((): void => {
     switch (component.type) {
@@ -241,6 +253,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
                 <CloneMenuItem disabled={!canClone} onSelect={handleClone} />
                 <DeleteMenuItem disabled={!canDelete} onSelect={handleDelete} />
               </ActionsMenuSection>
@@ -248,6 +261,14 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
+      {isConstraintsDialogOpen && (
+        <CreateConstraintsDialog
+          source={component}
+          subProject={subProject}
+          isOpen={isConstraintsDialogOpen}
+          onOpenChange={setConstraintsDialogOpen}
+        />
+      )}
       {isCloneDialogOpen && (
         <CloneComponentDialog
           component={component}

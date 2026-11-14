@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { defaultStitchingSettings } from '../../defaultStates'
+import { getConstraintFieldInputs } from '../../logic/constraints/getConstraintFieldInputs'
 import type { ConstraintSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { d } from '../../testData'
@@ -10,12 +11,7 @@ import { accessors } from '../../utils/accessors'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { IdGenerator } from '../../utils/random/IdGenerator'
-import {
-  getConstraintFieldInputs,
-  getConstraintFieldLabel,
-  getConstraintLabel,
-  getConstraintModelPath,
-} from './constraintFieldUtils'
+import { getConstraintFieldLabel, getConstraintLabel, getConstraintModelPath } from './constraintFieldUtils'
 
 const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 const models: ModelObjectSchema[] = [

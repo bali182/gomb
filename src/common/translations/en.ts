@@ -279,6 +279,7 @@ export const EN = {
         },
         common: {
           clone: 'Clone',
+          createConstraints: 'Constrain properties',
           delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
@@ -945,6 +946,14 @@ export const EN = {
         },
       },
       emptyStates: {
+        selectConstraintComponent: {
+          title: 'Select another component',
+          description: 'Select another component, hole or stitch line to choose common properties.',
+        },
+        selectConstraintOpening: {
+          title: 'Select another pocket opening',
+          description: 'Select another pocket opening to choose common properties.',
+        },
         noConstraintFields: {
           title: 'No linked fields yet',
           description: 'Choose an object and then a field below to start linking.',
@@ -980,6 +989,12 @@ export const EN = {
     },
   },
   dialogs: {
+    createConstraints: {
+      title: 'Create constraints',
+      commonProperties: 'Common properties',
+      alreadyConstrained: 'This property already belongs to a constraint.',
+      positiveAction: (count: number): string => `Create ${count} constraints`,
+    },
     cloneComponent: {
       title: 'Clone component',
       positiveAction: 'Clone',

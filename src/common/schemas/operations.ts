@@ -55,6 +55,15 @@ export type AddConstraintParamsSchema = {
   type: ConstraintSchema['type']
 }
 
+export type AddConstraintWithFieldsParamsSchema = {
+  type: ConstraintSchema['type']
+  fields: ConstraintFieldInputSchema[]
+}
+
+export type AddConstraintsParamsSchema = {
+  constraints: AddConstraintWithFieldsParamsSchema[]
+}
+
 export type AddConstraintFieldsParamsSchema = {
   constraintId: string
   fields: ConstraintFieldInputSchema[]
