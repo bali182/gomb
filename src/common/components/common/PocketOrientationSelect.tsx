@@ -1,8 +1,11 @@
 import { FC } from 'react'
 import { IconType } from 'react-icons'
-import { PiCaretDown, PiCaretLeft, PiCaretRight, PiCaretUp } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import { PocketOrientationSchema } from '../../schemas/components'
+import { PocketOrientationDownIcon } from '../icons/PocketOrientationDownIcon'
+import { PocketOrientationLeftIcon } from '../icons/PocketOrientationLeftIcon'
+import { PocketOrientationRightIcon } from '../icons/PocketOrientationRightIcon'
+import { PocketOrientationUpIcon } from '../icons/PocketOrientationUpIcon'
 import { EditorSelect } from './EditorSelect'
 
 type PocketOrientationSelectProps = {
@@ -28,10 +31,9 @@ export const PocketOrientationSelect: FC<PocketOrientationSelectProps> = ({ valu
 
 const values: PocketOrientationSchema[] = ['up', 'down', 'left', 'right']
 
-// TODO ICONS!!!
 const icons: Record<PocketOrientationSchema, IconType> = {
-  up: PiCaretDown,
-  down: PiCaretUp,
-  left: PiCaretRight,
-  right: PiCaretLeft,
+  up: PocketOrientationUpIcon,
+  down: PocketOrientationDownIcon,
+  left: PocketOrientationLeftIcon,
+  right: PocketOrientationRightIcon,
 }

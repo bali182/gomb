@@ -409,7 +409,7 @@ export const HU = {
               tooltip: 'Kiválasztja, hogy a zseb melyik éle maradjon nyitva a kártyák vagy bankjegyek behelyezéséhez.',
             },
             pocketStep: {
-              label: 'Zsebek eltolása',
+              label: 'Eltolás',
               tooltip: 'Az egymást követő zsebek egymáshoz képesti eltolását állítja be.',
             },
           },
