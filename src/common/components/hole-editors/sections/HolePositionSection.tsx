@@ -1,4 +1,6 @@
+import { Icon } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
+import { PiArrowsHorizontal, PiArrowsVertical } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
@@ -64,6 +66,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
         <EditorNumberInput
           modelId={modelId}
           field="xOffset"
+          startAddon={<Icon as={PiArrowsHorizontal} size="sm" />}
           issue={issues.xOffset}
           onChange={handleXOffsetChange}
           unit="mm"
@@ -83,6 +86,7 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
         <EditorNumberInput
           modelId={modelId}
           field="yOffset"
+          startAddon={<Icon as={PiArrowsVertical} size="sm" />}
           issue={issues.yOffset}
           onChange={handleYOffsetChange}
           unit="mm"

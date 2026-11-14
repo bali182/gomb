@@ -66,7 +66,7 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
         rightAddon={
           isOffAxisFill ? (
             <Tooltip content={fillTranslation.tooltip}>
-              <HStack color="fg.info" gap="1">
+              <HStack color="fg.muted" gap="1">
                 <PiInfo />
                 <Text fontWeight="bold" textStyle="xs">
                   {fillTranslation.label}
