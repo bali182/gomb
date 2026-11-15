@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js'
 
-import type { HasCornerRadiusSchema } from '../schemas/common'
+import type { HasCornerRadiusValuesSchema } from '../schemas/common'
 import type { CornerRadiusSchema } from '../schemas/geometry'
 
-export const getCornerRadius = (component: HasCornerRadiusSchema): CornerRadiusSchema => {
+export const getCornerRadius = (component: HasCornerRadiusValuesSchema): CornerRadiusSchema => {
   const { bottomLeftRadius, bottomRightRadius, topLeftRadius, topRightRadius } = component
 
   return {

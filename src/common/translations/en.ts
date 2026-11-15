@@ -7,7 +7,7 @@ import type { ColorKey } from '../data/colors'
 import type {
   AnchorSchema,
   HasAutoCornerRadiusSchema,
-  HasCornerRadiusSchema,
+  HasCornerRadiusValuesSchema,
   HasName,
   HasOffAxisAnchor,
   HasSizeSchema,
@@ -336,9 +336,9 @@ export const EN = {
               placeholder: 'Auto',
               tooltip: 'Matches the corner radius of the component this stitch line follows.',
             },
-            individualRadii: {
+            measurement: {
               label: 'Measurement',
-              tooltip: 'Use the same corner rounding everywhere, or set each corner separately.',
+              tooltip: 'Set the radius of each corner.',
             },
             topLeftRadius: {
               label: 'Top-left corner',
@@ -356,7 +356,7 @@ export const EN = {
               label: 'Bottom-right corner',
               tooltip: 'Sets the radius of the bottom-right corner.',
             },
-          } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
+          } satisfies SectionTranslationSchema<HasCornerRadiusValuesSchema & HasAutoCornerRadiusSchema>,
           size: {
             title: 'Size',
             width: {
@@ -919,10 +919,6 @@ export const EN = {
               end: 'Right',
             } satisfies EnumTranslationSchema<AnchorSchema>,
           },
-          individualRadii: {
-            false: 'Uniform radius',
-            true: 'Individual radii',
-          } satisfies EnumTranslationSchema<boolean>,
           autoCornerRadius: {
             false: 'Manual',
             true: 'Auto',
@@ -981,6 +977,15 @@ export const EN = {
         },
       },
       controls: {
+        radiusBinder: {
+          title: 'Radius bindings',
+          label: 'Bindings',
+          multipleConstraints: 'The corners belong to separate bindings and cannot be edited together here.',
+          bindAll: 'Bind all',
+          clear: 'Unbind all',
+          selectAnother: 'Select another corner to create a binding.',
+          save: 'Save',
+        },
         pocketItemCombobox: {
           noItem: 'None',
           noMatchingValues: 'No matching items.',

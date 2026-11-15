@@ -51,9 +51,8 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
       </Tabs.List>
       <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
         <SectionGroup.Root>
-          <CornerRadiusSection
+          <CornerRadiusSection<FrontPocketSchema>
             modelId={editable.id}
-            value={component}
             editable={editable}
             issues={issues}
             onChange={onChange}

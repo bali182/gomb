@@ -121,7 +121,6 @@ export const comparators = {
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.width === b.width &&
       a.height === b.height &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -148,7 +147,6 @@ export const comparators = {
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -193,7 +191,6 @@ export const comparators = {
     a.mainAxisAnchor === b.mainAxisAnchor &&
     a.layoutGap === b.layoutGap &&
     a.autoLayoutGap === b.autoLayoutGap &&
-    a.individualRadii === b.individualRadii &&
     a.topLeftRadius === b.topLeftRadius &&
     a.topRightRadius === b.topRightRadius &&
     a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -231,7 +228,6 @@ export const comparators = {
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -253,7 +249,6 @@ export const comparators = {
       a.yOffset === b.yOffset &&
       a.width === b.width &&
       a.height === b.height &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -289,7 +284,6 @@ export const comparators = {
       a.stitchHoleThickness === b.stitchHoleThickness &&
       a.stitchLineThickness === b.stitchLineThickness &&
       a.autoCornerRadius === b.autoCornerRadius &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&

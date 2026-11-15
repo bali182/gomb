@@ -70,7 +70,6 @@ export const validateFrontPocketSchema = (
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
     openingId: input.openingId,
-    individualRadii: input.individualRadii,
     autoLayoutGap: input.autoLayoutGap,
   }
   if (

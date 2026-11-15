@@ -10,7 +10,7 @@ import {
 } from './data/colors'
 import type {
   HasComponentReferenceSchema,
-  HasCornerRadiusSchema,
+  HasCornerRadiusValuesSchema,
   HasId,
   HasName,
   HasOffAxisAnchor,
@@ -75,12 +75,11 @@ export const defaultColorSettings: ColorSettingsSchema = {
   threadColor: threadColors.white,
 }
 
-export const defaultHasCornerRadius: HasCornerRadiusSchema = {
+export const defaultHasCornerRadius: HasCornerRadiusValuesSchema = {
   topLeftRadius: 0,
   bottomLeftRadius: 0,
   bottomRightRadius: 0,
   topRightRadius: 0,
-  individualRadii: false,
 }
 
 export const defaultHasLayout: HasLayoutSchema = {
@@ -193,7 +192,6 @@ export const defaultComponentBoundsStitchLine: ComponentBoundsStitchLineOwnSchem
   bottomRightCorner: true,
   bottomLeftCorner: true,
   autoCornerRadius: true,
-  individualRadii: false,
   bottomLeftRadius: 0,
   bottomRightRadius: 0,
   topLeftRadius: 0,

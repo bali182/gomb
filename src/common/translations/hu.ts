@@ -266,9 +266,9 @@ export const HU = {
               placeholder: 'Auto',
               tooltip: 'A varrásvonal lekerekítése az általa követett komponens sarkaihoz igazodik.',
             },
-            individualRadii: {
+            measurement: {
               label: 'Méretezés',
-              tooltip: 'Azonos saroklekerekítést használ minden saroknál, vagy külön is beállíthatja őket.',
+              tooltip: 'Az egyes sarkok lekerekítését állítja be.',
             },
             topLeftRadius: {
               label: 'Bal felső sarok',
@@ -846,10 +846,6 @@ export const HU = {
               end: 'Jobbra',
             },
           },
-          individualRadii: {
-            false: 'Egységes lekerekítés',
-            true: 'Egyedi lekerekítések',
-          },
           autoCornerRadius: {
             false: 'Manuális',
             true: 'Automatikus',
@@ -908,6 +904,15 @@ export const HU = {
         },
       },
       controls: {
+        radiusBinder: {
+          title: 'Rádiuszok értékkövetése',
+          label: 'Értékkövetés',
+          multipleConstraints: 'A sarkok több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
+          bindAll: 'Mindet összeköt',
+          clear: 'Kötések törlése',
+          selectAnother: 'Válassz még egy sarkot az értékkövetéshez.',
+          save: 'Mentés',
+        },
         pocketItemCombobox: {
           noItem: 'Nincs',
           noMatchingValues: 'Nincs egyező tárgy.',

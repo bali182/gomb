@@ -25,13 +25,7 @@ export const HoleEditor: FC<HoleEditorProps> = ({ editable, hole, issues: incomi
     <SectionGroup.Root>
       <HolePositionSection<HoleSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
       <SizeSection<HoleSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
-      <CornerRadiusSection<HoleSchema>
-        modelId={editable.id}
-        value={hole}
-        editable={editable}
-        issues={issues}
-        onChange={onChange}
-      />
+      <CornerRadiusSection<HoleSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
     </SectionGroup.Root>
   )
 }

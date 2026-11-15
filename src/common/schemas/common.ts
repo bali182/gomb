@@ -27,10 +27,6 @@ export type HasCornerRadiusValuesSchema = {
   bottomRightRadius: number
 }
 
-export type HasCornerRadiusSchema = HasCornerRadiusValuesSchema & {
-  individualRadii: boolean
-}
-
 export type HasAutoCornerRadiusSchema = {
   autoCornerRadius: boolean
 }

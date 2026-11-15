@@ -62,9 +62,8 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         onChange={onChange}
       />
       <AnchorSection<PocketClusterSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <CornerRadiusSection
+      <CornerRadiusSection<PocketClusterSchema>
         modelId={editable.id}
-        value={component}
         editable={editable}
         issues={issues}
         onChange={onChange}

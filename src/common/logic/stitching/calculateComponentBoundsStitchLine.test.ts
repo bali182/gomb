@@ -385,7 +385,6 @@ describe('component bounds stitch routes', () => {
       left: true,
       topRightCorner: true,
       topLeftCorner: true,
-      individualRadii: true,
       topLeftRadius: 20,
       stitchDirection: 'end-to-start',
       stitchHoleDistance: 15,

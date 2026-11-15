@@ -37,16 +37,11 @@ describe('validatePocketClusterSchema dimensions and stretch', () => {
   describe.each(['topLeftRadius', 'topRightRadius', 'bottomLeftRadius', 'bottomRightRadius'] as const)(
     '%s',
     (field) => {
-      it('keeps non-negative requested radii and the individual-radii setting', () => {
+      it('keeps non-negative requested radii', () => {
         const { component, input, context } = createFixture()
-        const result = validatePocketClusterSchema(
-          { ...input, [field]: '1000', individualRadii: true },
-          component,
-          context,
-        )
+        const result = validatePocketClusterSchema({ ...input, [field]: '1000' }, component, context)
         expect(result.isValid).toBe(true)
         expect(result.committedValue[field]).toBe(1000)
-        expect(result.committedValue.individualRadii).toBe(true)
       })
 
       it.each(['-1', '', 'abc'])('rejects invalid radius %s while preserving valid edits', (value) => {

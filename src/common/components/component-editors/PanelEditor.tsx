@@ -35,13 +35,7 @@ export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues,
         issues={issues}
         onChange={onChange}
       />
-      <CornerRadiusSection<PanelSchema>
-        modelId={editable.id}
-        value={component}
-        editable={editable}
-        issues={issues}
-        onChange={onChange}
-      />
+      <CornerRadiusSection<PanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
       <LayoutSection
         modelId={editable.id}
         component={component}

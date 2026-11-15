@@ -1,7 +1,7 @@
 import {
   AnchorSchema,
   HasComponentReferenceSchema,
-  HasCornerRadiusSchema,
+  HasCornerRadiusValuesSchema,
   HasIdentitySchema,
   HasSizeSchema,
   HasTypeSchema,
@@ -19,4 +19,4 @@ export type HoleSchema = HasTypeSchema<'hole'> &
   HasComponentReferenceSchema &
   HasAnchorsSchema &
   HasSizeSchema &
-  HasCornerRadiusSchema
+  HasCornerRadiusValuesSchema

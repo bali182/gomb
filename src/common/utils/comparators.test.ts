@@ -75,14 +75,10 @@ describe('input model comparators', () => {
     expect(comparators.hole(hole, { ...hole, [field]: hole[field] + 1 })).toBe(false)
   })
 
-  it('detects radius mode and layout anchor changes', () => {
+  it('detects layout anchor changes', () => {
     const root = d.rootPanel({ id: 'root', mainAxisAnchor: 'start' })
     const panel = d.panel({ id: 'panel', mainAxisAnchor: 'start' })
     const front = d.frontPocket({ id: 'front', mainAxisAnchor: 'start' })
-    const hole = d.hole({ id: 'hole', componentId: 'panel' })
-    expect(comparators.rootPanel(root, { ...root, individualRadii: !root.individualRadii })).toBe(false)
-    expect(comparators.panel(panel, { ...panel, individualRadii: !panel.individualRadii })).toBe(false)
-    expect(comparators.hole(hole, { ...hole, individualRadii: !hole.individualRadii })).toBe(false)
     expect(comparators.rootPanel(root, { ...root, mainAxisAnchor: 'end' })).toBe(false)
     expect(comparators.panel(panel, { ...panel, mainAxisAnchor: 'end' })).toBe(false)
     expect(comparators.frontPocket(front, { ...front, mainAxisAnchor: 'end' })).toBe(false)
