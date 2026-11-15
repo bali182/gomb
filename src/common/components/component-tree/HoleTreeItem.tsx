@@ -1,4 +1,4 @@
-import { TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
+import { Icon, TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
 import { PiCheck } from 'react-icons/pi'
 import { getModelIconByType } from '../../utils/getModelIcon'
@@ -32,7 +32,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
   dropIndicators,
   renderMenu,
 }) => {
-  const Icon = getModelIconByType(node.hole.type)
+  const ModelIcon = getModelIconByType(node.hole.type)
   const isExpandable = node.children.length > 0
 
   const handleClick = useCallback(
@@ -75,7 +75,7 @@ export const HoleTreeItem: FC<HoleTreeItemProps> = ({
     >
       {dropIndicators}
       <TreeItemVisual
-        icon={<Icon />}
+        icon={<Icon as={ModelIcon} size="sm" />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
         label={

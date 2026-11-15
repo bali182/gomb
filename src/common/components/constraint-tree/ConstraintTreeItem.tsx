@@ -1,4 +1,4 @@
-import { TreeView } from '@chakra-ui/react'
+import { Icon, TreeView } from '@chakra-ui/react'
 import { useCallback, type FC, type MouseEvent, type ReactNode } from 'react'
 import { PiLink } from 'react-icons/pi'
 import { useSubProjectSelectionContext } from '../../contexts/SubProjectSelectionContext'
@@ -34,7 +34,7 @@ export const ConstraintTreeItem: FC<ConstraintTreeItemProps> = ({ node, onSelect
       onPointerLeave={handlePointerLeave}
     >
       <TreeItemVisual
-        icon={<PiLink />}
+        icon={<Icon as={PiLink} size="sm" />}
         isPositioned={false}
         leading={null}
         label={

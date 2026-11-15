@@ -1,4 +1,4 @@
-import { TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
+import { Icon, TreeView, type TreeViewBranchControlProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
 import { PiCheck } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -35,7 +35,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   renderMenu,
   subProject,
 }) => {
-  const Icon = getProjectTreeNodeIcon(node, subProject)
+  const ModelIcon = getProjectTreeNodeIcon(node, subProject)
   const isExpandable = node.children.length > 0
 
   const handleClick = useCallback(
@@ -78,7 +78,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
     >
       {dropIndicators}
       <TreeItemVisual
-        icon={<Icon />}
+        icon={<Icon as={ModelIcon} size="sm" />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
         label={

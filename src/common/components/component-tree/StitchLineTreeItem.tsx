@@ -1,4 +1,4 @@
-import { TreeView, type TreeViewItemProps } from '@chakra-ui/react'
+import { Icon, TreeView, type TreeViewItemProps } from '@chakra-ui/react'
 import { useCallback, type FC, type KeyboardEvent, type MouseEvent, type ReactNode, type RefAttributes } from 'react'
 import { PiCheck } from 'react-icons/pi'
 import { getModelIconByType } from '../../utils/getModelIcon'
@@ -31,7 +31,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
   dropIndicators,
   renderMenu,
 }) => {
-  const Icon = getModelIconByType(node.stitchLine.type)
+  const ModelIcon = getModelIconByType(node.stitchLine.type)
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLDivElement>): void => {
@@ -70,7 +70,7 @@ export const StitchLineTreeItem: FC<StitchLineTreeItemProps> = ({
     >
       {dropIndicators}
       <TreeItemVisual
-        icon={<Icon />}
+        icon={<Icon as={ModelIcon} size="sm" />}
         isPositioned={false}
         label={
           <TreeView.ItemText asChild>

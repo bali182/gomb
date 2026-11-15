@@ -1,4 +1,4 @@
-import { Box, Icon as ChakraIcon } from '@chakra-ui/react'
+import { Box, Icon } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiStarDuotone } from 'react-icons/pi'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
@@ -10,12 +10,12 @@ type PocketOpeningIconProps = {
 }
 
 export const PocketOpeningIcon: FC<PocketOpeningIconProps> = ({ type, isDefault }) => {
-  const Icon = getModelIconByType(type)
+  const ModelIcon = getModelIconByType(type)
 
   return (
     <Box display="inline-flex" flexShrink="0" position="relative" verticalAlign="middle">
-      <Icon />
-      {isDefault && <ChakraIcon as={PiStarDuotone} position="absolute" bottom="-0.5" right="-1" boxSize="50%" />}
+      <Icon as={ModelIcon} size="sm" />
+      {isDefault && <Icon as={PiStarDuotone} position="absolute" bottom="-0.5" right="-1" boxSize="50%" />}
     </Box>
   )
 }
