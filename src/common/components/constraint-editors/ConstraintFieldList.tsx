@@ -1,6 +1,6 @@
 import { Box, Breadcrumb, HStack, Icon, Text, VStack } from '@chakra-ui/react'
 import { Fragment, useCallback, useMemo, type FC, type ReactElement } from 'react'
-import { PiLink, PiSlidersHorizontal, PiTrash } from 'react-icons/pi'
+import { PiLink, PiTrash } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
@@ -9,6 +9,7 @@ import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from '../common/EditorIconButton'
+import { getConstraintFieldIcon } from './constraintFieldIcons'
 import { getConstraintFieldLabel, getConstraintModelPath } from './constraintFieldUtils'
 
 type ConstraintFieldListProps = {
@@ -56,7 +57,7 @@ const ConstraintFieldGroup: FC<ConstraintFieldGroupProps> = ({ constraintId, nam
   return (
     <VStack align="stretch" gap="2" flex="1" minW="0" borderWidth="1px" borderRadius="md" px="3" py="2">
       <HStack gap="1.5">
-        <Icon as={PiSlidersHorizontal} boxSize="3.5" flexShrink="0" />
+        <Icon as={getConstraintFieldIcon(name)} size="sm" flexShrink="0" />
         <Text textStyle="sm" fontWeight="medium" truncate>
           {getConstraintFieldLabel(name, t)}
         </Text>
@@ -92,7 +93,7 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
 
   return (
     <HStack gap="3" flex="1" minW="0" justify="space-between">
-      <Breadcrumb.Root size="sm" color="fg.muted" minW="0">
+      <Breadcrumb.Root size="sm" color="fg.muted" minW="0" mt="1">
         <Breadcrumb.List flexWrap="wrap" gap="1" fontSize="2xs">
           {path.map((item, index) => (
             <Fragment key={item.id}>
@@ -104,7 +105,7 @@ const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId,
           ))}
         </Breadcrumb.List>
       </Breadcrumb.Root>
-      <EditorIconButton readOnly={isComputing} size="xs" variant="ghost" flexShrink="0" onClick={handleDelete}>
+      <EditorIconButton readOnly={isComputing} size="2xs" variant="ghost" flexShrink="0" onClick={handleDelete}>
         <PiTrash />
       </EditorIconButton>
     </HStack>

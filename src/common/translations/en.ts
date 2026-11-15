@@ -317,7 +317,6 @@ export const EN = {
               tooltip: 'Only available properties compatible with this constraint are listed.',
               placeholder: 'Field…',
             },
-            add: 'Add',
             noMatches: 'No matching fields or objects',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',

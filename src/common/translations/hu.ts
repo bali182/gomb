@@ -247,7 +247,6 @@ export const HU = {
               tooltip: 'Csak a kényszerhez illő, szabad tulajdonságok jelennek meg.',
               placeholder: 'Mező…',
             },
-            add: 'Hozzáad',
             noMatches: 'Nincs megfelelő mező vagy elem',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
           linkedAuto: 'A mező kényszerhez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
