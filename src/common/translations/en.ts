@@ -7,7 +7,7 @@ import type { ColorKey } from '../data/colors'
 import type {
   AnchorSchema,
   HasAutoCornerRadiusSchema,
-  HasCornerRadiusValuesSchema,
+  HasCornerRadiusSchema,
   HasName,
   HasOffAxisAnchor,
   HasSizeSchema,
@@ -356,7 +356,7 @@ export const EN = {
               label: 'Bottom-right corner',
               tooltip: 'Sets the radius of the bottom-right corner.',
             },
-          } satisfies SectionTranslationSchema<HasCornerRadiusValuesSchema & HasAutoCornerRadiusSchema>,
+          } satisfies SectionTranslationSchema<HasCornerRadiusSchema & HasAutoCornerRadiusSchema>,
           size: {
             title: 'Size',
             width: {

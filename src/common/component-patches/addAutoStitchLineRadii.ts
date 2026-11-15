@@ -1,4 +1,4 @@
-import { HasCornerRadiusValuesSchema } from '../schemas/common'
+import { HasCornerRadiusSchema } from '../schemas/common'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
@@ -21,7 +21,7 @@ export const addAutoStitchLineRadii = (
       stitchLine.id,
     ).autoComputedCornerRadius
 
-    const radius: HasCornerRadiusValuesSchema = {
+    const radius: HasCornerRadiusSchema = {
       bottomLeftRadius: bottomLeft.toNumber(),
       bottomRightRadius: bottomRight.toNumber(),
       topLeftRadius: topLeft.toNumber(),

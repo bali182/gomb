@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { applyResolution } from '../../logic/constraints/applyResolution'
 import { CORNER_RADIUS_FIELD_ORDER } from '../../logic/constraints/cornerRadiusConstraintUtils'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { ConstraintSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
@@ -30,7 +30,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const pair = (id: string, fields: readonly (keyof HasCornerRadiusValuesSchema)[]): ConstraintSchema => ({
+const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): ConstraintSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({ id: `${id}-${field}`, type: 'panel-constraint-field', modelId: 'panel', field })),
@@ -92,7 +92,7 @@ describe('setCornerRadiusConstraint', () => {
     expect(Object.values(result.constraints)[0].fields.map((field) => field.field)).toEqual(CORNER_RADIUS_FIELD_ORDER)
   })
 
-  const emptySelections: (readonly (keyof HasCornerRadiusValuesSchema)[])[] = [[], ['topLeftRadius']]
+  const emptySelections: (readonly (keyof HasCornerRadiusSchema)[])[] = [[], ['topLeftRadius']]
   it.each(emptySelections)('deletes the internal binding for selection %j', (...fields) => {
     const source = fixture({ radius: pair('radius', CORNER_RADIUS_FIELD_ORDER) })
     const snapshot = structuredClone(source)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { HasCornerRadiusValuesSchema } from '../schemas/common'
+import type { HasCornerRadiusSchema } from '../schemas/common'
 import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { comparators } from './comparators'
@@ -59,7 +59,7 @@ describe('constraint comparators', () => {
 })
 
 describe('input model comparators', () => {
-  const cornerFields: (keyof HasCornerRadiusValuesSchema)[] = [
+  const cornerFields: (keyof HasCornerRadiusSchema)[] = [
     'topLeftRadius',
     'topRightRadius',
     'bottomLeftRadius',

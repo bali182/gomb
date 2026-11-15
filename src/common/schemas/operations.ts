@@ -1,4 +1,4 @@
-import { FlipAxisSchema, HasCornerRadiusValuesSchema } from './common'
+import { FlipAxisSchema, HasCornerRadiusSchema } from './common'
 import { ComponentSchema } from './components'
 import { ConstraintSchema } from './constraints'
 import { ConstraintFieldInputSchema, ModelObjectFactorySchema, ReadonlyModelObjectFactorySchema } from './factory'
@@ -158,7 +158,7 @@ export type DeleteConstraintFieldParamsSchema = {
 
 export type SetCornerRadiusConstraintParamsSchema = {
   modelId: string
-  fields: readonly (keyof HasCornerRadiusValuesSchema)[]
+  fields: readonly (keyof HasCornerRadiusSchema)[]
 }
 
 export type SetDefaultPocketOpeningParamsSchema = {

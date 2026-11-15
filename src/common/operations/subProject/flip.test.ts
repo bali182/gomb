@@ -8,7 +8,7 @@ import { defaultStitchingSettings } from '../../defaultStates'
 import { calculatePocketBoundingBox } from '../../logic/calculatePocketBoundingBox'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
-import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusSchema } from '../../schemas/common'
 import type { LayoutOrientationSchema, PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
 import type { HoleSchema } from '../../schemas/hole'
@@ -77,13 +77,13 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layo
   })
 })
 
-const radii: HasCornerRadiusValuesSchema = {
+const radii: HasCornerRadiusSchema = {
   topLeftRadius: 1,
   topRightRadius: 2,
   bottomLeftRadius: 3,
   bottomRightRadius: 4,
 }
-const mirroredRadii: Record<FlipAxisSchema, HasCornerRadiusValuesSchema> = {
+const mirroredRadii: Record<FlipAxisSchema, HasCornerRadiusSchema> = {
   horizontal: { topLeftRadius: 2, topRightRadius: 1, bottomLeftRadius: 4, bottomRightRadius: 3 },
   vertical: { topLeftRadius: 3, topRightRadius: 4, bottomLeftRadius: 1, bottomRightRadius: 2 },
 }

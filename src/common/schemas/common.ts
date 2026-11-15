@@ -20,7 +20,7 @@ export type HasVersionSchema = {
 
 export type HasIdentitySchema = HasId & HasName
 
-export type HasCornerRadiusValuesSchema = {
+export type HasCornerRadiusSchema = {
   topLeftRadius: number
   topRightRadius: number
   bottomLeftRadius: number

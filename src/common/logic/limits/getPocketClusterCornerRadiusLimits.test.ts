@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { PocketOrientationSchema } from '../../schemas/components'
 import type { CornerRadiusSchema, RectSchema } from '../../schemas/geometry'
 import { d } from '../../testData'
@@ -16,7 +16,7 @@ const openingCorners: Record<PocketOrientationSchema, readonly (keyof CornerRadi
   right: ['topRight', 'bottomRight'],
 }
 
-const radiusFields: Record<keyof CornerRadiusSchema, keyof HasCornerRadiusValuesSchema> = {
+const radiusFields: Record<keyof CornerRadiusSchema, keyof HasCornerRadiusSchema> = {
   topLeft: 'topLeftRadius',
   topRight: 'topRightRadius',
   bottomLeft: 'bottomLeftRadius',

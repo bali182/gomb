@@ -4,7 +4,7 @@ import {
   STITCH_LINE_SIDE_AND_CORNER_ORDER,
   type StitchLineSideOrCornerField,
 } from '../../logic/stitching/stitchLineSidesAndCorners'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { CornerRadiusSchema } from '../../schemas/geometry'
 import type { CornerRadiusLimitsSchema } from '../../schemas/limits'
 import type {
@@ -30,7 +30,7 @@ export const getStitchLineOffsetCanonicalEndpoint = (
 
 export const getStitchLineOffsetCornerRadius = (
   autoCornerRadius: boolean,
-  value: HasCornerRadiusValuesSchema,
+  value: HasCornerRadiusSchema,
   autoComputedCornerRadius: CornerRadiusSchema | undefined,
   limits: CornerRadiusLimitsSchema | undefined,
 ): CornerRadiusSchema | undefined => {

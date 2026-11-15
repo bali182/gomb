@@ -1,7 +1,7 @@
 import {
   HasAutoCornerRadiusSchema,
   HasComponentTargetSchema,
-  HasCornerRadiusValuesSchema,
+  HasCornerRadiusSchema,
   HasIdentitySchema,
   HasTargetSchema,
   HasTypeSchema,
@@ -45,7 +45,7 @@ export type HasStitchDirectionSchema = {
 
 export type ComponentBoundsStitchLineOwnSchema = HasBasicOffsetsSchema &
   HasAutoCornerRadiusSchema &
-  HasCornerRadiusValuesSchema &
+  HasCornerRadiusSchema &
   HasStitchedCornersSchema &
   HasStitchedSidesSchema &
   HasCustomRenderTarget &

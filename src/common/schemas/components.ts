@@ -1,6 +1,6 @@
 import {
   AnchorSchema,
-  HasCornerRadiusValuesSchema,
+  HasCornerRadiusSchema,
   HasIdentitySchema,
   HasOffAxisAnchor,
   HasSizeSchema,
@@ -41,7 +41,7 @@ export type RootPanelSchema = HasTypeSchema<'root-panel'> &
   BaseComponentSchema &
   HasLayoutSchema &
   HasChildrenSchema &
-  HasCornerRadiusValuesSchema &
+  HasCornerRadiusSchema &
   HasSizeSchema
 
 /** A plain panel. Can have children (stuff placed on top of it) */
@@ -50,7 +50,7 @@ export type PanelSchema = HasTypeSchema<'panel'> &
   HasLayoutSchema &
   HasOffAxisAnchor &
   HasChildrenSchema &
-  HasCornerRadiusValuesSchema &
+  HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
   HasStretchSchema
 
@@ -64,7 +64,7 @@ export type FrontPocketSchema = HasTypeSchema<'front-pocket'> &
   BaseComponentSchema &
   HasChildrenSchema &
   HasLayoutSchema &
-  HasCornerRadiusValuesSchema &
+  HasCornerRadiusSchema &
   HasPocketOpeningSchema &
   HasPocketItemSchema
 
@@ -101,7 +101,7 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   BaseComponentSchema &
   HasChildrenSchema &
   HasOffAxisAnchor &
-  HasCornerRadiusValuesSchema &
+  HasCornerRadiusSchema &
   HasAutoDimensionsSchema &
   HasStretchSchema &
   PocketsSchema

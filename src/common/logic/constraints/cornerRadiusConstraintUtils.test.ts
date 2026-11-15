@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { PocketOrientationSchema } from '../../schemas/components'
 import type { ConstraintSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -16,7 +16,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const pair = (id: string, fields: readonly (keyof HasCornerRadiusValuesSchema)[]): ConstraintSchema => ({
+const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): ConstraintSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({ id: `${id}-${field}`, type: 'panel-constraint-field', modelId: 'panel', field })),
@@ -93,7 +93,7 @@ describe('getCornerRadiusConstraintState', () => {
   })
 
   const orientations: PocketOrientationSchema[] = ['up', 'down', 'left', 'right']
-  const expected: Record<PocketOrientationSchema, readonly (keyof HasCornerRadiusValuesSchema)[]> = {
+  const expected: Record<PocketOrientationSchema, readonly (keyof HasCornerRadiusSchema)[]> = {
     up: ['topLeftRadius', 'topRightRadius'],
     down: ['bottomLeftRadius', 'bottomRightRadius'],
     left: ['topLeftRadius', 'bottomLeftRadius'],

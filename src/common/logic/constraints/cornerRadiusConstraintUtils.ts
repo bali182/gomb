@@ -1,4 +1,4 @@
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { PocketOrientationSchema } from '../../schemas/components'
 import type { ConstraintSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -10,18 +10,18 @@ import { getConstraintFieldInputs } from './getConstraintFieldInputs'
 
 type CornerRadiusConstraintState = {
   constraint: ConstraintSchema | undefined
-  disabledFields: readonly (keyof HasCornerRadiusValuesSchema)[]
+  disabledFields: readonly (keyof HasCornerRadiusSchema)[]
   hasMultipleConstraints: boolean
 }
 
-export const CORNER_RADIUS_FIELD_ORDER: readonly (keyof HasCornerRadiusValuesSchema)[] = [
+export const CORNER_RADIUS_FIELD_ORDER: readonly (keyof HasCornerRadiusSchema)[] = [
   'topLeftRadius',
   'topRightRadius',
   'bottomLeftRadius',
   'bottomRightRadius',
 ]
 
-const OPENING_CORNERS: Record<PocketOrientationSchema, readonly (keyof HasCornerRadiusValuesSchema)[]> = {
+const OPENING_CORNERS: Record<PocketOrientationSchema, readonly (keyof HasCornerRadiusSchema)[]> = {
   up: ['topLeftRadius', 'topRightRadius'],
   down: ['bottomLeftRadius', 'bottomRightRadius'],
   left: ['topLeftRadius', 'bottomLeftRadius'],
@@ -45,7 +45,7 @@ export const getCornerRadiusConstraintState = (
     return undefined
   }
 
-  const disabledFields = new Set<keyof HasCornerRadiusValuesSchema>()
+  const disabledFields = new Set<keyof HasCornerRadiusSchema>()
   if (narrowers.is.pocketCluster(model)) {
     for (const field of OPENING_CORNERS[model.orientation]) {
       disabledFields.add(field)

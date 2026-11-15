@@ -9,7 +9,7 @@ import {
   getCornerRadiusConstraintState,
 } from '../../../logic/constraints/cornerRadiusConstraintUtils'
 import { portalRef } from '../../../portalRef'
-import type { HasCornerRadiusValuesSchema } from '../../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../../schemas/common'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorButton } from '../../common/EditorButton'
 import { Tooltip } from '../../common/Tooltip'
@@ -23,12 +23,12 @@ import {
 type RadiusBinderPopoverProps = {
   modelId: string
   onClose: () => void
-  disabledFields?: readonly (keyof HasCornerRadiusValuesSchema)[]
+  disabledFields?: readonly (keyof HasCornerRadiusSchema)[]
 }
 
 type RadiusBinderPart = {
   area: string
-  fields: readonly (keyof HasCornerRadiusValuesSchema)[]
+  fields: readonly (keyof HasCornerRadiusSchema)[]
   vertical: boolean
   cornerStyle?: SystemStyleObject
 }
@@ -37,7 +37,7 @@ type RadiusBinderPartButtonProps = {
   part: RadiusBinderPart
   disabled: boolean
   selected: boolean
-  onToggle: (fields: readonly (keyof HasCornerRadiusValuesSchema)[]) => void
+  onToggle: (fields: readonly (keyof HasCornerRadiusSchema)[]) => void
 }
 
 const RadiusBinderPartButton: FC<RadiusBinderPartButtonProps> = ({ part, disabled, selected, onToggle }) => {
@@ -114,7 +114,7 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
     () => (isDefined(subProject) ? getCornerRadiusConstraintState(subProject, modelId) : undefined),
     [subProject, modelId],
   )
-  const availableFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(
+  const availableFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(
     () =>
       isDefined(state)
         ? CORNER_RADIUS_FIELD_ORDER.filter(
@@ -124,7 +124,7 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
         : [],
     [state, disabledFields],
   )
-  const [selectedFields, setSelectedFields] = useState<readonly (keyof HasCornerRadiusValuesSchema)[]>(() =>
+  const [selectedFields, setSelectedFields] = useState<readonly (keyof HasCornerRadiusSchema)[]>(() =>
     CORNER_RADIUS_FIELD_ORDER.filter(
       (field) =>
         availableFields.includes(field) && state?.constraint?.fields.some((member) => member.field === field) === true,
@@ -135,7 +135,7 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
   const translations = t.project.editors.controls.radiusBinder
 
   const handleToggle = useCallback(
-    (fields: readonly (keyof HasCornerRadiusValuesSchema)[]): void => {
+    (fields: readonly (keyof HasCornerRadiusSchema)[]): void => {
       if (isComputing || fields.some((field) => !availableFields.includes(field))) {
         return
       }

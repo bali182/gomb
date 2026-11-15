@@ -10,7 +10,7 @@ import {
 } from './data/colors'
 import type {
   HasComponentReferenceSchema,
-  HasCornerRadiusValuesSchema,
+  HasCornerRadiusSchema,
   HasId,
   HasName,
   HasOffAxisAnchor,
@@ -75,7 +75,7 @@ export const defaultColorSettings: ColorSettingsSchema = {
   threadColor: threadColors.white,
 }
 
-export const defaultHasCornerRadius: HasCornerRadiusValuesSchema = {
+export const defaultHasCornerRadius: HasCornerRadiusSchema = {
   topLeftRadius: 0,
   bottomLeftRadius: 0,
   bottomRightRadius: 0,

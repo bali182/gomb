@@ -18,7 +18,7 @@ import {
   CORNER_RADIUS_FIELD_ORDER,
   getCornerRadiusConstraintState,
 } from '../../../logic/constraints/cornerRadiusConstraintUtils'
-import { HasAutoCornerRadiusSchema, HasCornerRadiusValuesSchema } from '../../../schemas/common'
+import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
 import { has } from '../../../utils/has'
@@ -37,15 +37,15 @@ import { RadiusBinderPopover } from './RadiusBinderPopover'
 const RADIUS_BINDER_POSITIONING: PopoverRootProps['positioning'] = { placement: 'bottom', gutter: 10 }
 const RADIUS_BINDER_TRIGGER_STYLE: SystemStyleObject = { bg: 'bg.emphasized' }
 
-type CornerRadiusSectionProps<T extends HasCornerRadiusValuesSchema & Partial<HasAutoCornerRadiusSchema>> = {
+type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
   modelId: string
-  disabledFields?: readonly (keyof HasCornerRadiusValuesSchema)[]
+  disabledFields?: readonly (keyof HasCornerRadiusSchema)[]
   editable: EditableSchema<T>
-  issues: IssuesSchema<HasCornerRadiusValuesSchema>
+  issues: IssuesSchema<HasCornerRadiusSchema>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function CornerRadiusSection<T extends HasCornerRadiusValuesSchema & Partial<HasAutoCornerRadiusSchema>>({
+export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>>({
   modelId,
   disabledFields,
   editable,
@@ -87,7 +87,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusValuesSchema & Part
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
 
   const radiusIssues = useMemo<readonly IssueSchema[]>(
-    () => getLabeledIssues<HasCornerRadiusValuesSchema>(issues, t.project.editors.sections.common.cornerRadius),
+    () => getLabeledIssues<HasCornerRadiusSchema>(issues, t.project.editors.sections.common.cornerRadius),
     [issues, t],
   )
 
@@ -102,7 +102,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusValuesSchema & Part
   )
 
   const handleRadiusChange = useCallback(
-    (key: keyof HasCornerRadiusValuesSchema): ((radius: string) => void) =>
+    (key: keyof HasCornerRadiusSchema): ((radius: string) => void) =>
       (radius: string): void => {
         onChange({ ...editable, [key]: radius })
       },
