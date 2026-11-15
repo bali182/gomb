@@ -54,9 +54,9 @@ describe('OpticalIllusionPocketCalculator', () => {
     'aligns every diagonal in the cluster for direction %s',
     (direction) => {
       const diagonals = [0, 1, 2].map((index) => {
-        const slope = getPathSegments(calculator({ ...opening, illusionSide: direction }, 80, index).getPocketOpeningPath()).find(
-          (segment) => !segment.start.y.eq(segment.end.y),
-        )
+        const slope = getPathSegments(
+          calculator({ ...opening, illusionSide: direction }, 80, index).getPocketOpeningPath(),
+        ).find((segment) => !segment.start.y.eq(segment.end.y))
         expect(slope).toBeDefined()
         if (slope === undefined) throw new Error('Missing diagonal')
         return [slope.start, slope.end].map((point) => ({
@@ -73,7 +73,9 @@ describe('OpticalIllusionPocketCalculator', () => {
   )
 
   it('allows independently configured pockets without changing their indices', () => {
-    const middle = points(calculator({ ...opening, illusionStartInset: 20, illusionEndInset: 20 }, 80, 1).getPocketOpeningPath())
+    const middle = points(
+      calculator({ ...opening, illusionStartInset: 20, illusionEndInset: 20 }, 80, 1).getPocketOpeningPath(),
+    )
     expect(middle).toEqual([
       [0, 15],
       [40, 15],
@@ -83,7 +85,12 @@ describe('OpticalIllusionPocketCalculator', () => {
   })
 
   it.each<PocketOpeningSideSchema>(['start', 'end'])('joins both radii tangentially for direction %s', (direction) => {
-    const path = calculator({ ...opening, illusionSide: direction, illusionLeadingRadius: 4, illusionTrailingRadius: 7 }).getPocketOpeningPath()
+    const path = calculator({
+      ...opening,
+      illusionSide: direction,
+      illusionLeadingRadius: 4,
+      illusionTrailingRadius: 7,
+    }).getPocketOpeningPath()
     const segments = getPathSegments(path)
     expect(
       segments
@@ -208,7 +215,10 @@ describe('OpticalIllusionPocketCalculator', () => {
       id: 'sub',
       root: d.rootPanel({ id: 'root', width: 150, height: 150, children: ['cluster'] }),
       components: [cluster, t, front],
-      pocketOpenings: [opening, { ...opening, id: 'rounded', name: 'Rounded', illusionLeadingRadius: 7, illusionTrailingRadius: 4 }],
+      pocketOpenings: [
+        opening,
+        { ...opening, id: 'rounded', name: 'Rounded', illusionLeadingRadius: 7, illusionTrailingRadius: 4 },
+      ],
       holes: [d.hole({ id: 'hole', componentId: 't', width: 2, height: 2 })],
       stitchLines: [d.tPocketStitchLine({ id: 'stitch', targetId: 't', targetType: 'component' })],
     })

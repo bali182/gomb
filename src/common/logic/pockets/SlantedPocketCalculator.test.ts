@@ -12,7 +12,13 @@ import { last } from '../../utils/last'
 import { getPathSegments } from '../pathSegments'
 import { createPocketCalculator } from './createPocketCalculator'
 
-const opening: SlantedPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'slanted', slantOffset: 15, slantSide: 'end' }
+const opening: SlantedPocketOpeningSchema = {
+  id: 'opening',
+  name: 'Opening',
+  type: 'slanted',
+  slantOffset: 15,
+  slantSide: 'end',
+}
 const rect: RectSchema = {
   x: new BigNumber(11),
   y: new BigNumber(17),
