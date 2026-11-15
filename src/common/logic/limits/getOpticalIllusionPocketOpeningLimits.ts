@@ -23,10 +23,10 @@ export const getOpticalIllusionPocketOpeningLimits = (
 
   const pocketCount = cluster.children.length
   const insetWidth = BigNumber.maximum(width.minus(new BigNumber(POSITION_EPSILON).times(pocketCount)), 0)
-  const startInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.endInset), insetWidth)
-  const endInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.startInset), insetWidth)
-  const adjustedStartInset = clamp(opening.startInset, 0, startInsetMaximum)
-  const adjustedEndInset = clamp(opening.endInset, 0, endInsetMaximum)
+  const startInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.illusionEndInset), insetWidth)
+  const endInsetMaximum = getSharedLengthMaximum(new BigNumber(opening.illusionStartInset), insetWidth)
+  const adjustedStartInset = clamp(opening.illusionStartInset, 0, startInsetMaximum)
+  const adjustedEndInset = clamp(opening.illusionEndInset, 0, endInsetMaximum)
 
   const openingHeight = BigNumber.minimum(cluster.pocketStep, depth)
   const pocketIndex = cluster.children.indexOf(pocket.id)
@@ -37,33 +37,33 @@ export const getOpticalIllusionPocketOpeningLimits = (
   const slantedLength = slantedWidth.pow(2).plus(openingHeight.pow(2)).sqrt()
   const halfAngleTangent = openingHeight.isZero() ? ZERO : openingHeight.dividedBy(slantedLength.plus(slantedWidth))
   const leadingTangentLength = clamp(
-    new BigNumber(opening.leadingRadius).times(halfAngleTangent),
+    new BigNumber(opening.illusionLeadingRadius).times(halfAngleTangent),
     0,
     BigNumber.maximum(leadingStraightLength, 0),
   )
   const trailingTangentLength = clamp(
-    new BigNumber(opening.trailingRadius).times(halfAngleTangent),
+    new BigNumber(opening.illusionTrailingRadius).times(halfAngleTangent),
     0,
     BigNumber.maximum(trailingStraightLength, 0),
   )
 
   return {
     type: 'optical-illusion',
-    startInset: {
+    illusionStartInset: {
       max: {
         value: startInsetMaximum,
         reason: 'optical-illusion-pocket-opening-insets-share-width',
         severity: 'warning',
       },
     },
-    endInset: {
+    illusionEndInset: {
       max: {
         value: endInsetMaximum,
         reason: 'optical-illusion-pocket-opening-insets-share-width',
         severity: 'warning',
       },
     },
-    leadingRadius: {
+    illusionLeadingRadius: {
       max: getRadiusLimit(
         leadingStraightLength,
         slantedLength,
@@ -72,7 +72,7 @@ export const getOpticalIllusionPocketOpeningLimits = (
         'optical-illusion-pocket-opening-radius-exceeds-leading-length',
       ),
     },
-    trailingRadius: {
+    illusionTrailingRadius: {
       max: getRadiusLimit(
         trailingStraightLength,
         slantedLength,

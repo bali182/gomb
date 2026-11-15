@@ -30,14 +30,14 @@ export const SlantedPocketOpeningEditor: FC<SlantedPocketOpeningEditorProps> = (
 
   const handleOffsetChange = useCallback(
     (offset: string): void => {
-      onChange({ ...editable, offset })
+      onChange({ ...editable, slantOffset: offset })
     },
     [editable, onChange],
   )
 
   const handleSideChange = useCallback(
     (side: PocketOpeningSideSchema): void => {
-      onChange({ ...editable, side })
+      onChange({ ...editable, slantSide: side })
     },
     [editable, onChange],
   )
@@ -50,24 +50,24 @@ export const SlantedPocketOpeningEditor: FC<SlantedPocketOpeningEditorProps> = (
           {t.project.editors.sections.components.slantedPocketOpening.geometry.title}
         </SectionGroup.SectionHeader>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.slantedPocketOpening.geometry.side.tooltip}
+          tooltip={t.project.editors.sections.components.slantedPocketOpening.geometry.slantSide.tooltip}
         >
-          {t.project.editors.sections.components.slantedPocketOpening.geometry.side.label}
+          {t.project.editors.sections.components.slantedPocketOpening.geometry.slantSide.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.side}>
-          <PocketOpeningSideSelect value={editable.side} issue={issues.side} onChange={handleSideChange} />
+        <SectionGroup.SectionRowEditor issue={issues.slantSide}>
+          <PocketOpeningSideSelect value={editable.slantSide} issue={issues.slantSide} onChange={handleSideChange} />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.slantedPocketOpening.geometry.offset.tooltip}
+          tooltip={t.project.editors.sections.components.slantedPocketOpening.geometry.slantOffset.tooltip}
         >
-          {t.project.editors.sections.components.slantedPocketOpening.geometry.offset.label}
+          {t.project.editors.sections.components.slantedPocketOpening.geometry.slantOffset.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.offset}>
+        <SectionGroup.SectionRowEditor issue={issues.slantOffset}>
           <EditorNumberInput
             modelId={editable.id}
             field="offset"
-            value={editable.offset}
-            issue={issues.offset}
+            value={editable.slantOffset}
+            issue={issues.slantOffset}
             onChange={handleOffsetChange}
             unit="mm"
           />

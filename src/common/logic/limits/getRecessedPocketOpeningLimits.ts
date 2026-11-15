@@ -36,14 +36,14 @@ export const getRecessedPocketOpeningLimits = (
   }
   const adjusted: RecessedPocketOpeningSchema = {
     ...opening,
-    innerOffset: clamp(opening.innerOffset, 0, innerOffsetMaximum.value).toNumber(),
+    recessInnerOffset: clamp(opening.recessInnerOffset, 0, innerOffsetMaximum.value).toNumber(),
   }
   const outerInsetMaximum: NumericBoundSchema = {
-    value: halfWidth.minus(adjusted.innerOffset),
+    value: halfWidth.minus(adjusted.recessInnerOffset),
     reason: 'pocket-opening-width',
     severity: 'warning',
   }
-  adjusted.outerInset = clamp(opening.outerInset, 0, outerInsetMaximum.value).toNumber()
+  adjusted.recessOuterInset = clamp(opening.recessOuterInset, 0, outerInsetMaximum.value).toNumber()
 
   let depthMaximum: NumericBoundSchema
   if (narrowers.is.computedFrontPocket(computedPocket)) {
@@ -55,22 +55,20 @@ export const getRecessedPocketOpeningLimits = (
   }
   const limits: RecessedPocketOpeningLimitsSchema = {
     type: 'recessed',
-    innerOffset: { max: innerOffsetMaximum },
-    outerInset: {
-      max: outerInsetMaximum,
-    },
-    depth: { max: depthMaximum },
+    recessInnerOffset: { max: innerOffsetMaximum },
+    recessOuterInset: { max: outerInsetMaximum },
+    recessDepth: { max: depthMaximum },
   }
-  adjusted.depth = clamp(opening.depth, 0, depthMaximum.value).toNumber()
-  if (adjusted.depth === 0) {
+  adjusted.recessDepth = clamp(opening.recessDepth, 0, depthMaximum.value).toNumber()
+  if (adjusted.recessDepth === 0) {
     return limits
   }
 
   const innerRadiusMaximum = getInnerRadiusMaximum(adjusted, width)
-  limits.innerRadius = { max: innerRadiusMaximum }
-  adjusted.innerRadius = clamp(opening.innerRadius, 0, innerRadiusMaximum.value).toNumber()
+  limits.recessInnerRadius = { max: innerRadiusMaximum }
+  adjusted.recessInnerRadius = clamp(opening.recessInnerRadius, 0, innerRadiusMaximum.value).toNumber()
 
-  limits.outerRadius = { max: getOuterRadiusMaximum(adjusted, computedPocket, pocketCluster, sourcePocket) }
+  limits.recessOuterRadius = { max: getOuterRadiusMaximum(adjusted, computedPocket, pocketCluster, sourcePocket) }
   return limits
 }
 
@@ -82,7 +80,7 @@ const getFrontPocketDepthMaximum = (
   const isVertical = orientation === 'up' || orientation === 'down'
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
   const pocketDepth = isVertical ? pocket.boundingRect.height : pocket.boundingRect.width
-  const innerCornerX = width.dividedBy(2).minus(opening.innerOffset)
+  const innerCornerX = width.dividedBy(2).minus(opening.recessInnerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
     reason: 'pocket-opening-depth',
@@ -130,7 +128,7 @@ const getTPocketDepthMaximum = (
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)
   const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
   const taper = new BigNumber(sourcePocket.tPocketTaper).plus(POSITION_EPSILON)
-  const innerCornerX = width.dividedBy(2).minus(opening.innerOffset)
+  const innerCornerX = width.dividedBy(2).minus(opening.recessInnerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
     reason: 'pocket-opening-depth',
@@ -144,11 +142,11 @@ const getTPocketDepthMaximum = (
   // clear the shoulder endpoint and its bottom corner must clear the tapered edge.
   let boundaryMaximum = maximum.value
   const aboveShoulderMaximum = BigNumber.maximum(tabDepth.minus(POSITION_EPSILON), 0)
-  if (tabWidth.isGreaterThan(opening.outerInset)) {
+  if (tabWidth.isGreaterThan(opening.recessOuterInset)) {
     const shoulderMaximum = innerCornerX
-      .minus(opening.outerInset)
+      .minus(opening.recessOuterInset)
       .times(tabDepth)
-      .dividedBy(tabWidth.minus(opening.outerInset))
+      .dividedBy(tabWidth.minus(opening.recessOuterInset))
     boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, shoulderMaximum))
   }
   if (taper.isGreaterThan(tabWidth)) {
@@ -164,12 +162,12 @@ const getTPocketDepthMaximum = (
 }
 
 const getInnerRadiusMaximum = (opening: RecessedPocketOpeningSchema, openingWidth: BigNumber): NumericBoundSchema => {
-  const horizontalDistance = openingWidth.dividedBy(2).minus(opening.innerOffset).minus(opening.outerInset)
-  const depth = new BigNumber(opening.depth)
+  const horizontalDistance = openingWidth.dividedBy(2).minus(opening.recessInnerOffset).minus(opening.recessOuterInset)
+  const depth = new BigNumber(opening.recessDepth)
   const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
   return {
-    value: new BigNumber(opening.innerOffset).dividedBy(angleFactor),
+    value: new BigNumber(opening.recessInnerOffset).dividedBy(angleFactor),
     reason: 'pocket-opening-width',
     severity: 'warning',
   }
@@ -183,19 +181,19 @@ const getOuterRadiusMaximum = (
 ): NumericBoundSchema => {
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
-  const horizontalDistance = width.dividedBy(2).minus(opening.innerOffset).minus(opening.outerInset)
-  const depth = new BigNumber(opening.depth)
+  const horizontalDistance = width.dividedBy(2).minus(opening.recessInnerOffset).minus(opening.recessOuterInset)
+  const depth = new BigNumber(opening.recessDepth)
   const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
-  const availableTop = new BigNumber(opening.outerInset)
+  const availableTop = new BigNumber(opening.recessOuterInset)
   const separatedMaximum = availableTop.dividedBy(angleFactor)
   const innerEndX = width
     .dividedBy(2)
-    .minus(opening.innerOffset)
-    .plus(new BigNumber(opening.innerRadius).times(angleFactor))
+    .minus(opening.recessInnerOffset)
+    .plus(new BigNumber(opening.recessInnerRadius).times(angleFactor))
   let upperBound = separatedMaximum
-  if (separatedMaximum.plus(opening.innerRadius).times(angleFactor).isGreaterThan(sideLength)) {
-    upperBound = innerEndX.pow(2).plus(depth.pow(2)).dividedBy(depth.times(2)).minus(opening.innerRadius)
+  if (separatedMaximum.plus(opening.recessInnerRadius).times(angleFactor).isGreaterThan(sideLength)) {
+    upperBound = innerEndX.pow(2).plus(depth.pow(2)).dividedBy(depth.times(2)).minus(opening.recessInnerRadius)
   }
   upperBound = BigNumber.maximum(upperBound, 0)
   const maximum: NumericBoundSchema = { value: upperBound, reason: 'pocket-opening-width', severity: 'warning' }
@@ -208,9 +206,11 @@ const getOuterRadiusMaximum = (
   }
   const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
   if (
-    getOuterTransitionX({ ...opening, outerRadius: upperBound.toNumber() }, width, tabDepth).isGreaterThanOrEqualTo(
-      tabWidth,
-    )
+    getOuterTransitionX(
+      { ...opening, recessOuterRadius: upperBound.toNumber() },
+      width,
+      tabDepth,
+    ).isGreaterThanOrEqualTo(tabWidth)
   ) {
     return maximum
   }
@@ -220,7 +220,7 @@ const getOuterRadiusMaximum = (
   let lowerBound = new BigNumber(0)
   while (upperBound.minus(lowerBound).isGreaterThan(OUTER_RADIUS_SEARCH_PRECISION)) {
     const candidate = upperBound.plus(lowerBound).dividedBy(2)
-    const candidateOpening: RecessedPocketOpeningSchema = { ...opening, outerRadius: candidate.toNumber() }
+    const candidateOpening: RecessedPocketOpeningSchema = { ...opening, recessOuterRadius: candidate.toNumber() }
     if (getOuterTransitionX(candidateOpening, width, tabDepth).isGreaterThanOrEqualTo(tabWidth)) {
       lowerBound = candidate
     } else {
@@ -236,26 +236,28 @@ const getOuterTransitionX = (
   openingWidth: BigNumber,
   distanceFromOpening: BigNumber,
 ): BigNumber => {
-  const depth = new BigNumber(opening.depth)
-  const horizontalDistance = openingWidth.dividedBy(2).minus(opening.innerOffset).minus(opening.outerInset)
+  const depth = new BigNumber(opening.recessDepth)
+  const horizontalDistance = openingWidth.dividedBy(2).minus(opening.recessInnerOffset).minus(opening.recessOuterInset)
   const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
   const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
-  const outerRadius = new BigNumber(opening.outerRadius)
-  const innerRadius = new BigNumber(opening.innerRadius)
-  const innerEndX = openingWidth.dividedBy(2).minus(opening.innerOffset).plus(innerRadius.times(angleFactor))
+  const outerRadius = new BigNumber(opening.recessOuterRadius)
+  const innerRadius = new BigNumber(opening.recessInnerRadius)
+  const innerEndX = openingWidth.dividedBy(2).minus(opening.recessInnerOffset).plus(innerRadius.times(angleFactor))
   const remainingDepth = depth.minus(distanceFromOpening)
   let outerStartX: BigNumber
   let outerEndDepth: BigNumber
 
   if (outerRadius.plus(innerRadius).times(angleFactor).isLessThan(sideLength)) {
     const oneMinusCosine = angleFactor.pow(2).times(2).dividedBy(angleFactor.pow(2).plus(1))
-    outerStartX = new BigNumber(opening.outerInset).minus(outerRadius.times(angleFactor))
+    outerStartX = new BigNumber(opening.recessOuterInset).minus(outerRadius.times(angleFactor))
     outerEndDepth = outerRadius.times(oneMinusCosine)
     if (
       distanceFromOpening.isGreaterThanOrEqualTo(outerEndDepth) &&
       remainingDepth.isGreaterThan(innerRadius.times(oneMinusCosine))
     ) {
-      return new BigNumber(opening.outerInset).plus(horizontalDistance.times(distanceFromOpening).dividedBy(depth))
+      return new BigNumber(opening.recessOuterInset).plus(
+        horizontalDistance.times(distanceFromOpening).dividedBy(depth),
+      )
     }
   } else {
     const radiusSum = outerRadius.plus(innerRadius)

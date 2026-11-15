@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type { FrontPocketSchema, PocketOrientationSchema, TPocketSchema } from '../../schemas/components'
+import type { RecessedPocketOpeningLimitsReasonSchema } from '../../schemas/limits'
 import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { narrowers } from '../../utils/narrowers'
@@ -13,6 +14,13 @@ import type { LinePathSegment } from '../pathSegmentTypes'
 import { createPocketCalculator } from '../pockets/createPocketCalculator'
 import { getRecessedPocketOpeningLimits } from './getRecessedPocketOpeningLimits'
 
+type RecessDepthTestCase = [
+  opening: Partial<RecessedPocketOpeningSchema>,
+  shape: Partial<TPocketSchema>,
+  value: number,
+  reason: RecessedPocketOpeningLimitsReasonSchema,
+]
+
 const createFixture = (
   overrides: Partial<RecessedPocketOpeningSchema> = {},
   tOverrides: Partial<TPocketSchema> = {},
@@ -23,11 +31,11 @@ const createFixture = (
     id: 'opening',
     name: 'Opening',
     type: 'recessed',
-    outerInset: 35,
-    innerOffset: 15,
-    depth: 15,
-    outerRadius: 5,
-    innerRadius: 15,
+    recessOuterInset: 35,
+    recessInnerOffset: 15,
+    recessDepth: 15,
+    recessOuterRadius: 5,
+    recessInnerRadius: 15,
     ...overrides,
   }
   const pocket = d.tPocket({ id: 't', openingId: opening.id, ...tOverrides })
@@ -59,40 +67,45 @@ const createFixture = (
 }
 describe('getRecessedPocketOpeningLimits', () => {
   it('preserves the inner offset and bounds the outer inset', () => {
-    const { limits } = createFixture({ outerInset: 45, innerOffset: 15 })
-    expect(limits.outerInset?.max?.value.toNumber()).toBe(35)
-    expect(limits.innerOffset?.max?.value.toNumber()).toBe(50)
+    const { limits } = createFixture({ recessOuterInset: 45, recessInnerOffset: 15 })
+    expect(limits.recessOuterInset?.max?.value.toNumber()).toBe(35)
+    expect(limits.recessInnerOffset?.max?.value.toNumber()).toBe(50)
   })
-  it.each([
-    [{ depth: 100 }, {}, 79, 'pocket-opening-depth'],
-    [{ outerInset: 10, innerOffset: 35, depth: 30 }, { tPocketTabWidth: 20 }, 10, 'pocket-opening-boundary'],
+  it.each<RecessDepthTestCase>([
+    [{ recessDepth: 100 }, {}, 79, 'pocket-opening-depth'],
     [
-      { outerInset: 10, innerOffset: 15, depth: 40 },
+      { recessOuterInset: 10, recessInnerOffset: 35, recessDepth: 30 },
+      { tPocketTabWidth: 20 },
+      10,
+      'pocket-opening-boundary',
+    ],
+    [
+      { recessOuterInset: 10, recessInnerOffset: 15, recessDepth: 40 },
       { tPocketTabWidth: 20, tPocketTaper: 20 },
       25,
       'pocket-opening-boundary',
     ],
     [
-      { outerInset: 20, innerOffset: 25, depth: 60 },
+      { recessOuterInset: 20, recessInnerOffset: 25, recessDepth: 60 },
       { tPocketTabWidth: 10, tPocketTaper: 40 },
       45,
       'pocket-opening-boundary',
     ],
-  ] as const)('bounds recess depth for %o', (opening, shape, value, reason) => {
+  ])('bounds recess depth for %o', (opening, shape, value, reason) => {
     const { limits } = createFixture(opening, shape)
-    expect(limits.depth?.max?.value.toNumber()).toBeCloseTo(value, 7)
-    expect(limits.depth?.max?.reason).toBe(reason)
+    expect(limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(value, 7)
+    expect(limits.recessDepth?.max?.reason).toBe(reason)
   })
   it('respects the actual front pocket closed corners', () => {
-    const { limits } = createFixture({ outerInset: 5, innerOffset: 40, depth: 100 }, {}, 'up', {
+    const { limits } = createFixture({ recessOuterInset: 5, recessInnerOffset: 40, recessDepth: 100 }, {}, 'up', {
       bottomLeftRadius: 40,
       bottomRightRadius: 30,
     })
-    expect(limits.depth?.max?.value.toNumber()).toBeCloseTo(60 + Math.sqrt(700), 7)
+    expect(limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(60 + Math.sqrt(700), 7)
   })
   it('leaves material between an unrounded recess and the T-pocket shoulder', () => {
     const { opening, source, cluster, computed, limits } = createFixture(
-      { outerInset: 10, innerOffset: 15, depth: 40, innerRadius: 0, outerRadius: 0 },
+      { recessOuterInset: 10, recessInnerOffset: 15, recessDepth: 40, recessInnerRadius: 0, recessOuterRadius: 0 },
       { tPocketTabWidth: 20, tPocketTaper: 20 },
     )
     const path = createPocketCalculator(
@@ -117,42 +130,50 @@ describe('getRecessedPocketOpeningLimits', () => {
 
   it('leaves material between the recess bottom and the tapered side', () => {
     const { opening, limits } = createFixture(
-      { outerInset: 20, innerOffset: 25, depth: 60, innerRadius: 0, outerRadius: 0 },
+      { recessOuterInset: 20, recessInnerOffset: 25, recessDepth: 60, recessInnerRadius: 0, recessOuterRadius: 0 },
       { tPocketTabWidth: 10, tPocketTaper: 40 },
     )
     const adjusted = getAdjustedPocketOpening(opening, limits)
     if (!narrowers.is.recessedPocketOpening(adjusted)) {
       throw new Error('Expected a recessed opening')
     }
-    const sideX = new BigNumber(adjusted.depth).minus(10).times(30).dividedBy(70).plus(10)
+    const sideX = new BigNumber(adjusted.recessDepth).minus(10).times(30).dividedBy(70).plus(10)
     const clearance = new BigNumber(25).minus(sideX)
     expect(clearance.gt(0)).toBe(true)
     expect(clearance.toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
   })
   it.each([0, 5, 30, 100])('keeps the R15 inner circle with outer radius %s', (outerRadius) => {
-    const { opening, limits } = createFixture({ outerRadius })
-    expect(getAdjustedPocketOpening(opening, limits)).toMatchObject({ innerRadius: 15 })
+    const { opening, limits } = createFixture({ recessOuterRadius: outerRadius })
+    const adjusted = getAdjustedPocketOpening(opening, limits)
+    if (!narrowers.is.recessedPocketOpening(adjusted)) {
+      throw new Error('Expected a recessed opening')
+    }
+    expect(adjusted.recessInnerRadius).toBe(15)
   })
   it('finds an outer radius that clears the actual T-pocket shoulder', () => {
     const { limits, opening } = createFixture(
-      { outerInset: 40, innerOffset: 10, depth: 25, innerRadius: 7, outerRadius: 50 },
+      { recessOuterInset: 40, recessInnerOffset: 10, recessDepth: 25, recessInnerRadius: 7, recessOuterRadius: 50 },
       { tPocketTabWidth: 39, tPocketTaper: 10 },
     )
-    expect(limits.outerRadius?.max?.reason).toBe('pocket-opening-boundary')
-    expect(limits.outerRadius?.max?.value.toNumber()).toBeGreaterThan(0)
-    expect(limits.outerRadius?.max?.value.toNumber()).toBeLessThan(50)
-    expect(getAdjustedPocketOpening(opening, limits)).toMatchObject({ innerRadius: 7 })
+    expect(limits.recessOuterRadius?.max?.reason).toBe('pocket-opening-boundary')
+    expect(limits.recessOuterRadius?.max?.value.toNumber()).toBeGreaterThan(0)
+    expect(limits.recessOuterRadius?.max?.value.toNumber()).toBeLessThan(50)
+    const adjusted = getAdjustedPocketOpening(opening, limits)
+    if (!narrowers.is.recessedPocketOpening(adjusted)) {
+      throw new Error('Expected a recessed opening')
+    }
+    expect(adjusted.recessInnerRadius).toBe(7)
   })
   it('does not constrain radii at zero depth', () => {
-    const { limits } = createFixture({ depth: 0, innerRadius: 100, outerRadius: 200 })
-    expect(limits.innerRadius).toBeUndefined()
-    expect(limits.outerRadius).toBeUndefined()
+    const { limits } = createFixture({ recessDepth: 0, recessInnerRadius: 100, recessOuterRadius: 200 })
+    expect(limits.recessInnerRadius).toBeUndefined()
+    expect(limits.recessOuterRadius).toBeUndefined()
   })
   it.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     'keeps corrected arcs from crossing facing %s',
     (orientation) => {
       const { opening, source, cluster, computed, limits } = createFixture(
-        { outerInset: 42, innerOffset: 8, depth: 10, outerRadius: 55, innerRadius: 39 },
+        { recessOuterInset: 42, recessInnerOffset: 8, recessDepth: 10, recessOuterRadius: 55, recessInnerRadius: 39 },
         {},
         orientation,
       )

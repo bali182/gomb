@@ -238,7 +238,7 @@ const cases: FactoryCaseSchema[] = [
         forbiddenIds: params.forbiddenIds,
         type: 'recessed-constraint-field',
         modelId: 'model',
-        field: 'depth',
+        field: 'recessDepth',
       }),
   },
   {
@@ -250,7 +250,7 @@ const cases: FactoryCaseSchema[] = [
         forbiddenIds: params.forbiddenIds,
         type: 'slanted-constraint-field',
         modelId: 'model',
-        field: 'side',
+        field: 'slantSide',
       }),
   },
   {
@@ -262,7 +262,7 @@ const cases: FactoryCaseSchema[] = [
         forbiddenIds: params.forbiddenIds,
         type: 'optical-illusion-constraint-field',
         modelId: 'model',
-        field: 'direction',
+        field: 'illusionSide',
       }),
   },
   {
@@ -461,9 +461,9 @@ describe('ReadonlyModelObjectFactory', () => {
     { id: 'unused', type: 'front-pocket-constraint-field', modelId: 'model', field: 'openingId' },
     { id: 'unused', type: 't-pocket-constraint-field', modelId: 'model', field: 'itemId' },
     { id: 'unused', type: 'hole-constraint-field', modelId: 'model', field: 'xOffset' },
-    { id: 'unused', type: 'recessed-constraint-field', modelId: 'model', field: 'depth' },
-    { id: 'unused', type: 'slanted-constraint-field', modelId: 'model', field: 'side' },
-    { id: 'unused', type: 'optical-illusion-constraint-field', modelId: 'model', field: 'direction' },
+    { id: 'unused', type: 'recessed-constraint-field', modelId: 'model', field: 'recessDepth' },
+    { id: 'unused', type: 'slanted-constraint-field', modelId: 'model', field: 'slantSide' },
+    { id: 'unused', type: 'optical-illusion-constraint-field', modelId: 'model', field: 'illusionSide' },
     { id: 'unused', type: 'component-bounds-stitch-line-constraint-field', modelId: 'model', field: 'onTop' },
     { id: 'unused', type: 't-pocket-stitch-line-constraint-field', modelId: 'model', field: 'stitchMargin' },
   ]

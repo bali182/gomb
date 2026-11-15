@@ -12,8 +12,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('slanted
     id: 'opening',
     name: 'Opening',
     type: 'slanted',
-    offset: 15,
-    side: 'end',
+    slantOffset: 15,
+    slantSide: 'end',
   }
   it('reserves the shoulder of this T-pocket only', () => {
     const source = d.tPocket({ id: 't', openingId: opening.id })
@@ -27,7 +27,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('slanted
       ZERO_CORNER_RADIUS,
       d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }), components: pockets, pocketOpenings: [opening] }),
     ).children[0]
-    const limit = getSlantedPocketOpeningLimits(opening, source, cluster, computed).offset?.max
+    const limit = getSlantedPocketOpeningLimits(opening, source, cluster, computed).slantOffset?.max
     expect(limit?.value.toNumber()).toBe(80)
     expect(limit?.reason).toBe('slanted-pocket-opening-offset-exceeds-pocket')
   })
@@ -59,7 +59,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('slanted
       getSlantedPocketOpeningLimits(selected, source, cluster, {
         ...computed,
         cornerRadius: radii,
-      }).offset?.max?.value.toNumber(),
+      }).slantOffset?.max?.value.toNumber(),
     ).toBe(expected[orientation][side === 'start' ? 0 : 1])
   })
 })

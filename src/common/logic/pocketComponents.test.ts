@@ -21,11 +21,11 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         id: 'opening',
         name: 'Opening',
         type: 'optical-illusion',
-        direction: 'start',
-        startInset: 100,
-        endInset: 0,
-        leadingRadius: 0,
-        trailingRadius: 0,
+        illusionSide: 'start',
+        illusionStartInset: 100,
+        illusionEndInset: 0,
+        illusionLeadingRadius: 0,
+        illusionTrailingRadius: 0,
       }
       const front = d.frontPocket({ id: 'front', openingId: opening.id })
       const cluster = d.pocketCluster({ id: 'cluster', orientation, children: [front.id], pocketStep: 80 })
@@ -57,8 +57,8 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         id: 'opening',
         name: 'Opening',
         type: 'slanted',
-        offset,
-        side: 'end',
+        slantOffset: offset,
+        slantSide: 'end',
       }
       const pockets = [
         d.tPocket({ id: 't1', openingId: opening.id, tPocketTabWidth: 10, tPocketTaper: 35 }),

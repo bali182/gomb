@@ -13,21 +13,21 @@ const opening: RecessedPocketOpeningSchema = {
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
-  outerInset: 5,
-  innerOffset: 25,
-  depth: 100,
-  outerRadius: 60,
-  innerRadius: 15,
+  recessOuterInset: 5,
+  recessInnerOffset: 25,
+  recessDepth: 100,
+  recessOuterRadius: 60,
+  recessInnerRadius: 15,
 }
 const limits: RecessedPocketOpeningLimitsSchema = {
   type: 'recessed',
-  outerInset: {
+  recessOuterInset: {
     min: { value: new BigNumber(10), reason: 'pocket-opening-width', severity: 'warning' },
     max: { value: new BigNumber(30), reason: 'pocket-opening-width', severity: 'warning' },
   },
-  innerOffset: { max: { value: new BigNumber(20), reason: 'pocket-opening-width', severity: 'warning' } },
-  depth: { max: { value: new BigNumber(79), reason: 'pocket-opening-depth', severity: 'warning' } },
-  outerRadius: { max: { value: new BigNumber(50), reason: 'pocket-opening-width', severity: 'warning' } },
+  recessInnerOffset: { max: { value: new BigNumber(20), reason: 'pocket-opening-width', severity: 'warning' } },
+  recessDepth: { max: { value: new BigNumber(79), reason: 'pocket-opening-depth', severity: 'warning' } },
+  recessOuterRadius: { max: { value: new BigNumber(50), reason: 'pocket-opening-width', severity: 'warning' } },
 }
 
 describe('getAdjustedPocketOpening', () => {
@@ -55,7 +55,7 @@ describe('getAdjustedPocketOpening', () => {
   })
 
   it('applies the outer inset maximum without changing the inner radius', () => {
-    expect(getAdjustedPocketOpening({ ...opening, outerInset: 90 }, limits)).toEqual({
+    expect(getAdjustedPocketOpening({ ...opening, recessOuterInset: 90 }, limits)).toEqual({
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
@@ -72,11 +72,11 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
-      outerInset: 20,
-      innerOffset: 15,
-      depth: 10,
-      outerRadius: 5,
-      innerRadius: 15,
+      recessOuterInset: 20,
+      recessInnerOffset: 15,
+      recessDepth: 10,
+      recessOuterRadius: 5,
+      recessInnerRadius: 15,
     }
     expect(getAdjustedPocketOpening(requested, limits)).toEqual(requested)
   })
@@ -95,24 +95,27 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'slanted',
-      offset: 90,
-      side: 'start',
+      slantOffset: 90,
+      slantSide: 'start',
     }
     const bound = {
       value: new BigNumber(20),
       reason: 'slanted-pocket-opening-offset-exceeds-pocket',
       severity: 'warning',
     } as const
-    expect(getAdjustedPocketOpening(slanted, { type: 'slanted', offset: { max: bound } })).toEqual({
+    expect(getAdjustedPocketOpening(slanted, { type: 'slanted', slantOffset: { max: bound } })).toEqual({
       ...slanted,
       offset: 20,
     })
     expect(getAdjustedPocketOpening(slanted, { type: 'slanted' })).toEqual(slanted)
     expect(
-      getAdjustedPocketOpening(slanted, { type: 'slanted', offset: { max: { ...bound, value: new BigNumber(0) } } }),
+      getAdjustedPocketOpening(slanted, {
+        type: 'slanted',
+        slantOffset: { max: { ...bound, value: new BigNumber(0) } },
+      }),
     ).toEqual({ ...slanted, offset: 0 })
     expect(getAdjustedPocketOpening(slanted, { type: 'straight' })).toBe(slanted)
-    expect(slanted.offset).toBe(90)
+    expect(slanted.slantOffset).toBe(90)
   })
 })
 
@@ -121,11 +124,11 @@ it('bounds optical illusion fields without changing its type or requested values
     id: 'opening',
     name: 'Opening',
     type: 'optical-illusion',
-    direction: 'start',
-    startInset: 70,
-    endInset: 80,
-    leadingRadius: 99,
-    trailingRadius: 99,
+    illusionSide: 'start',
+    illusionStartInset: 70,
+    illusionEndInset: 80,
+    illusionLeadingRadius: 99,
+    illusionTrailingRadius: 99,
   }
   const bound = {
     value: new BigNumber(50),
@@ -136,10 +139,10 @@ it('bounds optical illusion fields without changing its type or requested values
   expect(
     getAdjustedPocketOpening(requested, {
       type: 'optical-illusion',
-      startInset: { max: bound },
-      endInset: { max: bound },
-      leadingRadius: { max: { ...bound, value: new BigNumber(4) } },
-      trailingRadius: { max: { ...bound, value: new BigNumber(7) } },
+      illusionStartInset: { max: bound },
+      illusionEndInset: { max: bound },
+      illusionLeadingRadius: { max: { ...bound, value: new BigNumber(4) } },
+      illusionTrailingRadius: { max: { ...bound, value: new BigNumber(7) } },
     }),
   ).toEqual({ ...requested, startInset: 50, endInset: 50, leadingRadius: 4, trailingRadius: 7 })
   expect(requested).toEqual(snapshot)

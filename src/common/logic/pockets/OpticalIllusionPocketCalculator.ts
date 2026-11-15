@@ -28,13 +28,13 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
     if (count === 0 || index < 0) {
       throw new Error('Optical illusion pocket must belong to its cluster')
     }
-    const run = this.width.minus(this.opening.startInset).minus(this.opening.endInset).dividedBy(count)
-    const leadingX = new BigNumber(this.opening.startInset).plus(run.times(count - 1 - index))
+    const run = this.width.minus(this.opening.illusionStartInset).minus(this.opening.illusionEndInset).dividedBy(count)
+    const leadingX = new BigNumber(this.opening.illusionStartInset).plus(run.times(count - 1 - index))
     const trailingX = leadingX.plus(run)
     const length = run.pow(2).plus(height.pow(2)).sqrt()
     const factor = height.dividedBy(length.plus(run))
-    const leadingRadius = new BigNumber(this.opening.leadingRadius)
-    const trailingRadius = new BigNumber(this.opening.trailingRadius)
+    const leadingRadius = new BigNumber(this.opening.illusionLeadingRadius)
+    const trailingRadius = new BigNumber(this.opening.illusionTrailingRadius)
     const leadingTrim = leadingRadius.times(factor)
     const trailingTrim = trailingRadius.times(factor)
     const unitX = run.dividedBy(length)
@@ -66,7 +66,7 @@ export class OpticalIllusionPocketCalculator extends PocketCalculator<OpticalIll
     }
     this.appendLine(commands, { x: this.width, y: ZERO })
     const path = { commands }
-    return this.opening.direction === 'start' ? path : this.reflectOpening(path)
+    return this.opening.illusionSide === 'start' ? path : this.reflectOpening(path)
   }
 
   getTPocketPath(): PathSchema {

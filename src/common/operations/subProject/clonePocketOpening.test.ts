@@ -16,22 +16,22 @@ const openings: PocketOpeningSchema[] = [
     id: 'recessed-source',
     type: 'recessed',
     name: 'Opening',
-    outerInset: 17,
-    innerOffset: 11,
-    outerRadius: 3,
-    innerRadius: 4,
-    depth: 8,
+    recessOuterInset: 17,
+    recessInnerOffset: 11,
+    recessOuterRadius: 3,
+    recessInnerRadius: 4,
+    recessDepth: 8,
   },
-  { id: 'slanted-source', type: 'slanted', name: 'Opening', offset: 13, side: 'end' },
+  { id: 'slanted-source', type: 'slanted', name: 'Opening', slantOffset: 13, slantSide: 'end' },
   {
     id: 'optical-source',
     type: 'optical-illusion',
     name: 'Opening',
-    direction: 'end',
-    startInset: 7,
-    endInset: 9,
-    leadingRadius: 2,
-    trailingRadius: 5,
+    illusionSide: 'end',
+    illusionStartInset: 7,
+    illusionEndInset: 9,
+    illusionLeadingRadius: 2,
+    illusionTrailingRadius: 5,
   },
 ]
 
@@ -74,7 +74,13 @@ describe('clonePocketOpening', () => {
   })
 
   it('avoids names used by other opening types when cloning a numbered name', () => {
-    const opening: PocketOpeningSchema = { id: 'source', type: 'slanted', name: 'Opening 1', offset: 13, side: 'end' }
+    const opening: PocketOpeningSchema = {
+      id: 'source',
+      type: 'slanted',
+      name: 'Opening 1',
+      slantOffset: 13,
+      slantSide: 'end',
+    }
     const original = fixture(opening)
     const source: SubProjectSchema = {
       ...original,
@@ -110,7 +116,7 @@ describe('clonePocketOpening', () => {
           id: 'depth',
           type: 'equal-constraint',
           fields: [
-            { id: 'opening-depth', type: 'recessed-constraint-field', modelId: openings[1].id, field: 'depth' },
+            { id: 'opening-depth', type: 'recessed-constraint-field', modelId: openings[1].id, field: 'recessDepth' },
             { id: 'root-width', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
           ],
         },

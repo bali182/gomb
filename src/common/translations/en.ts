@@ -24,7 +24,7 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { ConstraintFieldBlockReasonSchema, ConstraintFieldNameSchema } from '../schemas/constraints'
 import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -505,24 +505,27 @@ export const EN = {
           recessedPocketOpening: {
             geometry: {
               title: 'Geometry',
-              outerInset: {
+              recessOuterInset: {
                 label: 'Outer inset',
                 tooltip: 'Distance from either opening edge to the outer corner, in mm.',
               },
-              innerOffset: {
+              recessInnerOffset: {
                 label: 'Inner offset',
                 tooltip:
                   'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
               },
-              depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
+              recessDepth: {
+                label: 'Depth',
+                tooltip: 'Depth of the recess measured inward from the opening, in mm.',
+              },
             } satisfies SectionTranslationSchema<RecessedPocketOpeningGeometrySchema>,
             cornerRadius: {
               title: 'Corner radius',
-              outerRadius: {
+              recessOuterRadius: {
                 label: 'Outer radius',
                 tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
               },
-              innerRadius: {
+              recessInnerRadius: {
                 label: 'Inner radius',
                 tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
               },
@@ -534,16 +537,16 @@ export const EN = {
           opticalIllusionPocketOpening: {
             geometry: {
               title: 'Geometry',
-              direction: {
+              illusionSide: {
                 label: 'Lower side',
                 tooltip: 'Selects the lower end of the opening; the shape rotates with the cluster.',
               },
-              startInset: {
+              illusionStartInset: {
                 label: 'Start inset',
                 tooltip:
                   'Distance from the lower-side edge to the start of the diagonal at the front pocket, in mm. Uses the whole cluster.',
               },
-              endInset: {
+              illusionEndInset: {
                 label: 'End inset',
                 tooltip:
                   'Distance from the upper-side edge to the end of the diagonal at the back pocket, in mm. Uses the whole cluster.',
@@ -551,11 +554,11 @@ export const EN = {
             } satisfies SectionTranslationSchema<OpticalIllusionPocketOpeningGeometrySchema>,
             cornerRadius: {
               title: 'Corner radius',
-              leadingRadius: {
+              illusionLeadingRadius: {
                 label: 'Leading radius',
                 tooltip: 'Radius where the leading straight section turns into the diagonal, in mm.',
               },
-              trailingRadius: {
+              illusionTrailingRadius: {
                 label: 'Trailing radius',
                 tooltip: 'Radius where the diagonal turns into the trailing straight section, in mm.',
               },
@@ -564,11 +567,11 @@ export const EN = {
           slantedPocketOpening: {
             geometry: {
               title: 'Geometry',
-              side: {
+              slantSide: {
                 label: 'Lower side',
                 tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
               },
-              offset: {
+              slantOffset: {
                 label: 'Offset',
                 tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.',
               },
@@ -842,6 +845,56 @@ export const EN = {
             'auto-layout-gap': 'Switch gap to manual to link it.',
             'auto-corner-radius': 'Switch corner radii to manual to link them.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          fields: {
+            width: 'Width',
+            height: 'Height',
+            topLeftRadius: 'Top-left radius',
+            topRightRadius: 'Top-right radius',
+            bottomLeftRadius: 'Bottom-left radius',
+            bottomRightRadius: 'Bottom-right radius',
+            layoutOrientation: 'Layout orientation',
+            mainAxisAnchor: 'Layout alignment',
+            layoutGap: 'Layout gap',
+            offAxisAnchor: 'Self alignment',
+            topStretch: 'Stretch top',
+            rightStretch: 'Stretch right',
+            bottomStretch: 'Stretch bottom',
+            leftStretch: 'Stretch left',
+            pocketStep: 'Pocket spacing',
+            orientation: 'Pocket orientation',
+            openingId: 'Pocket opening',
+            itemId: 'Pocket content',
+            itemOrientation: 'Pocket content orientation',
+            itemCrossAxisOffset: 'Pocket content offset',
+            itemOpeningOffset: 'Pocket content lift',
+            tPocketTabWidth: 'T-pocket tab width',
+            tPocketTaper: 'T-pocket taper',
+            xAnchor: 'Horizontal alignment',
+            yAnchor: 'Vertical alignment',
+            xOffset: 'X offset',
+            yOffset: 'Y offset',
+            recessOuterInset: 'Outer inset',
+            recessInnerOffset: 'Inner offset',
+            recessOuterRadius: 'Outer radius',
+            recessInnerRadius: 'Inner radius',
+            recessDepth: 'Opening depth',
+            slantOffset: 'Offset',
+            slantSide: 'Lower side',
+            illusionSide: 'Lower side',
+            illusionStartInset: 'Start inset',
+            illusionEndInset: 'End inset',
+            illusionLeadingRadius: 'Leading radius',
+            illusionTrailingRadius: 'Trailing radius',
+            stitchMargin: 'Stitch margin',
+            stitchHoleLength: 'Stitch hole length',
+            stitchHoleDistance: 'Stitch hole spacing',
+            stitchHoleThickness: 'Stitch hole thickness',
+            stitchLineThickness: 'Stitch line thickness',
+            onTop: 'Stitch line target',
+            startOffset: 'Stitch start offset',
+            endOffset: 'Stitch End offset',
+            stitchDirection: 'Stitch direction',
+          } satisfies EnumTranslationSchema<ConstraintFieldNameSchema>,
         },
         globalSettings: {
           theme: {

@@ -110,8 +110,8 @@ const createClusterSubProject = (orientation: PocketOrientationSchema): SubProje
   return d.subProject({
     id: 'sub-project',
     pocketOpenings: [
-      { id: 't-opening', name: 'T opening', type: 'slanted', side: 'start', offset: 15 },
-      { id: 'front-opening', name: 'Front opening', type: 'slanted', side: 'end', offset: 9 },
+      { id: 't-opening', name: 'T opening', type: 'slanted', slantSide: 'start', slantOffset: 15 },
+      { id: 'front-opening', name: 'Front opening', type: 'slanted', slantSide: 'end', slantOffset: 9 },
     ],
     root: d.rootPanel({ id: 'root', children: ['cluster', 'outside'], ...radii }),
     components: [
@@ -773,11 +773,11 @@ describe.each(orientationCases)(
           id: 'opening',
           name: 'Opening',
           type: 'recessed',
-          outerInset: 15,
-          innerOffset: 8,
-          depth: 10,
-          innerRadius: 5,
-          outerRadius: 3,
+          recessOuterInset: 15,
+          recessInnerOffset: 8,
+          recessDepth: 10,
+          recessInnerRadius: 5,
+          recessOuterRadius: 3,
         },
       ]
       for (const opening of openings) {
@@ -828,11 +828,11 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical
         id: 'opening',
         name: 'Opening',
         type: 'optical-illusion',
-        direction,
-        startInset: 12,
-        endInset: 25,
-        leadingRadius: 3,
-        trailingRadius: 7,
+        illusionSide: direction,
+        illusionStartInset: 12,
+        illusionEndInset: 25,
+        illusionLeadingRadius: 3,
+        illusionTrailingRadius: 7,
       }
       const root = d.rootPanel({ id: 'root', children: ['cluster'] })
       const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'], orientation })

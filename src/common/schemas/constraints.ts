@@ -101,17 +101,17 @@ export type HoleConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
 
 export type RecessedPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   RecessedPocketOpeningSchema,
-  'outerInset' | 'innerOffset' | 'outerRadius' | 'innerRadius' | 'depth'
+  'recessOuterInset' | 'recessInnerOffset' | 'recessOuterRadius' | 'recessInnerRadius' | 'recessDepth'
 >
 
 export type SlantedPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   SlantedPocketOpeningSchema,
-  'offset' | 'side'
+  'slantOffset' | 'slantSide'
 >
 
 export type OpticalIllusionPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   OpticalIllusionPocketOpeningSchema,
-  'direction' | 'startInset' | 'endInset' | 'leadingRadius' | 'trailingRadius'
+  'illusionSide' | 'illusionStartInset' | 'illusionEndInset' | 'illusionLeadingRadius' | 'illusionTrailingRadius'
 >
 
 export type ComponentBoundsStitchLineConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<

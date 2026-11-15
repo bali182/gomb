@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
-import type { SlantedPocketOpeningSchema } from '../schemas/pocketOpening'
+import type { EditableSchema } from '../schemas/editable'
+import type { IssuesSchema } from '../schemas/issues'
+import type {
+  OpticalIllusionPocketOpeningOwnSchema,
+  OpticalIllusionPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from '../schemas/pocketOpening'
+import type { DeepPartialSchema, NumericFieldNameSchema } from '../schemas/utils'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { d } from '../testData'
 import { EN } from '../translations/en'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { validatePocketOpeningSchema } from './validatePocketOpeningSchema'
+
 const subProject = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) })
 const context: ComponentBasedValidationContextSchema = {
   language: 'en-GB',
@@ -15,37 +24,46 @@ const context: ComponentBasedValidationContextSchema = {
   project: d.project({ id: 'project', subProjects: [subProject] }),
   computedSubProject: getComputedSubProject(subProject, defaultStitchingSettings),
 }
-const optical = {
-  type: 'optical-illusion' as const,
+const optical: OpticalIllusionPocketOpeningSchema = {
+  type: 'optical-illusion',
   ...defaultOpticalIllusionPocketOpening,
   id: 'optical',
   name: 'Optical',
 }
 
-const slanted: SlantedPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' }
+const slanted: SlantedPocketOpeningSchema = {
+  id: 'opening',
+  name: 'Opening',
+  type: 'slanted',
+  slantOffset: 15,
+  slantSide: 'end',
+}
+
 describe('validatePocketOpeningSchema', () => {
   it('rejects changing an opening type', () => {
-    const result = validatePocketOpeningSchema(
-      getEditableSchema(slanted, { language: 'en-GB' }),
-      { id: 'opening', name: 'Opening', type: 'straight' },
-      context,
-    )
+    const current: StraightPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'straight' }
+    const input: EditableSchema<SlantedPocketOpeningSchema> = getEditableSchema(slanted, { language: 'en-GB' })
+    const result = validatePocketOpeningSchema(input, current, context)
     expect(result.isValid).toBe(false)
-    expect(result.committedValue).toEqual({ id: 'opening', name: 'Opening', type: 'straight' })
+    expect(result.committedValue).toEqual(current)
   })
   it.each(['0', '-1', '', '-', 'abc'])('rejects invalid offset %s while retaining valid side changes', (offset) => {
-    const result = validatePocketOpeningSchema(
-      { id: 'opening', name: 'Opening', type: 'slanted', offset, side: 'start' },
-      slanted,
-      context,
-    )
+    const input: EditableSchema<SlantedPocketOpeningSchema> = {
+      ...getEditableSchema(slanted, { language: 'en-GB' }),
+      slantOffset: offset,
+      slantSide: 'start',
+    }
+    const result = validatePocketOpeningSchema(input, slanted, context)
     expect(result.isValid).toBe(false)
-    expect(result.issues).toMatchObject({ offset: { severity: 'error' } })
-    expect(result.committedValue).toEqual({ ...slanted, side: 'start' })
+    expect(result.issues).toMatchObject({
+      slantOffset: { severity: 'error' },
+    } satisfies DeepPartialSchema<IssuesSchema<SlantedPocketOpeningSchema>>)
+    expect(result.committedValue).toEqual({ ...slanted, slantSide: 'start' } satisfies SlantedPocketOpeningSchema)
   })
   it('rejects an unknown side without losing the previous value', () => {
-    const input = getEditableSchema(slanted, { language: 'en-GB' })
-    Reflect.set(input, 'side', 'unknown')
+    const input: EditableSchema<SlantedPocketOpeningSchema> = getEditableSchema(slanted, { language: 'en-GB' })
+    const field: keyof SlantedPocketOpeningSchema = 'slantSide'
+    Reflect.set(input, field, 'unknown')
     const result = validatePocketOpeningSchema(input, slanted, context)
     expect(result.isValid).toBe(false)
     expect(result.committedValue).toEqual(slanted)
@@ -54,40 +72,50 @@ describe('validatePocketOpeningSchema', () => {
 
 describe('optical illusion opening validation', () => {
   it('accepts all zero numeric fields', () => {
-    const value = {
+    const value: OpticalIllusionPocketOpeningSchema = {
       ...optical,
-      startInset: 0,
-      endInset: 0,
-      leadingRadius: 0,
-      trailingRadius: 0,
+      illusionStartInset: 0,
+      illusionEndInset: 0,
+      illusionLeadingRadius: 0,
+      illusionTrailingRadius: 0,
     }
     const result = validatePocketOpeningSchema(getEditableSchema(value, { language: 'en-GB' }), value, context)
     expect(result.isValid).toBe(true)
     expect(result.value).toEqual(value)
   })
-  it.each(['startInset', 'endInset', 'leadingRadius', 'trailingRadius'] as const)(
-    'retains %s on invalid input while committing direction',
-    (field) => {
-      const input = getEditableSchema(optical, { language: 'en-GB' })
-      input[field] = '-1'
-      input.direction = 'start'
-      const result = validatePocketOpeningSchema(input, optical, context)
-      expect(result.isValid).toBe(false)
-      expect(result.issues).toMatchObject({ [field]: { severity: 'error' } })
-      expect(result.committedValue).toEqual({ ...optical, direction: 'start' })
-    },
-  )
-  it('rejects an unknown direction', () => {
-    const input = getEditableSchema(optical, { language: 'en-GB' })
-    Reflect.set(input, 'direction', 'unknown')
+  it.each<NumericFieldNameSchema<OpticalIllusionPocketOpeningOwnSchema>>([
+    'illusionStartInset',
+    'illusionEndInset',
+    'illusionLeadingRadius',
+    'illusionTrailingRadius',
+  ])('retains %s on invalid input while committing side', (field) => {
+    const input: EditableSchema<OpticalIllusionPocketOpeningSchema> = getEditableSchema(optical, { language: 'en-GB' })
+    input[field] = '-1'
+    input.illusionSide = 'start'
     const result = validatePocketOpeningSchema(input, optical, context)
     expect(result.isValid).toBe(false)
-    expect(result.issues).toMatchObject({ direction: { severity: 'error' } })
+    expect(result.issues).toMatchObject({
+      [field]: { severity: 'error' },
+    } satisfies DeepPartialSchema<IssuesSchema<OpticalIllusionPocketOpeningSchema>>)
+    expect(result.committedValue).toEqual({
+      ...optical,
+      illusionSide: 'start',
+    } satisfies OpticalIllusionPocketOpeningSchema)
+  })
+  it('rejects an unknown side', () => {
+    const input: EditableSchema<OpticalIllusionPocketOpeningSchema> = getEditableSchema(optical, { language: 'en-GB' })
+    const field: keyof OpticalIllusionPocketOpeningSchema = 'illusionSide'
+    Reflect.set(input, field, 'unknown')
+    const result = validatePocketOpeningSchema(input, optical, context)
+    expect(result.isValid).toBe(false)
+    expect(result.issues).toMatchObject({
+      illusionSide: { severity: 'error' },
+    } satisfies DeepPartialSchema<IssuesSchema<OpticalIllusionPocketOpeningSchema>>)
   })
 })
 
 it.each(['', 'Taken'])('rejects invalid opening name %s while committing valid parameters', (name) => {
-  const taken = { id: 'taken', name: 'Taken', type: 'straight' } as const
+  const taken: StraightPocketOpeningSchema = { id: 'taken', name: 'Taken', type: 'straight' }
   const validationContext: ComponentBasedValidationContextSchema = {
     ...context,
     subProject: {
@@ -95,19 +123,26 @@ it.each(['', 'Taken'])('rejects invalid opening name %s while committing valid p
       pocketOpenings: { ...subProject.pocketOpenings, [slanted.id]: slanted, [taken.id]: taken },
     },
   }
-  const input = { ...getEditableSchema(slanted, { language: 'en-GB' }), name, offset: '21' }
+  const input: EditableSchema<SlantedPocketOpeningSchema> = {
+    ...getEditableSchema(slanted, { language: 'en-GB' }),
+    name,
+    slantOffset: '21',
+  }
   const result = validatePocketOpeningSchema(input, slanted, validationContext)
   expect(result.isValid).toBe(false)
-  expect(result.issues).toMatchObject({ name: { severity: 'error' } })
-  expect(result.committedValue).toEqual({ ...slanted, offset: 21 })
+  expect(result.issues).toMatchObject({
+    name: { severity: 'error' },
+  } satisfies DeepPartialSchema<IssuesSchema<SlantedPocketOpeningSchema>>)
+  expect(result.committedValue).toEqual({ ...slanted, slantOffset: 21 } satisfies SlantedPocketOpeningSchema)
 })
 
 it('accepts a unique name and preserves the current opening identity', () => {
-  const result = validatePocketOpeningSchema(
-    { ...getEditableSchema(slanted, { language: 'en-GB' }), id: 'replacement', name: 'Renamed' },
-    slanted,
-    context,
-  )
+  const input: EditableSchema<SlantedPocketOpeningSchema> = {
+    ...getEditableSchema(slanted, { language: 'en-GB' }),
+    id: 'replacement',
+    name: 'Renamed',
+  }
+  const result = validatePocketOpeningSchema(input, slanted, context)
   expect(result.isValid).toBe(true)
-  expect(result.committedValue).toEqual({ ...slanted, name: 'Renamed' })
+  expect(result.committedValue).toEqual({ ...slanted, name: 'Renamed' } satisfies SlantedPocketOpeningSchema)
 })

@@ -42,12 +42,12 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
     [70, 80, 50 - POSITION_EPSILON / 2, 50 - POSITION_EPSILON / 2],
     [0, 100, 0, 100 - POSITION_EPSILON],
   ])('shares width for inset pair %s / %s', (startInset, endInset, start, end) => {
-    const { opening, adjusted } = getLimits({ startInset, endInset })
+    const { opening, adjusted } = getLimits({ illusionStartInset: startInset, illusionEndInset: endInset })
     if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) {
       throw new Error('Wrong opening')
     }
-    expect(adjusted.startInset).toBeCloseTo(start, 12)
-    expect(adjusted.endInset).toBeCloseTo(end, 12)
+    expect(adjusted.illusionStartInset).toBeCloseTo(start, 12)
+    expect(adjusted.illusionEndInset).toBeCloseTo(end, 12)
     expect(opening).toMatchObject({ startInset, endInset })
   })
 
@@ -66,23 +66,33 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
     if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) {
       throw new Error('Wrong opening')
     }
-    const run = computed.boundingRect.width.minus(adjusted.startInset).minus(adjusted.endInset).dividedBy(count)
+    const run = computed.boundingRect.width
+      .minus(adjusted.illusionStartInset)
+      .minus(adjusted.illusionEndInset)
+      .dividedBy(count)
     expect(run.gt(0)).toBe(true)
     expect(run.toNumber()).toBeCloseTo(POSITION_EPSILON, 12)
   })
 
   it('limits R at a 45-degree corner using its 2 mm leading section', () => {
-    const { limits } = getLimits({ startInset: 2, endInset: 78, leadingRadius: 10 })
-    expect(limits.leadingRadius?.max?.value.toNumber()).toBeCloseTo(2 / Math.tan(Math.PI / 8), 10)
-    expect(limits.leadingRadius?.max?.reason).toBe('optical-illusion-pocket-opening-radius-exceeds-leading-length')
+    const { limits } = getLimits({ illusionStartInset: 2, illusionEndInset: 78, illusionLeadingRadius: 10 })
+    expect(limits.illusionLeadingRadius?.max?.value.toNumber()).toBeCloseTo(2 / Math.tan(Math.PI / 8), 10)
+    expect(limits.illusionLeadingRadius?.max?.reason).toBe(
+      'optical-illusion-pocket-opening-radius-exceeds-leading-length',
+    )
   })
 
   it('shares the diagonal by halves when both requested radii exceed half its length', () => {
-    const { limits, adjusted } = getLimits({ startInset: 40, endInset: 40, leadingRadius: 100, trailingRadius: 100 })
+    const { limits, adjusted } = getLimits({
+      illusionStartInset: 40,
+      illusionEndInset: 40,
+      illusionLeadingRadius: 100,
+      illusionTrailingRadius: 100,
+    })
     const expected = Math.hypot(20, 20) / 2 / Math.tan(Math.PI / 8)
-    expect(limits.leadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
-    expect(limits.trailingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
-    expect(limits.leadingRadius?.max?.reason).toBe('optical-illusion-pocket-opening-radii-share-slanted-length')
+    expect(limits.illusionLeadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
+    expect(limits.illusionTrailingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
+    expect(limits.illusionLeadingRadius?.max?.reason).toBe('optical-illusion-pocket-opening-radii-share-slanted-length')
     if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) throw new Error('Wrong opening')
     const path = new OpticalIllusionPocketCalculator(
       pocket,
@@ -99,13 +109,23 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
   })
 
   it('preserves the smaller rounding when only the other one must yield', () => {
-    const { limits } = getLimits({ startInset: 40, endInset: 40, leadingRadius: 100, trailingRadius: 5 })
+    const { limits } = getLimits({
+      illusionStartInset: 40,
+      illusionEndInset: 40,
+      illusionLeadingRadius: 100,
+      illusionTrailingRadius: 5,
+    })
     const expected = Math.hypot(20, 20) / Math.tan(Math.PI / 8) - 5
-    expect(limits.leadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
+    expect(limits.illusionLeadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
   })
 
   it('disables the corresponding radius when a straight section vanishes', () => {
-    const { adjusted } = getLimits({ startInset: 0, endInset: 0, leadingRadius: 20, trailingRadius: 20 })
+    const { adjusted } = getLimits({
+      illusionStartInset: 0,
+      illusionEndInset: 0,
+      illusionLeadingRadius: 20,
+      illusionTrailingRadius: 20,
+    })
     expect(adjusted).toMatchObject({ leadingRadius: 0, trailingRadius: 0 })
   })
 })

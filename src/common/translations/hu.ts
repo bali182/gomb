@@ -434,24 +434,30 @@ export const HU = {
           recessedPocketOpening: {
             geometry: {
               title: 'Geometria',
-              outerInset: {
+              recessOuterInset: {
                 label: 'Külső betolás',
                 tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
               },
-              innerOffset: {
+              recessInnerOffset: {
                 label: 'Belső eltolás',
                 tooltip:
                   'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
               },
-              depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
+              recessDepth: {
+                label: 'Mélység',
+                tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.',
+              },
             },
             cornerRadius: {
               title: 'Lekerekítés',
-              outerRadius: {
+              recessOuterRadius: {
                 label: 'Külső sugár',
                 tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
               },
-              innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
+              recessInnerRadius: {
+                label: 'Belső sugár',
+                tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.',
+              },
             },
           },
           opticalIllusionPocketOpeningCredit: {
@@ -460,16 +466,16 @@ export const HU = {
           opticalIllusionPocketOpening: {
             geometry: {
               title: 'Geometria',
-              direction: {
+              illusionSide: {
                 label: 'Alacsonyabb oldal',
                 tooltip: 'A nyílás alacsonyabb végét választja ki; a forma a clusterrel együtt fordul.',
               },
-              startInset: {
+              illusionStartInset: {
                 label: 'Kezdő betolás',
                 tooltip:
                   'Az átló kezdetének távolsága az alacsonyabb oldali széltől a front pocketnél, mm-ben. A teljes clusterre vonatkozik.',
               },
-              endInset: {
+              illusionEndInset: {
                 label: 'Záró betolás',
                 tooltip:
                   'Az átló végének távolsága a magasabb oldali széltől a leghátsó pocketnél, mm-ben. A teljes clusterre vonatkozik.',
@@ -477,11 +483,11 @@ export const HU = {
             },
             cornerRadius: {
               title: 'Lekerekítés',
-              leadingRadius: {
+              illusionLeadingRadius: {
                 label: 'Kezdő sugár',
                 tooltip: 'A kezdő egyenesből a ferde szakaszba vezető átmenet sugara, mm-ben.',
               },
-              trailingRadius: {
+              illusionTrailingRadius: {
                 label: 'Záró sugár',
                 tooltip: 'A ferde szakaszból a záró egyenesbe vezető átmenet sugara, mm-ben.',
               },
@@ -490,11 +496,11 @@ export const HU = {
           slantedPocketOpening: {
             geometry: {
               title: 'Geometria',
-              side: {
+              slantSide: {
                 label: 'Alacsonyabb oldal',
                 tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
               },
-              offset: {
+              slantOffset: {
                 label: 'Eltérés',
                 tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',
               },
@@ -766,6 +772,56 @@ export const HU = {
             'auto-layout-gap': 'Az összekötéshez állítsd manuálisra a hézagot.',
             'auto-corner-radius': 'Az összekötéshez állítsd manuálisra a rádiuszokat.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          fields: {
+            width: 'Szélesség',
+            height: 'Magasság',
+            topLeftRadius: 'Bal felső sarok',
+            topRightRadius: 'Jobb felső sarok',
+            bottomLeftRadius: 'Bal alsó sarok',
+            bottomRightRadius: 'Jobb alsó sarok',
+            layoutOrientation: 'Irány',
+            mainAxisAnchor: 'Igazítás',
+            layoutGap: 'Köz',
+            offAxisAnchor: 'Igazítás',
+            topStretch: 'Felső oldal',
+            rightStretch: 'Jobb oldal',
+            bottomStretch: 'Alsó oldal',
+            leftStretch: 'Bal oldal',
+            pocketStep: 'Eltolás',
+            orientation: 'Nyílás',
+            openingId: 'Zsebnyílás',
+            itemId: 'Tartalom',
+            itemOrientation: 'Tartalom forgatása',
+            itemCrossAxisOffset: 'Oldaleltolás',
+            itemOpeningOffset: 'Kiemelés',
+            tPocketTabWidth: 'Fül szélessége',
+            tPocketTaper: 'Keskenyedés',
+            xAnchor: 'Vízszintes igazítás',
+            yAnchor: 'Függőleges igazítás',
+            xOffset: 'X eltolás',
+            yOffset: 'Y eltolás',
+            recessOuterInset: 'Külső betolás',
+            recessInnerOffset: 'Belső eltolás',
+            recessOuterRadius: 'Külső sugár',
+            recessInnerRadius: 'Belső sugár',
+            recessDepth: 'Mélység',
+            slantOffset: 'Eltérés',
+            slantSide: 'Alacsonyabb oldal',
+            illusionSide: 'Alacsonyabb oldal',
+            illusionStartInset: 'Kezdő betolás',
+            illusionEndInset: 'Záró betolás',
+            illusionLeadingRadius: 'Kezdő sugár',
+            illusionTrailingRadius: 'Záró sugár',
+            stitchMargin: 'Margó',
+            stitchHoleLength: 'Lyuk hossza',
+            stitchHoleDistance: 'Lyuktávolság',
+            stitchHoleThickness: 'Lyuk vastagsága',
+            stitchLineThickness: 'Vonal vastagsága',
+            onTop: 'Rajzolási felület',
+            startOffset: 'Kezdő eltolás',
+            endOffset: 'Végeltolás',
+            stitchDirection: 'Irány',
+          },
         },
         globalSettings: {
           theme: {

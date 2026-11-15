@@ -40,7 +40,7 @@ const pocketFixture = () =>
       d.tPocket({ id: 't', openingId: 'opening' }),
       d.frontPocket({ id: 'front', openingId: 'opening' }),
     ],
-    pocketOpenings: [{ id: 'opening', type: 'slanted', name: 'Opening', offset: 2, side: 'start' }],
+    pocketOpenings: [{ id: 'opening', type: 'slanted', name: 'Opening', slantOffset: 2, slantSide: 'start' }],
     constraints: {
       reference: {
         id: 'reference',
@@ -53,7 +53,7 @@ const pocketFixture = () =>
       opening: {
         id: 'opening-constraint',
         type: 'equal-constraint',
-        fields: [{ id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'offset' }],
+        fields: [{ id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'slantOffset' }],
       },
     },
   })

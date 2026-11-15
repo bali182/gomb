@@ -12,7 +12,7 @@ import { last } from '../../utils/last'
 import { getPathSegments } from '../pathSegments'
 import { createPocketCalculator } from './createPocketCalculator'
 
-const opening: SlantedPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' }
+const opening: SlantedPocketOpeningSchema = { id: 'opening', name: 'Opening', type: 'slanted', slantOffset: 15, slantSide: 'end' }
 const rect: RectSchema = {
   x: new BigNumber(11),
   y: new BigNumber(17),
@@ -150,7 +150,7 @@ describe('SlantedPocketCalculator', () => {
     const calculator = createPocketCalculator(
       d.tPocket({ id: 't', tPocketTabWidth: 0, tPocketTaper: 0 }),
       cluster,
-      { ...opening, offset: 0 },
+      { ...opening, slantOffset: 0 },
       { ...rect, width: new BigNumber(0) },
       ZERO_CORNER_RADIUS,
     )

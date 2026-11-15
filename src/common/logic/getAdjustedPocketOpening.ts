@@ -16,7 +16,11 @@ export const getAdjustedPocketOpening = (
       }
       return {
         ...opening,
-        offset: clamp(opening.offset, limits.offset?.min?.value, limits.offset?.max?.value).toNumber(),
+        slantOffset: clamp(
+          opening.slantOffset,
+          limits.slantOffset?.min?.value,
+          limits.slantOffset?.max?.value,
+        ).toNumber(),
       }
     case 'recessed':
       if (limits.type !== 'recessed') {
@@ -24,22 +28,30 @@ export const getAdjustedPocketOpening = (
       }
       return {
         ...opening,
-        outerInset: clamp(opening.outerInset, limits.outerInset?.min?.value, limits.outerInset?.max?.value).toNumber(),
-        innerOffset: clamp(
-          opening.innerOffset,
-          limits.innerOffset?.min?.value,
-          limits.innerOffset?.max?.value,
+        recessOuterInset: clamp(
+          opening.recessOuterInset,
+          limits.recessOuterInset?.min?.value,
+          limits.recessOuterInset?.max?.value,
         ).toNumber(),
-        depth: clamp(opening.depth, limits.depth?.min?.value, limits.depth?.max?.value).toNumber(),
-        outerRadius: clamp(
-          opening.outerRadius,
-          limits.outerRadius?.min?.value,
-          limits.outerRadius?.max?.value,
+        recessInnerOffset: clamp(
+          opening.recessInnerOffset,
+          limits.recessInnerOffset?.min?.value,
+          limits.recessInnerOffset?.max?.value,
         ).toNumber(),
-        innerRadius: clamp(
-          opening.innerRadius,
-          limits.innerRadius?.min?.value,
-          limits.innerRadius?.max?.value,
+        recessDepth: clamp(
+          opening.recessDepth,
+          limits.recessDepth?.min?.value,
+          limits.recessDepth?.max?.value,
+        ).toNumber(),
+        recessOuterRadius: clamp(
+          opening.recessOuterRadius,
+          limits.recessOuterRadius?.min?.value,
+          limits.recessOuterRadius?.max?.value,
+        ).toNumber(),
+        recessInnerRadius: clamp(
+          opening.recessInnerRadius,
+          limits.recessInnerRadius?.min?.value,
+          limits.recessInnerRadius?.max?.value,
         ).toNumber(),
       }
     case 'optical-illusion':
@@ -48,10 +60,18 @@ export const getAdjustedPocketOpening = (
       }
       return {
         ...opening,
-        startInset: clamp(opening.startInset, 0, limits.startInset?.max?.value).toNumber(),
-        endInset: clamp(opening.endInset, 0, limits.endInset?.max?.value).toNumber(),
-        leadingRadius: clamp(opening.leadingRadius, 0, limits.leadingRadius?.max?.value).toNumber(),
-        trailingRadius: clamp(opening.trailingRadius, 0, limits.trailingRadius?.max?.value).toNumber(),
+        illusionStartInset: clamp(opening.illusionStartInset, 0, limits.illusionStartInset?.max?.value).toNumber(),
+        illusionEndInset: clamp(opening.illusionEndInset, 0, limits.illusionEndInset?.max?.value).toNumber(),
+        illusionLeadingRadius: clamp(
+          opening.illusionLeadingRadius,
+          0,
+          limits.illusionLeadingRadius?.max?.value,
+        ).toNumber(),
+        illusionTrailingRadius: clamp(
+          opening.illusionTrailingRadius,
+          0,
+          limits.illusionTrailingRadius?.max?.value,
+        ).toNumber(),
       }
   }
 }

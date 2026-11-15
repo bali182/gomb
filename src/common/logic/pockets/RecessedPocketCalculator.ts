@@ -16,18 +16,18 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
     const zero = new BigNumber(0)
     const halfWidth = width.dividedBy(2)
 
-    if (opening.depth === 0 || halfWidth.isLessThanOrEqualTo(opening.outerInset)) {
+    if (opening.recessDepth === 0 || halfWidth.isLessThanOrEqualTo(opening.recessOuterInset)) {
       return [
         { type: 'moveTo', point: { x: zero, y: zero } },
         { type: 'lineTo', point: { x: width, y: zero } },
       ]
     }
 
-    const depth = new BigNumber(opening.depth)
-    const horizontalDistance = halfWidth.minus(opening.innerOffset).minus(opening.outerInset)
+    const depth = new BigNumber(opening.recessDepth)
+    const horizontalDistance = halfWidth.minus(opening.recessInnerOffset).minus(opening.recessOuterInset)
     const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
     const angleFactor = depth.dividedBy(sideLength.plus(horizontalDistance))
-    const requiredLength = new BigNumber(opening.outerRadius).plus(opening.innerRadius).times(angleFactor)
+    const requiredLength = new BigNumber(opening.recessOuterRadius).plus(opening.recessInnerRadius).times(angleFactor)
     const leftTransition = requiredLength.isGreaterThanOrEqualTo(sideLength)
       ? this.getTouchingTransitionCommands(angleFactor)
       : this.getSeparatedTransitionCommands(angleFactor)
@@ -39,18 +39,18 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
     const opening = this.opening
     const width = this.width
     const zero = new BigNumber(0)
-    const outerRadius = new BigNumber(opening.outerRadius)
-    const innerRadius = new BigNumber(opening.innerRadius)
-    const depth = new BigNumber(opening.depth)
+    const outerRadius = new BigNumber(opening.recessOuterRadius)
+    const innerRadius = new BigNumber(opening.recessInnerRadius)
+    const depth = new BigNumber(opening.recessDepth)
     const denominator = angleFactor.pow(2).plus(1)
     const sine = angleFactor.times(2).dividedBy(denominator)
     const oneMinusCosine = angleFactor.pow(2).times(2).dividedBy(denominator)
     const outerStart: PointSchema = {
-      x: new BigNumber(opening.outerInset).minus(outerRadius.times(angleFactor)),
+      x: new BigNumber(opening.recessOuterInset).minus(outerRadius.times(angleFactor)),
       y: zero,
     }
     const innerEnd: PointSchema = {
-      x: width.dividedBy(2).minus(opening.innerOffset).plus(innerRadius.times(angleFactor)),
+      x: width.dividedBy(2).minus(opening.recessInnerOffset).plus(innerRadius.times(angleFactor)),
       y: depth,
     }
     const commands: PathCommand[] = [{ type: 'moveTo', point: outerStart }]
@@ -80,12 +80,12 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
     const opening = this.opening
     const width = this.width
     const zero = new BigNumber(0)
-    const outerRadius = new BigNumber(opening.outerRadius)
-    const innerRadius = new BigNumber(opening.innerRadius)
-    const depth = new BigNumber(opening.depth)
+    const outerRadius = new BigNumber(opening.recessOuterRadius)
+    const innerRadius = new BigNumber(opening.recessInnerRadius)
+    const depth = new BigNumber(opening.recessDepth)
     const radiusSum = outerRadius.plus(innerRadius)
     const innerEnd: PointSchema = {
-      x: width.dividedBy(2).minus(opening.innerOffset).plus(innerRadius.times(angleFactor)),
+      x: width.dividedBy(2).minus(opening.recessInnerOffset).plus(innerRadius.times(angleFactor)),
       y: depth,
     }
 

@@ -56,7 +56,7 @@ describe('createProjectMigration opening traversal', () => {
 
   it('retains record keys and returns the typed callback result without mutating the input', () => {
     const migrator = createMigrator()
-    vi.spyOn(migrator, 'recessedPocketOpening').mockImplementation((input) => ({ ...input, depth: 27 }))
+    vi.spyOn(migrator, 'recessedPocketOpening').mockImplementation((input) => ({ ...input, recessDepth: 27 }))
     const { project } = fixture()
     const snapshot = structuredClone(project)
     const result = createProjectMigration(migrator)(project, context)

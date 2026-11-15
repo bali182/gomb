@@ -29,35 +29,35 @@ export const RecessedPocketOpeningEditor: FC<RecessedPocketOpeningEditorProps> =
 
   const handleOuterInsetChange = useCallback(
     (outerInset: string): void => {
-      onChange({ ...editable, outerInset })
+      onChange({ ...editable, recessOuterInset: outerInset })
     },
     [editable, onChange],
   )
 
   const handleInnerOffsetChange = useCallback(
     (innerOffset: string): void => {
-      onChange({ ...editable, innerOffset })
+      onChange({ ...editable, recessInnerOffset: innerOffset })
     },
     [editable, onChange],
   )
 
   const handleDepthChange = useCallback(
     (depth: string): void => {
-      onChange({ ...editable, depth })
+      onChange({ ...editable, recessDepth: depth })
     },
     [editable, onChange],
   )
 
   const handleOuterRadiusChange = useCallback(
     (outerRadius: string): void => {
-      onChange({ ...editable, outerRadius })
+      onChange({ ...editable, recessOuterRadius: outerRadius })
     },
     [editable, onChange],
   )
 
   const handleInnerRadiusChange = useCallback(
     (innerRadius: string): void => {
-      onChange({ ...editable, innerRadius })
+      onChange({ ...editable, recessInnerRadius: innerRadius })
     },
     [editable, onChange],
   )
@@ -70,46 +70,46 @@ export const RecessedPocketOpeningEditor: FC<RecessedPocketOpeningEditorProps> =
           {t.project.editors.sections.components.recessedPocketOpening.geometry.title}
         </SectionGroup.SectionHeader>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.outerInset.tooltip}
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.recessOuterInset.tooltip}
         >
-          {t.project.editors.sections.components.recessedPocketOpening.geometry.outerInset.label}
+          {t.project.editors.sections.components.recessedPocketOpening.geometry.recessOuterInset.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.outerInset}>
+        <SectionGroup.SectionRowEditor issue={issues.recessOuterInset}>
           <EditorNumberInput
             modelId={editable.id}
             field="outerInset"
-            value={editable.outerInset}
-            issue={issues.outerInset}
+            value={editable.recessOuterInset}
+            issue={issues.recessOuterInset}
             onChange={handleOuterInsetChange}
             unit="mm"
           />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.innerOffset.tooltip}
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.recessInnerOffset.tooltip}
         >
-          {t.project.editors.sections.components.recessedPocketOpening.geometry.innerOffset.label}
+          {t.project.editors.sections.components.recessedPocketOpening.geometry.recessInnerOffset.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.innerOffset}>
+        <SectionGroup.SectionRowEditor issue={issues.recessInnerOffset}>
           <EditorNumberInput
             modelId={editable.id}
             field="innerOffset"
-            value={editable.innerOffset}
-            issue={issues.innerOffset}
+            value={editable.recessInnerOffset}
+            issue={issues.recessInnerOffset}
             onChange={handleInnerOffsetChange}
             unit="mm"
           />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.depth.tooltip}
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.geometry.recessDepth.tooltip}
         >
-          {t.project.editors.sections.components.recessedPocketOpening.geometry.depth.label}
+          {t.project.editors.sections.components.recessedPocketOpening.geometry.recessDepth.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.depth}>
+        <SectionGroup.SectionRowEditor issue={issues.recessDepth}>
           <EditorNumberInput
             modelId={editable.id}
             field="depth"
-            value={editable.depth}
-            issue={issues.depth}
+            value={editable.recessDepth}
+            issue={issues.recessDepth}
             onChange={handleDepthChange}
             unit="mm"
           />
@@ -120,31 +120,31 @@ export const RecessedPocketOpeningEditor: FC<RecessedPocketOpeningEditorProps> =
           {t.project.editors.sections.components.recessedPocketOpening.cornerRadius.title}
         </SectionGroup.SectionHeader>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.recessedPocketOpening.cornerRadius.outerRadius.tooltip}
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.cornerRadius.recessOuterRadius.tooltip}
         >
-          {t.project.editors.sections.components.recessedPocketOpening.cornerRadius.outerRadius.label}
+          {t.project.editors.sections.components.recessedPocketOpening.cornerRadius.recessOuterRadius.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.outerRadius}>
+        <SectionGroup.SectionRowEditor issue={issues.recessOuterRadius}>
           <EditorNumberInput
             modelId={editable.id}
             field="outerRadius"
-            value={editable.outerRadius}
-            issue={issues.outerRadius}
+            value={editable.recessOuterRadius}
+            issue={issues.recessOuterRadius}
             onChange={handleOuterRadiusChange}
             unit="mm"
           />
         </SectionGroup.SectionRowEditor>
         <SectionGroup.SectionRowTitle
-          tooltip={t.project.editors.sections.components.recessedPocketOpening.cornerRadius.innerRadius.tooltip}
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.cornerRadius.recessInnerRadius.tooltip}
         >
-          {t.project.editors.sections.components.recessedPocketOpening.cornerRadius.innerRadius.label}
+          {t.project.editors.sections.components.recessedPocketOpening.cornerRadius.recessInnerRadius.label}
         </SectionGroup.SectionRowTitle>
-        <SectionGroup.SectionRowEditor issue={issues.innerRadius}>
+        <SectionGroup.SectionRowEditor issue={issues.recessInnerRadius}>
           <EditorNumberInput
             modelId={editable.id}
             field="innerRadius"
-            value={editable.innerRadius}
-            issue={issues.innerRadius}
+            value={editable.recessInnerRadius}
+            issue={issues.recessInnerRadius}
             onChange={handleInnerRadiusChange}
             unit="mm"
           />

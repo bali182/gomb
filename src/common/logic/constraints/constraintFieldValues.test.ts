@@ -23,9 +23,9 @@ const fields: ConstraintFieldSchema[] = [
     field: 'topLeftRadius',
   },
   { id: 'stitch-field', type: 't-pocket-stitch-line-constraint-field', modelId: 'stitch', field: 'startOffset' },
-  { id: 'recessed-field', type: 'recessed-constraint-field', modelId: 'recessed', field: 'depth' },
-  { id: 'slanted-field', type: 'slanted-constraint-field', modelId: 'slanted', field: 'offset' },
-  { id: 'optical-field', type: 'optical-illusion-constraint-field', modelId: 'optical', field: 'startInset' },
+  { id: 'recessed-field', type: 'recessed-constraint-field', modelId: 'recessed', field: 'recessDepth' },
+  { id: 'slanted-field', type: 'slanted-constraint-field', modelId: 'slanted', field: 'slantOffset' },
+  { id: 'optical-field', type: 'optical-illusion-constraint-field', modelId: 'optical', field: 'illusionStartInset' },
 ]
 const fixture = () =>
   d.subProject({
@@ -43,9 +43,9 @@ const fixture = () =>
       d.tPocketStitchLine({ id: 'stitch', targetId: 'pocket', targetType: 'component', startOffset: 10 }),
     ],
     pocketOpenings: [
-      { ...modelFactory.createRecessedPocketOpening({}), id: 'recessed', depth: 10 },
-      { ...modelFactory.createSlantedPocketOpening({}), id: 'slanted', offset: 10 },
-      { ...modelFactory.createOpticalIllusionPocketOpening({}), id: 'optical', startInset: 10 },
+      { ...modelFactory.createRecessedPocketOpening({}), id: 'recessed', recessDepth: 10 },
+      { ...modelFactory.createSlantedPocketOpening({}), id: 'slanted', slantOffset: 10 },
+      { ...modelFactory.createOpticalIllusionPocketOpening({}), id: 'optical', illusionStartInset: 10 },
     ],
   })
 

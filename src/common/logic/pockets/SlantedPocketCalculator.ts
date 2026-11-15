@@ -43,7 +43,7 @@ export class SlantedPocketCalculator extends PocketCalculator<SlantedPocketOpeni
       return ZERO
     }
     const distanceFromUnchangedEnd =
-      this.opening.side === 'start' ? this.width.minus(distanceFromStart) : distanceFromStart
-    return distanceFromUnchangedEnd.times(this.opening.offset).dividedBy(this.width)
+      this.opening.slantSide === 'start' ? this.width.minus(distanceFromStart) : distanceFromStart
+    return distanceFromUnchangedEnd.times(this.opening.slantOffset).dividedBy(this.width)
   }
 }

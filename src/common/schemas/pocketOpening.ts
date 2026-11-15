@@ -6,15 +6,15 @@ export type StraightPocketOpeningSchema = HasTypeSchema<'straight'> & HasIdentit
 
 export type RecessedPocketOpeningGeometrySchema = {
   /** Distance inward from either opening edge, in mm. */
-  outerInset: number
+  recessOuterInset: number
   /** Distance outward from the opening center, in mm. */
-  innerOffset: number
-  depth: number
+  recessInnerOffset: number
+  recessDepth: number
 }
 
 export type RecessedPocketOpeningCornerRadiusSchema = {
-  outerRadius: number
-  innerRadius: number
+  recessOuterRadius: number
+  recessInnerRadius: number
 }
 
 export type RecessedPocketOpeningOwnSchema = RecessedPocketOpeningGeometrySchema &
@@ -24,22 +24,22 @@ export type RecessedPocketOpeningSchema = HasTypeSchema<'recessed'> & HasIdentit
 
 export type SlantedPocketOpeningOwnSchema = {
   /** Inward displacement of the selected opening endpoint, in mm. */
-  offset: number
+  slantOffset: number
   /** Endpoint in the opening's traversal direction, rotating with the cluster. */
-  side: PocketOpeningSideSchema
+  slantSide: PocketOpeningSideSchema
 }
 
 export type SlantedPocketOpeningSchema = HasTypeSchema<'slanted'> & HasIdentitySchema & SlantedPocketOpeningOwnSchema
 
 export type OpticalIllusionPocketOpeningGeometrySchema = {
-  direction: PocketOpeningSideSchema
-  startInset: number
-  endInset: number
+  illusionSide: PocketOpeningSideSchema
+  illusionStartInset: number
+  illusionEndInset: number
 }
 
 export type OpticalIllusionPocketOpeningCornerRadiusSchema = {
-  leadingRadius: number
-  trailingRadius: number
+  illusionLeadingRadius: number
+  illusionTrailingRadius: number
 }
 
 export type OpticalIllusionPocketOpeningOwnSchema = OpticalIllusionPocketOpeningGeometrySchema &

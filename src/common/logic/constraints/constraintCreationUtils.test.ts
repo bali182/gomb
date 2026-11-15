@@ -107,7 +107,7 @@ describe('getValidConstraintPropertySelection', () => {
   it('drops disappeared and disabled properties while preserving valid selections', () => {
     const automatic = { ...second, autoWidth: true }
     const properties = getCommonConstraintProperties(source, [first, automatic])
-    expect(getValidConstraintPropertySelection(properties, ['width', 'height', 'depth'])).toEqual(['height'])
+    expect(getValidConstraintPropertySelection(properties, ['width', 'height', 'recessDepth'])).toEqual(['height'])
     expect(getValidConstraintPropertySelection([], ['width'])).toEqual([])
     expect(getValidConstraintPropertySelection(properties, [])).toEqual([])
   })
