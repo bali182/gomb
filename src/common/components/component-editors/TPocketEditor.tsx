@@ -20,7 +20,7 @@ type TPocketEditorProps = {
   onChange: (value: EditableSchema<TPocketSchema>) => void
 }
 
-export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, onChange }) => {
+export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: component.id,
@@ -93,6 +93,7 @@ export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, iss
         <SectionGroup.Root>
           <ContentsSection<TPocketSchema>
             modelId={editable.id}
+            orientation={parent.orientation}
             editable={editable}
             issues={issues}
             onChange={onChange}

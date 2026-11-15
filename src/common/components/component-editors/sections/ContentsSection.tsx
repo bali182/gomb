@@ -1,11 +1,12 @@
-import { HStack, Text } from '@chakra-ui/react'
+import { HStack, Icon, Text } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 import { PiInfo } from 'react-icons/pi'
 import { useGlobalSettings } from '../../../hooks/useGlobalSettings'
 import { Tooltip } from '../../common/Tooltip'
 
+import type { IconType } from 'react-icons'
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { HasPocketItemSchema } from '../../../schemas/components'
+import type { HasPocketItemSchema, PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { PocketItemIdSchema, PocketItemOrientationSchema } from '../../../schemas/pocketItem'
@@ -14,9 +15,14 @@ import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { PocketItemCombobox } from '../../common/PocketItemCombobox'
 import { PocketItemOrientationSelect } from '../../common/PocketItemOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
+import { ItemCrossAxisOffsetIcon } from '../../icons/ItemCrossAxisOffsetIcon'
+import { ItemOffsetDownIcon } from '../../icons/ItemOffsetDownIcon'
+import { ItemOffsetLeftIcon } from '../../icons/ItemOffsetLeftIcon'
+import { ItemOpeningOffsetIcon } from '../../icons/ItemOpeningOffsetIcon'
 
 type ContentsSectionProps<T extends HasPocketItemSchema> = {
   modelId: string
+  orientation: PocketOrientationSchema
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
@@ -24,6 +30,7 @@ type ContentsSectionProps<T extends HasPocketItemSchema> = {
 
 export const ContentsSection = <T extends HasPocketItemSchema>({
   modelId,
+  orientation,
   editable,
   issues,
   onChange,
@@ -116,6 +123,7 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         <EditorNumberInput
           modelId={modelId}
           field="itemCrossAxisOffset"
+          startAddon={<Icon as={itemCrossAxisOffsetIcons[orientation]} size="sm" />}
           disabled={!hasItem}
           issue={issues.itemCrossAxisOffset}
           onChange={handleCardCrossAxisOffsetChange}
@@ -131,6 +139,7 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
         <EditorNumberInput
           modelId={modelId}
           field="itemOpeningOffset"
+          startAddon={<Icon as={itemOpeningOffsetIcons[orientation]} size="sm" />}
           disabled={!hasItem}
           issue={issues.itemOpeningOffset}
           onChange={handleCardOpeningOffsetChange}
@@ -140,4 +149,18 @@ export const ContentsSection = <T extends HasPocketItemSchema>({
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )
+}
+
+const itemCrossAxisOffsetIcons: Record<PocketOrientationSchema, IconType> = {
+  up: ItemCrossAxisOffsetIcon,
+  down: ItemCrossAxisOffsetIcon,
+  left: ItemOffsetDownIcon,
+  right: ItemOffsetDownIcon,
+}
+
+const itemOpeningOffsetIcons: Record<PocketOrientationSchema, IconType> = {
+  up: ItemOpeningOffsetIcon,
+  down: ItemOffsetDownIcon,
+  left: ItemOffsetLeftIcon,
+  right: ItemCrossAxisOffsetIcon,
 }

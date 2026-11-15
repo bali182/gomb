@@ -6,11 +6,14 @@ import {
   PiArrowLineUp,
   PiArrowsHorizontal,
   PiArrowsVertical,
+  PiCreditCard,
   PiEmpty,
 } from 'react-icons/pi'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
-import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
 import { HeightIcon } from '../icons/HeightIcon'
+import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
+import { ItemCrossAxisOffsetIcon } from '../icons/ItemCrossAxisOffsetIcon'
+import { ItemOpeningOffsetIcon } from '../icons/ItemOpeningOffsetIcon'
 import { LayoutOrientationIcon } from '../icons/LayoutOrientationIcon'
 import { RadiusBottomLeftIcon } from '../icons/RadiusBottomLeftIcon'
 import { RadiusBottomRightIcon } from '../icons/RadiusBottomRightIcon'
@@ -46,10 +49,10 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   pocketStep: StraightPocketOpeningStackIcon,
   orientation: MULTI_ICON,
   openingId: MULTI_ICON,
-  itemId: MULTI_ICON,
+  itemId: PiCreditCard,
   itemOrientation: MULTI_ICON,
-  itemCrossAxisOffset: TODO,
-  itemOpeningOffset: TODO,
+  itemCrossAxisOffset: ItemCrossAxisOffsetIcon,
+  itemOpeningOffset: ItemOpeningOffsetIcon,
   tPocketTabWidth: TPocketTabWidthIcon,
   tPocketTaper: TPocketTaperIcon,
   xAnchor: MULTI_ICON,
