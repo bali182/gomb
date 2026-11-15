@@ -2,6 +2,7 @@ import { Grid, Icon, Portal, Select, Text, createListCollection, type ListCollec
 import { useCallback, useLayoutEffect, useMemo, useRef, type FC } from 'react'
 import type { IconType } from 'react-icons'
 
+import { PiHand } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
@@ -18,10 +19,9 @@ type AutoDimensionEditorProps = {
   modelId: string
   field: ConstraintFieldNameSchema
   auto: boolean
-  autoIcon: IconType
+  icon: IconType
   autoValue: number
   issue: IssueSchema | undefined
-  manualIcon: IconType
   onAutoChange: (auto: boolean) => void
   onValueChange: (value: string) => void
   step?: number
@@ -38,8 +38,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   unit,
   value,
   step,
-  autoIcon: AutoIcon,
-  manualIcon: ManualIcon,
+  icon: ModelIcon,
   onAutoChange,
   onValueChange,
 }) => {
@@ -139,7 +138,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
           <Select.Control flex="1">
             <Tooltip disabled={!autoDisabled} content={t.project.editors.sections.constraints.linkedAuto}>
               <Select.Trigger border="0" borderRadius="0" height="full" minHeight="0" px="1.5" py="0" gap="1.5">
-                <Icon size="sm">{auto ? <AutoIcon /> : <ManualIcon />}</Icon>
+                <Icon size="sm" as={ModelIcon} />
                 <Grid>
                   <Text gridArea="1 / 1" visibility={auto ? 'visible' : 'hidden'} aria-hidden={!auto}>
                     {t.project.editors.enums.common.autoDimension.auto}
@@ -157,7 +156,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
               <Select.Content width="full">
                 {collection.items.map((mode: AutoDimensionModeSchema) => (
                   <Select.Item key={mode} item={mode}>
-                    <Icon size="sm">{mode === 'auto' ? <AutoIcon /> : <ManualIcon />}</Icon>
+                    <Icon size="sm" as={mode === 'auto' ? ModelIcon : PiHand} />
                     <Select.ItemText>{t.project.editors.enums.common.autoDimension[mode]}</Select.ItemText>
                     <Select.ItemIndicator />
                   </Select.Item>

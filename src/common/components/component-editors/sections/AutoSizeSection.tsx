@@ -1,6 +1,6 @@
 import { HStack, Text } from '@chakra-ui/react'
 import { useCallback } from 'react'
-import { PiArrowsHorizontal, PiArrowsVertical, PiRuler, PiWarningBold } from 'react-icons/pi'
+import { PiWarningBold } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasStretchSchema } from '../../../schemas/common'
@@ -9,6 +9,8 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { SectionGroup } from '../../common/SectionGroup'
+import { HeightIcon } from '../../icons/HeightIcon'
+import { WidthIcon } from '../../icons/WidthIcon'
 
 type AutoSizeSectionProps<T> = {
   modelId: string
@@ -95,10 +97,9 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
           modelId={modelId}
           field="width"
           auto={editable.autoWidth}
-          autoIcon={PiArrowsHorizontal}
+          icon={WidthIcon}
           autoValue={component.width}
           issue={issues.width}
-          manualIcon={PiRuler}
           onAutoChange={handleAutoWidthChange}
           onValueChange={handleWidthChange}
           unit="mm"
@@ -114,10 +115,9 @@ export function AutoSizeSection<T extends HasAutoDimensionsSchema & HasStretchSc
           modelId={modelId}
           field="height"
           auto={editable.autoHeight}
-          autoIcon={PiArrowsVertical}
+          icon={HeightIcon}
           autoValue={component.height}
           issue={issues.height}
-          manualIcon={PiRuler}
           onAutoChange={handleAutoHeightChange}
           onValueChange={handleHeightChange}
           unit="mm"

@@ -9,6 +9,7 @@ import {
   PiEmpty,
 } from 'react-icons/pi'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
 import { HeightIcon } from '../icons/HeightIcon'
 import { LayoutOrientationIcon } from '../icons/LayoutOrientationIcon'
 import { RadiusBottomLeftIcon } from '../icons/RadiusBottomLeftIcon'
@@ -36,7 +37,7 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   bottomRightRadius: RadiusBottomRightIcon,
   layoutOrientation: LayoutOrientationIcon,
   mainAxisAnchor: MULTI_ICON,
-  layoutGap: MULTI_ICON,
+  layoutGap: HorizontalGapIcon,
   offAxisAnchor: MULTI_ICON,
   topStretch: PiArrowLineUp,
   rightStretch: PiArrowLineRight,
