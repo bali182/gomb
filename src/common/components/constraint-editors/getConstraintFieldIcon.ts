@@ -15,10 +15,13 @@ import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
 import { ItemCrossAxisOffsetIcon } from '../icons/ItemCrossAxisOffsetIcon'
 import { ItemOpeningOffsetIcon } from '../icons/ItemOpeningOffsetIcon'
 import { LayoutOrientationIcon } from '../icons/LayoutOrientationIcon'
+import { OpticalIllusionPocketOpeningIcon } from '../icons/OpticalIllusionPocketOpeningIcon'
 import { RadiusBottomLeftIcon } from '../icons/RadiusBottomLeftIcon'
 import { RadiusBottomRightIcon } from '../icons/RadiusBottomRightIcon'
 import { RadiusTopLeftIcon } from '../icons/RadiusTopLeftIcon'
 import { RadiusTopRightIcon } from '../icons/RadiusTopRightIcon'
+import { RecessedPocketOpeningIcon } from '../icons/RecessedPocketOpeningIcon'
+import { SlantedPocketOpeningIcon } from '../icons/SlantedPocketOpeningIcon'
 import { StraightPocketOpeningStackIcon } from '../icons/StraightPocketOpeningStackIcon'
 import { TPocketTabWidthIcon } from '../icons/TPocketTabWidthIcon'
 import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
@@ -59,18 +62,18 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   yAnchor: MULTI_ICON,
   xOffset: PiArrowsHorizontal,
   yOffset: PiArrowsVertical,
-  recessOuterInset: TODO,
-  recessInnerOffset: TODO,
-  recessOuterRadius: TODO,
-  recessInnerRadius: TODO,
-  recessDepth: TODO,
-  slantOffset: TODO,
-  slantSide: TODO,
-  illusionSide: TODO,
-  illusionStartInset: TODO,
-  illusionEndInset: TODO,
-  illusionLeadingRadius: TODO,
-  illusionTrailingRadius: TODO,
+  recessOuterInset: RecessedPocketOpeningIcon,
+  recessInnerOffset: RecessedPocketOpeningIcon,
+  recessOuterRadius: RecessedPocketOpeningIcon,
+  recessInnerRadius: RecessedPocketOpeningIcon,
+  recessDepth: RecessedPocketOpeningIcon,
+  slantOffset: SlantedPocketOpeningIcon,
+  slantSide: SlantedPocketOpeningIcon,
+  illusionSide: OpticalIllusionPocketOpeningIcon,
+  illusionStartInset: OpticalIllusionPocketOpeningIcon,
+  illusionEndInset: OpticalIllusionPocketOpeningIcon,
+  illusionLeadingRadius: OpticalIllusionPocketOpeningIcon,
+  illusionTrailingRadius: OpticalIllusionPocketOpeningIcon,
   stitchMargin: TODO,
   stitchHoleLength: TODO,
   stitchHoleDistance: TODO,
