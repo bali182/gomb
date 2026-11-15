@@ -32,7 +32,7 @@ import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { EditorButton } from '../common/EditorButton'
-import { getConstraintFieldIcon } from './constraintFieldIcons'
+import { getConstraintFieldIcon } from './getConstraintFieldIcon'
 import type { ConstraintFieldAdderState } from './constraintFieldUtils'
 
 const modelChoicePadding: Tokens['spacing'] = '2'

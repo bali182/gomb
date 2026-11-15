@@ -9,7 +9,7 @@ import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from '../common/EditorIconButton'
-import { getConstraintFieldIcon } from './constraintFieldIcons'
+import { getConstraintFieldIcon } from './getConstraintFieldIcon'
 import { getConstraintFieldLabel, getConstraintModelPath } from './constraintFieldUtils'
 
 type ConstraintFieldListProps = {

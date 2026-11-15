@@ -7,7 +7,7 @@ import type {
 } from '../../logic/constraints/constraintCreationUtils'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { isDefined } from '../../utils/isDefined'
-import { getConstraintFieldIcon } from '../constraint-editors/constraintFieldIcons'
+import { getConstraintFieldIcon } from '../constraint-editors/getConstraintFieldIcon'
 import { getConstraintFieldLabel } from '../constraint-editors/constraintFieldUtils'
 
 type ConstraintPropertyListProps = {
