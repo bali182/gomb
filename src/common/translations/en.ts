@@ -141,7 +141,7 @@ export const EN = {
       sections: {
         components: 'Components',
         pocketOpenings: 'Pocket openings',
-        constraints: 'Constraints',
+        constraints: 'Bindings',
       },
       noModuleSelected: {
         title: 'No module selected',
@@ -279,8 +279,8 @@ export const EN = {
         },
         common: {
           clone: 'Clone',
-          createConstraints: 'Constrain properties',
-          deleteConstraints: 'Delete constraints',
+          createConstraints: 'Bind properties',
+          deleteConstraints: 'Delete bindings',
           delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
@@ -302,7 +302,7 @@ export const EN = {
       },
       sections: {
         constraints: {
-          title: 'Constraints',
+          title: 'Bindings',
           empty: 'Empty',
           addFields: {
             title: 'Add fields',
@@ -310,17 +310,17 @@ export const EN = {
             pocketOpenings: 'Pocket openings',
             modelId: {
               label: 'Object',
-              tooltip: 'Select the object whose property you want to link.',
+              tooltip: 'Select the object whose property you want to bind.',
               placeholder: 'Choose an object…',
             },
             property: {
               label: 'Property',
-              tooltip: 'Only available properties compatible with this constraint are listed.',
+              tooltip: 'Only available properties compatible with this binding are listed.',
               placeholder: 'Field…',
             },
             noMatches: 'No matching fields or objects',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
-          linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
+          linkedAuto: 'This field is part of a binding. Remove the binding to enable automatic mode.',
         },
         globalSettings: {
           app: {
@@ -840,10 +840,10 @@ export const EN = {
       enums: {
         constraints: {
           blockReason: {
-            'auto-width': 'Switch width to manual to link it.',
-            'auto-height': 'Switch height to manual to link it.',
-            'auto-layout-gap': 'Switch gap to manual to link it.',
-            'auto-corner-radius': 'Switch corner radii to manual to link them.',
+            'auto-width': 'Switch width to manual to bind it.',
+            'auto-height': 'Switch height to manual to bind it.',
+            'auto-layout-gap': 'Switch gap to manual to bind it.',
+            'auto-corner-radius': 'Switch corner radii to manual to bind them.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
           fields: {
             width: 'Width',
@@ -1008,8 +1008,8 @@ export const EN = {
           description: 'Select another pocket opening to choose common properties.',
         },
         noConstraintFields: {
-          title: 'No linked fields yet',
-          description: 'Choose an object and then a field below to start linking.',
+          title: 'No bound fields yet',
+          description: 'Choose an object and then a field below to create a binding.',
         },
         missingFrontPocket: {
           title: 'Empty pocket cluster',
@@ -1043,11 +1043,11 @@ export const EN = {
   },
   dialogs: {
     createConstraints: {
-      title: 'Create constraints',
+      title: 'Create bindings',
       commonProperties: 'Common properties',
-      alreadyConstrained: 'This property already belongs to a constraint.',
+      alreadyConstrained: 'This property already belongs to a binding.',
       affectedModels: (names: string): string => `Affected elements: ${names}.`,
-      positiveAction: (count: number): string => `Create ${count} constraints`,
+      positiveAction: (count: number): string => `Create ${count} bindings`,
     },
     cloneComponent: {
       title: 'Clone component',
@@ -1122,24 +1122,23 @@ export const EN = {
           },
         } satisfies CloneComponentDialogSectionTranslationSchema<ClonePocketOpeningActionSchema>,
         constraints: {
-          title: 'Constraints',
+          title: 'Bindings',
           options: {
             ignore: {
               label: 'Skip',
-              tooltip: 'Do not apply this constraint to the cloned elements.',
-              headerTooltip: 'Do not copy any constraints. The cloned elements will be unconstrained.',
+              tooltip: 'Do not apply this binding to the cloned elements.',
+              headerTooltip: 'Do not copy any bindings. The cloned elements will remain unbound.',
             },
             'constrain-separately': {
               label: 'To new',
-              tooltip:
-                'Duplicate this constraint, and use it on the cloned counterparts of the elements it belongs to.',
+              tooltip: 'Duplicate this binding, and use it on the cloned counterparts of the elements it belongs to.',
               headerTooltip:
-                'Create separate constraints for each existing constraint, and use them on the cloned counterparts of the elements they currently belong to.',
+                'Create separate bindings for each existing binding, and use them on the cloned counterparts of the elements they currently belong to.',
             },
             'add-to-existing': {
               label: 'To existing',
-              tooltip: 'Use this existing constraint to link the cloned elements to their originals.',
-              headerTooltip: 'Use all applicable existing constraints to link the cloned elements to their originals.',
+              tooltip: 'Use this existing binding to bind the cloned elements to their originals.',
+              headerTooltip: 'Use all applicable existing bindings to bind the cloned elements to their originals.',
             },
           },
         } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedConstraintActionSchema>,

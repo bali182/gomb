@@ -71,7 +71,7 @@ export const HU = {
       sections: {
         components: 'Elemek',
         pocketOpenings: 'Zsebnyílások',
-        constraints: 'Kényszerek',
+        constraints: 'Értékkövetések',
       },
       noModuleSelected: {
         title: 'Nincs kiválasztott modul',
@@ -209,8 +209,8 @@ export const HU = {
         },
         common: {
           clone: 'Duplikálás',
-          createConstraints: 'Mezők összekötése',
-          deleteConstraints: 'Kényszerek törlése',
+          createConstraints: 'Értékkövetések létrehozása',
+          deleteConstraints: 'Értékkövetések megszüntetése',
           delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',
@@ -232,7 +232,7 @@ export const HU = {
       },
       sections: {
         constraints: {
-          title: 'Kényszerek',
+          title: 'Értékkövetések',
           empty: 'Üres',
           addFields: {
             title: 'Mezők hozzáadása',
@@ -240,17 +240,17 @@ export const HU = {
             pocketOpenings: 'Zsebnyílások',
             modelId: {
               label: 'Elem',
-              tooltip: 'Válaszd ki az elemet, amelynek egy tulajdonságát össze szeretnéd kötni.',
+              tooltip: 'Válaszd ki, melyik elem mezőjét szeretnéd használni.',
               placeholder: 'Válassz elemet…',
             },
             property: {
               label: 'Tulajdonság',
-              tooltip: 'Csak a kényszerhez illő, szabad tulajdonságok jelennek meg.',
+              tooltip: 'Csak a megfelelő, más értékkövetésben még nem szereplő mezők jelennek meg.',
               placeholder: 'Mező…',
             },
             noMatches: 'Nincs megfelelő mező vagy elem',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
-          linkedAuto: 'A mező kényszerhez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
+          linkedAuto: 'Ez a mező értékkövetésben szerepel. Az automatikus módhoz előbb szüntesd meg az értékkövetést.',
         },
         globalSettings: {
           app: {
@@ -767,10 +767,10 @@ export const HU = {
       enums: {
         constraints: {
           blockReason: {
-            'auto-width': 'Az összekötéshez állítsd manuálisra a szélességet.',
-            'auto-height': 'Az összekötéshez állítsd manuálisra a magasságot.',
-            'auto-layout-gap': 'Az összekötéshez állítsd manuálisra a hézagot.',
-            'auto-corner-radius': 'Az összekötéshez állítsd manuálisra a rádiuszokat.',
+            'auto-width': 'Az értékkövetéshez állítsd manuálisra a szélességet.',
+            'auto-height': 'Az értékkövetéshez állítsd manuálisra a magasságot.',
+            'auto-layout-gap': 'Az értékkövetéshez állítsd manuálisra a hézagot.',
+            'auto-corner-radius': 'Az értékkövetéshez állítsd manuálisra a lekerekítéseket.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
           fields: {
             width: 'Szélesség',
@@ -935,8 +935,8 @@ export const HU = {
           description: 'Válassz még egy zsebnyílást a közös mezők kiválasztásához.',
         },
         noConstraintFields: {
-          title: 'Még nincsenek összekötött mezők',
-          description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
+          title: 'Még nincsenek hozzáadott mezők',
+          description: 'Válassz alább egy elemet, majd egy mezőt.',
         },
         missingFrontPocket: {
           title: 'Üres zsebzsoport',
@@ -970,11 +970,11 @@ export const HU = {
   },
   dialogs: {
     createConstraints: {
-      title: 'Kényszerek létrehozása',
+      title: 'Értékkövetések létrehozása',
       commonProperties: 'Közös mezők',
-      alreadyConstrained: 'Ez a mező már egy kényszer része.',
+      alreadyConstrained: 'Ez a mező már szerepel egy értékkövetésben.',
       affectedModels: (names: string): string => `Érintett elemek: ${names}.`,
-      positiveAction: (count: number): string => `${count} kényszer létrehozása`,
+      positiveAction: (count: number): string => `${count} értékkövetés létrehozása`,
     },
     cloneComponent: {
       title: 'Komponens duplikálása',
@@ -1050,24 +1050,23 @@ export const HU = {
           },
         },
         constraints: {
-          title: 'Kényszerek',
+          title: 'Értékkövetések',
           options: {
             ignore: {
               label: 'Kihagyás',
-              tooltip: 'A kényszer nem vonatkozik a lemásolt elemekre.',
-              headerTooltip: 'A kényszerek kihagyása. A lemásolt elemekre nem vonatkoznak kényszerek.',
+              tooltip: 'A lemásolt elemek kimaradnak ebből az értékkövetésből.',
+              headerTooltip: 'A lemásolt elemek kimaradnak az értékkövetésekből.',
             },
             'constrain-separately': {
               label: 'Újhoz',
-              tooltip: 'A kényszer duplikálása az általa összekapcsolt elemek másolatai között.',
+              tooltip: 'Az értékkövetésről külön másolat készül a lemásolt elemek között.',
               headerTooltip:
-                'Minden meglévő kényszerről külön másolat készül, amely az eredetileg összekapcsolt elemek másolatait köti össze.',
+                'Minden meglévő értékkövetésről külön másolat készül a hozzá tartozó elemek másolatai között.',
             },
             'add-to-existing': {
               label: 'Meglévőhöz',
-              tooltip: 'A lemásolt elemek összekapcsolása az eredetiekkel a meglévő kényszer segítségével.',
-              headerTooltip:
-                'A lemásolt elemek összekapcsolása az eredetiekkel az összes alkalmazható meglévő kényszer segítségével.',
+              tooltip: 'A lemásolt elemek bekerülnek a meglévő értékkövetésbe.',
+              headerTooltip: 'A lemásolt elemek bekerülnek minden alkalmazható meglévő értékkövetésbe.',
             },
           },
         },
@@ -1149,7 +1148,7 @@ export const HU = {
     'recessed-pocket-opening': 'Ívelt',
     'slanted-pocket-opening': 'Ferde',
     'optical-illusion-pocket-opening': 'Optikai illúzió',
-    'equal-constraint': 'Egyenlőség',
+    'equal-constraint': 'Értékkövetés',
     'root-panel-constraint-field': 'Mező',
     'panel-constraint-field': 'Mező',
     'pocket-cluster-constraint-field': 'Mező',
