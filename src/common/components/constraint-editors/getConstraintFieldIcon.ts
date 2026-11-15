@@ -8,6 +8,7 @@ import {
   PiArrowsVertical,
   PiCreditCard,
   PiEmpty,
+  PiNeedle,
 } from 'react-icons/pi'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { HeightIcon } from '../icons/HeightIcon'
@@ -22,6 +23,9 @@ import { RadiusTopLeftIcon } from '../icons/RadiusTopLeftIcon'
 import { RadiusTopRightIcon } from '../icons/RadiusTopRightIcon'
 import { RecessedPocketOpeningIcon } from '../icons/RecessedPocketOpeningIcon'
 import { SlantedPocketOpeningIcon } from '../icons/SlantedPocketOpeningIcon'
+import { StitchDirectionIcon } from '../icons/StitchDirectionIcon'
+import { StitchLineEndOffsetIcon } from '../icons/StitchLineEndOffsetIcon'
+import { StitchLineStartOffsetIcon } from '../icons/StitchLineStartOffsetIcon'
 import { StraightPocketOpeningStackIcon } from '../icons/StraightPocketOpeningStackIcon'
 import { TPocketTabWidthIcon } from '../icons/TPocketTabWidthIcon'
 import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
@@ -74,13 +78,13 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   illusionEndInset: OpticalIllusionPocketOpeningIcon,
   illusionLeadingRadius: OpticalIllusionPocketOpeningIcon,
   illusionTrailingRadius: OpticalIllusionPocketOpeningIcon,
-  stitchMargin: TODO,
-  stitchHoleLength: TODO,
-  stitchHoleDistance: TODO,
-  stitchHoleThickness: TODO,
-  stitchLineThickness: TODO,
+  stitchMargin: PiNeedle,
+  stitchHoleLength: PiNeedle,
+  stitchHoleDistance: PiNeedle,
+  stitchHoleThickness: PiNeedle,
+  stitchLineThickness: PiNeedle,
   onTop: TODO,
-  startOffset: MULTI_ICON,
-  endOffset: MULTI_ICON,
-  stitchDirection: MULTI_ICON,
+  startOffset: StitchLineStartOffsetIcon,
+  endOffset: StitchLineEndOffsetIcon,
+  stitchDirection: StitchDirectionIcon,
 }
