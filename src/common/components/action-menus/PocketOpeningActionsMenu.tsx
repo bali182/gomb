@@ -1,14 +1,20 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
-import { useCallback, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
+import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import { CloneMenuItem, CreateConstraintsMenuItem, DeleteMenuItem } from './CommonActionsMenuItems'
+import {
+  CloneMenuItem,
+  CreateConstraintsMenuItem,
+  DeleteConstraintsMenuItem,
+  DeleteMenuItem,
+} from './CommonActionsMenuItems'
 import { SetDefaultPocketOpeningMenuItem } from './PocketOpeningActionsMenuItems'
 
 type PocketOpeningActionsMenuProps = {
@@ -20,7 +26,8 @@ type PocketOpeningActionsMenuProps = {
 export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ opening, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } = useSubProjectOperations()
+  const { deleteModelConstraintFields, clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } =
+    useSubProjectOperations()
   const isDefault = subProject.defaultPocketOpening === opening.id
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -35,6 +42,15 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
     deletePocketOpening({ id: opening.id })
     onDelete(opening.id)
   }, [deletePocketOpening, onDelete, opening.id])
+
+  const hasConstraints = useMemo<boolean>(
+    () => accessors.subProject(subProject).constraint.byModel(opening.id).length > 0,
+    [subProject, opening.id],
+  )
+
+  const handleDeleteConstraints = useCallback((): void => {
+    deleteModelConstraintFields({ modelId: opening.id })
+  }, [deleteModelConstraintFields, opening.id])
 
   const handleCreateConstraints = useCallback((): void => {
     openDialog({ type: 'create-constraints', source: opening, subProject })
@@ -56,11 +72,14 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
           <Menu.Positioner>
             <Menu.Content>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <CloneMenuItem onSelect={handleClone} />
                 <SetDefaultPocketOpeningMenuItem disabled={isDefault} onSelect={handleSetDefault} />
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem disabled={isDefault} onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>

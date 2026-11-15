@@ -132,16 +132,21 @@ describe('cloneComponent', () => {
         d.frontPocket({ id: 'front', openingId: 'opening' }),
       ],
       pocketOpenings: [
-        { id: 'opening', type: 'slanted', name: 'Shared', offset: 4, side: 'start' },
-        { id: 'other-opening', type: 'slanted', name: 'Other', offset: 4, side: 'start' },
+        { id: 'opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },
+        { id: 'other-opening', type: 'slanted', name: 'Other', slantOffset: 4, slantSide: 'start' },
       ],
       constraints: {
         linked: {
           id: 'linked',
           type: 'equal-constraint',
           fields: [
-            { id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'offset' },
-            { id: 'other-opening-field', type: 'slanted-constraint-field', modelId: 'other-opening', field: 'offset' },
+            { id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'slantOffset' },
+            {
+              id: 'other-opening-field',
+              type: 'slanted-constraint-field',
+              modelId: 'other-opening',
+              field: 'slantOffset',
+            },
           ],
         },
       },
@@ -372,7 +377,13 @@ describe('selective component cloning', () => {
   it('remaps cloned hole, stitch line and opening constraint fields to the new models', () => {
     const source = { ...pocketFixture() }
     const openingId = narrowers.assert.tPocket(source.components.a).openingId
-    source.pocketOpenings[openingId] = { id: openingId, type: 'slanted', name: 'Opening', offset: 2, side: 'start' }
+    source.pocketOpenings[openingId] = {
+      id: openingId,
+      type: 'slanted',
+      name: 'Opening',
+      slantOffset: 2,
+      slantSide: 'start',
+    }
     source.holes = [d.hole({ id: 'hole', componentId: 'a' })]
     source.stitchLines = [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole' })]
     source.constraints.owned = {
@@ -386,7 +397,7 @@ describe('selective component cloning', () => {
           modelId: 'stitch',
           field: 'stitchMargin',
         },
-        { id: 'opening-field', type: 'slanted-constraint-field', modelId: openingId, field: 'offset' },
+        { id: 'opening-field', type: 'slanted-constraint-field', modelId: openingId, field: 'slantOffset' },
       ],
     }
     const params = createCloneComponentParams(source, 'first')

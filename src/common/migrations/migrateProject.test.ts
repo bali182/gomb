@@ -288,11 +288,11 @@ describe('standalone opening migration', () => {
     if (!isDefined(openingInput) || openingInput.type !== 'optical-illusion') {
       throw new Error('Missing opening')
     }
-    delete openingInput.trailingRadius
+    delete openingInput.illusionTrailingRadius
     const migrated = migrateProject(project, context)
     expect(migrated.subProjects?.[0]?.pocketOpenings?.optical).toEqual({
       ...opening,
-      trailingRadius: defaultOpticalIllusionPocketOpening.trailingRadius,
+      trailingRadius: defaultOpticalIllusionPocketOpening.illusionTrailingRadius,
     })
     expect(migrated.subProjects?.[0]?.pocketOpenings?.unused).toEqual(unused)
     expect(migrated.subProjects?.[0]?.components?.t).toHaveProperty('openingId', opening.id)

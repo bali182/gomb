@@ -77,6 +77,7 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
         <SectionGroup.Root>
           <ContentsSection<FrontPocketSchema>
             modelId={editable.id}
+            orientation={parent.orientation}
             editable={editable}
             issues={issues}
             onChange={onChange}

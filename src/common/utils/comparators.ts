@@ -161,26 +161,26 @@ export const comparators = {
     }
     if (narrowers.is.opticalIllusionPocketOpening(a) && narrowers.is.opticalIllusionPocketOpening(b)) {
       return (
-        a.direction === b.direction &&
-        a.startInset === b.startInset &&
-        a.endInset === b.endInset &&
-        a.leadingRadius === b.leadingRadius &&
-        a.trailingRadius === b.trailingRadius
+        a.illusionSide === b.illusionSide &&
+        a.illusionStartInset === b.illusionStartInset &&
+        a.illusionEndInset === b.illusionEndInset &&
+        a.illusionLeadingRadius === b.illusionLeadingRadius &&
+        a.illusionTrailingRadius === b.illusionTrailingRadius
       )
     }
     if (narrowers.is.straightPocketOpening(a) && narrowers.is.straightPocketOpening(b)) {
       return true
     }
     if (narrowers.is.slantedPocketOpening(a) && narrowers.is.slantedPocketOpening(b)) {
-      return a.offset === b.offset && a.side === b.side
+      return a.slantOffset === b.slantOffset && a.slantSide === b.slantSide
     }
     if (narrowers.is.recessedPocketOpening(a) && narrowers.is.recessedPocketOpening(b)) {
       return (
-        a.outerInset === b.outerInset &&
-        a.innerOffset === b.innerOffset &&
-        a.depth === b.depth &&
-        a.outerRadius === b.outerRadius &&
-        a.innerRadius === b.innerRadius
+        a.recessOuterInset === b.recessOuterInset &&
+        a.recessInnerOffset === b.recessInnerOffset &&
+        a.recessDepth === b.recessDepth &&
+        a.recessOuterRadius === b.recessOuterRadius &&
+        a.recessInnerRadius === b.recessInnerRadius
       )
     }
     return false

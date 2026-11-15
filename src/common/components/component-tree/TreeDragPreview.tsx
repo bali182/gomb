@@ -1,4 +1,4 @@
-import { Box, IconButton, type SystemStyleObject } from '@chakra-ui/react'
+import { Box, Icon, IconButton, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiCaretRight, PiDotsSixVertical } from 'react-icons/pi'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -24,7 +24,6 @@ const previewStyles: SystemStyleObject = {
   rounded: 'l2',
   textStyle: 'sm',
   userSelect: 'none',
-  _icon: { boxSize: '4' },
 }
 
 export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject }) => {
@@ -39,7 +38,7 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
         isPositioned={false}
         trigger={
           node.kind === 'component' || node.kind === 'hole' ? (
-            <PiCaretRight opacity={node.children.length > 0 ? undefined : 0.4} />
+            <Icon as={PiCaretRight} size="sm" opacity={node.children.length > 0 ? undefined : 0.4} />
           ) : undefined
         }
         label={
@@ -49,7 +48,7 @@ export const TreeDragPreview: FC<TreeDragPreviewProps> = ({ dragData, subProject
         }
         leading={
           <IconButton pointerEvents="none" size="2xs" variant="ghost" _hover={{ bg: 'transparent' }}>
-            <PiDotsSixVertical />
+            <Icon as={PiDotsSixVertical} size="sm" />
           </IconButton>
         }
         trailing={null}
@@ -66,6 +65,6 @@ const TreeDragPreviewIcon: FC<TreeDragPreviewProps> = ({ dragData, subProject })
     )
   }
 
-  const Icon = getProjectTreeNodeIcon(node, subProject)
-  return <Icon />
+  const ModelIcon = getProjectTreeNodeIcon(node, subProject)
+  return <Icon as={ModelIcon} size="sm" />
 }

@@ -37,11 +37,11 @@ const opening: PocketOpeningSchema = {
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
-  outerInset: 18,
-  innerOffset: 15,
-  depth: 8,
-  outerRadius: 3,
-  innerRadius: 4,
+  recessOuterInset: 18,
+  recessInnerOffset: 15,
+  recessDepth: 8,
+  recessOuterRadius: 3,
+  recessInnerRadius: 4,
 }
 
 const createSubProject = (clusterCount: number, pocketCount: number): SubProjectSchema => {

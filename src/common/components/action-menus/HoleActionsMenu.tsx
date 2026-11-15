@@ -1,5 +1,5 @@
 import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/react'
-import { useCallback, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -7,11 +7,13 @@ import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
+import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
   CreateConstraintsMenuItem,
+  DeleteConstraintsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -28,7 +30,7 @@ type HoleActionsMenuProps = {
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
+  const { deleteModelConstraintFields, addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -38,6 +40,15 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     addStitchLine({ targetType: 'hole', targetId: hole.id })
     onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
   }, [addStitchLine, hole.id, onAddStitchLine])
+
+  const hasConstraints = useMemo<boolean>(
+    () => accessors.subProject(subProject).constraint.byModel(hole.id).length > 0,
+    [subProject, hole.id],
+  )
+
+  const handleDeleteConstraints = useCallback((): void => {
+    deleteModelConstraintFields({ modelId: hole.id })
+  }, [deleteModelConstraintFields, hole.id])
 
   const handleCreateConstraints = useCallback((): void => {
     openDialog({ type: 'create-constraints', source: hole, subProject })
@@ -79,6 +90,9 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>

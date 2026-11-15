@@ -21,6 +21,11 @@ import type {
 import type { ComputedComponentSchema } from '../schemas/computed'
 import type { PathSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
+import type {
+  RecessedPocketOpeningSchema,
+  SlantedPocketOpeningSchema,
+  StraightPocketOpeningSchema,
+} from '../schemas/pocketOpening'
 import { isDefined } from '../utils/isDefined'
 import { translateExportElement } from './exports/exportGeometryUtils'
 import { getExportElementsForComponent } from './exports/getExportElements'
@@ -74,16 +79,16 @@ describe('empty pocket cluster placeholder', () => {
     const original = d.subProject({ id: 'sp', root, components: [cluster] })
     const empty = getComputedSubProject(original, defaultStitchingSettings)
     expect(getClosedPathArea(empty.components.cluster.path)).toBeCloseTo(8000, 7)
-    const opening = {
+    const opening: RecessedPocketOpeningSchema = {
       id: 'recessed',
       name: 'Recessed',
       type: 'recessed',
-      outerInset: 10,
-      innerOffset: 15,
-      depth: 12,
-      outerRadius: 0,
-      innerRadius: 0,
-    } as const
+      recessOuterInset: 10,
+      recessInnerOffset: 15,
+      recessDepth: 12,
+      recessOuterRadius: 0,
+      recessInnerRadius: 0,
+    }
     const front = d.frontPocket({ id: 'front', openingId: opening.id })
     const populated: SubProjectSchema = {
       ...original,
@@ -1742,14 +1747,14 @@ const pocketFixture = () => {
 }
 
 const openingFixture = () => {
-  const opening = {
-    type: 'slanted' as const,
+  const opening: SlantedPocketOpeningSchema = {
+    type: 'slanted',
     ...defaultSlantedPocketOpening,
     id: 'shared',
     name: 'Slanted',
-    offset: 1000,
+    slantOffset: 1000,
   }
-  const defaultOpening = { id: 'custom-default', name: 'Default', type: 'straight' } as const
+  const defaultOpening: StraightPocketOpeningSchema = { id: 'custom-default', name: 'Default', type: 'straight' }
   const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
   const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
   const t = d.tPocket({ id: 't', openingId: opening.id })
@@ -1760,7 +1765,7 @@ const openingFixture = () => {
     components: [cluster, t, front],
     pocketOpenings: [opening, defaultOpening],
   })
-  const subProject = {
+  const subProject: SubProjectSchema = {
     ...original,
     defaultPocketOpening: defaultOpening.id,
   }
@@ -1789,9 +1794,9 @@ it('keeps cluster stitching empty after its last T-pocket is removed', () => {
 
 it('computes independent local limits for pockets sharing one opening definition', () => {
   const { subProject, opening } = openingFixture()
-  const source = {
+  const source: SubProjectSchema = {
     ...subProject,
-    pocketOpenings: { ...subProject.pocketOpenings, [opening.id]: { ...opening, offset: 900 } },
+    pocketOpenings: { ...subProject.pocketOpenings, [opening.id]: { ...opening, slantOffset: 900 } },
   }
   const snapshot = structuredClone(source)
   const computed = getComputedSubProject(source, defaultStitchingSettings)
@@ -1805,7 +1810,7 @@ it('computes independent local limits for pockets sharing one opening definition
   ) {
     throw new Error('Unexpected limits')
   }
-  expect(tLimits.opening.offset?.max?.value.toNumber()).toBeGreaterThan(0)
-  expect(tLimits.opening.offset?.max?.value.lt(frontLimits.opening.offset?.max?.value ?? 0)).toBe(true)
+  expect(tLimits.opening.slantOffset?.max?.value.toNumber()).toBeGreaterThan(0)
+  expect(tLimits.opening.slantOffset?.max?.value.lt(frontLimits.opening.slantOffset?.max?.value ?? 0)).toBe(true)
   expect(source).toEqual(snapshot)
 })

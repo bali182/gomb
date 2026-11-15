@@ -33,6 +33,7 @@ import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { EditorButton } from '../common/EditorButton'
 import type { ConstraintFieldAdderState } from './constraintFieldUtils'
+import { getConstraintFieldIcon } from './getConstraintFieldIcon'
 
 const modelChoicePadding: Tokens['spacing'] = '2'
 const modelChoiceIndent: Tokens['spacing'] = '4'
@@ -285,7 +286,6 @@ export const ConstraintFieldCombobox: FC<ConstraintFieldComboboxProps> = ({
               onClick={handleAdd}
             >
               <PiPlus />
-              {t.project.editors.sections.constraints.addFields.add}
             </EditorButton>
           }
           endAddonProps={endAddonProps}
@@ -301,7 +301,7 @@ export const ConstraintFieldCombobox: FC<ConstraintFieldComboboxProps> = ({
             >
               {isDefined(selectedModel) && (
                 <>
-                  <TagsInput.Item index={0} value={selectedModel.id} flexShrink="1" minW="0" maxW="45%">
+                  <TagsInput.Item index={0} value={selectedModel.id} flexShrink="1" minW="0">
                     <TagsInput.ItemPreview>
                       <TagsInput.ItemText truncate>{selectedModel.label}</TagsInput.ItemText>
                       <TagsInput.ItemDeleteTrigger />
@@ -311,7 +311,7 @@ export const ConstraintFieldCombobox: FC<ConstraintFieldComboboxProps> = ({
                 </>
               )}
               {isDefined(selectedProperty) && (
-                <TagsInput.Item index={1} value={selectedProperty.id} flexShrink="1" minW="0" maxW="45%">
+                <TagsInput.Item index={1} value={selectedProperty.id} flexShrink="1" minW="0">
                   <TagsInput.ItemPreview>
                     <TagsInput.ItemText truncate>{selectedProperty.label}</TagsInput.ItemText>
                     <TagsInput.ItemDeleteTrigger />
@@ -343,6 +343,7 @@ export const ConstraintFieldCombobox: FC<ConstraintFieldComboboxProps> = ({
                 {isDefined(selectedModel) ? (
                   filteredProperties.map((item) => (
                     <Combobox.Item key={item.id} item={item}>
+                      <Icon as={getConstraintFieldIcon(item.id)} size="sm" flexShrink="0" />
                       <Combobox.ItemText>{item.label}</Combobox.ItemText>
                       <Combobox.ItemIndicator />
                     </Combobox.Item>

@@ -139,8 +139,8 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole', onTop: 'root' })],
     pocketOpenings: [
-      { id: 'shared-opening', type: 'slanted', name: 'Shared', offset: 4, side: 'start' },
-      { id: 'unused-opening', type: 'slanted', name: 'Unused', offset: 4, side: 'start' },
+      { id: 'shared-opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },
+      { id: 'unused-opening', type: 'slanted', name: 'Unused', slantOffset: 4, slantSide: 'start' },
     ],
     constraints: {
       dimensions: {
@@ -162,8 +162,8 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
         id: 'openings',
         type: 'equal-constraint',
         fields: [
-          { id: 'shared-field', type: 'slanted-constraint-field', modelId: 'shared-opening', field: 'offset' },
-          { id: 'unused-field', type: 'slanted-constraint-field', modelId: 'unused-opening', field: 'offset' },
+          { id: 'shared-field', type: 'slanted-constraint-field', modelId: 'shared-opening', field: 'slantOffset' },
+          { id: 'unused-field', type: 'slanted-constraint-field', modelId: 'unused-opening', field: 'slantOffset' },
         ],
       },
     },

@@ -150,11 +150,11 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
     }
     case 'recessed': {
       const fields: RecessedPocketOpeningConstraintFieldNameSchema[] = [
-        'outerInset',
-        'innerOffset',
-        'outerRadius',
-        'innerRadius',
-        'depth',
+        'recessOuterInset',
+        'recessInnerOffset',
+        'recessOuterRadius',
+        'recessInnerRadius',
+        'recessDepth',
       ]
       return fields.map(
         (field): RecessedPocketOpeningConstraintFieldInputSchema => ({
@@ -165,7 +165,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'slanted': {
-      const fields: SlantedPocketOpeningConstraintFieldNameSchema[] = ['offset', 'side']
+      const fields: SlantedPocketOpeningConstraintFieldNameSchema[] = ['slantOffset', 'slantSide']
       return fields.map(
         (field): SlantedPocketOpeningConstraintFieldInputSchema => ({
           type: 'slanted-constraint-field',
@@ -176,11 +176,11 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
     }
     case 'optical-illusion': {
       const fields: OpticalIllusionPocketOpeningConstraintFieldNameSchema[] = [
-        'direction',
-        'startInset',
-        'endInset',
-        'leadingRadius',
-        'trailingRadius',
+        'illusionSide',
+        'illusionStartInset',
+        'illusionEndInset',
+        'illusionLeadingRadius',
+        'illusionTrailingRadius',
       ]
       return fields.map(
         (field): OpticalIllusionPocketOpeningConstraintFieldInputSchema => ({

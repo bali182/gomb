@@ -5,7 +5,7 @@ import { narrowers } from '../../utils/narrowers'
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import type { PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
-import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
+import type { RecessedPocketOpeningOwnSchema, RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { getPathSegments } from '../pathSegments'
 import type { ArcPathSegment, PathSegment } from '../pathSegmentTypes'
@@ -23,11 +23,11 @@ const createOpening = (overrides: Partial<RecessedPocketOpeningSchema> = {}): Re
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
-  outerInset: 29,
-  innerOffset: 15,
-  depth: 8,
-  outerRadius: 5,
-  innerRadius: 5,
+  recessOuterInset: 29,
+  recessInnerOffset: 15,
+  recessDepth: 8,
+  recessOuterRadius: 5,
+  recessInnerRadius: 5,
   ...overrides,
 })
 
@@ -80,7 +80,12 @@ const expectSmoothJoins = (path: PathSchema): void => {
 
 describe('RecessedPocketCalculator', () => {
   it('keeps the illustrated R15 inner circle and joins it tangentially to R5 outer circles', () => {
-    const opening = createOpening({ outerInset: 35, depth: 15, outerRadius: 5, innerRadius: 15 })
+    const opening = createOpening({
+      recessOuterInset: 35,
+      recessDepth: 15,
+      recessOuterRadius: 5,
+      recessInnerRadius: 15,
+    })
     const path = createOpeningPath(opening, rect, 'up')
     const arcs = getArcs(path)
     const outerStart = 50 - 5 * Math.sqrt(15)
@@ -96,7 +101,9 @@ describe('RecessedPocketCalculator', () => {
     expectPoint(arcs[3].center, 100 - outerStart, 5)
     expect(Math.abs(arcs[1].sweepAngle)).toBeLessThan(Math.PI / 2)
     expectSmoothJoins(path)
-    expect(opening).toEqual(createOpening({ outerInset: 35, depth: 15, outerRadius: 5, innerRadius: 15 }))
+    expect(opening).toEqual(
+      createOpening({ recessOuterInset: 35, recessDepth: 15, recessOuterRadius: 5, recessInnerRadius: 15 }),
+    )
   })
 
   it.each([
@@ -106,7 +113,7 @@ describe('RecessedPocketCalculator', () => {
     { outerRadius: 15.000001, expectedSlopes: 0 },
     { outerRadius: 30, expectedSlopes: 0 },
   ])('joins R$outerRadius and R5 with $expectedSlopes sloping straight segments', ({ outerRadius, expectedSlopes }) => {
-    const path = createOpeningPath(createOpening({ outerRadius }), rect, 'up')
+    const path = createOpeningPath(createOpening({ recessOuterRadius: outerRadius }), rect, 'up')
     const slopes = getPathSegments(path).filter(
       (segment) => narrowers.path.is.lineSegment(segment) && !segment.start.y.isEqualTo(segment.end.y),
     )
@@ -119,7 +126,7 @@ describe('RecessedPocketCalculator', () => {
   it.each([14.999999, 15, 15.000001])(
     'changes continuously around the point where the straight disappears: R%s',
     (outerRadius) => {
-      const arcs = getArcs(createOpeningPath(createOpening({ outerRadius }), rect, 'up'))
+      const arcs = getArcs(createOpeningPath(createOpening({ recessOuterRadius: outerRadius }), rect, 'up'))
 
       const tolerance = Math.abs(outerRadius - 15) + 1e-12
       for (const [point, x, y] of [
@@ -136,7 +143,7 @@ describe('RecessedPocketCalculator', () => {
   )
 
   it.each([0, 1, 5, 15, 20, 40])('keeps the inner circles unchanged when the outer radius is %s', (outerRadius) => {
-    const path = createOpeningPath(createOpening({ outerRadius }), rect, 'up')
+    const path = createOpeningPath(createOpening({ recessOuterRadius: outerRadius }), rect, 'up')
     const innerArcs = getArcs(path).filter((arc) => arc.reversed)
 
     expect(innerArcs).toHaveLength(2)
@@ -148,24 +155,24 @@ describe('RecessedPocketCalculator', () => {
     }
   })
 
-  it.each([
-    { outerInset: 15, innerOffset: 15, depth: 10, outerRadius: 5, innerRadius: 5 },
-    { outerInset: 20, innerOffset: 15, depth: 2, outerRadius: 100, innerRadius: 50 },
-    { outerInset: 35, innerOffset: 15, depth: 2, outerRadius: 100, innerRadius: 15 },
-    { outerInset: 25, innerOffset: 15, depth: 30, outerRadius: 5, innerRadius: 5 },
+  it.each<RecessedPocketOpeningOwnSchema>([
+    { recessOuterInset: 15, recessInnerOffset: 15, recessDepth: 10, recessOuterRadius: 5, recessInnerRadius: 5 },
+    { recessOuterInset: 20, recessInnerOffset: 15, recessDepth: 2, recessOuterRadius: 100, recessInnerRadius: 50 },
+    { recessOuterInset: 35, recessInnerOffset: 15, recessDepth: 2, recessOuterRadius: 100, recessInnerRadius: 15 },
+    { recessOuterInset: 25, recessInnerOffset: 15, recessDepth: 30, recessOuterRadius: 5, recessInnerRadius: 5 },
   ])('keeps shallow and steep transitions smooth: %o', (parameters) => {
     const path = createOpeningPath(createOpening(parameters), rect, 'up')
     expect(getArcs(path).map((arc) => arc.radius.toNumber())).toEqual([
-      parameters.outerRadius,
-      parameters.innerRadius,
-      parameters.innerRadius,
-      parameters.outerRadius,
+      parameters.recessOuterRadius,
+      parameters.recessInnerRadius,
+      parameters.recessInnerRadius,
+      parameters.recessOuterRadius,
     ])
     expectSmoothJoins(path)
   })
 
   it.each([5, 15, 30])('mirrors the whole path when the outer radius is %s', (outerRadius) => {
-    const segments = getPathSegments(createOpeningPath(createOpening({ outerRadius }), rect, 'up'))
+    const segments = getPathSegments(createOpeningPath(createOpening({ recessOuterRadius: outerRadius }), rect, 'up'))
     for (let index = 0; index < segments.length; index += 1) {
       for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
         const first = getPointOnPathSegment(segments[index], new BigNumber(progress))
@@ -182,7 +189,16 @@ describe('RecessedPocketCalculator', () => {
     { outerRadius: 0, innerRadius: 15, expectedRadii: [15, 15] },
     { outerRadius: 20, innerRadius: 0, expectedRadii: [20, 20] },
   ])('omits zero-radius arcs: %o', ({ outerRadius, innerRadius, expectedRadii }) => {
-    const path = createOpeningPath(createOpening({ outerInset: 35, depth: 15, outerRadius, innerRadius }), rect, 'up')
+    const path = createOpeningPath(
+      createOpening({
+        recessOuterInset: 35,
+        recessDepth: 15,
+        recessOuterRadius: outerRadius,
+        recessInnerRadius: innerRadius,
+      }),
+      rect,
+      'up',
+    )
     expect(getArcs(path).map((arc) => arc.radius.toNumber())).toEqual(expectedRadii)
     for (const segment of getPathSegments(path)) {
       expect(segment.start.x.isFinite() && segment.start.y.isFinite()).toBe(true)
@@ -192,7 +208,7 @@ describe('RecessedPocketCalculator', () => {
 
   it('uses two R15 quarter arcs for an unrounded U opening', () => {
     const path = createOpeningPath(
-      createOpening({ outerInset: 35, depth: 15, outerRadius: 0, innerRadius: 15 }),
+      createOpening({ recessOuterInset: 35, recessDepth: 15, recessOuterRadius: 0, recessInnerRadius: 15 }),
       rect,
       'up',
     )
@@ -206,7 +222,7 @@ describe('RecessedPocketCalculator', () => {
   })
 
   it('returns a straight opening at zero depth', () => {
-    const segments = getPathSegments(createOpeningPath(createOpening({ depth: 0 }), rect, 'up'))
+    const segments = getPathSegments(createOpeningPath(createOpening({ recessDepth: 0 }), rect, 'up'))
     expect(segments).toHaveLength(1)
     expect(segments[0].type).toBe('line')
     expectPoint(segments[0].start, 0, 0)
@@ -266,7 +282,7 @@ describe.each<OrientationTestCase>([
     const calculator = new RecessedPocketCalculator(
       d.frontPocket({ id: 'front' }),
       d.pocketCluster({ id: 'cluster', orientation }),
-      createOpening({ outerInset: 35, depth: 15, outerRadius: 5, innerRadius: 15 }),
+      createOpening({ recessOuterInset: 35, recessDepth: 15, recessOuterRadius: 5, recessInnerRadius: 15 }),
       { x: new BigNumber(11), y: new BigNumber(17), width: new BigNumber(width), height: new BigNumber(height) },
       ZERO_CORNER_RADIUS,
     )

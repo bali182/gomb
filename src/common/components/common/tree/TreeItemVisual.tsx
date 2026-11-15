@@ -24,7 +24,7 @@ export const TreeItemVisual: FC<TreeItemVisualProps> = ({ icon, trigger, label, 
   >
     {trigger}
     {leading}
-    <Box display="inline-flex" boxSize="4" fontSize="md" flexShrink="0">
+    <Box display="inline-flex" flexShrink="0">
       {icon}
     </Box>
     {label}

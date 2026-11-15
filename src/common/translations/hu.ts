@@ -71,7 +71,7 @@ export const HU = {
       sections: {
         components: 'Elemek',
         pocketOpenings: 'Zsebnyílások',
-        constraints: 'Kényszerek',
+        constraints: 'Értékkövetések',
       },
       noModuleSelected: {
         title: 'Nincs kiválasztott modul',
@@ -209,7 +209,8 @@ export const HU = {
         },
         common: {
           clone: 'Duplikálás',
-          createConstraints: 'Mezők összekötése',
+          createConstraints: 'Értékkövetések létrehozása',
+          deleteConstraints: 'Értékkövetések megszüntetése',
           delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',
@@ -231,7 +232,7 @@ export const HU = {
       },
       sections: {
         constraints: {
-          title: 'Kényszerek',
+          title: 'Értékkövetések',
           empty: 'Üres',
           addFields: {
             title: 'Mezők hozzáadása',
@@ -239,18 +240,17 @@ export const HU = {
             pocketOpenings: 'Zsebnyílások',
             modelId: {
               label: 'Elem',
-              tooltip: 'Válaszd ki az elemet, amelynek egy tulajdonságát össze szeretnéd kötni.',
+              tooltip: 'Válaszd ki, melyik elem mezőjét szeretnéd használni.',
               placeholder: 'Válassz elemet…',
             },
             property: {
               label: 'Tulajdonság',
-              tooltip: 'Csak a kényszerhez illő, szabad tulajdonságok jelennek meg.',
+              tooltip: 'Csak a megfelelő, más értékkövetésben még nem szereplő mezők jelennek meg.',
               placeholder: 'Mező…',
             },
-            add: 'Hozzáad',
             noMatches: 'Nincs megfelelő mező vagy elem',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
-          linkedAuto: 'A mező kényszerhez van kötve. Az automatikus módhoz előbb töröld az összekötést.',
+          linkedAuto: 'Ez a mező értékkövetésben szerepel. Az automatikus módhoz előbb szüntesd meg az értékkövetést.',
         },
         globalSettings: {
           app: {
@@ -434,24 +434,30 @@ export const HU = {
           recessedPocketOpening: {
             geometry: {
               title: 'Geometria',
-              outerInset: {
+              recessOuterInset: {
                 label: 'Külső betolás',
                 tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
               },
-              innerOffset: {
+              recessInnerOffset: {
                 label: 'Belső eltolás',
                 tooltip:
                   'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
               },
-              depth: { label: 'Mélység', tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.' },
+              recessDepth: {
+                label: 'Mélység',
+                tooltip: 'A kivágás mélysége a nyílástól a zseb belseje felé mérve, mm-ben.',
+              },
             },
             cornerRadius: {
               title: 'Lekerekítés',
-              outerRadius: {
+              recessOuterRadius: {
                 label: 'Külső sugár',
                 tooltip: 'A nyílás egyenes éléből a kivágásba vezető átmenet sugara, mm-ben.',
               },
-              innerRadius: { label: 'Belső sugár', tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.' },
+              recessInnerRadius: {
+                label: 'Belső sugár',
+                tooltip: 'A kivágás alsó részébe vezető átmenet sugara, mm-ben.',
+              },
             },
           },
           opticalIllusionPocketOpeningCredit: {
@@ -460,16 +466,16 @@ export const HU = {
           opticalIllusionPocketOpening: {
             geometry: {
               title: 'Geometria',
-              direction: {
+              illusionSide: {
                 label: 'Alacsonyabb oldal',
                 tooltip: 'A nyílás alacsonyabb végét választja ki; a forma a clusterrel együtt fordul.',
               },
-              startInset: {
+              illusionStartInset: {
                 label: 'Kezdő betolás',
                 tooltip:
                   'Az átló kezdetének távolsága az alacsonyabb oldali széltől a front pocketnél, mm-ben. A teljes clusterre vonatkozik.',
               },
-              endInset: {
+              illusionEndInset: {
                 label: 'Záró betolás',
                 tooltip:
                   'Az átló végének távolsága a magasabb oldali széltől a leghátsó pocketnél, mm-ben. A teljes clusterre vonatkozik.',
@@ -477,11 +483,11 @@ export const HU = {
             },
             cornerRadius: {
               title: 'Lekerekítés',
-              leadingRadius: {
+              illusionLeadingRadius: {
                 label: 'Kezdő sugár',
                 tooltip: 'A kezdő egyenesből a ferde szakaszba vezető átmenet sugara, mm-ben.',
               },
-              trailingRadius: {
+              illusionTrailingRadius: {
                 label: 'Záró sugár',
                 tooltip: 'A ferde szakaszból a záró egyenesbe vezető átmenet sugara, mm-ben.',
               },
@@ -490,11 +496,11 @@ export const HU = {
           slantedPocketOpening: {
             geometry: {
               title: 'Geometria',
-              side: {
+              slantSide: {
                 label: 'Alacsonyabb oldal',
                 tooltip: 'Kiválasztja, melyik nyílásvégpont mozduljon befelé, rövidítve a zseb adott oldalát.',
               },
-              offset: {
+              slantOffset: {
                 label: 'Eltérés',
                 tooltip: 'A kiválasztott nyílásvégpontot ennyivel mozgatja a zseb belseje felé, mm-ben.',
               },
@@ -761,11 +767,61 @@ export const HU = {
       enums: {
         constraints: {
           blockReason: {
-            'auto-width': 'Az összekötéshez állítsd manuálisra a szélességet.',
-            'auto-height': 'Az összekötéshez állítsd manuálisra a magasságot.',
-            'auto-layout-gap': 'Az összekötéshez állítsd manuálisra a hézagot.',
-            'auto-corner-radius': 'Az összekötéshez állítsd manuálisra a rádiuszokat.',
+            'auto-width': 'Az értékkövetéshez állítsd manuálisra a szélességet.',
+            'auto-height': 'Az értékkövetéshez állítsd manuálisra a magasságot.',
+            'auto-layout-gap': 'Az értékkövetéshez állítsd manuálisra a hézagot.',
+            'auto-corner-radius': 'Az értékkövetéshez állítsd manuálisra a lekerekítéseket.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          fields: {
+            width: 'Szélesség',
+            height: 'Magasság',
+            topLeftRadius: 'Bal felső lekerekítés',
+            topRightRadius: 'Jobb felső lekerekítés',
+            bottomLeftRadius: 'Bal alsó lekerekítés',
+            bottomRightRadius: 'Jobb alsó lekerekítés',
+            layoutOrientation: 'Elrendezés iránya',
+            mainAxisAnchor: 'Elrendezés igazítása',
+            layoutGap: 'Elrendezés térköze',
+            offAxisAnchor: 'Elem igazítása',
+            topStretch: 'Felső él korrekciója',
+            rightStretch: 'Jobb él korrekciója',
+            bottomStretch: 'Alsó él korrekciója',
+            leftStretch: 'Bal él korrekciója',
+            pocketStep: 'Zsebek távolsága',
+            orientation: 'Zsebnyílás iránya',
+            openingId: 'Zsebnyílás',
+            itemId: 'Zseb tartalma',
+            itemOrientation: 'Tartalom tájolása',
+            itemCrossAxisOffset: 'Tartalom oldaleltolása',
+            itemOpeningOffset: 'Tartalom kiemelése',
+            tPocketTabWidth: 'T-zseb fülszélessége',
+            tPocketTaper: 'T-zseb keskenyedése',
+            xAnchor: 'Vízszintes igazítás',
+            yAnchor: 'Függőleges igazítás',
+            xOffset: 'X eltolás',
+            yOffset: 'Y eltolás',
+            recessOuterInset: 'Ívelt: külső betolás',
+            recessInnerOffset: 'Ívelt: belső eltolás',
+            recessOuterRadius: 'Ívelt: külső lekerekítés',
+            recessInnerRadius: 'Ívelt: belső lekerekítés',
+            recessDepth: 'Ívelt: mélység',
+            slantOffset: 'Ferde: eltérés',
+            slantSide: 'Ferde: alacsonyabb oldal',
+            illusionSide: 'Illúzió: alacsonyabb oldal',
+            illusionStartInset: 'Illúzió: kezdő betolás',
+            illusionEndInset: 'Illúzió: záró betolás',
+            illusionLeadingRadius: 'Illúzió: kezdő lekerekítés',
+            illusionTrailingRadius: 'Illúzió: záró lekerekítés',
+            stitchMargin: 'Varrás margója',
+            stitchHoleLength: 'Öltéslyuk hossza',
+            stitchHoleDistance: 'Öltéslyukak távolsága',
+            stitchHoleThickness: 'Öltéslyuk vastagsága',
+            stitchLineThickness: 'Varrásvonal vastagsága',
+            onTop: 'Varrás célfelülete',
+            startOffset: 'Varrás kezdő eltolása',
+            endOffset: 'Varrás végi eltolása',
+            stitchDirection: 'Varrás iránya',
+          },
         },
         globalSettings: {
           theme: {
@@ -879,8 +935,8 @@ export const HU = {
           description: 'Válassz még egy zsebnyílást a közös mezők kiválasztásához.',
         },
         noConstraintFields: {
-          title: 'Még nincsenek összekötött mezők',
-          description: 'Az összekötéshez válassz alább egy elemet, majd egy mezőt.',
+          title: 'Még nincsenek hozzáadott mezők',
+          description: 'Válassz alább egy elemet, majd egy mezőt.',
         },
         missingFrontPocket: {
           title: 'Üres zsebzsoport',
@@ -914,11 +970,11 @@ export const HU = {
   },
   dialogs: {
     createConstraints: {
-      title: 'Kényszerek létrehozása',
+      title: 'Értékkövetések létrehozása',
       commonProperties: 'Közös mezők',
-      alreadyConstrained: 'Ez a mező már egy kényszer része.',
+      alreadyConstrained: 'Ez a mező már szerepel egy értékkövetésben.',
       affectedModels: (names: string): string => `Érintett elemek: ${names}.`,
-      positiveAction: (count: number): string => `${count} kényszer létrehozása`,
+      positiveAction: (count: number): string => `${count} értékkövetés létrehozása`,
     },
     cloneComponent: {
       title: 'Komponens duplikálása',
@@ -994,24 +1050,23 @@ export const HU = {
           },
         },
         constraints: {
-          title: 'Kényszerek',
+          title: 'Értékkövetések',
           options: {
             ignore: {
               label: 'Kihagyás',
-              tooltip: 'A kényszer nem vonatkozik a lemásolt elemekre.',
-              headerTooltip: 'A kényszerek kihagyása. A lemásolt elemekre nem vonatkoznak kényszerek.',
+              tooltip: 'A lemásolt elemek kimaradnak ebből az értékkövetésből.',
+              headerTooltip: 'A lemásolt elemek kimaradnak az értékkövetésekből.',
             },
             'constrain-separately': {
               label: 'Újhoz',
-              tooltip: 'A kényszer duplikálása az általa összekapcsolt elemek másolatai között.',
+              tooltip: 'Az értékkövetésről külön másolat készül a lemásolt elemek között.',
               headerTooltip:
-                'Minden meglévő kényszerről külön másolat készül, amely az eredetileg összekapcsolt elemek másolatait köti össze.',
+                'Minden meglévő értékkövetésről külön másolat készül a hozzá tartozó elemek másolatai között.',
             },
             'add-to-existing': {
               label: 'Meglévőhöz',
-              tooltip: 'A lemásolt elemek összekapcsolása az eredetiekkel a meglévő kényszer segítségével.',
-              headerTooltip:
-                'A lemásolt elemek összekapcsolása az eredetiekkel az összes alkalmazható meglévő kényszer segítségével.',
+              tooltip: 'A lemásolt elemek bekerülnek a meglévő értékkövetésbe.',
+              headerTooltip: 'A lemásolt elemek bekerülnek minden alkalmazható meglévő értékkövetésbe.',
             },
           },
         },
@@ -1093,7 +1148,7 @@ export const HU = {
     'recessed-pocket-opening': 'Ívelt',
     'slanted-pocket-opening': 'Ferde',
     'optical-illusion-pocket-opening': 'Optikai illúzió',
-    'equal-constraint': 'Egyenlőség',
+    'equal-constraint': 'Értékkövetés',
     'root-panel-constraint-field': 'Mező',
     'panel-constraint-field': 'Mező',
     'pocket-cluster-constraint-field': 'Mező',

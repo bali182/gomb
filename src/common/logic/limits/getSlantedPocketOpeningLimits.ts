@@ -19,7 +19,7 @@ export const getSlantedPocketOpeningLimits = (
   const reserved = getReservedDepth(opening, pocket, cluster, computed)
   return {
     type: opening.type,
-    offset: {
+    slantOffset: {
       max: {
         value: width.isZero() ? ZERO : BigNumber.maximum(depth.minus(reserved), 0),
         reason: 'slanted-pocket-opening-offset-exceeds-pocket',
@@ -41,12 +41,12 @@ const getReservedDepth = (
   const radius = computed.cornerRadius
   switch (cluster.orientation) {
     case 'up':
-      return opening.side === 'start' ? radius.bottomLeft : radius.bottomRight
+      return opening.slantSide === 'start' ? radius.bottomLeft : radius.bottomRight
     case 'right':
-      return opening.side === 'start' ? radius.topLeft : radius.bottomLeft
+      return opening.slantSide === 'start' ? radius.topLeft : radius.bottomLeft
     case 'down':
-      return opening.side === 'start' ? radius.topRight : radius.topLeft
+      return opening.slantSide === 'start' ? radius.topRight : radius.topLeft
     case 'left':
-      return opening.side === 'start' ? radius.bottomRight : radius.topRight
+      return opening.slantSide === 'start' ? radius.bottomRight : radius.topRight
   }
 }

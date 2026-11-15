@@ -24,7 +24,7 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { ConstraintFieldBlockReasonSchema, ConstraintFieldNameSchema } from '../schemas/constraints'
 import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -141,7 +141,7 @@ export const EN = {
       sections: {
         components: 'Components',
         pocketOpenings: 'Pocket openings',
-        constraints: 'Constraints',
+        constraints: 'Bindings',
       },
       noModuleSelected: {
         title: 'No module selected',
@@ -279,7 +279,8 @@ export const EN = {
         },
         common: {
           clone: 'Clone',
-          createConstraints: 'Constrain properties',
+          createConstraints: 'Bind properties',
+          deleteConstraints: 'Delete bindings',
           delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
@@ -301,7 +302,7 @@ export const EN = {
       },
       sections: {
         constraints: {
-          title: 'Constraints',
+          title: 'Bindings',
           empty: 'Empty',
           addFields: {
             title: 'Add fields',
@@ -309,18 +310,17 @@ export const EN = {
             pocketOpenings: 'Pocket openings',
             modelId: {
               label: 'Object',
-              tooltip: 'Select the object whose property you want to link.',
+              tooltip: 'Select the object whose property you want to bind.',
               placeholder: 'Choose an object…',
             },
             property: {
               label: 'Property',
-              tooltip: 'Only available properties compatible with this constraint are listed.',
+              tooltip: 'Only available properties compatible with this binding are listed.',
               placeholder: 'Field…',
             },
-            add: 'Add',
             noMatches: 'No matching fields or objects',
           } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
-          linkedAuto: 'This field is linked by a constraint. Remove the link to enable automatic mode.',
+          linkedAuto: 'This field is part of a binding. Remove the binding to enable automatic mode.',
         },
         globalSettings: {
           app: {
@@ -505,24 +505,27 @@ export const EN = {
           recessedPocketOpening: {
             geometry: {
               title: 'Geometry',
-              outerInset: {
+              recessOuterInset: {
                 label: 'Outer inset',
                 tooltip: 'Distance from either opening edge to the outer corner, in mm.',
               },
-              innerOffset: {
+              recessInnerOffset: {
                 label: 'Inner offset',
                 tooltip:
                   'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
               },
-              depth: { label: 'Depth', tooltip: 'Depth of the recess measured inward from the opening, in mm.' },
+              recessDepth: {
+                label: 'Depth',
+                tooltip: 'Depth of the recess measured inward from the opening, in mm.',
+              },
             } satisfies SectionTranslationSchema<RecessedPocketOpeningGeometrySchema>,
             cornerRadius: {
               title: 'Corner radius',
-              outerRadius: {
+              recessOuterRadius: {
                 label: 'Outer radius',
                 tooltip: 'Radius of the transition from the opening edge into the recess, in mm.',
               },
-              innerRadius: {
+              recessInnerRadius: {
                 label: 'Inner radius',
                 tooltip: 'Radius of the transition into the bottom of the recess, in mm.',
               },
@@ -534,16 +537,16 @@ export const EN = {
           opticalIllusionPocketOpening: {
             geometry: {
               title: 'Geometry',
-              direction: {
+              illusionSide: {
                 label: 'Lower side',
                 tooltip: 'Selects the lower end of the opening; the shape rotates with the cluster.',
               },
-              startInset: {
+              illusionStartInset: {
                 label: 'Start inset',
                 tooltip:
                   'Distance from the lower-side edge to the start of the diagonal at the front pocket, in mm. Uses the whole cluster.',
               },
-              endInset: {
+              illusionEndInset: {
                 label: 'End inset',
                 tooltip:
                   'Distance from the upper-side edge to the end of the diagonal at the back pocket, in mm. Uses the whole cluster.',
@@ -551,11 +554,11 @@ export const EN = {
             } satisfies SectionTranslationSchema<OpticalIllusionPocketOpeningGeometrySchema>,
             cornerRadius: {
               title: 'Corner radius',
-              leadingRadius: {
+              illusionLeadingRadius: {
                 label: 'Leading radius',
                 tooltip: 'Radius where the leading straight section turns into the diagonal, in mm.',
               },
-              trailingRadius: {
+              illusionTrailingRadius: {
                 label: 'Trailing radius',
                 tooltip: 'Radius where the diagonal turns into the trailing straight section, in mm.',
               },
@@ -564,11 +567,11 @@ export const EN = {
           slantedPocketOpening: {
             geometry: {
               title: 'Geometry',
-              side: {
+              slantSide: {
                 label: 'Lower side',
                 tooltip: 'Selects the endpoint moved inward to make this side of the pocket shorter.',
               },
-              offset: {
+              slantOffset: {
                 label: 'Offset',
                 tooltip: 'Moves the selected opening endpoint inward by this distance, in mm.',
               },
@@ -837,11 +840,61 @@ export const EN = {
       enums: {
         constraints: {
           blockReason: {
-            'auto-width': 'Switch width to manual to link it.',
-            'auto-height': 'Switch height to manual to link it.',
-            'auto-layout-gap': 'Switch gap to manual to link it.',
-            'auto-corner-radius': 'Switch corner radii to manual to link them.',
+            'auto-width': 'Switch width to manual to bind it.',
+            'auto-height': 'Switch height to manual to bind it.',
+            'auto-layout-gap': 'Switch gap to manual to bind it.',
+            'auto-corner-radius': 'Switch corner radii to manual to bind them.',
           } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          fields: {
+            width: 'Width',
+            height: 'Height',
+            topLeftRadius: 'Top-left radius',
+            topRightRadius: 'Top-right radius',
+            bottomLeftRadius: 'Bottom-left radius',
+            bottomRightRadius: 'Bottom-right radius',
+            layoutOrientation: 'Layout orientation',
+            mainAxisAnchor: 'Layout alignment',
+            layoutGap: 'Layout gap',
+            offAxisAnchor: 'Self alignment',
+            topStretch: 'Top stretch',
+            rightStretch: 'Right stretch',
+            bottomStretch: 'Bottom stretch',
+            leftStretch: 'Left stretch',
+            pocketStep: 'Pocket spacing',
+            orientation: 'Pocket orientation',
+            openingId: 'Pocket opening',
+            itemId: 'Pocket content',
+            itemOrientation: 'Pocket content orientation',
+            itemCrossAxisOffset: 'Pocket content offset',
+            itemOpeningOffset: 'Pocket content lift',
+            tPocketTabWidth: 'T-pocket tab width',
+            tPocketTaper: 'T-pocket taper',
+            xAnchor: 'Horizontal alignment',
+            yAnchor: 'Vertical alignment',
+            xOffset: 'X offset',
+            yOffset: 'Y offset',
+            recessOuterInset: 'Recess outer inset',
+            recessInnerOffset: 'Recess inner offset',
+            recessOuterRadius: 'Recess outer radius',
+            recessInnerRadius: 'Recess inner radius',
+            recessDepth: 'Recess depth',
+            slantOffset: 'Slant offset',
+            slantSide: 'Slant lower side',
+            illusionSide: 'Illusion lower side',
+            illusionStartInset: 'Illusion start inset',
+            illusionEndInset: 'Illusion end inset',
+            illusionLeadingRadius: 'Illusion leading radius',
+            illusionTrailingRadius: 'Illusion trailing radius',
+            stitchMargin: 'Stitch margin',
+            stitchHoleLength: 'Stitch hole length',
+            stitchHoleDistance: 'Stitch hole spacing',
+            stitchHoleThickness: 'Stitch hole thickness',
+            stitchLineThickness: 'Stitch line thickness',
+            onTop: 'Stitch line target',
+            startOffset: 'Stitch start offset',
+            endOffset: 'Stitch end offset',
+            stitchDirection: 'Stitch direction',
+          } satisfies EnumTranslationSchema<ConstraintFieldNameSchema>,
         },
         globalSettings: {
           theme: {
@@ -955,8 +1008,8 @@ export const EN = {
           description: 'Select another pocket opening to choose common properties.',
         },
         noConstraintFields: {
-          title: 'No linked fields yet',
-          description: 'Choose an object and then a field below to start linking.',
+          title: 'No bound fields yet',
+          description: 'Choose an object and then a field below to create a binding.',
         },
         missingFrontPocket: {
           title: 'Empty pocket cluster',
@@ -990,11 +1043,11 @@ export const EN = {
   },
   dialogs: {
     createConstraints: {
-      title: 'Create constraints',
+      title: 'Create bindings',
       commonProperties: 'Common properties',
-      alreadyConstrained: 'This property already belongs to a constraint.',
+      alreadyConstrained: 'This property already belongs to a binding.',
       affectedModels: (names: string): string => `Affected elements: ${names}.`,
-      positiveAction: (count: number): string => `Create ${count} constraints`,
+      positiveAction: (count: number): string => `Create ${count} bindings`,
     },
     cloneComponent: {
       title: 'Clone component',
@@ -1069,24 +1122,23 @@ export const EN = {
           },
         } satisfies CloneComponentDialogSectionTranslationSchema<ClonePocketOpeningActionSchema>,
         constraints: {
-          title: 'Constraints',
+          title: 'Bindings',
           options: {
             ignore: {
               label: 'Skip',
-              tooltip: 'Do not apply this constraint to the cloned elements.',
-              headerTooltip: 'Do not copy any constraints. The cloned elements will be unconstrained.',
+              tooltip: 'Do not apply this binding to the cloned elements.',
+              headerTooltip: 'Do not copy any bindings. The cloned elements will remain unbound.',
             },
             'constrain-separately': {
               label: 'To new',
-              tooltip:
-                'Duplicate this constraint, and use it on the cloned counterparts of the elements it belongs to.',
+              tooltip: 'Duplicate this binding, and use it on the cloned counterparts of the elements it belongs to.',
               headerTooltip:
-                'Create separate constraints for each existing constraint, and use them on the cloned counterparts of the elements they currently belong to.',
+                'Create separate bindings for each existing binding, and use them on the cloned counterparts of the elements they currently belong to.',
             },
             'add-to-existing': {
               label: 'To existing',
-              tooltip: 'Use this existing constraint to link the cloned elements to their originals.',
-              headerTooltip: 'Use all applicable existing constraints to link the cloned elements to their originals.',
+              tooltip: 'Use this existing binding to bind the cloned elements to their originals.',
+              headerTooltip: 'Use all applicable existing bindings to bind the cloned elements to their originals.',
             },
           },
         } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedConstraintActionSchema>,

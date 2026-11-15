@@ -92,20 +92,20 @@ const validateSlantedPocketOpeningSchema = (
   currentValue: SlantedPocketOpeningSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<SlantedPocketOpeningSchema> => {
-  const offset = validateNumber(input.offset, currentValue.offset, context, { min: 0, minInclusive: false })
-  const side = validatePrimitiveUnion(input.side, currentValue.side, { start: true, end: true }, context)
-  const issues: IssuesSchema<SlantedPocketOpeningSchema> = { offset: offset.issues, side: side.issues }
+  const offset = validateNumber(input.slantOffset, currentValue.slantOffset, context, { min: 0, minInclusive: false })
+  const side = validatePrimitiveUnion(input.slantSide, currentValue.slantSide, { start: true, end: true }, context)
+  const issues: IssuesSchema<SlantedPocketOpeningSchema> = { slantOffset: offset.issues, slantSide: side.issues }
   const committedValue: SlantedPocketOpeningSchema = {
     ...currentValue,
-    offset: offset.committedValue,
-    side: side.committedValue,
+    slantOffset: offset.committedValue,
+    slantSide: side.committedValue,
   }
   if (!offset.isValid || !side.isValid) {
     return createInvalidValidationResult<SlantedPocketOpeningSchema>(issues, committedValue)
   }
   return createValidValidationResult<SlantedPocketOpeningSchema>(
     issues,
-    { ...currentValue, offset: offset.value, side: side.value },
+    { ...currentValue, slantOffset: offset.value, slantSide: side.value },
     committedValue,
   )
 }
@@ -115,27 +115,27 @@ const validateRecessedPocketOpeningSchema = (
   currentValue: RecessedPocketOpeningSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<RecessedPocketOpeningSchema> => {
-  const outerInset = validateNumber(input.outerInset, currentValue.outerInset, context, { min: 0 })
-  const innerOffset = validateNumber(input.innerOffset, currentValue.innerOffset, context, { min: 0 })
-  const depth = validateNumber(input.depth, currentValue.depth, context, { min: 0 })
-  const outerRadius = validateNumber(input.outerRadius, currentValue.outerRadius, context, { min: 0 })
-  const innerRadius = validateNumber(input.innerRadius, currentValue.innerRadius, context, { min: 0 })
+  const outerInset = validateNumber(input.recessOuterInset, currentValue.recessOuterInset, context, { min: 0 })
+  const innerOffset = validateNumber(input.recessInnerOffset, currentValue.recessInnerOffset, context, { min: 0 })
+  const depth = validateNumber(input.recessDepth, currentValue.recessDepth, context, { min: 0 })
+  const outerRadius = validateNumber(input.recessOuterRadius, currentValue.recessOuterRadius, context, { min: 0 })
+  const innerRadius = validateNumber(input.recessInnerRadius, currentValue.recessInnerRadius, context, { min: 0 })
   const issues: IssuesSchema<RecessedPocketOpeningSchema> = {
     type: undefined,
-    outerInset: outerInset.issues,
-    innerOffset: innerOffset.issues,
-    depth: depth.issues,
-    outerRadius: outerRadius.issues,
-    innerRadius: innerRadius.issues,
+    recessOuterInset: outerInset.issues,
+    recessInnerOffset: innerOffset.issues,
+    recessDepth: depth.issues,
+    recessOuterRadius: outerRadius.issues,
+    recessInnerRadius: innerRadius.issues,
   }
   const committedValue: RecessedPocketOpeningSchema = {
     ...currentValue,
     type: 'recessed',
-    outerInset: outerInset.committedValue,
-    innerOffset: innerOffset.committedValue,
-    depth: depth.committedValue,
-    outerRadius: outerRadius.committedValue,
-    innerRadius: innerRadius.committedValue,
+    recessOuterInset: outerInset.committedValue,
+    recessInnerOffset: innerOffset.committedValue,
+    recessDepth: depth.committedValue,
+    recessOuterRadius: outerRadius.committedValue,
+    recessInnerRadius: innerRadius.committedValue,
   }
 
   if (!outerInset.isValid || !innerOffset.isValid || !depth.isValid || !outerRadius.isValid || !innerRadius.isValid) {
@@ -147,11 +147,11 @@ const validateRecessedPocketOpeningSchema = (
     {
       ...currentValue,
       type: 'recessed',
-      outerInset: outerInset.value,
-      innerOffset: innerOffset.value,
-      depth: depth.value,
-      outerRadius: outerRadius.value,
-      innerRadius: innerRadius.value,
+      recessOuterInset: outerInset.value,
+      recessInnerOffset: innerOffset.value,
+      recessDepth: depth.value,
+      recessOuterRadius: outerRadius.value,
+      recessInnerRadius: innerRadius.value,
     },
     committedValue,
   )
@@ -162,26 +162,35 @@ const validateOpticalIllusionPocketOpeningSchema = (
   currentValue: OpticalIllusionPocketOpeningSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<OpticalIllusionPocketOpeningSchema> => {
-  const direction = validatePrimitiveUnion(input.direction, currentValue.direction, { start: true, end: true }, context)
-  const startInset = validateNumber(input.startInset, currentValue.startInset, context, { min: 0 })
-  const endInset = validateNumber(input.endInset, currentValue.endInset, context, { min: 0 })
-  const leadingRadius = validateNumber(input.leadingRadius, currentValue.leadingRadius, context, { min: 0 })
-  const trailingRadius = validateNumber(input.trailingRadius, currentValue.trailingRadius, context, { min: 0 })
+  const direction = validatePrimitiveUnion(
+    input.illusionSide,
+    currentValue.illusionSide,
+    { start: true, end: true },
+    context,
+  )
+  const startInset = validateNumber(input.illusionStartInset, currentValue.illusionStartInset, context, { min: 0 })
+  const endInset = validateNumber(input.illusionEndInset, currentValue.illusionEndInset, context, { min: 0 })
+  const leadingRadius = validateNumber(input.illusionLeadingRadius, currentValue.illusionLeadingRadius, context, {
+    min: 0,
+  })
+  const trailingRadius = validateNumber(input.illusionTrailingRadius, currentValue.illusionTrailingRadius, context, {
+    min: 0,
+  })
   const issues: IssuesSchema<OpticalIllusionPocketOpeningSchema> = {
     type: undefined,
-    direction: direction.issues,
-    startInset: startInset.issues,
-    endInset: endInset.issues,
-    leadingRadius: leadingRadius.issues,
-    trailingRadius: trailingRadius.issues,
+    illusionSide: direction.issues,
+    illusionStartInset: startInset.issues,
+    illusionEndInset: endInset.issues,
+    illusionLeadingRadius: leadingRadius.issues,
+    illusionTrailingRadius: trailingRadius.issues,
   }
   const committedValue: OpticalIllusionPocketOpeningSchema = {
     ...currentValue,
-    direction: direction.committedValue,
-    startInset: startInset.committedValue,
-    endInset: endInset.committedValue,
-    leadingRadius: leadingRadius.committedValue,
-    trailingRadius: trailingRadius.committedValue,
+    illusionSide: direction.committedValue,
+    illusionStartInset: startInset.committedValue,
+    illusionEndInset: endInset.committedValue,
+    illusionLeadingRadius: leadingRadius.committedValue,
+    illusionTrailingRadius: trailingRadius.committedValue,
   }
   if (
     !direction.isValid ||
@@ -196,11 +205,11 @@ const validateOpticalIllusionPocketOpeningSchema = (
     issues,
     {
       ...currentValue,
-      direction: direction.value,
-      startInset: startInset.value,
-      endInset: endInset.value,
-      leadingRadius: leadingRadius.value,
-      trailingRadius: trailingRadius.value,
+      illusionSide: direction.value,
+      illusionStartInset: startInset.value,
+      illusionEndInset: endInset.value,
+      illusionLeadingRadius: leadingRadius.value,
+      illusionTrailingRadius: trailingRadius.value,
     },
     committedValue,
   )

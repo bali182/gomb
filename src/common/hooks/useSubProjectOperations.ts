@@ -16,6 +16,7 @@ import { deleteComponent as deleteComponentPure } from '../operations/subProject
 import { deleteConstraint as deleteConstraintPure } from '../operations/subProject/deleteConstraint'
 import { deleteConstraintField as deleteConstraintFieldPure } from '../operations/subProject/deleteConstraintField'
 import { deleteHole as deleteHolePure } from '../operations/subProject/deleteHole'
+import { deleteModelConstraintFields as deleteModelConstraintFieldsPure } from '../operations/subProject/deleteModelConstraintFields'
 import { deletePocketOpening as deletePocketOpeningPure } from '../operations/subProject/deletePocketOpening'
 import { deleteStitchLine as deleteStitchLinePure } from '../operations/subProject/deleteStitchLine'
 import { flip as flipPure } from '../operations/subProject/flip'
@@ -47,6 +48,7 @@ import type {
   DeleteConstraintFieldParamsSchema,
   DeleteConstraintParamsSchema,
   DeleteHoleParamsSchema,
+  DeleteModelConstraintFieldsParamsSchema,
   DeletePocketOpeningParamsSchema,
   DeleteStitchLineParamsSchema,
   FlipParamsSchema,
@@ -91,6 +93,7 @@ export type UseSubProjectOperationsOutput = {
   deletePocketOpening: (params: DeletePocketOpeningParamsSchema) => void
   deleteConstraint: (params: DeleteConstraintParamsSchema) => void
   deleteConstraintField: (params: DeleteConstraintFieldParamsSchema) => void
+  deleteModelConstraintFields: (params: DeleteModelConstraintFieldsParamsSchema) => void
   setDefaultPocketOpening: (params: SetDefaultPocketOpeningParamsSchema) => void
   moveComponent: (params: MoveComponentParamsSchema) => void
   moveHole: (params: MoveHoleParamsSchema) => void
@@ -285,6 +288,13 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [executeOperation],
   )
 
+  const deleteModelConstraintFields = useCallback(
+    (params: DeleteModelConstraintFieldsParamsSchema): void => {
+      executeOperation(deleteModelConstraintFieldsPure, params)
+    },
+    [executeOperation],
+  )
+
   const setDefaultPocketOpening = useCallback(
     (params: SetDefaultPocketOpeningParamsSchema): void => {
       executeOperation(setDefaultPocketOpeningPure, params)
@@ -368,6 +378,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deletePocketOpening,
       deleteConstraint,
       deleteConstraintField,
+      deleteModelConstraintFields,
       setDefaultPocketOpening,
       moveComponent,
       moveHole,
@@ -397,6 +408,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deletePocketOpening,
       deleteConstraint,
       deleteConstraintField,
+      deleteModelConstraintFields,
       setDefaultPocketOpening,
       moveComponent,
       moveHole,

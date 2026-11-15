@@ -1,5 +1,5 @@
 import { Box, IconButton, IconButtonProps, Menu, Portal } from '@chakra-ui/react'
-import { useCallback, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useEditorDialogsContext } from '../../contexts/EditorDialogsContext'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -7,11 +7,13 @@ import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
+import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
   CreateConstraintsMenuItem,
+  DeleteConstraintsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -28,7 +30,7 @@ type StitchLineActionsMenuProps = {
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
+  const { deleteModelConstraintFields, cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -38,6 +40,15 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
     deleteStitchLine({ id: stitchLine.id })
     onDelete(stitchLine.id)
   }, [deleteStitchLine, stitchLine.id, onDelete])
+
+  const hasConstraints = useMemo<boolean>(
+    () => accessors.subProject(subProject).constraint.byModel(stitchLine.id).length > 0,
+    [subProject, stitchLine.id],
+  )
+
+  const handleDeleteConstraints = useCallback((): void => {
+    deleteModelConstraintFields({ modelId: stitchLine.id })
+  }, [deleteModelConstraintFields, stitchLine.id])
 
   const handleCreateConstraints = useCallback((): void => {
     openDialog({ type: 'create-constraints', source: stitchLine, subProject })
@@ -72,6 +83,9 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>

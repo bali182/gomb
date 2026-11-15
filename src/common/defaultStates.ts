@@ -129,24 +129,24 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
 }
 
 export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
-  outerInset: 15,
-  innerOffset: 15,
-  depth: 10,
-  outerRadius: 10,
-  innerRadius: 10,
+  recessOuterInset: 15,
+  recessInnerOffset: 15,
+  recessDepth: 10,
+  recessOuterRadius: 10,
+  recessInnerRadius: 10,
 }
 
 export const defaultOpticalIllusionPocketOpening: OpticalIllusionPocketOpeningOwnSchema = {
-  direction: 'start',
-  startInset: 10,
-  endInset: 10,
-  leadingRadius: 0,
-  trailingRadius: 0,
+  illusionSide: 'start',
+  illusionStartInset: 10,
+  illusionEndInset: 10,
+  illusionLeadingRadius: 0,
+  illusionTrailingRadius: 0,
 }
 
 export const defaultSlantedPocketOpening: SlantedPocketOpeningOwnSchema = {
-  offset: 15,
-  side: 'start',
+  slantOffset: 15,
+  slantSide: 'start',
 }
 
 export const defaultHasPocketItem: HasPocketItemSchema = {

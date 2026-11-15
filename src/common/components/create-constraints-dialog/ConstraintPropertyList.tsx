@@ -1,4 +1,4 @@
-import { Checkbox, Text, VStack } from '@chakra-ui/react'
+import { Checkbox, Icon, Text, VStack } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import type {
@@ -8,6 +8,7 @@ import type {
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { isDefined } from '../../utils/isDefined'
 import { getConstraintFieldLabel } from '../constraint-editors/constraintFieldUtils'
+import { getConstraintFieldIcon } from '../constraint-editors/getConstraintFieldIcon'
 
 type ConstraintPropertyListProps = {
   properties: CommonConstraintProperty[]
@@ -83,7 +84,10 @@ const ConstraintPropertyItem: FC<ConstraintPropertyItemProps> = ({ property, sel
     >
       <Checkbox.HiddenInput />
       <VStack align="stretch" gap="1" flex="1" minW="0">
-        <Checkbox.Label>{getConstraintFieldLabel(property.field, t)}</Checkbox.Label>
+        <Checkbox.Label display="flex" alignItems="center" gap="2">
+          <Icon as={getConstraintFieldIcon(property.field)} size="sm" flexShrink="0" />
+          {getConstraintFieldLabel(property.field, t)}
+        </Checkbox.Label>
         {constrainedModelNames.length > 0 && (
           <Text textStyle="xs" color="fg.muted">
             {t.dialogs.createConstraints.alreadyConstrained}{' '}

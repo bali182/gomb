@@ -1,6 +1,6 @@
 import { HStack, Text } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
-import { PiArrowsHorizontal, PiArrowsVertical, PiInfo, PiRuler } from 'react-icons/pi'
+import { PiInfo } from 'react-icons/pi'
 
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
@@ -17,6 +17,8 @@ import { AutoDimensionEditor } from '../../common/AutoDimensionEditor'
 import { LayoutOrientationSelect } from '../../common/LayoutOrientationSelect'
 import { SectionGroup } from '../../common/SectionGroup'
 import { Tooltip } from '../../common/Tooltip'
+import { HorizontalGapIcon } from '../../icons/HorizontalGapIcon'
+import { VerticalGapIcon } from '../../icons/VerticalGapIcon'
 
 type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
   modelId: string
@@ -128,10 +130,9 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
           modelId={modelId}
           field="layoutGap"
           auto={editable.autoLayoutGap}
-          autoIcon={editable.layoutOrientation === 'horizontal' ? PiArrowsHorizontal : PiArrowsVertical}
+          icon={editable.layoutOrientation === 'horizontal' ? HorizontalGapIcon : VerticalGapIcon}
           autoValue={component.layoutGap}
           issue={issues.layoutGap}
-          manualIcon={PiRuler}
           onAutoChange={handleAutoLayoutGapChange}
           onValueChange={handleGapChange}
           unit="mm"

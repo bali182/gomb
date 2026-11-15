@@ -63,7 +63,7 @@ describe('calculateTPocketStitchLine', () => {
     'follows slanted shoulders facing %s and retains offset signs',
     (orientation) => {
       const { cluster, pocket, stitchLine } = createFixture(
-        { id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' },
+        { id: 'opening', name: 'Opening', type: 'slanted', slantOffset: 15, slantSide: 'end' },
         orientation,
       )
       const left = 10 + (25 * (75 - 21.5)) / (90 - 21.5)
@@ -125,8 +125,14 @@ describe('calculateTPocketStitchLine', () => {
   )
 
   it('mirrors the stitch endpoints with the slanted side', () => {
-    const end = createFixture({ id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'end' })
-    const start = createFixture({ id: 'opening', name: 'Opening', type: 'slanted', offset: 15, side: 'start' })
+    const end = createFixture({ id: 'opening', name: 'Opening', type: 'slanted', slantOffset: 15, slantSide: 'end' })
+    const start = createFixture({
+      id: 'opening',
+      name: 'Opening',
+      type: 'slanted',
+      slantOffset: 15,
+      slantSide: 'start',
+    })
     const first = calculateTPocketStitchLine(end.stitchLine, end.cluster, end.pocket)
     const second = calculateTPocketStitchLine(start.stitchLine, start.cluster, start.pocket)
     expect(second?.line.start.x.toNumber()).toBeCloseTo(100 - (first?.line.end.x.toNumber() ?? 0), 9)
