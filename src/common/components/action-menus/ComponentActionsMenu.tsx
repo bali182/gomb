@@ -252,6 +252,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
                 <CloneMenuItem disabled={!canClone} onSelect={handleClone} />
                 <DeleteMenuItem disabled={!canDelete} onSelect={handleDelete} />
               </ActionsMenuSection>

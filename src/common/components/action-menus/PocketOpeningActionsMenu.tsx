@@ -56,11 +56,13 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
           <Menu.Positioner>
             <Menu.Content>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <CloneMenuItem onSelect={handleClone} />
                 <SetDefaultPocketOpeningMenuItem disabled={isDefault} onSelect={handleSetDefault} />
               </ActionsMenuSection>
               <ActionsMenuSection>
+                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
+                <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem disabled={isDefault} onSelect={handleDelete} />
               </ActionsMenuSection>
             </Menu.Content>

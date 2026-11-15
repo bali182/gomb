@@ -79,6 +79,8 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>

@@ -72,6 +72,8 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+              </ActionsMenuSection>
+              <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />
                 <DeleteMenuItem onSelect={handleDelete} />
               </ActionsMenuSection>
