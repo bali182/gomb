@@ -9,9 +9,11 @@ import {
   PiCreditCard,
   PiEmpty,
   PiNeedle,
+  PiSelectionForeground,
 } from 'react-icons/pi'
 import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import { HeightIcon } from '../icons/HeightIcon'
+import { HorizontalAnchorIcon } from '../icons/HorizontalAnchorIcon'
 import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
 import { ItemCrossAxisOffsetIcon } from '../icons/ItemCrossAxisOffsetIcon'
 import { ItemOpeningOffsetIcon } from '../icons/ItemOpeningOffsetIcon'
@@ -30,9 +32,9 @@ import { StitchLineStartOffsetIcon } from '../icons/StitchLineStartOffsetIcon'
 import { StraightPocketOpeningStackIcon } from '../icons/StraightPocketOpeningStackIcon'
 import { TPocketTabWidthIcon } from '../icons/TPocketTabWidthIcon'
 import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
+import { VerticalAnchorIcon } from '../icons/VerticalAnchorIcon'
 import { WidthIcon } from '../icons/WidthIcon'
 
-const TODO: IconType = PiEmpty
 const MULTI_ICON: IconType = PiEmpty
 
 export const getConstraintFieldIcon = (field: ConstraintFieldNameSchema): IconType => {
@@ -63,8 +65,8 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   itemOpeningOffset: ItemOpeningOffsetIcon,
   tPocketTabWidth: TPocketTabWidthIcon,
   tPocketTaper: TPocketTaperIcon,
-  xAnchor: MULTI_ICON,
-  yAnchor: MULTI_ICON,
+  xAnchor: HorizontalAnchorIcon,
+  yAnchor: VerticalAnchorIcon,
   xOffset: PiArrowsHorizontal,
   yOffset: PiArrowsVertical,
   recessOuterInset: RecessedPocketOpeningIcon,
@@ -84,7 +86,7 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   stitchHoleDistance: PiNeedle,
   stitchHoleThickness: PiNeedle,
   stitchLineThickness: PiNeedle,
-  onTop: TODO,
+  onTop: PiSelectionForeground,
   startOffset: StitchLineStartOffsetIcon,
   endOffset: StitchLineEndOffsetIcon,
   stitchDirection: StitchDirectionIcon,
