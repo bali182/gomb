@@ -1,5 +1,6 @@
 import type { IconType } from 'react-icons'
 import {
+  PiAlignCenterHorizontal,
   PiArrowLineDown,
   PiArrowLineLeft,
   PiArrowLineRight,
@@ -7,7 +8,6 @@ import {
   PiArrowsHorizontal,
   PiArrowsVertical,
   PiCreditCard,
-  PiEmpty,
   PiNeedle,
   PiSelectionForeground,
 } from 'react-icons/pi'
@@ -35,8 +35,6 @@ import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
 import { VerticalAnchorIcon } from '../icons/VerticalAnchorIcon'
 import { WidthIcon } from '../icons/WidthIcon'
 
-const MULTI_ICON: IconType = PiEmpty
-
 export const getConstraintFieldIcon = (field: ConstraintFieldNameSchema): IconType => {
   return constraintFieldIcons[field]
 }
@@ -49,9 +47,9 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   bottomLeftRadius: RadiusBottomLeftIcon,
   bottomRightRadius: RadiusBottomRightIcon,
   layoutOrientation: LayoutOrientationIcon,
-  mainAxisAnchor: MULTI_ICON,
+  mainAxisAnchor: PiAlignCenterHorizontal,
   layoutGap: HorizontalGapIcon,
-  offAxisAnchor: MULTI_ICON,
+  offAxisAnchor: PiAlignCenterHorizontal,
   topStretch: PiArrowLineUp,
   rightStretch: PiArrowLineRight,
   bottomStretch: PiArrowLineDown,
