@@ -17,6 +17,7 @@ import { ItemCrossAxisOffsetIcon } from '../icons/ItemCrossAxisOffsetIcon'
 import { ItemOpeningOffsetIcon } from '../icons/ItemOpeningOffsetIcon'
 import { LayoutOrientationIcon } from '../icons/LayoutOrientationIcon'
 import { OpticalIllusionPocketOpeningIcon } from '../icons/OpticalIllusionPocketOpeningIcon'
+import { PocketOrientationUpIcon } from '../icons/PocketOrientationUpIcon'
 import { RadiusBottomLeftIcon } from '../icons/RadiusBottomLeftIcon'
 import { RadiusBottomRightIcon } from '../icons/RadiusBottomRightIcon'
 import { RadiusTopLeftIcon } from '../icons/RadiusTopLeftIcon'
@@ -54,10 +55,10 @@ const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
   bottomStretch: PiArrowLineDown,
   leftStretch: PiArrowLineLeft,
   pocketStep: StraightPocketOpeningStackIcon,
-  orientation: MULTI_ICON,
-  openingId: MULTI_ICON,
+  orientation: PocketOrientationUpIcon,
+  openingId: RecessedPocketOpeningIcon,
   itemId: PiCreditCard,
-  itemOrientation: MULTI_ICON,
+  itemOrientation: LayoutOrientationIcon,
   itemCrossAxisOffset: ItemCrossAxisOffsetIcon,
   itemOpeningOffset: ItemOpeningOffsetIcon,
   tPocketTabWidth: TPocketTabWidthIcon,
