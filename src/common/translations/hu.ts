@@ -210,6 +210,7 @@ export const HU = {
         common: {
           clone: 'Duplikálás',
           createConstraints: 'Mezők összekötése',
+          deleteConstraints: 'Kényszerek törlése',
           delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',

@@ -1,6 +1,6 @@
 import { Menu, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC } from 'react'
-import { PiCopy, PiLink, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
+import { PiCopy, PiLink, PiLinkBreak, PiSquareSplitHorizontal, PiSquareSplitVertical, PiTrash } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
 import { EditorActionMenuItem } from '../common/EditorActionMenuItem'
 
@@ -63,6 +63,22 @@ export const CreateConstraintsMenuItem: FC<CommonMenuItemProps> = ({ disabled, o
     <EditorActionMenuItem value="create-constraints" disabled={disabled} onSelect={onSelect}>
       <PiLink />
       <Menu.ItemText>{t.project.editors.actions.common.createConstraints}</Menu.ItemText>
+    </EditorActionMenuItem>
+  )
+}
+
+export const DeleteConstraintsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
+  const { t } = useTranslation()
+  return (
+    <EditorActionMenuItem
+      value="delete-constraints"
+      disabled={disabled}
+      onSelect={onSelect}
+      color="fg.error"
+      _hover={deleteHoverStyle}
+    >
+      <PiLinkBreak />
+      <Menu.ItemText>{t.project.editors.actions.common.deleteConstraints}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }

@@ -24,6 +24,7 @@ import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/co
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { noop } from '../../utils/noop'
@@ -32,6 +33,7 @@ import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
   CreateConstraintsMenuItem,
+  DeleteConstraintsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -73,7 +75,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { addComponent, addHole, addStitchLine, deleteComponent, flip } = useSubProjectOperations()
+  const { deleteModelConstraintFields, addComponent, addHole, addStitchLine, deleteComponent, flip } =
+    useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
     // No subproject selected, we won't select any. This shouldn't happen as /projects/id autoselects a subproject if there are any.
@@ -137,6 +140,15 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
       }
     }
   }, [onDelete, component.id, component.type, deleteComponent, deleteRoot])
+
+  const hasConstraints = useMemo<boolean>(
+    () => accessors.subProject(subProject).constraint.byModel(component.id).length > 0,
+    [subProject, component.id],
+  )
+
+  const handleDeleteConstraints = useCallback((): void => {
+    deleteModelConstraintFields({ modelId: component.id })
+  }, [deleteModelConstraintFields, component.id])
 
   const handleCreateConstraints = useCallback((): void => {
     openDialog({ type: 'create-constraints', source: component, subProject })
@@ -252,6 +264,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
+                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneMenuItem disabled={!canClone} onSelect={handleClone} />

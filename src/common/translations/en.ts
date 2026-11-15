@@ -280,6 +280,7 @@ export const EN = {
         common: {
           clone: 'Clone',
           createConstraints: 'Constrain properties',
+          deleteConstraints: 'Delete constraints',
           delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',

@@ -147,6 +147,10 @@ export type DeleteConstraintParamsSchema = {
   id: string
 }
 
+export type DeleteModelConstraintFieldsParamsSchema = {
+  modelId: string
+}
+
 export type DeleteConstraintFieldParamsSchema = {
   constraintId: string
   id: string
