@@ -171,7 +171,7 @@ export const ResizableAccordion: FC<ResizableAccordionProps> = ({ ref, value, on
       heights[pair.afterId] = pairHeight - nextHeight
       const totalSize = openIds.reduce((sum: number, itemId: string): number => sum + current.value[itemId].size, 0)
       const nextValue = { ...current.value }
-      // Rebase the weights on the visible heights so constrained siblings keep their size.
+      // Rebase the weights on the visible heights so bound siblings keep their size.
       for (const itemId of openIds) {
         nextValue[itemId] = { ...current.value[itemId], size: (heights[itemId] / height) * totalSize }
       }
@@ -466,20 +466,20 @@ const getContentHeights = (
   let remainingHeight = availableHeight
   while (remainingIds.length > 0) {
     const totalSize = remainingIds.reduce((sum: number, id: string): number => sum + value[id].size, 0)
-    const constrainedIds = remainingIds.filter(
+    const boundIds = remainingIds.filter(
       (id: string): boolean => (remainingHeight * value[id].size) / totalSize < MIN_CONTENT_HEIGHT,
     )
-    if (constrainedIds.length === 0) {
+    if (boundIds.length === 0) {
       for (const id of remainingIds) {
         heights[id] = (remainingHeight * value[id].size) / totalSize
       }
       break
     }
-    for (const id of constrainedIds) {
+    for (const id of boundIds) {
       heights[id] = MIN_CONTENT_HEIGHT
     }
-    remainingHeight -= constrainedIds.length * MIN_CONTENT_HEIGHT
-    remainingIds = remainingIds.filter((id: string): boolean => !constrainedIds.includes(id))
+    remainingHeight -= boundIds.length * MIN_CONTENT_HEIGHT
+    remainingIds = remainingIds.filter((id: string): boolean => !boundIds.includes(id))
   }
   return heights
 }

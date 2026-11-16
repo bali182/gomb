@@ -8,7 +8,7 @@ import { defaultStitchingSettings } from '../../defaultStates'
 import { calculatePocketBoundingBox } from '../../logic/calculatePocketBoundingBox'
 import { getComputedSubProject } from '../../logic/getComputedSubProject'
 import { createPocketCalculator } from '../../logic/pockets/createPocketCalculator'
-import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusSchema } from '../../schemas/common'
 import type { LayoutOrientationSchema, PocketOrientationSchema } from '../../schemas/components'
 import type { PathSchema, RectSchema } from '../../schemas/geometry'
 import type { HoleSchema } from '../../schemas/hole'
@@ -77,13 +77,13 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layo
   })
 })
 
-const radii: HasCornerRadiusValuesSchema = {
+const radii: HasCornerRadiusSchema = {
   topLeftRadius: 1,
   topRightRadius: 2,
   bottomLeftRadius: 3,
   bottomRightRadius: 4,
 }
-const mirroredRadii: Record<FlipAxisSchema, HasCornerRadiusValuesSchema> = {
+const mirroredRadii: Record<FlipAxisSchema, HasCornerRadiusSchema> = {
   horizontal: { topLeftRadius: 2, topRightRadius: 1, bottomLeftRadius: 4, bottomRightRadius: 3 },
   vertical: { topLeftRadius: 3, topRightRadius: 4, bottomLeftRadius: 1, bottomRightRadius: 2 },
 }
@@ -163,8 +163,6 @@ describe.each(axes)('flip: %s', (axis) => {
     const panel = d.panel({
       id: 'panel',
       ...radii,
-      individualRadii: true,
-      individualStretch: true,
       topStretch: -2,
       rightStretch: 3,
       bottomStretch: 5,
@@ -192,7 +190,7 @@ describe.each(axes)('flip: %s', (axis) => {
   })
 
   it('mirrors root-panel radii and layout alignment while preserving its dimensions', () => {
-    const root = d.rootPanel({ id: 'root', ...radii, individualRadii: true, width: 170, height: 110, layoutGap: 6 })
+    const root = d.rootPanel({ id: 'root', ...radii, width: 170, height: 110, layoutGap: 6 })
     const original = d.subProject({ id: 'sp', root })
     expect(flip(createBaseOperationParams(original), { model: root, axis: axis }).components.root).toEqual({
       ...root,
@@ -298,7 +296,6 @@ describe.each(axes)('flip: %s', (axis) => {
       onTop: 'overlay',
       ...radii,
       autoCornerRadius: false,
-      individualRadii: true,
       stitchMargin: 7,
       top: true,
       right: true,
@@ -484,7 +481,6 @@ describe.each(orientationCases)(
       const cluster = {
         ...accessors.subProject(fixture).component.pocketCluster('cluster'),
         ...radii,
-        individualRadii: true,
       }
       const original = { ...fixture, components: { ...fixture.components, cluster } }
       const before = structuredClone(original)
@@ -492,7 +488,6 @@ describe.each(orientationCases)(
       const flippedCluster = accessors.subProject(result).component.pocketCluster(cluster.id)
       expect(flippedCluster).toMatchObject({
         ...mirroredRadii[axis],
-        individualRadii: true,
         orientation: expectedOrientation,
       })
       expect(flip(createBaseOperationParams(result), { model: flippedCluster, axis: axis })).toEqual(original)

@@ -43,8 +43,8 @@ as possible, preserving the longest disabled interval. Ties follow canonical
 order. It never disables an enabled part and leaves an empty boundary empty.
 The geometry uses this normalization before calculation, and the patcher
 persists it in the shared patcher pipeline. Stitched sides and corners cannot
-be linked by constraints. Obsolete constraint entries for these fields are
-ignored during resolution and removed by the constraint patcher.
+be linked by bindings. Obsolete binding entries for these fields are
+ignored during resolution and removed by the binding patcher.
 
 An empty boundary produces no route. Without positive endpoint extensions, a
 standalone corner with zero effective radius also produces no route. A

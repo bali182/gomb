@@ -13,8 +13,8 @@ import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObj
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { IdGenerator } from '../../utils/random/IdGenerator'
 import { addSubProject } from '../project/addSubProject'
+import { addBinding } from './addBinding'
 import { addComponent } from './addComponent'
-import { addConstraint } from './addConstraint'
 import { addHole } from './addHole'
 import { addPocketOpening } from './addPocketOpening'
 import { addStitchLine } from './addStitchLine'
@@ -82,7 +82,7 @@ describe('model creation in add operations', () => {
       color: 'red',
     })
     const pocket = accessors.subProject(result).component.tPocket(result.components.cluster.children[0])
-    expect(pocket).toMatchObject({ openingId: source.defaultPocketOpening, color: 'red', name: 'T-pocket 1' })
+    expect(pocket).toMatchObject({ openingId: source.defaultPocketOpening, color: 'red', name: 'T-pocket 3' })
     expect(createComponent).toHaveBeenCalledWith(
       expect.objectContaining({
         forbiddenIds: getSubProjectIds(source),
@@ -248,17 +248,17 @@ describe('model creation in add operations', () => {
     expect(source).toEqual(snapshot)
   })
 
-  it('creates an empty constraint without changing the source', () => {
+  it('creates an empty binding without changing the source', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
-    const result = addConstraint(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
-      type: 'equal-constraint',
+    const result = addBinding(createBaseOperationParams(source, { readonlyFactory: createFactory() }), {
+      type: 'equal-binding',
     })
-    const constraint = Object.values(result.constraints)[0]
-    expect(constraint).toMatchObject({ type: 'equal-constraint', fields: [] })
-    expect(constraint.id).toMatch(/^equal-constraint-/)
+    const binding = Object.values(result.bindings)[0]
+    expect(binding).toMatchObject({ type: 'equal-binding', fields: [] })
+    expect(binding.id).toMatch(/^equal-binding-/)
     expect(source).toEqual(snapshot)
-    expect(source.constraints).toEqual({})
+    expect(source.bindings).toEqual({})
   })
 
   it('adds and returns the new subproject while preserving the project snapshot', () => {
@@ -266,7 +266,7 @@ describe('model creation in add operations', () => {
     const snapshot = structuredClone(project)
     const result = addSubProject(project, { modelFactory: createFactory() })
     expect(result.project.subProjects).toEqual([...project.subProjects, result.subProject])
-    expect(result.subProject.components[result.subProject.root].name).toBe('Module 1')
+    expect(result.subProject.components[result.subProject.root].name).toBe('Module 2')
     expect(project).toEqual(snapshot)
   })
 })

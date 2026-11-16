@@ -7,13 +7,13 @@ import { getCloneIdMappings } from './getCloneIdMappings'
 const fixture = () =>
   d.subProject({
     id: 'sub',
-    constraints: {
-      constraint: {
-        id: 'constraint',
-        type: 'equal-constraint',
+    bindings: {
+      binding: {
+        id: 'binding',
+        type: 'equal-binding',
         fields: [
-          { id: 'first-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
-          { id: 'second-field', type: 'panel-constraint-field', modelId: 'unused-panel', field: 'height' },
+          { id: 'first-field', type: 'panel-binding-field', modelId: 'panel', field: 'width' },
+          { id: 'second-field', type: 'panel-binding-field', modelId: 'unused-panel', field: 'height' },
         ],
       },
     },
@@ -38,9 +38,9 @@ describe('getCloneIdMappings', () => {
     for (const component of Object.values(source.components)) {
       expect(mapping[component.id].startsWith(`${component.type}-`)).toBe(true)
     }
-    expect(mapping.constraint).toMatch(/^equal-constraint-/)
-    expect(mapping['first-field']).toMatch(/^panel-constraint-field-/)
-    expect(mapping['second-field']).toMatch(/^panel-constraint-field-/)
+    expect(mapping.binding).toMatch(/^equal-binding-/)
+    expect(mapping['first-field']).toMatch(/^panel-binding-field-/)
+    expect(mapping['second-field']).toMatch(/^panel-binding-field-/)
     expect(mapping.hole).toMatch(/^hole-/)
     expect(mapping.stitch).toMatch(/^component-bounds-stitch-line-/)
     for (const opening of Object.values(source.pocketOpenings)) {
@@ -55,7 +55,7 @@ describe('getCloneIdMappings', () => {
     reserve.mockRestore()
   })
 
-  it.each(['panel', 'constraint', 'first-field'])(
+  it.each(['panel', 'binding', 'first-field'])(
     'throws if source ID %s is duplicated across object types',
     (duplicateId) => {
       const source = fixture()

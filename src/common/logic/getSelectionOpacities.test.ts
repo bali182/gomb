@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ConstraintSchema } from '../schemas/constraints'
+import type { BindingSchema } from '../schemas/bindings'
 import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
@@ -34,21 +34,21 @@ type SelectionCase = { selected: ModelObjectSchema; related: string[] }
 
 describe('getSelectionOpacities', () => {
   it.each([false, true])(
-    'does not dim the drawing when selecting a constraint, editing pocket contents: %s',
+    'does not dim the drawing when selecting a binding, editing pocket contents: %s',
     (isEditingPocketContents) => {
       const source = fixture()
       const snapshot = structuredClone(source)
-      const constraint: ConstraintSchema = {
-        id: 'constraint',
-        type: 'equal-constraint',
+      const binding: BindingSchema = {
+        id: 'binding',
+        type: 'equal-binding',
         fields: [
-          { id: 'first', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
-          { id: 'second', type: 't-pocket-constraint-field', modelId: 't', field: 'tPocketTabWidth' },
+          { id: 'first', type: 'panel-binding-field', modelId: 'panel', field: 'width' },
+          { id: 'second', type: 't-pocket-binding-field', modelId: 't', field: 'tPocketTabWidth' },
         ],
       }
       const baseline = getSelectionOpacities(undefined, source, isEditingPocketContents)
-      expect(getSelectionOpacities(constraint, source, isEditingPocketContents)).toEqual(baseline)
-      expect(getSelectionOpacities({ ...constraint, fields: [] }, source, isEditingPocketContents)).toEqual(baseline)
+      expect(getSelectionOpacities(binding, source, isEditingPocketContents)).toEqual(baseline)
+      expect(getSelectionOpacities({ ...binding, fields: [] }, source, isEditingPocketContents)).toEqual(baseline)
       expect(source).toEqual(snapshot)
     },
   )

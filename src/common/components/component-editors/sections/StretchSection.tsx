@@ -1,89 +1,89 @@
-import { useCallback, useMemo, type ReactNode } from 'react'
-
-import { HStack, Icon } from '@chakra-ui/react'
-import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink, PiLinkBreak } from 'react-icons/pi'
+import {
+  Box,
+  HStack,
+  Icon,
+  Popover,
+  type PopoverOpenChangeDetails,
+  type PopoverRootProps,
+  type SystemStyleObject,
+} from '@chakra-ui/react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink } from 'react-icons/pi'
+import { useEditorContext } from '../../../contexts/EditorContext'
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { HasStretchSchema, HasStretchValuesSchema } from '../../../schemas/common'
-import type { HasAutoDimensionsSchema } from '../../../schemas/components'
+import type { StretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
+import { getStretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
+import type { HasStretchSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
+import { isDefined } from '../../../utils/isDefined'
 import { getLabeledIssues } from '../../../utils/issueUtils'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
+import { MiniButton } from '../../common/MiniButton'
 import { SectionGroup } from '../../common/SectionGroup'
-import { SectionHeaderToggle } from '../../common/SectionHeaderToggle'
+import { Tooltip } from '../../common/Tooltip'
+import { StretchBinderPopover } from './StretchBinderPopover'
 
 type StretchSectionProps<T> = {
   modelId: string
-  component: T
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSchema>({
+export function StretchSection<T extends HasStretchSchema>({
   modelId,
-  component,
   editable,
   issues,
   onChange,
 }: StretchSectionProps<T>): ReactNode {
   const { t } = useTranslation()
+  const { subProject, isComputing, setEditingInputId } = useEditorContext()
+  const [stretchBinderOpen, setStretchBinderOpen] = useState<boolean>(false)
+  const stretchBindingState = useMemo<StretchBindingState | undefined>(
+    () => (isDefined(subProject) ? getStretchBindingState(subProject, modelId) : undefined),
+    [subProject, modelId],
+  )
+  const stretchBinderDisabled = !isDefined(stretchBindingState) || stretchBindingState.hasMultipleBindings
+
+  const handleStretchBinderOpenChange = useCallback(
+    (details: PopoverOpenChangeDetails): void => {
+      if (details.open && (stretchBinderDisabled || isComputing)) {
+        return
+      }
+      if (details.open) {
+        setEditingInputId(undefined)
+      }
+      setStretchBinderOpen(details.open)
+    },
+    [isComputing, stretchBinderDisabled, setEditingInputId],
+  )
+
+  const handleStretchBinderClose = useCallback((): void => {
+    setStretchBinderOpen(false)
+  }, [])
 
   const horizontalIssues = useMemo<readonly IssueSchema[]>(() => {
-    const rowIssues: IssuesSchema<HasStretchValuesSchema> = {
+    const rowIssues: IssuesSchema<HasStretchSchema> = {
       leftStretch: issues.leftStretch,
       rightStretch: issues.rightStretch,
     }
-    return getLabeledIssues<HasStretchValuesSchema>(rowIssues, t.project.editors.sections.components.stretch)
+    return getLabeledIssues<HasStretchSchema>(rowIssues, t.project.editors.sections.components.stretch)
   }, [issues.leftStretch, issues.rightStretch, t])
 
   const verticalIssues = useMemo<readonly IssueSchema[]>(() => {
-    const rowIssues: IssuesSchema<HasStretchValuesSchema> = {
+    const rowIssues: IssuesSchema<HasStretchSchema> = {
       topStretch: issues.topStretch,
       bottomStretch: issues.bottomStretch,
     }
-    return getLabeledIssues<HasStretchValuesSchema>(rowIssues, t.project.editors.sections.components.stretch)
+    return getLabeledIssues<HasStretchSchema>(rowIssues, t.project.editors.sections.components.stretch)
   }, [issues.bottomStretch, issues.topStretch, t])
 
-  const handleStretchTypeChange = useCallback(
-    (uniformStretch: boolean) => {
-      const largestStretch = Math.max(
-        component.topStretch,
-        component.rightStretch,
-        component.bottomStretch,
-        component.leftStretch,
-      ).toString()
-
-      const stretchOverrides: EditableSchema<HasStretchValuesSchema> = {
-        topStretch: largestStretch,
-        rightStretch: largestStretch,
-        bottomStretch: largestStretch,
-        leftStretch: largestStretch,
-      }
-
-      onChange({
-        ...editable,
-        individualStretch: !uniformStretch,
-        ...(uniformStretch ? stretchOverrides : {}),
-      })
-    },
-    [component.bottomStretch, component.leftStretch, component.rightStretch, component.topStretch, editable, onChange],
-  )
-
   const handleStretchChange = useCallback(
-    (key: keyof HasStretchValuesSchema) => (stretch: string) => {
-      if (editable.individualStretch) {
+    (key: keyof HasStretchSchema): ((stretch: string) => void) =>
+      (stretch: string): void => {
         onChange({ ...editable, [key]: stretch })
-      } else {
-        onChange({
-          ...editable,
-          topStretch: stretch,
-          rightStretch: stretch,
-          bottomStretch: stretch,
-          leftStretch: stretch,
-        })
-      }
-    },
+      },
     [editable, onChange],
   )
 
@@ -91,14 +91,35 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
     <SectionGroup.Section>
       <SectionGroup.SectionHeader
         rightAddon={
-          <SectionHeaderToggle
-            onIcon={PiLink}
-            offIcon={PiLinkBreak}
-            onLabel={t.project.editors.enums.components.individualStretch.false}
-            offLabel={t.project.editors.enums.components.individualStretch.true}
-            value={!editable.individualStretch}
-            onChange={handleStretchTypeChange}
-          />
+          <Popover.Root
+            open={stretchBinderOpen && !stretchBinderDisabled}
+            onOpenChange={handleStretchBinderOpenChange}
+            positioning={STRETCH_BINDER_POSITIONING}
+            lazyMount
+            unmountOnExit
+          >
+            <Tooltip
+              content={t.project.editors.controls.stretchBinder.multipleBindings}
+              disabled={!isDefined(stretchBindingState) || !stretchBindingState.hasMultipleBindings}
+            >
+              <Box display="inline-flex">
+                <Popover.Trigger asChild>
+                  <MiniButton
+                    disabled={stretchBinderDisabled}
+                    readOnly={isComputing}
+                    {...STRETCH_BINDER_TRIGGER_STYLE}
+                    variant="ghost"
+                  >
+                    <Icon as={PiLink} size="sm" />
+                    {t.project.editors.controls.stretchBinder.label}
+                  </MiniButton>
+                </Popover.Trigger>
+              </Box>
+            </Tooltip>
+            {stretchBinderOpen && !stretchBinderDisabled && (
+              <StretchBinderPopover modelId={modelId} onClose={handleStretchBinderClose} />
+            )}
+          </Popover.Root>
         }
       >
         {t.project.editors.sections.components.stretch.title}
@@ -158,3 +179,6 @@ export function StretchSection<T extends HasStretchSchema & HasAutoDimensionsSch
     </SectionGroup.Section>
   )
 }
+
+const STRETCH_BINDER_POSITIONING: PopoverRootProps['positioning'] = { placement: 'bottom', gutter: 10 }
+const STRETCH_BINDER_TRIGGER_STYLE: SystemStyleObject = { bg: 'bg.emphasized' }

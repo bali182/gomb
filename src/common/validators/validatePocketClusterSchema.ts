@@ -85,10 +85,8 @@ export const validatePocketClusterSchema = (
     topRightRadius: topRightRadiusResult.committedValue,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
-    individualRadii: input.individualRadii,
     autoWidth: input.autoWidth,
     autoHeight: input.autoHeight,
-    individualStretch: input.individualStretch,
   }
   if (
     !nameResult.isValid ||

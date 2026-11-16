@@ -16,9 +16,9 @@ export const getSubProjectIds = (
   ids: Set<string> = new Set(),
 ): Set<string> => {
   addId(ids, subProject.id)
-  for (const constraint of Object.values(subProject.constraints ?? {})) {
-    addId(ids, constraint?.id)
-    for (const field of constraint?.fields ?? []) {
+  for (const binding of Object.values(subProject.bindings ?? {})) {
+    addId(ids, binding?.id)
+    for (const field of binding?.fields ?? []) {
       addId(ids, field.id)
     }
   }

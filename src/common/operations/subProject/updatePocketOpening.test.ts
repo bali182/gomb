@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { defaultSlantedPocketOpening } from '../../defaultStates'
+import type { SlantedPocketOpeningSchema, StraightPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
 import { comparators } from '../../utils/comparators'
@@ -7,14 +8,14 @@ import { createBaseOperationParams } from './testUtils'
 import { updatePocketOpening } from './updatePocketOpening'
 
 const fixture = () => {
-  const opening = {
-    type: 'slanted' as const,
+  const opening: SlantedPocketOpeningSchema = {
+    type: 'slanted',
     ...defaultSlantedPocketOpening,
     id: 'shared',
     name: 'Slanted',
-    offset: 1000,
+    slantOffset: 1000,
   }
-  const defaultOpening = { id: 'custom-default', name: 'Default', type: 'straight' } as const
+  const defaultOpening: StraightPocketOpeningSchema = { id: 'custom-default', name: 'Default', type: 'straight' }
   const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
   const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
   const t = d.tPocket({ id: 't', openingId: opening.id })
@@ -45,12 +46,12 @@ describe('updatePocketOpening', () => {
   it('updates one shared definition while retaining pocket references', () => {
     const { subProject, opening, t, front } = fixture()
     const snapshot = structuredClone(subProject)
-    const changedOpening = { ...opening, offset: 900 }
+    const changedOpening: SlantedPocketOpeningSchema = { ...opening, slantOffset: 900 }
     const updated = updatePocketOpening(createBaseOperationParams(subProject), { opening: changedOpening })
     expect(updated.components).toBe(subProject.components)
     expect(accessors.subProject(updated).pocketOpening.byId(t.openingId)).toBe(changedOpening)
     expect(accessors.subProject(updated).pocketOpening.byId(front.openingId)).toBe(changedOpening)
-    expect(updated.pocketOpenings.shared).toMatchObject({ offset: 900 })
+    expect(updated.pocketOpenings.shared).toMatchObject({ slantOffset: 900 })
     expect(comparators.subProject(subProject, updated)).toBe(false)
     expect(subProject).toEqual(snapshot)
   })

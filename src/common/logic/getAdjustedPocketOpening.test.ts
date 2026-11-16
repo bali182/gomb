@@ -31,26 +31,26 @@ const limits: RecessedPocketOpeningLimitsSchema = {
 }
 
 describe('getAdjustedPocketOpening', () => {
-  it('applies the supplied bounds and preserves unconstrained fields', () => {
+  it('applies the supplied bounds and preserves unbound fields', () => {
     expect(getAdjustedPocketOpening(opening, limits)).toEqual({
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
-      outerInset: 10,
-      innerOffset: 20,
-      depth: 79,
-      outerRadius: 50,
-      innerRadius: 15,
+      recessOuterInset: 10,
+      recessInnerOffset: 20,
+      recessDepth: 79,
+      recessOuterRadius: 50,
+      recessInnerRadius: 15,
     })
     expect(opening).toEqual({
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
-      outerInset: 5,
-      innerOffset: 25,
-      depth: 100,
-      outerRadius: 60,
-      innerRadius: 15,
+      recessOuterInset: 5,
+      recessInnerOffset: 25,
+      recessDepth: 100,
+      recessOuterRadius: 60,
+      recessInnerRadius: 15,
     })
   })
 
@@ -59,11 +59,11 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
-      outerInset: 30,
-      innerOffset: 20,
-      depth: 79,
-      outerRadius: 50,
-      innerRadius: 15,
+      recessOuterInset: 30,
+      recessInnerOffset: 20,
+      recessDepth: 79,
+      recessOuterRadius: 50,
+      recessInnerRadius: 15,
     })
   })
 
@@ -105,7 +105,7 @@ describe('getAdjustedPocketOpening', () => {
     } as const
     expect(getAdjustedPocketOpening(slanted, { type: 'slanted', slantOffset: { max: bound } })).toEqual({
       ...slanted,
-      offset: 20,
+      slantOffset: 20,
     })
     expect(getAdjustedPocketOpening(slanted, { type: 'slanted' })).toEqual(slanted)
     expect(
@@ -113,7 +113,7 @@ describe('getAdjustedPocketOpening', () => {
         type: 'slanted',
         slantOffset: { max: { ...bound, value: new BigNumber(0) } },
       }),
-    ).toEqual({ ...slanted, offset: 0 })
+    ).toEqual({ ...slanted, slantOffset: 0 })
     expect(getAdjustedPocketOpening(slanted, { type: 'straight' })).toBe(slanted)
     expect(slanted.slantOffset).toBe(90)
   })
@@ -144,7 +144,13 @@ it('bounds optical illusion fields without changing its type or requested values
       illusionLeadingRadius: { max: { ...bound, value: new BigNumber(4) } },
       illusionTrailingRadius: { max: { ...bound, value: new BigNumber(7) } },
     }),
-  ).toEqual({ ...requested, startInset: 50, endInset: 50, leadingRadius: 4, trailingRadius: 7 })
+  ).toEqual({
+    ...requested,
+    illusionStartInset: 50,
+    illusionEndInset: 50,
+    illusionLeadingRadius: 4,
+    illusionTrailingRadius: 7,
+  })
   expect(requested).toEqual(snapshot)
   expect(getAdjustedPocketOpening(requested, { type: 'straight' })).toBe(requested)
 })

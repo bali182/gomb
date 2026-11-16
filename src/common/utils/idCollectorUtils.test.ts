@@ -9,8 +9,8 @@ describe('getProjectIds', () => {
         subProjects: [
           {
             id: 'sub',
-            constraints: {
-              constraint: { id: 'constraint', fields: [{ id: 'constraint-field', modelId: 'model-reference' }] },
+            bindings: {
+              binding: { id: 'binding', fields: [{ id: 'binding-field', modelId: 'model-reference' }] },
             },
             root: 'root-reference',
             defaultPocketOpening: 'opening-reference',
@@ -26,8 +26,8 @@ describe('getProjectIds', () => {
       new Set([
         'project',
         'sub',
-        'constraint',
-        'constraint-field',
+        'binding',
+        'binding-field',
         'component',
         'hole',
         'stitch',
@@ -44,7 +44,7 @@ describe('getProjectIds', () => {
       getProjectIds({
         subProjects: [
           {
-            constraints: { empty: {}, partial: { fields: [{}] } },
+            bindings: { empty: {}, partial: { fields: [{}] } },
             components: { empty: {} },
             holes: [{}],
             stitchLines: [{}],
@@ -64,7 +64,7 @@ describe('getSubProjectIds', () => {
         id: 'sub',
         root: 'root-reference',
         defaultPocketOpening: 'opening-reference',
-        constraints: { constraint: { id: 'constraint', fields: [{ id: 'member', modelId: 'model-reference' }] } },
+        bindings: { binding: { id: 'binding', fields: [{ id: 'member', modelId: 'model-reference' }] } },
         components: { component: { id: 'component', children: ['child-reference'], itemId: 'ID-1' } },
         holes: [{ id: 'hole', componentId: 'owner-reference' }],
         stitchLines: [{ id: 'stitch', targetId: 'target-reference', onTop: 'onTop-reference' }],
@@ -73,16 +73,14 @@ describe('getSubProjectIds', () => {
       ids,
     )
     expect(result).toBe(ids)
-    expect(result).toEqual(
-      new Set(['existing', 'sub', 'constraint', 'member', 'component', 'hole', 'stitch', 'opening']),
-    )
+    expect(result).toEqual(new Set(['existing', 'sub', 'binding', 'member', 'component', 'hole', 'stitch', 'opening']))
   })
 
   it('accepts incomplete input', () => {
     expect(getSubProjectIds({})).toEqual(new Set())
     expect(
       getSubProjectIds({
-        constraints: { empty: {}, partial: { fields: [{}] } },
+        bindings: { empty: {}, partial: { fields: [{}] } },
         components: { empty: {} },
         holes: [{}],
         stitchLines: [{}],

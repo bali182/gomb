@@ -23,8 +23,8 @@ const computed: ComputedTPocketSchema = {
   cornerRadius: ZERO_CORNER_RADIUS,
 }
 const getLimits = (fields: Partial<OpticalIllusionPocketOpeningSchema> = {}) => {
-  const opening = {
-    type: 'optical-illusion' as const,
+  const opening: OpticalIllusionPocketOpeningSchema = {
+    type: 'optical-illusion',
     id: 'opening',
     name: 'Opening',
     ...defaultOpticalIllusionPocketOpening,
@@ -48,17 +48,17 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
     }
     expect(adjusted.illusionStartInset).toBeCloseTo(start, 12)
     expect(adjusted.illusionEndInset).toBeCloseTo(end, 12)
-    expect(opening).toMatchObject({ startInset, endInset })
+    expect(opening).toMatchObject({ illusionStartInset: startInset, illusionEndInset: endInset })
   })
 
   it.each([1, 2, 6])('reserves horizontal run for each of %s pockets', (count) => {
-    const opening = {
-      type: 'optical-illusion' as const,
+    const opening: OpticalIllusionPocketOpeningSchema = {
+      type: 'optical-illusion',
       id: 'opening',
       name: 'Opening',
       ...defaultOpticalIllusionPocketOpening,
-      startInset: 100,
-      endInset: 100,
+      illusionStartInset: 100,
+      illusionEndInset: 100,
     }
     const populated = { ...cluster, children: ['t', ...Array.from({ length: count - 1 }, (_, index) => `t-${index}`)] }
     const limits = getOpticalIllusionPocketOpeningLimits(opening, pocket, populated, computed)
@@ -93,7 +93,9 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
     expect(limits.illusionLeadingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
     expect(limits.illusionTrailingRadius?.max?.value.toNumber()).toBeCloseTo(expected, 10)
     expect(limits.illusionLeadingRadius?.max?.reason).toBe('optical-illusion-pocket-opening-radii-share-slanted-length')
-    if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) throw new Error('Wrong opening')
+    if (!narrowers.is.opticalIllusionPocketOpening(adjusted)) {
+      throw new Error('Wrong opening')
+    }
     const path = new OpticalIllusionPocketCalculator(
       pocket,
       cluster,
@@ -126,6 +128,6 @@ describe('getOpticalIllusionPocketOpeningLimits', () => {
       illusionLeadingRadius: 20,
       illusionTrailingRadius: 20,
     })
-    expect(adjusted).toMatchObject({ leadingRadius: 0, trailingRadius: 0 })
+    expect(adjusted).toMatchObject({ illusionLeadingRadius: 0, illusionTrailingRadius: 0 })
   })
 })

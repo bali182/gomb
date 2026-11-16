@@ -18,13 +18,13 @@ const fixture = () =>
     ],
     holes: [d.hole({ id: 'hole', componentId: 'child' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole' })],
-    constraints: {
+    bindings: {
       linked: {
         id: 'linked',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 'child-field', type: 'panel-constraint-field', modelId: 'child', field: 'width' },
-          { id: 'grandchild-field', type: 'panel-constraint-field', modelId: 'grandchild', field: 'width' },
+          { id: 'child-field', type: 'panel-binding-field', modelId: 'child', field: 'width' },
+          { id: 'grandchild-field', type: 'panel-binding-field', modelId: 'grandchild', field: 'width' },
         ],
       },
     },
@@ -41,19 +41,19 @@ const pocketFixture = () =>
       d.frontPocket({ id: 'front', openingId: 'opening' }),
     ],
     pocketOpenings: [{ id: 'opening', type: 'slanted', name: 'Opening', slantOffset: 2, slantSide: 'start' }],
-    constraints: {
+    bindings: {
       reference: {
         id: 'reference',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 't-field', type: 't-pocket-constraint-field', modelId: 't', field: 'openingId' },
-          { id: 'front-field', type: 'front-pocket-constraint-field', modelId: 'front', field: 'openingId' },
+          { id: 't-field', type: 't-pocket-binding-field', modelId: 't', field: 'openingId' },
+          { id: 'front-field', type: 'front-pocket-binding-field', modelId: 'front', field: 'openingId' },
         ],
       },
       opening: {
-        id: 'opening-constraint',
-        type: 'equal-constraint',
-        fields: [{ id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'slantOffset' }],
+        id: 'opening-binding',
+        type: 'equal-binding',
+        fields: [{ id: 'opening-field', type: 'slanted-binding-field', modelId: 'opening', field: 'slantOffset' }],
       },
     },
   })
@@ -65,7 +65,7 @@ describe('clone component selection', () => {
     expect(params.children).toEqual({ child: { action: 'clone' }, grandchild: { action: 'clone' } })
     expect(params.holes).toEqual({ hole: { action: 'clone' } })
     expect(params.stitchLines).toEqual({ stitch: { action: 'clone' } })
-    expect(params.constraints).toEqual({ linked: { action: 'ignore' } })
+    expect(params.bindings).toEqual({ linked: { action: 'ignore' } })
     const selection = getCloneComponentSelection(source, params)
     expect(selection.clonedModelIds).toEqual(new Set(['panel', 'child', 'grandchild', 'hole', 'stitch']))
     expect(selection.components.map((row) => [row.component.id, row.disabled])).toEqual([
@@ -79,20 +79,20 @@ describe('clone component selection', () => {
     const source = fixture()
     let params = createCloneComponentParams(source, 'panel')
     params.holes.hole.action = 'ignore'
-    params.constraints.linked.action = 'add-to-existing'
+    params.bindings.linked.action = 'add-to-existing'
     params.children.child.action = 'ignore'
     params = normalizeCloneComponentParams(source, params)
     expect(params.children.grandchild.action).toBe('ignore')
     expect(params.holes).toEqual({})
     expect(params.stitchLines).toEqual({})
-    expect(params.constraints).toEqual({})
+    expect(params.bindings).toEqual({})
     expect(getCloneComponentSelection(source, params).components[2].disabled).toBe(true)
     params.children.child.action = 'clone'
     params = normalizeCloneComponentParams(source, params)
     expect(params.children.grandchild.action).toBe('ignore')
     expect(params.holes.hole.action).toBe('clone')
     expect(params.stitchLines.stitch.action).toBe('clone')
-    expect(params.constraints.linked.action).toBe('ignore')
+    expect(params.bindings.linked.action).toBe('ignore')
   })
 
   it('restores a stitch line with its default after its hole is deselected and selected', () => {
@@ -107,20 +107,20 @@ describe('clone component selection', () => {
     expect(params.stitchLines.stitch.action).toBe('clone')
   })
 
-  it('keeps a constraint with one new field, but resets separate creation to ignore', () => {
+  it('keeps a binding with one new field, but resets separate creation to ignore', () => {
     const source = fixture()
     const params = createCloneComponentParams(source, 'panel')
-    params.constraints.linked.action = 'constrain-separately'
+    params.bindings.linked.action = 'bind-separately'
     params.children.grandchild.action = 'ignore'
     const normalized = normalizeCloneComponentParams(source, params)
-    expect(normalized.constraints.linked.action).toBe('ignore')
-    expect(getCloneComponentSelection(source, normalized).constraints[0]).toMatchObject({
+    expect(normalized.bindings.linked.action).toBe('ignore')
+    expect(getCloneComponentSelection(source, normalized).bindings[0]).toMatchObject({
       canAddToExisting: true,
-      canConstrainSeparately: false,
+      canBindSeparately: false,
       fields: [{ modelId: 'child' }],
     })
-    normalized.constraints.linked.action = 'add-to-existing'
-    expect(normalizeCloneComponentParams(source, normalized).constraints.linked.action).toBe('add-to-existing')
+    normalized.bindings.linked.action = 'add-to-existing'
+    expect(normalizeCloneComponentParams(source, normalized).bindings.linked.action).toBe('add-to-existing')
   })
 
   it('requires the front pocket only while its cluster is selected and restores opening defaults', () => {
@@ -151,13 +151,13 @@ describe('clone component selection', () => {
       const source = pocketFixture()
       const params = createCloneComponentParams(source, 'panel')
       params.pocketOpenings.opening = { action }
-      params.constraints.reference.action = 'add-to-existing'
+      params.bindings.reference.action = 'add-to-existing'
       const normalized = normalizeCloneComponentParams(source, params)
-      expect(normalized.constraints.reference.action).toBe('ignore')
+      expect(normalized.bindings.reference.action).toBe('ignore')
       const selection = getCloneComponentSelection(source, normalized)
       expect(selection.clonedModelIds.has('opening')).toBe(action === 'clone')
-      expect(selection.constraints.find((row) => row.constraint.id === 'reference')?.canAddToExisting).toBe(false)
-      expect(selection.constraints.some((row) => row.constraint.id === 'opening-constraint')).toBe(action === 'clone')
+      expect(selection.bindings.find((row) => row.binding.id === 'reference')?.canAddToExisting).toBe(false)
+      expect(selection.bindings.some((row) => row.binding.id === 'opening-binding')).toBe(action === 'clone')
     },
   )
 
@@ -166,30 +166,30 @@ describe('clone component selection', () => {
     source.defaultPocketOpening = 'opening'
     const params = createCloneComponentParams(source, 'panel')
     params.pocketOpenings.opening = { action: 'set-to-default' }
-    params.constraints.reference.action = 'add-to-existing'
-    expect(normalizeCloneComponentParams(source, params).constraints.reference.action).toBe('add-to-existing')
+    params.bindings.reference.action = 'add-to-existing'
+    expect(normalizeCloneComponentParams(source, params).bindings.reference.action).toBe('add-to-existing')
   })
 
-  it('lists constraints on holes and stitch lines only when those models will be cloned', () => {
+  it('lists bindings on holes and stitch lines only when those models will be cloned', () => {
     const source = fixture()
-    source.constraints.owned = {
+    source.bindings.owned = {
       id: 'owned',
-      type: 'equal-constraint',
+      type: 'equal-binding',
       fields: [
-        { id: 'hole-width', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
+        { id: 'hole-width', type: 'hole-binding-field', modelId: 'hole', field: 'width' },
         {
           id: 'stitch-margin',
-          type: 'component-bounds-stitch-line-constraint-field',
+          type: 'component-bounds-stitch-line-binding-field',
           modelId: 'stitch',
           field: 'stitchMargin',
         },
       ],
     }
     let params = createCloneComponentParams(source, 'panel')
-    expect(params.constraints.owned.action).toBe('ignore')
+    expect(params.bindings.owned.action).toBe('ignore')
     params.holes.hole.action = 'ignore'
     params = normalizeCloneComponentParams(source, params)
-    expect(params.constraints.owned).toBeUndefined()
+    expect(params.bindings.owned).toBeUndefined()
   })
 
   it('leaves a leaf source present and disabled, with no child records', () => {

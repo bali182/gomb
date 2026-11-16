@@ -1,8 +1,8 @@
 import type {
   AnchorSchema,
   FlipAxisSchema,
-  HasCornerRadiusValuesSchema,
-  HasStretchValuesSchema,
+  HasCornerRadiusSchema,
+  HasStretchSchema,
 } from '../../schemas/common'
 import type {
   ComponentSchema,
@@ -240,7 +240,7 @@ const flipStitchLine = (
   }
 }
 
-const flipCornerRadii = (value: HasCornerRadiusValuesSchema, axis: FlipAxisSchema): HasCornerRadiusValuesSchema => {
+const flipCornerRadii = (value: HasCornerRadiusSchema, axis: FlipAxisSchema): HasCornerRadiusSchema => {
   switch (axis) {
     case 'horizontal':
       return {
@@ -259,7 +259,7 @@ const flipCornerRadii = (value: HasCornerRadiusValuesSchema, axis: FlipAxisSchem
   }
 }
 
-const flipStretch = (value: HasStretchValuesSchema, axis: FlipAxisSchema): HasStretchValuesSchema => {
+const flipStretch = (value: HasStretchSchema, axis: FlipAxisSchema): HasStretchSchema => {
   switch (axis) {
     case 'horizontal':
       return {

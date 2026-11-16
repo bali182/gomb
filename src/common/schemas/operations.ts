@@ -1,7 +1,7 @@
-import { FlipAxisSchema } from './common'
+import { BindingSchema } from './bindings'
+import { FlipAxisSchema, HasCornerRadiusSchema, HasStretchSchema } from './common'
 import { ComponentSchema } from './components'
-import { ConstraintSchema } from './constraints'
-import { ConstraintFieldInputSchema, ModelObjectFactorySchema, ReadonlyModelObjectFactorySchema } from './factory'
+import { BindingFieldInputSchema, ModelObjectFactorySchema, ReadonlyModelObjectFactorySchema } from './factory'
 import { HoleSchema } from './hole'
 import { IdGeneratorSchema, NameGeneratorSchema } from './idGenerator'
 import { ModelObjectSchema } from './modelObject'
@@ -51,22 +51,22 @@ export type AddComponentsParamsSchema = {
   position: ComponentInsertionPositionSchema
 }
 
-export type AddConstraintParamsSchema = {
-  type: ConstraintSchema['type']
+export type AddBindingParamsSchema = {
+  type: BindingSchema['type']
 }
 
-export type AddConstraintWithFieldsParamsSchema = {
-  type: ConstraintSchema['type']
-  fields: ConstraintFieldInputSchema[]
+export type AddBindingWithFieldsParamsSchema = {
+  type: BindingSchema['type']
+  fields: BindingFieldInputSchema[]
 }
 
-export type AddConstraintsParamsSchema = {
-  constraints: AddConstraintWithFieldsParamsSchema[]
+export type AddBindingsParamsSchema = {
+  bindings: AddBindingWithFieldsParamsSchema[]
 }
 
-export type AddConstraintFieldsParamsSchema = {
-  constraintId: string
-  fields: ConstraintFieldInputSchema[]
+export type AddBindingFieldsParamsSchema = {
+  bindingId: string
+  fields: BindingFieldInputSchema[]
 }
 
 export type AddHoleParamsSchema = {
@@ -91,15 +91,15 @@ export type AddStitchLineToComponentParamsSchema = {
 export type AddStitchLineParamsSchema = AddStitchLineToHoleParamsSchema | AddStitchLineToComponentParamsSchema
 
 export type CloneRelatedModelActionSchema = 'clone' | 'ignore'
-export type CloneRelatedConstraintActionSchema = 'constrain-separately' | 'add-to-existing' | 'ignore'
+export type CloneRelatedBindingActionSchema = 'bind-separately' | 'add-to-existing' | 'ignore'
 export type ClonePocketOpeningActionSchema = 'keep-original' | 'clone' | 'set-to-default'
 
 export type CloneRelatedModelSchema = {
   action: CloneRelatedModelActionSchema
 }
 
-export type CloneRelatedConstraintSchema = {
-  action: CloneRelatedConstraintActionSchema
+export type CloneRelatedBindingSchema = {
+  action: CloneRelatedBindingActionSchema
 }
 
 export type CloneRelatedPocketOpeningSchema = {
@@ -112,7 +112,7 @@ export type CloneComponentParamsSchema = {
   holes: Record<string, CloneRelatedModelSchema>
   stitchLines: Record<string, CloneRelatedModelSchema>
   pocketOpenings: Record<string, CloneRelatedPocketOpeningSchema>
-  constraints: Record<string, CloneRelatedConstraintSchema>
+  bindings: Record<string, CloneRelatedBindingSchema>
 }
 
 export type CloneHoleParamsSchema = {
@@ -143,17 +143,27 @@ export type DeletePocketOpeningParamsSchema = {
   id: string
 }
 
-export type DeleteConstraintParamsSchema = {
+export type DeleteBindingParamsSchema = {
   id: string
 }
 
-export type DeleteModelConstraintFieldsParamsSchema = {
+export type DeleteModelBindingFieldsParamsSchema = {
   modelId: string
 }
 
-export type DeleteConstraintFieldParamsSchema = {
-  constraintId: string
+export type DeleteBindingFieldParamsSchema = {
+  bindingId: string
   id: string
+}
+
+export type SetCornerRadiusBindingParamsSchema = {
+  modelId: string
+  fields: readonly (keyof HasCornerRadiusSchema)[]
+}
+
+export type SetStretchBindingParamsSchema = {
+  modelId: string
+  fields: readonly (keyof HasStretchSchema)[]
 }
 
 export type SetDefaultPocketOpeningParamsSchema = {

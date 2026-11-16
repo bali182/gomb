@@ -1,4 +1,20 @@
 import type {
+  BindingFieldSchema,
+  BindingSchema,
+  ComponentBoundsStitchLineBindingFieldSchema,
+  EqualBindingSchema,
+  FrontPocketBindingFieldSchema,
+  HoleBindingFieldSchema,
+  OpticalIllusionPocketOpeningBindingFieldSchema,
+  PanelBindingFieldSchema,
+  PocketClusterBindingFieldSchema,
+  RecessedPocketOpeningBindingFieldSchema,
+  RootPanelBindingFieldSchema,
+  SlantedPocketOpeningBindingFieldSchema,
+  TPocketBindingFieldSchema,
+  TPocketStitchLineBindingFieldSchema,
+} from '../../schemas/bindings'
+import type {
   ComponentSchema,
   FrontPocketSchema,
   PanelSchema,
@@ -6,22 +22,6 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
-import type {
-  ComponentBoundsStitchLineConstraintFieldSchema,
-  ConstraintFieldSchema,
-  ConstraintSchema,
-  EqualConstraintSchema,
-  FrontPocketConstraintFieldSchema,
-  HoleConstraintFieldSchema,
-  OpticalIllusionPocketOpeningConstraintFieldSchema,
-  PanelConstraintFieldSchema,
-  PocketClusterConstraintFieldSchema,
-  RecessedPocketOpeningConstraintFieldSchema,
-  RootPanelConstraintFieldSchema,
-  SlantedPocketOpeningConstraintFieldSchema,
-  TPocketConstraintFieldSchema,
-  TPocketStitchLineConstraintFieldSchema,
-} from '../../schemas/constraints'
 import type * as Factory from '../../schemas/factory'
 import type { HoleSchema } from '../../schemas/hole'
 import type { IdGeneratorSchema, NameGeneratorSchema } from '../../schemas/idGenerator'
@@ -161,106 +161,102 @@ export class ModelObjectFactory implements Factory.ModelObjectFactorySchema {
     return model
   }
 
-  public createConstraint(params: Factory.CreateConstraintParamsSchema): ConstraintSchema {
-    const model = this.readonlyFactory.createConstraint(params)
+  public createBinding(params: Factory.CreateBindingParamsSchema): BindingSchema {
+    const model = this.readonlyFactory.createBinding(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createEqualConstraint(params: Factory.CreateEqualConstraintParamsSchema): EqualConstraintSchema {
-    const model = this.readonlyFactory.createEqualConstraint(params)
+  public createEqualBinding(params: Factory.CreateEqualBindingParamsSchema): EqualBindingSchema {
+    const model = this.readonlyFactory.createEqualBinding(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createConstraintField(params: Factory.CreateConstraintFieldParamsSchema): ConstraintFieldSchema {
-    const model = this.readonlyFactory.createConstraintField(params)
+  public createBindingField(params: Factory.CreateBindingFieldParamsSchema): BindingFieldSchema {
+    const model = this.readonlyFactory.createBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createRootPanelConstraintField(
-    params: Factory.CreateRootPanelConstraintFieldParamsSchema,
-  ): RootPanelConstraintFieldSchema {
-    const model = this.readonlyFactory.createRootPanelConstraintField(params)
+  public createRootPanelBindingField(
+    params: Factory.CreateRootPanelBindingFieldParamsSchema,
+  ): RootPanelBindingFieldSchema {
+    const model = this.readonlyFactory.createRootPanelBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createPanelConstraintField(
-    params: Factory.CreatePanelConstraintFieldParamsSchema,
-  ): PanelConstraintFieldSchema {
-    const model = this.readonlyFactory.createPanelConstraintField(params)
+  public createPanelBindingField(params: Factory.CreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema {
+    const model = this.readonlyFactory.createPanelBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createPocketClusterConstraintField(
-    params: Factory.CreatePocketClusterConstraintFieldParamsSchema,
-  ): PocketClusterConstraintFieldSchema {
-    const model = this.readonlyFactory.createPocketClusterConstraintField(params)
+  public createPocketClusterBindingField(
+    params: Factory.CreatePocketClusterBindingFieldParamsSchema,
+  ): PocketClusterBindingFieldSchema {
+    const model = this.readonlyFactory.createPocketClusterBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createFrontPocketConstraintField(
-    params: Factory.CreateFrontPocketConstraintFieldParamsSchema,
-  ): FrontPocketConstraintFieldSchema {
-    const model = this.readonlyFactory.createFrontPocketConstraintField(params)
+  public createFrontPocketBindingField(
+    params: Factory.CreateFrontPocketBindingFieldParamsSchema,
+  ): FrontPocketBindingFieldSchema {
+    const model = this.readonlyFactory.createFrontPocketBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createTPocketConstraintField(
-    params: Factory.CreateTPocketConstraintFieldParamsSchema,
-  ): TPocketConstraintFieldSchema {
-    const model = this.readonlyFactory.createTPocketConstraintField(params)
+  public createTPocketBindingField(params: Factory.CreateTPocketBindingFieldParamsSchema): TPocketBindingFieldSchema {
+    const model = this.readonlyFactory.createTPocketBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createHoleConstraintField(params: Factory.CreateHoleConstraintFieldParamsSchema): HoleConstraintFieldSchema {
-    const model = this.readonlyFactory.createHoleConstraintField(params)
+  public createHoleBindingField(params: Factory.CreateHoleBindingFieldParamsSchema): HoleBindingFieldSchema {
+    const model = this.readonlyFactory.createHoleBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createRecessedPocketOpeningConstraintField(
-    params: Factory.CreateRecessedPocketOpeningConstraintFieldParamsSchema,
-  ): RecessedPocketOpeningConstraintFieldSchema {
-    const model = this.readonlyFactory.createRecessedPocketOpeningConstraintField(params)
+  public createRecessedPocketOpeningBindingField(
+    params: Factory.CreateRecessedPocketOpeningBindingFieldParamsSchema,
+  ): RecessedPocketOpeningBindingFieldSchema {
+    const model = this.readonlyFactory.createRecessedPocketOpeningBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createSlantedPocketOpeningConstraintField(
-    params: Factory.CreateSlantedPocketOpeningConstraintFieldParamsSchema,
-  ): SlantedPocketOpeningConstraintFieldSchema {
-    const model = this.readonlyFactory.createSlantedPocketOpeningConstraintField(params)
+  public createSlantedPocketOpeningBindingField(
+    params: Factory.CreateSlantedPocketOpeningBindingFieldParamsSchema,
+  ): SlantedPocketOpeningBindingFieldSchema {
+    const model = this.readonlyFactory.createSlantedPocketOpeningBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createOpticalIllusionPocketOpeningConstraintField(
-    params: Factory.CreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema,
-  ): OpticalIllusionPocketOpeningConstraintFieldSchema {
-    const model = this.readonlyFactory.createOpticalIllusionPocketOpeningConstraintField(params)
+  public createOpticalIllusionPocketOpeningBindingField(
+    params: Factory.CreateOpticalIllusionPocketOpeningBindingFieldParamsSchema,
+  ): OpticalIllusionPocketOpeningBindingFieldSchema {
+    const model = this.readonlyFactory.createOpticalIllusionPocketOpeningBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createComponentBoundsStitchLineConstraintField(
-    params: Factory.CreateComponentBoundsStitchLineConstraintFieldParamsSchema,
-  ): ComponentBoundsStitchLineConstraintFieldSchema {
-    const model = this.readonlyFactory.createComponentBoundsStitchLineConstraintField(params)
+  public createComponentBoundsStitchLineBindingField(
+    params: Factory.CreateComponentBoundsStitchLineBindingFieldParamsSchema,
+  ): ComponentBoundsStitchLineBindingFieldSchema {
+    const model = this.readonlyFactory.createComponentBoundsStitchLineBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }
 
-  public createTPocketStitchLineConstraintField(
-    params: Factory.CreateTPocketStitchLineConstraintFieldParamsSchema,
-  ): TPocketStitchLineConstraintFieldSchema {
-    const model = this.readonlyFactory.createTPocketStitchLineConstraintField(params)
+  public createTPocketStitchLineBindingField(
+    params: Factory.CreateTPocketStitchLineBindingFieldParamsSchema,
+  ): TPocketStitchLineBindingFieldSchema {
+    const model = this.readonlyFactory.createTPocketStitchLineBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }

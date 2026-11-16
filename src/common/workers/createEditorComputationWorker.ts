@@ -14,13 +14,15 @@ type PendingComputation = {
   reject: (error: unknown) => void
 }
 
-export const createEditorComputationWorker = (): {
+export type EditorComputationWorkerClient = {
   compute: (
     request: EditorComputationRequestSchema,
     isCurrent: (requestId: number) => boolean,
   ) => Promise<SubProjectComputationResultSchema | undefined>
   terminate: () => void
-} => {
+}
+
+export const createEditorComputationWorker = (): EditorComputationWorkerClient => {
   let worker: Worker | undefined
   let pending: PendingComputation | undefined
   let terminated = false

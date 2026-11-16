@@ -6,8 +6,8 @@ import { PiHand } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
+import type { BindingFieldNameSchema } from '../../schemas/bindings'
 import { AutoDimensionModeSchema } from '../../schemas/components'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
 import type { IssueSchema } from '../../schemas/issues'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -17,7 +17,7 @@ import { Tooltip } from './Tooltip'
 
 type AutoDimensionEditorProps = {
   modelId: string
-  field: ConstraintFieldNameSchema
+  field: BindingFieldNameSchema
   auto: boolean
   icon: IconType
   autoValue: number
@@ -50,9 +50,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   const focusRequested = useRef(false)
 
   const autoDisabled = useMemo<boolean>(() => {
-    return (
-      !auto && isDefined(subProject) && accessors.subProject(subProject).constraint.byField(modelId, field).length > 0
-    )
+    return !auto && isDefined(subProject) && accessors.subProject(subProject).binding.byField(modelId, field).length > 0
   }, [auto, field, modelId, subProject])
 
   const collection = useMemo<ListCollection<AutoDimensionModeSchema>>(
@@ -136,7 +134,7 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
         >
           <Select.HiddenSelect />
           <Select.Control flex="1">
-            <Tooltip disabled={!autoDisabled} content={t.project.editors.sections.constraints.linkedAuto}>
+            <Tooltip disabled={!autoDisabled} content={t.project.editors.sections.bindings.linkedAuto}>
               <Select.Trigger border="0" borderRadius="0" height="full" minHeight="0" px="1.5" py="0" gap="1.5">
                 <Icon size="sm" as={ModelIcon} />
                 <Grid>

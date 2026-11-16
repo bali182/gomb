@@ -1,6 +1,6 @@
 import { useMemo, type FC } from 'react'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
@@ -31,7 +31,7 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
 }) => {
   const { subProject } = useSubProject()
   const accessor = accessors.subProject(subProject)
-  const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
+  const disabledFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(() => {
     switch (component.orientation) {
       case 'up':
         return ['topLeftRadius', 'topRightRadius']
@@ -62,17 +62,15 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         onChange={onChange}
       />
       <AnchorSection<PocketClusterSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <CornerRadiusSection
+      <CornerRadiusSection<PocketClusterSchema>
         modelId={editable.id}
-        value={component}
         editable={editable}
         issues={issues}
         onChange={onChange}
         disabledFields={disabledFields}
       />
-      <StretchSection
+      <StretchSection<PocketClusterSchema>
         modelId={editable.id}
-        component={component}
         editable={editable}
         issues={issues}
         onChange={onChange}

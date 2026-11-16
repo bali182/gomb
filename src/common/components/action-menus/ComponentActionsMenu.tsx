@@ -32,8 +32,8 @@ import { toaster } from '../Toaster'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
-  CreateConstraintsMenuItem,
-  DeleteConstraintsMenuItem,
+  CreateBindingsMenuItem,
+  DeleteBindingsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -75,7 +75,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   const exportDrawAreaContext = useEditorDrawArea({ isInteractive: false })
   const { subProject: selectedSubProject } = useOptionalSubProject()
   const { cloneSubProject, deleteSubProject } = useProjectOperations()
-  const { deleteModelConstraintFields, addComponent, addHole, addStitchLine, deleteComponent, flip } =
+  const { deleteModelBindingFields, addComponent, addHole, addStitchLine, deleteComponent, flip } =
     useSubProjectOperations()
   const { navigateToProject, navigateToSubProject } = useEditorContext()
   const nextSelectedSubProjectAfterDelete = useMemo((): SubProjectSchema | undefined => {
@@ -141,17 +141,17 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
     }
   }, [onDelete, component.id, component.type, deleteComponent, deleteRoot])
 
-  const hasConstraints = useMemo<boolean>(
-    () => accessors.subProject(subProject).constraint.byModel(component.id).length > 0,
+  const hasBindings = useMemo<boolean>(
+    () => accessors.subProject(subProject).binding.byModel(component.id).length > 0,
     [subProject, component.id],
   )
 
-  const handleDeleteConstraints = useCallback((): void => {
-    deleteModelConstraintFields({ modelId: component.id })
-  }, [deleteModelConstraintFields, component.id])
+  const handleDeleteBindings = useCallback((): void => {
+    deleteModelBindingFields({ modelId: component.id })
+  }, [deleteModelBindingFields, component.id])
 
-  const handleCreateConstraints = useCallback((): void => {
-    openDialog({ type: 'create-constraints', source: component, subProject })
+  const handleCreateBindings = useCallback((): void => {
+    openDialog({ type: 'create-bindings', source: component, subProject })
   }, [openDialog, component, subProject])
 
   const handleClone = useCallback((): void => {
@@ -263,8 +263,8 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+                <CreateBindingsMenuItem onSelect={handleCreateBindings} />
+                <DeleteBindingsMenuItem disabled={!hasBindings} onSelect={handleDeleteBindings} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneMenuItem disabled={!canClone} onSelect={handleClone} />

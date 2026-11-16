@@ -1,3 +1,4 @@
+import type { BindingFieldSchema, BindingSchema } from '../schemas/bindings'
 import type {
   ComponentSchema,
   FrontPocketSchema,
@@ -6,7 +7,6 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
@@ -59,9 +59,9 @@ export const comparators = {
       a.id === b.id &&
       a.root === b.root &&
       a.defaultPocketOpening === b.defaultPocketOpening &&
-      Object.keys(a.constraints).length === Object.keys(b.constraints).length &&
-      Object.entries(a.constraints).every(
-        ([id, constraint]) => id in b.constraints && comparators.constraint(constraint, b.constraints[id]),
+      Object.keys(a.bindings).length === Object.keys(b.bindings).length &&
+      Object.entries(a.bindings).every(
+        ([id, binding]) => id in b.bindings && comparators.binding(binding, b.bindings[id]),
       ) &&
       Object.keys(a.pocketOpenings).length === Object.keys(b.pocketOpenings).length &&
       Object.entries(a.pocketOpenings).every(
@@ -77,10 +77,10 @@ export const comparators = {
     )
   },
 
-  constraint: (a: ConstraintSchema, b: ConstraintSchema): boolean => {
-    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.constraintField)
+  binding: (a: BindingSchema, b: BindingSchema): boolean => {
+    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.bindingField)
   },
-  constraintField: (a: ConstraintFieldSchema, b: ConstraintFieldSchema): boolean => {
+  bindingField: (a: BindingFieldSchema, b: BindingFieldSchema): boolean => {
     return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field
   },
 
@@ -121,7 +121,6 @@ export const comparators = {
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.width === b.width &&
       a.height === b.height &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -143,12 +142,10 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualStretch === b.individualStretch &&
       a.topStretch === b.topStretch &&
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -193,7 +190,6 @@ export const comparators = {
     a.mainAxisAnchor === b.mainAxisAnchor &&
     a.layoutGap === b.layoutGap &&
     a.autoLayoutGap === b.autoLayoutGap &&
-    a.individualRadii === b.individualRadii &&
     a.topLeftRadius === b.topLeftRadius &&
     a.topRightRadius === b.topRightRadius &&
     a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -226,12 +222,10 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualStretch === b.individualStretch &&
       a.topStretch === b.topStretch &&
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
       a.leftStretch === b.leftStretch &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -253,7 +247,6 @@ export const comparators = {
       a.yOffset === b.yOffset &&
       a.width === b.width &&
       a.height === b.height &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&
@@ -289,7 +282,6 @@ export const comparators = {
       a.stitchHoleThickness === b.stitchHoleThickness &&
       a.stitchLineThickness === b.stitchLineThickness &&
       a.autoCornerRadius === b.autoCornerRadius &&
-      a.individualRadii === b.individualRadii &&
       a.topLeftRadius === b.topLeftRadius &&
       a.topRightRadius === b.topRightRadius &&
       a.bottomLeftRadius === b.bottomLeftRadius &&

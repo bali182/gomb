@@ -3,7 +3,7 @@ import type { SubProjectComputationResultSchema } from '../schemas/editorComputa
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { getSubProjectDiff } from '../utils/getSubProjectDiff'
-import { applyResolution } from './constraints/applyResolution'
+import { applyResolution } from './bindings/applyResolution'
 import { getComputedSubProject } from './getComputedSubProject'
 
 export const processSubProjectComputation = (
@@ -12,13 +12,13 @@ export const processSubProjectComputation = (
   previousSubProject?: SubProjectSchema,
 ): SubProjectComputationResultSchema => {
   const inputDiff = getSubProjectDiff(previousSubProject, subProject)
-  const constrained = applyResolution({ input: subProject, target: subProject, inputDiff })
-  const computed = getComputedSubProject(constrained, stitchingSettings)
-  const patched = getPatchedSubProject(constrained, computed)
-  const patchDiff = getSubProjectDiff(constrained, patched)
-  const resolved = applyResolution({ input: constrained, target: patched, inputDiff, patchDiff })
+  const bound = applyResolution({ input: subProject, target: subProject, inputDiff })
+  const computed = getComputedSubProject(bound, stitchingSettings)
+  const patched = getPatchedSubProject(bound, computed)
+  const patchDiff = getSubProjectDiff(bound, patched)
+  const resolved = applyResolution({ input: bound, target: patched, inputDiff, patchDiff })
   return {
     subProject: resolved,
-    computedSubProject: resolved === constrained ? computed : getComputedSubProject(resolved, stitchingSettings),
+    computedSubProject: resolved === bound ? computed : getComputedSubProject(resolved, stitchingSettings),
   }
 }

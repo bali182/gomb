@@ -1,5 +1,5 @@
+import type { BindingFieldSchema, BindingSchema } from '../../schemas/bindings'
 import type { ComponentSchema } from '../../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
 import type { HoleSchema } from '../../schemas/hole'
 import type { NameGeneratorSchema } from '../../schemas/idGenerator'
 import type { BaseSubProjectOperationParamsSchema, CloneComponentParamsSchema } from '../../schemas/operations'
@@ -55,7 +55,7 @@ export const cloneComponent = (
     holes: cloneSelectedHoles(subProject, selection, idMappings, nameGenerator),
     stitchLines: cloneSelectedStitchLines(subProject, selection, idMappings, nameGenerator),
     pocketOpenings: cloneSelectedOpenings(subProject, selection, idMappings, nameGenerator),
-    constraints: cloneSelectedConstraints(subProject, normalized, selection, idMappings),
+    bindings: cloneSelectedBindings(subProject, normalized, selection, idMappings),
   }
 }
 
@@ -169,35 +169,35 @@ const cloneSelectedOpenings = (
       }
 }
 
-const cloneSelectedConstraints = (
+const cloneSelectedBindings = (
   subProject: SubProjectSchema,
   params: CloneComponentParamsSchema,
   selection: CloneComponentSelection,
   idMappings: Readonly<Record<string, string>>,
-): Record<string, ConstraintSchema> => {
-  let constraints = subProject.constraints
-  for (const row of selection.constraints) {
-    const action = params.constraints[row.constraint.id]?.action ?? 'ignore'
+): Record<string, BindingSchema> => {
+  let bindings = subProject.bindings
+  for (const row of selection.bindings) {
+    const action = params.bindings[row.binding.id]?.action ?? 'ignore'
     if (action === 'ignore') {
       continue
     }
     const fields = row.fields.map(
-      (field): ConstraintFieldSchema => ({ ...field, id: idMappings[field.id], modelId: idMappings[field.modelId] }),
+      (field): BindingFieldSchema => ({ ...field, id: idMappings[field.id], modelId: idMappings[field.modelId] }),
     )
     switch (action) {
       case 'add-to-existing': {
-        constraints = {
-          ...constraints,
-          [row.constraint.id]: { ...row.constraint, fields: [...row.constraint.fields, ...fields] },
+        bindings = {
+          ...bindings,
+          [row.binding.id]: { ...row.binding, fields: [...row.binding.fields, ...fields] },
         }
         break
       }
-      case 'constrain-separately': {
-        const id = idMappings[row.constraint.id]
-        constraints = { ...constraints, [id]: { ...row.constraint, id, fields } }
+      case 'bind-separately': {
+        const id = idMappings[row.binding.id]
+        bindings = { ...bindings, [id]: { ...row.binding, id, fields } }
         break
       }
     }
   }
-  return constraints
+  return bindings
 }

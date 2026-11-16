@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createBaseOperationParams } from '../operations/subProject/testUtils'
 import { updateComponent } from '../operations/subProject/updateComponent'
-import type { EqualConstraintSchema } from '../schemas/constraints'
+import type { EqualBindingSchema } from '../schemas/bindings'
 import { d } from '../testData'
 import { accessors } from './accessors'
 import { getSubProjectDiff } from './getSubProjectDiff'
@@ -13,7 +13,7 @@ const fixture = () =>
     components: [d.panel({ id: 'panel', width: 10 })],
     holes: [d.hole({ id: 'first', componentId: 'panel' }), d.hole({ id: 'second', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component' })],
-    constraints: { equal: { id: 'equal', type: 'equal-constraint', fields: [] } },
+    bindings: { equal: { id: 'equal', type: 'equal-binding', fields: [] } },
   })
 
 describe('getSubProjectDiff', () => {
@@ -32,7 +32,7 @@ describe('getSubProjectDiff', () => {
       holes: {},
       stitchLines: {},
       pocketOpenings: {},
-      constraints: {},
+      bindings: {},
     })
   })
 
@@ -62,21 +62,21 @@ describe('getSubProjectDiff', () => {
     expect(diff.stitchLines.stitch).toEqual({ before: before.stitchLines[0], after: undefined })
   })
 
-  it('includes constraint membership and subproject reference changes', () => {
+  it('includes binding membership and subproject reference changes', () => {
     const before = fixture()
-    const added: EqualConstraintSchema = { id: 'other', type: 'equal-constraint', fields: [] }
-    const after = { ...before, root: 'panel', defaultPocketOpening: 'other-opening', constraints: { other: added } }
+    const added: EqualBindingSchema = { id: 'other', type: 'equal-binding', fields: [] }
+    const after = { ...before, root: 'panel', defaultPocketOpening: 'other-opening', bindings: { other: added } }
     const diff = getSubProjectDiff(before, after)
     expect(diff.root).toEqual({ before: 'root', after: 'panel' })
     expect(diff.defaultPocketOpening).toEqual({ before: before.defaultPocketOpening, after: 'other-opening' })
-    expect(diff.constraints.equal).toEqual({ before: before.constraints.equal, after: undefined })
-    expect(diff.constraints.other).toEqual({ before: undefined, after: added })
+    expect(diff.bindings.equal).toEqual({ before: before.bindings.equal, after: undefined })
+    expect(diff.bindings.other).toEqual({ before: undefined, after: added })
   })
 
   it('represents loading without a previous subproject as additions', () => {
     const input = fixture()
     const diff = getSubProjectDiff(undefined, input)
     expect(diff.components.panel).toEqual({ before: undefined, after: input.components.panel })
-    expect(diff.constraints.equal).toEqual({ before: undefined, after: input.constraints.equal })
+    expect(diff.bindings.equal).toEqual({ before: undefined, after: input.bindings.equal })
   })
 })

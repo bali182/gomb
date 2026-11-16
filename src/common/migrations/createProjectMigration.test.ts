@@ -60,7 +60,7 @@ describe('createProjectMigration opening traversal', () => {
     const { project } = fixture()
     const snapshot = structuredClone(project)
     const result = createProjectMigration(migrator)(project, context)
-    expect(result.subProjects?.[0]?.pocketOpenings?.recessed).toMatchObject({ id: 'recessed', depth: 27 })
+    expect(result.subProjects?.[0]?.pocketOpenings?.recessed).toMatchObject({ id: 'recessed', recessDepth: 27 })
     expect(project).toEqual(snapshot)
   })
 

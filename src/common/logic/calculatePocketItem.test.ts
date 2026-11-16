@@ -68,7 +68,13 @@ describe('calculatePocketItem', () => {
   it.each([-4, 0, 4])(
     'applies a %s cross-axis offset independently of a zero opening offset',
     (itemCrossAxisOffset) => {
-      const pocket = d.frontPocket({ id: 'pocket', itemId: 'ID-2', itemCrossAxisOffset })
+      const pocket = d.frontPocket({
+        id: 'pocket',
+        itemId: 'ID-2',
+        itemOrientation: 'landscape',
+        itemCrossAxisOffset,
+        itemOpeningOffset: 0,
+      })
       const item = calculatePocketItem(pocket, d.pocketCluster({ id: 'cluster', orientation: 'up' }), rect)
       expect(item?.boundingRect.x.toNumber()).toBe(17.5 + itemCrossAxisOffset)
       expect(item?.boundingRect.y.toNumber()).toBe(96)

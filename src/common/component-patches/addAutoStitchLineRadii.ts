@@ -1,4 +1,4 @@
-import { HasCornerRadiusValuesSchema } from '../schemas/common'
+import { HasCornerRadiusSchema } from '../schemas/common'
 import { ComponentBoundsStitchLineSchema, StitchLineSchema } from '../schemas/stitching'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
@@ -21,32 +21,21 @@ export const addAutoStitchLineRadii = (
       stitchLine.id,
     ).autoComputedCornerRadius
 
-    const radius: HasCornerRadiusValuesSchema = {
+    const radius: HasCornerRadiusSchema = {
       bottomLeftRadius: bottomLeft.toNumber(),
       bottomRightRadius: bottomRight.toNumber(),
       topLeftRadius: topLeft.toNumber(),
       topRightRadius: topRight.toNumber(),
     }
-    const radiusValues = new Set([
-      radius.bottomLeftRadius,
-      radius.bottomRightRadius,
-      radius.topLeftRadius,
-      radius.topRightRadius,
-    ])
-
-    const individualRadii = radiusValues.size > 1
-
     if (
       radius.bottomLeftRadius !== stitchLine.bottomLeftRadius ||
       radius.bottomRightRadius !== stitchLine.bottomRightRadius ||
       radius.topLeftRadius !== stitchLine.topLeftRadius ||
-      radius.topRightRadius !== stitchLine.topRightRadius ||
-      individualRadii !== stitchLine.individualRadii
+      radius.topRightRadius !== stitchLine.topRightRadius
     ) {
       const updatedStitchLine: ComponentBoundsStitchLineSchema = {
         ...stitchLine,
         ...radius,
-        individualRadii: radiusValues.size > 1,
       }
       stitchLines.push(updatedStitchLine)
       modified = true

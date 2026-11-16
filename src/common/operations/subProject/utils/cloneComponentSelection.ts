@@ -1,5 +1,5 @@
+import type { BindingFieldSchema, BindingSchema } from '../../../schemas/bindings'
 import type { ComponentSchema } from '../../../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../../../schemas/constraints'
 import type { HoleSchema } from '../../../schemas/hole'
 import type { CloneComponentParamsSchema, CloneRelatedModelSchema } from '../../../schemas/operations'
 import type { PocketOpeningSchema } from '../../../schemas/pocketOpening'
@@ -14,11 +14,11 @@ export type CloneComponentRow = {
   disabled: boolean
 }
 
-export type CloneConstraintRow = {
-  constraint: ConstraintSchema
-  fields: ConstraintFieldSchema[]
+export type CloneBindingRow = {
+  binding: BindingSchema
+  fields: BindingFieldSchema[]
   canAddToExisting: boolean
-  canConstrainSeparately: boolean
+  canBindSeparately: boolean
 }
 
 export type CloneComponentSelection = {
@@ -27,7 +27,7 @@ export type CloneComponentSelection = {
   holes: HoleSchema[]
   stitchLines: StitchLineSchema[]
   pocketOpenings: PocketOpeningSchema[]
-  constraints: CloneConstraintRow[]
+  bindings: CloneBindingRow[]
   clonedModelIds: Set<string>
 }
 
@@ -38,7 +38,7 @@ export const createCloneComponentParams = (subProject: SubProjectSchema, rootId:
     holes: {},
     stitchLines: {},
     pocketOpenings: {},
-    constraints: {},
+    bindings: {},
   })
 
 export const normalizeCloneComponentParams = (
@@ -93,14 +93,14 @@ export const normalizeCloneComponentParams = (
     holes,
     stitchLines,
     pocketOpenings,
-    constraints: {},
+    bindings: {},
   }
-  for (const row of getConstraintRows(subProject, normalized, clonedModelIds)) {
-    const action = params.constraints[row.constraint.id]?.action ?? 'ignore'
-    normalized.constraints[row.constraint.id] = {
+  for (const row of getBindingRows(subProject, normalized, clonedModelIds)) {
+    const action = params.bindings[row.binding.id]?.action ?? 'ignore'
+    normalized.bindings[row.binding.id] = {
       action:
         (action === 'add-to-existing' && !row.canAddToExisting) ||
-        (action === 'constrain-separately' && !row.canConstrainSeparately)
+        (action === 'bind-separately' && !row.canBindSeparately)
           ? 'ignore'
           : action,
     }
@@ -141,7 +141,7 @@ export const getCloneComponentSelection = (
     pocketOpenings: Object.values(subProject.pocketOpenings).filter((opening) =>
       isDefined(normalized.pocketOpenings[opening.id]),
     ),
-    constraints: getConstraintRows(subProject, normalized, clonedModelIds),
+    bindings: getBindingRows(subProject, normalized, clonedModelIds),
     clonedModelIds,
   }
 }
@@ -183,16 +183,16 @@ const normalizeRelatedModels = (
   return result
 }
 
-const getConstraintRows = (
+const getBindingRows = (
   subProject: SubProjectSchema,
   params: CloneComponentParamsSchema,
   clonedModelIds: ReadonlySet<string>,
-): CloneConstraintRow[] => {
+): CloneBindingRow[] => {
   const accessor = accessors.subProject(subProject)
-  const rows: CloneConstraintRow[] = []
-  for (const constraint of Object.values(subProject.constraints)) {
-    const fields = constraint.fields.filter(
-      (field) => clonedModelIds.has(field.modelId) && isDefined(accessor.optional.constraint.model(field)),
+  const rows: CloneBindingRow[] = []
+  for (const binding of Object.values(subProject.bindings)) {
+    const fields = binding.fields.filter(
+      (field) => clonedModelIds.has(field.modelId) && isDefined(accessor.optional.binding.model(field)),
     )
     if (fields.length === 0) {
       continue
@@ -210,7 +210,7 @@ const getConstraintRows = (
         action === 'clone' || (action === 'set-to-default' && component.openingId !== subProject.defaultPocketOpening)
       )
     })
-    rows.push({ constraint, fields, canAddToExisting: !openingConflict, canConstrainSeparately: fields.length >= 2 })
+    rows.push({ binding, fields, canAddToExisting: !openingConflict, canBindSeparately: fields.length >= 2 })
   }
   return rows
 }

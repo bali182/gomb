@@ -1,3 +1,19 @@
+import type {
+  BindingFieldSchema,
+  BindingSchema,
+  ComponentBoundsStitchLineBindingFieldSchema,
+  EqualBindingSchema,
+  FrontPocketBindingFieldSchema,
+  HoleBindingFieldSchema,
+  OpticalIllusionPocketOpeningBindingFieldSchema,
+  PanelBindingFieldSchema,
+  PocketClusterBindingFieldSchema,
+  RecessedPocketOpeningBindingFieldSchema,
+  RootPanelBindingFieldSchema,
+  SlantedPocketOpeningBindingFieldSchema,
+  TPocketBindingFieldSchema,
+  TPocketStitchLineBindingFieldSchema,
+} from './bindings'
 import type { HasComponentReferenceSchema, HasComponentTargetSchema, HasTargetSchema } from './common'
 import type {
   ComponentSchema,
@@ -8,22 +24,6 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from './components'
-import type {
-  ComponentBoundsStitchLineConstraintFieldSchema,
-  ConstraintFieldSchema,
-  ConstraintSchema,
-  EqualConstraintSchema,
-  FrontPocketConstraintFieldSchema,
-  HoleConstraintFieldSchema,
-  OpticalIllusionPocketOpeningConstraintFieldSchema,
-  PanelConstraintFieldSchema,
-  PocketClusterConstraintFieldSchema,
-  RecessedPocketOpeningConstraintFieldSchema,
-  RootPanelConstraintFieldSchema,
-  SlantedPocketOpeningConstraintFieldSchema,
-  TPocketConstraintFieldSchema,
-  TPocketStitchLineConstraintFieldSchema,
-} from './constraints'
 import type { HoleSchema } from './hole'
 import type {
   OpticalIllusionPocketOpeningSchema,
@@ -94,85 +94,80 @@ export type ReadonlyCreatePocketOpeningParamsSchema = HasReadonlyForbiddenIdsSch
   HasReadonlyForbiddenNamesSchema & {
     type: PocketOpeningSchema['type']
   }
-export type ReadonlyCreateConstraintParamsSchema = HasReadonlyForbiddenIdsSchema & {
-  type: ConstraintSchema['type']
+export type ReadonlyCreateBindingParamsSchema = HasReadonlyForbiddenIdsSchema & {
+  type: BindingSchema['type']
 }
 
-export type RootPanelConstraintFieldInputSchema = Omit<RootPanelConstraintFieldSchema, 'id'>
+export type RootPanelBindingFieldInputSchema = Omit<RootPanelBindingFieldSchema, 'id'>
 
-export type PanelConstraintFieldInputSchema = Omit<PanelConstraintFieldSchema, 'id'>
+export type PanelBindingFieldInputSchema = Omit<PanelBindingFieldSchema, 'id'>
 
-export type PocketClusterConstraintFieldInputSchema = Omit<PocketClusterConstraintFieldSchema, 'id'>
+export type PocketClusterBindingFieldInputSchema = Omit<PocketClusterBindingFieldSchema, 'id'>
 
-export type FrontPocketConstraintFieldInputSchema = Omit<FrontPocketConstraintFieldSchema, 'id'>
+export type FrontPocketBindingFieldInputSchema = Omit<FrontPocketBindingFieldSchema, 'id'>
 
-export type TPocketConstraintFieldInputSchema = Omit<TPocketConstraintFieldSchema, 'id'>
+export type TPocketBindingFieldInputSchema = Omit<TPocketBindingFieldSchema, 'id'>
 
-export type HoleConstraintFieldInputSchema = Omit<HoleConstraintFieldSchema, 'id'>
+export type HoleBindingFieldInputSchema = Omit<HoleBindingFieldSchema, 'id'>
 
-export type RecessedPocketOpeningConstraintFieldInputSchema = Omit<RecessedPocketOpeningConstraintFieldSchema, 'id'>
+export type RecessedPocketOpeningBindingFieldInputSchema = Omit<RecessedPocketOpeningBindingFieldSchema, 'id'>
 
-export type SlantedPocketOpeningConstraintFieldInputSchema = Omit<SlantedPocketOpeningConstraintFieldSchema, 'id'>
+export type SlantedPocketOpeningBindingFieldInputSchema = Omit<SlantedPocketOpeningBindingFieldSchema, 'id'>
 
-export type OpticalIllusionPocketOpeningConstraintFieldInputSchema = Omit<
-  OpticalIllusionPocketOpeningConstraintFieldSchema,
+export type OpticalIllusionPocketOpeningBindingFieldInputSchema = Omit<
+  OpticalIllusionPocketOpeningBindingFieldSchema,
   'id'
 >
 
-export type ComponentBoundsStitchLineConstraintFieldInputSchema = Omit<
-  ComponentBoundsStitchLineConstraintFieldSchema,
-  'id'
->
+export type ComponentBoundsStitchLineBindingFieldInputSchema = Omit<ComponentBoundsStitchLineBindingFieldSchema, 'id'>
 
-export type TPocketStitchLineConstraintFieldInputSchema = Omit<TPocketStitchLineConstraintFieldSchema, 'id'>
+export type TPocketStitchLineBindingFieldInputSchema = Omit<TPocketStitchLineBindingFieldSchema, 'id'>
 
-export type ConstraintFieldInputSchema =
-  | RootPanelConstraintFieldInputSchema
-  | PanelConstraintFieldInputSchema
-  | PocketClusterConstraintFieldInputSchema
-  | FrontPocketConstraintFieldInputSchema
-  | TPocketConstraintFieldInputSchema
-  | HoleConstraintFieldInputSchema
-  | RecessedPocketOpeningConstraintFieldInputSchema
-  | SlantedPocketOpeningConstraintFieldInputSchema
-  | OpticalIllusionPocketOpeningConstraintFieldInputSchema
-  | ComponentBoundsStitchLineConstraintFieldInputSchema
-  | TPocketStitchLineConstraintFieldInputSchema
+export type BindingFieldInputSchema =
+  | RootPanelBindingFieldInputSchema
+  | PanelBindingFieldInputSchema
+  | PocketClusterBindingFieldInputSchema
+  | FrontPocketBindingFieldInputSchema
+  | TPocketBindingFieldInputSchema
+  | HoleBindingFieldInputSchema
+  | RecessedPocketOpeningBindingFieldInputSchema
+  | SlantedPocketOpeningBindingFieldInputSchema
+  | OpticalIllusionPocketOpeningBindingFieldInputSchema
+  | ComponentBoundsStitchLineBindingFieldInputSchema
+  | TPocketStitchLineBindingFieldInputSchema
 
-export type ReadonlyCreateConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema & ConstraintFieldInputSchema
+export type ReadonlyCreateBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema & BindingFieldInputSchema
 
-export type ReadonlyCreateRootPanelConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  RootPanelConstraintFieldInputSchema
+export type ReadonlyCreateRootPanelBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  RootPanelBindingFieldInputSchema
 
-export type ReadonlyCreatePanelConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  PanelConstraintFieldInputSchema
+export type ReadonlyCreatePanelBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema & PanelBindingFieldInputSchema
 
-export type ReadonlyCreatePocketClusterConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  PocketClusterConstraintFieldInputSchema
+export type ReadonlyCreatePocketClusterBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  PocketClusterBindingFieldInputSchema
 
-export type ReadonlyCreateFrontPocketConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  FrontPocketConstraintFieldInputSchema
+export type ReadonlyCreateFrontPocketBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  FrontPocketBindingFieldInputSchema
 
-export type ReadonlyCreateTPocketConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  TPocketConstraintFieldInputSchema
+export type ReadonlyCreateTPocketBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  TPocketBindingFieldInputSchema
 
-export type ReadonlyCreateHoleConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  HoleConstraintFieldInputSchema
+export type ReadonlyCreateHoleBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema & HoleBindingFieldInputSchema
 
-export type ReadonlyCreateRecessedPocketOpeningConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  RecessedPocketOpeningConstraintFieldInputSchema
+export type ReadonlyCreateRecessedPocketOpeningBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  RecessedPocketOpeningBindingFieldInputSchema
 
-export type ReadonlyCreateSlantedPocketOpeningConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  SlantedPocketOpeningConstraintFieldInputSchema
+export type ReadonlyCreateSlantedPocketOpeningBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  SlantedPocketOpeningBindingFieldInputSchema
 
-export type ReadonlyCreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  OpticalIllusionPocketOpeningConstraintFieldInputSchema
+export type ReadonlyCreateOpticalIllusionPocketOpeningBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  OpticalIllusionPocketOpeningBindingFieldInputSchema
 
-export type ReadonlyCreateComponentBoundsStitchLineConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  ComponentBoundsStitchLineConstraintFieldInputSchema
+export type ReadonlyCreateComponentBoundsStitchLineBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  ComponentBoundsStitchLineBindingFieldInputSchema
 
-export type ReadonlyCreateTPocketStitchLineConstraintFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
-  TPocketStitchLineConstraintFieldInputSchema
+export type ReadonlyCreateTPocketStitchLineBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
+  TPocketStitchLineBindingFieldInputSchema
 
 export type ReadonlyCreateFrontPocketParamsSchema = ReadonlyCreatePocketParamsSchema
 
@@ -190,7 +185,7 @@ export type ReadonlyCreateSlantedPocketOpeningParamsSchema = HasReadonlyForbidde
 export type ReadonlyCreateOpticalIllusionPocketOpeningParamsSchema = HasReadonlyForbiddenIdsSchema &
   HasReadonlyForbiddenNamesSchema
 
-export type ReadonlyCreateEqualConstraintParamsSchema = HasReadonlyForbiddenIdsSchema
+export type ReadonlyCreateEqualBindingParamsSchema = HasReadonlyForbiddenIdsSchema
 
 export type CreateComponentParamsSchema = ReadonlyCreateComponentParamsSchema &
   HasForbiddenIdsSchema &
@@ -228,42 +223,40 @@ export type CreatePocketOpeningParamsSchema = ReadonlyCreatePocketOpeningParamsS
   HasForbiddenIdsSchema &
   HasForbiddenNamesSchema
 
-export type CreateConstraintParamsSchema = ReadonlyCreateConstraintParamsSchema & HasForbiddenIdsSchema
+export type CreateBindingParamsSchema = ReadonlyCreateBindingParamsSchema & HasForbiddenIdsSchema
 
-export type CreateConstraintFieldParamsSchema = ReadonlyCreateConstraintFieldParamsSchema & HasForbiddenIdsSchema
+export type CreateBindingFieldParamsSchema = ReadonlyCreateBindingFieldParamsSchema & HasForbiddenIdsSchema
 
-export type CreateRootPanelConstraintFieldParamsSchema = ReadonlyCreateRootPanelConstraintFieldParamsSchema &
+export type CreateRootPanelBindingFieldParamsSchema = ReadonlyCreateRootPanelBindingFieldParamsSchema &
   HasForbiddenIdsSchema
 
-export type CreatePanelConstraintFieldParamsSchema = ReadonlyCreatePanelConstraintFieldParamsSchema &
+export type CreatePanelBindingFieldParamsSchema = ReadonlyCreatePanelBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreatePocketClusterBindingFieldParamsSchema = ReadonlyCreatePocketClusterBindingFieldParamsSchema &
   HasForbiddenIdsSchema
 
-export type CreatePocketClusterConstraintFieldParamsSchema = ReadonlyCreatePocketClusterConstraintFieldParamsSchema &
+export type CreateFrontPocketBindingFieldParamsSchema = ReadonlyCreateFrontPocketBindingFieldParamsSchema &
   HasForbiddenIdsSchema
 
-export type CreateFrontPocketConstraintFieldParamsSchema = ReadonlyCreateFrontPocketConstraintFieldParamsSchema &
+export type CreateTPocketBindingFieldParamsSchema = ReadonlyCreateTPocketBindingFieldParamsSchema &
   HasForbiddenIdsSchema
 
-export type CreateTPocketConstraintFieldParamsSchema = ReadonlyCreateTPocketConstraintFieldParamsSchema &
+export type CreateHoleBindingFieldParamsSchema = ReadonlyCreateHoleBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateRecessedPocketOpeningBindingFieldParamsSchema =
+  ReadonlyCreateRecessedPocketOpeningBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateSlantedPocketOpeningBindingFieldParamsSchema =
+  ReadonlyCreateSlantedPocketOpeningBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateOpticalIllusionPocketOpeningBindingFieldParamsSchema =
+  ReadonlyCreateOpticalIllusionPocketOpeningBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateComponentBoundsStitchLineBindingFieldParamsSchema =
+  ReadonlyCreateComponentBoundsStitchLineBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateTPocketStitchLineBindingFieldParamsSchema = ReadonlyCreateTPocketStitchLineBindingFieldParamsSchema &
   HasForbiddenIdsSchema
-
-export type CreateHoleConstraintFieldParamsSchema = ReadonlyCreateHoleConstraintFieldParamsSchema &
-  HasForbiddenIdsSchema
-
-export type CreateRecessedPocketOpeningConstraintFieldParamsSchema =
-  ReadonlyCreateRecessedPocketOpeningConstraintFieldParamsSchema & HasForbiddenIdsSchema
-
-export type CreateSlantedPocketOpeningConstraintFieldParamsSchema =
-  ReadonlyCreateSlantedPocketOpeningConstraintFieldParamsSchema & HasForbiddenIdsSchema
-
-export type CreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema =
-  ReadonlyCreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema & HasForbiddenIdsSchema
-
-export type CreateComponentBoundsStitchLineConstraintFieldParamsSchema =
-  ReadonlyCreateComponentBoundsStitchLineConstraintFieldParamsSchema & HasForbiddenIdsSchema
-
-export type CreateTPocketStitchLineConstraintFieldParamsSchema =
-  ReadonlyCreateTPocketStitchLineConstraintFieldParamsSchema & HasForbiddenIdsSchema
 
 export type CreateFrontPocketParamsSchema = ReadonlyCreateFrontPocketParamsSchema &
   HasForbiddenIdsSchema &
@@ -289,7 +282,7 @@ export type CreateOpticalIllusionPocketOpeningParamsSchema = ReadonlyCreateOptic
   HasForbiddenIdsSchema &
   HasForbiddenNamesSchema
 
-export type CreateEqualConstraintParamsSchema = ReadonlyCreateEqualConstraintParamsSchema & HasForbiddenIdsSchema
+export type CreateEqualBindingParamsSchema = ReadonlyCreateEqualBindingParamsSchema & HasForbiddenIdsSchema
 
 export type ReadonlyModelObjectFactorySchema = {
   createComponent(params: ReadonlyCreateComponentParamsSchema): ComponentSchema
@@ -311,36 +304,34 @@ export type ReadonlyModelObjectFactorySchema = {
   createOpticalIllusionPocketOpening(
     params: ReadonlyCreateOpticalIllusionPocketOpeningParamsSchema,
   ): OpticalIllusionPocketOpeningSchema
-  createConstraint(params: ReadonlyCreateConstraintParamsSchema): ConstraintSchema
-  createEqualConstraint(params: ReadonlyCreateEqualConstraintParamsSchema): EqualConstraintSchema
-  createConstraintField(params: ReadonlyCreateConstraintFieldParamsSchema): ConstraintFieldSchema
-  createRootPanelConstraintField(
-    params: ReadonlyCreateRootPanelConstraintFieldParamsSchema,
-  ): RootPanelConstraintFieldSchema
-  createPanelConstraintField(params: ReadonlyCreatePanelConstraintFieldParamsSchema): PanelConstraintFieldSchema
-  createPocketClusterConstraintField(
-    params: ReadonlyCreatePocketClusterConstraintFieldParamsSchema,
-  ): PocketClusterConstraintFieldSchema
-  createFrontPocketConstraintField(
-    params: ReadonlyCreateFrontPocketConstraintFieldParamsSchema,
-  ): FrontPocketConstraintFieldSchema
-  createTPocketConstraintField(params: ReadonlyCreateTPocketConstraintFieldParamsSchema): TPocketConstraintFieldSchema
-  createHoleConstraintField(params: ReadonlyCreateHoleConstraintFieldParamsSchema): HoleConstraintFieldSchema
-  createRecessedPocketOpeningConstraintField(
-    params: ReadonlyCreateRecessedPocketOpeningConstraintFieldParamsSchema,
-  ): RecessedPocketOpeningConstraintFieldSchema
-  createSlantedPocketOpeningConstraintField(
-    params: ReadonlyCreateSlantedPocketOpeningConstraintFieldParamsSchema,
-  ): SlantedPocketOpeningConstraintFieldSchema
-  createOpticalIllusionPocketOpeningConstraintField(
-    params: ReadonlyCreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema,
-  ): OpticalIllusionPocketOpeningConstraintFieldSchema
-  createComponentBoundsStitchLineConstraintField(
-    params: ReadonlyCreateComponentBoundsStitchLineConstraintFieldParamsSchema,
-  ): ComponentBoundsStitchLineConstraintFieldSchema
-  createTPocketStitchLineConstraintField(
-    params: ReadonlyCreateTPocketStitchLineConstraintFieldParamsSchema,
-  ): TPocketStitchLineConstraintFieldSchema
+  createBinding(params: ReadonlyCreateBindingParamsSchema): BindingSchema
+  createEqualBinding(params: ReadonlyCreateEqualBindingParamsSchema): EqualBindingSchema
+  createBindingField(params: ReadonlyCreateBindingFieldParamsSchema): BindingFieldSchema
+  createRootPanelBindingField(params: ReadonlyCreateRootPanelBindingFieldParamsSchema): RootPanelBindingFieldSchema
+  createPanelBindingField(params: ReadonlyCreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema
+  createPocketClusterBindingField(
+    params: ReadonlyCreatePocketClusterBindingFieldParamsSchema,
+  ): PocketClusterBindingFieldSchema
+  createFrontPocketBindingField(
+    params: ReadonlyCreateFrontPocketBindingFieldParamsSchema,
+  ): FrontPocketBindingFieldSchema
+  createTPocketBindingField(params: ReadonlyCreateTPocketBindingFieldParamsSchema): TPocketBindingFieldSchema
+  createHoleBindingField(params: ReadonlyCreateHoleBindingFieldParamsSchema): HoleBindingFieldSchema
+  createRecessedPocketOpeningBindingField(
+    params: ReadonlyCreateRecessedPocketOpeningBindingFieldParamsSchema,
+  ): RecessedPocketOpeningBindingFieldSchema
+  createSlantedPocketOpeningBindingField(
+    params: ReadonlyCreateSlantedPocketOpeningBindingFieldParamsSchema,
+  ): SlantedPocketOpeningBindingFieldSchema
+  createOpticalIllusionPocketOpeningBindingField(
+    params: ReadonlyCreateOpticalIllusionPocketOpeningBindingFieldParamsSchema,
+  ): OpticalIllusionPocketOpeningBindingFieldSchema
+  createComponentBoundsStitchLineBindingField(
+    params: ReadonlyCreateComponentBoundsStitchLineBindingFieldParamsSchema,
+  ): ComponentBoundsStitchLineBindingFieldSchema
+  createTPocketStitchLineBindingField(
+    params: ReadonlyCreateTPocketStitchLineBindingFieldParamsSchema,
+  ): TPocketStitchLineBindingFieldSchema
 }
 
 export type ModelObjectFactorySchema = {
@@ -361,32 +352,28 @@ export type ModelObjectFactorySchema = {
   createOpticalIllusionPocketOpening(
     params: CreateOpticalIllusionPocketOpeningParamsSchema,
   ): OpticalIllusionPocketOpeningSchema
-  createConstraint(params: CreateConstraintParamsSchema): ConstraintSchema
-  createEqualConstraint(params: CreateEqualConstraintParamsSchema): EqualConstraintSchema
-  createConstraintField(params: CreateConstraintFieldParamsSchema): ConstraintFieldSchema
-  createRootPanelConstraintField(params: CreateRootPanelConstraintFieldParamsSchema): RootPanelConstraintFieldSchema
-  createPanelConstraintField(params: CreatePanelConstraintFieldParamsSchema): PanelConstraintFieldSchema
-  createPocketClusterConstraintField(
-    params: CreatePocketClusterConstraintFieldParamsSchema,
-  ): PocketClusterConstraintFieldSchema
-  createFrontPocketConstraintField(
-    params: CreateFrontPocketConstraintFieldParamsSchema,
-  ): FrontPocketConstraintFieldSchema
-  createTPocketConstraintField(params: CreateTPocketConstraintFieldParamsSchema): TPocketConstraintFieldSchema
-  createHoleConstraintField(params: CreateHoleConstraintFieldParamsSchema): HoleConstraintFieldSchema
-  createRecessedPocketOpeningConstraintField(
-    params: CreateRecessedPocketOpeningConstraintFieldParamsSchema,
-  ): RecessedPocketOpeningConstraintFieldSchema
-  createSlantedPocketOpeningConstraintField(
-    params: CreateSlantedPocketOpeningConstraintFieldParamsSchema,
-  ): SlantedPocketOpeningConstraintFieldSchema
-  createOpticalIllusionPocketOpeningConstraintField(
-    params: CreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema,
-  ): OpticalIllusionPocketOpeningConstraintFieldSchema
-  createComponentBoundsStitchLineConstraintField(
-    params: CreateComponentBoundsStitchLineConstraintFieldParamsSchema,
-  ): ComponentBoundsStitchLineConstraintFieldSchema
-  createTPocketStitchLineConstraintField(
-    params: CreateTPocketStitchLineConstraintFieldParamsSchema,
-  ): TPocketStitchLineConstraintFieldSchema
+  createBinding(params: CreateBindingParamsSchema): BindingSchema
+  createEqualBinding(params: CreateEqualBindingParamsSchema): EqualBindingSchema
+  createBindingField(params: CreateBindingFieldParamsSchema): BindingFieldSchema
+  createRootPanelBindingField(params: CreateRootPanelBindingFieldParamsSchema): RootPanelBindingFieldSchema
+  createPanelBindingField(params: CreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema
+  createPocketClusterBindingField(params: CreatePocketClusterBindingFieldParamsSchema): PocketClusterBindingFieldSchema
+  createFrontPocketBindingField(params: CreateFrontPocketBindingFieldParamsSchema): FrontPocketBindingFieldSchema
+  createTPocketBindingField(params: CreateTPocketBindingFieldParamsSchema): TPocketBindingFieldSchema
+  createHoleBindingField(params: CreateHoleBindingFieldParamsSchema): HoleBindingFieldSchema
+  createRecessedPocketOpeningBindingField(
+    params: CreateRecessedPocketOpeningBindingFieldParamsSchema,
+  ): RecessedPocketOpeningBindingFieldSchema
+  createSlantedPocketOpeningBindingField(
+    params: CreateSlantedPocketOpeningBindingFieldParamsSchema,
+  ): SlantedPocketOpeningBindingFieldSchema
+  createOpticalIllusionPocketOpeningBindingField(
+    params: CreateOpticalIllusionPocketOpeningBindingFieldParamsSchema,
+  ): OpticalIllusionPocketOpeningBindingFieldSchema
+  createComponentBoundsStitchLineBindingField(
+    params: CreateComponentBoundsStitchLineBindingFieldParamsSchema,
+  ): ComponentBoundsStitchLineBindingFieldSchema
+  createTPocketStitchLineBindingField(
+    params: CreateTPocketStitchLineBindingFieldParamsSchema,
+  ): TPocketStitchLineBindingFieldSchema
 }

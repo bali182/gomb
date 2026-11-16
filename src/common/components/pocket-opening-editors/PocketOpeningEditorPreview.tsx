@@ -258,7 +258,7 @@ const createPreviewSubProject = (
     defaultPocketOpening: opening.id,
     pocketOpenings: { [opening.id]: opening },
     components: Object.fromEntries(components.map((component): [string, ComponentSchema] => [component.id, component])),
-    constraints: {},
+    bindings: {},
     holes: [],
     stitchLines: [],
   }

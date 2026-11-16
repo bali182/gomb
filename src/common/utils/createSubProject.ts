@@ -31,7 +31,7 @@ export const createSubProject = ({ project, modelFactory }: CreateSubProjectPara
     defaultPocketOpening: defaultPocketOpening.id,
     pocketOpenings: { [defaultPocketOpening.id]: defaultPocketOpening },
     components: { [root.id]: root },
-    constraints: {},
+    bindings: {},
     holes: [],
     stitchLines: [],
   }

@@ -20,15 +20,11 @@ export type HasVersionSchema = {
 
 export type HasIdentitySchema = HasId & HasName
 
-export type HasCornerRadiusValuesSchema = {
+export type HasCornerRadiusSchema = {
   topLeftRadius: number
   topRightRadius: number
   bottomLeftRadius: number
   bottomRightRadius: number
-}
-
-export type HasCornerRadiusSchema = HasCornerRadiusValuesSchema & {
-  individualRadii: boolean
 }
 
 export type HasAutoCornerRadiusSchema = {
@@ -65,15 +61,11 @@ export type HasXYOffsetSchema = {
   yOffset: number
 }
 
-export type HasStretchValuesSchema = {
+export type HasStretchSchema = {
   topStretch: number
   rightStretch: number
   bottomStretch: number
   leftStretch: number
-}
-
-export type HasStretchSchema = HasStretchValuesSchema & {
-  individualStretch: boolean
 }
 
 export type HasOffAxisAnchor = {

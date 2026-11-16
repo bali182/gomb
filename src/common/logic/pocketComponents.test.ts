@@ -5,6 +5,7 @@ import { POSITION_EPSILON } from '../constants/layout'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import type { PocketOrientationSchema } from '../schemas/components'
 import type { OpticalIllusionPocketOpeningSchema, SlantedPocketOpeningSchema } from '../schemas/pocketOpening'
+import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getExportElementsForComponent } from './exports/getExportElements'
@@ -144,15 +145,20 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       (itemId) => {
         const { subProject } = fixture()
         const source = accessors.subProject(subProject)
-        const changed = {
+        const changed: SubProjectSchema = {
           ...subProject,
           components: {
             ...subProject.components,
-            t1: { ...source.component.tPocket('t1'), itemId: 'ID-1' as const, itemCrossAxisOffset: 3 },
+            t1: {
+              ...source.component.tPocket('t1'),
+              itemId: 'ID-1',
+              itemOrientation: 'landscape',
+              itemCrossAxisOffset: 3,
+            },
             front: {
               ...source.component.frontPocket('front'),
               itemId,
-              itemOrientation: 'portrait' as const,
+              itemOrientation: 'portrait',
               itemOpeningOffset: 7,
             },
           },
@@ -173,11 +179,11 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
       expect(computed.limits.components.t1).toMatchObject({
         type: 't-pocket',
-        opening: { type: 'slanted', offset: { max: { value: new BigNumber(70) } } },
+        opening: { type: 'slanted', slantOffset: { max: { value: new BigNumber(70) } } },
       })
       expect(computed.limits.components.front).toMatchObject({
         type: 'front-pocket',
-        opening: { type: 'slanted', offset: { max: { value: new BigNumber(90) } } },
+        opening: { type: 'slanted', slantOffset: { max: { value: new BigNumber(90) } } },
       })
       const accessor = accessors.computedSubProject(computed)
       const cluster = accessor.component.pocketCluster('cluster')
@@ -191,7 +197,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     it('bounds step and each T-pocket shape independently', () => {
       const { subProject } = fixture()
       const source = accessors.subProject(subProject)
-      const changed = {
+      const changed: SubProjectSchema = {
         ...subProject,
         components: {
           ...subProject.components,
@@ -219,7 +225,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         const { subProject } = fixture(1)
         const source = accessors.subProject(subProject)
         const root = source.component.rootPanel()
-        const changed = {
+        const changed: SubProjectSchema = {
           ...subProject,
           components: {
             ...subProject.components,
@@ -279,7 +285,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       const { subProject } = fixture()
       const front = accessors.subProject(subProject).component.frontPocket('front')
       const child = d.panel({ id: 'child' })
-      const changed = {
+      const changed: SubProjectSchema = {
         ...subProject,
         components: { ...subProject.components, front: { ...front, children: [child.id] }, child },
       }

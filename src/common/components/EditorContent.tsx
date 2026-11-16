@@ -28,6 +28,7 @@ import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
+import { EditorBindingTree } from './binding-tree/EditorBindingTree'
 import { CommonEmptyState } from './common/CommonEmptyState'
 import {
   ResizableAccordion,
@@ -41,7 +42,6 @@ import {
 import { ResizableAccordionItem } from './common/resizable-accordion/ResizableAccordionItem'
 import { EditorComponentTree, type EditorComponentTreeHandle } from './component-tree/EditorComponentTree'
 import { EditorTreeDragAndDrop } from './component-tree/EditorTreeDragAndDrop'
-import { EditorConstraintTree } from './constraint-tree/EditorConstraintTree'
 import { DrawArea } from './DrawArea'
 import { EditorMenu } from './editor-menu/EditorMenu'
 import { EditorDialogsProvider } from './EditorDialogsProvider'
@@ -61,7 +61,7 @@ const panels: SplitterPanelData[] = [
 type ItemCounts = {
   components: number | undefined
   pocketOpenings: number | undefined
-  constraints: number | undefined
+  bindings: number | undefined
 }
 
 type EditorContentProps = {
@@ -73,7 +73,7 @@ type EditorContentProps = {
 export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProjectId }) => {
   const { t } = useTranslation()
   const { isComputing, setEditingInputId } = useEditorContext()
-  const { addConstraint, addPocketOpening } = useSubProjectOperations()
+  const { addBinding, addPocketOpening } = useSubProjectOperations()
   const { project } = useProject()
   const { setUISettings, settings } = useGlobalSettings()
   const [treeSections, setTreeSections] = useState<TreeSectionsSettingsSchema>(() => settings.ui.treeSections)
@@ -86,7 +86,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
       const next: TreeSectionsSettingsSchema = {
         components: event.value.components,
         openings: event.value.openings,
-        constraints: event.value.constraints,
+        bindings: event.value.bindings,
       }
       setTreeSections(next)
       switch (event.type) {
@@ -115,8 +115,8 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     }
     if (narrowers.is.pocketOpening(selected)) {
       accordionRef.current?.setItemState('openings', { open: true })
-    } else if (narrowers.is.constraint(selected)) {
-      accordionRef.current?.setItemState('constraints', { open: true })
+    } else if (narrowers.is.binding(selected)) {
+      accordionRef.current?.setItemState('bindings', { open: true })
     }
   }, [selected])
 
@@ -145,11 +145,11 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     componentTreeRef.current?.expand(target)
   }, [])
 
-  const handleAddConstraint = useCallback((): void => {
+  const handleAddBinding = useCallback((): void => {
     setEditingInputId(undefined)
-    addConstraint({ type: 'equal-constraint' })
-    accordionRef.current?.setItemState('constraints', { open: true })
-  }, [addConstraint, setEditingInputId])
+    addBinding({ type: 'equal-binding' })
+    accordionRef.current?.setItemState('bindings', { open: true })
+  }, [addBinding, setEditingInputId])
 
   const handleAddPocketOpening = useCallback(
     (type: PocketOpeningSchema['type']): void => {
@@ -166,7 +166,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     }
     return {
       components: accessor.component.components().length,
-      constraints: accessor.constraint.constraints().length,
+      bindings: accessor.binding.bindings().length,
       pocketOpenings: accessor.pocketOpening.pocketOpenings().length,
     }
   }, [accessor])
@@ -264,13 +264,13 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       {isDefined(subProject) ? <EditorPocketOpeningTree /> : <EmptyComponentTreeState />}
                     </ResizableAccordionItem>
                     <ResizableAccordionItem
-                      id="constraints"
+                      id="bindings"
                       title={
                         <HStack gap="2">
-                          {t.project.tree.sections.constraints}
+                          {t.project.tree.sections.bindings}
                           {isDefined(itemCounts) && (
                             <Badge bg="bg" variant="surface">
-                              {itemCounts.constraints}
+                              {itemCounts.bindings}
                             </Badge>
                           )}
                         </HStack>
@@ -278,14 +278,14 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       actions={
                         <ResizableAccordionHeaderButton
                           disabled={!isDefined(subProject) || isComputing}
-                          onClick={handleAddConstraint}
+                          onClick={handleAddBinding}
                         >
                           <PiPlusCircle />
-                          {t.project.editors.actions.constraints.add}
+                          {t.project.editors.actions.bindings.add}
                         </ResizableAccordionHeaderButton>
                       }
                     >
-                      {isDefined(subProject) ? <EditorConstraintTree /> : <EmptyComponentTreeState />}
+                      {isDefined(subProject) ? <EditorBindingTree /> : <EmptyComponentTreeState />}
                     </ResizableAccordionItem>
                   </ResizableAccordion>
                 </EditorTreeDragAndDrop>

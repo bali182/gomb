@@ -80,7 +80,6 @@ export const defaultHasCornerRadius: HasCornerRadiusSchema = {
   bottomLeftRadius: 0,
   bottomRightRadius: 0,
   topRightRadius: 0,
-  individualRadii: false,
 }
 
 export const defaultHasLayout: HasLayoutSchema = {
@@ -102,7 +101,6 @@ export const defaultHasOffAxisAnchor: HasOffAxisAnchor = {
 }
 
 export const defaultHasStretch: HasStretchSchema = {
-  individualStretch: true,
   topStretch: 0,
   rightStretch: 0,
   bottomStretch: 0,
@@ -193,7 +191,6 @@ export const defaultComponentBoundsStitchLine: ComponentBoundsStitchLineOwnSchem
   bottomRightCorner: true,
   bottomLeftCorner: true,
   autoCornerRadius: true,
-  individualRadii: false,
   bottomLeftRadius: 0,
   bottomRightRadius: 0,
   topLeftRadius: 0,

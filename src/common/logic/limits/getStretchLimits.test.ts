@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 
 import { POSITION_EPSILON } from '../../constants/layout'
-import type { HasStretchValuesSchema } from '../../schemas/common'
+import type { HasStretchSchema } from '../../schemas/common'
 import type { RectSchema } from '../../schemas/geometry'
 import { getStretchLimits } from './getStretchLimits'
 
@@ -167,7 +167,7 @@ describe.each([
       width: new BigNumber(horizontal ? size : 37),
       height: new BigNumber(horizontal ? 43 : size),
     }
-    const stretch: HasStretchValuesSchema = {
+    const stretch: HasStretchSchema = {
       topStretch: 0,
       rightStretch: 0,
       bottomStretch: 0,
@@ -204,7 +204,7 @@ describe.each([
       width: new BigNumber(100),
       height: new BigNumber(100),
     }
-    const stretch: HasStretchValuesSchema = {
+    const stretch: HasStretchSchema = {
       topStretch: 0,
       rightStretch: 0,
       bottomStretch: 0,

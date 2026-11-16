@@ -17,11 +17,11 @@ describe('createPocketOpening', () => {
     expect(modelFactory.createPocketOpening({ type: 'recessed' })).toMatchObject({
       type: 'recessed',
 
-      outerInset: 15,
-      innerOffset: 15,
-      depth: 10,
-      outerRadius: 10,
-      innerRadius: 10,
+      recessOuterInset: 15,
+      recessInnerOffset: 15,
+      recessDepth: 10,
+      recessOuterRadius: 10,
+      recessInnerRadius: 10,
     })
   })
 
@@ -29,8 +29,8 @@ describe('createPocketOpening', () => {
     expect(modelFactory.createPocketOpening({ type: 'slanted' })).toMatchObject({
       type: 'slanted',
 
-      offset: 15,
-      side: 'start',
+      slantOffset: 15,
+      slantSide: 'start',
     })
   })
 
@@ -38,11 +38,11 @@ describe('createPocketOpening', () => {
     expect(modelFactory.createPocketOpening({ type: 'optical-illusion' })).toMatchObject({
       type: 'optical-illusion',
 
-      direction: 'start',
-      startInset: 10,
-      endInset: 10,
-      leadingRadius: 0,
-      trailingRadius: 0,
+      illusionSide: 'start',
+      illusionStartInset: 10,
+      illusionEndInset: 10,
+      illusionLeadingRadius: 0,
+      illusionTrailingRadius: 0,
     })
   })
 })

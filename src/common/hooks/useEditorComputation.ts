@@ -11,6 +11,7 @@ import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
+import type { EditorComputationWorkerClient } from '../workers/createEditorComputationWorker'
 import { createEditorComputationWorker } from '../workers/createEditorComputationWorker'
 
 type UseEditorComputationOptions = {
@@ -44,7 +45,7 @@ type ComputationRuntime = {
   failedTask: ComputationTask | undefined
   lastResult: EditorComputationResultSchema | undefined
   error: unknown
-  worker: ReturnType<typeof createEditorComputationWorker> | undefined
+  worker: EditorComputationWorkerClient | undefined
   waiters: ComputationWaiter[]
 }
 

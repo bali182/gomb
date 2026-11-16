@@ -1,5 +1,6 @@
 import type { ArcPathSegment, LinePathSegment, PathSegment } from '../logic/pathSegmentTypes'
 import type { StitchHoleLineSegment, StitchHoleSegment } from '../logic/stitching/stitchHoleGeometry'
+import type { BindingSchema } from '../schemas/bindings'
 import type { HasTypeSchema } from '../schemas/common'
 import type {
   ComponentSchema,
@@ -21,7 +22,6 @@ import type {
   StitchPathFragment,
   StitchSidePathFragment,
 } from '../schemas/computed'
-import type { ConstraintSchema } from '../schemas/constraints'
 import type {
   PathArcToSchema,
   PathCloseSchema,
@@ -44,7 +44,7 @@ import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
-    constraint: (input: SubProjectItemSchema): input is ConstraintSchema => hasType(input, 'equal-constraint'),
+    binding: (input: SubProjectItemSchema): input is BindingSchema => hasType(input, 'equal-binding'),
     // Component
     component: (input: SubProjectItemSchema): input is ComponentSchema => {
       return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')

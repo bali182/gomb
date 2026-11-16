@@ -1,6 +1,6 @@
+import type { BindingSchema } from '../schemas/bindings'
 import type { HasTargetSchema } from '../schemas/common'
 import type { ComponentSchema } from '../schemas/components'
-import type { ConstraintSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
@@ -76,8 +76,8 @@ const getPocketOpeningAnchor = (model: PocketOpeningSchema): FloatingEditorAncho
   }
 }
 
-const getConstraintAnchor = (model: ConstraintSchema): FloatingEditorAnchor | undefined => {
-  const element = document.querySelector<HTMLElement>(`[data-constraint-id="${CSS.escape(model.id)}"]`)
+const getBindingAnchor = (model: BindingSchema): FloatingEditorAnchor | undefined => {
+  const element = document.querySelector<HTMLElement>(`[data-binding-id="${CSS.escape(model.id)}"]`)
   if (!isDefined(element)) {
     return undefined
   }
@@ -134,7 +134,7 @@ const getBoundingClientRect = (rects: DOMRect[]): DOMRect | undefined => {
 }
 
 export const floatingEditorAnchors = {
-  constraint: getConstraintAnchor,
+  binding: getBindingAnchor,
   component: getComponentAnchor,
   stitchLine: getStitchLineAnchor,
   hole: getHoleAnchor,

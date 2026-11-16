@@ -1,17 +1,17 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { defaultPanel, defaultStitchingSettings } from '../../defaultStates'
+import type { BindingFieldSchema } from '../../schemas/bindings'
 import type { PanelSchema } from '../../schemas/components'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
 import type {
-  CreateEqualConstraintParamsSchema,
-  CreatePanelConstraintFieldParamsSchema,
+  CreateEqualBindingParamsSchema,
+  CreatePanelBindingFieldParamsSchema,
   CreatePanelParamsSchema,
   HasForbiddenIdsSchema,
   HasForbiddenNamesSchema,
   ModelObjectFactorySchema,
-  ReadonlyCreateConstraintFieldParamsSchema,
-  ReadonlyCreateEqualConstraintParamsSchema,
-  ReadonlyCreatePanelConstraintFieldParamsSchema,
+  ReadonlyCreateBindingFieldParamsSchema,
+  ReadonlyCreateEqualBindingParamsSchema,
+  ReadonlyCreatePanelBindingFieldParamsSchema,
   ReadonlyCreatePanelParamsSchema,
   ReadonlyModelObjectFactorySchema,
 } from '../../schemas/factory'
@@ -25,7 +25,7 @@ import { ReadonlyModelObjectFactory } from './ReadonlyModelObjectFactory'
 type FactoryCaseParamsSchema = HasForbiddenIdsSchema & HasForbiddenNamesSchema
 
 type FactorySchema = ReadonlyModelObjectFactorySchema | ModelObjectFactorySchema
-type FactoryResultSchema = SubProjectItemSchema | ConstraintFieldSchema
+type FactoryResultSchema = SubProjectItemSchema | BindingFieldSchema
 type FactoryCaseSchema = {
   label: string
   prefix: IdPrefixSchema
@@ -48,18 +48,18 @@ const translations: Record<IdPrefixSchema, string> = {
   'recessed-pocket-opening': 'Name',
   'slanted-pocket-opening': 'Name',
   'optical-illusion-pocket-opening': 'Name',
-  'equal-constraint': 'Name',
-  'root-panel-constraint-field': 'Name',
-  'panel-constraint-field': 'Name',
-  'pocket-cluster-constraint-field': 'Name',
-  'front-pocket-constraint-field': 'Name',
-  't-pocket-constraint-field': 'Name',
-  'hole-constraint-field': 'Name',
-  'recessed-constraint-field': 'Name',
-  'slanted-constraint-field': 'Name',
-  'optical-illusion-constraint-field': 'Name',
-  'component-bounds-stitch-line-constraint-field': 'Name',
-  't-pocket-stitch-line-constraint-field': 'Name',
+  'equal-binding': 'Name',
+  'root-panel-binding-field': 'Name',
+  'panel-binding-field': 'Name',
+  'pocket-cluster-binding-field': 'Name',
+  'front-pocket-binding-field': 'Name',
+  't-pocket-binding-field': 'Name',
+  'hole-binding-field': 'Name',
+  'recessed-binding-field': 'Name',
+  'slanted-binding-field': 'Name',
+  'optical-illusion-binding-field': 'Name',
+  'component-bounds-stitch-line-binding-field': 'Name',
+  't-pocket-stitch-line-binding-field': 'Name',
 }
 
 const createGenerators = () => {
@@ -152,139 +152,139 @@ const cases: FactoryCaseSchema[] = [
     create: (factory, params) => factory.createOpticalIllusionPocketOpening(params),
   },
   {
-    label: 'createEqualConstraint',
-    prefix: 'equal-constraint',
-    type: 'equal-constraint',
-    create: (factory, params) => factory.createEqualConstraint({ forbiddenIds: params.forbiddenIds }),
+    label: 'createEqualBinding',
+    prefix: 'equal-binding',
+    type: 'equal-binding',
+    create: (factory, params) => factory.createEqualBinding({ forbiddenIds: params.forbiddenIds }),
   },
   {
-    label: 'createRootPanelConstraintField',
-    prefix: 'root-panel-constraint-field',
-    type: 'root-panel-constraint-field',
+    label: 'createRootPanelBindingField',
+    prefix: 'root-panel-binding-field',
+    type: 'root-panel-binding-field',
     create: (factory, params) =>
-      factory.createRootPanelConstraintField({
+      factory.createRootPanelBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'root-panel-constraint-field',
+        type: 'root-panel-binding-field',
         modelId: 'model',
         field: 'width',
       }),
   },
   {
-    label: 'createPanelConstraintField',
-    prefix: 'panel-constraint-field',
-    type: 'panel-constraint-field',
+    label: 'createPanelBindingField',
+    prefix: 'panel-binding-field',
+    type: 'panel-binding-field',
     create: (factory, params) =>
-      factory.createPanelConstraintField({
+      factory.createPanelBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'panel-constraint-field',
+        type: 'panel-binding-field',
         modelId: 'model',
         field: 'height',
       }),
   },
   {
-    label: 'createPocketClusterConstraintField',
-    prefix: 'pocket-cluster-constraint-field',
-    type: 'pocket-cluster-constraint-field',
+    label: 'createPocketClusterBindingField',
+    prefix: 'pocket-cluster-binding-field',
+    type: 'pocket-cluster-binding-field',
     create: (factory, params) =>
-      factory.createPocketClusterConstraintField({
+      factory.createPocketClusterBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'pocket-cluster-constraint-field',
+        type: 'pocket-cluster-binding-field',
         modelId: 'model',
         field: 'pocketStep',
       }),
   },
   {
-    label: 'createFrontPocketConstraintField',
-    prefix: 'front-pocket-constraint-field',
-    type: 'front-pocket-constraint-field',
+    label: 'createFrontPocketBindingField',
+    prefix: 'front-pocket-binding-field',
+    type: 'front-pocket-binding-field',
     create: (factory, params) =>
-      factory.createFrontPocketConstraintField({
+      factory.createFrontPocketBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'front-pocket-constraint-field',
+        type: 'front-pocket-binding-field',
         modelId: 'model',
         field: 'openingId',
       }),
   },
   {
-    label: 'createTPocketConstraintField',
-    prefix: 't-pocket-constraint-field',
-    type: 't-pocket-constraint-field',
+    label: 'createTPocketBindingField',
+    prefix: 't-pocket-binding-field',
+    type: 't-pocket-binding-field',
     create: (factory, params) =>
-      factory.createTPocketConstraintField({
+      factory.createTPocketBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 't-pocket-constraint-field',
+        type: 't-pocket-binding-field',
         modelId: 'model',
         field: 'itemId',
       }),
   },
   {
-    label: 'createHoleConstraintField',
-    prefix: 'hole-constraint-field',
-    type: 'hole-constraint-field',
+    label: 'createHoleBindingField',
+    prefix: 'hole-binding-field',
+    type: 'hole-binding-field',
     create: (factory, params) =>
-      factory.createHoleConstraintField({
+      factory.createHoleBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'hole-constraint-field',
+        type: 'hole-binding-field',
         modelId: 'model',
         field: 'xOffset',
       }),
   },
   {
-    label: 'createRecessedPocketOpeningConstraintField',
-    prefix: 'recessed-constraint-field',
-    type: 'recessed-constraint-field',
+    label: 'createRecessedPocketOpeningBindingField',
+    prefix: 'recessed-binding-field',
+    type: 'recessed-binding-field',
     create: (factory, params) =>
-      factory.createRecessedPocketOpeningConstraintField({
+      factory.createRecessedPocketOpeningBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'recessed-constraint-field',
+        type: 'recessed-binding-field',
         modelId: 'model',
         field: 'recessDepth',
       }),
   },
   {
-    label: 'createSlantedPocketOpeningConstraintField',
-    prefix: 'slanted-constraint-field',
-    type: 'slanted-constraint-field',
+    label: 'createSlantedPocketOpeningBindingField',
+    prefix: 'slanted-binding-field',
+    type: 'slanted-binding-field',
     create: (factory, params) =>
-      factory.createSlantedPocketOpeningConstraintField({
+      factory.createSlantedPocketOpeningBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'slanted-constraint-field',
+        type: 'slanted-binding-field',
         modelId: 'model',
         field: 'slantSide',
       }),
   },
   {
-    label: 'createOpticalIllusionPocketOpeningConstraintField',
-    prefix: 'optical-illusion-constraint-field',
-    type: 'optical-illusion-constraint-field',
+    label: 'createOpticalIllusionPocketOpeningBindingField',
+    prefix: 'optical-illusion-binding-field',
+    type: 'optical-illusion-binding-field',
     create: (factory, params) =>
-      factory.createOpticalIllusionPocketOpeningConstraintField({
+      factory.createOpticalIllusionPocketOpeningBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'optical-illusion-constraint-field',
+        type: 'optical-illusion-binding-field',
         modelId: 'model',
         field: 'illusionSide',
       }),
   },
   {
-    label: 'createComponentBoundsStitchLineConstraintField',
-    prefix: 'component-bounds-stitch-line-constraint-field',
-    type: 'component-bounds-stitch-line-constraint-field',
+    label: 'createComponentBoundsStitchLineBindingField',
+    prefix: 'component-bounds-stitch-line-binding-field',
+    type: 'component-bounds-stitch-line-binding-field',
     create: (factory, params) =>
-      factory.createComponentBoundsStitchLineConstraintField({
+      factory.createComponentBoundsStitchLineBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'component-bounds-stitch-line-constraint-field',
+        type: 'component-bounds-stitch-line-binding-field',
         modelId: 'model',
         field: 'onTop',
       }),
   },
   {
-    label: 'createTPocketStitchLineConstraintField',
-    prefix: 't-pocket-stitch-line-constraint-field',
-    type: 't-pocket-stitch-line-constraint-field',
+    label: 'createTPocketStitchLineBindingField',
+    prefix: 't-pocket-stitch-line-binding-field',
+    type: 't-pocket-stitch-line-binding-field',
     create: (factory, params) =>
-      factory.createTPocketStitchLineConstraintField({
+      factory.createTPocketStitchLineBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 't-pocket-stitch-line-constraint-field',
+        type: 't-pocket-stitch-line-binding-field',
         modelId: 'model',
         field: 'stitchMargin',
       }),
@@ -372,15 +372,15 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
     },
   )
 
-  it('dispatches equality constraints without creating a name or relation', () => {
+  it('dispatches equality bindings without creating a name or relation', () => {
     const { id, name } = createGenerators()
     const getName = vi.spyOn(name, 'get')
     const factory = mode === 'readonly' ? new ReadonlyModelObjectFactory(id, name) : new ModelObjectFactory(id, name)
-    const constraint = factory.createConstraint({
-      type: 'equal-constraint',
+    const binding = factory.createBinding({
+      type: 'equal-binding',
       forbiddenIds: new Set(),
     })
-    expect(constraint).toEqual({ id: 'equal-constraint-1', type: 'equal-constraint', fields: [] })
+    expect(binding).toEqual({ id: 'equal-binding-1', type: 'equal-binding', fields: [] })
     expect(getName).not.toHaveBeenCalled()
   })
 
@@ -393,9 +393,9 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
       factory.createComponentBoundsStitchLine({ ...params, targetType: 'hole', targetId: 'existing-hole' }),
     ).toMatchObject({ targetId: 'existing-hole', targetType: 'hole' })
     expect(
-      factory.createPanelConstraintField({
+      factory.createPanelBindingField({
         forbiddenIds: params.forbiddenIds,
-        type: 'panel-constraint-field',
+        type: 'panel-binding-field',
         modelId: 'existing-panel',
         field: 'width',
       }),
@@ -440,10 +440,10 @@ describe('ReadonlyModelObjectFactory', () => {
     first.children.push('child')
     expect(second.children).toEqual([])
     expect(defaultPanel).toEqual(snapshot)
-    const constraint = factory.createEqualConstraint({})
-    const otherConstraint = factory.createEqualConstraint({})
-    constraint.fields.push({ id: 'field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' })
-    expect(otherConstraint.fields).toEqual([])
+    const binding = factory.createEqualBinding({})
+    const otherBinding = factory.createEqualBinding({})
+    binding.fields.push({ id: 'field', type: 'panel-binding-field', modelId: 'panel', field: 'width' })
+    expect(otherBinding.fields).toEqual([])
   })
 
   it('retains stitch-aligned root dimensions and pocket step', () => {
@@ -454,32 +454,32 @@ describe('ReadonlyModelObjectFactory', () => {
     expect(factory.createPocketCluster({ stitchingSettings }).pocketStep).toBe(12)
   })
 
-  const members: ConstraintFieldSchema[] = [
-    { id: 'unused', type: 'root-panel-constraint-field', modelId: 'model', field: 'width' },
-    { id: 'unused', type: 'panel-constraint-field', modelId: 'model', field: 'height' },
-    { id: 'unused', type: 'pocket-cluster-constraint-field', modelId: 'model', field: 'pocketStep' },
-    { id: 'unused', type: 'front-pocket-constraint-field', modelId: 'model', field: 'openingId' },
-    { id: 'unused', type: 't-pocket-constraint-field', modelId: 'model', field: 'itemId' },
-    { id: 'unused', type: 'hole-constraint-field', modelId: 'model', field: 'xOffset' },
-    { id: 'unused', type: 'recessed-constraint-field', modelId: 'model', field: 'recessDepth' },
-    { id: 'unused', type: 'slanted-constraint-field', modelId: 'model', field: 'slantSide' },
-    { id: 'unused', type: 'optical-illusion-constraint-field', modelId: 'model', field: 'illusionSide' },
-    { id: 'unused', type: 'component-bounds-stitch-line-constraint-field', modelId: 'model', field: 'onTop' },
-    { id: 'unused', type: 't-pocket-stitch-line-constraint-field', modelId: 'model', field: 'stitchMargin' },
+  const members: BindingFieldSchema[] = [
+    { id: 'unused', type: 'root-panel-binding-field', modelId: 'model', field: 'width' },
+    { id: 'unused', type: 'panel-binding-field', modelId: 'model', field: 'height' },
+    { id: 'unused', type: 'pocket-cluster-binding-field', modelId: 'model', field: 'pocketStep' },
+    { id: 'unused', type: 'front-pocket-binding-field', modelId: 'model', field: 'openingId' },
+    { id: 'unused', type: 't-pocket-binding-field', modelId: 'model', field: 'itemId' },
+    { id: 'unused', type: 'hole-binding-field', modelId: 'model', field: 'xOffset' },
+    { id: 'unused', type: 'recessed-binding-field', modelId: 'model', field: 'recessDepth' },
+    { id: 'unused', type: 'slanted-binding-field', modelId: 'model', field: 'slantSide' },
+    { id: 'unused', type: 'optical-illusion-binding-field', modelId: 'model', field: 'illusionSide' },
+    { id: 'unused', type: 'component-bounds-stitch-line-binding-field', modelId: 'model', field: 'onTop' },
+    { id: 'unused', type: 't-pocket-stitch-line-binding-field', modelId: 'model', field: 'stitchMargin' },
   ]
   it.each(members)('dispatches $type with its corresponding field', (member) => {
     const { id, name } = createGenerators()
     const factory = new ReadonlyModelObjectFactory(id, name)
     const { id: _id, ...input } = member
     const readonlyIds: ReadonlySet<string> = new Set(['existing-id'])
-    expect(factory.createConstraintField({ ...input, forbiddenIds: readonlyIds })).toEqual({
+    expect(factory.createBindingField({ ...input, forbiddenIds: readonlyIds })).toEqual({
       ...member,
       id: `${member.type}-1`,
     })
     expect(readonlyIds).toEqual(new Set(['existing-id']))
     const mutableParams: HasForbiddenIdsSchema = { forbiddenIds: new Set() }
     const mutableFactory = new ModelObjectFactory(id, name)
-    const created = mutableFactory.createConstraintField({ ...input, ...mutableParams })
+    const created = mutableFactory.createBindingField({ ...input, ...mutableParams })
     expect(created).toEqual({ ...member, id: `${member.type}-1` })
     expect(mutableParams.forbiddenIds).toEqual(new Set([created.id]))
   })
@@ -491,39 +491,39 @@ it('preserves the public return types and the discriminator-to-field association
   expectTypeOf({}).toExtend<ReadonlyCreatePanelParamsSchema>()
   expectTypeOf({}).not.toExtend<CreatePanelParamsSchema>()
   expectTypeOf<{
-    type: 'panel-constraint-field'
+    type: 'panel-binding-field'
     modelId: string
     field: 'width'
-  }>().toExtend<ReadonlyCreateConstraintFieldParamsSchema>()
+  }>().toExtend<ReadonlyCreateBindingFieldParamsSchema>()
   expectTypeOf<{
-    type: 'panel-constraint-field'
+    type: 'panel-binding-field'
     modelId: string
     field: 'openingId'
-  }>().not.toExtend<ReadonlyCreateConstraintFieldParamsSchema>()
+  }>().not.toExtend<ReadonlyCreateBindingFieldParamsSchema>()
   expectTypeOf<{
-    type: 'hole-constraint-field'
+    type: 'hole-binding-field'
     modelId: string
     field: 'openingId'
-  }>().not.toExtend<ReadonlyCreateConstraintFieldParamsSchema>()
+  }>().not.toExtend<ReadonlyCreateBindingFieldParamsSchema>()
 })
 
 it('requires name exclusions only for objects that have a name', () => {
-  expectTypeOf<{ forbiddenIds: Set<string> }>().toExtend<CreateEqualConstraintParamsSchema>()
+  expectTypeOf<{ forbiddenIds: Set<string> }>().toExtend<CreateEqualBindingParamsSchema>()
   expectTypeOf<{ forbiddenIds: Set<string> }>().not.toExtend<CreatePanelParamsSchema>()
-  expectTypeOf({}).toExtend<ReadonlyCreateEqualConstraintParamsSchema>()
-  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof CreateEqualConstraintParamsSchema>()
-  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof ReadonlyCreateEqualConstraintParamsSchema>()
-  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof CreatePanelConstraintFieldParamsSchema>()
-  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof ReadonlyCreatePanelConstraintFieldParamsSchema>()
+  expectTypeOf({}).toExtend<ReadonlyCreateEqualBindingParamsSchema>()
+  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof CreateEqualBindingParamsSchema>()
+  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof ReadonlyCreateEqualBindingParamsSchema>()
+  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof CreatePanelBindingFieldParamsSchema>()
+  expectTypeOf<'forbiddenNames'>().not.toExtend<keyof ReadonlyCreatePanelBindingFieldParamsSchema>()
   expectTypeOf<{
     forbiddenIds: Set<string>
-    type: 'panel-constraint-field'
+    type: 'panel-binding-field'
     modelId: string
     field: 'width'
-  }>().toExtend<CreatePanelConstraintFieldParamsSchema>()
+  }>().toExtend<CreatePanelBindingFieldParamsSchema>()
   expectTypeOf<{
     forbiddenIds: Set<string>
     modelId: string
     field: 'width'
-  }>().not.toExtend<CreatePanelConstraintFieldParamsSchema>()
+  }>().not.toExtend<CreatePanelBindingFieldParamsSchema>()
 })

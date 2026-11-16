@@ -3,7 +3,7 @@ import { useCallback, useMemo, type FC } from 'react'
 import { PocketEditorTabs } from '../../constants/editorTabs'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { HasCornerRadiusValuesSchema } from '../../schemas/common'
+import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { FrontPocketSchema, PocketClusterSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
@@ -31,7 +31,7 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
     (openingId: string): void => onChange({ ...editable, openingId }),
     [editable, onChange],
   )
-  const disabledFields = useMemo<readonly (keyof HasCornerRadiusValuesSchema)[]>(() => {
+  const disabledFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(() => {
     switch (parent.orientation) {
       case 'up':
         return ['topLeftRadius', 'topRightRadius']
@@ -51,9 +51,8 @@ export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, edita
       </Tabs.List>
       <Tabs.Content value={PocketEditorTabs.layout} pt={0}>
         <SectionGroup.Root>
-          <CornerRadiusSection
+          <CornerRadiusSection<FrontPocketSchema>
             modelId={editable.id}
-            value={component}
             editable={editable}
             issues={issues}
             onChange={onChange}

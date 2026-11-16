@@ -67,7 +67,7 @@ describe('clonePocketOpening', () => {
     expect(result.components).toBe(source.components)
     expect(result.holes).toBe(source.holes)
     expect(result.stitchLines).toBe(source.stitchLines)
-    expect(result.constraints).toBe(source.constraints)
+    expect(result.bindings).toBe(source.bindings)
     expect(accessors.subProject(result).component.frontPocket('front').openingId).toBe(opening.id)
     expect(accessors.subProject(result).component.tPocket('pocket').openingId).toBe(opening.id)
     expect(source).toEqual(snapshot)
@@ -107,25 +107,25 @@ describe('clonePocketOpening', () => {
     expect(result.pocketOpenings[source.defaultPocketOpening]).toBe(source.pocketOpenings[source.defaultPocketOpening])
   })
 
-  it('keeps existing constraints on the source opening and pocket references unchanged', () => {
+  it('keeps existing bindings on the source opening and pocket references unchanged', () => {
     const original = fixture(openings[1])
     const source: SubProjectSchema = {
       ...original,
-      constraints: {
+      bindings: {
         depth: {
           id: 'depth',
-          type: 'equal-constraint',
+          type: 'equal-binding',
           fields: [
-            { id: 'opening-depth', type: 'recessed-constraint-field', modelId: openings[1].id, field: 'recessDepth' },
-            { id: 'root-width', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
+            { id: 'opening-depth', type: 'recessed-binding-field', modelId: openings[1].id, field: 'recessDepth' },
+            { id: 'root-width', type: 'root-panel-binding-field', modelId: 'root', field: 'width' },
           ],
         },
         reference: {
           id: 'reference',
-          type: 'equal-constraint',
+          type: 'equal-binding',
           fields: [
-            { id: 'front-opening', type: 'front-pocket-constraint-field', modelId: 'front', field: 'openingId' },
-            { id: 'pocket-opening', type: 't-pocket-constraint-field', modelId: 'pocket', field: 'openingId' },
+            { id: 'front-opening', type: 'front-pocket-binding-field', modelId: 'front', field: 'openingId' },
+            { id: 'pocket-opening', type: 't-pocket-binding-field', modelId: 'pocket', field: 'openingId' },
           ],
         },
       },
@@ -134,7 +134,7 @@ describe('clonePocketOpening', () => {
     const result = clonePocketOpening(createBaseOperationParams(source, { name: nameGenerator }), {
       id: openings[1].id,
     })
-    expect(result.constraints).toBe(source.constraints)
+    expect(result.bindings).toBe(source.bindings)
     expect(result.components).toBe(source.components)
     expect(source).toEqual(snapshot)
   })

@@ -20,7 +20,6 @@ export const RootPanelEditor: FC<RootPanelEditorProps> = ({ component, editable,
       <SizeSection<RootPanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
       <CornerRadiusSection<RootPanelSchema>
         modelId={editable.id}
-        value={component}
         editable={editable}
         issues={issues}
         onChange={onChange}
