@@ -1,6 +1,6 @@
 import { FlipAxisSchema, HasCornerRadiusSchema, HasStretchSchema } from './common'
 import { ComponentSchema } from './components'
-import { ConstraintSchema } from './constraints'
+import { BindingSchema } from './constraints'
 import { ConstraintFieldInputSchema, ModelObjectFactorySchema, ReadonlyModelObjectFactorySchema } from './factory'
 import { HoleSchema } from './hole'
 import { IdGeneratorSchema, NameGeneratorSchema } from './idGenerator'
@@ -52,11 +52,11 @@ export type AddComponentsParamsSchema = {
 }
 
 export type AddConstraintParamsSchema = {
-  type: ConstraintSchema['type']
+  type: BindingSchema['type']
 }
 
 export type AddConstraintWithFieldsParamsSchema = {
-  type: ConstraintSchema['type']
+  type: BindingSchema['type']
   fields: ConstraintFieldInputSchema[]
 }
 

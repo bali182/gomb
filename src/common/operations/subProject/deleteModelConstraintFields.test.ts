@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { deleteModelConstraintFields } from './deleteModelConstraintFields'
@@ -82,7 +82,7 @@ describe('deleteModelConstraintFields', () => {
     expect(deleteModelConstraintFields(createBaseOperationParams(source), { modelId })).toBe(source)
   })
 
-  const fields: ConstraintFieldSchema[] = [
+  const fields: BindingFieldSchema[] = [
     { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'height' },
     { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
     { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'height' },

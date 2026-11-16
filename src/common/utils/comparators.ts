@@ -6,7 +6,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
@@ -77,10 +77,10 @@ export const comparators = {
     )
   },
 
-  constraint: (a: ConstraintSchema, b: ConstraintSchema): boolean => {
+  constraint: (a: BindingSchema, b: BindingSchema): boolean => {
     return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.constraintField)
   },
-  constraintField: (a: ConstraintFieldSchema, b: ConstraintFieldSchema): boolean => {
+  constraintField: (a: BindingFieldSchema, b: BindingFieldSchema): boolean => {
     return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field
   },
 

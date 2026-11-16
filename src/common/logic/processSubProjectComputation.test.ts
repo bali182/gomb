@@ -7,14 +7,14 @@ import { deletePocketOpening } from '../operations/subProject/deletePocketOpenin
 import { flip } from '../operations/subProject/flip'
 import { updateHole } from '../operations/subProject/updateHole'
 import { updateStitchLine } from '../operations/subProject/updateStitchLine'
-import type { ConstraintFieldSchema, EqualConstraintSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, EqualBindingSchema } from '../schemas/constraints'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { getComputedSubProject } from './getComputedSubProject'
 import { processSubProjectComputation } from './processSubProjectComputation'
 
-const equal = (id: string, fields: ConstraintFieldSchema[]): EqualConstraintSchema => ({
+const equal = (id: string, fields: BindingFieldSchema[]): EqualBindingSchema => ({
   id,
   type: 'equal-constraint',
   fields,
@@ -277,7 +277,7 @@ describe('obsolete stitch constraint fields', () => {
       type: 'component-bounds-stitch-line-constraint-field',
       modelId: 'stitch',
       field,
-    } as unknown as ConstraintFieldSchema
+    } as unknown as BindingFieldSchema
     source.constraints.linked = {
       ...source.constraints.linked,
       fields: [obsolete, source.constraints.linked.fields[0]],

@@ -3,7 +3,7 @@ import {
   getStretchConstraintState,
 } from '../../logic/constraints/stretchConstraintUtils'
 import { getConstraintFieldInputs } from '../../logic/constraints/getConstraintFieldInputs'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema } from '../../schemas/constraints'
 import type {
   BaseSubProjectOperationParamsSchema,
   SetStretchConstraintParamsSchema,
@@ -52,7 +52,7 @@ export const setStretchConstraint = (
   const forbiddenIds = getSubProjectIds(subProject)
   const constraint = existing ?? readonlyFactory.createConstraint({ type: 'equal-constraint', forbiddenIds })
   forbiddenIds.add(constraint.id)
-  const fields: ConstraintFieldSchema[] = []
+  const fields: BindingFieldSchema[] = []
   for (const field of selected) {
     const member = existing?.fields.find((member) => member.field === field)
     if (isDefined(member)) {

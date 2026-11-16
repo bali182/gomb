@@ -1,5 +1,5 @@
 import type { ComponentSchema } from '../../../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../../../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../../../schemas/constraints'
 import type { HoleSchema } from '../../../schemas/hole'
 import type { CloneComponentParamsSchema, CloneRelatedModelSchema } from '../../../schemas/operations'
 import type { PocketOpeningSchema } from '../../../schemas/pocketOpening'
@@ -15,8 +15,8 @@ export type CloneComponentRow = {
 }
 
 export type CloneConstraintRow = {
-  constraint: ConstraintSchema
-  fields: ConstraintFieldSchema[]
+  constraint: BindingSchema
+  fields: BindingFieldSchema[]
   canAddToExisting: boolean
   canConstrainSeparately: boolean
 }

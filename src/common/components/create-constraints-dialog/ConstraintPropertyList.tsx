@@ -5,15 +5,15 @@ import type {
   CommonConstraintProperty,
   ConstraintPropertyBlocker,
 } from '../../logic/constraints/constraintCreationUtils'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema } from '../../schemas/constraints'
 import { isDefined } from '../../utils/isDefined'
 import { getConstraintFieldLabel } from '../constraint-editors/constraintFieldUtils'
 import { getConstraintFieldIcon } from '../constraint-editors/getConstraintFieldIcon'
 
 type ConstraintPropertyListProps = {
   properties: CommonConstraintProperty[]
-  selection: ConstraintFieldNameSchema[]
-  onSelectionChange: (field: ConstraintFieldNameSchema, selected: boolean) => void
+  selection: BindingFieldNameSchema[]
+  onSelectionChange: (field: BindingFieldNameSchema, selected: boolean) => void
 }
 
 export const ConstraintPropertyList: FC<ConstraintPropertyListProps> = ({
@@ -40,7 +40,7 @@ export const ConstraintPropertyList: FC<ConstraintPropertyListProps> = ({
 type ConstraintPropertyItemProps = {
   property: CommonConstraintProperty
   selected: boolean
-  onSelectionChange: (field: ConstraintFieldNameSchema, selected: boolean) => void
+  onSelectionChange: (field: BindingFieldNameSchema, selected: boolean) => void
 }
 
 const ConstraintPropertyItem: FC<ConstraintPropertyItemProps> = ({ property, selected, onSelectionChange }) => {

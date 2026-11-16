@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createBaseOperationParams } from '../operations/subProject/testUtils'
 import { updateComponent } from '../operations/subProject/updateComponent'
-import type { EqualConstraintSchema } from '../schemas/constraints'
+import type { EqualBindingSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { accessors } from './accessors'
 import { getSubProjectDiff } from './getSubProjectDiff'
@@ -64,7 +64,7 @@ describe('getSubProjectDiff', () => {
 
   it('includes constraint membership and subproject reference changes', () => {
     const before = fixture()
-    const added: EqualConstraintSchema = { id: 'other', type: 'equal-constraint', fields: [] }
+    const added: EqualBindingSchema = { id: 'other', type: 'equal-constraint', fields: [] }
     const after = { ...before, root: 'panel', defaultPocketOpening: 'other-opening', constraints: { other: added } }
     const diff = getSubProjectDiff(before, after)
     expect(diff.root).toEqual({ before: 'root', after: 'panel' })

@@ -1,7 +1,7 @@
 import { describe, expect, it, type BenchCompareOptions } from 'vitest'
 import { getPatchedSubProject } from '../component-patches/getPatchedSubProject'
 import type { ComponentSchema } from '../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../schemas/constraints'
 import type { EditorComputationRequestSchema, SubProjectComputationResultSchema } from '../schemas/editorComputation'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { StitchLineSchema } from '../schemas/stitching'
@@ -101,10 +101,10 @@ const createSubProject = (clusterCount: number, pocketCount: number): SubProject
   })
 }
 
-const createConstraints = (subProject: SubProjectSchema): Record<string, ConstraintSchema> => {
+const createConstraints = (subProject: SubProjectSchema): Record<string, BindingSchema> => {
   const pockets = Object.values(subProject.components).filter(narrowers.is.pocket)
   const tabFields = pockets.filter(narrowers.is.tPocket).map(
-    (pocket): ConstraintFieldSchema => ({
+    (pocket): BindingFieldSchema => ({
       id: `${pocket.id}-tab`,
       type: 't-pocket-constraint-field',
       modelId: pocket.id,
@@ -112,7 +112,7 @@ const createConstraints = (subProject: SubProjectSchema): Record<string, Constra
     }),
   )
   const itemFields = pockets.map(
-    (pocket): ConstraintFieldSchema =>
+    (pocket): BindingFieldSchema =>
       narrowers.is.tPocket(pocket)
         ? { id: `${pocket.id}-item`, type: 't-pocket-constraint-field', modelId: pocket.id, field: 'itemOpeningOffset' }
         : {
@@ -123,7 +123,7 @@ const createConstraints = (subProject: SubProjectSchema): Record<string, Constra
           },
   )
   const holeFields = subProject.holes.map(
-    (hole): ConstraintFieldSchema => ({
+    (hole): BindingFieldSchema => ({
       id: `${hole.id}-width`,
       type: 'hole-constraint-field',
       modelId: hole.id,
@@ -131,7 +131,7 @@ const createConstraints = (subProject: SubProjectSchema): Record<string, Constra
     }),
   )
   const marginFields = subProject.stitchLines.map(
-    (stitchLine): ConstraintFieldSchema =>
+    (stitchLine): BindingFieldSchema =>
       narrowers.is.tPocketStitchLine(stitchLine)
         ? {
             id: `${stitchLine.id}-margin`,
@@ -146,7 +146,7 @@ const createConstraints = (subProject: SubProjectSchema): Record<string, Constra
             field: 'stitchMargin',
           },
   )
-  const constraints: Record<string, ConstraintSchema> = {}
+  const constraints: Record<string, BindingSchema> = {}
   for (const [group, fields] of [tabFields, itemFields, holeFields, marginFields].entries()) {
     if (fields.length < 2) {
       continue

@@ -1,10 +1,10 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { pocketItems } from '../../data/pocketItems'
 import type {
-  ConstraintCompatibilityGroupSchema,
-  ConstraintFieldNameSchema,
-  ConstraintFieldSchema,
-  ConstraintValueSchema,
+  BindingCompatibilityGroupSchema,
+  BindingFieldNameSchema,
+  BindingFieldSchema,
+  BindingValueSchema,
 } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { PocketItemIdSchema } from '../../schemas/pocketItem'
@@ -16,8 +16,8 @@ import { narrowers } from '../../utils/narrowers'
 
 export const getConstraintFieldValue = (
   model: ModelObjectSchema,
-  constraintField: ConstraintFieldSchema,
-): ConstraintValueSchema => {
+  constraintField: BindingFieldSchema,
+): BindingValueSchema => {
   switch (constraintField.type) {
     case 'root-panel-constraint-field':
       return narrowers.assert.rootPanel(model)[constraintField.field]
@@ -56,7 +56,7 @@ export const getConstraintFieldValue = (
   }
 }
 
-const isCompatibleValue = (group: ConstraintCompatibilityGroupSchema, value: ConstraintValueSchema): boolean => {
+const isCompatibleValue = (group: BindingCompatibilityGroupSchema, value: BindingValueSchema): boolean => {
   switch (group) {
     case 'number':
       return typeof value === 'number'
@@ -90,21 +90,21 @@ const isCompatibleValue = (group: ConstraintCompatibilityGroupSchema, value: Con
   }
 }
 
-function assertFieldValue<Model extends ModelObjectSchema, Field extends keyof Model & ConstraintFieldNameSchema>(
+function assertFieldValue<Model extends ModelObjectSchema, Field extends keyof Model & BindingFieldNameSchema>(
   model: Model,
   field: Field,
-  value: ConstraintValueSchema,
-): asserts value is Model[Field] & ConstraintValueSchema {
-  const group: ConstraintCompatibilityGroupSchema | undefined = constraintFieldCompatibility[model.type][field]
+  value: BindingValueSchema,
+): asserts value is Model[Field] & BindingValueSchema {
+  const group: BindingCompatibilityGroupSchema | undefined = constraintFieldCompatibility[model.type][field]
   if (!isDefined(group) || !isCompatibleValue(group, value)) {
     throw new Error(`Incompatible constraint value for ${model.type}.${field}`)
   }
 }
 
-const setField = <Model extends ModelObjectSchema, Field extends keyof Model & ConstraintFieldNameSchema>(
+const setField = <Model extends ModelObjectSchema, Field extends keyof Model & BindingFieldNameSchema>(
   model: Model,
   field: Field,
-  value: ConstraintValueSchema,
+  value: BindingValueSchema,
 ): Model => {
   assertFieldValue(model, field, value)
   if (Object.is(model[field], value)) {
@@ -121,8 +121,8 @@ const setField = <Model extends ModelObjectSchema, Field extends keyof Model & C
 
 export const setConstraintFieldValue = (
   subProject: SubProjectSchema,
-  constraintField: ConstraintFieldSchema,
-  value: ConstraintValueSchema,
+  constraintField: BindingFieldSchema,
+  value: BindingValueSchema,
 ): SubProjectSchema => {
   const model = accessors.subProject(subProject).constraint.model(constraintField)
   let updated: ModelObjectSchema

@@ -8,7 +8,7 @@ import {
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
-import type { ConstraintSchema } from './schemas/constraints'
+import type { BindingSchema } from './schemas/constraints'
 import { HoleSchema } from './schemas/hole'
 import type { PocketOpeningSchema } from './schemas/pocketOpening'
 import { ProjectSchema } from './schemas/project'
@@ -45,7 +45,7 @@ type CreateSubProjectConfig = HasId &
     stitchLines?: StitchLineSchema[]
     holes?: HoleSchema[]
     pocketOpenings?: PocketOpeningSchema[]
-    constraints?: Record<string, ConstraintSchema>
+    constraints?: Record<string, BindingSchema>
   }
 
 type CreateRootPanelConfig = Partial<RootPanelSchema> & HasId & HasStitchingSettings

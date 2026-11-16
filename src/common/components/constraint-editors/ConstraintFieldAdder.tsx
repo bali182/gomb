@@ -8,7 +8,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 import { constraintFieldBlockers } from '../../logic/constraints/constraintFieldBlockers'
 import { getConstraintFieldInputs } from '../../logic/constraints/getConstraintFieldInputs'
 import type { SubProjectAccessorSchema } from '../../schemas/accessors'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { ConstraintFieldInputSchema } from '../../schemas/factory'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { accessors } from '../../utils/accessors'
@@ -24,7 +24,7 @@ import type { ConstraintFieldAdderState } from './constraintFieldUtils'
 import { getConstraintFieldLabel } from './constraintFieldUtils'
 
 type ConstraintFieldAdderProps = {
-  constraint: ConstraintSchema
+  constraint: BindingSchema
 }
 
 const getConstraintTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {

@@ -1,4 +1,4 @@
-import type { ConstraintSchema } from '../../../schemas/constraints'
+import type { BindingSchema } from '../../../schemas/constraints'
 
 export type ConstraintTreeRootNode = {
   kind: 'root'
@@ -8,6 +8,6 @@ export type ConstraintTreeRootNode = {
 export type ConstraintTreeItemNode = {
   kind: 'constraint'
   id: string
-  constraint: ConstraintSchema
+  constraint: BindingSchema
 }
 export type ConstraintTreeNode = ConstraintTreeRootNode | ConstraintTreeItemNode

@@ -1,7 +1,7 @@
-import type { ConstraintFieldBlockerDefinitionsSchema, ConstraintFieldBlockersSchema } from '../../schemas/constraints'
+import type { BindingFieldBlockerDefinitionsSchema, BindingFieldBlockersSchema } from '../../schemas/constraints'
 import { narrowers } from '../../utils/narrowers'
 
-const definitions: ConstraintFieldBlockerDefinitionsSchema = {
+const definitions: BindingFieldBlockerDefinitionsSchema = {
   'root-panel': {
     layoutGap: (model) => (narrowers.assert.rootPanel(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
   },
@@ -36,4 +36,4 @@ const definitions: ConstraintFieldBlockerDefinitionsSchema = {
   'optical-illusion': {},
 }
 
-export const constraintFieldBlockers: ConstraintFieldBlockersSchema = definitions
+export const constraintFieldBlockers: BindingFieldBlockersSchema = definitions

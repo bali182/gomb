@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { applyResolution } from '../../logic/constraints/applyResolution'
 import { STRETCH_FIELD_ORDER } from '../../logic/constraints/stretchConstraintUtils'
 import type { HasStretchSchema } from '../../schemas/common'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
@@ -11,7 +11,7 @@ import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { setStretchConstraint } from './setStretchConstraint'
 import { createBaseOperationParams } from './testUtils'
 
-const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProjectSchema =>
+const fixture = (constraints: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
@@ -22,7 +22,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const binding = (id: string, fields: readonly (keyof HasStretchSchema)[]): ConstraintSchema => ({
+const binding = (id: string, fields: readonly (keyof HasStretchSchema)[]): BindingSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({
@@ -114,7 +114,7 @@ describe('setStretchConstraint', () => {
       modelId: 'root',
       field: 'width',
     })
-    const unrelated: ConstraintSchema = {
+    const unrelated: BindingSchema = {
       id: 'radius',
       type: 'equal-constraint',
       fields: [

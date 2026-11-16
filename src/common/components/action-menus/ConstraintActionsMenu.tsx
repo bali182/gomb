@@ -3,13 +3,13 @@ import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { DeleteMenuItem } from './CommonActionsMenuItems'
 
 type ConstraintActionsMenuProps = {
-  constraint: ConstraintSchema
+  constraint: BindingSchema
   size: IconButtonProps['size']
   onDelete?: (constraintId: string) => void
 }

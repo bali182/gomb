@@ -21,7 +21,7 @@ import type {
   StitchPathFragment,
   StitchSidePathFragment,
 } from '../schemas/computed'
-import type { ConstraintSchema } from '../schemas/constraints'
+import type { BindingSchema } from '../schemas/constraints'
 import type {
   PathArcToSchema,
   PathCloseSchema,
@@ -44,7 +44,7 @@ import { isRecord } from './isRecord'
 
 export const narrowers = {
   is: {
-    constraint: (input: SubProjectItemSchema): input is ConstraintSchema => hasType(input, 'equal-constraint'),
+    constraint: (input: SubProjectItemSchema): input is BindingSchema => hasType(input, 'equal-constraint'),
     // Component
     component: (input: SubProjectItemSchema): input is ComponentSchema => {
       return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')

@@ -3,7 +3,7 @@ import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { deleteComponent } from '../operations/subProject/deleteComponent'
 import { createBaseOperationParams } from '../operations/subProject/testUtils'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { EN } from '../translations/en'
 import { NameGenerator } from '../utils/factory/NameGenerator'
@@ -14,7 +14,7 @@ import { getPatchedSubProject } from './getPatchedSubProject'
 
 const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 
-const fields: ConstraintFieldSchema[] = [
+const fields: BindingFieldSchema[] = [
   { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
   { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
   { id: 'cluster-field', type: 'pocket-cluster-constraint-field', modelId: 'cluster', field: 'width' },
@@ -63,7 +63,7 @@ describe('deleteOrphanedConstraintFields', () => {
 
   it.each(fields)('removes missing and wrong model types for $type', (field) => {
     const source = fixture()
-    const constraint: ConstraintSchema = {
+    const constraint: BindingSchema = {
       ...source.constraints.linked,
       fields: [
         fields[0],
@@ -140,7 +140,7 @@ describe('obsolete constraint fields', () => {
       type: 'component-bounds-stitch-line-constraint-field',
       modelId: 'bounds',
       field: 'topStartOffset',
-    } as unknown as ConstraintFieldSchema
+    } as unknown as BindingFieldSchema
     source.constraints.linked = { ...source.constraints.linked, fields: [fields[0], obsolete] }
     const computed = getComputedSubProject(source, defaultStitchingSettings)
     const result = deleteOrphanedConstraintFields(source, computed)

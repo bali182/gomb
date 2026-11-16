@@ -1,15 +1,15 @@
 import type {
-  ComponentBoundsStitchLineConstraintFieldNameSchema,
-  FrontPocketConstraintFieldNameSchema,
-  HoleConstraintFieldNameSchema,
-  OpticalIllusionPocketOpeningConstraintFieldNameSchema,
-  PanelConstraintFieldNameSchema,
-  PocketClusterConstraintFieldNameSchema,
-  RecessedPocketOpeningConstraintFieldNameSchema,
-  RootPanelConstraintFieldNameSchema,
-  SlantedPocketOpeningConstraintFieldNameSchema,
-  TPocketConstraintFieldNameSchema,
-  TPocketStitchLineConstraintFieldNameSchema,
+  ComponentBoundsStitchLineBindingFieldNameSchema,
+  FrontPocketBindingFieldNameSchema,
+  HoleBindingFieldNameSchema,
+  OpticalIllusionPocketOpeningBindingFieldNameSchema,
+  PanelBindingFieldNameSchema,
+  PocketClusterBindingFieldNameSchema,
+  RecessedPocketOpeningBindingFieldNameSchema,
+  RootPanelBindingFieldNameSchema,
+  SlantedPocketOpeningBindingFieldNameSchema,
+  TPocketBindingFieldNameSchema,
+  TPocketStitchLineBindingFieldNameSchema,
 } from '../../schemas/constraints'
 import type {
   ComponentBoundsStitchLineConstraintFieldInputSchema,
@@ -30,7 +30,7 @@ import type { ModelObjectSchema } from '../../schemas/modelObject'
 export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFieldInputSchema[] => {
   switch (model.type) {
     case 'root-panel': {
-      const fields: RootPanelConstraintFieldNameSchema[] = [
+      const fields: RootPanelBindingFieldNameSchema[] = [
         'width',
         'height',
         'topLeftRadius',
@@ -50,7 +50,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'panel': {
-      const fields: PanelConstraintFieldNameSchema[] = [
+      const fields: PanelBindingFieldNameSchema[] = [
         'width',
         'height',
         'topLeftRadius',
@@ -71,7 +71,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'pocket-cluster': {
-      const fields: PocketClusterConstraintFieldNameSchema[] = [
+      const fields: PocketClusterBindingFieldNameSchema[] = [
         'width',
         'height',
         'topLeftRadius',
@@ -95,7 +95,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'front-pocket': {
-      const fields: FrontPocketConstraintFieldNameSchema[] = [
+      const fields: FrontPocketBindingFieldNameSchema[] = [
         'topLeftRadius',
         'topRightRadius',
         'bottomLeftRadius',
@@ -118,7 +118,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 't-pocket': {
-      const fields: TPocketConstraintFieldNameSchema[] = [
+      const fields: TPocketBindingFieldNameSchema[] = [
         'tPocketTabWidth',
         'tPocketTaper',
         'openingId',
@@ -132,7 +132,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'hole': {
-      const fields: HoleConstraintFieldNameSchema[] = [
+      const fields: HoleBindingFieldNameSchema[] = [
         'width',
         'height',
         'topLeftRadius',
@@ -149,7 +149,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'recessed': {
-      const fields: RecessedPocketOpeningConstraintFieldNameSchema[] = [
+      const fields: RecessedPocketOpeningBindingFieldNameSchema[] = [
         'recessOuterInset',
         'recessInnerOffset',
         'recessOuterRadius',
@@ -165,7 +165,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'slanted': {
-      const fields: SlantedPocketOpeningConstraintFieldNameSchema[] = ['slantOffset', 'slantSide']
+      const fields: SlantedPocketOpeningBindingFieldNameSchema[] = ['slantOffset', 'slantSide']
       return fields.map(
         (field): SlantedPocketOpeningConstraintFieldInputSchema => ({
           type: 'slanted-constraint-field',
@@ -175,7 +175,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'optical-illusion': {
-      const fields: OpticalIllusionPocketOpeningConstraintFieldNameSchema[] = [
+      const fields: OpticalIllusionPocketOpeningBindingFieldNameSchema[] = [
         'illusionSide',
         'illusionStartInset',
         'illusionEndInset',
@@ -191,7 +191,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 'component-bounds-stitch-line': {
-      const fields: ComponentBoundsStitchLineConstraintFieldNameSchema[] = [
+      const fields: ComponentBoundsStitchLineBindingFieldNameSchema[] = [
         'startOffset',
         'endOffset',
         'stitchDirection',
@@ -215,7 +215,7 @@ export const getConstraintFieldInputs = (model: ModelObjectSchema): ConstraintFi
       )
     }
     case 't-pocket-stitch-line': {
-      const fields: TPocketStitchLineConstraintFieldNameSchema[] = [
+      const fields: TPocketStitchLineBindingFieldNameSchema[] = [
         'stitchMargin',
         'stitchHoleLength',
         'stitchHoleDistance',

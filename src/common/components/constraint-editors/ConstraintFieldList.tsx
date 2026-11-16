@@ -5,7 +5,7 @@ import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema, BindingFieldSchema, BindingSchema } from '../../schemas/constraints'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from '../common/EditorIconButton'
@@ -13,15 +13,15 @@ import { getConstraintFieldLabel, getConstraintModelPath } from './constraintFie
 import { getConstraintFieldIcon } from './getConstraintFieldIcon'
 
 type ConstraintFieldListProps = {
-  constraint: ConstraintSchema
+  constraint: BindingSchema
 }
 
 export const ConstraintFieldList: FC<ConstraintFieldListProps> = ({ constraint }) => {
   const { subProject } = useSubProject()
 
-  const groups = useMemo<Map<ConstraintFieldNameSchema, ConstraintFieldSchema[]>>(() => {
+  const groups = useMemo<Map<BindingFieldNameSchema, BindingFieldSchema[]>>(() => {
     const accessor = accessors.subProject(subProject)
-    const groups = new Map<ConstraintFieldNameSchema, ConstraintFieldSchema[]>()
+    const groups = new Map<BindingFieldNameSchema, BindingFieldSchema[]>()
     for (const field of constraint.fields) {
       if (!isDefined(accessor.optional.constraint.model(field))) {
         continue
@@ -47,8 +47,8 @@ export const ConstraintFieldList: FC<ConstraintFieldListProps> = ({ constraint }
 
 type ConstraintFieldGroupProps = {
   constraintId: string
-  name: ConstraintFieldNameSchema
-  fields: ConstraintFieldSchema[]
+  name: BindingFieldNameSchema
+  fields: BindingFieldSchema[]
 }
 
 const ConstraintFieldGroup: FC<ConstraintFieldGroupProps> = ({ constraintId, name, fields }) => {
@@ -73,7 +73,7 @@ const ConstraintFieldGroup: FC<ConstraintFieldGroupProps> = ({ constraintId, nam
 
 type ConstraintFieldBindingProps = {
   constraintId: string
-  field: ConstraintFieldSchema
+  field: BindingFieldSchema
 }
 
 const ConstraintFieldBinding: FC<ConstraintFieldBindingProps> = ({ constraintId, field }) => {

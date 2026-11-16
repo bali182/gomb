@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { defaultStitchingSettings } from '../../defaultStates'
 import { getConstraintFieldInputs } from '../../logic/constraints/getConstraintFieldInputs'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { d } from '../../testData'
 import { EN } from '../../translations/en'
@@ -43,7 +43,7 @@ describe('constraint field metadata', () => {
   })
 
   it('builds translated labels without using object names or values', () => {
-    const constraint: ConstraintSchema = {
+    const constraint: BindingSchema = {
       id: 'constraint',
       type: 'equal-constraint',
       fields: [

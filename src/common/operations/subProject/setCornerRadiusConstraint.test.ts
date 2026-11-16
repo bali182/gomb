@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { applyResolution } from '../../logic/constraints/applyResolution'
 import { CORNER_RADIUS_FIELD_ORDER } from '../../logic/constraints/cornerRadiusConstraintUtils'
 import type { HasCornerRadiusSchema } from '../../schemas/common'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { accessors } from '../../utils/accessors'
@@ -11,7 +11,7 @@ import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { setCornerRadiusConstraint } from './setCornerRadiusConstraint'
 import { createBaseOperationParams } from './testUtils'
 
-const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProjectSchema =>
+const fixture = (constraints: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel'] }),
@@ -30,7 +30,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): ConstraintSchema => ({
+const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): BindingSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({ id: `${id}-${field}`, type: 'panel-constraint-field', modelId: 'panel', field })),
@@ -61,7 +61,7 @@ describe('setCornerRadiusConstraint', () => {
 
   it('changes the existing binding while retaining its id and surviving field ids', () => {
     const existing = pair('radius', ['topLeftRadius', 'topRightRadius'])
-    const unrelated: ConstraintSchema = {
+    const unrelated: BindingSchema = {
       id: 'width',
       type: 'equal-constraint',
       fields: [{ id: 'root-width', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' }],

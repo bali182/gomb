@@ -1,7 +1,7 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
-import type { ConstraintFieldBlockReasonSchema } from '../schemas/constraints'
+import type { BindingFieldBlockReasonSchema } from '../schemas/constraints'
 import type { HasCustomRenderTarget } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
@@ -768,7 +768,7 @@ export const HU = {
             'auto-height': 'Az értékkövetéshez állítsd manuálisra a magasságot.',
             'auto-layout-gap': 'Az értékkövetéshez állítsd manuálisra a hézagot.',
             'auto-corner-radius': 'Az értékkövetéshez állítsd manuálisra a lekerekítéseket.',
-          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          } satisfies EnumTranslationSchema<BindingFieldBlockReasonSchema>,
           fields: {
             width: 'Szélesség',
             height: 'Magasság',

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { HasCornerRadiusSchema } from '../schemas/common'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../schemas/constraints'
 import { d } from '../testData'
 import { comparators } from './comparators'
 
-const field: ConstraintFieldSchema = { id: 'field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }
-const constraint: ConstraintSchema = {
+const field: BindingFieldSchema = { id: 'field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }
+const constraint: BindingSchema = {
   id: 'constraint',
   type: 'equal-constraint',
   fields: [field, { ...field, id: 'other', field: 'height' }],
@@ -16,7 +16,7 @@ describe('constraint comparators', () => {
     expect(comparators.constraint(constraint, structuredClone(constraint))).toBe(true)
     expect(comparators.constraintField(field, { ...field })).toBe(true)
   })
-  const changedFields: ConstraintFieldSchema[] = [
+  const changedFields: BindingFieldSchema[] = [
     { ...field, id: 'changed' },
     { ...field, modelId: 'other-panel' },
     { ...field, field: 'height' },
@@ -44,7 +44,7 @@ describe('constraint comparators', () => {
         constraints: { second: subProject.constraints.second, first: constraint },
       }),
     ).toBe(true)
-    const variants: Record<string, ConstraintSchema>[] = [
+    const variants: Record<string, BindingSchema>[] = [
       {},
       { first: constraint },
       { first: constraint, other: subProject.constraints.second },

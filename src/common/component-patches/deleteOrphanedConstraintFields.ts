@@ -1,5 +1,5 @@
 import { constraintFieldCompatibility } from '../data/constraintFieldCompatibility'
-import type { ConstraintSchema } from '../schemas/constraints'
+import type { BindingSchema } from '../schemas/constraints'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
 import { has } from '../utils/has'
@@ -10,7 +10,7 @@ export const deleteOrphanedConstraintFields = (
   _computedSubProject: ComputedSubProjectSchema,
 ): SubProjectSchema => {
   const accessor = accessors.subProject(subProject)
-  const constraints: Record<string, ConstraintSchema> = {}
+  const constraints: Record<string, BindingSchema> = {}
   let hasChanged = false
 
   for (const [id, constraint] of Object.entries(subProject.constraints)) {

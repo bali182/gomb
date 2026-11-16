@@ -1,5 +1,5 @@
 import type { ComponentSchema } from '../../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../../schemas/constraints'
 import type { HoleSchema } from '../../schemas/hole'
 import type { NameGeneratorSchema } from '../../schemas/idGenerator'
 import type { BaseSubProjectOperationParamsSchema, CloneComponentParamsSchema } from '../../schemas/operations'
@@ -174,7 +174,7 @@ const cloneSelectedConstraints = (
   params: CloneComponentParamsSchema,
   selection: CloneComponentSelection,
   idMappings: Readonly<Record<string, string>>,
-): Record<string, ConstraintSchema> => {
+): Record<string, BindingSchema> => {
   let constraints = subProject.constraints
   for (const row of selection.constraints) {
     const action = params.constraints[row.constraint.id]?.action ?? 'ignore'
@@ -182,7 +182,7 @@ const cloneSelectedConstraints = (
       continue
     }
     const fields = row.fields.map(
-      (field): ConstraintFieldSchema => ({ ...field, id: idMappings[field.id], modelId: idMappings[field.modelId] }),
+      (field): BindingFieldSchema => ({ ...field, id: idMappings[field.id], modelId: idMappings[field.modelId] }),
     )
     switch (action) {
       case 'add-to-existing': {

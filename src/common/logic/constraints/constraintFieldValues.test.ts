@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema } from '../../schemas/constraints'
 import { d } from '../../testData'
 import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
@@ -9,7 +9,7 @@ import { IdGenerator } from '../../utils/random/IdGenerator'
 import { getConstraintFieldValue, setConstraintFieldValue } from './constraintFieldValues'
 
 const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
-const fields: ConstraintFieldSchema[] = [
+const fields: BindingFieldSchema[] = [
   { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
   { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
   { id: 'cluster-field', type: 'pocket-cluster-constraint-field', modelId: 'cluster', field: 'width' },

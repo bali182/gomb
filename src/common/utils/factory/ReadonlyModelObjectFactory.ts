@@ -21,20 +21,20 @@ import type {
   TPocketSchema,
 } from '../../schemas/components'
 import type {
-  ComponentBoundsStitchLineConstraintFieldSchema,
-  ConstraintFieldSchema,
-  ConstraintSchema,
-  EqualConstraintSchema,
-  FrontPocketConstraintFieldSchema,
-  HoleConstraintFieldSchema,
-  OpticalIllusionPocketOpeningConstraintFieldSchema,
-  PanelConstraintFieldSchema,
-  PocketClusterConstraintFieldSchema,
-  RecessedPocketOpeningConstraintFieldSchema,
-  RootPanelConstraintFieldSchema,
-  SlantedPocketOpeningConstraintFieldSchema,
-  TPocketConstraintFieldSchema,
-  TPocketStitchLineConstraintFieldSchema,
+  ComponentBoundsStitchLineBindingFieldSchema,
+  BindingFieldSchema,
+  BindingSchema,
+  EqualBindingSchema,
+  FrontPocketBindingFieldSchema,
+  HoleBindingFieldSchema,
+  OpticalIllusionPocketOpeningBindingFieldSchema,
+  PanelBindingFieldSchema,
+  PocketClusterBindingFieldSchema,
+  RecessedPocketOpeningBindingFieldSchema,
+  RootPanelBindingFieldSchema,
+  SlantedPocketOpeningBindingFieldSchema,
+  TPocketBindingFieldSchema,
+  TPocketStitchLineBindingFieldSchema,
 } from '../../schemas/constraints'
 import type * as Factory from '../../schemas/factory'
 import type { HoleSchema } from '../../schemas/hole'
@@ -233,18 +233,18 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
     }
   }
 
-  public createConstraint(params: Factory.ReadonlyCreateConstraintParamsSchema): ConstraintSchema {
+  public createConstraint(params: Factory.ReadonlyCreateConstraintParamsSchema): BindingSchema {
     switch (params.type) {
       case 'equal-constraint':
         return this.createEqualConstraint(params)
     }
   }
 
-  public createEqualConstraint(params: Factory.ReadonlyCreateEqualConstraintParamsSchema): EqualConstraintSchema {
+  public createEqualConstraint(params: Factory.ReadonlyCreateEqualConstraintParamsSchema): EqualBindingSchema {
     return { id: this.id.get('equal-constraint', params.forbiddenIds), type: 'equal-constraint', fields: [] }
   }
 
-  public createConstraintField(params: Factory.ReadonlyCreateConstraintFieldParamsSchema): ConstraintFieldSchema {
+  public createConstraintField(params: Factory.ReadonlyCreateConstraintFieldParamsSchema): BindingFieldSchema {
     switch (params.type) {
       case 'root-panel-constraint-field':
         return this.createRootPanelConstraintField(params)
@@ -273,7 +273,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createRootPanelConstraintField(
     params: Factory.ReadonlyCreateRootPanelConstraintFieldParamsSchema,
-  ): RootPanelConstraintFieldSchema {
+  ): RootPanelBindingFieldSchema {
     return {
       id: this.id.get('root-panel-constraint-field', params.forbiddenIds),
       type: 'root-panel-constraint-field',
@@ -284,7 +284,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createPanelConstraintField(
     params: Factory.ReadonlyCreatePanelConstraintFieldParamsSchema,
-  ): PanelConstraintFieldSchema {
+  ): PanelBindingFieldSchema {
     return {
       id: this.id.get('panel-constraint-field', params.forbiddenIds),
       type: 'panel-constraint-field',
@@ -295,7 +295,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createPocketClusterConstraintField(
     params: Factory.ReadonlyCreatePocketClusterConstraintFieldParamsSchema,
-  ): PocketClusterConstraintFieldSchema {
+  ): PocketClusterBindingFieldSchema {
     return {
       id: this.id.get('pocket-cluster-constraint-field', params.forbiddenIds),
       type: 'pocket-cluster-constraint-field',
@@ -306,7 +306,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createFrontPocketConstraintField(
     params: Factory.ReadonlyCreateFrontPocketConstraintFieldParamsSchema,
-  ): FrontPocketConstraintFieldSchema {
+  ): FrontPocketBindingFieldSchema {
     return {
       id: this.id.get('front-pocket-constraint-field', params.forbiddenIds),
       type: 'front-pocket-constraint-field',
@@ -317,7 +317,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createTPocketConstraintField(
     params: Factory.ReadonlyCreateTPocketConstraintFieldParamsSchema,
-  ): TPocketConstraintFieldSchema {
+  ): TPocketBindingFieldSchema {
     return {
       id: this.id.get('t-pocket-constraint-field', params.forbiddenIds),
       type: 't-pocket-constraint-field',
@@ -328,7 +328,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createHoleConstraintField(
     params: Factory.ReadonlyCreateHoleConstraintFieldParamsSchema,
-  ): HoleConstraintFieldSchema {
+  ): HoleBindingFieldSchema {
     return {
       id: this.id.get('hole-constraint-field', params.forbiddenIds),
       type: 'hole-constraint-field',
@@ -339,7 +339,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createRecessedPocketOpeningConstraintField(
     params: Factory.ReadonlyCreateRecessedPocketOpeningConstraintFieldParamsSchema,
-  ): RecessedPocketOpeningConstraintFieldSchema {
+  ): RecessedPocketOpeningBindingFieldSchema {
     return {
       id: this.id.get('recessed-constraint-field', params.forbiddenIds),
       type: 'recessed-constraint-field',
@@ -350,7 +350,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createSlantedPocketOpeningConstraintField(
     params: Factory.ReadonlyCreateSlantedPocketOpeningConstraintFieldParamsSchema,
-  ): SlantedPocketOpeningConstraintFieldSchema {
+  ): SlantedPocketOpeningBindingFieldSchema {
     return {
       id: this.id.get('slanted-constraint-field', params.forbiddenIds),
       type: 'slanted-constraint-field',
@@ -361,7 +361,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createOpticalIllusionPocketOpeningConstraintField(
     params: Factory.ReadonlyCreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema,
-  ): OpticalIllusionPocketOpeningConstraintFieldSchema {
+  ): OpticalIllusionPocketOpeningBindingFieldSchema {
     return {
       id: this.id.get('optical-illusion-constraint-field', params.forbiddenIds),
       type: 'optical-illusion-constraint-field',
@@ -372,7 +372,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createComponentBoundsStitchLineConstraintField(
     params: Factory.ReadonlyCreateComponentBoundsStitchLineConstraintFieldParamsSchema,
-  ): ComponentBoundsStitchLineConstraintFieldSchema {
+  ): ComponentBoundsStitchLineBindingFieldSchema {
     return {
       id: this.id.get('component-bounds-stitch-line-constraint-field', params.forbiddenIds),
       type: 'component-bounds-stitch-line-constraint-field',
@@ -383,7 +383,7 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createTPocketStitchLineConstraintField(
     params: Factory.ReadonlyCreateTPocketStitchLineConstraintFieldParamsSchema,
-  ): TPocketStitchLineConstraintFieldSchema {
+  ): TPocketStitchLineBindingFieldSchema {
     return {
       id: this.id.get('t-pocket-stitch-line-constraint-field', params.forbiddenIds),
       type: 't-pocket-stitch-line-constraint-field',

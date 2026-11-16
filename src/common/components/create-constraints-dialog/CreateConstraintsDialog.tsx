@@ -8,7 +8,7 @@ import {
   getValidConstraintPropertySelection,
   type CommonConstraintProperty,
 } from '../../logic/constraints/constraintCreationUtils'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { AddConstraintWithFieldsParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -38,7 +38,7 @@ type CreateConstraintsDialogProps = {
 
 type CreateConstraintsSelection = {
   nodeIds: string[]
-  fields: ConstraintFieldNameSchema[]
+  fields: BindingFieldNameSchema[]
 }
 
 const panels: Splitter.PanelData[] = [
@@ -115,7 +115,7 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
     () => getCommonConstraintProperties(subProject, selectedModels),
     [subProject, selectedModels],
   )
-  const selectedFields = useMemo<ConstraintFieldNameSchema[]>(
+  const selectedFields = useMemo<BindingFieldNameSchema[]>(
     () => (selectedModels.length < 2 ? [] : getValidConstraintPropertySelection(properties, selection.fields)),
     [properties, selection.fields, selectedModels.length],
   )
@@ -167,7 +167,7 @@ export const CreateConstraintsDialog: FC<CreateConstraintsDialogProps> = ({
   )
 
   const handlePropertySelectionChange = useCallback(
-    (field: ConstraintFieldNameSchema, selected: boolean): void => {
+    (field: BindingFieldNameSchema, selected: boolean): void => {
       setSelection((current: CreateConstraintsSelection): CreateConstraintsSelection => {
         const fields = selected
           ? Array.from(new Set([...current.fields, field]))

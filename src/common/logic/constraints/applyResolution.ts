@@ -1,5 +1,5 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
-import type { ConstraintFieldSchema, ConstraintSchema, ConstraintValueSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema, BindingValueSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import type { ChangeSchema, SubProjectDiffSchema } from '../../schemas/subProjectDiff'
@@ -73,13 +73,13 @@ export const applyResolution = ({ input, target, inputDiff, patchDiff }: ApplyRe
   return result
 }
 
-const isSameField = (first: ConstraintFieldSchema, second: ConstraintFieldSchema): boolean => {
+const isSameField = (first: BindingFieldSchema, second: BindingFieldSchema): boolean => {
   return first.modelId === second.modelId && first.field === second.field
 }
 
 const getConstraintModelChange = (
   diff: SubProjectDiffSchema,
-  field: ConstraintFieldSchema,
+  field: BindingFieldSchema,
 ): ChangeSchema<ModelObjectSchema> | undefined => {
   switch (field.type) {
     case 'root-panel-constraint-field':
@@ -101,10 +101,10 @@ const getConstraintModelChange = (
 }
 
 const getChangedValues = (
-  fields: readonly ConstraintFieldSchema[],
+  fields: readonly BindingFieldSchema[],
   diff: SubProjectDiffSchema,
-): ConstraintValueSchema[] => {
-  const values: ConstraintValueSchema[] = []
+): BindingValueSchema[] => {
+  const values: BindingValueSchema[] = []
   for (const constraintField of fields) {
     const change = getConstraintModelChange(diff, constraintField)
     if (!isDefined(change?.before) || !isDefined(change.after) || change.before.type !== change.after.type) {
@@ -120,9 +120,9 @@ const getChangedValues = (
 }
 
 const getExistingField = (
-  fields: readonly ConstraintFieldSchema[],
-  change: ChangeSchema<ConstraintSchema> | undefined,
-): ConstraintFieldSchema | undefined => {
+  fields: readonly BindingFieldSchema[],
+  change: ChangeSchema<BindingSchema> | undefined,
+): BindingFieldSchema | undefined => {
   if (!isDefined(change?.before) || !isDefined(change.after)) {
     return undefined
   }
@@ -139,17 +139,17 @@ const getExistingField = (
 }
 
 const selectChangedValue = (
-  values: readonly ConstraintValueSchema[],
-  fallback: ConstraintValueSchema,
-): ConstraintValueSchema => {
+  values: readonly BindingValueSchema[],
+  fallback: BindingValueSchema,
+): BindingValueSchema => {
   const first = values[0]
   return values.every((value) => Object.is(value, first)) ? first : fallback
 }
 
 const isValidReference = (
   subProject: SubProjectSchema,
-  constraintField: ConstraintFieldSchema,
-  value: ConstraintValueSchema,
+  constraintField: BindingFieldSchema,
+  value: BindingValueSchema,
 ): boolean => {
   const accessor = accessors.subProject(subProject)
   const model = accessor.constraint.model(constraintField)

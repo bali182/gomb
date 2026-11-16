@@ -7,10 +7,10 @@ import type {
   StitchLineAccessorSchema,
 } from '../../schemas/accessors'
 import type {
-  ConstraintFieldNameSchema,
-  ConstraintFieldSchema,
-  ConstraintSchema,
-  EqualConstraintSchema,
+  BindingFieldNameSchema,
+  BindingFieldSchema,
+  BindingSchema,
+  EqualBindingSchema,
 } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -19,9 +19,9 @@ import { isDefined } from '../isDefined'
 import { narrowers } from '../narrowers'
 
 export class OptionalConstraintAccessor implements OptionalAccessorSchema<ConstraintAccessorSchema> {
-  private readonly constraintsByModel = new Map<string, ConstraintSchema[]>()
-  private readonly constraintsByField = new Map<string, Map<ConstraintFieldNameSchema, ConstraintSchema[]>>()
-  private readonly allConstraints: ConstraintSchema[]
+  private readonly constraintsByModel = new Map<string, BindingSchema[]>()
+  private readonly constraintsByField = new Map<string, Map<BindingFieldNameSchema, BindingSchema[]>>()
+  private readonly allConstraints: BindingSchema[]
 
   constructor(
     private readonly root: SubProjectSchema,
@@ -39,7 +39,7 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
         }
         this.constraintsByModel.set(field.modelId, byModel)
         const byField =
-          this.constraintsByField.get(field.modelId) ?? new Map<ConstraintFieldNameSchema, ConstraintSchema[]>()
+          this.constraintsByField.get(field.modelId) ?? new Map<BindingFieldNameSchema, BindingSchema[]>()
         const constraints = byField.get(field.field) ?? []
         if (!constraints.includes(constraint)) {
           constraints.push(constraint)
@@ -54,19 +54,19 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
     this.model = this.model.bind(this)
   }
 
-  byId(id: string): ConstraintSchema | undefined {
+  byId(id: string): BindingSchema | undefined {
     return has(this.root.constraints, id) ? this.root.constraints[id] : undefined
   }
 
-  byModel(modelId: string): ConstraintSchema[] {
+  byModel(modelId: string): BindingSchema[] {
     return this.constraintsByModel.get(modelId) ?? []
   }
 
-  byField(modelId: string, field: ConstraintFieldNameSchema): ConstraintSchema[] {
+  byField(modelId: string, field: BindingFieldNameSchema): BindingSchema[] {
     return this.constraintsByField.get(modelId)?.get(field) ?? []
   }
 
-  model(field: ConstraintFieldSchema): ModelObjectSchema | undefined {
+  model(field: BindingFieldSchema): ModelObjectSchema | undefined {
     switch (field.type) {
       case 'root-panel-constraint-field':
         return this.component.rootPanel(field.modelId)
@@ -99,7 +99,7 @@ export class OptionalConstraintAccessor implements OptionalAccessorSchema<Constr
     }
   }
 
-  constraints(): readonly EqualConstraintSchema[] {
+  constraints(): readonly EqualBindingSchema[] {
     return this.allConstraints
   }
 }

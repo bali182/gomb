@@ -1,12 +1,12 @@
 import type { HasStretchSchema } from '../../schemas/common'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 
 export type StretchConstraintState = {
-  constraint: ConstraintSchema | undefined
+  constraint: BindingSchema | undefined
   disabledFields: readonly (keyof HasStretchSchema)[]
   hasMultipleConstraints: boolean
 }

@@ -1,5 +1,5 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
-import type { ConstraintFieldBlockReasonSchema, ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../../schemas/constraints'
 import type { ConstraintFieldInputSchema } from '../../schemas/factory'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
@@ -11,11 +11,11 @@ import { getConstraintFieldInputs } from './getConstraintFieldInputs'
 export type ConstraintPropertyBlocker = {
   model: ModelObjectSchema
   alreadyConstrained: boolean
-  autoReason: ConstraintFieldBlockReasonSchema | undefined
+  autoReason: BindingFieldBlockReasonSchema | undefined
 }
 
 export type CommonConstraintProperty = {
-  field: ConstraintFieldNameSchema
+  field: BindingFieldNameSchema
   fields: ConstraintFieldInputSchema[]
   blockers: ConstraintPropertyBlocker[]
 }
@@ -55,6 +55,6 @@ export const getCommonConstraintProperties = (
 
 export const getValidConstraintPropertySelection = (
   properties: CommonConstraintProperty[],
-  selection: ConstraintFieldNameSchema[],
-): ConstraintFieldNameSchema[] =>
+  selection: BindingFieldNameSchema[],
+): BindingFieldNameSchema[] =>
   selection.filter((field) => properties.some((property) => property.field === field && property.blockers.length === 0))

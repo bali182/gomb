@@ -8,9 +8,9 @@ import type {
 } from './pocketOpening'
 import type { ComponentBoundsStitchLineSchema, TPocketStitchLineSchema } from './stitching'
 
-type CheckedConstraintFieldNameSchema<Model, Field extends keyof Model> = Field
+type CheckedBindingFieldNameSchema<Model, Field extends keyof Model> = Field
 
-export type RootPanelConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type RootPanelBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   RootPanelSchema,
   | 'width'
   | 'height'
@@ -23,7 +23,7 @@ export type RootPanelConstraintFieldNameSchema = CheckedConstraintFieldNameSchem
   | 'layoutGap'
 >
 
-export type PanelConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type PanelBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   PanelSchema,
   | 'width'
   | 'height'
@@ -41,7 +41,7 @@ export type PanelConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   | 'leftStretch'
 >
 
-export type PocketClusterConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type PocketClusterBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   PocketClusterSchema,
   | 'width'
   | 'height'
@@ -58,7 +58,7 @@ export type PocketClusterConstraintFieldNameSchema = CheckedConstraintFieldNameS
   | 'orientation'
 >
 
-export type FrontPocketConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type FrontPocketBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   FrontPocketSchema,
   | 'topLeftRadius'
   | 'topRightRadius'
@@ -74,7 +74,7 @@ export type FrontPocketConstraintFieldNameSchema = CheckedConstraintFieldNameSch
   | 'itemOpeningOffset'
 >
 
-export type TPocketConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type TPocketBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   TPocketSchema,
   | 'tPocketTabWidth'
   | 'tPocketTaper'
@@ -85,7 +85,7 @@ export type TPocketConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   | 'itemOpeningOffset'
 >
 
-export type HoleConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type HoleBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   HoleSchema,
   | 'width'
   | 'height'
@@ -99,22 +99,22 @@ export type HoleConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
   | 'yOffset'
 >
 
-export type RecessedPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type RecessedPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   RecessedPocketOpeningSchema,
   'recessOuterInset' | 'recessInnerOffset' | 'recessOuterRadius' | 'recessInnerRadius' | 'recessDepth'
 >
 
-export type SlantedPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type SlantedPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   SlantedPocketOpeningSchema,
   'slantOffset' | 'slantSide'
 >
 
-export type OpticalIllusionPocketOpeningConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type OpticalIllusionPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   OpticalIllusionPocketOpeningSchema,
   'illusionSide' | 'illusionStartInset' | 'illusionEndInset' | 'illusionLeadingRadius' | 'illusionTrailingRadius'
 >
 
-export type ComponentBoundsStitchLineConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type ComponentBoundsStitchLineBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   ComponentBoundsStitchLineSchema,
   | 'startOffset'
   | 'endOffset'
@@ -131,7 +131,7 @@ export type ComponentBoundsStitchLineConstraintFieldNameSchema = CheckedConstrai
   | 'onTop'
 >
 
-export type TPocketStitchLineConstraintFieldNameSchema = CheckedConstraintFieldNameSchema<
+export type TPocketStitchLineBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   TPocketStitchLineSchema,
   | 'stitchMargin'
   | 'stitchHoleLength'
@@ -143,120 +143,120 @@ export type TPocketStitchLineConstraintFieldNameSchema = CheckedConstraintFieldN
   | 'stitchDirection'
 >
 
-export type ConstraintFieldNameSchema =
-  | RootPanelConstraintFieldNameSchema
-  | PanelConstraintFieldNameSchema
-  | PocketClusterConstraintFieldNameSchema
-  | FrontPocketConstraintFieldNameSchema
-  | TPocketConstraintFieldNameSchema
-  | HoleConstraintFieldNameSchema
-  | RecessedPocketOpeningConstraintFieldNameSchema
-  | SlantedPocketOpeningConstraintFieldNameSchema
-  | OpticalIllusionPocketOpeningConstraintFieldNameSchema
-  | ComponentBoundsStitchLineConstraintFieldNameSchema
-  | TPocketStitchLineConstraintFieldNameSchema
+export type BindingFieldNameSchema =
+  | RootPanelBindingFieldNameSchema
+  | PanelBindingFieldNameSchema
+  | PocketClusterBindingFieldNameSchema
+  | FrontPocketBindingFieldNameSchema
+  | TPocketBindingFieldNameSchema
+  | HoleBindingFieldNameSchema
+  | RecessedPocketOpeningBindingFieldNameSchema
+  | SlantedPocketOpeningBindingFieldNameSchema
+  | OpticalIllusionPocketOpeningBindingFieldNameSchema
+  | ComponentBoundsStitchLineBindingFieldNameSchema
+  | TPocketStitchLineBindingFieldNameSchema
 
-export type RootPanelConstraintFieldSchema = {
+export type RootPanelBindingFieldSchema = {
   id: string
   type: 'root-panel-constraint-field'
   modelId: string
-  field: RootPanelConstraintFieldNameSchema
+  field: RootPanelBindingFieldNameSchema
 }
 
-export type PanelConstraintFieldSchema = {
+export type PanelBindingFieldSchema = {
   id: string
   type: 'panel-constraint-field'
   modelId: string
-  field: PanelConstraintFieldNameSchema
+  field: PanelBindingFieldNameSchema
 }
 
-export type PocketClusterConstraintFieldSchema = {
+export type PocketClusterBindingFieldSchema = {
   id: string
   type: 'pocket-cluster-constraint-field'
   modelId: string
-  field: PocketClusterConstraintFieldNameSchema
+  field: PocketClusterBindingFieldNameSchema
 }
 
-export type FrontPocketConstraintFieldSchema = {
+export type FrontPocketBindingFieldSchema = {
   id: string
   type: 'front-pocket-constraint-field'
   modelId: string
-  field: FrontPocketConstraintFieldNameSchema
+  field: FrontPocketBindingFieldNameSchema
 }
 
-export type TPocketConstraintFieldSchema = {
+export type TPocketBindingFieldSchema = {
   id: string
   type: 't-pocket-constraint-field'
   modelId: string
-  field: TPocketConstraintFieldNameSchema
+  field: TPocketBindingFieldNameSchema
 }
 
-export type HoleConstraintFieldSchema = {
+export type HoleBindingFieldSchema = {
   id: string
   type: 'hole-constraint-field'
   modelId: string
-  field: HoleConstraintFieldNameSchema
+  field: HoleBindingFieldNameSchema
 }
 
-export type RecessedPocketOpeningConstraintFieldSchema = {
+export type RecessedPocketOpeningBindingFieldSchema = {
   id: string
   type: 'recessed-constraint-field'
   modelId: string
-  field: RecessedPocketOpeningConstraintFieldNameSchema
+  field: RecessedPocketOpeningBindingFieldNameSchema
 }
 
-export type SlantedPocketOpeningConstraintFieldSchema = {
+export type SlantedPocketOpeningBindingFieldSchema = {
   id: string
   type: 'slanted-constraint-field'
   modelId: string
-  field: SlantedPocketOpeningConstraintFieldNameSchema
+  field: SlantedPocketOpeningBindingFieldNameSchema
 }
 
-export type OpticalIllusionPocketOpeningConstraintFieldSchema = {
+export type OpticalIllusionPocketOpeningBindingFieldSchema = {
   id: string
   type: 'optical-illusion-constraint-field'
   modelId: string
-  field: OpticalIllusionPocketOpeningConstraintFieldNameSchema
+  field: OpticalIllusionPocketOpeningBindingFieldNameSchema
 }
 
-export type ComponentBoundsStitchLineConstraintFieldSchema = {
+export type ComponentBoundsStitchLineBindingFieldSchema = {
   id: string
   type: 'component-bounds-stitch-line-constraint-field'
   modelId: string
-  field: ComponentBoundsStitchLineConstraintFieldNameSchema
+  field: ComponentBoundsStitchLineBindingFieldNameSchema
 }
 
-export type TPocketStitchLineConstraintFieldSchema = {
+export type TPocketStitchLineBindingFieldSchema = {
   id: string
   type: 't-pocket-stitch-line-constraint-field'
   modelId: string
-  field: TPocketStitchLineConstraintFieldNameSchema
+  field: TPocketStitchLineBindingFieldNameSchema
 }
 
-export type ConstraintFieldSchema =
-  | RootPanelConstraintFieldSchema
-  | PanelConstraintFieldSchema
-  | PocketClusterConstraintFieldSchema
-  | FrontPocketConstraintFieldSchema
-  | TPocketConstraintFieldSchema
-  | HoleConstraintFieldSchema
-  | RecessedPocketOpeningConstraintFieldSchema
-  | SlantedPocketOpeningConstraintFieldSchema
-  | OpticalIllusionPocketOpeningConstraintFieldSchema
-  | ComponentBoundsStitchLineConstraintFieldSchema
-  | TPocketStitchLineConstraintFieldSchema
+export type BindingFieldSchema =
+  | RootPanelBindingFieldSchema
+  | PanelBindingFieldSchema
+  | PocketClusterBindingFieldSchema
+  | FrontPocketBindingFieldSchema
+  | TPocketBindingFieldSchema
+  | HoleBindingFieldSchema
+  | RecessedPocketOpeningBindingFieldSchema
+  | SlantedPocketOpeningBindingFieldSchema
+  | OpticalIllusionPocketOpeningBindingFieldSchema
+  | ComponentBoundsStitchLineBindingFieldSchema
+  | TPocketStitchLineBindingFieldSchema
 
-export type EqualConstraintSchema = {
+export type EqualBindingSchema = {
   id: string
   type: 'equal-constraint'
-  fields: ConstraintFieldSchema[]
+  fields: BindingFieldSchema[]
 }
 
-export type ConstraintSchema = EqualConstraintSchema
+export type BindingSchema = EqualBindingSchema
 
-export type ConstraintValueSchema = string | number | boolean | undefined
+export type BindingValueSchema = string | number | boolean | undefined
 
-export type ConstraintCompatibilityGroupSchema =
+export type BindingCompatibilityGroupSchema =
   // Loose types
   | 'string'
   | 'number'
@@ -279,49 +279,49 @@ export type ConstraintCompatibilityGroupSchema =
   | 'field:stitch-hole-thickness'
   | 'field:stitch-line-thickness'
 
-export type ModelConstraintFieldCompatibilitySchema<
-  Fields extends ConstraintFieldNameSchema = ConstraintFieldNameSchema,
-> = Readonly<Partial<Record<Fields, ConstraintCompatibilityGroupSchema>>>
+export type ModelBindingFieldCompatibilitySchema<Fields extends BindingFieldNameSchema = BindingFieldNameSchema> =
+  Readonly<Partial<Record<Fields, BindingCompatibilityGroupSchema>>>
 
-export type ConstraintFieldCompatibilityDefinitionsSchema = {
-  'root-panel': ModelConstraintFieldCompatibilitySchema<RootPanelConstraintFieldNameSchema>
-  'panel': ModelConstraintFieldCompatibilitySchema<PanelConstraintFieldNameSchema>
-  'pocket-cluster': ModelConstraintFieldCompatibilitySchema<PocketClusterConstraintFieldNameSchema>
-  'front-pocket': ModelConstraintFieldCompatibilitySchema<FrontPocketConstraintFieldNameSchema>
-  't-pocket': ModelConstraintFieldCompatibilitySchema<TPocketConstraintFieldNameSchema>
-  'hole': ModelConstraintFieldCompatibilitySchema<HoleConstraintFieldNameSchema>
+export type BindingFieldCompatibilityDefinitionsSchema = {
+  'root-panel': ModelBindingFieldCompatibilitySchema<RootPanelBindingFieldNameSchema>
+  'panel': ModelBindingFieldCompatibilitySchema<PanelBindingFieldNameSchema>
+  'pocket-cluster': ModelBindingFieldCompatibilitySchema<PocketClusterBindingFieldNameSchema>
+  'front-pocket': ModelBindingFieldCompatibilitySchema<FrontPocketBindingFieldNameSchema>
+  't-pocket': ModelBindingFieldCompatibilitySchema<TPocketBindingFieldNameSchema>
+  'hole': ModelBindingFieldCompatibilitySchema<HoleBindingFieldNameSchema>
   'straight': Record<string, never>
-  'recessed': ModelConstraintFieldCompatibilitySchema<RecessedPocketOpeningConstraintFieldNameSchema>
-  'slanted': ModelConstraintFieldCompatibilitySchema<SlantedPocketOpeningConstraintFieldNameSchema>
-  'optical-illusion': ModelConstraintFieldCompatibilitySchema<OpticalIllusionPocketOpeningConstraintFieldNameSchema>
-  'component-bounds-stitch-line': ModelConstraintFieldCompatibilitySchema<ComponentBoundsStitchLineConstraintFieldNameSchema>
-  't-pocket-stitch-line': ModelConstraintFieldCompatibilitySchema<TPocketStitchLineConstraintFieldNameSchema>
+  'recessed': ModelBindingFieldCompatibilitySchema<RecessedPocketOpeningBindingFieldNameSchema>
+  'slanted': ModelBindingFieldCompatibilitySchema<SlantedPocketOpeningBindingFieldNameSchema>
+  'optical-illusion': ModelBindingFieldCompatibilitySchema<OpticalIllusionPocketOpeningBindingFieldNameSchema>
+  'component-bounds-stitch-line': ModelBindingFieldCompatibilitySchema<ComponentBoundsStitchLineBindingFieldNameSchema>
+  't-pocket-stitch-line': ModelBindingFieldCompatibilitySchema<TPocketStitchLineBindingFieldNameSchema>
 }
 
-export type ConstraintFieldCompatibilitySchema = Readonly<
-  Record<ModelObjectTypeSchema, ModelConstraintFieldCompatibilitySchema>
+export type BindingFieldCompatibilitySchema = Readonly<
+  Record<ModelObjectTypeSchema, ModelBindingFieldCompatibilitySchema>
 >
 
-export type ConstraintFieldBlockReasonSchema = 'auto-width' | 'auto-height' | 'auto-layout-gap' | 'auto-corner-radius'
+export type BindingFieldBlockReasonSchema = 'auto-width' | 'auto-height' | 'auto-layout-gap' | 'auto-corner-radius'
 
-export type ConstraintFieldBlockerSchema = (model: ModelObjectSchema) => ConstraintFieldBlockReasonSchema | undefined
+export type BindingFieldBlockerSchema = (model: ModelObjectSchema) => BindingFieldBlockReasonSchema | undefined
 
-export type ModelConstraintFieldBlockersSchema<Fields extends ConstraintFieldNameSchema = ConstraintFieldNameSchema> =
-  Readonly<Partial<Record<Fields, ConstraintFieldBlockerSchema>>>
+export type ModelBindingFieldBlockersSchema<Fields extends BindingFieldNameSchema = BindingFieldNameSchema> = Readonly<
+  Partial<Record<Fields, BindingFieldBlockerSchema>>
+>
 
-export type ConstraintFieldBlockerDefinitionsSchema = {
-  'root-panel': ModelConstraintFieldBlockersSchema<RootPanelConstraintFieldNameSchema>
-  'panel': ModelConstraintFieldBlockersSchema<PanelConstraintFieldNameSchema>
-  'pocket-cluster': ModelConstraintFieldBlockersSchema<PocketClusterConstraintFieldNameSchema>
-  'front-pocket': ModelConstraintFieldBlockersSchema<FrontPocketConstraintFieldNameSchema>
-  't-pocket': ModelConstraintFieldBlockersSchema<TPocketConstraintFieldNameSchema>
-  'hole': ModelConstraintFieldBlockersSchema<HoleConstraintFieldNameSchema>
+export type BindingFieldBlockerDefinitionsSchema = {
+  'root-panel': ModelBindingFieldBlockersSchema<RootPanelBindingFieldNameSchema>
+  'panel': ModelBindingFieldBlockersSchema<PanelBindingFieldNameSchema>
+  'pocket-cluster': ModelBindingFieldBlockersSchema<PocketClusterBindingFieldNameSchema>
+  'front-pocket': ModelBindingFieldBlockersSchema<FrontPocketBindingFieldNameSchema>
+  't-pocket': ModelBindingFieldBlockersSchema<TPocketBindingFieldNameSchema>
+  'hole': ModelBindingFieldBlockersSchema<HoleBindingFieldNameSchema>
   'straight': Record<string, never>
-  'recessed': ModelConstraintFieldBlockersSchema<RecessedPocketOpeningConstraintFieldNameSchema>
-  'slanted': ModelConstraintFieldBlockersSchema<SlantedPocketOpeningConstraintFieldNameSchema>
-  'optical-illusion': ModelConstraintFieldBlockersSchema<OpticalIllusionPocketOpeningConstraintFieldNameSchema>
-  'component-bounds-stitch-line': ModelConstraintFieldBlockersSchema<ComponentBoundsStitchLineConstraintFieldNameSchema>
-  't-pocket-stitch-line': ModelConstraintFieldBlockersSchema<TPocketStitchLineConstraintFieldNameSchema>
+  'recessed': ModelBindingFieldBlockersSchema<RecessedPocketOpeningBindingFieldNameSchema>
+  'slanted': ModelBindingFieldBlockersSchema<SlantedPocketOpeningBindingFieldNameSchema>
+  'optical-illusion': ModelBindingFieldBlockersSchema<OpticalIllusionPocketOpeningBindingFieldNameSchema>
+  'component-bounds-stitch-line': ModelBindingFieldBlockersSchema<ComponentBoundsStitchLineBindingFieldNameSchema>
+  't-pocket-stitch-line': ModelBindingFieldBlockersSchema<TPocketStitchLineBindingFieldNameSchema>
 }
 
-export type ConstraintFieldBlockersSchema = Readonly<Record<ModelObjectTypeSchema, ModelConstraintFieldBlockersSchema>>
+export type BindingFieldBlockersSchema = Readonly<Record<ModelObjectTypeSchema, ModelBindingFieldBlockersSchema>>

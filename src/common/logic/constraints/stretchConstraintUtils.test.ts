@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { HasStretchSchema } from '../../schemas/common'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { STRETCH_FIELD_ORDER, getStretchConstraintState } from './stretchConstraintUtils'
 
-const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProjectSchema =>
+const fixture = (constraints: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel', 'cluster', 'pocket'] }),
@@ -18,7 +18,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const binding = (id: string, fields: readonly (keyof HasStretchSchema)[]): ConstraintSchema => ({
+const binding = (id: string, fields: readonly (keyof HasStretchSchema)[]): BindingSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({
@@ -91,7 +91,7 @@ describe('getStretchConstraintState', () => {
   })
 
   it('ignores bindings that do not contain any stretch field', () => {
-    const constraint: ConstraintSchema = {
+    const constraint: BindingSchema = {
       id: 'width',
       type: 'equal-constraint',
       fields: [{ id: 'panel-width', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],

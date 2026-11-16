@@ -18,7 +18,7 @@ import {
   ComputedStitchLineSchema,
   ComputedTPocketSchema,
 } from './computed'
-import type { ConstraintFieldNameSchema, ConstraintFieldSchema, ConstraintSchema } from './constraints'
+import type { BindingFieldNameSchema, BindingFieldSchema, BindingSchema } from './constraints'
 import { HoleSchema } from './hole'
 import { ComponentLimitsSchema, HoleLimitsSchema, StitchLineLimitsSchema } from './limits'
 import type { ModelObjectSchema } from './modelObject'
@@ -111,11 +111,11 @@ export type SubProjectLimitsAccessorSchema = {
 }
 
 export type ConstraintAccessorSchema = {
-  byId(id: string): ConstraintSchema
-  byModel(modelId: string): ConstraintSchema[]
-  byField(modelId: string, field: ConstraintFieldNameSchema): ConstraintSchema[]
-  model(field: ConstraintFieldSchema): ModelObjectSchema
-  constraints(): readonly ConstraintSchema[]
+  byId(id: string): BindingSchema
+  byModel(modelId: string): BindingSchema[]
+  byField(modelId: string, field: BindingFieldNameSchema): BindingSchema[]
+  model(field: BindingFieldSchema): ModelObjectSchema
+  constraints(): readonly BindingSchema[]
 }
 
 export type OptionalSubProjectAccessorSchema = {

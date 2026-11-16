@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { PocketOrientationSchema } from '../../schemas/components'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { CORNER_RADIUS_FIELD_ORDER, getCornerRadiusConstraintState } from './cornerRadiusConstraintUtils'
 
-const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProjectSchema =>
+const fixture = (constraints: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel'] }),
@@ -16,7 +16,7 @@ const fixture = (constraints: Record<string, ConstraintSchema> = {}): SubProject
     constraints,
   })
 
-const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): ConstraintSchema => ({
+const pair = (id: string, fields: readonly (keyof HasCornerRadiusSchema)[]): BindingSchema => ({
   id,
   type: 'equal-constraint',
   fields: fields.map((field) => ({ id: `${id}-${field}`, type: 'panel-constraint-field', modelId: 'panel', field })),
@@ -76,7 +76,7 @@ describe('getCornerRadiusConstraintState', () => {
   })
 
   it('ignores constraints unrelated to corner radii', () => {
-    const width: ConstraintSchema = {
+    const width: BindingSchema = {
       id: 'width',
       type: 'equal-constraint',
       fields: [{ id: 'width-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }],

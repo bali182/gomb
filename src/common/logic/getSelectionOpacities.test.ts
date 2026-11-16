@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ConstraintSchema } from '../schemas/constraints'
+import type { BindingSchema } from '../schemas/constraints'
 import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
@@ -38,7 +38,7 @@ describe('getSelectionOpacities', () => {
     (isEditingPocketContents) => {
       const source = fixture()
       const snapshot = structuredClone(source)
-      const constraint: ConstraintSchema = {
+      const constraint: BindingSchema = {
         id: 'constraint',
         type: 'equal-constraint',
         fields: [

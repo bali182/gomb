@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { defaultPanel, defaultStitchingSettings } from '../../defaultStates'
 import type { PanelSchema } from '../../schemas/components'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema } from '../../schemas/constraints'
 import type {
   CreateEqualConstraintParamsSchema,
   CreatePanelConstraintFieldParamsSchema,
@@ -25,7 +25,7 @@ import { ReadonlyModelObjectFactory } from './ReadonlyModelObjectFactory'
 type FactoryCaseParamsSchema = HasForbiddenIdsSchema & HasForbiddenNamesSchema
 
 type FactorySchema = ReadonlyModelObjectFactorySchema | ModelObjectFactorySchema
-type FactoryResultSchema = SubProjectItemSchema | ConstraintFieldSchema
+type FactoryResultSchema = SubProjectItemSchema | BindingFieldSchema
 type FactoryCaseSchema = {
   label: string
   prefix: IdPrefixSchema
@@ -454,7 +454,7 @@ describe('ReadonlyModelObjectFactory', () => {
     expect(factory.createPocketCluster({ stitchingSettings }).pocketStep).toBe(12)
   })
 
-  const members: ConstraintFieldSchema[] = [
+  const members: BindingFieldSchema[] = [
     { id: 'unused', type: 'root-panel-constraint-field', modelId: 'model', field: 'width' },
     { id: 'unused', type: 'panel-constraint-field', modelId: 'model', field: 'height' },
     { id: 'unused', type: 'pocket-cluster-constraint-field', modelId: 'model', field: 'pocketStep' },

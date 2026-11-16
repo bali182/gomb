@@ -1,9 +1,9 @@
 import type {
-  ConstraintFieldCompatibilityDefinitionsSchema,
-  ConstraintFieldCompatibilitySchema,
+  BindingFieldCompatibilityDefinitionsSchema,
+  BindingFieldCompatibilitySchema,
 } from '../schemas/constraints'
 
-const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
+const definitions: BindingFieldCompatibilityDefinitionsSchema = {
   'root-panel': {
     width: 'number',
     height: 'number',
@@ -127,4 +127,4 @@ const definitions: ConstraintFieldCompatibilityDefinitionsSchema = {
   'straight': {},
 }
 
-export const constraintFieldCompatibility: ConstraintFieldCompatibilitySchema = definitions
+export const constraintFieldCompatibility: BindingFieldCompatibilitySchema = definitions

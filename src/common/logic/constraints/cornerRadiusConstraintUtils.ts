@@ -1,6 +1,6 @@
 import type { HasCornerRadiusSchema } from '../../schemas/common'
 import type { PocketOrientationSchema } from '../../schemas/components'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -9,7 +9,7 @@ import { constraintFieldBlockers } from './constraintFieldBlockers'
 import { getConstraintFieldInputs } from './getConstraintFieldInputs'
 
 export type CornerRadiusConstraintState = {
-  constraint: ConstraintSchema | undefined
+  constraint: BindingSchema | undefined
   disabledFields: readonly (keyof HasCornerRadiusSchema)[]
   hasMultipleConstraints: boolean
 }

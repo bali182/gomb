@@ -3,9 +3,9 @@ import { createBaseOperationParams } from '../../operations/subProject/testUtils
 import { updateComponent } from '../../operations/subProject/updateComponent'
 import { updateStitchLine } from '../../operations/subProject/updateStitchLine'
 import type {
-  ConstraintFieldSchema,
-  EqualConstraintSchema,
-  PanelConstraintFieldSchema,
+  BindingFieldSchema,
+  EqualBindingSchema,
+  PanelBindingFieldSchema,
 } from '../../schemas/constraints'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
@@ -16,20 +16,20 @@ import { getConstraintFieldValue } from './constraintFieldValues'
 
 const field = (
   modelId: string,
-  name: PanelConstraintFieldSchema['field'] = 'width',
+  name: PanelBindingFieldSchema['field'] = 'width',
   id = `${modelId}:${name}`,
-): PanelConstraintFieldSchema => ({
+): PanelBindingFieldSchema => ({
   id,
   type: 'panel-constraint-field',
   modelId,
   field: name,
 })
-const equal = (id: string, fields: ConstraintFieldSchema[]): EqualConstraintSchema => ({
+const equal = (id: string, fields: BindingFieldSchema[]): EqualBindingSchema => ({
   id,
   type: 'equal-constraint',
   fields,
 })
-const fixture = (constraints: Record<string, EqualConstraintSchema>): SubProjectSchema =>
+const fixture = (constraints: Record<string, EqualBindingSchema>): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['a', 'b', 'c', 'd'] }),
@@ -196,7 +196,7 @@ describe('applyResolution before patching', () => {
   })
 
   it('propagates optional resets as deletions and treats missing and undefined equally', () => {
-    const fields: ConstraintFieldSchema[] = [
+    const fields: BindingFieldSchema[] = [
       { id: 's1-margin', type: 'component-bounds-stitch-line-constraint-field', modelId: 's1', field: 'stitchMargin' },
       { id: 's2-margin', type: 'component-bounds-stitch-line-constraint-field', modelId: 's2', field: 'stitchMargin' },
     ]
@@ -286,7 +286,7 @@ describe('applyResolution after patching', () => {
   })
 
   it('preserves an optional reset from the input diff when a patcher writes a value back', () => {
-    const fields: ConstraintFieldSchema[] = [
+    const fields: BindingFieldSchema[] = [
       { id: 's1-margin', type: 'component-bounds-stitch-line-constraint-field', modelId: 's1', field: 'stitchMargin' },
       { id: 's2-margin', type: 'component-bounds-stitch-line-constraint-field', modelId: 's2', field: 'stitchMargin' },
     ]

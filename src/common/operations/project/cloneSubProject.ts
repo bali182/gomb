@@ -1,5 +1,5 @@
 import type { ComponentSchema } from '../../schemas/components'
-import type { ConstraintFieldSchema, ConstraintSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema, BindingSchema } from '../../schemas/constraints'
 import type { NameGeneratorSchema } from '../../schemas/idGenerator'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import type { ProjectSchema } from '../../schemas/project'
@@ -73,13 +73,13 @@ export const cloneSubProject = (
           },
         },
         constraints: Object.fromEntries(
-          Object.values(sourceSubProject.constraints).map((constraint): [string, ConstraintSchema] => [
+          Object.values(sourceSubProject.constraints).map((constraint): [string, BindingSchema] => [
             idMappings[constraint.id],
             {
               ...constraint,
               id: idMappings[constraint.id],
               fields: constraint.fields.map(
-                (field): ConstraintFieldSchema => ({
+                (field): BindingFieldSchema => ({
                   ...field,
                   id: idMappings[field.id],
                   modelId: idMappings[field.modelId],

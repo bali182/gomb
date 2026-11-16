@@ -7,7 +7,7 @@ import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import { AutoDimensionModeSchema } from '../../schemas/components'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema } from '../../schemas/constraints'
 import type { IssueSchema } from '../../schemas/issues'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
@@ -17,7 +17,7 @@ import { Tooltip } from './Tooltip'
 
 type AutoDimensionEditorProps = {
   modelId: string
-  field: ConstraintFieldNameSchema
+  field: BindingFieldNameSchema
   auto: boolean
   icon: IconType
   autoValue: number

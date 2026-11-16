@@ -24,7 +24,7 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { ConstraintFieldBlockReasonSchema, ConstraintFieldNameSchema } from '../schemas/constraints'
+import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../schemas/constraints'
 import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -841,7 +841,7 @@ export const EN = {
             'auto-height': 'Switch height to manual to bind it.',
             'auto-layout-gap': 'Switch gap to manual to bind it.',
             'auto-corner-radius': 'Switch corner radii to manual to bind them.',
-          } satisfies EnumTranslationSchema<ConstraintFieldBlockReasonSchema>,
+          } satisfies EnumTranslationSchema<BindingFieldBlockReasonSchema>,
           fields: {
             width: 'Width',
             height: 'Height',
@@ -891,7 +891,7 @@ export const EN = {
             startOffset: 'Stitch start offset',
             endOffset: 'Stitch end offset',
             stitchDirection: 'Stitch direction',
-          } satisfies EnumTranslationSchema<ConstraintFieldNameSchema>,
+          } satisfies EnumTranslationSchema<BindingFieldNameSchema>,
         },
         globalSettings: {
           theme: {

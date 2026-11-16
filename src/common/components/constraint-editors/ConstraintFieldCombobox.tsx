@@ -25,7 +25,7 @@ import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema } from '../../schemas/constraints'
 import type { ConstraintFieldInputSchema } from '../../schemas/factory'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import { getModelIcon } from '../../utils/getModelIcon'
@@ -53,7 +53,7 @@ export type ConstraintModelChoice = {
 }
 
 export type ConstraintPropertyChoice = {
-  id: ConstraintFieldNameSchema
+  id: BindingFieldNameSchema
   label: string
   field: ConstraintFieldInputSchema
 }

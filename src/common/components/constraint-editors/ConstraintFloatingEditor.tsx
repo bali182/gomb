@@ -2,7 +2,7 @@ import { Box, Text, VStack } from '@chakra-ui/react'
 import type { FC } from 'react'
 import { PiLink } from 'react-icons/pi'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { ConstraintSchema } from '../../schemas/constraints'
+import type { BindingSchema } from '../../schemas/constraints'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
 import { ConstraintActionsMenu } from '../action-menus/ConstraintActionsMenu'
 import { CommonEmptyState } from '../common/CommonEmptyState'
@@ -13,7 +13,7 @@ import { ConstraintFieldList } from './ConstraintFieldList'
 import { getConstraintLabel } from './constraintFieldUtils'
 
 type ConstraintFloatingEditorProps = {
-  constraint: ConstraintSchema
+  constraint: BindingSchema
   anchorElement: FloatingEditorAnchor
   onClose: () => void
 }

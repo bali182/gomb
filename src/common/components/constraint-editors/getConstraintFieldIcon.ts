@@ -11,7 +11,7 @@ import {
   PiNeedle,
   PiSelectionForeground,
 } from 'react-icons/pi'
-import type { ConstraintFieldNameSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema } from '../../schemas/constraints'
 import { HeightIcon } from '../icons/HeightIcon'
 import { HorizontalAnchorIcon } from '../icons/HorizontalAnchorIcon'
 import { HorizontalGapIcon } from '../icons/HorizontalGapIcon'
@@ -35,11 +35,11 @@ import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
 import { VerticalAnchorIcon } from '../icons/VerticalAnchorIcon'
 import { WidthIcon } from '../icons/WidthIcon'
 
-export const getConstraintFieldIcon = (field: ConstraintFieldNameSchema): IconType => {
+export const getConstraintFieldIcon = (field: BindingFieldNameSchema): IconType => {
   return constraintFieldIcons[field]
 }
 
-const constraintFieldIcons: Record<ConstraintFieldNameSchema, IconType> = {
+const constraintFieldIcons: Record<BindingFieldNameSchema, IconType> = {
   width: WidthIcon,
   height: HeightIcon,
   topLeftRadius: RadiusTopLeftIcon,

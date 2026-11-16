@@ -1,4 +1,4 @@
-import type { ConstraintFieldNameSchema, ConstraintSchema } from '../../schemas/constraints'
+import type { BindingFieldNameSchema, BindingSchema } from '../../schemas/constraints'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import type { TranslationSchema } from '../../translations/translationSchema'
@@ -8,18 +8,18 @@ import { narrowers } from '../../utils/narrowers'
 
 export type ConstraintFieldAdderState = {
   modelId: string | undefined
-  property: ConstraintFieldNameSchema | undefined
+  property: BindingFieldNameSchema | undefined
 }
 
-export const getConstraintFieldLabel = (field: ConstraintFieldNameSchema, t: TranslationSchema): string =>
+export const getConstraintFieldLabel = (field: BindingFieldNameSchema, t: TranslationSchema): string =>
   t.project.editors.enums.constraints.fields[field]
 
-export const getConstraintLabel = (constraint: ConstraintSchema, t: TranslationSchema): string => {
+export const getConstraintLabel = (constraint: BindingSchema, t: TranslationSchema): string => {
   if (constraint.fields.length === 0) {
     return t.project.editors.sections.constraints.empty
   }
 
-  const counts = new Map<ConstraintFieldNameSchema, number>()
+  const counts = new Map<BindingFieldNameSchema, number>()
   for (const field of constraint.fields) {
     counts.set(field.field, (counts.get(field.field) ?? 0) + 1)
   }

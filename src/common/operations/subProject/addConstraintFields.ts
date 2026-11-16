@@ -1,6 +1,6 @@
 import { constraintFieldCompatibility } from '../../data/constraintFieldCompatibility'
 import { constraintFieldBlockers } from '../../logic/constraints/constraintFieldBlockers'
-import type { ConstraintFieldSchema } from '../../schemas/constraints'
+import type { BindingFieldSchema } from '../../schemas/constraints'
 import type { AddConstraintFieldsParamsSchema, BaseSubProjectOperationParamsSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
@@ -17,7 +17,7 @@ export const addConstraintFields = (
     return subProject
   }
   const forbiddenIds = getSubProjectIds(subProject)
-  const fields: ConstraintFieldSchema[] = [...constraint.fields]
+  const fields: BindingFieldSchema[] = [...constraint.fields]
   for (const input of inputs) {
     const field = readonlyFactory.createConstraintField({ ...input, forbiddenIds })
     const model = accessor.optional.constraint.model(field)
