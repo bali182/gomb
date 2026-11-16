@@ -8,7 +8,7 @@ import { narrowers } from '../../utils/narrowers'
 import { constraintFieldBlockers } from './constraintFieldBlockers'
 import { getConstraintFieldInputs } from './getConstraintFieldInputs'
 
-type CornerRadiusConstraintState = {
+export type CornerRadiusConstraintState = {
   constraint: ConstraintSchema | undefined
   disabledFields: readonly (keyof HasCornerRadiusSchema)[]
   hasMultipleConstraints: boolean

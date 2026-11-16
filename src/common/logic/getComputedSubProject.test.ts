@@ -1591,7 +1591,6 @@ describe.each(['panel', 'pocket-cluster'] as const)('opposing stretch on %s', (t
       autoWidth: false,
       autoHeight: false,
       offAxisAnchor: 'start' as const,
-      individualStretch: false,
       leftStretch: -80,
       rightStretch: -80,
       topStretch: -80,

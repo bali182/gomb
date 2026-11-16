@@ -399,9 +399,6 @@ export const HU = {
               label: 'Bal oldal',
               tooltip: 'A bal élt mozgatja. A pozitív érték kifelé, a negatív befelé mozgatja.',
             },
-            individualStretch: {
-              tooltip: 'Minden élen azonos beállítást használ, vagy külön is beállíthatja őket.',
-            },
           },
           pockets: {
             title: 'Zsebek',
@@ -876,10 +873,6 @@ export const HU = {
             horizontal: 'Vízszintes',
             vertical: 'Függőleges',
           },
-          individualStretch: {
-            false: 'Egységes méretkorrekció',
-            true: 'Oldalankénti méretkorrekció',
-          },
         },
         export: {
           exportFormats: {
@@ -904,6 +897,15 @@ export const HU = {
         },
       },
       controls: {
+        stretchBinder: {
+          title: 'Méretkorrekciók értékkövetése',
+          label: 'Értékkövetés',
+          multipleConstraints: 'Az oldalak több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
+          bindAll: 'Mindet összeköt',
+          clear: 'Kötések törlése',
+          selectAnother: 'Válassz még egy oldalt az értékkövetéshez.',
+          save: 'Mentés',
+        },
         radiusBinder: {
           title: 'Rádiuszok értékkövetése',
           label: 'Értékkövetés',

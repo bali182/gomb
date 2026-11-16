@@ -25,6 +25,7 @@ import { moveHole as moveHolePure } from '../operations/subProject/moveHole'
 import { moveStitchLine as moveStitchLinePure } from '../operations/subProject/moveStitchLine'
 import { setCornerRadiusConstraint as setCornerRadiusConstraintPure } from '../operations/subProject/setCornerRadiusConstraint'
 import { setDefaultPocketOpening as setDefaultPocketOpeningPure } from '../operations/subProject/setDefaultPocketOpening'
+import { setStretchConstraint as setStretchConstraintPure } from '../operations/subProject/setStretchConstraint'
 import { updateComponent as updateComponentPure } from '../operations/subProject/updateComponent'
 import { updateHole as updateHolePure } from '../operations/subProject/updateHole'
 import { updatePocketOpening as updatePocketOpeningPure } from '../operations/subProject/updatePocketOpening'
@@ -58,6 +59,7 @@ import type {
   MoveStitchLineParamsSchema,
   SetCornerRadiusConstraintParamsSchema,
   SetDefaultPocketOpeningParamsSchema,
+  SetStretchConstraintParamsSchema,
   SubProjectOperationSchema,
   UpdateComponentParamsSchema,
   UpdateHoleParamsSchema,
@@ -98,6 +100,7 @@ export type UseSubProjectOperationsOutput = {
   deleteModelConstraintFields: (params: DeleteModelConstraintFieldsParamsSchema) => void
   setCornerRadiusConstraint: (params: SetCornerRadiusConstraintParamsSchema) => void
   setDefaultPocketOpening: (params: SetDefaultPocketOpeningParamsSchema) => void
+  setStretchConstraint: (params: SetStretchConstraintParamsSchema) => void
   moveComponent: (params: MoveComponentParamsSchema) => void
   moveHole: (params: MoveHoleParamsSchema) => void
   moveStitchLine: (params: MoveStitchLineParamsSchema) => void
@@ -305,6 +308,13 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [executeOperation],
   )
 
+  const setStretchConstraint = useCallback(
+    (params: SetStretchConstraintParamsSchema): void => {
+      executeOperation(setStretchConstraintPure, params)
+    },
+    [executeOperation],
+  )
+
   const setDefaultPocketOpening = useCallback(
     (params: SetDefaultPocketOpeningParamsSchema): void => {
       executeOperation(setDefaultPocketOpeningPure, params)
@@ -391,6 +401,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deleteModelConstraintFields,
       setCornerRadiusConstraint,
       setDefaultPocketOpening,
+      setStretchConstraint,
       moveComponent,
       moveHole,
       moveStitchLine,
@@ -422,6 +433,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deleteModelConstraintFields,
       setCornerRadiusConstraint,
       setDefaultPocketOpening,
+      setStretchConstraint,
       moveComponent,
       moveHole,
       moveStitchLine,

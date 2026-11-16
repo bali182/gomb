@@ -1,5 +1,5 @@
 import type BigNumber from 'bignumber.js'
-import type { HasCornerRadiusSchema, HasStretchValuesSchema, HasTypeSchema } from './common'
+import type { HasCornerRadiusSchema, HasStretchSchema, HasTypeSchema } from './common'
 import type {
   FrontPocketSchema,
   PanelSchema,
@@ -118,7 +118,7 @@ export type StitchLineLimitsSchema = ComponentBoundsStitchLineLimitsSchema | TPo
 export type CornerRadiusLimitsSchema = Partial<
   Record<NumericFieldNameSchema<HasCornerRadiusSchema>, NumericFieldLimitsSchema>
 >
-export type StretchLimitsSchema = Record<keyof HasStretchValuesSchema, NumericFieldLimitsSchema>
+export type StretchLimitsSchema = Record<keyof HasStretchSchema, NumericFieldLimitsSchema>
 export type PocketsLimitsSchema = Partial<Record<NumericFieldNameSchema<PocketsSchema>, NumericFieldLimitsSchema>>
 export type SubProjectLimitsSchema = {
   components: Record<string, ComponentLimitsSchema>

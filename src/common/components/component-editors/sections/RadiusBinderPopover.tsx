@@ -8,6 +8,7 @@ import {
   CORNER_RADIUS_FIELD_ORDER,
   getCornerRadiusConstraintState,
 } from '../../../logic/constraints/cornerRadiusConstraintUtils'
+import type { CornerRadiusConstraintState } from '../../../logic/constraints/cornerRadiusConstraintUtils'
 import { portalRef } from '../../../portalRef'
 import type { HasCornerRadiusSchema } from '../../../schemas/common'
 import { isDefined } from '../../../utils/isDefined'
@@ -110,7 +111,7 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
   const { setCornerRadiusConstraint } = useSubProjectOperations()
-  const state = useMemo<ReturnType<typeof getCornerRadiusConstraintState>>(
+  const state = useMemo<CornerRadiusConstraintState | undefined>(
     () => (isDefined(subProject) ? getCornerRadiusConstraintState(subProject, modelId) : undefined),
     [subProject, modelId],
   )

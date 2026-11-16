@@ -163,7 +163,6 @@ describe.each(axes)('flip: %s', (axis) => {
     const panel = d.panel({
       id: 'panel',
       ...radii,
-      individualStretch: true,
       topStretch: -2,
       rightStretch: 3,
       bottomStretch: 5,

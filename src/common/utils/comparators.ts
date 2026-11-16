@@ -142,7 +142,6 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualStretch === b.individualStretch &&
       a.topStretch === b.topStretch &&
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&
@@ -223,7 +222,6 @@ export const comparators = {
       a.height === b.height &&
       a.autoWidth === b.autoWidth &&
       a.autoHeight === b.autoHeight &&
-      a.individualStretch === b.individualStretch &&
       a.topStretch === b.topStretch &&
       a.rightStretch === b.rightStretch &&
       a.bottomStretch === b.bottomStretch &&

@@ -97,12 +97,11 @@ describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (
     }
   }
 
-  it('fills missing stretch fields with zero and individual mode with true', () => {
+  it('fills missing stretch fields with zero', () => {
     const input = createInput()
     const snapshot = structuredClone(input)
     const migrated = migrateProject(input, context)
     expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
-      individualStretch: true,
       topStretch: 0,
       rightStretch: 0,
       bottomStretch: 0,
@@ -115,14 +114,12 @@ describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (
   it('preserves supplied signed values and fills only missing fields', () => {
     const migrated = migrateProject(
       createInput({
-        individualStretch: false,
         topStretch: 12,
         leftStretch: -7,
       }),
       context,
     )
     expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
-      individualStretch: false,
       topStretch: 12,
       rightStretch: 0,
       bottomStretch: 0,
@@ -155,7 +152,6 @@ describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (
     }
     const migrated = migrateProject(legacy, context)
     expect(migrated.subProjects?.[0]?.components?.child).toMatchObject({
-      individualStretch: true,
       topStretch: 0,
       rightStretch: 0,
       bottomStretch: 0,

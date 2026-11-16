@@ -61,15 +61,11 @@ export type HasXYOffsetSchema = {
   yOffset: number
 }
 
-export type HasStretchValuesSchema = {
+export type HasStretchSchema = {
   topStretch: number
   rightStretch: number
   bottomStretch: number
   leftStretch: number
-}
-
-export type HasStretchSchema = HasStretchValuesSchema & {
-  individualStretch: boolean
 }
 
 export type HasOffAxisAnchor = {

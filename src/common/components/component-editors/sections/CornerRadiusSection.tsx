@@ -18,6 +18,7 @@ import {
   CORNER_RADIUS_FIELD_ORDER,
   getCornerRadiusConstraintState,
 } from '../../../logic/constraints/cornerRadiusConstraintUtils'
+import type { CornerRadiusConstraintState } from '../../../logic/constraints/cornerRadiusConstraintUtils'
 import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
@@ -55,7 +56,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
   const [radiusBinderOpen, setRadiusBinderOpen] = useState<boolean>(false)
-  const radiusConstraintState = useMemo<ReturnType<typeof getCornerRadiusConstraintState>>(
+  const radiusConstraintState = useMemo<CornerRadiusConstraintState | undefined>(
     () => (isDefined(subProject) ? getCornerRadiusConstraintState(subProject, modelId) : undefined),
     [subProject, modelId],
   )

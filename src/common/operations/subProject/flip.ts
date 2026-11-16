@@ -2,7 +2,7 @@ import type {
   AnchorSchema,
   FlipAxisSchema,
   HasCornerRadiusSchema,
-  HasStretchValuesSchema,
+  HasStretchSchema,
 } from '../../schemas/common'
 import type {
   ComponentSchema,
@@ -259,7 +259,7 @@ const flipCornerRadii = (value: HasCornerRadiusSchema, axis: FlipAxisSchema): Ha
   }
 }
 
-const flipStretch = (value: HasStretchValuesSchema, axis: FlipAxisSchema): HasStretchValuesSchema => {
+const flipStretch = (value: HasStretchSchema, axis: FlipAxisSchema): HasStretchSchema => {
   switch (axis) {
     case 'horizontal':
       return {

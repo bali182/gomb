@@ -69,9 +69,8 @@ export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
         onChange={onChange}
         disabledFields={disabledFields}
       />
-      <StretchSection
+      <StretchSection<PocketClusterSchema>
         modelId={editable.id}
-        component={component}
         editable={editable}
         issues={issues}
         onChange={onChange}

@@ -101,7 +101,6 @@ export const defaultHasOffAxisAnchor: HasOffAxisAnchor = {
 }
 
 export const defaultHasStretch: HasStretchSchema = {
-  individualStretch: true,
   topStretch: 0,
   rightStretch: 0,
   bottomStretch: 0,

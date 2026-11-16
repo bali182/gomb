@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js'
 
 import { POSITION_EPSILON } from '../../constants/layout'
-import type { HasStretchValuesSchema } from '../../schemas/common'
+import type { HasStretchSchema } from '../../schemas/common'
 import type { RectSchema } from '../../schemas/geometry'
 import type { NumericBoundSchema, StretchLimitsSchema } from '../../schemas/limits'
 
-export const getStretchLimits = (stretch: HasStretchValuesSchema, boundingRect: RectSchema): StretchLimitsSchema => ({
+export const getStretchLimits = (stretch: HasStretchSchema, boundingRect: RectSchema): StretchLimitsSchema => ({
   leftStretch: { min: getMinimumStretch(stretch.rightStretch, boundingRect.width) },
   rightStretch: { min: getMinimumStretch(stretch.leftStretch, boundingRect.width) },
   topStretch: { min: getMinimumStretch(stretch.bottomStretch, boundingRect.height) },

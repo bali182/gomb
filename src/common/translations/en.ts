@@ -470,9 +470,6 @@ export const EN = {
               label: 'Left edge',
               tooltip: 'Moves the left edge. Positive values extend it outward. Negative values move it inward.',
             },
-            individualStretch: {
-              tooltip: 'Use the same edge adjustment everywhere, or set each edge separately.',
-            },
           } satisfies SectionTranslationSchema<HasStretchSchema>,
           pockets: {
             title: 'Pockets',
@@ -949,10 +946,6 @@ export const EN = {
             horizontal: 'Horizontal',
             vertical: 'Vertical',
           } satisfies EnumTranslationSchema<LayoutOrientationSchema>,
-          individualStretch: {
-            false: 'Uniform stretch',
-            true: 'Individual stretch',
-          } satisfies EnumTranslationSchema<boolean>,
         },
         export: {
           exportFormats: {
@@ -977,6 +970,15 @@ export const EN = {
         },
       },
       controls: {
+        stretchBinder: {
+          title: 'Stretch bindings',
+          label: 'Bindings',
+          multipleConstraints: 'The edges belong to separate bindings and cannot be edited together here.',
+          bindAll: 'Bind all',
+          clear: 'Unbind all',
+          selectAnother: 'Select another edge to create a binding.',
+          save: 'Save',
+        },
         radiusBinder: {
           title: 'Radius bindings',
           label: 'Bindings',
