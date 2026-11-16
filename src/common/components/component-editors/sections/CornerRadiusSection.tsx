@@ -14,11 +14,11 @@ import { isDefined } from '../../../utils/isDefined'
 
 import { PiCar, PiLink, PiPencilLine } from 'react-icons/pi'
 import { useTranslation } from '../../../hooks/useTranslation'
+import type { CornerRadiusBindingState } from '../../../logic/bindings/cornerRadiusBindingUtils'
 import {
   CORNER_RADIUS_FIELD_ORDER,
-  getCornerRadiusConstraintState,
-} from '../../../logic/constraints/cornerRadiusConstraintUtils'
-import type { CornerRadiusConstraintState } from '../../../logic/constraints/cornerRadiusConstraintUtils'
+  getCornerRadiusBindingState,
+} from '../../../logic/bindings/cornerRadiusBindingUtils'
 import { HasAutoCornerRadiusSchema, HasCornerRadiusSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
@@ -56,11 +56,11 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
   const [radiusBinderOpen, setRadiusBinderOpen] = useState<boolean>(false)
-  const radiusConstraintState = useMemo<CornerRadiusConstraintState | undefined>(
-    () => (isDefined(subProject) ? getCornerRadiusConstraintState(subProject, modelId) : undefined),
+  const radiusBindingState = useMemo<CornerRadiusBindingState | undefined>(
+    () => (isDefined(subProject) ? getCornerRadiusBindingState(subProject, modelId) : undefined),
     [subProject, modelId],
   )
-  const radiusBinderDisabled = !isDefined(radiusConstraintState) || radiusConstraintState.hasMultipleConstraints
+  const radiusBinderDisabled = !isDefined(radiusBindingState) || radiusBindingState.hasMultipleBindings
 
   const handleRadiusBinderOpenChange = useCallback(
     (details: PopoverOpenChangeDetails): void => {
@@ -82,7 +82,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const autoDisabled =
     !Boolean(editable.autoCornerRadius) &&
     isDefined(accessor) &&
-    CORNER_RADIUS_FIELD_ORDER.some((field) => accessor.constraint.byField(modelId, field).length > 0)
+    CORNER_RADIUS_FIELD_ORDER.some((field) => accessor.binding.byField(modelId, field).length > 0)
 
   const hasAuto = has<Partial<HasAutoCornerRadiusSchema>>(editable, 'autoCornerRadius')
   const disabled = hasAuto && Boolean(editable.autoCornerRadius)
@@ -117,7 +117,7 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
           hasAuto ? (
             <SectionHeaderToggle
               disabled={autoDisabled}
-              tooltip={autoDisabled ? t.project.editors.sections.constraints.linkedAuto : undefined}
+              tooltip={autoDisabled ? t.project.editors.sections.bindings.linkedAuto : undefined}
               onIcon={PiPencilLine}
               offIcon={PiCar}
               onLabel={t.project.editors.enums.common.autoCornerRadius.false}
@@ -136,8 +136,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
             unmountOnExit
           >
             <Tooltip
-              content={t.project.editors.controls.radiusBinder.multipleConstraints}
-              disabled={!isDefined(radiusConstraintState) || !radiusConstraintState.hasMultipleConstraints}
+              content={t.project.editors.controls.radiusBinder.multipleBindings}
+              disabled={!isDefined(radiusBindingState) || !radiusBindingState.hasMultipleBindings}
             >
               <Box display="inline-flex">
                 <Popover.Trigger asChild>

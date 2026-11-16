@@ -12,8 +12,8 @@ import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
-  CreateConstraintsMenuItem,
-  DeleteConstraintsMenuItem,
+  CreateBindingsMenuItem,
+  DeleteBindingsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -30,7 +30,7 @@ type HoleActionsMenuProps = {
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { deleteModelConstraintFields, addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
+  const { deleteModelBindingFields, addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -41,17 +41,17 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
   }, [addStitchLine, hole.id, onAddStitchLine])
 
-  const hasConstraints = useMemo<boolean>(
-    () => accessors.subProject(subProject).constraint.byModel(hole.id).length > 0,
+  const hasBindings = useMemo<boolean>(
+    () => accessors.subProject(subProject).binding.byModel(hole.id).length > 0,
     [subProject, hole.id],
   )
 
-  const handleDeleteConstraints = useCallback((): void => {
-    deleteModelConstraintFields({ modelId: hole.id })
-  }, [deleteModelConstraintFields, hole.id])
+  const handleDeleteBindings = useCallback((): void => {
+    deleteModelBindingFields({ modelId: hole.id })
+  }, [deleteModelBindingFields, hole.id])
 
-  const handleCreateConstraints = useCallback((): void => {
-    openDialog({ type: 'create-constraints', source: hole, subProject })
+  const handleCreateBindings = useCallback((): void => {
+    openDialog({ type: 'create-bindings', source: hole, subProject })
   }, [openDialog, hole, subProject])
 
   const handleClone = useCallback((): void => {
@@ -89,8 +89,8 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+                <CreateBindingsMenuItem onSelect={handleCreateBindings} />
+                <DeleteBindingsMenuItem disabled={!hasBindings} onSelect={handleDeleteBindings} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />

@@ -4,8 +4,8 @@ import type { ModelObjectSchema } from '../schemas/modelObject'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { isDefined } from '../utils/isDefined'
 
-export type CreateConstraintsDialogRequestSchema = {
-  type: 'create-constraints'
+export type CreateBindingsDialogRequestSchema = {
+  type: 'create-bindings'
   source: ModelObjectSchema
   subProject: SubProjectSchema
 }
@@ -16,7 +16,7 @@ export type CloneComponentDialogRequestSchema = {
   subProject: SubProjectSchema
 }
 
-export type EditorDialogRequestSchema = CreateConstraintsDialogRequestSchema | CloneComponentDialogRequestSchema
+export type EditorDialogRequestSchema = CreateBindingsDialogRequestSchema | CloneComponentDialogRequestSchema
 
 export type EditorDialogsContextValue = {
   openDialog: (request: EditorDialogRequestSchema) => void

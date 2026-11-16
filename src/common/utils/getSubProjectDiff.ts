@@ -47,6 +47,6 @@ export const getSubProjectDiff = (
       comparators.stitchLine,
     ),
     pocketOpenings: getChangesFromRecord(before?.pocketOpenings ?? {}, after.pocketOpenings, comparators.pocketOpening),
-    constraints: getChangesFromRecord(before?.constraints ?? {}, after.constraints, comparators.constraint),
+    bindings: getChangesFromRecord(before?.bindings ?? {}, after.bindings, comparators.binding),
   }
 }

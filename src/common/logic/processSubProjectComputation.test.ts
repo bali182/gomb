@@ -7,7 +7,7 @@ import { deletePocketOpening } from '../operations/subProject/deletePocketOpenin
 import { flip } from '../operations/subProject/flip'
 import { updateHole } from '../operations/subProject/updateHole'
 import { updateStitchLine } from '../operations/subProject/updateStitchLine'
-import type { BindingFieldSchema, EqualBindingSchema } from '../schemas/constraints'
+import type { BindingFieldSchema, EqualBindingSchema } from '../schemas/bindings'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
@@ -16,7 +16,7 @@ import { processSubProjectComputation } from './processSubProjectComputation'
 
 const equal = (id: string, fields: BindingFieldSchema[]): EqualBindingSchema => ({
   id,
-  type: 'equal-constraint',
+  type: 'equal-binding',
   fields,
 })
 const offsetFixture = (): SubProjectSchema =>
@@ -36,12 +36,12 @@ const offsetFixture = (): SubProjectSchema =>
         startOffset: 15,
       }),
     ],
-    constraints: {
+    bindings: {
       linked: equal('linked', [
-        { id: 'hole-offset', type: 'hole-constraint-field', modelId: 'hole', field: 'xOffset' },
+        { id: 'hole-offset', type: 'hole-binding-field', modelId: 'hole', field: 'xOffset' },
         {
           id: 'stitch-offset',
-          type: 'component-bounds-stitch-line-constraint-field',
+          type: 'component-bounds-stitch-line-binding-field',
           modelId: 'stitch',
           field: 'startOffset',
         },
@@ -144,10 +144,10 @@ describe('processSubProjectComputation', () => {
           ...radii,
         }),
       ],
-      constraints: {
+      bindings: {
         linked: equal('linked', [
-          { id: 'large-radius', type: 'hole-constraint-field', modelId: 'large', field: 'topLeftRadius' },
-          { id: 'small-radius', type: 'hole-constraint-field', modelId: 'small', field: 'topLeftRadius' },
+          { id: 'large-radius', type: 'hole-binding-field', modelId: 'large', field: 'topLeftRadius' },
+          { id: 'small-radius', type: 'hole-binding-field', modelId: 'small', field: 'topLeftRadius' },
         ]),
       },
     })
@@ -182,10 +182,10 @@ describe('processSubProjectComputation', () => {
           topRightRadius: 30,
         }),
       ],
-      constraints: {
+      bindings: {
         linked: equal('linked', [
-          { id: 'a-radius', type: 'panel-constraint-field', modelId: 'a', field: 'topLeftRadius' },
-          { id: 'b-radius', type: 'panel-constraint-field', modelId: 'b', field: 'topLeftRadius' },
+          { id: 'a-radius', type: 'panel-binding-field', modelId: 'a', field: 'topLeftRadius' },
+          { id: 'b-radius', type: 'panel-binding-field', modelId: 'b', field: 'topLeftRadius' },
         ]),
       },
     })
@@ -198,7 +198,7 @@ describe('processSubProjectComputation', () => {
     expect(accessors.subProject(result.subProject).component.panel('b').topLeftRadius).toBe(20)
   })
 
-  it('retains reference cleanup and removes orphaned constraint fields without deleting constraints', () => {
+  it('retains reference cleanup and removes orphaned binding fields without deleting bindings', () => {
     const before = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root', children: ['panel'] }),
@@ -206,22 +206,22 @@ describe('processSubProjectComputation', () => {
       stitchLines: ['first', 'second'].map((id) =>
         d.componentBoundsStitchLine({ id, targetId: 'root', targetType: 'component', onTop: 'panel' }),
       ),
-      constraints: {
+      bindings: {
         render: equal('render', [
           {
             id: 'first-target',
-            type: 'component-bounds-stitch-line-constraint-field',
+            type: 'component-bounds-stitch-line-binding-field',
             modelId: 'first',
             field: 'onTop',
           },
           {
             id: 'second-target',
-            type: 'component-bounds-stitch-line-constraint-field',
+            type: 'component-bounds-stitch-line-binding-field',
             modelId: 'second',
             field: 'onTop',
           },
         ]),
-        size: equal('size', [{ id: 'panel-width', type: 'panel-constraint-field', modelId: 'panel', field: 'width' }]),
+        size: equal('size', [{ id: 'panel-width', type: 'panel-binding-field', modelId: 'panel', field: 'width' }]),
       },
     })
     const input = deleteComponent(createBaseOperationParams(before), { id: 'panel' })
@@ -231,7 +231,7 @@ describe('processSubProjectComputation', () => {
         (stitchLine) => accessors.subProject(result.subProject).stitchLine.bounds(stitchLine.id).onTop,
       ),
     ).toEqual([undefined, undefined])
-    expect(result.subProject.constraints.size.fields).toEqual([])
+    expect(result.subProject.bindings.size.fields).toEqual([])
     expect(result.subProject.components).not.toHaveProperty('panel')
   })
 
@@ -244,10 +244,10 @@ describe('processSubProjectComputation', () => {
         d.tPocket({ id: 'a', openingId: 'removed' }),
         d.tPocket({ id: 'b', openingId: 'removed' }),
       ],
-      constraints: {
+      bindings: {
         linked: equal('linked', [
-          { id: 'a-opening', type: 't-pocket-constraint-field', modelId: 'a', field: 'openingId' },
-          { id: 'b-opening', type: 't-pocket-constraint-field', modelId: 'b', field: 'openingId' },
+          { id: 'a-opening', type: 't-pocket-binding-field', modelId: 'a', field: 'openingId' },
+          { id: 'b-opening', type: 't-pocket-binding-field', modelId: 'b', field: 'openingId' },
         ]),
       },
     })
@@ -259,7 +259,7 @@ describe('processSubProjectComputation', () => {
   })
 })
 
-describe('obsolete stitch constraint fields', () => {
+describe('obsolete stitch binding fields', () => {
   it.each([
     'topStartOffset',
     'top',
@@ -270,19 +270,19 @@ describe('obsolete stitch constraint fields', () => {
     'topRightCorner',
     'bottomRightCorner',
     'bottomLeftCorner',
-  ])('ignores obsolete %s before resolving constraints and removes it afterward', (field) => {
+  ])('ignores obsolete %s before resolving bindings and removes it afterward', (field) => {
     const source = offsetFixture()
     const obsolete = {
       id: 'old',
-      type: 'component-bounds-stitch-line-constraint-field',
+      type: 'component-bounds-stitch-line-binding-field',
       modelId: 'stitch',
       field,
     } as unknown as BindingFieldSchema
-    source.constraints.linked = {
-      ...source.constraints.linked,
-      fields: [obsolete, source.constraints.linked.fields[0]],
+    source.bindings.linked = {
+      ...source.bindings.linked,
+      fields: [obsolete, source.bindings.linked.fields[0]],
     }
     const result = processSubProjectComputation(source, defaultStitchingSettings)
-    expect(result.subProject.constraints.linked.fields).toEqual([source.constraints.linked.fields[1]])
+    expect(result.subProject.bindings.linked.fields).toEqual([source.bindings.linked.fields[1]])
   })
 })

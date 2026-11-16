@@ -23,7 +23,7 @@ export const getSelectionOpacities = (
   const relatedComponentIds = getRelatedComponentIds(selection, subProject)
   const hasSelection =
     isDefined(selection) &&
-    selection.type !== 'equal-constraint' &&
+    selection.type !== 'equal-binding' &&
     (!narrowers.is.pocketOpening(selection) || relatedComponentIds.size > 0)
   const opacities: SelectionOpacitiesSchema = {
     components: {},
@@ -80,7 +80,7 @@ const getRelatedComponentIds = (
     return new Set<string>()
   }
   switch (selection.type) {
-    case 'equal-constraint':
+    case 'equal-binding':
       return new Set<string>()
     case 'straight':
     case 'slanted':

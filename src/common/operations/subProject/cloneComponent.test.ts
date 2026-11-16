@@ -17,13 +17,13 @@ const nameGenerator = new NameGenerator(EN.defaultNames)
 const fixture = () =>
   d.subProject({
     id: 'sub',
-    constraints: {
+    bindings: {
       linked: {
         id: 'linked',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'width' },
-          { id: 'child-field', type: 'panel-constraint-field', modelId: 'child', field: 'height' },
+          { id: 'panel-field', type: 'panel-binding-field', modelId: 'panel', field: 'width' },
+          { id: 'child-field', type: 'panel-binding-field', modelId: 'child', field: 'height' },
         ],
       },
     },
@@ -57,7 +57,7 @@ describe('cloneComponent', () => {
       createBaseOperationParams(source, { name: nameGenerator }),
       createCloneComponentParams(source, 'panel'),
     )
-    expect(result.constraints).toBe(source.constraints)
+    expect(result.bindings).toBe(source.bindings)
     const copyId = result.components.root.children[1]
     const copy = result.components[copyId]
     const componentCount = 2
@@ -135,15 +135,15 @@ describe('cloneComponent', () => {
         { id: 'opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },
         { id: 'other-opening', type: 'slanted', name: 'Other', slantOffset: 4, slantSide: 'start' },
       ],
-      constraints: {
+      bindings: {
         linked: {
           id: 'linked',
-          type: 'equal-constraint',
+          type: 'equal-binding',
           fields: [
-            { id: 'opening-field', type: 'slanted-constraint-field', modelId: 'opening', field: 'slantOffset' },
+            { id: 'opening-field', type: 'slanted-binding-field', modelId: 'opening', field: 'slantOffset' },
             {
               id: 'other-opening-field',
-              type: 'slanted-constraint-field',
+              type: 'slanted-binding-field',
               modelId: 'other-opening',
               field: 'slantOffset',
             },
@@ -164,7 +164,7 @@ describe('cloneComponent', () => {
     expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe('opening')
     expect(accessor.component.frontPocket(cluster.children[1]).openingId).toBe('opening')
     expect(result.pocketOpenings).toBe(source.pocketOpenings)
-    expect(result.constraints).toBe(source.constraints)
+    expect(result.bindings).toBe(source.bindings)
     expect(result.stitchLines.slice(-2).map((stitchLine) => stitchLine.targetId)).toEqual([
       cluster.id,
       cluster.children[0],
@@ -337,44 +337,44 @@ describe('selective component cloning', () => {
     },
   )
 
-  it('adds one new field to an existing constraint while retaining the original fields', () => {
+  it('adds one new field to an existing binding while retaining the original fields', () => {
     const source = fixture()
     const params = createCloneComponentParams(source, 'panel')
     params.children.child.action = 'ignore'
-    params.constraints.linked.action = 'add-to-existing'
+    params.bindings.linked.action = 'add-to-existing'
     const result = cloneComponent(createBaseOperationParams(source), params)
     const copyId = result.components.root.children[1]
-    expect(Object.keys(result.constraints)).toEqual(['linked'])
-    expect(result.constraints.linked.fields.slice(0, 2)).toEqual(source.constraints.linked.fields)
-    expect(result.constraints.linked.fields[2]).toMatchObject({
+    expect(Object.keys(result.bindings)).toEqual(['linked'])
+    expect(result.bindings.linked.fields.slice(0, 2)).toEqual(source.bindings.linked.fields)
+    expect(result.bindings.linked.fields[2]).toMatchObject({
       modelId: copyId,
       field: 'width',
-      type: 'panel-constraint-field',
+      type: 'panel-binding-field',
     })
-    expect(result.constraints.linked.fields[2].id).not.toBe('panel-field')
-    expect(source.constraints.linked.fields).toHaveLength(2)
+    expect(result.bindings.linked.fields[2].id).not.toBe('panel-field')
+    expect(source.bindings.linked.fields).toHaveLength(2)
   })
 
-  it('creates a separate constraint containing only fields of cloned models with new IDs', () => {
+  it('creates a separate binding containing only fields of cloned models with new IDs', () => {
     const source = fixture()
     const params = createCloneComponentParams(source, 'panel')
-    params.constraints.linked.action = 'constrain-separately'
+    params.bindings.linked.action = 'bind-separately'
     const result = cloneComponent(createBaseOperationParams(source), params)
     const copy = result.components[result.components.root.children[1]]
-    const constraint = Object.values(result.constraints).find((candidate) => candidate.id !== 'linked')
-    expect(constraint).toMatchObject({
-      type: 'equal-constraint',
+    const binding = Object.values(result.bindings).find((candidate) => candidate.id !== 'linked')
+    expect(binding).toMatchObject({
+      type: 'equal-binding',
       fields: [
         { modelId: copy.id, field: 'width' },
         { modelId: copy.children[0], field: 'height' },
       ],
     })
-    expect(result.constraints.linked).toBe(source.constraints.linked)
-    expect(constraint?.fields.map((field) => field.id)).not.toContain('panel-field')
-    expect(constraint?.fields.map((field) => field.id)).not.toContain('child-field')
+    expect(result.bindings.linked).toBe(source.bindings.linked)
+    expect(binding?.fields.map((field) => field.id)).not.toContain('panel-field')
+    expect(binding?.fields.map((field) => field.id)).not.toContain('child-field')
   })
 
-  it('remaps cloned hole, stitch line and opening constraint fields to the new models', () => {
+  it('remaps cloned hole, stitch line and opening binding fields to the new models', () => {
     const source = { ...pocketFixture() }
     const openingId = narrowers.assert.tPocket(source.components.a).openingId
     source.pocketOpenings[openingId] = {
@@ -386,36 +386,36 @@ describe('selective component cloning', () => {
     }
     source.holes = [d.hole({ id: 'hole', componentId: 'a' })]
     source.stitchLines = [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole' })]
-    source.constraints.owned = {
+    source.bindings.owned = {
       id: 'owned',
-      type: 'equal-constraint',
+      type: 'equal-binding',
       fields: [
-        { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
+        { id: 'hole-field', type: 'hole-binding-field', modelId: 'hole', field: 'width' },
         {
           id: 'stitch-field',
-          type: 'component-bounds-stitch-line-constraint-field',
+          type: 'component-bounds-stitch-line-binding-field',
           modelId: 'stitch',
           field: 'stitchMargin',
         },
-        { id: 'opening-field', type: 'slanted-constraint-field', modelId: openingId, field: 'slantOffset' },
+        { id: 'opening-field', type: 'slanted-binding-field', modelId: openingId, field: 'slantOffset' },
       ],
     }
     const params = createCloneComponentParams(source, 'first')
     params.pocketOpenings[openingId] = { action: 'clone' }
-    params.constraints.owned.action = 'constrain-separately'
+    params.bindings.owned.action = 'bind-separately'
     const result = cloneComponent(createBaseOperationParams(source), params)
-    const constraint = Object.values(result.constraints).find((candidate) => candidate.id !== 'owned')
+    const binding = Object.values(result.bindings).find((candidate) => candidate.id !== 'owned')
     const clonedOpening = Object.values(result.pocketOpenings).find(
       (opening) => !Object.keys(source.pocketOpenings).includes(opening.id),
     )
-    expect(constraint?.fields.map((field) => field.modelId)).toEqual([
+    expect(binding?.fields.map((field) => field.modelId)).toEqual([
       result.holes[1].id,
       result.stitchLines[1].id,
       clonedOpening?.id,
     ])
   })
 
-  it('normalizes forced front-pocket exclusion and invalid separate constraints in operation input', () => {
+  it('normalizes forced front-pocket exclusion and invalid separate bindings in operation input', () => {
     const source = pocketFixture()
     const params = createCloneComponentParams(source, 'first')
     params.children['front-a'].action = 'ignore'
@@ -425,7 +425,7 @@ describe('selective component cloning', () => {
     const panels = fixture()
     const panelParams = createCloneComponentParams(panels, 'panel')
     panelParams.children.child.action = 'ignore'
-    panelParams.constraints.linked.action = 'constrain-separately'
-    expect(cloneComponent(createBaseOperationParams(panels), panelParams).constraints).toBe(panels.constraints)
+    panelParams.bindings.linked.action = 'bind-separately'
+    expect(cloneComponent(createBaseOperationParams(panels), panelParams).bindings).toBe(panels.bindings)
   })
 })

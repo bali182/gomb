@@ -66,7 +66,7 @@ export type TreeSectionStateSchema = {
 export type TreeSectionsSettingsSchema = {
   components: TreeSectionStateSchema
   openings: TreeSectionStateSchema
-  constraints: TreeSectionStateSchema
+  bindings: TreeSectionStateSchema
 }
 
 export type UISettingsSchema = {

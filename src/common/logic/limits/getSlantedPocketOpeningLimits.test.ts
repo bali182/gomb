@@ -32,7 +32,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('slanted
     expect(limit?.reason).toBe('slanted-pocket-opening-offset-exceeds-pocket')
   })
   it.each(['start', 'end'] as const)('uses the selected closed corner for side %s', (side) => {
-    const selected = { ...opening, side }
+    const selected: SlantedPocketOpeningSchema = { ...opening, slantSide: side }
     const source = d.frontPocket({ id: 'front', openingId: selected.id })
     const cluster = d.pocketCluster({ id: 'cluster', orientation, children: ['front'] })
     const rect = { x: new BigNumber(0), y: new BigNumber(0), width: new BigNumber(100), height: new BigNumber(100) }

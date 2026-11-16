@@ -6,7 +6,7 @@ import {
 } from '../contexts/EditorDialogsContext'
 import { isDefined } from '../utils/isDefined'
 import { CloneComponentDialog } from './clone-component-dialog/CloneComponentDialog'
-import { CreateConstraintsDialog } from './create-constraints-dialog/CreateConstraintsDialog'
+import { CreateBindingsDialog } from './create-bindings-dialog/CreateBindingsDialog'
 
 export const EditorDialogsProvider: FC<PropsWithChildren> = ({ children }) => {
   const [request, setRequest] = useState<EditorDialogRequestSchema | undefined>()
@@ -28,9 +28,9 @@ export const EditorDialogsProvider: FC<PropsWithChildren> = ({ children }) => {
       return null
     }
     switch (request.type) {
-      case 'create-constraints':
+      case 'create-bindings':
         return (
-          <CreateConstraintsDialog
+          <CreateBindingsDialog
             source={request.source}
             subProject={request.subProject}
             isOpen={true}

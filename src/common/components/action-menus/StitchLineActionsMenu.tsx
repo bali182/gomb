@@ -12,8 +12,8 @@ import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
   CloneMenuItem,
-  CreateConstraintsMenuItem,
-  DeleteConstraintsMenuItem,
+  CreateBindingsMenuItem,
+  DeleteBindingsMenuItem,
   DeleteMenuItem,
   FlipHorizontalMenuItem,
   FlipVerticalMenuItem,
@@ -30,7 +30,7 @@ type StitchLineActionsMenuProps = {
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { deleteModelConstraintFields, cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
+  const { deleteModelBindingFields, cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
     event.stopPropagation()
@@ -41,17 +41,17 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
     onDelete(stitchLine.id)
   }, [deleteStitchLine, stitchLine.id, onDelete])
 
-  const hasConstraints = useMemo<boolean>(
-    () => accessors.subProject(subProject).constraint.byModel(stitchLine.id).length > 0,
+  const hasBindings = useMemo<boolean>(
+    () => accessors.subProject(subProject).binding.byModel(stitchLine.id).length > 0,
     [subProject, stitchLine.id],
   )
 
-  const handleDeleteConstraints = useCallback((): void => {
-    deleteModelConstraintFields({ modelId: stitchLine.id })
-  }, [deleteModelConstraintFields, stitchLine.id])
+  const handleDeleteBindings = useCallback((): void => {
+    deleteModelBindingFields({ modelId: stitchLine.id })
+  }, [deleteModelBindingFields, stitchLine.id])
 
-  const handleCreateConstraints = useCallback((): void => {
-    openDialog({ type: 'create-constraints', source: stitchLine, subProject })
+  const handleCreateBindings = useCallback((): void => {
+    openDialog({ type: 'create-bindings', source: stitchLine, subProject })
   }, [openDialog, stitchLine, subProject])
 
   const handleClone = useCallback((): void => {
@@ -82,8 +82,8 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
                 <FlipVerticalMenuItem onSelect={handleFlipVertical} />
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+                <CreateBindingsMenuItem onSelect={handleCreateBindings} />
+                <DeleteBindingsMenuItem disabled={!hasBindings} onSelect={handleDeleteBindings} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />

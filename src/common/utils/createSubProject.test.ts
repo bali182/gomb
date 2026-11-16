@@ -20,7 +20,7 @@ describe('createSubProject', () => {
     const forbid = vi.spyOn(IdGenerator.prototype, 'getAndForbid')
     try {
       const subProject = createSubProject({ project, modelFactory })
-      expect(subProject.constraints).toEqual({})
+      expect(subProject.bindings).toEqual({})
       expect(subProject.id).toMatch(/^sub-project-/)
       expect(subProject.root).toMatch(/^root-panel-/)
       expect(subProject.defaultPocketOpening).toMatch(/^straight-pocket-opening-/)

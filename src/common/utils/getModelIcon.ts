@@ -44,7 +44,7 @@ export const getModelIcon = (model: SubProjectItemSchema, subProject: SubProject
 
 export const getModelIconByType = (type: SubProjectItemSchema['type']): IconType => {
   switch (type) {
-    case 'equal-constraint':
+    case 'equal-binding':
       return PiLink
     case 'root-panel':
       return PiWalletDuotone

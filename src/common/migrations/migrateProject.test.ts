@@ -266,10 +266,10 @@ describe('standalone opening migration', () => {
       ...defaultOpticalIllusionPocketOpening,
       id: 'optical',
       name: 'Optical',
-      startInset: 17,
-      endInset: 23,
-      leadingRadius: 4,
-      trailingRadius: 9,
+      illusionStartInset: 17,
+      illusionEndInset: 23,
+      illusionLeadingRadius: 4,
+      illusionTrailingRadius: 9,
     }
     const unused = { ...opening, id: 'unused', name: 'Unused' }
     const t = d.tPocket({ id: 't', openingId: opening.id })
@@ -288,7 +288,7 @@ describe('standalone opening migration', () => {
     const migrated = migrateProject(project, context)
     expect(migrated.subProjects?.[0]?.pocketOpenings?.optical).toEqual({
       ...opening,
-      trailingRadius: defaultOpticalIllusionPocketOpening.illusionTrailingRadius,
+      illusionTrailingRadius: defaultOpticalIllusionPocketOpening.illusionTrailingRadius,
     })
     expect(migrated.subProjects?.[0]?.pocketOpenings?.unused).toEqual(unused)
     expect(migrated.subProjects?.[0]?.components?.t).toHaveProperty('openingId', opening.id)
@@ -325,18 +325,18 @@ it('preserves legacy IDs and references on loading and reloading a current proje
   expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(project)
 })
 
-it('defaults missing constraints and preserves existing constraints through save and reload', () => {
+it('defaults missing bindings and preserves existing bindings through save and reload', () => {
   const source = d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel'] }),
     components: [d.panel({ id: 'panel' })],
-    constraints: {
+    bindings: {
       linked: {
         id: 'linked',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
-          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
+          { id: 'root-field', type: 'root-panel-binding-field', modelId: 'root', field: 'width' },
+          { id: 'panel-field', type: 'panel-binding-field', modelId: 'panel', field: 'height' },
         ],
       },
     },
@@ -346,8 +346,8 @@ it('defaults missing constraints and preserves existing constraints through save
   const loaded = loadProjectFromContents(JSON.stringify(project), context)
   expect(loaded).toEqual(project)
   expect(loadProjectFromContents(JSON.stringify(loaded), context)).toEqual(project)
-  const { constraints: _constraints, ...legacy } = source
+  const { bindings: _bindings, ...legacy } = source
   const oldProject = { ...project, subProjects: [legacy] }
-  expect(loadProjectFromContents(JSON.stringify(oldProject), context).subProjects[0].constraints).toEqual({})
+  expect(loadProjectFromContents(JSON.stringify(oldProject), context).subProjects[0].bindings).toEqual({})
   expect(project).toEqual(snapshot)
 })

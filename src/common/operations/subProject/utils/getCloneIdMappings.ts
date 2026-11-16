@@ -1,4 +1,4 @@
-import type { BindingFieldSchema } from '../../../schemas/constraints'
+import type { BindingFieldSchema } from '../../../schemas/bindings'
 import type { IdGeneratorSchema, IdPrefixSchema } from '../../../schemas/idGenerator'
 import type { SubProjectItemSchema, SubProjectSchema } from '../../../schemas/subProject'
 import { getSubProjectIds } from '../../../utils/idCollectorUtils'
@@ -11,9 +11,9 @@ export const getCloneIdMappings = (
 
   const entries: [string, string][] = [
     [subProject.id, idGenerator.get('sub-project', ids)],
-    ...Object.values(subProject.constraints).flatMap((constraint): [string, string][] => [
-      [constraint.id, idGenerator.getAndForbid(getModelIdPrefix(constraint), ids)],
-      ...constraint.fields.map((field): [string, string] => [
+    ...Object.values(subProject.bindings).flatMap((binding): [string, string][] => [
+      [binding.id, idGenerator.getAndForbid(getModelIdPrefix(binding), ids)],
+      ...binding.fields.map((field): [string, string] => [
         field.id,
         idGenerator.getAndForbid(getModelIdPrefix(field), ids),
       ]),

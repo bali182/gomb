@@ -11,8 +11,8 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { PiArrowLineDown, PiArrowLineLeft, PiArrowLineRight, PiArrowLineUp, PiLink } from 'react-icons/pi'
 import { useEditorContext } from '../../../contexts/EditorContext'
 import { useTranslation } from '../../../hooks/useTranslation'
-import { getStretchConstraintState } from '../../../logic/constraints/stretchConstraintUtils'
-import type { StretchConstraintState } from '../../../logic/constraints/stretchConstraintUtils'
+import type { StretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
+import { getStretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
 import type { HasStretchSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssueSchema, IssuesSchema } from '../../../schemas/issues'
@@ -40,11 +40,11 @@ export function StretchSection<T extends HasStretchSchema>({
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
   const [stretchBinderOpen, setStretchBinderOpen] = useState<boolean>(false)
-  const stretchConstraintState = useMemo<StretchConstraintState | undefined>(
-    () => (isDefined(subProject) ? getStretchConstraintState(subProject, modelId) : undefined),
+  const stretchBindingState = useMemo<StretchBindingState | undefined>(
+    () => (isDefined(subProject) ? getStretchBindingState(subProject, modelId) : undefined),
     [subProject, modelId],
   )
-  const stretchBinderDisabled = !isDefined(stretchConstraintState) || stretchConstraintState.hasMultipleConstraints
+  const stretchBinderDisabled = !isDefined(stretchBindingState) || stretchBindingState.hasMultipleBindings
 
   const handleStretchBinderOpenChange = useCallback(
     (details: PopoverOpenChangeDetails): void => {
@@ -99,8 +99,8 @@ export function StretchSection<T extends HasStretchSchema>({
             unmountOnExit
           >
             <Tooltip
-              content={t.project.editors.controls.stretchBinder.multipleConstraints}
-              disabled={!isDefined(stretchConstraintState) || !stretchConstraintState.hasMultipleConstraints}
+              content={t.project.editors.controls.stretchBinder.multipleBindings}
+              disabled={!isDefined(stretchBindingState) || !stretchBindingState.hasMultipleBindings}
             >
               <Box display="inline-flex">
                 <Popover.Trigger asChild>

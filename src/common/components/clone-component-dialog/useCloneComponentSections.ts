@@ -8,7 +8,7 @@ import type { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
-import { getConstraintLabel, getConstraintModelPath } from '../constraint-editors/constraintFieldUtils'
+import { getBindingLabel, getBindingModelPath } from '../binding-editors/bindingFieldUtils'
 import type {
   CloneAction,
   CloneDialogRow,
@@ -64,19 +64,19 @@ export const useCloneComponentSections = (
     [t.dialogs.cloneComponent.sections.pocketOpenings.options],
   )
 
-  const constraintOptions = useMemo<CloneOption[]>(
+  const bindingOptions = useMemo<CloneOption[]>(
     (): CloneOption[] => [
       {
         value: 'add-to-existing',
-        translation: t.dialogs.cloneComponent.sections.constraints.options['add-to-existing'],
+        translation: t.dialogs.cloneComponent.sections.bindings.options['add-to-existing'],
       },
       {
-        value: 'constrain-separately',
-        translation: t.dialogs.cloneComponent.sections.constraints.options['constrain-separately'],
+        value: 'bind-separately',
+        translation: t.dialogs.cloneComponent.sections.bindings.options['bind-separately'],
       },
-      { value: 'ignore', translation: t.dialogs.cloneComponent.sections.constraints.options.ignore },
+      { value: 'ignore', translation: t.dialogs.cloneComponent.sections.bindings.options.ignore },
     ],
-    [t.dialogs.cloneComponent.sections.constraints.options],
+    [t.dialogs.cloneComponent.sections.bindings.options],
   )
 
   const componentRows = useMemo<CloneDialogRow[]>(
@@ -84,7 +84,7 @@ export const useCloneComponentSections = (
       selection.components.map((row) => ({
         id: row.component.id,
         name: row.component.name,
-        components: getConstraintModelPath(row.component, subProject).filter(narrowers.is.component),
+        components: getBindingModelPath(row.component, subProject).filter(narrowers.is.component),
         action: row.component.id === params.rootId ? 'clone' : (params.children[row.component.id]?.action ?? 'ignore'),
         disabled: row.disabled,
         disabledActions: [],
@@ -96,7 +96,7 @@ export const useCloneComponentSections = (
     (model: ModelObjectSchema): CloneDialogRow => ({
       id: model.id,
       name: model.name,
-      components: getConstraintModelPath(model, subProject).filter(narrowers.is.component),
+      components: getBindingModelPath(model, subProject).filter(narrowers.is.component),
       action: narrowers.is.hole(model)
         ? (params.holes[model.id]?.action ?? 'clone')
         : (params.stitchLines[model.id]?.action ?? 'clone'),
@@ -146,31 +146,27 @@ export const useCloneComponentSections = (
         false,
       ),
       createSection(
-        'constraints',
-        t.dialogs.cloneComponent.sections.constraints.title,
-        constraintOptions,
-        selection.constraints.map((row): CloneDialogRow => {
+        'bindings',
+        t.dialogs.cloneComponent.sections.bindings.title,
+        bindingOptions,
+        selection.bindings.map((row): CloneDialogRow => {
           const addToExisting: CloneAction[] = row.canAddToExisting ? [] : ['add-to-existing']
-          const constrainSeparately: CloneAction[] = row.canConstrainSeparately ? [] : ['constrain-separately']
+          const bindSeparately: CloneAction[] = row.canBindSeparately ? [] : ['bind-separately']
           return {
-            id: row.constraint.id,
-            name: getConstraintLabel(row.constraint, t),
+            id: row.binding.id,
+            name: getBindingLabel(row.binding, t),
             components: Array.from(
               new Map(
                 row.fields
                   .flatMap((field) =>
-                    getRelatedComponents(
-                      accessors.subProject(subProject).constraint.model(field),
-                      subProject,
-                      selection,
-                    ),
+                    getRelatedComponents(accessors.subProject(subProject).binding.model(field), subProject, selection),
                   )
                   .map((related) => [related.id, related]),
               ).values(),
             ),
-            action: params.constraints[row.constraint.id]?.action ?? 'ignore',
+            action: params.bindings[row.binding.id]?.action ?? 'ignore',
             disabled: false,
-            disabledActions: [...addToExisting, ...constrainSeparately],
+            disabledActions: [...addToExisting, ...bindSeparately],
           }
         }),
         false,
@@ -185,7 +181,7 @@ export const useCloneComponentSections = (
     holeOptions,
     stitchLineOptions,
     pocketOpeningOptions,
-    constraintOptions,
+    bindingOptions,
     componentRows,
     createModelRow,
   ])
@@ -241,7 +237,7 @@ const getRelatedComponents = (
           component.openingId === model.id,
       )
   }
-  const components = getConstraintModelPath(model, subProject).filter(narrowers.is.component)
+  const components = getBindingModelPath(model, subProject).filter(narrowers.is.component)
   const owner = components[components.length - 1]
   return isDefined(owner) && selection.clonedModelIds.has(owner.id) ? [owner] : []
 }

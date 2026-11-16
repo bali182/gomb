@@ -13,17 +13,9 @@ import {
 } from '../../defaultStates'
 import { getClosestPocketStepSize, getClosestRootDimensions } from '../../operations/subProject/utils/dimensionUtils'
 import type {
-  ComponentSchema,
-  FrontPocketSchema,
-  PanelSchema,
-  PocketClusterSchema,
-  RootPanelSchema,
-  TPocketSchema,
-} from '../../schemas/components'
-import type {
-  ComponentBoundsStitchLineBindingFieldSchema,
   BindingFieldSchema,
   BindingSchema,
+  ComponentBoundsStitchLineBindingFieldSchema,
   EqualBindingSchema,
   FrontPocketBindingFieldSchema,
   HoleBindingFieldSchema,
@@ -35,7 +27,15 @@ import type {
   SlantedPocketOpeningBindingFieldSchema,
   TPocketBindingFieldSchema,
   TPocketStitchLineBindingFieldSchema,
-} from '../../schemas/constraints'
+} from '../../schemas/bindings'
+import type {
+  ComponentSchema,
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from '../../schemas/components'
 import type * as Factory from '../../schemas/factory'
 import type { HoleSchema } from '../../schemas/hole'
 import type { IdGeneratorSchema, NameGeneratorSchema } from '../../schemas/idGenerator'
@@ -233,160 +233,156 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
     }
   }
 
-  public createConstraint(params: Factory.ReadonlyCreateConstraintParamsSchema): BindingSchema {
+  public createBinding(params: Factory.ReadonlyCreateBindingParamsSchema): BindingSchema {
     switch (params.type) {
-      case 'equal-constraint':
-        return this.createEqualConstraint(params)
+      case 'equal-binding':
+        return this.createEqualBinding(params)
     }
   }
 
-  public createEqualConstraint(params: Factory.ReadonlyCreateEqualConstraintParamsSchema): EqualBindingSchema {
-    return { id: this.id.get('equal-constraint', params.forbiddenIds), type: 'equal-constraint', fields: [] }
+  public createEqualBinding(params: Factory.ReadonlyCreateEqualBindingParamsSchema): EqualBindingSchema {
+    return { id: this.id.get('equal-binding', params.forbiddenIds), type: 'equal-binding', fields: [] }
   }
 
-  public createConstraintField(params: Factory.ReadonlyCreateConstraintFieldParamsSchema): BindingFieldSchema {
+  public createBindingField(params: Factory.ReadonlyCreateBindingFieldParamsSchema): BindingFieldSchema {
     switch (params.type) {
-      case 'root-panel-constraint-field':
-        return this.createRootPanelConstraintField(params)
-      case 'panel-constraint-field':
-        return this.createPanelConstraintField(params)
-      case 'pocket-cluster-constraint-field':
-        return this.createPocketClusterConstraintField(params)
-      case 'front-pocket-constraint-field':
-        return this.createFrontPocketConstraintField(params)
-      case 't-pocket-constraint-field':
-        return this.createTPocketConstraintField(params)
-      case 'hole-constraint-field':
-        return this.createHoleConstraintField(params)
-      case 'recessed-constraint-field':
-        return this.createRecessedPocketOpeningConstraintField(params)
-      case 'slanted-constraint-field':
-        return this.createSlantedPocketOpeningConstraintField(params)
-      case 'optical-illusion-constraint-field':
-        return this.createOpticalIllusionPocketOpeningConstraintField(params)
-      case 'component-bounds-stitch-line-constraint-field':
-        return this.createComponentBoundsStitchLineConstraintField(params)
-      case 't-pocket-stitch-line-constraint-field':
-        return this.createTPocketStitchLineConstraintField(params)
+      case 'root-panel-binding-field':
+        return this.createRootPanelBindingField(params)
+      case 'panel-binding-field':
+        return this.createPanelBindingField(params)
+      case 'pocket-cluster-binding-field':
+        return this.createPocketClusterBindingField(params)
+      case 'front-pocket-binding-field':
+        return this.createFrontPocketBindingField(params)
+      case 't-pocket-binding-field':
+        return this.createTPocketBindingField(params)
+      case 'hole-binding-field':
+        return this.createHoleBindingField(params)
+      case 'recessed-binding-field':
+        return this.createRecessedPocketOpeningBindingField(params)
+      case 'slanted-binding-field':
+        return this.createSlantedPocketOpeningBindingField(params)
+      case 'optical-illusion-binding-field':
+        return this.createOpticalIllusionPocketOpeningBindingField(params)
+      case 'component-bounds-stitch-line-binding-field':
+        return this.createComponentBoundsStitchLineBindingField(params)
+      case 't-pocket-stitch-line-binding-field':
+        return this.createTPocketStitchLineBindingField(params)
     }
   }
 
-  public createRootPanelConstraintField(
-    params: Factory.ReadonlyCreateRootPanelConstraintFieldParamsSchema,
+  public createRootPanelBindingField(
+    params: Factory.ReadonlyCreateRootPanelBindingFieldParamsSchema,
   ): RootPanelBindingFieldSchema {
     return {
-      id: this.id.get('root-panel-constraint-field', params.forbiddenIds),
-      type: 'root-panel-constraint-field',
+      id: this.id.get('root-panel-binding-field', params.forbiddenIds),
+      type: 'root-panel-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createPanelConstraintField(
-    params: Factory.ReadonlyCreatePanelConstraintFieldParamsSchema,
-  ): PanelBindingFieldSchema {
+  public createPanelBindingField(params: Factory.ReadonlyCreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema {
     return {
-      id: this.id.get('panel-constraint-field', params.forbiddenIds),
-      type: 'panel-constraint-field',
+      id: this.id.get('panel-binding-field', params.forbiddenIds),
+      type: 'panel-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createPocketClusterConstraintField(
-    params: Factory.ReadonlyCreatePocketClusterConstraintFieldParamsSchema,
+  public createPocketClusterBindingField(
+    params: Factory.ReadonlyCreatePocketClusterBindingFieldParamsSchema,
   ): PocketClusterBindingFieldSchema {
     return {
-      id: this.id.get('pocket-cluster-constraint-field', params.forbiddenIds),
-      type: 'pocket-cluster-constraint-field',
+      id: this.id.get('pocket-cluster-binding-field', params.forbiddenIds),
+      type: 'pocket-cluster-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createFrontPocketConstraintField(
-    params: Factory.ReadonlyCreateFrontPocketConstraintFieldParamsSchema,
+  public createFrontPocketBindingField(
+    params: Factory.ReadonlyCreateFrontPocketBindingFieldParamsSchema,
   ): FrontPocketBindingFieldSchema {
     return {
-      id: this.id.get('front-pocket-constraint-field', params.forbiddenIds),
-      type: 'front-pocket-constraint-field',
+      id: this.id.get('front-pocket-binding-field', params.forbiddenIds),
+      type: 'front-pocket-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createTPocketConstraintField(
-    params: Factory.ReadonlyCreateTPocketConstraintFieldParamsSchema,
+  public createTPocketBindingField(
+    params: Factory.ReadonlyCreateTPocketBindingFieldParamsSchema,
   ): TPocketBindingFieldSchema {
     return {
-      id: this.id.get('t-pocket-constraint-field', params.forbiddenIds),
-      type: 't-pocket-constraint-field',
+      id: this.id.get('t-pocket-binding-field', params.forbiddenIds),
+      type: 't-pocket-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createHoleConstraintField(
-    params: Factory.ReadonlyCreateHoleConstraintFieldParamsSchema,
-  ): HoleBindingFieldSchema {
+  public createHoleBindingField(params: Factory.ReadonlyCreateHoleBindingFieldParamsSchema): HoleBindingFieldSchema {
     return {
-      id: this.id.get('hole-constraint-field', params.forbiddenIds),
-      type: 'hole-constraint-field',
+      id: this.id.get('hole-binding-field', params.forbiddenIds),
+      type: 'hole-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createRecessedPocketOpeningConstraintField(
-    params: Factory.ReadonlyCreateRecessedPocketOpeningConstraintFieldParamsSchema,
+  public createRecessedPocketOpeningBindingField(
+    params: Factory.ReadonlyCreateRecessedPocketOpeningBindingFieldParamsSchema,
   ): RecessedPocketOpeningBindingFieldSchema {
     return {
-      id: this.id.get('recessed-constraint-field', params.forbiddenIds),
-      type: 'recessed-constraint-field',
+      id: this.id.get('recessed-binding-field', params.forbiddenIds),
+      type: 'recessed-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createSlantedPocketOpeningConstraintField(
-    params: Factory.ReadonlyCreateSlantedPocketOpeningConstraintFieldParamsSchema,
+  public createSlantedPocketOpeningBindingField(
+    params: Factory.ReadonlyCreateSlantedPocketOpeningBindingFieldParamsSchema,
   ): SlantedPocketOpeningBindingFieldSchema {
     return {
-      id: this.id.get('slanted-constraint-field', params.forbiddenIds),
-      type: 'slanted-constraint-field',
+      id: this.id.get('slanted-binding-field', params.forbiddenIds),
+      type: 'slanted-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createOpticalIllusionPocketOpeningConstraintField(
-    params: Factory.ReadonlyCreateOpticalIllusionPocketOpeningConstraintFieldParamsSchema,
+  public createOpticalIllusionPocketOpeningBindingField(
+    params: Factory.ReadonlyCreateOpticalIllusionPocketOpeningBindingFieldParamsSchema,
   ): OpticalIllusionPocketOpeningBindingFieldSchema {
     return {
-      id: this.id.get('optical-illusion-constraint-field', params.forbiddenIds),
-      type: 'optical-illusion-constraint-field',
+      id: this.id.get('optical-illusion-binding-field', params.forbiddenIds),
+      type: 'optical-illusion-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createComponentBoundsStitchLineConstraintField(
-    params: Factory.ReadonlyCreateComponentBoundsStitchLineConstraintFieldParamsSchema,
+  public createComponentBoundsStitchLineBindingField(
+    params: Factory.ReadonlyCreateComponentBoundsStitchLineBindingFieldParamsSchema,
   ): ComponentBoundsStitchLineBindingFieldSchema {
     return {
-      id: this.id.get('component-bounds-stitch-line-constraint-field', params.forbiddenIds),
-      type: 'component-bounds-stitch-line-constraint-field',
+      id: this.id.get('component-bounds-stitch-line-binding-field', params.forbiddenIds),
+      type: 'component-bounds-stitch-line-binding-field',
       modelId: params.modelId,
       field: params.field,
     }
   }
 
-  public createTPocketStitchLineConstraintField(
-    params: Factory.ReadonlyCreateTPocketStitchLineConstraintFieldParamsSchema,
+  public createTPocketStitchLineBindingField(
+    params: Factory.ReadonlyCreateTPocketStitchLineBindingFieldParamsSchema,
   ): TPocketStitchLineBindingFieldSchema {
     return {
-      id: this.id.get('t-pocket-stitch-line-constraint-field', params.forbiddenIds),
-      type: 't-pocket-stitch-line-constraint-field',
+      id: this.id.get('t-pocket-stitch-line-binding-field', params.forbiddenIds),
+      type: 't-pocket-stitch-line-binding-field',
       modelId: params.modelId,
       field: params.field,
     }

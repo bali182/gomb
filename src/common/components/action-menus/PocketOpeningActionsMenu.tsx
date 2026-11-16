@@ -9,12 +9,7 @@ import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
 import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
-import {
-  CloneMenuItem,
-  CreateConstraintsMenuItem,
-  DeleteConstraintsMenuItem,
-  DeleteMenuItem,
-} from './CommonActionsMenuItems'
+import { CloneMenuItem, CreateBindingsMenuItem, DeleteBindingsMenuItem, DeleteMenuItem } from './CommonActionsMenuItems'
 import { SetDefaultPocketOpeningMenuItem } from './PocketOpeningActionsMenuItems'
 
 type PocketOpeningActionsMenuProps = {
@@ -26,7 +21,7 @@ type PocketOpeningActionsMenuProps = {
 export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ opening, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
   const { subProject } = useSubProject()
-  const { deleteModelConstraintFields, clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } =
+  const { deleteModelBindingFields, clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } =
     useSubProjectOperations()
   const isDefault = subProject.defaultPocketOpening === opening.id
 
@@ -43,17 +38,17 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
     onDelete(opening.id)
   }, [deletePocketOpening, onDelete, opening.id])
 
-  const hasConstraints = useMemo<boolean>(
-    () => accessors.subProject(subProject).constraint.byModel(opening.id).length > 0,
+  const hasBindings = useMemo<boolean>(
+    () => accessors.subProject(subProject).binding.byModel(opening.id).length > 0,
     [subProject, opening.id],
   )
 
-  const handleDeleteConstraints = useCallback((): void => {
-    deleteModelConstraintFields({ modelId: opening.id })
-  }, [deleteModelConstraintFields, opening.id])
+  const handleDeleteBindings = useCallback((): void => {
+    deleteModelBindingFields({ modelId: opening.id })
+  }, [deleteModelBindingFields, opening.id])
 
-  const handleCreateConstraints = useCallback((): void => {
-    openDialog({ type: 'create-constraints', source: opening, subProject })
+  const handleCreateBindings = useCallback((): void => {
+    openDialog({ type: 'create-bindings', source: opening, subProject })
   }, [openDialog, opening, subProject])
 
   const handleClone = useCallback((): void => {
@@ -75,8 +70,8 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
                 <SetDefaultPocketOpeningMenuItem disabled={isDefault} onSelect={handleSetDefault} />
               </ActionsMenuSection>
               <ActionsMenuSection>
-                <CreateConstraintsMenuItem onSelect={handleCreateConstraints} />
-                <DeleteConstraintsMenuItem disabled={!hasConstraints} onSelect={handleDeleteConstraints} />
+                <CreateBindingsMenuItem onSelect={handleCreateBindings} />
+                <DeleteBindingsMenuItem disabled={!hasBindings} onSelect={handleDeleteBindings} />
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CloneMenuItem onSelect={handleClone} />

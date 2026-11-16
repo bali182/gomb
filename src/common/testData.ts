@@ -1,4 +1,5 @@
 import { defaultStitchingSettings } from './defaultStates'
+import type { BindingSchema } from './schemas/bindings'
 import { HasComponentReferenceSchema, HasComponentTargetSchema, HasId, HasTargetSchema } from './schemas/common'
 import {
   ComponentSchema,
@@ -8,7 +9,6 @@ import {
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
-import type { BindingSchema } from './schemas/constraints'
 import { HoleSchema } from './schemas/hole'
 import type { PocketOpeningSchema } from './schemas/pocketOpening'
 import { ProjectSchema } from './schemas/project'
@@ -45,7 +45,7 @@ type CreateSubProjectConfig = HasId &
     stitchLines?: StitchLineSchema[]
     holes?: HoleSchema[]
     pocketOpenings?: PocketOpeningSchema[]
-    constraints?: Record<string, BindingSchema>
+    bindings?: Record<string, BindingSchema>
   }
 
 type CreateRootPanelConfig = Partial<RootPanelSchema> & HasId & HasStitchingSettings
@@ -78,7 +78,7 @@ export const d = {
     stitchLines = [],
     holes = [],
     pocketOpenings = [],
-    constraints = {},
+    bindings = {},
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
     const subProject = createSubProject({ project: { ...createProject(id), stitchingSettings }, modelFactory })
@@ -95,7 +95,7 @@ export const d = {
       ...subProject.pocketOpenings,
       ...Object.fromEntries(pocketOpenings.map((opening) => [opening.id, opening])),
     }
-    subProject.constraints = constraints
+    subProject.bindings = bindings
     subProject.holes = holes
     const accessor = accessors.subProject(subProject)
     for (const component of components) {

@@ -1,5 +1,5 @@
+import type { BindingSchema } from './bindings'
 import type { ComponentSchema } from './components'
-import type { BindingSchema } from './constraints'
 import type { HoleSchema } from './hole'
 import type { PocketOpeningSchema } from './pocketOpening'
 import type { StitchLineSchema } from './stitching'
@@ -16,5 +16,5 @@ export type SubProjectDiffSchema = {
   holes: Record<string, ChangeSchema<HoleSchema>>
   stitchLines: Record<string, ChangeSchema<StitchLineSchema>>
   pocketOpenings: Record<string, ChangeSchema<PocketOpeningSchema>>
-  constraints: Record<string, ChangeSchema<BindingSchema>>
+  bindings: Record<string, ChangeSchema<BindingSchema>>
 }

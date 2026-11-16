@@ -1,9 +1,10 @@
 import { format, register } from 'timeago.js'
 import en from 'timeago.js/lib/lang/en_US'
+import type { BindingFieldAdderState } from '../components/binding-editors/bindingFieldUtils'
 import { CloneSectionKey } from '../components/clone-component-dialog/types'
-import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
 import type { ColorKey } from '../data/colors'
+import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../schemas/bindings'
 import type {
   AnchorSchema,
   HasAutoCornerRadiusSchema,
@@ -24,7 +25,6 @@ import type {
   PocketsSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../schemas/constraints'
 import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { HasAnchorsSchema } from '../schemas/hole'
@@ -32,7 +32,7 @@ import type { IdPrefixSchema } from '../schemas/idGenerator'
 import type { LimitReasonSchema } from '../schemas/limits'
 import {
   ClonePocketOpeningActionSchema,
-  CloneRelatedConstraintActionSchema,
+  CloneRelatedBindingActionSchema,
   CloneRelatedModelActionSchema,
 } from '../schemas/operations'
 import type {
@@ -141,7 +141,7 @@ export const EN = {
       sections: {
         components: 'Components',
         pocketOpenings: 'Pocket openings',
-        constraints: 'Bindings',
+        bindings: 'Bindings',
       },
       noModuleSelected: {
         title: 'No module selected',
@@ -269,7 +269,7 @@ export const EN = {
         description: "The pocket's actual shape depends on its dimensions and layout.",
       },
       actions: {
-        constraints: {
+        bindings: {
           add: 'Create',
         },
         pocketOpenings: {
@@ -279,8 +279,8 @@ export const EN = {
         },
         common: {
           clone: 'Clone',
-          createConstraints: 'Bind properties',
-          deleteConstraints: 'Delete bindings',
+          createBindings: 'Bind properties',
+          deleteBindings: 'Delete bindings',
           delete: 'Delete',
           flipHorizontal: 'Flip horizontal',
           flipVertical: 'Flip vertical',
@@ -301,7 +301,7 @@ export const EN = {
         },
       },
       sections: {
-        constraints: {
+        bindings: {
           title: 'Bindings',
           empty: 'Empty',
           addFields: {
@@ -319,7 +319,7 @@ export const EN = {
               placeholder: 'Field…',
             },
             noMatches: 'No matching fields or objects',
-          } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
+          } satisfies SectionTranslationSchema<BindingFieldAdderState>,
           linkedAuto: 'This field is part of a binding. Remove the binding to enable automatic mode.',
         },
         globalSettings: {
@@ -835,7 +835,7 @@ export const EN = {
         },
       },
       enums: {
-        constraints: {
+        bindings: {
           blockReason: {
             'auto-width': 'Switch width to manual to bind it.',
             'auto-height': 'Switch height to manual to bind it.',
@@ -973,7 +973,7 @@ export const EN = {
         stretchBinder: {
           title: 'Stretch bindings',
           label: 'Bindings',
-          multipleConstraints: 'The edges belong to separate bindings and cannot be edited together here.',
+          multipleBindings: 'The edges belong to separate bindings and cannot be edited together here.',
           bindAll: 'Bind all',
           clear: 'Unbind all',
           selectAnother: 'Select another edge to create a binding.',
@@ -982,7 +982,7 @@ export const EN = {
         radiusBinder: {
           title: 'Radius bindings',
           label: 'Bindings',
-          multipleConstraints: 'The corners belong to separate bindings and cannot be edited together here.',
+          multipleBindings: 'The corners belong to separate bindings and cannot be edited together here.',
           bindAll: 'Bind all',
           clear: 'Unbind all',
           selectAnother: 'Select another corner to create a binding.',
@@ -1006,15 +1006,15 @@ export const EN = {
         },
       },
       emptyStates: {
-        selectConstraintComponent: {
+        selectBindingComponent: {
           title: 'Select another component',
           description: 'Select another component, hole or stitch line to choose common properties.',
         },
-        selectConstraintOpening: {
+        selectBindingOpening: {
           title: 'Select another pocket opening',
           description: 'Select another pocket opening to choose common properties.',
         },
-        noConstraintFields: {
+        noBindingFields: {
           title: 'No bound fields yet',
           description: 'Choose an object and then a field below to create a binding.',
         },
@@ -1049,10 +1049,10 @@ export const EN = {
     },
   },
   dialogs: {
-    createConstraints: {
+    createBindings: {
       title: 'Create bindings',
       commonProperties: 'Common properties',
-      alreadyConstrained: 'This property already belongs to a binding.',
+      alreadyBound: 'This property already belongs to a binding.',
       affectedModels: (names: string): string => `Affected elements: ${names}.`,
       positiveAction: (count: number): string => `Create ${count} bindings`,
     },
@@ -1128,7 +1128,7 @@ export const EN = {
             },
           },
         } satisfies CloneComponentDialogSectionTranslationSchema<ClonePocketOpeningActionSchema>,
-        constraints: {
+        bindings: {
           title: 'Bindings',
           options: {
             ignore: {
@@ -1136,7 +1136,7 @@ export const EN = {
               tooltip: 'Do not apply this binding to the cloned elements.',
               headerTooltip: 'Do not copy any bindings. The cloned elements will remain unbound.',
             },
-            'constrain-separately': {
+            'bind-separately': {
               label: 'To new',
               tooltip: 'Duplicate this binding, and use it on the cloned counterparts of the elements it belongs to.',
               headerTooltip:
@@ -1148,7 +1148,7 @@ export const EN = {
               headerTooltip: 'Use all applicable existing bindings to bind the cloned elements to their originals.',
             },
           },
-        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedConstraintActionSchema>,
+        } satisfies CloneComponentDialogSectionTranslationSchema<CloneRelatedBindingActionSchema>,
       } satisfies Record<CloneSectionKey, CloneComponentDialogSectionTranslationSchema>,
     },
     globalSettings: {
@@ -1227,18 +1227,18 @@ export const EN = {
     'recessed-pocket-opening': 'Recessed',
     'slanted-pocket-opening': 'Slanted',
     'optical-illusion-pocket-opening': 'Optical illusion',
-    'equal-constraint': 'Equality',
-    'root-panel-constraint-field': 'Field',
-    'panel-constraint-field': 'Field',
-    'pocket-cluster-constraint-field': 'Field',
-    'front-pocket-constraint-field': 'Field',
-    't-pocket-constraint-field': 'Field',
-    'hole-constraint-field': 'Field',
-    'recessed-constraint-field': 'Field',
-    'slanted-constraint-field': 'Field',
-    'optical-illusion-constraint-field': 'Field',
-    'component-bounds-stitch-line-constraint-field': 'Field',
-    't-pocket-stitch-line-constraint-field': 'Field',
+    'equal-binding': 'Equality',
+    'root-panel-binding-field': 'Field',
+    'panel-binding-field': 'Field',
+    'pocket-cluster-binding-field': 'Field',
+    'front-pocket-binding-field': 'Field',
+    't-pocket-binding-field': 'Field',
+    'hole-binding-field': 'Field',
+    'recessed-binding-field': 'Field',
+    'slanted-binding-field': 'Field',
+    'optical-illusion-binding-field': 'Field',
+    'component-bounds-stitch-line-binding-field': 'Field',
+    't-pocket-stitch-line-binding-field': 'Field',
   } satisfies Record<IdPrefixSchema, string>,
   data: {
     pocketItemGroups: {

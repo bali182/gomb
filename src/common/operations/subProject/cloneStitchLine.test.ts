@@ -11,15 +11,15 @@ describe('cloneStitchLine', () => {
   it.each(['component', 'hole'] as const)('retains %s targets and onTop references', (targetType) => {
     const source = d.subProject({
       id: 'sub',
-      constraints: {
+      bindings: {
         linked: {
           id: 'linked',
-          type: 'equal-constraint',
+          type: 'equal-binding',
           fields: [
-            { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'topLeftRadius' },
+            { id: 'root-field', type: 'root-panel-binding-field', modelId: 'root', field: 'topLeftRadius' },
             {
               id: 'stitch-field',
-              type: 'component-bounds-stitch-line-constraint-field',
+              type: 'component-bounds-stitch-line-binding-field',
               modelId: 'stitch',
               field: 'topLeftRadius',
             },
@@ -48,7 +48,7 @@ describe('cloneStitchLine', () => {
       id: expect.stringMatching(/^component-bounds-stitch-line-/),
       name: 'Stitch 1',
     })
-    expect(result.constraints).toBe(source.constraints)
+    expect(result.bindings).toBe(source.bindings)
     expect(result.components).toBe(source.components)
     expect(result.holes).toBe(source.holes)
     expect(source).toEqual(snapshot)

@@ -4,11 +4,11 @@ import { PiLink, PiLinkBreak } from 'react-icons/pi'
 import { useEditorContext } from '../../../contexts/EditorContext'
 import { useSubProjectOperations } from '../../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../../hooks/useTranslation'
+import type { CornerRadiusBindingState } from '../../../logic/bindings/cornerRadiusBindingUtils'
 import {
   CORNER_RADIUS_FIELD_ORDER,
-  getCornerRadiusConstraintState,
-} from '../../../logic/constraints/cornerRadiusConstraintUtils'
-import type { CornerRadiusConstraintState } from '../../../logic/constraints/cornerRadiusConstraintUtils'
+  getCornerRadiusBindingState,
+} from '../../../logic/bindings/cornerRadiusBindingUtils'
 import { portalRef } from '../../../portalRef'
 import type { HasCornerRadiusSchema } from '../../../schemas/common'
 import { isDefined } from '../../../utils/isDefined'
@@ -110,9 +110,9 @@ const RadiusBinderPartButton: FC<RadiusBinderPartButtonProps> = ({ part, disable
 export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, disabledFields, onClose }) => {
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
-  const { setCornerRadiusConstraint } = useSubProjectOperations()
-  const state = useMemo<CornerRadiusConstraintState | undefined>(
-    () => (isDefined(subProject) ? getCornerRadiusConstraintState(subProject, modelId) : undefined),
+  const { setCornerRadiusBinding } = useSubProjectOperations()
+  const state = useMemo<CornerRadiusBindingState | undefined>(
+    () => (isDefined(subProject) ? getCornerRadiusBindingState(subProject, modelId) : undefined),
     [subProject, modelId],
   )
   const availableFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(
@@ -128,11 +128,11 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
   const [selectedFields, setSelectedFields] = useState<readonly (keyof HasCornerRadiusSchema)[]>(() =>
     CORNER_RADIUS_FIELD_ORDER.filter(
       (field) =>
-        availableFields.includes(field) && state?.constraint?.fields.some((member) => member.field === field) === true,
+        availableFields.includes(field) && state?.binding?.fields.some((member) => member.field === field) === true,
     ),
   )
   const allSelected = availableFields.length > 0 && availableFields.every((field) => selectedFields.includes(field))
-  const disabled = !isDefined(state) || state.hasMultipleConstraints
+  const disabled = !isDefined(state) || state.hasMultipleBindings
   const translations = t.project.editors.controls.radiusBinder
 
   const handleToggle = useCallback(
@@ -163,9 +163,9 @@ export const RadiusBinderPopover: FC<RadiusBinderPopoverProps> = ({ modelId, dis
       return
     }
     setEditingInputId(undefined)
-    setCornerRadiusConstraint({ modelId, fields: selectedFields })
+    setCornerRadiusBinding({ modelId, fields: selectedFields })
     onClose()
-  }, [disabled, isComputing, modelId, onClose, selectedFields, setCornerRadiusConstraint, setEditingInputId])
+  }, [disabled, isComputing, modelId, onClose, selectedFields, setCornerRadiusBinding, setEditingInputId])
 
   return (
     <Portal container={portalRef}>

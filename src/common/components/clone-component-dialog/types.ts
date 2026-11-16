@@ -1,17 +1,17 @@
 import type { ComponentSchema } from '../../schemas/components'
 import type {
   ClonePocketOpeningActionSchema,
-  CloneRelatedConstraintActionSchema,
+  CloneRelatedBindingActionSchema,
   CloneRelatedModelActionSchema,
 } from '../../schemas/operations'
 import type { CloneComponenActionTranslationSchema } from '../../schemas/translation'
 
 export type CloneAction =
   | CloneRelatedModelActionSchema
-  | CloneRelatedConstraintActionSchema
+  | CloneRelatedBindingActionSchema
   | ClonePocketOpeningActionSchema
 
-export type CloneSectionKey = 'children' | 'holes' | 'stitchLines' | 'pocketOpenings' | 'constraints'
+export type CloneSectionKey = 'children' | 'holes' | 'stitchLines' | 'pocketOpenings' | 'bindings'
 
 export type CloneOption = {
   value: CloneAction

@@ -37,7 +37,7 @@ describe('SlantedPocketCalculator', () => {
       orientation: 'up',
       pocketStep: 20,
     })
-    const selected = { ...opening, side }
+    const selected: SlantedPocketOpeningSchema = { ...opening, slantSide: side }
     const snapshot = JSON.stringify({ cluster, selected, rect })
     const calculator = createPocketCalculator(
       d.tPocket({ id: 't', tPocketTabWidth: 10, tPocketTaper: 35 }),

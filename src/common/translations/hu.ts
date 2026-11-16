@@ -1,7 +1,7 @@
 import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
-import type { ConstraintFieldAdderState } from '../components/constraint-editors/constraintFieldUtils'
-import type { BindingFieldBlockReasonSchema } from '../schemas/constraints'
+import type { BindingFieldAdderState } from '../components/binding-editors/bindingFieldUtils'
+import type { BindingFieldBlockReasonSchema } from '../schemas/bindings'
 import type { HasCustomRenderTarget } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
@@ -71,7 +71,7 @@ export const HU = {
       sections: {
         components: 'Elemek',
         pocketOpenings: 'Zsebnyílások',
-        constraints: 'Értékkövetések',
+        bindings: 'Értékkövetések',
       },
       noModuleSelected: {
         title: 'Nincs kiválasztott modul',
@@ -199,7 +199,7 @@ export const HU = {
         description: 'A zseb tényleges alakja a méreteitől és az elrendezésétől függ.',
       },
       actions: {
-        constraints: {
+        bindings: {
           add: 'Létrehozás',
         },
         pocketOpenings: {
@@ -209,8 +209,8 @@ export const HU = {
         },
         common: {
           clone: 'Duplikálás',
-          createConstraints: 'Értékkövetések létrehozása',
-          deleteConstraints: 'Értékkövetések megszüntetése',
+          createBindings: 'Értékkövetések létrehozása',
+          deleteBindings: 'Értékkövetések megszüntetése',
           delete: 'Törlés',
           flipHorizontal: 'Vízszintes tükrözés',
           flipVertical: 'Függőleges tükrözés',
@@ -231,7 +231,7 @@ export const HU = {
         },
       },
       sections: {
-        constraints: {
+        bindings: {
           title: 'Értékkövetések',
           empty: 'Üres',
           addFields: {
@@ -249,7 +249,7 @@ export const HU = {
               placeholder: 'Mező…',
             },
             noMatches: 'Nincs megfelelő mező vagy elem',
-          } satisfies SectionTranslationSchema<ConstraintFieldAdderState>,
+          } satisfies SectionTranslationSchema<BindingFieldAdderState>,
           linkedAuto: 'Ez a mező értékkövetésben szerepel. Az automatikus módhoz előbb szüntesd meg az értékkövetést.',
         },
         globalSettings: {
@@ -762,7 +762,7 @@ export const HU = {
         },
       },
       enums: {
-        constraints: {
+        bindings: {
           blockReason: {
             'auto-width': 'Az értékkövetéshez állítsd manuálisra a szélességet.',
             'auto-height': 'Az értékkövetéshez állítsd manuálisra a magasságot.',
@@ -900,7 +900,7 @@ export const HU = {
         stretchBinder: {
           title: 'Méretkorrekciók értékkövetése',
           label: 'Értékkövetés',
-          multipleConstraints: 'Az oldalak több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
+          multipleBindings: 'Az oldalak több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
           bindAll: 'Mindet összeköt',
           clear: 'Kötések törlése',
           selectAnother: 'Válassz még egy oldalt az értékkövetéshez.',
@@ -909,7 +909,7 @@ export const HU = {
         radiusBinder: {
           title: 'Rádiuszok értékkövetése',
           label: 'Értékkövetés',
-          multipleConstraints: 'A sarkok több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
+          multipleBindings: 'A sarkok több külön értékkövetésben szerepelnek, ezért itt nem szerkeszthetők együtt.',
           bindAll: 'Mindet összeköt',
           clear: 'Kötések törlése',
           selectAnother: 'Válassz még egy sarkot az értékkövetéshez.',
@@ -933,15 +933,15 @@ export const HU = {
         },
       },
       emptyStates: {
-        selectConstraintComponent: {
+        selectBindingComponent: {
           title: 'Válassz még egy komponenst',
           description: 'Válassz még egy komponenst, lyukat vagy varrásvonalat a közös mezők kiválasztásához.',
         },
-        selectConstraintOpening: {
+        selectBindingOpening: {
           title: 'Válassz még egy zsebnyílást',
           description: 'Válassz még egy zsebnyílást a közös mezők kiválasztásához.',
         },
-        noConstraintFields: {
+        noBindingFields: {
           title: 'Még nincsenek hozzáadott mezők',
           description: 'Válassz alább egy elemet, majd egy mezőt.',
         },
@@ -976,10 +976,10 @@ export const HU = {
     },
   },
   dialogs: {
-    createConstraints: {
+    createBindings: {
       title: 'Értékkövetések létrehozása',
       commonProperties: 'Közös mezők',
-      alreadyConstrained: 'Ez a mező már szerepel egy értékkövetésben.',
+      alreadyBound: 'Ez a mező már szerepel egy értékkövetésben.',
       affectedModels: (names: string): string => `Érintett elemek: ${names}.`,
       positiveAction: (count: number): string => `${count} értékkövetés létrehozása`,
     },
@@ -1056,7 +1056,7 @@ export const HU = {
             },
           },
         },
-        constraints: {
+        bindings: {
           title: 'Értékkövetések',
           options: {
             ignore: {
@@ -1064,7 +1064,7 @@ export const HU = {
               tooltip: 'A lemásolt elemek kimaradnak ebből az értékkövetésből.',
               headerTooltip: 'A lemásolt elemek kimaradnak az értékkövetésekből.',
             },
-            'constrain-separately': {
+            'bind-separately': {
               label: 'Újhoz',
               tooltip: 'Az értékkövetésről külön másolat készül a lemásolt elemek között.',
               headerTooltip:
@@ -1155,18 +1155,18 @@ export const HU = {
     'recessed-pocket-opening': 'Ívelt',
     'slanted-pocket-opening': 'Ferde',
     'optical-illusion-pocket-opening': 'Optikai illúzió',
-    'equal-constraint': 'Értékkövetés',
-    'root-panel-constraint-field': 'Mező',
-    'panel-constraint-field': 'Mező',
-    'pocket-cluster-constraint-field': 'Mező',
-    'front-pocket-constraint-field': 'Mező',
-    't-pocket-constraint-field': 'Mező',
-    'hole-constraint-field': 'Mező',
-    'recessed-constraint-field': 'Mező',
-    'slanted-constraint-field': 'Mező',
-    'optical-illusion-constraint-field': 'Mező',
-    'component-bounds-stitch-line-constraint-field': 'Mező',
-    't-pocket-stitch-line-constraint-field': 'Mező',
+    'equal-binding': 'Értékkövetés',
+    'root-panel-binding-field': 'Mező',
+    'panel-binding-field': 'Mező',
+    'pocket-cluster-binding-field': 'Mező',
+    'front-pocket-binding-field': 'Mező',
+    't-pocket-binding-field': 'Mező',
+    'hole-binding-field': 'Mező',
+    'recessed-binding-field': 'Mező',
+    'slanted-binding-field': 'Mező',
+    'optical-illusion-binding-field': 'Mező',
+    'component-bounds-stitch-line-binding-field': 'Mező',
+    't-pocket-stitch-line-binding-field': 'Mező',
   },
   data: {
     pocketItemGroups: {

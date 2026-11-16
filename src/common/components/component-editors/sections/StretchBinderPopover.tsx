@@ -4,8 +4,8 @@ import { PiLink, PiLinkBreak } from 'react-icons/pi'
 import { useEditorContext } from '../../../contexts/EditorContext'
 import { useSubProjectOperations } from '../../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { StretchConstraintState } from '../../../logic/constraints/stretchConstraintUtils'
-import { STRETCH_FIELD_ORDER, getStretchConstraintState } from '../../../logic/constraints/stretchConstraintUtils'
+import type { StretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
+import { STRETCH_FIELD_ORDER, getStretchBindingState } from '../../../logic/bindings/stretchBindingUtils'
 import { portalRef } from '../../../portalRef'
 import type { HasStretchSchema } from '../../../schemas/common'
 import { isDefined } from '../../../utils/isDefined'
@@ -26,9 +26,9 @@ type StretchBinderPopoverProps = {
 export const StretchBinderPopover: FC<StretchBinderPopoverProps> = ({ modelId, onClose }) => {
   const { t } = useTranslation()
   const { subProject, isComputing, setEditingInputId } = useEditorContext()
-  const { setStretchConstraint } = useSubProjectOperations()
-  const state = useMemo<StretchConstraintState | undefined>(
-    () => (isDefined(subProject) ? getStretchConstraintState(subProject, modelId) : undefined),
+  const { setStretchBinding } = useSubProjectOperations()
+  const state = useMemo<StretchBindingState | undefined>(
+    () => (isDefined(subProject) ? getStretchBindingState(subProject, modelId) : undefined),
     [subProject, modelId],
   )
   const availableFields = useMemo<readonly (keyof HasStretchSchema)[]>(
@@ -38,11 +38,11 @@ export const StretchBinderPopover: FC<StretchBinderPopoverProps> = ({ modelId, o
   const [selectedFields, setSelectedFields] = useState<readonly (keyof HasStretchSchema)[]>(() =>
     STRETCH_FIELD_ORDER.filter(
       (field) =>
-        availableFields.includes(field) && state?.constraint?.fields.some((member) => member.field === field) === true,
+        availableFields.includes(field) && state?.binding?.fields.some((member) => member.field === field) === true,
     ),
   )
   const allSelected = availableFields.length > 0 && availableFields.every((field) => selectedFields.includes(field))
-  const disabled = !isDefined(state) || state.hasMultipleConstraints
+  const disabled = !isDefined(state) || state.hasMultipleBindings
   const translations = t.project.editors.controls.stretchBinder
 
   const handleToggle = useCallback(
@@ -70,9 +70,9 @@ export const StretchBinderPopover: FC<StretchBinderPopoverProps> = ({ modelId, o
       return
     }
     setEditingInputId(undefined)
-    setStretchConstraint({ modelId, fields: selectedFields })
+    setStretchBinding({ modelId, fields: selectedFields })
     onClose()
-  }, [disabled, isComputing, modelId, onClose, selectedFields, setStretchConstraint, setEditingInputId])
+  }, [disabled, isComputing, modelId, onClose, selectedFields, setStretchBinding, setEditingInputId])
 
   return (
     <Portal container={portalRef}>

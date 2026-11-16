@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { useEditorContext } from '../contexts/EditorContext'
+import { addBinding as addBindingPure } from '../operations/subProject/addBinding'
+import { addBindingFields as addBindingFieldsPure } from '../operations/subProject/addBindingFields'
+import { addBindings as addBindingsPure } from '../operations/subProject/addBindings'
 import { addComponent as addComponentPure } from '../operations/subProject/addComponent'
 import { addComponents as addComponentsPure } from '../operations/subProject/addComponents'
-import { addConstraint as addConstraintPure } from '../operations/subProject/addConstraint'
-import { addConstraintFields as addConstraintFieldsPure } from '../operations/subProject/addConstraintFields'
-import { addConstraints as addConstraintsPure } from '../operations/subProject/addConstraints'
 import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
@@ -12,20 +12,20 @@ import { cloneComponent as cloneComponentPure } from '../operations/subProject/c
 import { cloneHole as cloneHolePure } from '../operations/subProject/cloneHole'
 import { clonePocketOpening as clonePocketOpeningPure } from '../operations/subProject/clonePocketOpening'
 import { cloneStitchLine as cloneStitchLinePure } from '../operations/subProject/cloneStitchLine'
+import { deleteBinding as deleteBindingPure } from '../operations/subProject/deleteBinding'
+import { deleteBindingField as deleteBindingFieldPure } from '../operations/subProject/deleteBindingField'
 import { deleteComponent as deleteComponentPure } from '../operations/subProject/deleteComponent'
-import { deleteConstraint as deleteConstraintPure } from '../operations/subProject/deleteConstraint'
-import { deleteConstraintField as deleteConstraintFieldPure } from '../operations/subProject/deleteConstraintField'
 import { deleteHole as deleteHolePure } from '../operations/subProject/deleteHole'
-import { deleteModelConstraintFields as deleteModelConstraintFieldsPure } from '../operations/subProject/deleteModelConstraintFields'
+import { deleteModelBindingFields as deleteModelBindingFieldsPure } from '../operations/subProject/deleteModelBindingFields'
 import { deletePocketOpening as deletePocketOpeningPure } from '../operations/subProject/deletePocketOpening'
 import { deleteStitchLine as deleteStitchLinePure } from '../operations/subProject/deleteStitchLine'
 import { flip as flipPure } from '../operations/subProject/flip'
 import { moveComponent as moveComponentPure } from '../operations/subProject/moveComponent'
 import { moveHole as moveHolePure } from '../operations/subProject/moveHole'
 import { moveStitchLine as moveStitchLinePure } from '../operations/subProject/moveStitchLine'
-import { setCornerRadiusConstraint as setCornerRadiusConstraintPure } from '../operations/subProject/setCornerRadiusConstraint'
+import { setCornerRadiusBinding as setCornerRadiusBindingPure } from '../operations/subProject/setCornerRadiusBinding'
 import { setDefaultPocketOpening as setDefaultPocketOpeningPure } from '../operations/subProject/setDefaultPocketOpening'
-import { setStretchConstraint as setStretchConstraintPure } from '../operations/subProject/setStretchConstraint'
+import { setStretchBinding as setStretchBindingPure } from '../operations/subProject/setStretchBinding'
 import { updateComponent as updateComponentPure } from '../operations/subProject/updateComponent'
 import { updateHole as updateHolePure } from '../operations/subProject/updateHole'
 import { updatePocketOpening as updatePocketOpeningPure } from '../operations/subProject/updatePocketOpening'
@@ -33,11 +33,11 @@ import { updateStitchLine as updateStitchLinePure } from '../operations/subProje
 import type { ReadonlyModelObjectFactorySchema } from '../schemas/factory'
 import type { IdGeneratorSchema, NameGeneratorSchema } from '../schemas/idGenerator'
 import type {
+  AddBindingFieldsParamsSchema,
+  AddBindingParamsSchema,
+  AddBindingsParamsSchema,
   AddComponentParamsSchema,
   AddComponentsParamsSchema,
-  AddConstraintFieldsParamsSchema,
-  AddConstraintParamsSchema,
-  AddConstraintsParamsSchema,
   AddHoleParamsSchema,
   AddPocketOpeningParamsSchema,
   AddStitchLineParamsSchema,
@@ -46,20 +46,20 @@ import type {
   CloneHoleParamsSchema,
   ClonePocketOpeningParamsSchema,
   CloneStitchLineParamsSchema,
+  DeleteBindingFieldParamsSchema,
+  DeleteBindingParamsSchema,
   DeleteComponentParamsSchema,
-  DeleteConstraintFieldParamsSchema,
-  DeleteConstraintParamsSchema,
   DeleteHoleParamsSchema,
-  DeleteModelConstraintFieldsParamsSchema,
+  DeleteModelBindingFieldsParamsSchema,
   DeletePocketOpeningParamsSchema,
   DeleteStitchLineParamsSchema,
   FlipParamsSchema,
   MoveComponentParamsSchema,
   MoveHoleParamsSchema,
   MoveStitchLineParamsSchema,
-  SetCornerRadiusConstraintParamsSchema,
+  SetCornerRadiusBindingParamsSchema,
   SetDefaultPocketOpeningParamsSchema,
-  SetStretchConstraintParamsSchema,
+  SetStretchBindingParamsSchema,
   SubProjectOperationSchema,
   UpdateComponentParamsSchema,
   UpdateHoleParamsSchema,
@@ -81,9 +81,9 @@ import { useTranslation } from './useTranslation'
 export type UseSubProjectOperationsOutput = {
   addComponent: (params: AddComponentParamsSchema) => void
   addComponents: (params: AddComponentsParamsSchema) => void
-  addConstraint: (params: AddConstraintParamsSchema) => void
-  addConstraints: (params: AddConstraintsParamsSchema) => void
-  addConstraintFields: (params: AddConstraintFieldsParamsSchema) => void
+  addBinding: (params: AddBindingParamsSchema) => void
+  addBindings: (params: AddBindingsParamsSchema) => void
+  addBindingFields: (params: AddBindingFieldsParamsSchema) => void
   addHole: (params: AddHoleParamsSchema) => void
   addPocketOpening: (params: AddPocketOpeningParamsSchema) => void
   addStitchLine: (params: AddStitchLineParamsSchema) => void
@@ -95,12 +95,12 @@ export type UseSubProjectOperationsOutput = {
   deleteHole: (params: DeleteHoleParamsSchema) => void
   deleteStitchLine: (params: DeleteStitchLineParamsSchema) => void
   deletePocketOpening: (params: DeletePocketOpeningParamsSchema) => void
-  deleteConstraint: (params: DeleteConstraintParamsSchema) => void
-  deleteConstraintField: (params: DeleteConstraintFieldParamsSchema) => void
-  deleteModelConstraintFields: (params: DeleteModelConstraintFieldsParamsSchema) => void
-  setCornerRadiusConstraint: (params: SetCornerRadiusConstraintParamsSchema) => void
+  deleteBinding: (params: DeleteBindingParamsSchema) => void
+  deleteBindingField: (params: DeleteBindingFieldParamsSchema) => void
+  deleteModelBindingFields: (params: DeleteModelBindingFieldsParamsSchema) => void
+  setCornerRadiusBinding: (params: SetCornerRadiusBindingParamsSchema) => void
   setDefaultPocketOpening: (params: SetDefaultPocketOpeningParamsSchema) => void
-  setStretchConstraint: (params: SetStretchConstraintParamsSchema) => void
+  setStretchBinding: (params: SetStretchBindingParamsSchema) => void
   moveComponent: (params: MoveComponentParamsSchema) => void
   moveHole: (params: MoveHoleParamsSchema) => void
   moveStitchLine: (params: MoveStitchLineParamsSchema) => void
@@ -182,23 +182,23 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [executeOperation],
   )
 
-  const addConstraint = useCallback(
-    (params: AddConstraintParamsSchema): void => {
-      executeOperation(addConstraintPure, params)
+  const addBinding = useCallback(
+    (params: AddBindingParamsSchema): void => {
+      executeOperation(addBindingPure, params)
     },
     [executeOperation],
   )
 
-  const addConstraints = useCallback(
-    (params: AddConstraintsParamsSchema): void => {
-      executeOperation(addConstraintsPure, params)
+  const addBindings = useCallback(
+    (params: AddBindingsParamsSchema): void => {
+      executeOperation(addBindingsPure, params)
     },
     [executeOperation],
   )
 
-  const addConstraintFields = useCallback(
-    (params: AddConstraintFieldsParamsSchema): void => {
-      executeOperation(addConstraintFieldsPure, params)
+  const addBindingFields = useCallback(
+    (params: AddBindingFieldsParamsSchema): void => {
+      executeOperation(addBindingFieldsPure, params)
     },
     [executeOperation],
   )
@@ -280,37 +280,37 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [executeOperation],
   )
 
-  const deleteConstraint = useCallback(
-    (params: DeleteConstraintParamsSchema): void => {
-      executeOperation(deleteConstraintPure, params)
+  const deleteBinding = useCallback(
+    (params: DeleteBindingParamsSchema): void => {
+      executeOperation(deleteBindingPure, params)
     },
     [executeOperation],
   )
 
-  const deleteConstraintField = useCallback(
-    (params: DeleteConstraintFieldParamsSchema): void => {
-      executeOperation(deleteConstraintFieldPure, params)
+  const deleteBindingField = useCallback(
+    (params: DeleteBindingFieldParamsSchema): void => {
+      executeOperation(deleteBindingFieldPure, params)
     },
     [executeOperation],
   )
 
-  const deleteModelConstraintFields = useCallback(
-    (params: DeleteModelConstraintFieldsParamsSchema): void => {
-      executeOperation(deleteModelConstraintFieldsPure, params)
+  const deleteModelBindingFields = useCallback(
+    (params: DeleteModelBindingFieldsParamsSchema): void => {
+      executeOperation(deleteModelBindingFieldsPure, params)
     },
     [executeOperation],
   )
 
-  const setCornerRadiusConstraint = useCallback(
-    (params: SetCornerRadiusConstraintParamsSchema): void => {
-      executeOperation(setCornerRadiusConstraintPure, params)
+  const setCornerRadiusBinding = useCallback(
+    (params: SetCornerRadiusBindingParamsSchema): void => {
+      executeOperation(setCornerRadiusBindingPure, params)
     },
     [executeOperation],
   )
 
-  const setStretchConstraint = useCallback(
-    (params: SetStretchConstraintParamsSchema): void => {
-      executeOperation(setStretchConstraintPure, params)
+  const setStretchBinding = useCallback(
+    (params: SetStretchBindingParamsSchema): void => {
+      executeOperation(setStretchBindingPure, params)
     },
     [executeOperation],
   )
@@ -382,9 +382,9 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     () => ({
       addComponent,
       addComponents,
-      addConstraint,
-      addConstraints,
-      addConstraintFields,
+      addBinding,
+      addBindings,
+      addBindingFields,
       addHole,
       addPocketOpening,
       addStitchLine,
@@ -396,12 +396,12 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deleteHole,
       deleteStitchLine,
       deletePocketOpening,
-      deleteConstraint,
-      deleteConstraintField,
-      deleteModelConstraintFields,
-      setCornerRadiusConstraint,
+      deleteBinding,
+      deleteBindingField,
+      deleteModelBindingFields,
+      setCornerRadiusBinding,
       setDefaultPocketOpening,
-      setStretchConstraint,
+      setStretchBinding,
       moveComponent,
       moveHole,
       moveStitchLine,
@@ -414,9 +414,9 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [
       addComponent,
       addComponents,
-      addConstraint,
-      addConstraints,
-      addConstraintFields,
+      addBinding,
+      addBindings,
+      addBindingFields,
       addHole,
       addPocketOpening,
       addStitchLine,
@@ -428,12 +428,12 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       deleteHole,
       deleteStitchLine,
       deletePocketOpening,
-      deleteConstraint,
-      deleteConstraintField,
-      deleteModelConstraintFields,
-      setCornerRadiusConstraint,
+      deleteBinding,
+      deleteBindingField,
+      deleteModelBindingFields,
+      setCornerRadiusBinding,
       setDefaultPocketOpening,
-      setStretchConstraint,
+      setStretchBinding,
       moveComponent,
       moveHole,
       moveStitchLine,

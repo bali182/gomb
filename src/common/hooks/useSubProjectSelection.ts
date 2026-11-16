@@ -11,10 +11,10 @@ type ComponentSelectionSchema = HasTypeSchema<'component'> & { componentId: stri
 type StitchLineSelectionSchema = HasTypeSchema<'stitch-line'> & { stitchLineId: string }
 type HoleSelectionSchema = HasTypeSchema<'hole'> & { holeId: string }
 type PocketOpeningSelectionSchema = HasTypeSchema<'pocket-opening'> & { openingId: string }
-type ConstraintSelectionSchema = HasTypeSchema<'constraint'> & { constraintId: string }
+type BindingSelectionSchema = HasTypeSchema<'binding'> & { bindingId: string }
 
 type SelectionSchema =
-  | ConstraintSelectionSchema
+  | BindingSelectionSchema
   | ComponentSelectionSchema
   | StitchLineSelectionSchema
   | HoleSelectionSchema
@@ -90,8 +90,8 @@ const getSelectionSchema = (model: SubProjectItemSchema): SelectionSchema | unde
   if (narrowers.is.pocketOpening(model)) {
     return { type: 'pocket-opening', openingId: model.id }
   }
-  if (narrowers.is.constraint(model)) {
-    return { type: 'constraint', constraintId: model.id }
+  if (narrowers.is.binding(model)) {
+    return { type: 'binding', bindingId: model.id }
   }
   return undefined
 }
@@ -107,8 +107,8 @@ const getModelObject = (
   const optional = accessors.subProject(subProject).optional
 
   switch (selection.type) {
-    case 'constraint':
-      return optional.constraint.byId(selection.constraintId)
+    case 'binding':
+      return optional.binding.byId(selection.bindingId)
     case 'component':
       return optional.component.byId(selection.componentId)
     case 'stitch-line':

@@ -57,28 +57,28 @@ export const FlipVerticalMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSele
   )
 }
 
-export const CreateConstraintsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
+export const CreateBindingsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
-    <EditorActionMenuItem value="create-constraints" disabled={disabled} onSelect={onSelect}>
+    <EditorActionMenuItem value="create-bindings" disabled={disabled} onSelect={onSelect}>
       <PiLink />
-      <Menu.ItemText>{t.project.editors.actions.common.createConstraints}</Menu.ItemText>
+      <Menu.ItemText>{t.project.editors.actions.common.createBindings}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }
 
-export const DeleteConstraintsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
+export const DeleteBindingsMenuItem: FC<CommonMenuItemProps> = ({ disabled, onSelect }) => {
   const { t } = useTranslation()
   return (
     <EditorActionMenuItem
-      value="delete-constraints"
+      value="delete-bindings"
       disabled={disabled}
       onSelect={onSelect}
       color="fg.error"
       _hover={deleteHoverStyle}
     >
       <PiLinkBreak />
-      <Menu.ItemText>{t.project.editors.actions.common.deleteConstraints}</Menu.ItemText>
+      <Menu.ItemText>{t.project.editors.actions.common.deleteBindings}</Menu.ItemText>
     </EditorActionMenuItem>
   )
 }

@@ -164,7 +164,7 @@ describe('getRecessedPocketOpeningLimits', () => {
     }
     expect(adjusted.recessInnerRadius).toBe(7)
   })
-  it('does not constrain radii at zero depth', () => {
+  it('does not bind radii at zero depth', () => {
     const { limits } = createFixture({ recessDepth: 0, recessInnerRadius: 100, recessOuterRadius: 200 })
     expect(limits.recessInnerRadius).toBeUndefined()
     expect(limits.recessOuterRadius).toBeUndefined()

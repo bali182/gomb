@@ -1,3 +1,4 @@
+import type { BindingFieldSchema, BindingSchema } from '../schemas/bindings'
 import type {
   ComponentSchema,
   FrontPocketSchema,
@@ -6,7 +7,6 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
-import type { BindingFieldSchema, BindingSchema } from '../schemas/constraints'
 import type { HoleSchema } from '../schemas/hole'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
@@ -59,9 +59,9 @@ export const comparators = {
       a.id === b.id &&
       a.root === b.root &&
       a.defaultPocketOpening === b.defaultPocketOpening &&
-      Object.keys(a.constraints).length === Object.keys(b.constraints).length &&
-      Object.entries(a.constraints).every(
-        ([id, constraint]) => id in b.constraints && comparators.constraint(constraint, b.constraints[id]),
+      Object.keys(a.bindings).length === Object.keys(b.bindings).length &&
+      Object.entries(a.bindings).every(
+        ([id, binding]) => id in b.bindings && comparators.binding(binding, b.bindings[id]),
       ) &&
       Object.keys(a.pocketOpenings).length === Object.keys(b.pocketOpenings).length &&
       Object.entries(a.pocketOpenings).every(
@@ -77,10 +77,10 @@ export const comparators = {
     )
   },
 
-  constraint: (a: BindingSchema, b: BindingSchema): boolean => {
-    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.constraintField)
+  binding: (a: BindingSchema, b: BindingSchema): boolean => {
+    return a.id === b.id && a.type === b.type && areArraysEqual(a.fields, b.fields, comparators.bindingField)
   },
-  constraintField: (a: BindingFieldSchema, b: BindingFieldSchema): boolean => {
+  bindingField: (a: BindingFieldSchema, b: BindingFieldSchema): boolean => {
     return a.id === b.id && a.type === b.type && a.modelId === b.modelId && a.field === b.field
   },
 

@@ -126,7 +126,7 @@ it.each(['missing-root', 'missing-child', 'cycle'])('does not clone an invalid s
   expect(cloneSubProject(project, { subProject: source, nameGenerator })).toBe(project)
 })
 
-it('clones the complete constraint structure with fresh IDs and remapped models', () => {
+it('clones the complete binding structure with fresh IDs and remapped models', () => {
   const source = d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
@@ -142,17 +142,17 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
       { id: 'shared-opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },
       { id: 'unused-opening', type: 'slanted', name: 'Unused', slantOffset: 4, slantSide: 'start' },
     ],
-    constraints: {
+    bindings: {
       dimensions: {
         id: 'dimensions',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 'root-field', type: 'root-panel-constraint-field', modelId: 'root', field: 'width' },
-          { id: 'panel-field', type: 'panel-constraint-field', modelId: 'panel', field: 'height' },
-          { id: 'hole-field', type: 'hole-constraint-field', modelId: 'hole', field: 'width' },
+          { id: 'root-field', type: 'root-panel-binding-field', modelId: 'root', field: 'width' },
+          { id: 'panel-field', type: 'panel-binding-field', modelId: 'panel', field: 'height' },
+          { id: 'hole-field', type: 'hole-binding-field', modelId: 'hole', field: 'width' },
           {
             id: 'stitch-field',
-            type: 'component-bounds-stitch-line-constraint-field',
+            type: 'component-bounds-stitch-line-binding-field',
             modelId: 'stitch',
             field: 'topLeftRadius',
           },
@@ -160,10 +160,10 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
       },
       openings: {
         id: 'openings',
-        type: 'equal-constraint',
+        type: 'equal-binding',
         fields: [
-          { id: 'shared-field', type: 'slanted-constraint-field', modelId: 'shared-opening', field: 'slantOffset' },
-          { id: 'unused-field', type: 'slanted-constraint-field', modelId: 'unused-opening', field: 'slantOffset' },
+          { id: 'shared-field', type: 'slanted-binding-field', modelId: 'shared-opening', field: 'slantOffset' },
+          { id: 'unused-field', type: 'slanted-binding-field', modelId: 'unused-opening', field: 'slantOffset' },
         ],
       },
     },
@@ -171,10 +171,10 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
   const project = d.project({ id: 'project', subProjects: [source] })
   const snapshot = structuredClone(project)
   const cloned = cloneSubProject(project, { subProject: source, nameGenerator }).subProjects[1]
-  const copiedConstraints = Object.values(cloned.constraints)
-  expect(copiedConstraints).toHaveLength(2)
-  const dimensions = copiedConstraints[0]
-  const openings = copiedConstraints[1]
+  const copiedBindings = Object.values(cloned.bindings)
+  expect(copiedBindings).toHaveLength(2)
+  const dimensions = copiedBindings[0]
+  const openings = copiedBindings[1]
   const copiedOpening = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Shared')
   const unusedOpening = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Unused')
   expect(dimensions.fields.map((field) => field.modelId)).toEqual([
@@ -188,18 +188,18 @@ it('clones the complete constraint structure with fresh IDs and remapped models'
   const cluster = accessor.component.pocketCluster(cloned.components[cloned.root].children[1])
   expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe(copiedOpening?.id)
   expect(accessor.component.frontPocket(cluster.children[1]).openingId).toBe(copiedOpening?.id)
-  const originalConstraints = Object.values(source.constraints)
-  for (const [index, constraint] of copiedConstraints.entries()) {
-    expect(cloned.constraints[constraint.id]).toBe(constraint)
-    expect(constraint.id).toMatch(/^equal-constraint-/)
-    expect(constraint).not.toBe(originalConstraints[index])
-    expect(constraint.fields).not.toBe(originalConstraints[index].fields)
-    expect(constraint.fields.map(({ type, field }) => ({ type, field }))).toEqual(
-      originalConstraints[index].fields.map(({ type, field }) => ({ type, field })),
+  const originalBindings = Object.values(source.bindings)
+  for (const [index, binding] of copiedBindings.entries()) {
+    expect(cloned.bindings[binding.id]).toBe(binding)
+    expect(binding.id).toMatch(/^equal-binding-/)
+    expect(binding).not.toBe(originalBindings[index])
+    expect(binding.fields).not.toBe(originalBindings[index].fields)
+    expect(binding.fields.map(({ type, field }) => ({ type, field }))).toEqual(
+      originalBindings[index].fields.map(({ type, field }) => ({ type, field })),
     )
-    for (const [fieldIndex, field] of constraint.fields.entries()) {
+    for (const [fieldIndex, field] of binding.fields.entries()) {
       expect(field.id.startsWith(`${field.type}-`)).toBe(true)
-      expect(field).not.toBe(originalConstraints[index].fields[fieldIndex])
+      expect(field).not.toBe(originalBindings[index].fields[fieldIndex])
     }
   }
   const originalIds = getProjectIds(project)
