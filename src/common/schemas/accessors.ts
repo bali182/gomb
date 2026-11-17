@@ -64,6 +64,7 @@ export type StitchLineAccessorSchema = {
   byId(id: string): StitchLineSchema
   bounds(id: string): ComponentBoundsStitchLineSchema
   tPocket(id: string): TPocketStitchLineSchema
+  ownerPocketCluster(id: string): PocketClusterSchema
   byOwner(componentId: string): StitchLineSchema[]
   byOnTop(componentId: string): StitchLineSchema[]
 }

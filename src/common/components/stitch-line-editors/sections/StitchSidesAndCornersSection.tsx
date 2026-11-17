@@ -16,6 +16,7 @@ import { isDefined } from '../../../utils/isDefined'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
+import { Tooltip } from '../../common/Tooltip'
 import { StitchLineDirectionControl } from '../StitchLineDirectionControl'
 import { StitchLineOffsetIcon } from '../StitchLineOffsetIcon'
 import { StitchLineSidesAndCorners } from '../StitchLineSidesAndCorners'
@@ -138,48 +139,52 @@ export const StitchSidesAndCornersSection = ({
           }
           startOffsetEditor={
             startDisabled || !isDefined(startPosition) ? undefined : (
-              <VStack width="32">
-                <EditorNumberInput
-                  modelId={editable.id}
-                  field="startOffset"
-                  issue={issues.startOffset}
-                  onChange={handleStartOffsetChange}
-                  startAddon={
-                    <StitchLineOffsetIcon
-                      position={startPosition}
-                      endpoint={startCanonicalEndpoint}
-                      isClosed={isClosed}
-                      boxSize="5"
-                    />
-                  }
-                  unit="mm"
-                  value={editable.startOffset}
-                  arrowPosition={startArrowPosition}
-                />
-              </VStack>
+              <Tooltip content={t.project.editors.sections.stitchLines.sidesAndCorners.startOffset.tooltip}>
+                <VStack width="32">
+                  <EditorNumberInput
+                    modelId={editable.id}
+                    field="startOffset"
+                    issue={issues.startOffset}
+                    onChange={handleStartOffsetChange}
+                    startAddon={
+                      <StitchLineOffsetIcon
+                        position={startPosition}
+                        endpoint={startCanonicalEndpoint}
+                        isClosed={isClosed}
+                        boxSize="5"
+                      />
+                    }
+                    unit="mm"
+                    value={editable.startOffset}
+                    arrowPosition={startArrowPosition}
+                  />
+                </VStack>
+              </Tooltip>
             )
           }
           endOffsetEditor={
             endDisabled || !isDefined(endPosition) ? undefined : (
-              <VStack width="32">
-                <EditorNumberInput
-                  modelId={editable.id}
-                  field="endOffset"
-                  issue={issues.endOffset}
-                  onChange={handleEndOffsetChange}
-                  startAddon={
-                    <StitchLineOffsetIcon
-                      position={endPosition}
-                      endpoint={endCanonicalEndpoint}
-                      isClosed={isClosed}
-                      boxSize="5"
-                    />
-                  }
-                  unit="mm"
-                  value={editable.endOffset}
-                  arrowPosition={endArrowPosition}
-                />
-              </VStack>
+              <Tooltip content={t.project.editors.sections.stitchLines.sidesAndCorners.endOffset.tooltip}>
+                <VStack width="32">
+                  <EditorNumberInput
+                    modelId={editable.id}
+                    field="endOffset"
+                    issue={issues.endOffset}
+                    onChange={handleEndOffsetChange}
+                    startAddon={
+                      <StitchLineOffsetIcon
+                        position={endPosition}
+                        endpoint={endCanonicalEndpoint}
+                        isClosed={isClosed}
+                        boxSize="5"
+                      />
+                    }
+                    unit="mm"
+                    value={editable.endOffset}
+                    arrowPosition={endArrowPosition}
+                  />
+                </VStack>
+              </Tooltip>
             )
           }
         />

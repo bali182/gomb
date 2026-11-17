@@ -645,7 +645,7 @@ export const EN = {
                 'Moves the punching end, where a stitch hole is not required. Positive values extend the line. Negative values shorten it.',
             },
             stitchDirection: {
-              label: 'Direction',
+              label: 'Punching direction',
               tooltip: 'Changes which way the stitch line runs along the pocket.',
             },
           } satisfies SectionTranslationSchema<TPocketStitchLineOwnSchema>,

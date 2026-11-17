@@ -17,7 +17,7 @@ export class OptionalSubProjectAccessor implements OptionalSubProjectAccessorSch
     this.pocketOpening = new OptionalPocketOpeningAccessor(root)
     this.component = new OptionalComponentAccessor(root)
     this.hole = new OptionalHoleAccessor(root)
-    this.stitchLine = new OptionalStitchLineAccessor(root, this.hole)
+    this.stitchLine = new OptionalStitchLineAccessor(root, this.hole, this.component)
     this.binding = new OptionalBindingAccessor(root, this.component, this.hole, this.stitchLine, this.pocketOpening)
   }
 }

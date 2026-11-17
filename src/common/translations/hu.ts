@@ -574,7 +574,7 @@ export const HU = {
                 'A lyukasztás befejezési végét mozgatja, ahol nem kötelező öltéslyuknak lennie. A pozitív érték hosszabbít, a negatív rövidít.',
             },
             stitchDirection: {
-              label: 'Irány',
+              label: 'Lyukasztás iránya',
               tooltip: 'Megváltoztatja, milyen irányban fut a varrásvonal a zseb mentén.',
             },
           },

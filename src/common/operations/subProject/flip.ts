@@ -1,9 +1,4 @@
-import type {
-  AnchorSchema,
-  FlipAxisSchema,
-  HasCornerRadiusSchema,
-  HasStretchSchema,
-} from '../../schemas/common'
+import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusSchema, HasStretchSchema } from '../../schemas/common'
 import type {
   ComponentSchema,
   FrontPocketSchema,

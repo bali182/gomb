@@ -1,4 +1,5 @@
 import type { AccessorOwnerSchema, OptionalAccessorSchema, StitchLineAccessorSchema } from '../../schemas/accessors'
+import type { PocketClusterSchema } from '../../schemas/components'
 import type {
   ComponentBoundsStitchLineSchema,
   StitchLineSchema,
@@ -15,6 +16,7 @@ export class StitchLineAccessor extends BaseStrictAccessor implements StitchLine
     this.byId = this.byId.bind(this)
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
+    this.ownerPocketCluster = this.ownerPocketCluster.bind(this)
     this.byOwner = this.byOwner.bind(this)
     this.byOnTop = this.byOnTop.bind(this)
   }
@@ -29,6 +31,10 @@ export class StitchLineAccessor extends BaseStrictAccessor implements StitchLine
 
   tPocket(id: string): TPocketStitchLineSchema {
     return this.requireResult(this.optional.tPocket(id), 't-pocket stitch line')
+  }
+
+  ownerPocketCluster(id: string): PocketClusterSchema {
+    return this.requireResult(this.optional.ownerPocketCluster(id), 'pocket cluster')
   }
 
   byOwner(componentId: string): StitchLineSchema[] {
