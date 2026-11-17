@@ -1,4 +1,10 @@
-import type { HoleAccessorSchema, OptionalAccessorSchema, StitchLineAccessorSchema } from '../../schemas/accessors'
+import type {
+  ComponentAccessorSchema,
+  HoleAccessorSchema,
+  OptionalAccessorSchema,
+  StitchLineAccessorSchema,
+} from '../../schemas/accessors'
+import type { PocketClusterSchema } from '../../schemas/components'
 import type {
   ComponentBoundsStitchLineSchema,
   StitchLineSchema,
@@ -13,7 +19,11 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
   private readonly stitchLinesByOwner = new Map<string, StitchLineSchema[]>()
   private readonly stitchLinesByOnTop = new Map<string, StitchLineSchema[]>()
 
-  constructor(root: SubProjectSchema, holes: OptionalAccessorSchema<HoleAccessorSchema>) {
+  constructor(
+    root: SubProjectSchema,
+    private readonly holes: OptionalAccessorSchema<HoleAccessorSchema>,
+    private readonly component: OptionalAccessorSchema<ComponentAccessorSchema>,
+  ) {
     for (const stitchLine of root.stitchLines) {
       this.stitchLines.set(stitchLine.id, stitchLine)
       const ownerId = OptionalStitchLineAccessor.getOwnerId(stitchLine, holes)
@@ -31,6 +41,7 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
     this.byId = this.byId.bind(this)
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
+    this.ownerPocketCluster = this.ownerPocketCluster.bind(this)
     this.byOwner = this.byOwner.bind(this)
     this.byOnTop = this.byOnTop.bind(this)
   }
@@ -47,6 +58,26 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
   tPocket(id: string): TPocketStitchLineSchema | undefined {
     const stitchLine = this.byId(id)
     return isDefined(stitchLine) && narrowers.is.tPocketStitchLine(stitchLine) ? stitchLine : undefined
+  }
+
+  ownerPocketCluster(id: string): PocketClusterSchema | undefined {
+    const stitchLine = this.byId(id)
+    if (!isDefined(stitchLine)) {
+      return undefined
+    }
+    const ownerId = OptionalStitchLineAccessor.getOwnerId(stitchLine, this.holes)
+    if (!isDefined(ownerId)) {
+      return undefined
+    }
+    const owner = this.component.byId(ownerId)
+    if (!isDefined(owner)) {
+      return undefined
+    }
+    if (narrowers.is.pocketCluster(owner)) {
+      return owner
+    }
+    const parent = this.component.parent(owner.id)
+    return isDefined(parent) && narrowers.is.pocketCluster(parent) ? parent : undefined
   }
 
   byOwner(componentId: string): StitchLineSchema[] {

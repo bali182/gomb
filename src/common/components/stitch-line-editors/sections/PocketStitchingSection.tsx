@@ -1,14 +1,21 @@
-import { Switch } from '@chakra-ui/react'
+import { Icon, Text, VStack } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
-import { PiArrowLeft, PiArrowRight } from 'react-icons/pi'
-import { EditorSwitch } from '../../common/EditorSwitch'
 
+import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
+import type { PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
-import type { TPocketStitchLineSchema } from '../../../schemas/stitching'
+import type { StitchDirectionSchema, TPocketStitchLineSchema } from '../../../schemas/stitching'
+import { accessors } from '../../../utils/accessors'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
+import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
+import { Tooltip } from '../../common/Tooltip'
+import { StitchLineEndOffsetIcon } from '../../icons/StitchLineEndOffsetIcon'
+import { StitchLineStartOffsetIcon } from '../../icons/StitchLineStartOffsetIcon'
+import { TPocketStitchDirectionControl } from '../TPocketStitchDirectionControl'
+import { TPocketStitchLineDiagram } from '../TPocketStitchLineDiagram'
 
 type PocketStitchingSectionProps = {
   editable: EditableSchema<TPocketStitchLineSchema>
@@ -18,6 +25,11 @@ type PocketStitchingSectionProps = {
 
 export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {
   const { t } = useTranslation()
+  const { subProject } = useSubProject()
+  const accessor = accessors.subProject(subProject)
+  const { orientation } = accessor.stitchLine.ownerPocketCluster(editable.id)
+  const isVertical = orientation === 'left' || orientation === 'right'
+  const isReversed = editable.stitchDirection === 'end-to-start'
   const handleStartOffsetChange = useCallback(
     (startOffset: string): void => {
       onChange({ ...editable, startOffset })
@@ -31,8 +43,8 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
     [editable, onChange],
   )
   const handleStitchDirectionChange = useCallback(
-    (details: Switch.CheckedChangeDetails): void => {
-      onChange({ ...editable, stitchDirection: details.checked ? 'start-to-end' : 'end-to-start' })
+    (stitchDirection: StitchDirectionSchema): void => {
+      onChange({ ...editable, stitchDirection })
     },
     [editable, onChange],
   )
@@ -42,57 +54,75 @@ export const PocketStitchingSection = ({ editable, issues, onChange }: PocketSti
       <SectionGroup.SectionHeader>
         {t.project.editors.sections.stitchLines.pocketStitching.title}
       </SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle
-        tooltip={t.project.editors.sections.stitchLines.pocketStitching.startOffset.tooltip}
-      >
-        {t.project.editors.sections.stitchLines.pocketStitching.startOffset.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.startOffset}>
-        <EditorNumberInput
-          modelId={editable.id}
-          field="startOffset"
-          issue={issues.startOffset}
-          onChange={handleStartOffsetChange}
-          unit="mm"
-          value={editable.startOffset}
+      <SectionGroup.SectionFullWidthContent padded={false}>
+        <TPocketStitchLineDiagram
+          stitchDirection={editable.stitchDirection}
+          orientation={orientation}
+          startOffsetEditor={
+            <Tooltip content={t.project.editors.sections.stitchLines.pocketStitching.startOffset.tooltip}>
+              <VStack width="100%">
+                <EditorNumberInput
+                  modelId={editable.id}
+                  field="startOffset"
+                  issue={issues.startOffset}
+                  onChange={handleStartOffsetChange}
+                  startAddon={
+                    <Icon
+                      as={isReversed ? StitchLineEndOffsetIcon : StitchLineStartOffsetIcon}
+                      boxSize="5"
+                      transform={isVertical ? 'rotate(90deg)' : undefined}
+                    />
+                  }
+                  unit="mm"
+                  value={editable.startOffset}
+                  arrowPosition={T_POCKET_OFFSET_ARROW_POSITIONS[orientation]}
+                />
+              </VStack>
+            </Tooltip>
+          }
+          endOffsetEditor={
+            <Tooltip content={t.project.editors.sections.stitchLines.pocketStitching.endOffset.tooltip}>
+              <VStack width="100%">
+                <EditorNumberInput
+                  modelId={editable.id}
+                  field="endOffset"
+                  issue={issues.endOffset}
+                  onChange={handleEndOffsetChange}
+                  startAddon={
+                    <Icon
+                      as={isReversed ? StitchLineStartOffsetIcon : StitchLineEndOffsetIcon}
+                      boxSize="5"
+                      transform={isVertical ? 'rotate(90deg)' : undefined}
+                    />
+                  }
+                  unit="mm"
+                  value={editable.endOffset}
+                  arrowPosition={T_POCKET_OFFSET_ARROW_POSITIONS[orientation]}
+                />
+              </VStack>
+            </Tooltip>
+          }
+          directionEditor={
+            <VStack gap="1.5">
+              <TPocketStitchDirectionControl
+                value={editable.stitchDirection}
+                orientation={orientation}
+                onChange={handleStitchDirectionChange}
+              />
+              <Text color="fg.muted" textStyle="xs" textAlign="center">
+                {t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.label}
+              </Text>
+            </VStack>
+          }
         />
-      </SectionGroup.SectionRowEditor>
-
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.stitchLines.pocketStitching.endOffset.tooltip}>
-        {t.project.editors.sections.stitchLines.pocketStitching.endOffset.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.endOffset}>
-        <EditorNumberInput
-          modelId={editable.id}
-          field="endOffset"
-          issue={issues.endOffset}
-          onChange={handleEndOffsetChange}
-          unit="mm"
-          value={editable.endOffset}
-        />
-      </SectionGroup.SectionRowEditor>
-
-      <SectionGroup.SectionRowTitle
-        tooltip={t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.tooltip}
-      >
-        {t.project.editors.sections.stitchLines.pocketStitching.stitchDirection.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.stitchDirection}>
-        <EditorSwitch
-          checked={editable.stitchDirection === 'start-to-end'}
-          onCheckedChange={handleStitchDirectionChange}
-          size="md"
-        >
-          <Switch.HiddenInput />
-          <Switch.Control bg="bg.emphasized" _checked={{ bg: 'bg.emphasized' }}>
-            <Switch.Thumb bg="bg.panel" _checked={{ bg: 'bg.panel' }}>
-              <Switch.ThumbIndicator fallback={<PiArrowLeft />}>
-                <PiArrowRight />
-              </Switch.ThumbIndicator>
-            </Switch.Thumb>
-          </Switch.Control>
-        </EditorSwitch>
-      </SectionGroup.SectionRowEditor>
+      </SectionGroup.SectionFullWidthContent>
     </SectionGroup.Section>
   )
+}
+
+const T_POCKET_OFFSET_ARROW_POSITIONS: Record<PocketOrientationSchema, NumberInputArrowPosition> = {
+  up: 'bottom',
+  down: 'top',
+  right: 'left',
+  left: 'right',
 }

@@ -35,11 +35,11 @@ export const StitchLineDirectionControl: FC<StitchLineDirectionControlProps> = (
         <SegmentGroup.Indicator />
         <SegmentGroup.Item value="start-to-end">
           <SegmentGroup.ItemHiddenInput />
-          <StitchLineDirectionIcon value={value} stitchDirection="start-to-end" boxSize="32px" />
+          <StitchLineDirectionIcon value={value} stitchDirection="start-to-end" size="2xl" />
         </SegmentGroup.Item>
         <SegmentGroup.Item value="end-to-start">
           <SegmentGroup.ItemHiddenInput />
-          <StitchLineDirectionIcon value={value} stitchDirection="end-to-start" boxSize="32px" />
+          <StitchLineDirectionIcon value={value} stitchDirection="end-to-start" size="2xl" />
         </SegmentGroup.Item>
       </EditorSegmentGroup>
     </Tooltip>

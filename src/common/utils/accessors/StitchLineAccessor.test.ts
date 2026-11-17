@@ -111,3 +111,83 @@ describe('stitch line grouping', () => {
     expect(accessor.optional.stitchLine.byOnTop('missing')).toEqual([])
   })
 })
+
+describe('stitch line pocket cluster', () => {
+  it('resolves the owner or its immediate parent for component and hole targets', () => {
+    const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front', 'panel'] })
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      components: [cluster, d.tPocket({ id: 't' }), d.frontPocket({ id: 'front' }), d.panel({ id: 'panel' })],
+      holes: [d.hole({ id: 'cluster-hole', componentId: 'cluster' }), d.hole({ id: 't-hole', componentId: 't' })],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'cluster-stitch', targetType: 'component', targetId: 'cluster' }),
+        d.tPocketStitchLine({ id: 't-stitch', targetType: 'component', targetId: 't' }),
+        d.componentBoundsStitchLine({ id: 'front-stitch', targetType: 'component', targetId: 'front' }),
+        d.componentBoundsStitchLine({ id: 'panel-stitch', targetType: 'component', targetId: 'panel', onTop: 'root' }),
+        d.componentBoundsStitchLine({ id: 'cluster-hole-stitch', targetType: 'hole', targetId: 'cluster-hole' }),
+        d.componentBoundsStitchLine({ id: 't-hole-stitch', targetType: 'hole', targetId: 't-hole' }),
+      ],
+    })
+    const snapshot = structuredClone(subProject)
+    const accessor = accessors.subProject(subProject)
+
+    for (const stitchLine of subProject.stitchLines) {
+      expect(accessor.optional.stitchLine.ownerPocketCluster(stitchLine.id)).toBe(cluster)
+      expect(accessor.stitchLine.ownerPocketCluster(stitchLine.id)).toBe(cluster)
+    }
+
+    const optionalPocketCluster = accessor.optional.stitchLine.ownerPocketCluster
+    const pocketCluster = accessor.stitchLine.ownerPocketCluster
+    expect(optionalPocketCluster('t-stitch')).toBe(cluster)
+    expect(pocketCluster('t-stitch')).toBe(cluster)
+    expect(subProject).toEqual(snapshot)
+  })
+
+  it.each([
+    'missing-stitch',
+    'missing-owner',
+    'missing-hole',
+    'missing-hole-owner',
+    'root-stitch',
+    'no-parent',
+    'non-cluster-parent',
+    'grandparent-cluster',
+    'drawing-layer-cluster',
+  ])('returns undefined optionally and throws strictly when cluster resolution fails: %s', (id) => {
+    const subProject = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', children: ['cluster', 'panel'] }),
+      components: [
+        d.pocketCluster({ id: 'cluster', children: ['nested-panel', 'missing-component'] }),
+        d.panel({ id: 'nested-panel', children: ['nested-t'] }),
+        d.tPocket({ id: 'nested-t' }),
+        d.panel({ id: 'panel', children: ['t'] }),
+        d.tPocket({ id: 't' }),
+        d.tPocket({ id: 'detached-t' }),
+      ],
+      holes: [d.hole({ id: 'dangling-hole', componentId: 'missing-component' })],
+      stitchLines: [
+        d.tPocketStitchLine({ id: 'missing-owner', targetType: 'component', targetId: 'missing-component' }),
+        d.componentBoundsStitchLine({ id: 'missing-hole', targetType: 'hole', targetId: 'missing' }),
+        d.componentBoundsStitchLine({ id: 'missing-hole-owner', targetType: 'hole', targetId: 'dangling-hole' }),
+        d.componentBoundsStitchLine({ id: 'root-stitch', targetType: 'component', targetId: 'root' }),
+        d.tPocketStitchLine({ id: 'no-parent', targetType: 'component', targetId: 'detached-t' }),
+        d.tPocketStitchLine({ id: 'non-cluster-parent', targetType: 'component', targetId: 't' }),
+        d.tPocketStitchLine({ id: 'grandparent-cluster', targetType: 'component', targetId: 'nested-t' }),
+        d.componentBoundsStitchLine({
+          id: 'drawing-layer-cluster',
+          targetType: 'component',
+          targetId: 'root',
+          onTop: 'cluster',
+        }),
+      ],
+    })
+    const snapshot = structuredClone(subProject)
+    const accessor = accessors.subProject(subProject)
+
+    expect(accessor.optional.stitchLine.ownerPocketCluster(id)).toBeUndefined()
+    expect(() => accessor.stitchLine.ownerPocketCluster(id)).toThrow('Missing pocket cluster from sub-project sub.')
+    expect(subProject).toEqual(snapshot)
+  })
+})

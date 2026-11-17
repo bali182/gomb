@@ -28,12 +28,7 @@ export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues,
         onChange={onChange}
       />
       <AnchorSection<PanelSchema> parent={parent} editable={editable} issues={issues} onChange={onChange} />
-      <StretchSection<PanelSchema>
-        modelId={editable.id}
-        editable={editable}
-        issues={issues}
-        onChange={onChange}
-      />
+      <StretchSection<PanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
       <CornerRadiusSection<PanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
       <LayoutSection
         modelId={editable.id}
