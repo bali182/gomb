@@ -4,7 +4,6 @@ import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { canMoveComponent } from './utils/componentRules'
-import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export const moveComponent = (
   { subProject }: BaseSubProjectOperationParamsSchema,
@@ -17,17 +16,22 @@ export const moveComponent = (
   const movedComponent = accessor.optional.component.byId(id)
   const targetParent = accessor.optional.component.byId(targetParentId)
 
-  if (!isDefined(movedComponent) || narrowers.is.rootPanel(movedComponent) || !isDefined(targetParent)) {
+  if (
+    !isDefined(movedComponent) ||
+    narrowers.is.rootPanel(movedComponent) ||
+    !isDefined(targetParent) ||
+    narrowers.is.rootPanel(targetParent)
+  ) {
     return subProject
   }
 
-  if (getComponentDescendants(movedComponent, subProject).includes(targetParentId)) {
+  if (accessor.component.descendantIds(movedComponent.id, true).includes(targetParentId)) {
     return subProject
   }
 
   const sourceParent = accessor.optional.component.parent(id)
 
-  if (!isDefined(sourceParent)) {
+  if (!isDefined(sourceParent) || narrowers.is.rootPanel(sourceParent)) {
     return subProject
   }
 

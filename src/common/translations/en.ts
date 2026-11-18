@@ -23,6 +23,7 @@ import type {
   LayoutOrientationSchema,
   PocketOrientationSchema,
   PocketsSchema,
+  RootPanelFaceSideSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { CurrencyIdSchema } from '../schemas/currency'
@@ -136,6 +137,9 @@ export const EN = {
     },
   },
   project: {
+    rootPanelFaces: {
+      flip: 'Turn over',
+    },
     computing: 'Computing…',
     tree: {
       sections: {
@@ -250,6 +254,7 @@ export const EN = {
       },
     },
     editors: {
+      faceLayoutTitle: (name: string): string => `${name} layout`,
       tabs: {
         components: {
           layout: 'Layout',
@@ -922,6 +927,14 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
+          rootPanelFaceSide: {
+            front: 'front',
+            back: 'back',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
+          rootPanelFaceName: {
+            front: 'Front face',
+            back: 'Back face',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
           pocketOpening: {
             straight: 'Straight',
             recessed: 'Recessed',
@@ -1215,6 +1228,8 @@ export const EN = {
   defaultNames: {
     'project': 'Project',
     'sub-project': 'Subproject',
+    'root-panel-face': 'Face',
+    'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Module',
     'panel': 'Panel',
     'pocket-cluster': 'Pocket cluster',

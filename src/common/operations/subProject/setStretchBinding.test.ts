@@ -13,8 +13,9 @@ import { createBaseOperationParams } from './testUtils'
 
 const fixture = (bindings: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel', topStretch: 12, rightStretch: -4, bottomStretch: 6, leftStretch: 2 }),
       d.pocketCluster({ id: 'cluster' }),

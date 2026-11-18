@@ -6,8 +6,9 @@ import { accessors } from './index'
 describe('ComputedComponentAccessor', () => {
   it('resolves children in source order and handles missing references according to strictness', () => {
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['second', 'first'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['second', 'first'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.panel({ id: 'first' }), d.panel({ id: 'second' })],
     })
     const project = d.project({ id: 'project', subProjects: [subProject] })
@@ -19,10 +20,10 @@ describe('ComputedComponentAccessor', () => {
     const first = accessor.component.panel('first')
     const second = accessor.component.panel('second')
 
-    expect(children('root')).toEqual([second, first])
-    expect(children('root')[0]).toBe(second)
+    expect(children('root-front')).toEqual([second, first])
+    expect(children('root-front')[0]).toBe(second)
     expect(children('first')).toEqual([])
-    expect(optionalChildren('root')).toEqual([second, first])
+    expect(optionalChildren('root-front')).toEqual([second, first])
     expect(optionalChildren('missing')).toEqual([])
     expect(() => children('missing')).toThrow('Missing component')
 
@@ -30,18 +31,19 @@ describe('ComputedComponentAccessor', () => {
       ...computed,
       components: {
         ...computed.components,
-        root: { ...accessor.component.rootPanel(), children: ['second', 'missing', 'first'] },
+        'root-front': { ...accessor.component.rootPanelFace('root-front'), children: ['second', 'missing', 'first'] },
       },
     })
-    expect(incomplete.optional.component.children('root')).toEqual([second, first])
-    expect(() => incomplete.component.children('root')).toThrow('Missing component')
+    expect(incomplete.optional.component.children('root-front')).toEqual([second, first])
+    expect(() => incomplete.component.children('root-front')).toThrow('Missing component')
     expect(computed).toEqual(snapshot)
   })
 
   it('indexes parents and supports every typed component lookup', () => {
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.panel({ id: 'panel', children: ['cluster'] }),
         d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
@@ -53,7 +55,7 @@ describe('ComputedComponentAccessor', () => {
     const computed = getComputedSubProject(subProject, project.stitchingSettings)
     const snapshot = structuredClone(computed)
     const accessor = accessors.computedSubProject(computed)
-    expect(accessor.component.rootPanel().children).toEqual(['panel'])
+    expect(accessor.component.rootPanelFace('root-front').children).toEqual(['panel'])
     expect(accessor.component.panel('panel').children).toEqual(['cluster'])
     expect(accessor.component.pocketCluster('cluster').children).toEqual(['t', 'front'])
     expect(accessor.component.tPocket('t').children).toEqual([])
@@ -77,7 +79,7 @@ describe('ComputedComponentAccessor', () => {
     const parent = accessor.component.parent
     expect(parent('t')).toBe(computed.components.cluster)
     expect(parent('cluster')).toBe(computed.components.panel)
-    expect(parent('panel')).toBe(computed.components.root)
+    expect(parent('panel')).toBe(computed.components['root-front'])
     expect(accessor.optional.component.parent('root')).toBeUndefined()
     expect(accessor.optional.component.parent('missing')).toBeUndefined()
     expect(() => parent('root')).toThrow('Missing parent')

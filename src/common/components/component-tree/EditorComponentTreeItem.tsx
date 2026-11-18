@@ -35,7 +35,8 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
   const { isComputing } = useEditorContext()
   const { component } = node
   const isActiveComponent = activeDragData?.kind === 'component' && activeDragData.componentId === component.id
-  const isDraggable = !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
+  const isDraggable =
+    !narrowers.is.rootPanel(component) && !narrowers.is.rootPanelFace(component) && !narrowers.is.frontPocket(component)
   const canReorder = !isDefined(activeDragData) || activeDragData.kind === 'component'
 
   const handleDragHandleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
@@ -92,14 +93,18 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
     return component.children[0]
   }, [component, activeDragData])
 
-  const dropPositions = useMemo<ComponentTreeDropPosition[]>(() => {
+  const dropPositionsByType = useMemo<ComponentTreeDropPosition[]>(() => {
     if (narrowers.is.rootPanel(component)) {
+      return []
+    }
+    if (narrowers.is.rootPanelFace(component)) {
       return ['inside']
     }
-    const positions: ComponentTreeDropPosition[] = nodeState.expanded
-      ? ['before', 'inside']
-      : ['before', 'inside', 'after']
-    return positions.filter((position) => {
+    return nodeState.expanded ? ['before', 'inside'] : ['before', 'inside', 'after']
+  }, [component, nodeState.expanded])
+
+  const dropPositions = useMemo<ComponentTreeDropPosition[]>(() => {
+    return dropPositionsByType.filter((position) => {
       if (activeDragData?.kind !== 'component') {
         return true
       }
@@ -114,8 +119,8 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
       })
     })
   }, [
+    dropPositionsByType,
     component,
-    nodeState.expanded,
     activeDragData,
     subProject,
     node.parentId,

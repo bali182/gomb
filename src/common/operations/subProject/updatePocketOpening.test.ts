@@ -16,11 +16,12 @@ const fixture = () => {
     slantOffset: 1000,
   }
   const defaultOpening: StraightPocketOpeningSchema = { id: 'custom-default', name: 'Default', type: 'straight' }
-  const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
+  const root = d.rootPanel({ id: 'root', width: 100, height: 100 })
   const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
   const t = d.tPocket({ id: 't', openingId: opening.id })
   const front = d.frontPocket({ id: 'front', openingId: opening.id })
   const original = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
     id: 'sub',
     root,
     components: [cluster, t, front],

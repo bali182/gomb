@@ -76,7 +76,7 @@ const findNestingLevel = (
       child,
       componentId,
       computedSubProject,
-      narrowers.is.computedPocketCluster(component) ? level : level + 1,
+      narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component) ? level : level + 1,
     )
     if (isDefined(childLevel)) {
       return childLevel
@@ -125,6 +125,7 @@ const getComponentBoundingRects = (
     !narrowers.is.pocketCluster(model) &&
     !narrowers.is.panel(model) &&
     !narrowers.is.rootPanel(model) &&
+    !narrowers.is.rootPanelFace(model) &&
     context.isShowingPocketItems &&
     isDefined(component.item)
   ) {
@@ -188,10 +189,17 @@ const collectBoundingRects = (
   ...accessors
     .computedSubProject(computedSubProject)
     .component.children(component.componentId)
+    .filter(
+      (child) =>
+        !narrowers.is.computedRootPanel(component) ||
+        child.componentId === (params.context.rootPanelFaceId ?? component.frontFaceId),
+    )
     .flatMap((child) =>
       collectBoundingRects(
         child,
-        narrowers.is.computedPocketCluster(component) ? nestingLevel : nestingLevel + 1,
+        narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component)
+          ? nestingLevel
+          : nestingLevel + 1,
         computedSubProject,
         params,
       ),

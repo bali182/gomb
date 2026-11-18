@@ -259,8 +259,12 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
                 )}
               </ActionsMenuSection>
               <ActionsMenuSection>
-                {!subProjectOnly && <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />}
-                {!subProjectOnly && <FlipVerticalMenuItem onSelect={handleFlipVertical} />}
+                {!subProjectOnly && !narrowers.is.rootPanel(component) && (
+                  <FlipHorizontalMenuItem onSelect={handleFlipHorizontal} />
+                )}
+                {!subProjectOnly && !narrowers.is.rootPanel(component) && (
+                  <FlipVerticalMenuItem onSelect={handleFlipVertical} />
+                )}
               </ActionsMenuSection>
               <ActionsMenuSection>
                 <CreateBindingsMenuItem onSelect={handleCreateBindings} />

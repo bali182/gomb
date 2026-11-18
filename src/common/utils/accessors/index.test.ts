@@ -67,10 +67,10 @@ describe('accessor factories', () => {
     const subProject = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root' }),
-      holes: [d.hole({ id: 'old', componentId: 'root' })],
+      holes: [d.hole({ id: 'old', componentId: 'root-front' })],
     })
     const first = accessors.subProject(subProject)
-    const updated = { ...subProject, holes: [d.hole({ id: 'new', componentId: 'root' })] }
+    const updated = { ...subProject, holes: [d.hole({ id: 'new', componentId: 'root-front' })] }
     const second = accessors.subProject(updated)
     expect(first.hole.byId('old')).toBe(subProject.holes[0])
     expect(first.optional.hole.byId('new')).toBeUndefined()

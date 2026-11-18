@@ -12,6 +12,7 @@ import type {
   HasComponentReferenceSchema,
   HasCornerRadiusSchema,
   HasId,
+  HasIdentitySchema,
   HasName,
   HasOffAxisAnchor,
   HasStretchSchema,
@@ -20,11 +21,13 @@ import type {
 import type {
   FrontPocketSchema,
   HasAutoDimensionsSchema,
+  HasFacesSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
   HasPocketOpeningSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
@@ -107,11 +110,9 @@ export const defaultHasStretch: HasStretchSchema = {
   leftStretch: 0,
 }
 
-export const defaultRootPanel: Omit<RootPanelSchema, keyof HasId | keyof HasName> = {
-  ...defaultHasLayout,
+export const defaultRootPanel: Omit<RootPanelSchema, keyof HasId | keyof HasName | keyof HasFacesSchema> = {
   ...defaultHasCornerRadius,
   type: 'root-panel',
-  children: [],
   width: 100,
   height: 100,
 }
@@ -220,4 +221,10 @@ export const defaultHole: Omit<HoleSchema, keyof HasId | keyof HasName | keyof H
   type: 'hole',
   height: 20,
   width: 20,
+}
+
+export const defaultRootPanelFace: Omit<RootPanelFaceSchema, keyof HasIdentitySchema> = {
+  type: 'root-panel-face',
+  ...defaultHasLayout,
+  children: [],
 }

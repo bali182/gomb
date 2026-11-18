@@ -97,6 +97,8 @@ const migrateComponent = (
       return migrator.frontPocket(component, context)
     case 't-pocket':
       return migrator.tPocket(component, context)
+    case 'root-panel-face':
+      return migrator.rootPanelFace(component, context)
     case 'root-panel':
       return migrator.rootPanel(component, context)
     case 'panel':

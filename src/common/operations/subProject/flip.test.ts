@@ -28,22 +28,40 @@ const axes: FlipAxisSchema[] = ['horizontal', 'vertical']
 describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layout alignment', (layoutOrientation) => {
   describe.each<AnchorSchema>(['start', 'middle', 'end'])('%s', (mainAxisAnchor) => {
     it.each(axes)('mirrors alignment at every layout depth along %s', (axis) => {
-      const root = d.rootPanel({ id: 'root', children: ['panel'], layoutOrientation, mainAxisAnchor })
+      const root = d.rootPanel({ id: 'root' })
       const panel = d.panel({ id: 'panel', children: ['cluster'], layoutOrientation, mainAxisAnchor })
       const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
       const front = d.frontPocket({ id: 'front', layoutOrientation, mainAxisAnchor })
-      const original = d.subProject({ id: 'sp', root, components: [panel, cluster, front] })
+      const original = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'], layoutOrientation, mainAxisAnchor }),
+        id: 'sp',
+        root,
+        components: [panel, cluster, front],
+      })
       const mirrored: Record<AnchorSchema, AnchorSchema> = { start: 'end', middle: 'middle', end: 'start' }
-      const result = accessors.subProject(flip(createBaseOperationParams(original), { model: root, axis: axis }))
+      const result = accessors.subProject(
+        flip(createBaseOperationParams(original), {
+          model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+          axis: axis,
+        }),
+      )
       const expected = layoutOrientation === axis ? mirrored[mainAxisAnchor] : mainAxisAnchor
-      expect(result.component.rootPanel().mainAxisAnchor).toBe(expected)
+      expect(result.component.rootPanelFace('root-front').mainAxisAnchor).toBe(expected)
       expect(result.component.panel('panel').mainAxisAnchor).toBe(expected)
       expect(result.component.frontPocket('front').mainAxisAnchor).toBe(expected)
       expect(
-        flip(createBaseOperationParams(flip(createBaseOperationParams(original), { model: root, axis: axis })), {
-          model: root,
-          axis: axis,
-        }),
+        flip(
+          createBaseOperationParams(
+            flip(createBaseOperationParams(original), {
+              model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+              axis: axis,
+            }),
+          ),
+          {
+            model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+            axis: axis,
+          },
+        ),
       ).toEqual(original)
     })
 
@@ -52,17 +70,27 @@ describe.each<LayoutOrientationSchema>(['horizontal', 'vertical'])('flip %s layo
         id: 'root',
         width: 100,
         height: 100,
-        children: ['a', 'b'],
-        layoutOrientation,
-        mainAxisAnchor,
-        layoutGap: 10,
       })
       const a = d.panel({ id: 'a', width: 20, height: 20, autoWidth: false, autoHeight: false })
       const b = d.panel({ id: 'b', width: secondSize, height: secondSize, autoWidth: false, autoHeight: false })
-      const original = d.subProject({ id: 'sp', root, components: [a, b] })
+      const original = d.subProject({
+        frontFace: d.rootPanelFace({
+          id: 'root-front',
+          children: ['a', 'b'],
+          layoutOrientation,
+          mainAxisAnchor,
+          layoutGap: 10,
+        }),
+        id: 'sp',
+        root,
+        components: [a, b],
+      })
       const before = getComputedSubProject(original, defaultStitchingSettings)
       const after = getComputedSubProject(
-        flip(createBaseOperationParams(original), { model: root, axis: layoutOrientation }),
+        flip(createBaseOperationParams(original), {
+          model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+          axis: layoutOrientation,
+        }),
         defaultStitchingSettings,
       )
       const position = layoutOrientation === 'horizontal' ? 'x' : 'y'
@@ -108,12 +136,13 @@ const orientationCases: OrientationFlipCase[] = [
 
 const createClusterSubProject = (orientation: PocketOrientationSchema): SubProjectSchema => {
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster', 'outside'] }),
     id: 'sub-project',
     pocketOpenings: [
       { id: 't-opening', name: 'T opening', type: 'slanted', slantSide: 'start', slantOffset: 15 },
       { id: 'front-opening', name: 'Front opening', type: 'slanted', slantSide: 'end', slantOffset: 9 },
     ],
-    root: d.rootPanel({ id: 'root', children: ['cluster', 'outside'], ...radii }),
+    root: d.rootPanel({ id: 'root', ...radii }),
     components: [
       d.pocketCluster({
         id: 'cluster',
@@ -173,8 +202,13 @@ describe.each(axes)('flip: %s', (axis) => {
       width: 80,
       height: 60,
     })
-    const root = d.rootPanel({ id: 'root', children: ['panel'] })
-    const original = d.subProject({ id: 'sp', root, components: [panel] })
+    const root = d.rootPanel({ id: 'root' })
+    const original = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
+      id: 'sp',
+      root,
+      components: [panel],
+    })
     const expectedStretch =
       axis === 'horizontal'
         ? { topStretch: -2, rightStretch: 7, bottomStretch: 5, leftStretch: 3 }
@@ -189,26 +223,41 @@ describe.each(axes)('flip: %s', (axis) => {
     expect(result.components.root).toBe(root)
   })
 
-  it('mirrors root-panel radii and layout alignment while preserving its dimensions', () => {
-    const root = d.rootPanel({ id: 'root', ...radii, width: 170, height: 110, layoutGap: 6 })
-    const original = d.subProject({ id: 'sp', root })
-    expect(flip(createBaseOperationParams(original), { model: root, axis: axis }).components.root).toEqual({
-      ...root,
-      ...mirroredRadii[axis],
-      mainAxisAnchor: axis === root.layoutOrientation ? 'end' : 'start',
+  it('preserves the shared root geometry when mirroring a face', () => {
+    const root = d.rootPanel({ id: 'root', ...radii, width: 170, height: 110 })
+    const original = d.subProject({
+      frontFace: d.rootPanelFace({ id: root.frontFaceId, layoutGap: 6 }),
+      id: 'sp',
+      root,
     })
+    const result = flip(createBaseOperationParams(original), {
+      model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+      axis,
+    })
+    expect(result.components.root).toBe(root)
+    expect(result.components[root.backFaceId]).toBe(original.components[root.backFaceId])
   })
 
   it.each<LayoutOrientationSchema>(['horizontal', 'vertical'])(
     'mirrors %s layout order or off-axis anchors',
     (layoutOrientation) => {
-      const root = d.rootPanel({ id: 'root', children: ['a', 'b', 'c'], layoutOrientation })
+      const root = d.rootPanel({ id: 'root' })
       const a = d.panel({ id: 'a', offAxisAnchor: 'start' })
       const b = d.panel({ id: 'b', offAxisAnchor: 'middle' })
       const c = d.pocketCluster({ id: 'c', offAxisAnchor: 'end' })
-      const original = d.subProject({ id: 'sp', root, components: [a, b, c] })
-      const result = accessors.subProject(flip(createBaseOperationParams(original), { model: root, axis: axis }))
-      expect(result.component.rootPanel().children).toEqual(
+      const original = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: ['a', 'b', 'c'], layoutOrientation }),
+        id: 'sp',
+        root,
+        components: [a, b, c],
+      })
+      const result = accessors.subProject(
+        flip(createBaseOperationParams(original), {
+          model: accessors.subProject(original).component.rootPanelFace(root.frontFaceId),
+          axis: axis,
+        }),
+      )
+      expect(result.component.rootPanelFace('root-front').children).toEqual(
         axis === layoutOrientation ? ['c', 'b', 'a'] : ['a', 'b', 'c'],
       )
       expect(result.component.panel('a').offAxisAnchor).toBe(axis === layoutOrientation ? 'start' : 'end')
@@ -248,7 +297,7 @@ describe.each(axes)('flip: %s', (axis) => {
   ])('mirrors a $anchor-anchored hole and its own radii', ({ anchor, expected }) => {
     const root = d.rootPanel({ id: 'root' })
     const hole: HoleSchema = {
-      ...d.hole({ id: 'hole', componentId: 'root' }),
+      ...d.hole({ id: 'hole', componentId: 'root-front' }),
       xAnchor: anchor,
       yAnchor: anchor,
       xOffset: 11,
@@ -269,11 +318,11 @@ describe.each(axes)('flip: %s', (axis) => {
 
   it('mirrors hole-targeted stitching without changing the owner or unrelated stitching', () => {
     const root = d.rootPanel({ id: 'root', ...radii })
-    const hole: HoleSchema = { ...d.hole({ id: 'hole', componentId: 'root' }), ...radii }
+    const hole: HoleSchema = { ...d.hole({ id: 'hole', componentId: 'root-front' }), ...radii }
     const ownStitch = d.componentBoundsStitchLine({ id: 'own', targetId: 'hole', targetType: 'hole', ...radii })
     const otherStitch = d.componentBoundsStitchLine({
       id: 'other',
-      targetId: 'root',
+      targetId: 'root-front',
       targetType: 'component',
       ...radii,
     })
@@ -289,7 +338,7 @@ describe.each(axes)('flip: %s', (axis) => {
     const stitchLine = d.componentBoundsStitchLine({
       id: 'stitch',
       targetType: 'component',
-      targetId: 'root',
+      targetId: 'root-front',
       startOffset: 1,
       endOffset: 2,
       stitchDirection: 'start-to-end',
@@ -342,7 +391,7 @@ describe.each(axes)('flip: %s', (axis) => {
   })
 
   it('includes owned holes and both target types of stitching while leaving outside objects untouched', () => {
-    const root = d.rootPanel({ id: 'root', children: ['selected', 'outside'] })
+    const root = d.rootPanel({ id: 'root' })
     const selected = d.panel({ id: 'selected', children: ['child'] })
     const child = d.panel({ id: 'child', ...radii })
     const outside = d.panel({ id: 'outside', ...radii })
@@ -374,6 +423,7 @@ describe.each(axes)('flip: %s', (axis) => {
       ...radii,
     })
     const original = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['selected', 'outside'] }),
       id: 'sp',
       root,
       components: [selected, child, outside],
@@ -393,7 +443,7 @@ describe.each(axes)('flip: %s', (axis) => {
   })
 
   it('distinguishes identical component, hole and stitch-line IDs', () => {
-    const root = d.rootPanel({ id: 'root', children: ['shared', 'outside'] })
+    const root = d.rootPanel({ id: 'root' })
     const component = d.panel({ id: 'shared', ...radii })
     const outside = d.panel({ id: 'outside' })
     const hole: HoleSchema = { ...d.hole({ id: 'shared', componentId: 'outside' }), ...radii }
@@ -410,6 +460,7 @@ describe.each(axes)('flip: %s', (axis) => {
       ...radii,
     })
     const original = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['shared', 'outside'] }),
       id: 'sp',
       root,
       components: [component, outside],
@@ -437,7 +488,7 @@ describe.each(axes)('flip: %s', (axis) => {
 
   it('uses the current stored model instead of stale values supplied by a caller', () => {
     const original = createClusterSubProject('up')
-    const stale = d.rootPanel({ id: 'root', ...radii, topLeftRadius: 99, children: [] })
+    const stale = d.rootPanel({ id: 'root', ...radii, topLeftRadius: 99 })
     expect(flip(createBaseOperationParams(original), { model: stale, axis: axis })).toEqual(
       flip(createBaseOperationParams(original), { model: original.components.root, axis: axis }),
     )
@@ -449,7 +500,7 @@ describe.each(axes)('flip: %s', (axis) => {
     const boundsStitch = d.componentBoundsStitchLine({
       id: 'bounds-stitch',
       targetType: 'component',
-      targetId: 'root',
+      targetId: 'root-front',
       ...radii,
     })
     const original = { ...source, stitchLines: [boundsStitch, pocketStitch] }
@@ -829,11 +880,17 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical
         illusionLeadingRadius: 3,
         illusionTrailingRadius: 7,
       }
-      const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+      const root = d.rootPanel({ id: 'root' })
       const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'], orientation })
       const t = d.tPocket({ id: 't', openingId: opening.id })
       const front = d.frontPocket({ id: 'front', openingId: opening.id })
-      const source = d.subProject({ id: 'sub', root, components: [cluster, t, front], pocketOpenings: [opening] })
+      const source = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
+        id: 'sub',
+        root,
+        components: [cluster, t, front],
+        pocketOpenings: [opening],
+      })
       const pocketFlip = flip(createBaseOperationParams(source), { model: t, axis: axis })
       expect(pocketFlip.pocketOpenings).toBe(source.pocketOpenings)
       expect(accessors.subProject(pocketFlip).component.tPocket('t').openingId).toBe(opening.id)

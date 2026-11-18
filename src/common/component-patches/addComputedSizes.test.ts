@@ -10,10 +10,15 @@ import { addComputedSizes } from './addComputedSizes'
 
 describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (type) => {
   it('stores layout dimensions before stretch and preserves stretch fields', () => {
-    const root = d.rootPanel({ id: 'root', width: 100, height: 60, children: ['child'] })
+    const root = d.rootPanel({ id: 'root', width: 100, height: 60 })
     const config = { id: 'child', leftStretch: 5, rightStretch: 10, topStretch: -4, bottomStretch: 6 }
     const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
-    const subProject = d.subProject({ id: 'sub-project', root, components: [child] })
+    const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['child'] }),
+      id: 'sub-project',
+      root,
+      components: [child],
+    })
     const computed = getComputedSubProject(subProject, defaultStitchingSettings)
     const patched = addComputedSizes(subProject, computed)
 
@@ -39,14 +44,21 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
         id: 'root',
         width: 100,
         height: 100,
-        children: ['fixed', 'child'],
-        layoutOrientation,
-        autoLayoutGap: true,
-        layoutGap: 30,
       })
       const fixed = d.panel({ id: 'fixed', width: 120, height: 120, autoWidth: false, autoHeight: false })
       const child = type === 'panel' ? d.panel({ id: 'child' }) : d.pocketCluster({ id: 'child' })
-      const subProject = d.subProject({ id: 'sub-project', root, components: [fixed, child] })
+      const subProject = d.subProject({
+        frontFace: d.rootPanelFace({
+          id: 'root-front',
+          children: ['fixed', 'child'],
+          layoutOrientation,
+          autoLayoutGap: true,
+          layoutGap: 30,
+        }),
+        id: 'sub-project',
+        root,
+        components: [fixed, child],
+      })
       const snapshot = structuredClone(subProject)
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
       const patched = addComputedSizes(subProject, computed)
@@ -56,7 +68,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
           ? { width: POSITION_EPSILON, height: 100 }
           : { width: 100, height: POSITION_EPSILON },
       )
-      expect(accessors.subProject(patched).component.rootPanel().layoutGap).toBe(0)
+      expect(accessors.subProject(patched).component.rootPanelFace('root-front').layoutGap).toBe(0)
       expect(subProject).toEqual(snapshot)
     },
   )
@@ -64,7 +76,6 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
   it('retains minimum positive layout dimensions when auto sizing is switched to fixed', () => {
     const root = d.rootPanel({
       id: 'root',
-      children: ['fixed', 'container'],
       width: 100,
       height: 100,
     })
@@ -77,6 +88,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
     const nestedFixed = d.panel({ id: 'nested-fixed', height: 100, autoHeight: false })
     const child = type === 'panel' ? d.panel({ id: 'child' }) : d.pocketCluster({ id: 'child' })
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['fixed', 'container'] }),
       id: 'sub-project',
       root,
       components: [fixed, container, nestedFixed, child],
@@ -95,7 +107,7 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
   })
 
   it('keeps fixed sizes even when stretch changes the computed bounds', () => {
-    const root = d.rootPanel({ id: 'root', children: ['child'], autoLayoutGap: false })
+    const root = d.rootPanel({ id: 'root' })
     const config = {
       id: 'child',
       width: 150,
@@ -106,7 +118,12 @@ describe.each(['panel', 'pocket-cluster'] as const)('addComputedSizes for %s', (
       bottomStretch: -20,
     }
     const child = type === 'panel' ? d.panel(config) : d.pocketCluster(config)
-    const subProject = d.subProject({ id: 'sub-project', root, components: [child] })
+    const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['child'], autoLayoutGap: false }),
+      id: 'sub-project',
+      root,
+      components: [child],
+    })
     const computed = getComputedSubProject(subProject, defaultStitchingSettings)
     const patched = addComputedSizes(subProject, computed)
     expect(patched.components[child.id]).toBe(child)

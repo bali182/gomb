@@ -2,8 +2,9 @@ import type { BindingFieldBlockerDefinitionsSchema, BindingFieldBlockersSchema }
 import { narrowers } from '../../utils/narrowers'
 
 const definitions: BindingFieldBlockerDefinitionsSchema = {
-  'root-panel': {
-    layoutGap: (model) => (narrowers.assert.rootPanel(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
+  'root-panel': {},
+  'root-panel-face': {
+    layoutGap: (model) => (narrowers.assert.rootPanelFace(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
   },
   'panel': {
     width: (model) => (narrowers.assert.panel(model).autoWidth ? 'auto-width' : undefined),

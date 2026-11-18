@@ -4,6 +4,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -93,6 +94,10 @@ export const comparators = {
       return comparators.rootPanel(a, b)
     }
 
+    if (narrowers.is.rootPanelFace(a) && narrowers.is.rootPanelFace(b)) {
+      return comparators.rootPanelFace(a, b)
+    }
+
     if (narrowers.is.panel(a) && narrowers.is.panel(b)) {
       return comparators.panel(a, b)
     }
@@ -109,16 +114,23 @@ export const comparators = {
     }
     return false
   },
+  rootPanelFace: (a: RootPanelFaceSchema, b: RootPanelFaceSchema): boolean => {
+    return (
+      a.id === b.id &&
+      a.layoutOrientation === b.layoutOrientation &&
+      a.mainAxisAnchor === b.mainAxisAnchor &&
+      a.layoutGap === b.layoutGap &&
+      a.autoLayoutGap === b.autoLayoutGap &&
+      areArraysEqual(a.children, b.children, (first, second) => first === second)
+    )
+  },
   rootPanel: (a: RootPanelSchema, b: RootPanelSchema): boolean => {
     return (
       a.id === b.id &&
       a.name === b.name &&
       a.color === b.color &&
-      a.layoutOrientation === b.layoutOrientation &&
-      a.mainAxisAnchor === b.mainAxisAnchor &&
-      a.layoutGap === b.layoutGap &&
-      a.autoLayoutGap === b.autoLayoutGap &&
-      areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+      a.frontFaceId === b.frontFaceId &&
+      a.backFaceId === b.backFaceId &&
       a.width === b.width &&
       a.height === b.height &&
       a.topLeftRadius === b.topLeftRadius &&

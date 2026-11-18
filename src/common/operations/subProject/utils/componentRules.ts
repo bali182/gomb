@@ -5,7 +5,6 @@ import type { SubProjectSchema } from '../../../schemas/subProject'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
-import { getComponentDescendants } from './getComponentDescendants'
 
 export const canAddChild = (
   parent: ComponentSchema,
@@ -13,6 +12,8 @@ export const canAddChild = (
   subProject: SubProjectSchema,
 ): boolean => {
   switch (parent.type) {
+    case 'root-panel':
+      return false
     case 't-pocket':
       return false
     case 'pocket-cluster': {
@@ -28,7 +29,7 @@ export const canAddChild = (
 }
 
 export const canDeleteComponent = (component: ComponentSchema, subProject: SubProjectSchema): boolean => {
-  if (narrowers.is.rootPanel(component)) {
+  if (narrowers.is.rootPanel(component) || narrowers.is.rootPanelFace(component)) {
     return false
   }
   if (narrowers.is.frontPocket(component)) {
@@ -44,12 +45,14 @@ export const canDeleteComponent = (component: ComponentSchema, subProject: SubPr
 }
 
 export const canCloneComponent = (component: ComponentSchema): boolean =>
-  !narrowers.is.rootPanel(component) && !narrowers.is.frontPocket(component)
+  !narrowers.is.rootPanel(component) && !narrowers.is.rootPanelFace(component) && !narrowers.is.frontPocket(component)
 
-export const canAddHole = (component: ComponentSchema): boolean => !narrowers.is.pocketCluster(component)
+export const canAddHole = (component: ComponentSchema): boolean =>
+  !narrowers.is.pocketCluster(component) && !narrowers.is.rootPanel(component)
 
 const componentStitchLineTypes: Record<ComponentSchema['type'], readonly StitchLineSchema['type'][]> = {
-  'root-panel': ['component-bounds-stitch-line'],
+  'root-panel': [],
+  'root-panel-face': ['component-bounds-stitch-line'],
   panel: ['component-bounds-stitch-line'],
   'front-pocket': ['component-bounds-stitch-line'],
   't-pocket': ['t-pocket-stitch-line'],
@@ -84,7 +87,9 @@ export const canMoveComponent = (subProject: SubProjectSchema, params: MoveCompo
   if (
     !isDefined(component) ||
     !isDefined(parent) ||
+    narrowers.is.rootPanel(parent) ||
     narrowers.is.rootPanel(component) ||
+    narrowers.is.rootPanelFace(component) ||
     narrowers.is.frontPocket(component) ||
     component.id === parent.id
   ) {
@@ -96,7 +101,7 @@ export const canMoveComponent = (subProject: SubProjectSchema, params: MoveCompo
   ) {
     return false
   }
-  if (getComponentDescendants(component, subProject).includes(parent.id)) {
+  if (accessor.component.descendantIds(component.id, true).includes(parent.id)) {
     return false
   }
   const children = parent.children.filter((id) => id !== component.id)

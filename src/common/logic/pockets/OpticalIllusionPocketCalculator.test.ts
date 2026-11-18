@@ -212,8 +212,9 @@ describe('OpticalIllusionPocketCalculator', () => {
     })
     const front = d.frontPocket({ id: 'front', openingId: opening.id })
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', width: 150, height: 150, children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root', width: 150, height: 150 }),
       components: [cluster, t, front],
       pocketOpenings: [
         opening,

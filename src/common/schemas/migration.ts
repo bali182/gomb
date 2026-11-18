@@ -1,5 +1,12 @@
 import type { TranslationSchema } from '../translations/translationSchema'
-import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema, TPocketSchema } from './components'
+import type {
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  RootPanelFaceSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from './components'
 import type { HoleSchema } from './hole'
 import type {
   OpticalIllusionPocketOpeningSchema,
@@ -49,6 +56,10 @@ export type ProjectMigratorSchema = {
     input: DeepPartialSchema<StitchLineCommonConfigSchema>,
     context: ProjectMigrationContextSchema,
   ) => DeepPartialSchema<StitchLineCommonConfigSchema>
+  rootPanelFace: (
+    input: DeepPartialSchema<RootPanelFaceSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<RootPanelFaceSchema>
   rootPanel: (
     input: DeepPartialSchema<RootPanelSchema>,
     context: ProjectMigrationContextSchema,

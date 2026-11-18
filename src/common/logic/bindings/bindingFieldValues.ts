@@ -19,6 +19,8 @@ export const getBindingFieldValue = (
   bindingField: BindingFieldSchema,
 ): BindingValueSchema => {
   switch (bindingField.type) {
+    case 'root-panel-face-binding-field':
+      return narrowers.assert.rootPanelFace(model)[bindingField.field]
     case 'root-panel-binding-field':
       return narrowers.assert.rootPanel(model)[bindingField.field]
     case 'panel-binding-field':
@@ -127,6 +129,9 @@ export const setBindingFieldValue = (
   const model = accessors.subProject(subProject).binding.model(bindingField)
   let updated: ModelObjectSchema
   switch (bindingField.type) {
+    case 'root-panel-face-binding-field':
+      updated = setField(narrowers.assert.rootPanelFace(model), bindingField.field, value)
+      break
     case 'root-panel-binding-field':
       updated = setField(narrowers.assert.rootPanel(model), bindingField.field, value)
       break
@@ -178,6 +183,7 @@ export const setBindingFieldValue = (
 
 const replaceModel = (subProject: SubProjectSchema, updated: ModelObjectSchema): SubProjectSchema => {
   switch (updated.type) {
+    case 'root-panel-face':
     case 'root-panel':
     case 'panel':
     case 'pocket-cluster':

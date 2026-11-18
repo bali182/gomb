@@ -8,7 +8,7 @@ describe('ComputedHoleAccessor', () => {
     const subProject = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root' }),
-      holes: [d.hole({ id: 'hole', componentId: 'root' })],
+      holes: [d.hole({ id: 'hole', componentId: 'root-front' })],
     })
     const project = d.project({ id: 'project', subProjects: [subProject] })
     const computed = getComputedSubProject(subProject, project.stitchingSettings)

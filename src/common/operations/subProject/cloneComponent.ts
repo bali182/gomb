@@ -27,7 +27,7 @@ export const cloneComponent = (
     return subProject
   }
   const parent = accessor.optional.component.parent(source.id)
-  if (!isDefined(parent)) {
+  if (!isDefined(parent) || narrowers.is.rootPanel(parent)) {
     return subProject
   }
   const sourceIndex = parent.children.indexOf(source.id)
@@ -66,10 +66,13 @@ const cloneSelectedComponents = (
   idMappings: Readonly<Record<string, string>>,
   nameGenerator: NameGeneratorSchema,
 ): Record<string, ComponentSchema> => {
-  const usedNames = new Set(Object.values(subProject.components).map((component) => component.name))
+  const usedNames = accessors.subProject(subProject).component.names()
   const result: Record<string, ComponentSchema> = {}
   for (const { component } of selection.components) {
     if (!selection.clonedModelIds.has(component.id)) {
+      continue
+    }
+    if (narrowers.is.rootPanel(component) || narrowers.is.rootPanelFace(component)) {
       continue
     }
     const cloned: ComponentSchema = {
@@ -111,7 +114,7 @@ const cloneSelectedHoles = (
   idMappings: Readonly<Record<string, string>>,
   nameGenerator: NameGeneratorSchema,
 ): HoleSchema[] => {
-  const usedNames = new Set(subProject.holes.map((hole) => hole.name))
+  const usedNames = accessors.subProject(subProject).hole.names()
   const cloned = selection.holes
     .filter((hole) => selection.clonedModelIds.has(hole.id))
     .map(
@@ -131,7 +134,7 @@ const cloneSelectedStitchLines = (
   idMappings: Readonly<Record<string, string>>,
   nameGenerator: NameGeneratorSchema,
 ): StitchLineSchema[] => {
-  const usedNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
+  const usedNames = accessors.subProject(subProject).stitchLine.names()
   const cloned = selection.stitchLines
     .filter((stitchLine) => selection.clonedModelIds.has(stitchLine.id))
     .map(
@@ -151,7 +154,7 @@ const cloneSelectedOpenings = (
   idMappings: Readonly<Record<string, string>>,
   nameGenerator: NameGeneratorSchema,
 ): Record<string, PocketOpeningSchema> => {
-  const usedNames = new Set(Object.values(subProject.pocketOpenings).map((opening) => opening.name))
+  const usedNames = accessors.subProject(subProject).pocketOpening.names()
   const cloned = selection.pocketOpenings
     .filter((opening) => selection.clonedModelIds.has(opening.id))
     .map(

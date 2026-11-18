@@ -9,6 +9,7 @@ import type {
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedPocketSchema,
+  ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
 } from '../../schemas/computed'
@@ -22,6 +23,9 @@ export class ComputedComponentAccessor extends BaseStrictAccessor implements Com
     super(owner)
     this.byId = this.byId.bind(this)
     this.children = this.children.bind(this)
+    this.childIds = this.childIds.bind(this)
+    this.rootPanelFace = this.rootPanelFace.bind(this)
+    this.rootPanelFaceOf = this.rootPanelFaceOf.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -36,7 +40,18 @@ export class ComputedComponentAccessor extends BaseStrictAccessor implements Com
   }
 
   children(id: string): ComputedComponentSchema[] {
-    return this.byId(id).children.map(this.byId)
+    return this.childIds(id).map(this.byId)
+  }
+
+  childIds(id: string): string[] {
+    this.byId(id)
+    return this.optional.childIds(id)
+  }
+  rootPanelFace(id: string): ComputedRootPanelFaceSchema {
+    return this.requireResult(this.optional.rootPanelFace(id), 'root panel face')
+  }
+  rootPanelFaceOf(id: string): ComputedRootPanelFaceSchema {
+    return this.requireResult(this.optional.rootPanelFaceOf(id), 'root panel face')
   }
 
   pocket(id: string): ComputedPocketSchema {

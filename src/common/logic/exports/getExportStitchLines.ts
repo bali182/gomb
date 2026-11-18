@@ -1,4 +1,3 @@
-import { getComponentDescendants } from '../../operations/subProject/utils/getComponentDescendants'
 import type {
   ComputedComponentSchema,
   ComputedStitchLineSchema,
@@ -81,7 +80,7 @@ const getRelatedStitchLines = (
     return []
   }
   const componentIds = new Set([
-    ...getComponentDescendants(source, subProject),
+    ...accessor.component.descendantIds(source.id, true),
     ...getFollowingSiblingSubtreeIds(source.id, subProject),
   ])
   let parent = accessor.optional.component.parent(source.id)
@@ -95,12 +94,16 @@ const getRelatedStitchLines = (
 
 const getFollowingSiblingSubtreeIds = (componentId: string, subProject: SubProjectSchema): string[] => {
   const accessor = accessors.subProject(subProject)
-  const siblings = accessor.optional.component.parent(componentId)?.children ?? []
+  const parent = accessor.optional.component.parent(componentId)
+  if (isDefined(parent) && narrowers.is.rootPanel(parent)) {
+    return []
+  }
+  const siblings = isDefined(parent) ? accessor.component.childIds(parent.id) : []
   const componentIds: string[] = []
   for (const siblingId of siblings.slice(siblings.indexOf(componentId) + 1)) {
     const sibling = accessor.optional.component.byId(siblingId)
     if (isDefined(sibling)) {
-      componentIds.push(...getComponentDescendants(sibling, subProject))
+      componentIds.push(...accessor.component.descendantIds(sibling.id, true))
     }
   }
   return componentIds

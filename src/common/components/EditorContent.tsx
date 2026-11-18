@@ -20,6 +20,7 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import type { HasTargetSchema } from '../schemas/common'
+import type { RootPanelFaceSideSchema } from '../schemas/components'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { TreeSectionsSettingsSchema } from '../schemas/settings'
@@ -78,7 +79,8 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const { setUISettings, settings } = useGlobalSettings()
   const [treeSections, setTreeSections] = useState<TreeSectionsSettingsSchema>(() => settings.ui.treeSections)
   const accordionRef = useRef<ResizableAccordionHandle>(null)
-  const { selected, clearSelection } = useDrawAreaContext().selection
+  const { selection, rootPanelFaceId, flipRootPanelFace } = useDrawAreaContext()
+  const { selected, clearSelection } = selection
   const { stopMeasuring } = useMeasurement()
 
   const handleTreeSectionsChange = useCallback(
@@ -126,6 +128,13 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     [project, subProjectId],
   )
   const accessor = useMemo(() => (isDefined(subProject) ? accessors.subProject(subProject) : undefined), [subProject])
+
+  const activeSide: RootPanelFaceSideSchema | undefined = useMemo(() => {
+    if (!isDefined(accessor)) {
+      return undefined
+    }
+    return rootPanelFaceId === accessor.component.rootPanel().backFaceId ? 'back' : 'front'
+  }, [accessor, rootPanelFaceId])
 
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
@@ -217,6 +226,9 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       title={
                         <HStack gap="2">
                           {t.project.tree.sections.components}
+                          {isDefined(activeSide) && (
+                            <Badge>{t.project.editors.enums.components.rootPanelFaceSide[activeSide]}</Badge>
+                          )}
                           {isDefined(itemCounts) && (
                             <Badge bg="bg" variant="surface">
                               {itemCounts.components}
@@ -226,6 +238,12 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       }
                       actions={
                         <HStack gap="1">
+                          <ResizableAccordionHeaderButton
+                            disabled={!isDefined(subProject) || isComputing}
+                            onClick={flipRootPanelFace}
+                          >
+                            {t.project.rootPanelFaces.flip}
+                          </ResizableAccordionHeaderButton>
                           <ResizableAccordionHeaderIconButton
                             disabled={!isDefined(subProject)}
                             onClick={handleExpandAll}

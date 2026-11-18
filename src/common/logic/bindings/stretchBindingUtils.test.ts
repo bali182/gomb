@@ -7,8 +7,9 @@ import { STRETCH_FIELD_ORDER, getStretchBindingState } from './stretchBindingUti
 
 const fixture = (bindings: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster', 'pocket'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'cluster', 'pocket'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' }), d.pocketCluster({ id: 'cluster' }), d.tPocket({ id: 'pocket' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     bindings,

@@ -1,4 +1,3 @@
-import { getComponentAncestorIds } from '../../../operations/subProject/utils/getComponentAncestorIds'
 import type { SubProjectItemSchema, SubProjectSchema } from '../../../schemas/subProject'
 import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
@@ -78,7 +77,7 @@ const getComponentRelatedIds = (
   subProject: SubProjectSchema,
   includeComponent: boolean,
 ): string[] => {
-  const ancestorNodeIds = getComponentAncestorIds(componentId, subProject).map(getComponentNodeId)
+  const ancestorNodeIds = accessors.subProject(subProject).component.ancestorIds(componentId).map(getComponentNodeId)
   return includeComponent ? [...ancestorNodeIds, getComponentNodeId(componentId)] : ancestorNodeIds
 }
 

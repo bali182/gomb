@@ -1,3 +1,4 @@
+import type { RootPanelFaceSideSchema } from '../schemas/components'
 import type { ReadonlyModelObjectFactorySchema } from '../schemas/factory'
 import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectSchema } from '../schemas/subProject'
@@ -9,9 +10,10 @@ import { IdGenerator } from './random/IdGenerator'
 export type CreateSubProjectParams = {
   project: ProjectSchema
   modelFactory: ReadonlyModelObjectFactorySchema
+  faceNames: Record<RootPanelFaceSideSchema, string>
 }
 
-export const createSubProject = ({ project, modelFactory }: CreateSubProjectParams): SubProjectSchema => {
+export const createSubProject = ({ project, modelFactory, faceNames }: CreateSubProjectParams): SubProjectSchema => {
   const forbiddenIds = getProjectIds(project)
   const forbiddenNames = new Set(
     project.subProjects
@@ -19,7 +21,13 @@ export const createSubProject = ({ project, modelFactory }: CreateSubProjectPara
       .filter(isDefined)
       .map((root) => root.name),
   )
+  const frontFace = modelFactory.createRootPanelFace({ forbiddenIds, name: faceNames.front })
+  forbiddenIds.add(frontFace.id)
+  const backFace = modelFactory.createRootPanelFace({ forbiddenIds, name: faceNames.back })
+  forbiddenIds.add(backFace.id)
   const root = modelFactory.createRootPanel({
+    frontFaceId: frontFace.id,
+    backFaceId: backFace.id,
     stitchingSettings: project.stitchingSettings,
     forbiddenIds,
     forbiddenNames,
@@ -30,7 +38,7 @@ export const createSubProject = ({ project, modelFactory }: CreateSubProjectPara
     root: root.id,
     defaultPocketOpening: defaultPocketOpening.id,
     pocketOpenings: { [defaultPocketOpening.id]: defaultPocketOpening },
-    components: { [root.id]: root },
+    components: { [root.id]: root, [frontFace.id]: frontFace, [backFace.id]: backFace },
     bindings: {},
     holes: [],
     stitchLines: [],

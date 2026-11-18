@@ -122,8 +122,8 @@ export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, su
 
   const handleSelectionChange = useCallback(
     (nodeIds: string[]): void => {
-      const models: ModelObjectSchema[] = [source]
-      const nextNodeIds: string[] = [sourceNodeId]
+      const models: ModelObjectSchema[] = []
+      const nextNodeIds: string[] = []
       for (const nodeId of nodeIds) {
         if (nextNodeIds.includes(nodeId)) {
           continue
@@ -142,23 +142,21 @@ export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, su
         }),
       )
     },
-    [modelsByNodeId, source, sourceNodeId, subProject],
+    [modelsByNodeId, subProject],
   )
 
   const isComponentNodeSelectable = useCallback(
     (node: ProjectTreeNode): boolean =>
-      node.id !== sourceNodeId &&
-      (selection.nodeIds.includes(node.id) ||
-        getCommonBindingProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0),
-    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
+      selection.nodeIds.includes(node.id) ||
+      getCommonBindingProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0,
+    [selection.nodeIds, selectedModels, subProject],
   )
   const isOpeningNodeSelectable = useCallback(
     (node: PocketOpeningTreeNode): boolean =>
       node.kind === 'pocket-opening' &&
-      node.id !== sourceNodeId &&
       (selection.nodeIds.includes(node.id) ||
         getCommonBindingProperties(subProject, [...selectedModels, node.opening]).length > 0),
-    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
+    [selection.nodeIds, selectedModels, subProject],
   )
 
   const handlePropertySelectionChange = useCallback(

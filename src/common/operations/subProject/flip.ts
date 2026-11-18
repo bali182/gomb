@@ -5,7 +5,7 @@ import type {
   PanelSchema,
   PocketClusterSchema,
   PocketOrientationSchema,
-  RootPanelSchema,
+  RootPanelFaceSchema,
 } from '../../schemas/components'
 import type { HoleSchema } from '../../schemas/hole'
 import type { BaseSubProjectOperationParamsSchema, FlipParamsSchema } from '../../schemas/operations'
@@ -15,7 +15,6 @@ import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { updateHole } from './updateHole'
-import { getComponentDescendants } from './utils/getComponentDescendants'
 
 export const flip = (
   base: BaseSubProjectOperationParamsSchema,
@@ -30,7 +29,9 @@ export const flip = (
     case 'optical-illusion':
       return subProject
     case 'root-panel':
-      return flipComponentSubtree(subProject, narrowers.assert.rootPanel(accessor.component.byId(model.id)), axis)
+      return subProject
+    case 'root-panel-face':
+      return flipComponentSubtree(subProject, accessor.component.rootPanelFace(model.id), axis)
     case 'panel':
       return flipComponentSubtree(subProject, accessor.component.panel(model.id), axis)
     case 'pocket-cluster':
@@ -80,15 +81,11 @@ const flipComponentSubtree = (
   component: ComponentSchema,
   axis: FlipAxisSchema,
 ): SubProjectSchema => {
-  const componentIds = new Set(getComponentDescendants(component, subProject))
+  const accessor = accessors.subProject(subProject)
+  const componentIds = new Set(accessor.component.descendantIds(component.id, true))
   const components = { ...subProject.components }
   for (const componentId of componentIds) {
-    components[componentId] = flipComponent(
-      accessors.subProject(subProject).component.byId(componentId),
-      subProject,
-      axis,
-      componentIds,
-    )
+    components[componentId] = flipComponent(accessor.component.byId(componentId), subProject, axis, componentIds)
   }
   const holeIds = new Set(subProject.holes.filter((hole) => componentIds.has(hole.componentId)).map((hole) => hole.id))
   const holes = subProject.holes.map((hole) => (holeIds.has(hole.id) ? flipHole(hole, axis) : hole))
@@ -108,10 +105,11 @@ const flipComponent = (
 ): ComponentSchema => {
   const accessor = accessors.subProject(subProject)
   switch (component.type) {
-    case 'root-panel': {
-      const flipped: RootPanelSchema = {
+    case 'root-panel':
+      return component
+    case 'root-panel-face': {
+      const flipped: RootPanelFaceSchema = {
         ...component,
-        ...flipCornerRadii(component, axis),
         children: flipChildOrder(component, axis),
         mainAxisAnchor:
           component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
@@ -274,7 +272,7 @@ const flipStretch = (value: HasStretchSchema, axis: FlipAxisSchema): HasStretchS
 }
 
 const flipChildOrder = (
-  component: RootPanelSchema | PanelSchema | FrontPocketSchema,
+  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
   axis: FlipAxisSchema,
 ): string[] => {
   return component.layoutOrientation === axis ? [...component.children].reverse() : component.children
@@ -292,6 +290,8 @@ const flipOffAxisAnchor = (
   }
   switch (parent.type) {
     case 'root-panel':
+      return component.offAxisAnchor
+    case 'root-panel-face':
     case 'panel':
     case 'front-pocket':
       return parent.layoutOrientation !== axis ? flipAnchor(component.offAxisAnchor) : component.offAxisAnchor

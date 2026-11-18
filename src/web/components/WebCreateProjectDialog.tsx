@@ -67,11 +67,21 @@ export const WebCreateProjectDialog: FC<WebCreateProjectDialogProps> = ({ isOpen
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
       modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(t.defaultNames)),
+      faceNames: t.project.editors.enums.components.rootPanelFaceName,
     })
     addProject(createdProject)
     onOpenChange(false)
     navigate(webAppRoutes.subProject(createdProject.id, initialSubProject.id))
-  }, [addProject, context, editableValue, navigate, onOpenChange, project, t.defaultNames])
+  }, [
+    addProject,
+    context,
+    editableValue,
+    navigate,
+    onOpenChange,
+    project,
+    t.defaultNames,
+    t.project.editors.enums.components.rootPanelFaceName,
+  ])
 
   return (
     <EditDialog

@@ -6,6 +6,7 @@ import {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
@@ -40,6 +41,8 @@ type CreateTestProjectConfig = HasId &
 
 type CreateSubProjectConfig = HasId &
   HasStitchingSettings & {
+    frontFace?: RootPanelFaceSchema
+    backFace?: RootPanelFaceSchema
     root: RootPanelSchema
     components?: ComponentSchema[]
     stitchLines?: StitchLineSchema[]
@@ -74,6 +77,14 @@ export const d = {
   subProject: ({
     id,
     root,
+    frontFace = {
+      ...modelFactory.createRootPanelFace({ name: EN.project.editors.enums.components.rootPanelFaceName.front }),
+      id: root.frontFaceId,
+    },
+    backFace = {
+      ...modelFactory.createRootPanelFace({ name: EN.project.editors.enums.components.rootPanelFaceName.back }),
+      id: root.backFaceId,
+    },
     components = [],
     stitchLines = [],
     holes = [],
@@ -81,11 +92,17 @@ export const d = {
     bindings = {},
     stitchingSettings = defaultStitchingSettings,
   }: CreateSubProjectConfig): SubProjectSchema => {
-    const subProject = createSubProject({ project: { ...createProject(id), stitchingSettings }, modelFactory })
+    const subProject = createSubProject({
+      project: { ...createProject(id), stitchingSettings },
+      modelFactory,
+      faceNames: EN.project.editors.enums.components.rootPanelFaceName,
+    })
     subProject.id = id
     subProject.root = root.id
     subProject.components = {
       [root.id]: root,
+      [frontFace.id]: frontFace,
+      [backFace.id]: backFace,
     }
     for (const component of components) {
       subProject.components[component.id] = component
@@ -116,12 +133,18 @@ export const d = {
     ...rest
   }: CreateRootPanelConfig): RootPanelSchema => {
     return {
-      ...modelFactory.createRootPanel({ stitchingSettings }),
+      ...modelFactory.createRootPanel({ stitchingSettings, frontFaceId: `${id}-front`, backFaceId: `${id}-back` }),
       id,
       name: id,
       ...rest,
     }
   },
+
+  rootPanelFace: ({ id, ...rest }: Partial<RootPanelFaceSchema> & HasId): RootPanelFaceSchema => ({
+    ...modelFactory.createRootPanelFace({ name: id }),
+    id,
+    ...rest,
+  }),
 
   panel: ({ id, stitchingSettings: _stitchingSettings, ...rest }: CreatePanelConfig): PanelSchema => {
     return {

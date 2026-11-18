@@ -22,13 +22,20 @@ const context: ProjectMigrationContextSchema = { t: EN }
 
 describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: %s', (mainAxisAnchor) => {
   it('fills missing alignment and preserves supplied alignment on all layout component types', () => {
-    const root = d.rootPanel({ id: 'root', children: ['panel'] })
+    const root = d.rootPanel({ id: 'root' })
     const panel = d.panel({ id: 'panel', children: ['cluster'] })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
     const front = d.frontPocket({ id: 'front' })
     const original = d.project({
       id: 'project',
-      subProjects: [d.subProject({ id: 'sp', root, components: [panel, cluster, front] })],
+      subProjects: [
+        d.subProject({
+          frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
+          id: 'sp',
+          root,
+          components: [panel, cluster, front],
+        }),
+      ],
     })
     const legacy: DeepPartialSchema<ProjectSchema> = structuredClone(original)
     const components = legacy.subProjects?.[0]?.components
@@ -36,12 +43,12 @@ describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: 
       throw new Error('Missing components')
     }
     for (const component of Object.values(components)) {
-      if (component?.type === 'root-panel' || component?.type === 'panel' || component?.type === 'front-pocket') {
+      if (component?.type === 'root-panel-face' || component?.type === 'panel' || component?.type === 'front-pocket') {
         delete component.mainAxisAnchor
       }
     }
     const migrated = migrateProject(legacy, context)
-    for (const id of ['root', 'panel', 'front']) {
+    for (const id of ['root-front', 'panel', 'front']) {
       expect(migrated.subProjects?.[0]?.components?.[id]).toHaveProperty('mainAxisAnchor', 'start')
     }
     const configured = d.project({
@@ -49,13 +56,14 @@ describe.each(['start', 'middle', 'end'] as const)('layout alignment migration: 
       subProjects: [
         d.subProject({
           id: 'sp',
-          root: { ...root, mainAxisAnchor },
+          root,
+          frontFace: d.rootPanelFace({ id: root.frontFaceId, mainAxisAnchor }),
           components: [{ ...panel, mainAxisAnchor }, cluster, { ...front, mainAxisAnchor }],
         }),
       ],
     })
     const preserved = migrateProject(configured, context)
-    for (const id of ['root', 'panel', 'front']) {
+    for (const id of ['root-front', 'panel', 'front']) {
       expect(preserved.subProjects?.[0]?.components?.[id]).toHaveProperty('mainAxisAnchor', mainAxisAnchor)
     }
     expect(typia.is<ProjectSchema>(preserved)).toBe(true)
@@ -67,6 +75,7 @@ const createProjectWithSubProject = (): ProjectSchema => {
   const subProject = createSubProject({
     project,
     modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames)),
+    faceNames: EN.project.editors.enums.components.rootPanelFaceName,
   })
 
   return {
@@ -77,10 +86,16 @@ const createProjectWithSubProject = (): ProjectSchema => {
 
 describe.each(['panel', 'pocket-cluster'] as const)('stretch defaults for %s', (type) => {
   const createInput = (fields: Partial<HasStretchSchema> = {}) => {
-    const root = d.rootPanel({ id: 'root', children: ['child'] })
+    const root = d.rootPanel({ id: 'root' })
     const project = d.project({
       id: 'project',
-      subProjects: [d.subProject({ id: 'sub-project', root })],
+      subProjects: [
+        d.subProject({
+          frontFace: d.rootPanelFace({ id: 'root-front', children: ['child'] }),
+          id: 'sub-project',
+          root,
+        }),
+      ],
     })
     const subProject = project.subProjects[0]
     return {
@@ -172,7 +187,7 @@ describe('migrateProject', () => {
 
     delete legacyProject.version
     delete legacyProject.colorSettings?.threadColor
-    if (root.type === 'root-panel' || root.type === 'panel' || root.type === 'front-pocket') {
+    if (root.type === 'root-panel-face' || root.type === 'panel' || root.type === 'front-pocket') {
       delete root.autoLayoutGap
     }
 
@@ -259,7 +274,7 @@ describe('migrateProject', () => {
 
 describe('standalone opening migration', () => {
   it('fills missing parameters and preserves standalone identities, references and unused openings', () => {
-    const root = d.rootPanel({ id: 'root', children: ['cluster'] })
+    const root = d.rootPanel({ id: 'root' })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
     const opening = {
       type: 'optical-illusion' as const,
@@ -277,7 +292,13 @@ describe('standalone opening migration', () => {
     const project: DeepPartialSchema<ProjectSchema> = d.project({
       id: 'project',
       subProjects: [
-        d.subProject({ id: 'sub', root, components: [cluster, t, front], pocketOpenings: [opening, unused] }),
+        d.subProject({
+          frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
+          id: 'sub',
+          root,
+          components: [cluster, t, front],
+          pocketOpenings: [opening, unused],
+        }),
       ],
     })
     const openingInput = project.subProjects?.[0]?.pocketOpenings?.optical
@@ -299,8 +320,9 @@ describe('standalone opening migration', () => {
 
 it('preserves legacy IDs and references on loading and reloading a current project', () => {
   const subProject = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'legacy-root-front', children: ['legacy-cluster'] }),
     id: 'legacy-sub',
-    root: d.rootPanel({ id: 'legacy-root', children: ['legacy-cluster'] }),
+    root: d.rootPanel({ id: 'legacy-root' }),
     components: [
       d.pocketCluster({ id: 'legacy-cluster', children: ['legacy-pocket'] }),
       d.tPocket({ id: 'legacy-pocket', openingId: 'legacy-opening', itemId: 'ID-1' }),
@@ -327,8 +349,9 @@ it('preserves legacy IDs and references on loading and reloading a current proje
 
 it('defaults missing bindings and preserves existing bindings through save and reload', () => {
   const source = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' })],
     bindings: {
       linked: {

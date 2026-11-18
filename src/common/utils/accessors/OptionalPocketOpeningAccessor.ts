@@ -8,8 +8,13 @@ export class OptionalPocketOpeningAccessor implements OptionalAccessorSchema<Poc
 
   constructor(private readonly root: SubProjectSchema) {
     this.allPocketOpenings = Object.values(root.pocketOpenings)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.defaultOpening = this.defaultOpening.bind(this)
+  }
+
+  names(): Set<string> {
+    return new Set(this.allPocketOpenings.map((opening) => opening.name))
   }
 
   byId(id: string): PocketOpeningSchema | undefined {

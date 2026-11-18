@@ -8,8 +8,13 @@ export class PocketOpeningAccessor extends BaseStrictAccessor implements PocketO
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.defaultOpening = this.defaultOpening.bind(this)
+  }
+
+  names(): Set<string> {
+    return this.optional.names()
   }
 
   byId(id: string): PocketOpeningSchema {

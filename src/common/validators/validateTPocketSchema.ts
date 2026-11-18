@@ -2,6 +2,7 @@ import type { TPocketSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+import { accessors } from '../utils/accessors'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
@@ -16,7 +17,7 @@ export const validateTPocketSchema = (
     input.name,
     currentValue.name,
     currentValue.id,
-    Object.values(context.subProject.components),
+    accessors.subProject(context.subProject).component.components(),
     context,
   )
   const colorResult = validateOptionalHexColor(input.color, currentValue.color, context)

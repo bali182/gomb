@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
+import { narrowers } from './narrowers'
 
 import { defaultStitchingSettings } from '../defaultStates'
 import { processSubProjectComputation } from '../logic/processSubProjectComputation'
@@ -36,7 +37,10 @@ describe('editor computation serialization', () => {
       stitchingSettings: defaultStitchingSettings,
       previousSubProject: {
         ...subProject,
-        components: { ...subProject.components, root: { ...subProject.components.root, name: 'Previous root' } },
+        components: {
+          ...subProject.components,
+          root: { ...narrowers.assert.rootPanel(subProject.components.root), name: 'Previous root' },
+        },
       },
     }
     const restoredRequest = deserializeEditorComputation<EditorComputationRequestSchema>(

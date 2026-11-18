@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 
 const target: ComponentBoundsStitchLineTarget = {
-  componentId: 'root',
+  componentId: 'root-front',
   boundingRect: { x: new BigNumber(0), y: new BigNumber(0), width: new BigNumber(100), height: new BigNumber(80) },
   cornerRadius: ZERO_CORNER_RADIUS,
 }
@@ -40,7 +40,7 @@ const stitchLine = (
   id: 'stitch',
   name: 'Stitch',
   type: 'component-bounds-stitch-line',
-  targetId: 'root',
+  targetId: 'root-front',
   targetType: 'component',
   stitchMargin: 0,
   stitchHoleDistance: 30,

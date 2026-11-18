@@ -14,11 +14,13 @@ export const getExportChildMarkerPaths = (
 ): PathSchema[] => {
   const accessor = accessors.computedSubProject(computedSubProject)
   const parentMarkerLines = getBoundingRectMarkerLines(component.boundingRect)
-  const boundingRects = accessor.component.children(component.componentId).flatMap((child) => {
-    return narrowers.is.computedPocketCluster(child)
-      ? accessor.component.children(child.componentId).map((pocket) => pocket.boundingRect)
-      : [child.boundingRect]
-  })
+  const boundingRects = accessor.component
+    .children(narrowers.is.computedRootPanel(component) ? component.frontFaceId : component.componentId)
+    .flatMap((child) => {
+      return narrowers.is.computedPocketCluster(child)
+        ? accessor.component.children(child.componentId).map((pocket) => pocket.boundingRect)
+        : [child.boundingRect]
+    })
 
   const markerLines = boundingRects.flatMap((boundingRect) => {
     return getBoundingRectMarkerLines(boundingRect).filter(

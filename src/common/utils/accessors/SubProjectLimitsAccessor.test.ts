@@ -8,8 +8,8 @@ describe('SubProjectLimitsAccessor', () => {
     const subProject = d.subProject({
       id: 'sub',
       root: d.rootPanel({ id: 'root' }),
-      holes: [d.hole({ id: 'hole', componentId: 'root' })],
-      stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root', targetType: 'component' })],
+      holes: [d.hole({ id: 'hole', componentId: 'root-front' })],
+      stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root-front', targetType: 'component' })],
     })
     const project = d.project({ id: 'project', subProjects: [subProject] })
     const computed = getComputedSubProject(subProject, project.stitchingSettings)

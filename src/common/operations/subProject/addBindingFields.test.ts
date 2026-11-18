@@ -18,8 +18,9 @@ const modelFactory: ReadonlyModelObjectFactorySchema = new ReadonlyModelObjectFa
 )
 const fixture = (): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'auto'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'auto'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel', autoWidth: false, autoHeight: false }),
       d.panel({ id: 'auto', autoWidth: true }),

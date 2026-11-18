@@ -34,9 +34,14 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         id: 'root',
         width: vertical ? 100 : 80,
         height: vertical ? 80 : 100,
-        children: [cluster.id],
       })
-      const source = d.subProject({ id: 'sub', root, components: [cluster, front], pocketOpenings: [opening] })
+      const source = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: [cluster.id] }),
+        id: 'sub',
+        root,
+        components: [cluster, front],
+        pocketOpenings: [opening],
+      })
       const snapshot = structuredClone(source)
       const computed = accessors.computedSubProject(getComputedSubProject(source, defaultStitchingSettings))
       const path = computed.component.frontPocket(front.id).path
@@ -76,9 +81,9 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         id: 'root',
         width: vertical ? 100 : 130,
         height: vertical ? 130 : 100,
-        children: [cluster.id],
       })
       const subProject = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: [cluster.id] }),
         id: 'sub',
         root,
         components: [cluster, ...pockets],
@@ -300,8 +305,9 @@ describe('invalid pocket states and patchers', () => {
   it('builds the cluster selection contour from the cut pocket contours', () => {
     const cluster = d.pocketCluster({ id: 'cluster', children: ['front'] })
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', width: 100, height: 100, children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root', width: 100, height: 100 }),
       components: [cluster, d.frontPocket({ id: 'front' })],
       holes: [d.hole({ id: 'hole', componentId: 'front', width: 10, height: 10 })],
     })
@@ -314,8 +320,9 @@ describe('invalid pocket states and patchers', () => {
     for (const children of [[], ['t']]) {
       const cluster = d.pocketCluster({ id: 'cluster', children })
       const source = d.subProject({
+        frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
         id: 'sub',
-        root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+        root: d.rootPanel({ id: 'root' }),
         components: [cluster, d.tPocket({ id: 't' })],
       })
       const computed = getComputedSubProject(source, defaultStitchingSettings)
@@ -330,8 +337,9 @@ describe('invalid pocket states and patchers', () => {
     const zombie = d.panel({ id: 'zombie', children: ['nested'] })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [cluster, t, front, zombie, d.panel({ id: 'nested' })],
       holes: [
         d.hole({ id: 'cluster-hole', componentId: 'cluster' }),
@@ -349,7 +357,7 @@ describe('invalid pocket states and patchers', () => {
     const patched = getPatchedSubProject(source, computed)
     expect(patched.components.zombie).toBeUndefined()
     expect(patched.components.nested).toBeUndefined()
-    expect(patched.components.t.children).toEqual([])
+    expect(accessors.subProject(patched).component.childIds('t')).toEqual([])
     expect(patched.holes).toEqual([])
     expect(patched.stitchLines.map((line) => line.id)).toEqual(['front-line'])
     expect(computed.stitchLines['front-line'].routes.length).toBeGreaterThan(0)

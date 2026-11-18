@@ -6,6 +6,7 @@ import { getCloneIdMappings } from './getCloneIdMappings'
 
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
     bindings: {
       binding: {
@@ -17,7 +18,7 @@ const fixture = () =>
         ],
       },
     },
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' }), d.panel({ id: 'unused-panel' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole' })],

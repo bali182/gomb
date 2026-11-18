@@ -1,6 +1,8 @@
 export type IdPrefixSchema =
   | 'project'
   | 'sub-project'
+  | 'root-panel-face'
+  | 'root-panel-face-binding-field'
   | 'root-panel'
   | 'panel'
   | 'pocket-cluster'

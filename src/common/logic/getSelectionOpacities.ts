@@ -1,4 +1,3 @@
-import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
 import type { ComponentSchema } from '../schemas/components'
 import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectItemSchema, SubProjectSchema } from '../schemas/subProject'
@@ -94,13 +93,15 @@ const getRelatedComponentIds = (
           )
           .map((component: ComponentSchema): string => component.id),
       )
+    case 'root-panel-face':
+      return new Set([selection.id, subProject.root])
     case 'root-panel':
     case 'panel':
     case 'front-pocket':
     case 't-pocket':
       return new Set([selection.id])
     case 'pocket-cluster':
-      return new Set(getComponentDescendants(selection, subProject))
+      return new Set(accessors.subProject(subProject).component.descendantIds(selection.id, true))
     case 'hole':
       return new Set([selection.componentId])
     case 'component-bounds-stitch-line':

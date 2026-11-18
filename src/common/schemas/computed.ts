@@ -44,6 +44,10 @@ export type BaseComputedSchema = HasComponentReferenceSchema & HasPathSchema & H
 
 export type ComputedRootPanelSchema = HasTypeSchema<'computed-root-panel'> &
   BaseComputedSchema &
+  HasComputedCornerRadiusSchema & { frontFaceId: string; backFaceId: string }
+
+export type ComputedRootPanelFaceSchema = HasTypeSchema<'computed-root-panel-face'> &
+  BaseComputedSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
   HasChildrenSchema
@@ -85,6 +89,7 @@ export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster
 
 export type ComputedComponentSchema =
   | ComputedRootPanelSchema
+  | ComputedRootPanelFaceSchema
   | ComputedPanelSchema
   | ComputedPocketClusterSchema
   | ComputedFrontPocketSchema

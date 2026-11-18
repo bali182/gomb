@@ -1,6 +1,7 @@
 import type { BaseSubProjectOperationParamsSchema, CloneStitchLineParamsSchema } from '../../schemas/operations'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { SubProjectSchema } from '../../schemas/subProject'
+import { accessors } from '../../utils/accessors'
 import { getCloneIdMappings } from './utils/getCloneIdMappings'
 
 export const cloneStitchLine = (
@@ -15,7 +16,7 @@ export const cloneStitchLine = (
 
   const idMappings = getCloneIdMappings(subProject, idGenerator)
   const sourceStitchLine = subProject.stitchLines[sourceStitchLineIndex]
-  const usedNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
+  const usedNames = accessors.subProject(subProject).stitchLine.names()
   const clonedStitchLine: StitchLineSchema = {
     ...sourceStitchLine,
     id: idMappings[sourceStitchLine.id],

@@ -82,6 +82,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
 
     const { project: createdProject, subProject: initialSubProject } = addSubProject(validationResult.value, {
       modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(t.defaultNames)),
+      faceNames: t.project.editors.enums.components.rootPanelFaceName,
     })
 
     const response = await electronApi.write({
@@ -106,6 +107,7 @@ export const ElectronCreateProjectDialog: FC<ElectronCreateProjectDialogProps> =
     project,
     showSaveFailedToast,
     t.defaultNames,
+    t.project.editors.enums.components.rootPanelFaceName,
   ])
 
   return (

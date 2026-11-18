@@ -5,12 +5,13 @@ import { accessors } from './index'
 
 describe('ComputedSubProjectAccessor', () => {
   it('returns computed elements by their source identifiers', () => {
-    const root = d.rootPanel({ id: 'root', children: ['panel', 'pocket-cluster'] })
+    const root = d.rootPanel({ id: 'root' })
     const panel = d.panel({ id: 'panel' })
     const pocketCluster = d.pocketCluster({ id: 'pocket-cluster' })
     const hole = d.hole({ id: 'hole', componentId: panel.id })
     const stitchLine = d.componentBoundsStitchLine({ id: 'stitch-line', targetId: panel.id, targetType: 'component' })
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'pocket-cluster'] }),
       id: 'sub-project',
       root,
       components: [panel, pocketCluster],
@@ -43,10 +44,15 @@ describe('ComputedSubProjectAccessor', () => {
   })
 
   it('throws when a computed component has an unexpected type', () => {
-    const root = d.rootPanel({ id: 'root', children: ['panel', 'pocket-cluster'] })
+    const root = d.rootPanel({ id: 'root' })
     const panel = d.panel({ id: 'panel' })
     const pocketCluster = d.pocketCluster({ id: 'pocket-cluster' })
-    const subProject = d.subProject({ id: 'sub-project', root, components: [panel, pocketCluster] })
+    const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'pocket-cluster'] }),
+      id: 'sub-project',
+      root,
+      components: [panel, pocketCluster],
+    })
     const project = d.project({ id: 'project', subProjects: [subProject] })
     const accessor = accessors.computedSubProject(getComputedSubProject(subProject, project.stitchingSettings))
 
@@ -56,12 +62,13 @@ describe('ComputedSubProjectAccessor', () => {
 
   it('finds components, holes and source stitch IDs even when stitching is drawn on another component', () => {
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.panel({ id: 'panel' })],
       holes: [d.hole({ id: 'hole', componentId: 'panel' })],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'line', targetId: 'panel', targetType: 'component', onTop: 'root' }),
+        d.componentBoundsStitchLine({ id: 'line', targetId: 'panel', targetType: 'component', onTop: 'root-front' }),
       ],
     })
     const project = d.project({ id: 'project', subProjects: [subProject] })

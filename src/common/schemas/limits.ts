@@ -5,6 +5,7 @@ import type {
   PanelSchema,
   PocketClusterSchema,
   PocketsSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from './components'
@@ -91,6 +92,7 @@ export type NumericFieldLimitsSchema = {
 export type NumericLimitsSchema<T extends HasTypeSchema<string>> = Pick<T, 'type'> &
   Partial<Record<NumericFieldNameSchema<T>, NumericFieldLimitsSchema>>
 
+export type RootPanelFaceLimitsSchema = NumericLimitsSchema<RootPanelFaceSchema>
 export type RootPanelLimitsSchema = NumericLimitsSchema<RootPanelSchema>
 export type PanelLimitsSchema = NumericLimitsSchema<PanelSchema>
 export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
@@ -108,6 +110,7 @@ export type FrontPocketLimitsSchema = NumericLimitsSchema<FrontPocketSchema> & {
 export type TPocketLimitsSchema = NumericLimitsSchema<TPocketSchema> & { opening: PocketOpeningLimitsSchema }
 export type ComponentLimitsSchema =
   | RootPanelLimitsSchema
+  | RootPanelFaceLimitsSchema
   | PanelLimitsSchema
   | PocketClusterLimitsSchema
   | FrontPocketLimitsSchema

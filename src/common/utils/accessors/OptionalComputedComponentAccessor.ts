@@ -5,6 +5,7 @@ import type {
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedPocketSchema,
+  ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
 } from '../../schemas/computed'
@@ -17,7 +18,7 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
 
   constructor(private readonly root: ComputedSubProjectSchema) {
     for (const parent of Object.values(root.components)) {
-      for (const childId of parent.children) {
+      for (const childId of this.childIds(parent.componentId)) {
         if (!this.parents.has(childId)) {
           this.parents.set(childId, parent)
         }
@@ -25,6 +26,9 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
     }
     this.byId = this.byId.bind(this)
     this.children = this.children.bind(this)
+    this.childIds = this.childIds.bind(this)
+    this.rootPanelFace = this.rootPanelFace.bind(this)
+    this.rootPanelFaceOf = this.rootPanelFaceOf.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -39,7 +43,47 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
   }
 
   children(id: string): ComputedComponentSchema[] {
-    return (this.byId(id)?.children ?? []).map(this.byId).filter(isDefined)
+    return this.childIds(id).map(this.byId).filter(isDefined)
+  }
+
+  childIds(id: string): string[] {
+    const component = this.byId(id)
+    if (!isDefined(component)) {
+      return []
+    }
+    if (narrowers.is.computedRootPanel(component)) {
+      if (
+        component.frontFaceId === component.backFaceId ||
+        !isDefined(this.rootPanelFace(component.frontFaceId)) ||
+        !isDefined(this.rootPanelFace(component.backFaceId))
+      ) {
+        throw new Error('Invalid root panel faces')
+      }
+      return [component.frontFaceId, component.backFaceId]
+    }
+    return component.children
+  }
+
+  rootPanelFace(id: string): ComputedRootPanelFaceSchema | undefined {
+    const value = this.byId(id)
+    return isDefined(value) && narrowers.is.computedRootPanelFace(value) ? value : undefined
+  }
+
+  rootPanelFaceOf(id: string): ComputedRootPanelFaceSchema | undefined {
+    let component = this.byId(id)
+    const visited = new Set<string>()
+    while (isDefined(component)) {
+      if (narrowers.is.computedRootPanelFace(component)) {
+        return component
+      }
+      const componentId = component.componentId
+      if (visited.has(componentId)) {
+        return undefined
+      }
+      visited.add(componentId)
+      component = this.parent(componentId)
+    }
+    return undefined
   }
 
   pocket(id: string): ComputedPocketSchema | undefined {

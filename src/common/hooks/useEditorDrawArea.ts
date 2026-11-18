@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react'
+import { useCallback, useLayoutEffect, useMemo } from 'react'
 import {
   EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY,
   STITCH_LINE_LABEL_BACKGROUND_COLOR,
@@ -6,17 +6,21 @@ import {
   STROKE_THICKNESS,
 } from '../constants/drawing'
 import { PocketEditorTabs } from '../constants/editorTabs'
+import type { SubProjectItemSchema } from '../schemas/subProject'
+import { accessors } from '../utils/accessors'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 import { produce } from '../utils/produce'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useProject } from './useProject'
+import { useRootPanelFace } from './useRootPanelFace'
 import { useSubProject } from './useSubProject'
 
 import { formatHex8, parse } from 'culori'
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { getSelectionOpacities, type SelectionOpacitiesSchema } from '../logic/getSelectionOpacities'
+import { SubProjectAccessorSchema } from '../schemas/accessors'
 import type {
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
@@ -45,9 +49,33 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const { subProject } = useSubProject()
+  const { face, side, setSide } = useRootPanelFace()
   const drawAreaSelection = useSubProjectSelection(subProject)
+
+  const flipRootPanelFace = useCallback((): void => {
+    drawAreaSelection.clearSelection()
+    drawAreaSelection.clearHover()
+    setSide(side === 'front' ? 'back' : 'front')
+  }, [drawAreaSelection, setSide, side])
+
   const { isHovered, isSelected, selected } = drawAreaSelection
   const { clearSelection, clearHover } = drawAreaSelection
+
+  useLayoutEffect(() => {
+    if (!isInteractive || !isDefined(selected)) {
+      return
+    }
+    const accessor = accessors.subProject(subProject)
+    const componentId = getOwnerComponentId(selected, accessor)
+    if (!isDefined(componentId)) {
+      return
+    }
+    const selectedFace = accessor.optional.component.rootPanelFaceOf(componentId)
+    if (!isDefined(selectedFace) || selectedFace.id === face.id) {
+      return
+    }
+    setSide(selectedFace.id === accessor.component.rootPanel().frontFaceId ? 'front' : 'back')
+  }, [isInteractive, selected, subProject, face.id, setSide])
 
   const isEditingPocketContents = useMemo<boolean>(() => {
     return (
@@ -87,7 +115,10 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
-      if (narrowers.is.pocketCluster(component) && component.children.length === 0) {
+      if (
+        narrowers.is.rootPanelFace(component) ||
+        (narrowers.is.pocketCluster(component) && component.children.length === 0)
+      ) {
         return 'transparent'
       }
       return applyOpacity(
@@ -231,6 +262,8 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
+      rootPanelFaceId: face.id,
+      flipRootPanelFace,
       isInteractive,
       isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
@@ -244,6 +277,8 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       labelStyles,
     }),
     [
+      face.id,
+      flipRootPanelFace,
       pocketItemStyles,
       componentStyles,
       drawAreaSelection,
@@ -281,4 +316,17 @@ const getMaskColor = (color: string | undefined, maskColor: 'black' | 'white'): 
 
   const channel = maskColor === 'black' ? 0 : 1
   return formatHex8({ mode: 'rgb', r: channel, g: channel, b: channel, alpha: parsed.alpha ?? 1 })
+}
+
+const getOwnerComponentId = (model: SubProjectItemSchema, accessor: SubProjectAccessorSchema): string | undefined => {
+  if (narrowers.is.component(model)) {
+    return model.id
+  }
+  if (narrowers.is.hole(model)) {
+    return model.componentId
+  }
+  if (narrowers.is.stitchLine(model)) {
+    return model.targetType === 'component' ? model.targetId : accessor.hole.byId(model.targetId).componentId
+  }
+  return undefined
 }

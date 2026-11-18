@@ -16,7 +16,9 @@ import type {
   ReadonlyModelObjectFactorySchema,
 } from '../../schemas/factory'
 import type { IdPrefixSchema } from '../../schemas/idGenerator'
+import type { ModelObjectSchema } from '../../schemas/modelObject'
 import type { SubProjectItemSchema } from '../../schemas/subProject'
+import { isDefined } from '../isDefined'
 import { IdGenerator } from '../random/IdGenerator'
 import { ModelObjectFactory } from './ModelObjectFactory'
 import { NameGenerator } from './NameGenerator'
@@ -36,6 +38,8 @@ type FactoryCaseSchema = {
 const translations: Record<IdPrefixSchema, string> = {
   'project': 'Name',
   'sub-project': 'Name',
+  'root-panel-face': 'Face',
+  'root-panel-face-binding-field': 'Face field',
   'root-panel': 'Name',
   'panel': 'Name',
   'pocket-cluster': 'Name',
@@ -80,7 +84,13 @@ const cases: FactoryCaseSchema[] = [
     label: 'createRootPanel',
     prefix: 'root-panel',
     type: 'root-panel',
-    create: (factory, params) => factory.createRootPanel({ ...params, stitchingSettings: defaultStitchingSettings }),
+    create: (factory, params) =>
+      factory.createRootPanel({
+        frontFaceId: 'factory-front',
+        backFaceId: 'factory-back',
+        ...params,
+        stitchingSettings: defaultStitchingSettings,
+      }),
   },
   {
     label: 'createPanel',
@@ -309,9 +319,10 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
       expect(first.type).toBe(type)
       expect(first.id).toBe(`${prefix}-2`)
       expect(params.forbiddenIds).toEqual(new Set(mode === 'readonly' ? [`${prefix}-1`] : [`${prefix}-1`, first.id]))
-      if ('name' in first) {
-        expect(first.name).toBe('Name 2')
-        expect(params.forbiddenNames).toEqual(new Set(mode === 'readonly' ? ['Name 1'] : ['Name 1', first.name]))
+      const namedFirst = getNamedModel(first)
+      if (isDefined(namedFirst)) {
+        expect(namedFirst.name).toBe('Name 2')
+        expect(params.forbiddenNames).toEqual(new Set(mode === 'readonly' ? ['Name 1'] : ['Name 1', namedFirst.name]))
       } else {
         expect(params.forbiddenNames).toEqual(new Set(['Name 1']))
       }
@@ -325,8 +336,9 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
       expect(second.id).toBe(`${prefix}-${mode === 'readonly' ? 2 : 3}`)
       const fresh = create(factory, { forbiddenIds: new Set(), forbiddenNames: new Set() })
       expect(fresh.id).toBe(`${prefix}-1`)
-      if ('name' in fresh) {
-        expect(fresh.name).toBe('Name 1')
+      const namedFresh = getNamedModel(fresh)
+      if (isDefined(namedFresh)) {
+        expect(namedFresh.name).toBe('Name 1')
       }
     },
   )
@@ -337,6 +349,8 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
       const factory = build()
       const component = factory.createComponent({
         type,
+        frontFaceId: 'factory-front',
+        backFaceId: 'factory-back',
         stitchingSettings: defaultStitchingSettings,
         openingId: 'opening',
         color: '#123456',
@@ -344,7 +358,7 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
         forbiddenNames: new Set(),
       })
       expect(component.type).toBe(type)
-      expect(component.color).toBe('#123456')
+      expect(component).toHaveProperty('color', '#123456')
       if (component.type === 'front-pocket' || component.type === 't-pocket') {
         expect(component.openingId).toBe('opening')
       } else {
@@ -371,6 +385,26 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
       ).toMatchObject({ type, targetId: 'owner', targetType: 'component' })
     },
   )
+
+  it('preserves an explicit face name and only the forbidding factory reserves it', () => {
+    const factory = build()
+    const forbiddenIds = new Set<string>()
+    const forbiddenNames = new Set<string>()
+    const face = factory.createRootPanelFace({ name: 'Front face', forbiddenIds, forbiddenNames })
+    expect(face.name).toBe('Front face')
+    expect(forbiddenIds.has(face.id)).toBe(mode === 'forbidding')
+    expect(forbiddenNames.has('Front face')).toBe(mode === 'forbidding')
+    expect(
+      factory.createComponent({
+        type: 'root-panel-face',
+        name: 'Back face',
+        forbiddenIds,
+        forbiddenNames,
+        stitchingSettings: defaultStitchingSettings,
+      }).name,
+    ).toBe('Back face')
+    expect(forbiddenNames.has('Back face')).toBe(mode === 'forbidding')
+  })
 
   it('dispatches equality bindings without creating a name or relation', () => {
     const { id, name } = createGenerators()
@@ -450,7 +484,9 @@ describe('ReadonlyModelObjectFactory', () => {
     const { id, name } = createGenerators()
     const factory = new ReadonlyModelObjectFactory(id, name)
     const stitchingSettings = { ...defaultStitchingSettings, stitchMargin: 4, stitchHoleDistance: 3 }
-    expect(factory.createRootPanel({ stitchingSettings })).toMatchObject({ width: 101, height: 101 })
+    expect(
+      factory.createRootPanel({ frontFaceId: 'factory-front', backFaceId: 'factory-back', stitchingSettings }),
+    ).toMatchObject({ width: 101, height: 101 })
     expect(factory.createPocketCluster({ stitchingSettings }).pocketStep).toBe(12)
   })
 
@@ -527,3 +563,36 @@ it('requires name exclusions only for objects that have a name', () => {
     field: 'width'
   }>().not.toExtend<CreatePanelBindingFieldParamsSchema>()
 })
+
+const getNamedModel = (model: FactoryResultSchema): ModelObjectSchema | undefined => {
+  switch (model.type) {
+    case 'root-panel':
+    case 'root-panel-face':
+    case 'panel':
+    case 'pocket-cluster':
+    case 'front-pocket':
+    case 't-pocket':
+    case 'hole':
+    case 'component-bounds-stitch-line':
+    case 't-pocket-stitch-line':
+    case 'straight':
+    case 'recessed':
+    case 'slanted':
+    case 'optical-illusion':
+      return model
+    case 'equal-binding':
+    case 'root-panel-binding-field':
+    case 'root-panel-face-binding-field':
+    case 'panel-binding-field':
+    case 'pocket-cluster-binding-field':
+    case 'front-pocket-binding-field':
+    case 't-pocket-binding-field':
+    case 'hole-binding-field':
+    case 'recessed-binding-field':
+    case 'slanted-binding-field':
+    case 'optical-illusion-binding-field':
+    case 'component-bounds-stitch-line-binding-field':
+    case 't-pocket-stitch-line-binding-field':
+      return undefined
+  }
+}

@@ -17,9 +17,10 @@ export const addComputedSizes = (
           return component
         case 'front-pocket':
           return updateAutoLayoutGapComponent(component, narrowers.assert.computedFrontPocket(computedComponent))
-        case 'root-panel': {
-          const computedRootPanel = narrowers.assert.computedRootPanel(computedComponent)
-          return updateAutoLayoutGapComponent(component, computedRootPanel)
+        case 'root-panel':
+          return component
+        case 'root-panel-face': {
+          return updateAutoLayoutGapComponent(component, narrowers.assert.computedRootPanelFace(computedComponent))
         }
         case 'panel': {
           const computedPanel = narrowers.assert.computedPanel(computedComponent)

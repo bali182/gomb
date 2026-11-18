@@ -8,6 +8,8 @@ const definitions: BindingFieldCompatibilityDefinitionsSchema = {
     topRightRadius: 'number',
     bottomLeftRadius: 'number',
     bottomRightRadius: 'number',
+  },
+  'root-panel-face': {
     layoutOrientation: 'enum:layout-orientation',
     mainAxisAnchor: 'enum:anchor',
     layoutGap: 'number',

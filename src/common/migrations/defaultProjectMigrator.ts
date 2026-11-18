@@ -8,6 +8,7 @@ import {
   defaultPocketCluster,
   defaultRecessedPocketOpening,
   defaultRootPanel,
+  defaultRootPanelFace,
   defaultSlantedPocketOpening,
   defaultStitchingSettings,
   defaultTPocket,
@@ -17,6 +18,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -66,10 +68,19 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
   stitchingSettings: (input) => {
     return m.applyDefaults<StitchLineCommonConfigSchema>(m.requireObject(input), defaultStitchingSettings)
   },
+  rootPanelFace: (input) => {
+    const face = m.requireObject<RootPanelFaceSchema>(input)
+    m.requireString(face, 'id')
+    m.requireString(face, 'name')
+    m.requireValue(face, 'type', 'root-panel-face')
+    return m.applyDefaults<RootPanelFaceSchema>(face, defaultRootPanelFace)
+  },
   rootPanel: (input) => {
     const rootPanel = m.requireObject<RootPanelSchema>(input)
     m.requireString(rootPanel, 'id')
     m.requireString(rootPanel, 'name')
+    m.requireString(rootPanel, 'frontFaceId')
+    m.requireString(rootPanel, 'backFaceId')
     m.requireValue(rootPanel, 'type', 'root-panel')
 
     return m.applyDefaults<RootPanelSchema>(rootPanel, defaultRootPanel)

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
+import { RootPanelFace } from '../../components/svg/RootPanelFace'
 import { accessors } from '../../utils/accessors'
 
 import { Panel } from '../../components/svg/Panel'
@@ -54,6 +55,9 @@ export const renderSvgComponentToString = ({
     case 'front-pocket':
     case 't-pocket':
       content = <Pocket componentId={componentId} nestingLevel={nestingLevel} />
+      break
+    case 'root-panel-face':
+      content = <RootPanelFace componentId={componentId} nestingLevel={nestingLevel} />
       break
     case 'root-panel':
       content = <RootPanel componentId={componentId} nestingLevel={nestingLevel} />

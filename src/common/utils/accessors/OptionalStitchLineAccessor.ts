@@ -20,7 +20,7 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
   private readonly stitchLinesByOnTop = new Map<string, StitchLineSchema[]>()
 
   constructor(
-    root: SubProjectSchema,
+    private readonly root: SubProjectSchema,
     private readonly holes: OptionalAccessorSchema<HoleAccessorSchema>,
     private readonly component: OptionalAccessorSchema<ComponentAccessorSchema>,
   ) {
@@ -38,12 +38,17 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
       onTopStitchLines.push(stitchLine)
       this.stitchLinesByOnTop.set(onTopId, onTopStitchLines)
     }
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.ownerPocketCluster = this.ownerPocketCluster.bind(this)
     this.byOwner = this.byOwner.bind(this)
     this.byOnTop = this.byOnTop.bind(this)
+  }
+
+  names(): Set<string> {
+    return new Set(this.root.stitchLines.map((stitchLine) => stitchLine.name))
   }
 
   byId(id: string): StitchLineSchema | undefined {

@@ -28,13 +28,14 @@ describe.each<StitchLineModeTestCase>([
 ])('getExportStitchLines $mode', ({ mode, expectedIds }) => {
   it.each([false, true])('selects and clips stitches with a cutout: %s', (withCutout) => {
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub-project',
-      root: d.rootPanel({ id: 'root', width: 100, height: 100, children: ['panel'] }),
+      root: d.rootPanel({ id: 'root', width: 100, height: 100 }),
       components: [d.panel({ id: 'panel', children: ['child'] }), d.panel({ id: 'child' })],
       stitchLines: [
         d.componentBoundsStitchLine({
           id: 'root-stitch',
-          targetId: 'root',
+          targetId: 'root-front',
           targetType: 'component',
           stitchMargin: stitchMargins['root-stitch'],
         }),
@@ -113,8 +114,9 @@ describe.each<StitchLineModeTestCase>([
 describe('cluster T-pocket stitching export', () => {
   const fixture = () =>
     d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', width: 100, height: 120, children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root', width: 100, height: 120 }),
       components: [
         d.pocketCluster({ id: 'cluster', children: ['a', 'b', 'front'], pocketStep: 0 }),
         d.tPocket({ id: 'a' }),

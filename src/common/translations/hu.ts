@@ -2,6 +2,7 @@ import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 import type { BindingFieldAdderState } from '../components/binding-editors/bindingFieldUtils'
 import type { BindingFieldBlockReasonSchema } from '../schemas/bindings'
+import type { RootPanelFaceSideSchema } from '../schemas/components'
 import type { HasCustomRenderTarget } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
@@ -66,6 +67,9 @@ export const HU = {
     },
   },
   project: {
+    rootPanelFaces: {
+      flip: 'Fordítás',
+    },
     computing: 'Számítás folyamatban…',
     tree: {
       sections: {
@@ -180,6 +184,7 @@ export const HU = {
       },
     },
     editors: {
+      faceLayoutTitle: (name: string): string => `${name} elrendezése`,
       tabs: {
         components: {
           layout: 'Elrendezés',
@@ -849,6 +854,14 @@ export const HU = {
           },
         },
         components: {
+          rootPanelFaceSide: {
+            front: 'eleje',
+            back: 'hátulja',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
+          rootPanelFaceName: {
+            front: 'Előoldal',
+            back: 'Hátoldal',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
           pocketOpening: {
             straight: 'Egyenes',
             recessed: 'Ívelt',
@@ -1143,6 +1156,8 @@ export const HU = {
   defaultNames: {
     'project': 'Projekt',
     'sub-project': 'Alprojekt',
+    'root-panel-face': 'Face',
+    'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Modul',
     'panel': 'Panel',
     'pocket-cluster': 'Zsebcsoport',

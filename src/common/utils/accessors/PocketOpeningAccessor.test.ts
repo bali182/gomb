@@ -31,3 +31,25 @@ describe('PocketOpeningAccessor', () => {
     expect(() => accessor.pocketOpening.defaultOpening()).toThrow('Missing default pocket opening')
   })
 })
+
+it('returns default and unused opening names through strict and optional accessors', () => {
+  const subProject = fixture()
+  const accessor = accessors.subProject(subProject)
+  const names = accessor.pocketOpening.names
+  const optionalNames = accessor.optional.pocketOpening.names
+  expect(names()).toEqual(new Set(['Straight 1', 'Unused']))
+  expect(optionalNames()).toEqual(names())
+  const snapshot = structuredClone(subProject)
+  const expectedNames = names()
+  for (const getNames of [names, optionalNames]) {
+    const result = getNames()
+    result.clear()
+    result.add('Temporary name')
+    expect(names()).toEqual(expectedNames)
+    expect(optionalNames()).toEqual(expectedNames)
+  }
+  expect(subProject).toEqual(snapshot)
+  const empty = accessors.subProject({ ...subProject, pocketOpenings: {} })
+  expect(empty.pocketOpening.names()).toEqual(new Set([]))
+  expect(empty.optional.pocketOpening.names()).toEqual(new Set([]))
+})

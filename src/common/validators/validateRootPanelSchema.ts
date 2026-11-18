@@ -1,4 +1,4 @@
-import type { LayoutOrientationSchema, RootPanelSchema } from '../schemas/components'
+import type { RootPanelSchema } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
@@ -8,12 +8,6 @@ import { createInvalidValidationResult, createValidValidationResult } from './cr
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 import { validateOptionalHexColor } from './validateOptionalHexColor'
-import { validatePrimitiveUnion } from './validatePrimitiveUnion'
-
-const layoutOrientationValues: Record<LayoutOrientationSchema, boolean> = {
-  horizontal: true,
-  vertical: true,
-}
 
 export const validateRootPanelSchema = (
   input: EditableSchema<RootPanelSchema>,
@@ -28,23 +22,10 @@ export const validateRootPanelSchema = (
     input.name,
     currentValue.name,
     input.id,
-    [...Object.values(context.subProject.components), ...otherRootPanels],
+    [...accessors.subProject(context.subProject).component.components(), ...otherRootPanels],
     context,
   )
   const colorResult = validateOptionalHexColor(input.color, currentValue.color, context)
-  const layoutOrientationResult = validatePrimitiveUnion(
-    input.layoutOrientation,
-    currentValue.layoutOrientation,
-    layoutOrientationValues,
-    context,
-  )
-  const mainAxisAnchorResult = validatePrimitiveUnion(
-    input.mainAxisAnchor,
-    currentValue.mainAxisAnchor,
-    { start: true, middle: true, end: true },
-    context,
-  )
-  const layoutGapResult = validateNumber(input.layoutGap, currentValue.layoutGap, context, { min: 0 })
   const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context, { min: 0 })
   const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context, { min: 0 })
   const bottomLeftRadiusResult = validateNumber(input.bottomLeftRadius, currentValue.bottomLeftRadius, context, {
@@ -59,36 +40,30 @@ export const validateRootPanelSchema = (
   const issues: IssuesSchema<RootPanelSchema> = {
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
-    children: input.children.map(() => undefined),
     color: colorResult.issues,
     height: heightResult.issues,
     id: undefined,
-    layoutGap: layoutGapResult.issues,
-    layoutOrientation: layoutOrientationResult.issues,
-    mainAxisAnchor: mainAxisAnchorResult.issues,
     name: nameResult.issues,
     topLeftRadius: topLeftRadiusResult.issues,
     topRightRadius: topRightRadiusResult.issues,
     type: undefined,
+    frontFaceId: undefined,
+    backFaceId: undefined,
     width: widthResult.issues,
-    autoLayoutGap: undefined,
   }
 
   const committedValue: RootPanelSchema = {
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
-    children: currentValue.children,
     height: heightResult.committedValue,
     id: currentValue.id,
-    layoutGap: layoutGapResult.committedValue,
-    layoutOrientation: layoutOrientationResult.committedValue,
-    mainAxisAnchor: mainAxisAnchorResult.committedValue,
     name: nameResult.committedValue,
     topLeftRadius: topLeftRadiusResult.committedValue,
     topRightRadius: topRightRadiusResult.committedValue,
     type: currentValue.type,
+    frontFaceId: currentValue.frontFaceId,
+    backFaceId: currentValue.backFaceId,
     width: widthResult.committedValue,
-    autoLayoutGap: input.autoLayoutGap,
   }
 
   if (isDefined(colorResult.committedValue)) {
@@ -98,9 +73,6 @@ export const validateRootPanelSchema = (
   if (
     !nameResult.isValid ||
     !colorResult.isValid ||
-    !layoutOrientationResult.isValid ||
-    !mainAxisAnchorResult.isValid ||
-    !layoutGapResult.isValid ||
     !topLeftRadiusResult.isValid ||
     !topRightRadiusResult.isValid ||
     !bottomLeftRadiusResult.isValid ||
@@ -114,18 +86,15 @@ export const validateRootPanelSchema = (
   const value: RootPanelSchema = {
     bottomLeftRadius: bottomLeftRadiusResult.value,
     bottomRightRadius: bottomRightRadiusResult.value,
-    children: currentValue.children,
     height: heightResult.value,
     id: currentValue.id,
-    layoutGap: layoutGapResult.value,
-    layoutOrientation: layoutOrientationResult.value,
-    mainAxisAnchor: mainAxisAnchorResult.value,
     name: nameResult.value,
     topLeftRadius: topLeftRadiusResult.value,
     topRightRadius: topRightRadiusResult.value,
     type: currentValue.type,
+    frontFaceId: currentValue.frontFaceId,
+    backFaceId: currentValue.backFaceId,
     width: widthResult.value,
-    autoLayoutGap: input.autoLayoutGap,
   }
 
   if (isDefined(colorResult.value)) {

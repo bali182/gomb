@@ -157,7 +157,7 @@ const collectComponents = (subProject: SubProjectSchema, rootId: string): Compon
     }
     visited.add(id)
     components.push(component)
-    for (const childId of component.children) {
+    for (const childId of accessors.subProject(subProject).component.childIds(component.id)) {
       if (!visit(childId)) {
         return false
       }

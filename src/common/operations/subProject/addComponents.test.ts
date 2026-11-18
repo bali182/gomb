@@ -1,14 +1,17 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ComponentInsertionPositionSchema, CreateComponentsFnParamsSchema } from '../../schemas/operations'
 import { d } from '../../testData'
+import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
+import { narrowers } from '../../utils/narrowers'
 import { addComponents } from './addComponents'
 import { createBaseOperationParams } from './testUtils'
 
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', name: 'Panel 1', children: ['first', 'second'] }),
+    root: d.rootPanel({ id: 'root', name: 'Panel 1' }),
     components: [d.panel({ id: 'first', name: 'Panel 2' }), d.panel({ id: 'second', name: 'Panel 3' })],
   })
 
@@ -34,16 +37,24 @@ describe('addComponents', () => {
           stitchingSettings: base.project.stitchingSettings,
         }),
       ])
-      const result = addComponents(base, { parentId: 'root', position, createComponents })
+      const result = addComponents(base, { parentId: 'root-front', position, createComponents })
       const added = Object.values(result.components).filter((component) => !sourceIds.has(component.id))
       const addedIds = added.map((component) => component.id)
       const index = position === 'start' ? 0 : position === 'end' ? 2 : position
-      expect(result.components.root.children).toEqual([
-        ...source.components.root.children.slice(0, index),
+      expect(
+        accessors.subProject(result).component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId),
+      ).toEqual([
+        ...accessors
+          .subProject(source)
+          .component.childIds(accessors.subProject(source).component.rootPanel().frontFaceId)
+          .slice(0, index),
         ...addedIds,
-        ...source.components.root.children.slice(index),
+        ...accessors
+          .subProject(source)
+          .component.childIds(accessors.subProject(source).component.rootPanel().frontFaceId)
+          .slice(index),
       ])
-      expect(added.map((component) => component.name)).toEqual(['Panel 4', 'Panel 5'])
+      expect(added.map((component) => narrowers.assert.panel(component).name)).toEqual(['Panel 4', 'Panel 5'])
       expect(new Set(addedIds).size).toBe(2)
       for (const component of added) {
         expect(sourceIds.has(component.id)).toBe(false)
@@ -60,9 +71,9 @@ describe('addComponents', () => {
     (position) => {
       const source = fixture()
       const createComponents = vi.fn(() => [])
-      expect(addComponents(createBaseOperationParams(source), { parentId: 'root', position, createComponents })).toBe(
-        source,
-      )
+      expect(
+        addComponents(createBaseOperationParams(source), { parentId: 'root-front', position, createComponents }),
+      ).toBe(source)
       expect(createComponents).not.toHaveBeenCalled()
     },
   )
@@ -80,7 +91,7 @@ describe('addComponents', () => {
     const source = fixture()
     expect(
       addComponents(createBaseOperationParams(source), {
-        parentId: 'root',
+        parentId: 'root-front',
         position: 'end',
         createComponents: () => [],
       }),

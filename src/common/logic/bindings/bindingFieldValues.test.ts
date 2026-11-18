@@ -29,8 +29,9 @@ const fields: BindingFieldSchema[] = [
 ]
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', width: 10, children: ['panel', 'cluster'] }),
+    root: d.rootPanel({ id: 'root', width: 10 }),
     components: [
       d.panel({ id: 'panel', height: 10 }),
       d.pocketCluster({ id: 'cluster', width: 10, children: ['front', 'pocket'] }),

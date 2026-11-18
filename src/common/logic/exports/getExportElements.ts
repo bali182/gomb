@@ -43,10 +43,13 @@ export const getExportElementsForComponent = (
   if (!isDefined(component) || !isDefined(computed)) {
     return []
   }
-  const children = computed.children.flatMap((childId) =>
-    getExportElementsForComponent(subProject, computedSubProject, childId, settings, stitchingSettings),
-  )
-  if (narrowers.is.pocketCluster(component)) {
+  const children = accessors
+    .computedSubProject(computedSubProject)
+    .component.childIds(componentId)
+    .flatMap((childId) =>
+      getExportElementsForComponent(subProject, computedSubProject, childId, settings, stitchingSettings),
+    )
+  if (narrowers.is.pocketCluster(component) || narrowers.is.rootPanelFace(component)) {
     return children
   }
   if (narrowers.is.computedPocketCluster(computed)) {
@@ -66,10 +69,13 @@ const getExportElement = (
 ): ExportElementSchema => {
   const rect = getExportCutHelperBoundingRect(computed.boundingRect, settings.cutHelperDistance)
   const cutHelper = isDefined(rect) ? calculateRectPath(rect, ZERO_CORNER_RADIUS) : undefined
+  const surface = narrowers.is.computedRootPanel(computed)
+    ? accessors.computedSubProject(computedSubProject).component.rootPanelFace(computed.frontFaceId)
+    : computed
   const stitchLines = getExportStitchLines(
     subProject,
     computedSubProject,
-    computed,
+    surface,
     settings.stitchLineMode,
     stitchingSettings,
   )
@@ -108,7 +114,7 @@ const getExportElement = (
     cutHelper,
     cutHelperBoundingRect: rect,
     stitchLines,
-    path: computed.path,
+    path: surface.path,
     childMarkerPaths: settings.childMarkers ? getExportChildMarkerPaths(computed, computedSubProject) : [],
   }
   return element

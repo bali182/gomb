@@ -13,12 +13,17 @@ export class StitchLineAccessor extends BaseStrictAccessor implements StitchLine
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.ownerPocketCluster = this.ownerPocketCluster.bind(this)
     this.byOwner = this.byOwner.bind(this)
     this.byOnTop = this.byOnTop.bind(this)
+  }
+
+  names(): Set<string> {
+    return this.optional.names()
   }
 
   byId(id: string): StitchLineSchema {

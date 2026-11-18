@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { narrowers } from '../../utils/narrowers'
 
 import { POCKET_ITEM_STITCH_MASK_ID, VIEWBOX_PADDING } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
@@ -40,25 +41,34 @@ export const PocketItemStitchMask: FC<PocketItemStitchMaskProps> = ({ componentI
 }
 
 const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskProps> = ({ componentId }) => {
-  const { pocketItemStyles, componentStyles, isInteractive, selection } = useDrawAreaContext()
+  const { pocketItemStyles, componentStyles, isInteractive, selection, rootPanelFaceId } = useDrawAreaContext()
   const component = useComponent(componentId)
   const computed = useComputedComponent(componentId)
-  const { subProject } = useSubProject()
+  const { subProject, computedSubProject } = useSubProject()
   const componentStyleParams: DrawAreaComponentStyleParams = { component, nestingLevel: 0 }
-  const componentPath = (
+  const path = narrowers.is.computedRootPanel(computed)
+    ? accessors
+        .computedSubProject(computedSubProject)
+        .component.rootPanelFace(rootPanelFaceId === computed.backFaceId ? computed.backFaceId : computed.frontFaceId)
+        .path
+    : computed.path
+  const componentPath = narrowers.is.computedRootPanelFace(computed) ? null : (
     <PocketItemStitchMaskPath
-      path={computed.path}
+      path={path}
       fill={componentStyles.getMaskFillColor(componentStyleParams)}
       stroke={componentStyles.getMaskStrokeColor(componentStyleParams)}
       strokeWidth={componentStyles.getBorderThickness(componentStyleParams)}
     />
   )
 
-  const children = computed.children.map((childId) => (
-    <PocketItemStitchMaskComponent key={childId} componentId={childId} />
-  ))
+  const childIds = narrowers.is.computedRootPanel(computed)
+    ? [rootPanelFaceId ?? computed.frontFaceId]
+    : computed.children
+  const children = childIds.map((childId) => <PocketItemStitchMaskComponent key={childId} componentId={childId} />)
 
   switch (computed.type) {
+    case 'computed-root-panel-face':
+      return <>{children}</>
     case 'computed-root-panel':
     case 'computed-panel':
       return (

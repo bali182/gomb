@@ -27,8 +27,9 @@ const equal = (id: string, fields: BindingFieldSchema[]): EqualBindingSchema => 
 })
 const fixture = (bindings: Record<string, EqualBindingSchema>): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['a', 'b', 'c', 'd'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['a', 'b', 'c', 'd'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: ['a', 'b', 'c', 'd'].map((id) =>
       d.panel({ id, width: 10, height: 10, autoWidth: false, autoHeight: false }),
     ),
@@ -220,8 +221,9 @@ describe('applyResolution before patching', () => {
 
   it('clears linked item references while retaining each pocket orientation and offsets', () => {
     const before = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', children: ['a', 'b'] }),
         d.tPocket({

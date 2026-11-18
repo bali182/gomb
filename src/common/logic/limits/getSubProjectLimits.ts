@@ -42,7 +42,9 @@ const collectComponentLimits = (
   const limits: Record<string, ComponentLimitsSchema> = {}
   const parents: Record<string, ComputedComponentSchema> = {}
   for (const parent of Object.values(computedSubProject.components)) {
-    for (const childId of parent.children) {
+    for (const childId of narrowers.is.computedRootPanel(parent)
+      ? [parent.frontFaceId, parent.backFaceId]
+      : parent.children) {
       parents[childId] = parent
     }
   }
@@ -136,6 +138,8 @@ const getComponentLimits = (
   subProject: SubProjectSchema,
 ): ComponentLimitsSchema | undefined => {
   switch (component.type) {
+    case 'root-panel-face':
+      return { type: component.type }
     case 'root-panel':
       return getRootPanelLimits(component, narrowers.assert.computedRootPanel(computed))
     case 'panel':

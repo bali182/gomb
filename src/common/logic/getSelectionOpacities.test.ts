@@ -13,8 +13,9 @@ const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameG
 
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel' }),
       d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
@@ -25,7 +26,7 @@ const fixture = () =>
     stitchLines: [
       d.componentBoundsStitchLine({ id: 'bounds', targetId: 'panel', targetType: 'component' }),
       d.componentBoundsStitchLine({ id: 'hole-bounds', targetId: 'hole', targetType: 'hole' }),
-      d.componentBoundsStitchLine({ id: 'on-top', targetId: 'panel', targetType: 'component', onTop: 'root' }),
+      d.componentBoundsStitchLine({ id: 'on-top', targetId: 'panel', targetType: 'component', onTop: 'root-front' }),
       d.tPocketStitchLine({ id: 'pocket-stitch', targetId: 't', targetType: 'component' }),
     ],
   })
@@ -55,16 +56,19 @@ describe('getSelectionOpacities', () => {
 
   const source = fixture()
   const cases: SelectionCase[] = [
-    ...Object.values(source.components).map(
-      (selected): SelectionCase => ({
-        selected,
-        related: selected.type === 'pocket-cluster' ? ['cluster', 't', 'front'] : [selected.id],
-      }),
-    ),
+    ...Object.values(source.components).map((selected): SelectionCase => {
+      if (selected.type === 'pocket-cluster') {
+        return { selected, related: ['cluster', 't', 'front'] }
+      }
+      if (selected.type === 'root-panel-face') {
+        return { selected, related: [selected.id, source.root] }
+      }
+      return { selected, related: [selected.id] }
+    }),
     { selected: source.holes[0], related: ['panel'] },
     { selected: source.stitchLines[0], related: ['panel'] },
     { selected: source.stitchLines[1], related: ['panel'] },
-    { selected: source.stitchLines[2], related: ['root'] },
+    { selected: source.stitchLines[2], related: ['root-front'] },
     { selected: source.stitchLines[3], related: ['t'] },
   ]
   it.each(cases)('retains related components for $selected.type / $selected.id', ({ selected, related }) => {
