@@ -10,13 +10,17 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { RootPanelFace } from './RootPanelFace'
 import { SizeLabel } from './SizeLabel'
 
-type RootPanelProps = { componentId: string; nestingLevel: number }
-export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => {
-  const { componentStyles, isInteractive, rootPanelFaceId, selection } = useDrawAreaContext()
+type RootPanelProps = {
+  componentId: string
+  nestingLevel: number
+  faceIdAboveRoot: string
+}
+export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceIdAboveRoot }) => {
+  const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const rootPanel = useComponent<RootPanelSchema>(componentId)
-  const faceId = rootPanelFaceId === rootPanel.backFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
-  const computedFace = useComputedComponent<ComputedRootPanelFaceSchema>(faceId)
+  const inactiveFaceId = faceIdAboveRoot === rootPanel.frontFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
+  const computedFace = useComputedComponent<ComputedRootPanelFaceSchema>(faceIdAboveRoot)
   const pathData = usePath(computedFace.path)
   const isActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
   const styleParams: DrawAreaComponentStyleParams = { component: rootPanel, nestingLevel }
@@ -39,6 +43,12 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
 
   return (
     <>
+      <RootPanelFace
+        key={inactiveFaceId}
+        componentId={inactiveFaceId}
+        nestingLevel={nestingLevel}
+        direction="reverse"
+      />
       <path
         d={pathData}
         fill={componentStyles.getBackgroundColor(styleParams)}
@@ -53,7 +63,7 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
       {settings.view.componentDimensionsVisible && isActive && (
         <SizeLabel reference="bottom-right" boundingRect={computedFace.boundingRect} />
       )}
-      <RootPanelFace componentId={faceId} nestingLevel={nestingLevel} />
+      <RootPanelFace key={faceIdAboveRoot} componentId={faceIdAboveRoot} nestingLevel={nestingLevel} />
     </>
   )
 }

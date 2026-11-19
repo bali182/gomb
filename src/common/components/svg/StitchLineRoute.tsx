@@ -1,7 +1,8 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
-import { POCKET_ITEM_STITCH_MASK_ID } from '../../constants/drawing'
+import { POCKET_ITEM_STITCH_MASK_ID, POCKET_ITEM_STITCH_MASK_REVERSE_ID } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
+import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
@@ -18,6 +19,8 @@ type StitchLineRouteProps = {
 export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine }) => {
   const { isInteractive, isShowingPocketItems, selection, stitchLineStyles } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
+  const { direction } = useSvgFace()
+  const maskId = direction === 'reverse' ? POCKET_ITEM_STITCH_MASK_REVERSE_ID : POCKET_ITEM_STITCH_MASK_ID
   const pathData = usePath(route.path)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
   const stitchHoleThickness = stitchLineStyles.getStitchHoleThickness(stitchLine)
@@ -49,7 +52,7 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
 
   return (
     <g
-      mask={isShowingPocketItems && !isStitchLineActive ? `url(#${POCKET_ITEM_STITCH_MASK_ID})` : undefined}
+      mask={isShowingPocketItems && !isStitchLineActive ? `url(#${maskId})` : undefined}
       data-stitch-line-id={stitchLine.id}
       onClick={isInteractive ? handleClick : undefined}
       onPointerEnter={isInteractive ? handlePointerEnter : undefined}

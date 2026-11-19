@@ -20,6 +20,7 @@ import type { TranslationSchema } from '../../translations/translationSchema'
 import { accessors } from '../../utils/accessors'
 import { downloadBlob } from '../../utils/downloadBlob'
 import { isDefined } from '../../utils/isDefined'
+import { reflectRectHorizontally } from '../geometryUtils'
 import { getComputedSubProject } from '../getComputedSubProject'
 import { renderSvgComponentToString } from './renderSvgComponentToString'
 import { renderSvgToPng } from './renderSvgToPng'
@@ -180,20 +181,19 @@ const collectBoundingRects = (
   nestingLevel: number,
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
-): RectSchema[] => [
-  ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
-  ...getStitchLineBoundingRects(
-    accessors.computedSubProject(computedSubProject).stitchLine.byOnTop(component.componentId),
-    params,
-  ),
-  ...accessors
-    .computedSubProject(computedSubProject)
-    .component.children(component.componentId)
-    .filter(
-      (child) =>
-        !narrowers.is.computedRootPanel(component) ||
-        child.componentId === (params.context.rootPanelFaceId ?? component.frontFaceId),
-    )
+  isReversed = false,
+): RectSchema[] => {
+  const accessor = accessors.computedSubProject(computedSubProject)
+  const root = accessor.component.rootPanel()
+  const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
+  const ownRects = [
+    ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
+    ...getStitchLineBoundingRects(accessor.stitchLine.byOnTop(component.componentId), params),
+  ]
+  const visibleRects = isReversed ? ownRects.map((rect) => reflectRectHorizontally(rect, axisX)) : ownRects
+  const activeFaceId = params.context.rootPanelFaceId === root.backFaceId ? root.backFaceId : root.frontFaceId
+  const childrenRects = accessor.component
+    .children(component.componentId)
     .flatMap((child) =>
       collectBoundingRects(
         child,
@@ -202,9 +202,11 @@ const collectBoundingRects = (
           : nestingLevel + 1,
         computedSubProject,
         params,
+        narrowers.is.computedRootPanel(component) ? child.componentId !== activeFaceId : isReversed,
       ),
-    ),
-]
+    )
+  return [...visibleRects, ...childrenRects]
+}
 
 const getBoundingRectUnion = (rects: readonly RectSchema[]): RectSchema => {
   const first = rects[0]

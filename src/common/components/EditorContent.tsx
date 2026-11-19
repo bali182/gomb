@@ -13,6 +13,7 @@ import { FC, ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, use
 import { PiPlus, PiPlusCircle, PiWarningCircle } from 'react-icons/pi'
 import { useDrawAreaContext } from '../contexts/DrawAreaContext'
 import { useEditorContext } from '../contexts/EditorContext'
+import { useDrawAreaTurn } from '../hooks/useDrawAreaTurn'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useMeasurement } from '../hooks/useMeasurement'
 import { useProject } from '../hooks/useProject'
@@ -82,6 +83,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const { selection, rootPanelFaceId, flipRootPanelFace } = useDrawAreaContext()
   const { selected, clearSelection } = selection
   const { stopMeasuring } = useMeasurement()
+  const { presentation, floatingEditorsVisible } = useDrawAreaTurn()
 
   const handleTreeSectionsChange = useCallback(
     (event: ResizableAccordionChangeEvent): void => {
@@ -194,7 +196,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
         >
           <Splitter.Panel id="draw-area" minHeight="0" minWidth="0">
             <Box height="100%" minHeight="0" minWidth="0" overflow="hidden" position="relative">
-              {isDefined(subProject) && <DrawArea />}
+              {isDefined(presentation) && <DrawArea presentation={presentation} />}
               {!isDefined(subProject) && isDefined(subProjectId) && <MissingSubProjectState />}
               {!isDefined(subProject) && !isDefined(subProjectId) && <EmptyProjectState />}
 
@@ -207,7 +209,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                 </Flex>
               </Box>
 
-              {isDefined(subProject) && <FloatingEditors onAdd={handleAdd} />}
+              {floatingEditorsVisible && <FloatingEditors onAdd={handleAdd} />}
               <SubProjectComputationFeedback />
             </Box>
           </Splitter.Panel>

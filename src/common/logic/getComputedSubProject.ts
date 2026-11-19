@@ -39,6 +39,7 @@ import { calculatePocketClusterGeometry } from './calculatePocketClusterGeometry
 import { calculateRectPath } from './calculateRectPath'
 import { unionClosedPaths } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
+import { reflectRectHorizontally } from './geometryUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 import { getPocketClusterCornerRadiusLimits } from './limits/getPocketClusterCornerRadiusLimits'
@@ -75,7 +76,7 @@ export const getComputedSubProject = (
     components: computedComponents,
     holes,
     stitchLines,
-    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines)),
+    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines), root.boundingRect),
   }
   return { ...geometry, limits: getSubProjectLimits(subProject, geometry, stitchingSettings) }
 }
@@ -365,12 +366,17 @@ const assertLayoutChildren = (children: ComponentSchema[]): (PanelSchema | Pocke
 const getSubProjectViewBox = (
   components: ComputedComponentSchema[],
   stitchLines: ComputedStitchLineSchema[],
+  rootBoundingRect: RectSchema,
 ): RectSchema => {
   const items = components
     .filter((component) => narrowers.is.computedFrontPocket(component) || narrowers.is.computedTPocket(component))
     .flatMap((pocket): ComputedPocketItemSchema[] => (isDefined(pocket.item) ? [pocket.item] : []))
   const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...items]
-  const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
+  const axisX = rootBoundingRect.x.plus(rootBoundingRect.width.dividedBy(2))
+  const boundingRects: RectSchema[] = withBoundingRects.flatMap((element) => [
+    element.boundingRect,
+    reflectRectHorizontally(element.boundingRect, axisX),
+  ])
 
   const firstBoundingRect = boundingRects[0]
 

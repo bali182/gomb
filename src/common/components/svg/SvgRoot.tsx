@@ -13,7 +13,12 @@ const noOutline: CSSProperties = {
   outline: 'none',
 }
 
-export const SvgRoot = () => {
+type SvgRootProps = {
+  faceIdAboveRoot: string
+  overlaysVisible?: boolean
+}
+
+export const SvgRoot = ({ faceIdAboveRoot, overlaysVisible = true }: SvgRootProps) => {
   const { isShowingPocketItems } = useDrawAreaContext()
   const { isMeasuring } = useMeasurement()
   const { computedSubProject: computedProject } = useSubProject()
@@ -29,10 +34,19 @@ export const SvgRoot = () => {
       style={{ display: 'block' }}
       viewBox={viewBox}
     >
-      <defs>{isShowingPocketItems && <PocketItemStitchMask componentId={computedProject.root} />}</defs>
-      <RootPanel componentId={computedProject.root} nestingLevel={0} />
-      <g ref={svgLabelsPortalRef} pointerEvents="none" style={noOutline} />
-      {isMeasuring && <MeasurementOverlay />}
+      <defs>
+        {isShowingPocketItems && (
+          <PocketItemStitchMask componentId={computedProject.root} faceIdAboveRoot={faceIdAboveRoot} />
+        )}
+      </defs>
+      <RootPanel componentId={computedProject.root} nestingLevel={0} faceIdAboveRoot={faceIdAboveRoot} />
+      <g
+        ref={svgLabelsPortalRef}
+        pointerEvents="none"
+        style={noOutline}
+        visibility={overlaysVisible ? undefined : 'hidden'}
+      />
+      <g visibility={overlaysVisible ? undefined : 'hidden'}>{isMeasuring && <MeasurementOverlay />}</g>
     </svg>
   )
 }

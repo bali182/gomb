@@ -2031,3 +2031,17 @@ it('computes independent local limits for pockets sharing one opening definition
   expect(tLimits.opening.slantOffset?.max?.value.lt(frontLimits.opening.slantOffset?.max?.value ?? 0)).toBe(true)
   expect(source).toEqual(snapshot)
 })
+
+it('includes the reflected overflow of both faces in an orientation-independent view box', () => {
+  const source = d.subProject({
+    id: 'sub',
+    root: d.rootPanel({ id: 'root', width: 120, height: 80 }),
+    backFace: d.rootPanelFace({ id: 'root-back', children: ['wide-panel'], mainAxisAnchor: 'start' }),
+    components: [d.panel({ id: 'wide-panel', width: 180, height: 20, autoWidth: false, autoHeight: false })],
+  })
+  const computed = getComputedSubProject(source, defaultStitchingSettings)
+  expect(computed.viewBox.x.toNumber()).toBe(-60)
+  expect(computed.viewBox.width.toNumber()).toBe(240)
+  expect(computed.viewBox.y.toNumber()).toBe(0)
+  expect(computed.viewBox.height.toNumber()).toBe(80)
+})

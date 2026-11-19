@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { defaultExportParams, defaultStitchingSettings } from '../defaultStates'
 import { cloneSubProject } from '../operations/project/cloneSubProject'
@@ -12,6 +13,7 @@ import { loadProjectFromContents } from '../utils/loadProjectFromContents'
 import { validateRootPanelFaceSchema } from '../validators/validateRootPanelFaceSchema'
 import { getExportElements } from './exports/getExportElements'
 import { getComputedSubProject } from './getComputedSubProject'
+import { isPointInClosedPath } from './isPointInClosedPath'
 import { processSubProjectComputation } from './processSubProjectComputation'
 
 const fixture = () =>
@@ -191,5 +193,140 @@ describe('root panel face names', () => {
     Reflect.deleteProperty(missingName, 'name')
     subProject.components['root-back'] = missingName
     expect(() => loadProjectFromContents(JSON.stringify(project), { t: EN })).toThrow()
+  })
+})
+
+describe('shared root cutouts', () => {
+  it('cuts holes from both faces through the same material in their corresponding orientations', () => {
+    const subProject = fixture()
+    subProject.holes = [
+      d.hole({
+        id: 'front-hole',
+        componentId: 'root-front',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: 10,
+        yOffset: 30,
+        width: 20,
+        height: 10,
+      }),
+      d.hole({
+        id: 'back-hole',
+        componentId: 'root-back',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: 10,
+        yOffset: 30,
+        width: 20,
+        height: 10,
+      }),
+      d.hole({
+        id: 'panel-hole',
+        componentId: 'front-panel',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: 50,
+        yOffset: 30,
+        width: 10,
+        height: 10,
+      }),
+    ]
+    const snapshot = structuredClone(subProject)
+    const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+    const accessor = accessors.computedSubProject(computed)
+    const rootPath = accessor.component.rootPanel().path
+    const frontPath = accessor.component.rootPanelFace('root-front').path
+    const backPath = accessor.component.rootPanelFace('root-back').path
+    for (const x of [20, 100]) {
+      const point = { x: new BigNumber(x), y: new BigNumber(35) }
+      expect(isPointInClosedPath(point, rootPath)).toBe(false)
+      expect(isPointInClosedPath(point, frontPath)).toBe(false)
+      expect(isPointInClosedPath(point, backPath)).toBe(false)
+    }
+    const panelHolePoint = { x: new BigNumber(55), y: new BigNumber(35) }
+    expect(isPointInClosedPath(panelHolePoint, rootPath)).toBe(true)
+    expect(isPointInClosedPath(panelHolePoint, accessor.component.panel('front-panel').path)).toBe(false)
+    expect(accessor.hole.byId('back-hole').boundingRect.x.toNumber()).toBe(10)
+    expect(
+      isPointInClosedPath(
+        { x: new BigNumber(20), y: new BigNumber(35) },
+        accessor.hole.byId('back-hole').highlightPath,
+      ),
+    ).toBe(true)
+    expect(subProject).toEqual(snapshot)
+    const elements = getExportElements(
+      d.project({ id: 'project', subProjects: [subProject] }),
+      { ...d.project({ id: 'project', subProjects: [] }), subProjects: [computed] },
+      defaultExportParams,
+    )
+    const rootElement = elements.find((element) => element.id === 'root')
+    expect(rootElement?.type).toBe('export-panel')
+    if (rootElement?.type === 'export-panel') {
+      expect(isPointInClosedPath({ x: new BigNumber(100), y: new BigNumber(35) }, rootElement.path)).toBe(false)
+    }
+  })
+
+  it('combines overlapping cuts from opposite sides without creating material in their overlap', () => {
+    const subProject = fixture()
+    subProject.holes = [
+      d.hole({
+        id: 'front-hole',
+        componentId: 'root-front',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: 10,
+        yOffset: 30,
+        width: 20,
+        height: 10,
+      }),
+      d.hole({
+        id: 'back-hole',
+        componentId: 'root-back',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: 85,
+        yOffset: 30,
+        width: 20,
+        height: 10,
+      }),
+    ]
+    const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+    const rootPath = accessors.computedSubProject(computed).component.rootPanel().path
+    for (const x of [12, 20, 32]) {
+      expect(isPointInClosedPath({ x: new BigNumber(x), y: new BigNumber(35) }, rootPath)).toBe(false)
+    }
+    expect(isPointInClosedPath({ x: new BigNumber(36), y: new BigNumber(35) }, rootPath)).toBe(true)
+  })
+
+  it('clips a cut crossing the root edge in both face orientations', () => {
+    const subProject = fixture()
+    subProject.holes = [
+      d.hole({
+        id: 'back-notch',
+        componentId: 'root-back',
+        xAnchor: 'start',
+        yAnchor: 'start',
+        xOffset: -5,
+        yOffset: 30,
+        width: 20,
+        height: 10,
+      }),
+    ]
+    const accessor = accessors.computedSubProject(getComputedSubProject(subProject, defaultStitchingSettings))
+    expect(
+      isPointInClosedPath(
+        { x: new BigNumber(115), y: new BigNumber(35) },
+        accessor.component.rootPanelFace('root-front').path,
+      ),
+    ).toBe(false)
+    expect(
+      isPointInClosedPath(
+        { x: new BigNumber(5), y: new BigNumber(35) },
+        accessor.component.rootPanelFace('root-back').path,
+      ),
+    ).toBe(false)
+    expect(
+      isPointInClosedPath({ x: new BigNumber(100), y: new BigNumber(35) }, accessor.component.rootPanel().path),
+    ).toBe(true)
   })
 })
