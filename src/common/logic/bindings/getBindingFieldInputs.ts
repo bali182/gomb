@@ -213,7 +213,6 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
         'topRightRadius',
         'bottomLeftRadius',
         'bottomRightRadius',
-        'onTop',
       ]
       return fields.map(
         (field): ComponentBoundsStitchLineBindingFieldInputSchema => ({

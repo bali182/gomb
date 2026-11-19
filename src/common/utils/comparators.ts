@@ -287,7 +287,8 @@ export const comparators = {
       a.name === b.name &&
       a.targetType === b.targetType &&
       a.targetId === b.targetId &&
-      a.onTop === b.onTop &&
+      a.entryComponentId === b.entryComponentId &&
+      a.exitComponentId === b.exitComponentId &&
       a.stitchMargin === b.stitchMargin &&
       a.stitchHoleLength === b.stitchHoleLength &&
       a.stitchHoleDistance === b.stitchHoleDistance &&
@@ -317,6 +318,7 @@ export const comparators = {
       a.name === b.name &&
       a.targetType === b.targetType &&
       a.targetId === b.targetId &&
+      a.exitComponentId === b.exitComponentId &&
       a.stitchMargin === b.stitchMargin &&
       a.stitchHoleLength === b.stitchHoleLength &&
       a.stitchHoleDistance === b.stitchHoleDistance &&

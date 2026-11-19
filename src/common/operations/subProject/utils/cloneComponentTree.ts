@@ -172,7 +172,7 @@ const cloneHoles = (
   preserveNames: boolean,
 ): HoleSchema[] => {
   const usedNames = accessors.subProject(subProject).hole.names()
-  return holesToClone.map((sourceHole) => {
+  return holesToClone.map((sourceHole): HoleSchema => {
     const name = preserveNames ? sourceHole.name : nameGenerator.getByBaseNameAndForbid(sourceHole.name, usedNames)
     return { ...sourceHole, id: idMappings[sourceHole.id], componentId: idMappings[sourceHole.componentId], name }
   })
@@ -187,19 +187,23 @@ const cloneStitchLines = (
   preserveNames: boolean,
 ): StitchLineSchema[] => {
   const usedNames = accessors.subProject(subProject).stitchLine.names()
-  return stitchLinesToClone.map((sourceStitchLine) => {
+  return stitchLinesToClone.map((sourceStitchLine): StitchLineSchema => {
     const name = preserveNames
       ? sourceStitchLine.name
       : nameGenerator.getByBaseNameAndForbid(sourceStitchLine.name, usedNames)
     const id = idMappings[sourceStitchLine.id]
     const targetId = idMappings[sourceStitchLine.targetId]
+    const exitComponentId =
+      isDefined(sourceStitchLine.exitComponentId) && componentIdsToClone.has(sourceStitchLine.exitComponentId)
+        ? idMappings[sourceStitchLine.exitComponentId]
+        : undefined
     if (narrowers.is.componentBoundsStitchLine(sourceStitchLine)) {
-      const onTop =
-        isDefined(sourceStitchLine.onTop) && componentIdsToClone.has(sourceStitchLine.onTop)
-          ? idMappings[sourceStitchLine.onTop]
+      const entryComponentId =
+        isDefined(sourceStitchLine.entryComponentId) && componentIdsToClone.has(sourceStitchLine.entryComponentId)
+          ? idMappings[sourceStitchLine.entryComponentId]
           : undefined
-      return { ...sourceStitchLine, id, name, targetId, onTop }
+      return { ...sourceStitchLine, id, name, targetId, entryComponentId, exitComponentId }
     }
-    return { ...sourceStitchLine, id, name, targetId }
+    return { ...sourceStitchLine, id, name, targetId, exitComponentId }
   })
 }

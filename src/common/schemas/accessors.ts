@@ -19,6 +19,7 @@ import {
   ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
+  ComputedStitchRouteSchema,
   ComputedTPocketSchema,
 } from './computed'
 import { HoleSchema } from './hole'
@@ -67,6 +68,8 @@ export type ComponentAccessorSchema = {
   ancestorIds(id: string, includeSelf?: boolean): readonly string[]
   descendants(id: string, includeSelf?: boolean): readonly ComponentSchema[]
   descendantIds(id: string, includeSelf?: boolean): readonly string[]
+  layers(faceId: string): readonly ComponentSchema[]
+  layerIds(faceId: string): readonly string[]
   names(): Set<string>
 }
 
@@ -76,7 +79,10 @@ export type StitchLineAccessorSchema = {
   tPocket(id: string): TPocketStitchLineSchema
   ownerPocketCluster(id: string): PocketClusterSchema
   byOwner(componentId: string): StitchLineSchema[]
-  byOnTop(componentId: string): StitchLineSchema[]
+  defaultEntryComponentId(stitchLineId: string, pocketId?: string): string
+  defaultExitComponentId(stitchLineId: string): string
+  entryComponent(stitchLineId: string, pocketId?: string): ComponentSchema
+  exitComponent(stitchLineId: string): ComponentSchema
   names(): Set<string>
 }
 
@@ -113,7 +119,8 @@ export type ComputedStitchLineAccessorSchema = {
   bounds(id: string): ComputedStitchLineSchema
   tPocket(id: string): ComputedStitchLineSchema
   byOwner(componentId: string): ComputedStitchLineSchema[]
-  byOnTop(componentId: string): ComputedStitchLineSchema[]
+  byEntry(componentId: string): ComputedStitchRouteSchema[]
+  byExit(componentId: string): ComputedStitchRouteSchema[]
 }
 
 export type ComputedHoleAccessorSchema = {

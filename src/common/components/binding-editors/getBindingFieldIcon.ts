@@ -9,7 +9,6 @@ import {
   PiArrowsVertical,
   PiCreditCard,
   PiNeedle,
-  PiSelectionForeground,
 } from 'react-icons/pi'
 import type { BindingFieldNameSchema } from '../../schemas/bindings'
 import { HeightIcon } from '../icons/HeightIcon'
@@ -84,7 +83,6 @@ const bindingFieldIcons: Record<BindingFieldNameSchema, IconType> = {
   stitchHoleDistance: PiNeedle,
   stitchHoleThickness: PiNeedle,
   stitchLineThickness: PiNeedle,
-  onTop: PiSelectionForeground,
   startOffset: StitchLineStartOffsetIcon,
   endOffset: StitchLineEndOffsetIcon,
   stitchDirection: StitchDirectionIcon,

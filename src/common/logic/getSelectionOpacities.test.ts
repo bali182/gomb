@@ -26,7 +26,12 @@ const fixture = () =>
     stitchLines: [
       d.componentBoundsStitchLine({ id: 'bounds', targetId: 'panel', targetType: 'component' }),
       d.componentBoundsStitchLine({ id: 'hole-bounds', targetId: 'hole', targetType: 'hole' }),
-      d.componentBoundsStitchLine({ id: 'on-top', targetId: 'panel', targetType: 'component', onTop: 'root-front' }),
+      d.componentBoundsStitchLine({
+        id: 'on-top',
+        targetId: 'panel',
+        targetType: 'component',
+        entryComponentId: 'root-front',
+      }),
       d.tPocketStitchLine({ id: 'pocket-stitch', targetId: 't', targetType: 'component' }),
     ],
   })
@@ -66,10 +71,10 @@ describe('getSelectionOpacities', () => {
       return { selected, related: [selected.id] }
     }),
     { selected: source.holes[0], related: ['panel'] },
-    { selected: source.stitchLines[0], related: ['panel'] },
-    { selected: source.stitchLines[1], related: ['panel'] },
-    { selected: source.stitchLines[2], related: ['root-front'] },
-    { selected: source.stitchLines[3], related: ['t'] },
+    { selected: source.stitchLines[0], related: ['panel', 'root-back', 'root'] },
+    { selected: source.stitchLines[1], related: ['panel', 'root-back', 'root'] },
+    { selected: source.stitchLines[2], related: ['root-front', 'root-back', 'root'] },
+    { selected: source.stitchLines[3], related: ['t', 'root-back', 'root'] },
   ]
   it.each(cases)('retains related components for $selected.type / $selected.id', ({ selected, related }) => {
     const result = getSelectionOpacities(selected, source, false)
@@ -104,4 +109,10 @@ describe('getSelectionOpacities', () => {
         .map(([id]) => id),
     ).toEqual([selected.id])
   })
+})
+
+it('retains the geometry-owner relationship when the stitch entry is on another component', () => {
+  const source = fixture()
+  const result = getSelectionOpacities(source.components.panel, source, false)
+  expect(result.stitchLines['on-top'].stroke).toBe(1)
 })

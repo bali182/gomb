@@ -17,6 +17,8 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.layers = this.layers.bind(this)
+    this.layerIds = this.layerIds.bind(this)
     this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.children = this.children.bind(this)
@@ -39,6 +41,15 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.frontPockets = this.frontPockets.bind(this)
     this.panels = this.panels.bind(this)
     this.pocketClusters = this.pocketClusters.bind(this)
+  }
+
+  layers(faceId: string): readonly ComponentSchema[] {
+    return this.layerIds(faceId).map(this.byId)
+  }
+
+  layerIds(faceId: string): readonly string[] {
+    this.rootPanelFace(faceId)
+    return this.optional.layerIds(faceId)
   }
 
   names(): Set<string> {

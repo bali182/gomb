@@ -87,7 +87,8 @@ describe('input model comparators', () => {
   it('detects render-target, offset and route direction changes', () => {
     const stitchLine = d.componentBoundsStitchLine({ id: 'stitch', targetId: 'root-front', targetType: 'component' })
     const variants = [
-      { ...stitchLine, onTop: 'panel' },
+      { ...stitchLine, entryComponentId: 'panel' },
+      { ...stitchLine, exitComponentId: 'panel' },
       { ...stitchLine, startOffset: 1 },
       { ...stitchLine, endOffset: 2 },
       { ...stitchLine, stitchDirection: 'end-to-start' as const },

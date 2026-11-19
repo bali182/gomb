@@ -338,17 +338,29 @@ describe('selective component cloning', () => {
     expect(source).toEqual(snapshot)
   })
 
-  it('preserves internal and external onTop references without cloning their targets', () => {
+  it('preserves internal and external entryComponentId references without cloning their targets', () => {
     const source = fixture()
     source.stitchLines = [
-      d.componentBoundsStitchLine({ id: 'internal', targetId: 'panel', targetType: 'component', onTop: 'child' }),
-      d.componentBoundsStitchLine({ id: 'external', targetId: 'panel', targetType: 'component', onTop: 'outside' }),
+      d.componentBoundsStitchLine({
+        id: 'internal',
+        targetId: 'panel',
+        targetType: 'component',
+        entryComponentId: 'child',
+      }),
+      d.componentBoundsStitchLine({
+        id: 'external',
+        targetId: 'panel',
+        targetType: 'component',
+        entryComponentId: 'outside',
+      }),
     ]
     const params = createCloneComponentParams(source, 'panel')
     params.children.child.action = 'ignore'
     const result = cloneComponent(createBaseOperationParams(source), params)
     expect(
-      result.stitchLines.slice(-2).map((stitchLine) => narrowers.assert.componentBoundsStitchLine(stitchLine).onTop),
+      result.stitchLines
+        .slice(-2)
+        .map((stitchLine) => narrowers.assert.componentBoundsStitchLine(stitchLine).entryComponentId),
     ).toEqual(['child', 'outside'])
     expect(Object.keys(result.components)).toHaveLength(Object.keys(source.components).length + 1)
   })

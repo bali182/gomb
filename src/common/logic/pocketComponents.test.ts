@@ -117,7 +117,7 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
         subProject,
         computed,
         'cluster',
-        { ...defaultExportParams, stitchLineMode: 'related-stitch-lines' },
+        { ...defaultExportParams },
         defaultStitchingSettings,
       )
       expect(elements.map((element) => element.id)).toEqual(['t1', 't2', 'front'])
@@ -127,24 +127,21 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       ).toBe(true)
       expect(subProject).toEqual(before)
     })
-    it.each(['own-stitch-lines', 'related-stitch-lines', 'all-stitch-lines'] as const)(
-      'keeps the cluster border on every pocket in %s exports',
-      (stitchLineMode) => {
-        const { subProject } = fixture()
-        const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-        const elements = getExportElementsForComponent(
-          subProject,
-          computed,
-          'cluster',
-          { ...defaultExportParams, stitchLineMode },
-          defaultStitchingSettings,
-        )
-        expect(elements).toHaveLength(3)
-        for (const element of elements) {
-          expect(element.stitchLines.some((line) => line.stitchLine.id === 'border')).toBe(true)
-        }
-      },
-    )
+    it('keeps the cluster border on every physically crossed pocket', () => {
+      const { subProject } = fixture()
+      const computed = getComputedSubProject(subProject, defaultStitchingSettings)
+      const elements = getExportElementsForComponent(
+        subProject,
+        computed,
+        'cluster',
+        { ...defaultExportParams },
+        defaultStitchingSettings,
+      )
+      expect(elements).toHaveLength(3)
+      for (const element of elements) {
+        expect(element.stitchLines.some((line) => line.stitchLine.id === 'border')).toBe(true)
+      }
+    })
     it.each(['ID-2', 'HUF'] as const)(
       'computes each pocket item from its own configuration with %s in front',
       (itemId) => {

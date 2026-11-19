@@ -24,8 +24,8 @@ describe('ComputedSubProjectAccessor', () => {
 
     expect(accessor.component.byId(panel.id)).toBe(computed.components[panel.id])
     expect(accessor.stitchLine.byId(stitchLine.id).stitchLineId).toBe(stitchLine.id)
-    expect(accessor.stitchLine.byOnTop(panel.id)).toEqual([computed.stitchLines[stitchLine.id]])
-    expect(accessor.stitchLine.byOnTop('missing-component')).toEqual([])
+    expect(accessor.stitchLine.byEntry(panel.id)).toEqual(computed.stitchLines[stitchLine.id].routes)
+    expect(accessor.stitchLine.byEntry('missing-component')).toEqual([])
     expect(accessor.hole.byId(hole.id).holeId).toBe(hole.id)
     expect(accessor.component.rootPanel().componentId).toBe(root.id)
     expect(accessor.component.panel(panel.id).componentId).toBe(panel.id)
@@ -68,7 +68,12 @@ describe('ComputedSubProjectAccessor', () => {
       components: [d.panel({ id: 'panel' })],
       holes: [d.hole({ id: 'hole', componentId: 'panel' })],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'line', targetId: 'panel', targetType: 'component', onTop: 'root-front' }),
+        d.componentBoundsStitchLine({
+          id: 'line',
+          targetId: 'panel',
+          targetType: 'component',
+          entryComponentId: 'root-front',
+        }),
       ],
     })
     const project = d.project({ id: 'project', subProjects: [subProject] })

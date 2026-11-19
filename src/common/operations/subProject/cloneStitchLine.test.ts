@@ -8,7 +8,7 @@ import { createBaseOperationParams } from './testUtils'
 const nameGenerator = new NameGenerator(EN.defaultNames)
 
 describe('cloneStitchLine', () => {
-  it.each(['component', 'hole'] as const)('retains %s targets and onTop references', (targetType) => {
+  it.each(['component', 'hole'] as const)('retains %s targets and entryComponentId references', (targetType) => {
     const source = d.subProject({
       frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub',
@@ -35,7 +35,8 @@ describe('cloneStitchLine', () => {
           id: 'stitch',
           targetId: targetType === 'component' ? 'panel' : 'hole',
           targetType,
-          onTop: 'root-front',
+          entryComponentId: 'root-front',
+          exitComponentId: 'root-back',
           name: 'Stitch',
         }),
       ],

@@ -56,7 +56,6 @@ export const defaultStitchingSettings: StitchLineCommonConfigSchema = {
 export const defaultExportParams: ExportSettingsSchema = {
   gap: 10,
   padding: 10,
-  stitchLineMode: 'related-stitch-lines',
   showNames: true,
   showDimensions: true,
   showParentNames: true,

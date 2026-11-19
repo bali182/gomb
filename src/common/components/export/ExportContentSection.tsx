@@ -1,24 +1,12 @@
-import {
-  Select,
-  Switch,
-  createListCollection,
-  type ListCollection,
-  type SelectValueChangeDetails,
-} from '@chakra-ui/react'
-import { useCallback, useMemo, type ReactNode } from 'react'
+import { Switch } from '@chakra-ui/react'
+import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
-import type { ExportSettingsSchema, ExportStitchLineModeSchema } from '../../schemas/settings'
-import { isDefined } from '../../utils/isDefined'
+import type { ExportSettingsSchema } from '../../schemas/settings'
 import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
-
-type ExportStitchLineModeOption = {
-  label: string
-  value: ExportStitchLineModeSchema
-}
 
 type ExportContentSectionProps = {
   editable: EditableSchema<ExportSettingsSchema>
@@ -28,44 +16,6 @@ type ExportContentSectionProps = {
 
 export function ExportContentSection({ editable, issues, onChange }: ExportContentSectionProps): ReactNode {
   const { t } = useTranslation()
-  const stitchLineModeOptions = useMemo<ExportStitchLineModeOption[]>(
-    () => [
-      {
-        label: t.project.editors.enums.export.exportStitchLineModes['own-stitch-lines'],
-        value: 'own-stitch-lines',
-      },
-      {
-        label: t.project.editors.enums.export.exportStitchLineModes['related-stitch-lines'],
-        value: 'related-stitch-lines',
-      },
-      {
-        label: t.project.editors.enums.export.exportStitchLineModes['all-stitch-lines'],
-        value: 'all-stitch-lines',
-      },
-    ],
-    [t],
-  )
-  const stitchLineModeCollection = useMemo<ListCollection<ExportStitchLineModeOption>>(
-    () =>
-      createListCollection<ExportStitchLineModeOption>({
-        itemToString: (item) => item.label,
-        itemToValue: (item) => item.value,
-        items: stitchLineModeOptions,
-      }),
-    [stitchLineModeOptions],
-  )
-  const handleStitchLineModeChange = useCallback(
-    (details: SelectValueChangeDetails<ExportStitchLineModeOption>): void => {
-      const stitchLineMode = details.value[0]
-
-      if (!isDefined(stitchLineMode)) {
-        return
-      }
-
-      onChange({ ...editable, stitchLineMode: stitchLineMode as ExportStitchLineModeSchema })
-    },
-    [editable, onChange],
-  )
   const handleShowNamesChange = useCallback(
     (details: Switch.CheckedChangeDetails): void => {
       onChange({ ...editable, showNames: details.checked })
@@ -97,44 +47,9 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
     [editable, onChange],
   )
 
-  const hasStitchLineModeError = isDefined(issues.stitchLineMode) && issues.stitchLineMode.severity === 'error'
-
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader>{t.project.editors.sections.export.content.title}</SectionGroup.SectionHeader>
-
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.stitchLineMode.tooltip}>
-        {t.project.editors.sections.export.content.stitchLineMode.label}
-      </SectionGroup.SectionRowTitle>
-      <SectionGroup.SectionRowEditor issue={issues.stitchLineMode}>
-        <Select.Root
-          aria-invalid={hasStitchLineModeError}
-          collection={stitchLineModeCollection}
-          onValueChange={handleStitchLineModeChange}
-          size="xs"
-          value={[editable.stitchLineMode]}
-        >
-          <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Select.Positioner>
-            <Select.Content>
-              {stitchLineModeCollection.items.map((item) => (
-                <Select.Item item={item} key={item.value}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                  <Select.ItemIndicator />
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Positioner>
-        </Select.Root>
-      </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.content.showNames.tooltip}>
         {t.project.editors.sections.export.content.showNames.label}

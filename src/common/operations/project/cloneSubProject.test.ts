@@ -99,14 +99,20 @@ describe('cloneSubProject', () => {
   })
 })
 
-it('maps onTop references inside a full subproject clone', () => {
+it('maps entryComponentId references inside a full subproject clone', () => {
   const source = d.subProject({
     frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
     root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' })],
     stitchLines: [
-      d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component', onTop: 'root-front' }),
+      d.componentBoundsStitchLine({
+        id: 'stitch',
+        targetId: 'panel',
+        targetType: 'component',
+        entryComponentId: 'root-front',
+        exitComponentId: 'root-back',
+      }),
     ],
   })
   const project = d.project({ id: 'project', subProjects: [source] })
@@ -115,7 +121,8 @@ it('maps onTop references inside a full subproject clone', () => {
     targetId: accessors
       .subProject(cloned)
       .component.childIds(accessors.subProject(cloned).component.rootPanel().frontFaceId)[0],
-    onTop: accessors.subProject(cloned).component.rootPanel().frontFaceId,
+    entryComponentId: accessors.subProject(cloned).component.rootPanel().frontFaceId,
+    exitComponentId: accessors.subProject(cloned).component.rootPanel().backFaceId,
   })
 })
 
@@ -155,7 +162,13 @@ it('clones the complete binding structure with fresh IDs and remapped models', (
     ],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     stitchLines: [
-      d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole', onTop: 'root-front' }),
+      d.componentBoundsStitchLine({
+        id: 'stitch',
+        targetId: 'hole',
+        targetType: 'hole',
+        entryComponentId: 'root-front',
+        exitComponentId: 'root-back',
+      }),
     ],
     pocketOpenings: [
       { id: 'shared-opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },

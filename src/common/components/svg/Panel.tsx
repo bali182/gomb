@@ -57,21 +57,26 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
     <>
       <SvgComponentLayers
         content={
-          <>
-            <path
-              d={pathData}
-              fill={componentStyles.getBackgroundColor(styleParams)}
-              filter={componentStyles.getFilter(styleParams)}
-              stroke={componentStyles.getBorderColor(styleParams)}
-              strokeWidth={componentStyles.getBorderThickness(styleParams)}
-              data-component-id={panel.id}
-              onPointerEnter={isInteractive ? handlePointerEnter : undefined}
-              onPointerLeave={isInteractive ? handlePointerLeave : undefined}
-              onClick={isInteractive ? handleClick : undefined}
-            />
-            <StitchLines componentId={panel.id} />
-            <HoleHighlights componentId={panel.id} />
-          </>
+          <SvgComponentLayers
+            before={<StitchLines componentId={panel.id} surface="back" />}
+            after={<StitchLines componentId={panel.id} surface="front" />}
+            content={
+              <>
+                <path
+                  d={pathData}
+                  fill={componentStyles.getBackgroundColor(styleParams)}
+                  filter={componentStyles.getFilter(styleParams)}
+                  stroke={componentStyles.getBorderColor(styleParams)}
+                  strokeWidth={componentStyles.getBorderThickness(styleParams)}
+                  data-component-id={panel.id}
+                  onPointerEnter={isInteractive ? handlePointerEnter : undefined}
+                  onPointerLeave={isInteractive ? handlePointerLeave : undefined}
+                  onClick={isInteractive ? handleClick : undefined}
+                />
+                <HoleHighlights componentId={panel.id} />
+              </>
+            }
+          />
         }
         after={orderedChildren.map((component) => {
           switch (component.type) {

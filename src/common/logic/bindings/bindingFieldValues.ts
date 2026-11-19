@@ -67,8 +67,6 @@ const isCompatibleValue = (group: BindingCompatibilityGroupSchema, value: Bindin
       return typeof value === 'string'
     case 'boolean':
       return typeof value === 'boolean'
-    case 'reference:component':
-      return !isDefined(value) || typeof value === 'string'
     case 'reference:pocket-item':
       return !isDefined(value) || (typeof value === 'string' && has(pocketItems, value as PocketItemIdSchema))
     case 'field:stitch-margin':

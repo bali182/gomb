@@ -56,19 +56,18 @@ import type {
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
   ExportPageSettingsSchema,
-  ExportStitchLineModeSchema,
   LanguageSchema,
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
 import type {
   HasBasicOffsetsSchema,
-  HasCustomRenderTarget,
+  HasEntryComponentSchema,
+  HasExitComponentSchema,
   HasStitchDirectionSchema,
   HasStitchedCornersSchema,
   HasStitchedSidesSchema,
   StitchLineCommonConfigSchema,
-  TPocketStitchLineOwnSchema,
 } from '../schemas/stitching'
 import type { ThemeSchema } from '../schemas/theme'
 import type {
@@ -608,12 +607,18 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasPocketItemSchema>,
         },
         stitchLines: {
-          renderTarget: {
-            title: '-',
-            onTop: {
-              label: 'Render target',
+          components: {
+            title: 'Stitching layers',
+            entryComponentId: {
+              label: 'First pierced',
+              tooltip: 'The first material layer pierced by the stitching.',
             },
-          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
+            exitComponentId: {
+              label: 'Last pierced',
+              tooltip:
+                'The last material layer pierced by the stitching. This layer and all layers between it and the first are included.',
+            },
+          } satisfies SectionTranslationSchema<HasEntryComponentSchema & HasExitComponentSchema>,
           settings: {
             title: 'Stitching',
             stitchMargin: {
@@ -653,7 +658,7 @@ export const EN = {
               label: 'Punching direction',
               tooltip: 'Changes which way the stitch line runs along the pocket.',
             },
-          } satisfies SectionTranslationSchema<TPocketStitchLineOwnSchema>,
+          } satisfies SectionTranslationSchema<HasBasicOffsetsSchema & HasStitchDirectionSchema>,
           sidesAndCorners: {
             title: 'Seam line',
             startOffset: {
@@ -792,10 +797,6 @@ export const EN = {
           } satisfies SectionTranslationSchema<ExportLayoutSettingsSchema>,
           content: {
             title: 'Content',
-            stitchLineMode: {
-              label: 'Stitch lines',
-              tooltip: 'Chooses which stitch lines are included in the export.',
-            },
             showNames: {
               label: 'Show names',
               tooltip: 'Includes component names in the exported file.',
@@ -892,7 +893,6 @@ export const EN = {
             stitchHoleDistance: 'Stitch hole spacing',
             stitchHoleThickness: 'Stitch hole thickness',
             stitchLineThickness: 'Stitch line thickness',
-            onTop: 'Stitch line target',
             startOffset: 'Stitch start offset',
             endOffset: 'Stitch end offset',
             stitchDirection: 'Stitch direction',
@@ -966,11 +966,6 @@ export const EN = {
             pdf: 'PDF',
             png: 'PNG',
           } satisfies EnumTranslationSchema<ExportFormatSchema>,
-          exportStitchLineModes: {
-            'own-stitch-lines': 'Own stitch lines',
-            'related-stitch-lines': 'Related stitch lines',
-            'all-stitch-lines': 'All stitch lines',
-          } satisfies EnumTranslationSchema<ExportStitchLineModeSchema>,
           exportOrientation: {
             portrait: 'Portrait',
             landscape: 'Landscape',

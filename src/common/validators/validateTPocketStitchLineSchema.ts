@@ -43,6 +43,7 @@ export const validateTPocketStitchLineSchema = (
     stitchLineThickness: commonConfigResult.issues.stitchLineThickness,
     stitchMargin: commonConfigResult.issues.stitchMargin,
     type: undefined,
+    exitComponentId: undefined,
   }
 
   const committedValue: TPocketStitchLineSchema = {
@@ -55,6 +56,7 @@ export const validateTPocketStitchLineSchema = (
     startOffset: startOffsetResult.committedValue,
     stitchDirection: stitchDirectionResult.committedValue,
     type: currentValue.type,
+    exitComponentId: input.exitComponentId,
   }
 
   if (

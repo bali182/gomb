@@ -11,7 +11,6 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
 import { PocketClusterSelectionLabel } from './PocketClusterSelectionLabel'
 import { SizeLabel } from './SizeLabel'
-import { StitchLines } from './StitchLines'
 
 type PocketClusterProps = {
   componentId: string
@@ -70,7 +69,6 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <StitchLines componentId={componentId} />
       <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )

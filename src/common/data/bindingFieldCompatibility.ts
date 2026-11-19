@@ -111,7 +111,6 @@ const definitions: BindingFieldCompatibilityDefinitionsSchema = {
     topRightRadius: 'number',
     bottomLeftRadius: 'number',
     bottomRightRadius: 'number',
-    onTop: 'reference:component',
   },
   't-pocket-stitch-line': {
     stitchMargin: 'field:stitch-margin',

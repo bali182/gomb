@@ -1,4 +1,4 @@
-import { type FC } from 'react'
+import { useCallback, type FC } from 'react'
 import { StitchLineEditorTabs } from '../../constants/editorTabs'
 
 import { Tabs } from '@chakra-ui/react'
@@ -6,10 +6,15 @@ import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
-import type { StitchLineCommonConfigSchema, TPocketStitchLineSchema } from '../../schemas/stitching'
+import type {
+  HasExitComponentSchema,
+  StitchLineCommonConfigSchema,
+  TPocketStitchLineSchema,
+} from '../../schemas/stitching'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketStitchingSection } from './sections/PocketStitchingSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
+import { TPocketStitchLineComponentsSection } from './sections/TPocketStitchLineComponentsSection'
 
 type TPocketStitchLineEditorProps = {
   editable: EditableSchema<TPocketStitchLineSchema>
@@ -32,6 +37,10 @@ export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
     defaultTab: StitchLineEditorTabs.settings,
     tabs: StitchLineEditorTabs,
   })
+  const handleComponentsChange = useCallback(
+    (value: HasExitComponentSchema): void => onChange({ ...editable, ...value }),
+    [editable, onChange],
+  )
   return (
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       <Tabs.List alignItems="center" pr="2">
@@ -42,6 +51,11 @@ export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
       </Tabs.List>
       <Tabs.Content value={StitchLineEditorTabs.settings} pt={0}>
         <SectionGroup.Root>
+          <TPocketStitchLineComponentsSection
+            stitchLineId={editable.id}
+            value={editable}
+            onChange={handleComponentsChange}
+          />
           <PocketStitchingSection editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>
       </Tabs.Content>

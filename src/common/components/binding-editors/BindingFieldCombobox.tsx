@@ -1,30 +1,18 @@
 import {
-  Box,
   Combobox,
-  HStack,
   Icon,
   InputGroup,
-  Portal,
   TagsInput,
-  createListCollection,
-  useCombobox,
-  useFilter,
   useTagsInput,
-  type ComboboxInputValueChangeDetails,
-  type ComboboxOpenChangeDetails,
-  type ComboboxValueChangeDetails,
   type InputGroupProps,
-  type ListCollection,
   type SystemStyleObject,
   type TagsInputValueChangeDetails,
-  type Tokens,
 } from '@chakra-ui/react'
-import { useCallback, useId, useMemo, useRef, useState, type FC, type ReactNode } from 'react'
+import { useCallback, useId, useMemo, useRef, useState, type FC } from 'react'
 import { PiArrowRight, PiPlus } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
-import { portalRef } from '../../portalRef'
 import type { BindingFieldNameSchema } from '../../schemas/bindings'
 import type { BindingFieldInputSchema } from '../../schemas/factory'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
@@ -32,14 +20,12 @@ import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { EditorButton } from '../common/EditorButton'
+import { TreeCombobox, type TreeComboboxGroup, type TreeComboboxItem } from '../common/TreeCombobox'
 import type { BindingFieldAdderState } from './bindingFieldUtils'
 import { getBindingFieldIcon } from './getBindingFieldIcon'
 
-const modelChoicePadding: Tokens['spacing'] = '2'
-const modelChoiceIndent: Tokens['spacing'] = '4'
 const comboboxValue: string[] = []
-const endAddonProps: InputGroupProps['endAddonProps'] = { px: '0', size: 'sm' }
-const modelChoiceDisabledStyles: SystemStyleObject = { opacity: 1 }
+const endAddonProps: InputGroupProps['endAddonProps'] = { px: '0', size: 'xs' }
 const fieldInputStyles: SystemStyleObject = { minWidth: '0', _readOnly: { display: 'block' } }
 
 const validateTag = (): boolean => false
@@ -57,8 +43,6 @@ export type BindingPropertyChoice = {
   label: string
   field: BindingFieldInputSchema
 }
-
-type BindingFieldChoice = BindingModelChoice | BindingPropertyChoice
 
 type BindingFieldComboboxIds = {
   input: string
@@ -85,49 +69,58 @@ export const BindingFieldCombobox: FC<BindingFieldComboboxProps> = ({
   const { t } = useTranslation()
   const [search, setSearch] = useState<string>('')
   const [open, setOpen] = useState<boolean>(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
-  const searching = search.trim().length > 0
-  const { contains } = useFilter({ sensitivity: 'base' })
+
   const selectedModel = useMemo<BindingModelChoice | undefined>(
     () => modelChoices.find((item) => item.id === selection.modelId),
     [modelChoices, selection.modelId],
   )
+
   const selectedProperty = useMemo<BindingPropertyChoice | undefined>(
     () => propertyChoices.find((item) => item.id === selection.property),
     [propertyChoices, selection.property],
   )
+
   const complete = isDefined(selectedModel) && isDefined(selectedProperty)
+
+  const placeholder = isDefined(selectedModel)
+    ? t.project.editors.sections.bindings.addFields.property.placeholder
+    : t.project.editors.sections.bindings.addFields.modelId.placeholder
+
   const value = useMemo<string[]>(() => {
     if (!isDefined(selectedModel)) {
       return []
     }
     return isDefined(selectedProperty) ? [selectedModel.id, selectedProperty.id] : [selectedModel.id]
   }, [selectedModel, selectedProperty])
-  const filteredModels = useMemo<BindingModelChoice[]>(
-    () => modelChoices.filter((item) => contains(item.label, search.trim())),
-    [modelChoices, contains, search],
-  )
-  const filteredComponents = useMemo<BindingModelChoice[]>(
-    () => filteredModels.filter((item) => !narrowers.is.pocketOpening(item.model)),
-    [filteredModels],
-  )
-  const filteredOpenings = useMemo<BindingModelChoice[]>(
-    () => filteredModels.filter((item) => narrowers.is.pocketOpening(item.model)),
-    [filteredModels],
-  )
-  const filteredProperties = useMemo<BindingPropertyChoice[]>(
-    () => propertyChoices.filter((item) => contains(item.label, search.trim())),
-    [propertyChoices, contains, search],
-  )
-  const collection = useMemo<ListCollection<BindingFieldChoice>>(
-    () =>
-      createListCollection<BindingFieldChoice>({
-        items: isDefined(selectedModel) ? filteredProperties : filteredModels,
-        itemToString: (item) => item.label,
-        itemToValue: (item) => item.id,
-        isItemDisabled: (item) => 'disabled' in item && item.disabled,
-      }),
-    [selectedModel, filteredProperties, filteredModels],
+
+  const items = useMemo<TreeComboboxItem[]>(() => {
+    if (isDefined(selectedModel)) {
+      return propertyChoices.map((item) => ({
+        id: item.id,
+        label: item.label,
+        icon: getBindingFieldIcon(item.id),
+        depth: 0,
+        disabled: false,
+      }))
+    }
+    return modelChoices.map((item) => ({
+      id: item.id,
+      label: item.label,
+      icon: getModelIcon(item.model, subProject),
+      depth: item.depth,
+      disabled: item.disabled,
+      groupId: narrowers.is.pocketOpening(item.model) ? 'openings' : 'components',
+    }))
+  }, [selectedModel, propertyChoices, modelChoices, subProject])
+
+  const groups = useMemo<TreeComboboxGroup[]>(
+    () => [
+      { id: 'components', label: t.project.editors.sections.bindings.addFields.components },
+      { id: 'openings', label: t.project.editors.sections.bindings.addFields.pocketOpenings },
+    ],
+    [t],
   )
   const id = useId()
   const ids = useMemo<BindingFieldComboboxIds>(() => ({ input: `${id}:input`, control: `${id}:control` }), [id])
@@ -151,36 +144,30 @@ export const BindingFieldCombobox: FC<BindingFieldComboboxProps> = ({
   )
 
   const handleChoiceChange = useCallback(
-    (details: ComboboxValueChangeDetails<BindingFieldChoice>): void => {
-      const item = details.items[0]
-      if (isComputing || complete || !isDefined(item)) {
+    (id: string): void => {
+      if (isComputing || complete) {
         return
       }
-      if ('model' in item) {
-        if (item.disabled) {
+      if (!isDefined(selectedModel)) {
+        onSelectionChange({ modelId: id, property: undefined })
+        setOpen(true)
+      } else {
+        const property = propertyChoices.find((item) => item.id === id)
+        if (!isDefined(property)) {
           return
         }
-        onSelectionChange({ modelId: item.id, property: undefined })
-        setOpen(true)
-      } else if (isDefined(selectedModel)) {
-        onSelectionChange({ modelId: selectedModel.id, property: item.id })
+        onSelectionChange({ modelId: selectedModel.id, property: property.id })
         setOpen(false)
       }
       setSearch('')
     },
-    [complete, isComputing, onSelectionChange, selectedModel],
+    [isComputing, complete, selectedModel, onSelectionChange, propertyChoices],
   )
 
-  const handleInputValueChange = useCallback((details: ComboboxInputValueChangeDetails): void => {
-    if (details.reason === 'input-change') {
-      setSearch(details.inputValue)
-    }
-  }, [])
-
   const handleOpenChange = useCallback(
-    (details: ComboboxOpenChangeDetails): void => {
-      setOpen(details.open && !complete)
-      if (!details.open) {
+    (nextOpen: boolean): void => {
+      setOpen(nextOpen && !complete)
+      if (!nextOpen) {
         setSearch('')
       }
     },
@@ -203,176 +190,93 @@ export const BindingFieldCombobox: FC<BindingFieldComboboxProps> = ({
     validate: validateTag,
     onValueChange: handleTagsChange,
   })
-  const combobox = useCombobox<BindingFieldChoice>({
-    ids,
-    collection,
-    value: comboboxValue,
-    inputValue: search,
-    open: open && !complete,
-    inputBehavior: searching ? 'autohighlight' : 'none',
-    openOnClick: true,
-    openOnChange: !complete,
-    closeOnSelect: false,
-    selectionBehavior: 'clear',
-    readOnly: isComputing,
-    onValueChange: handleChoiceChange,
-    onInputValueChange: handleInputValueChange,
-    onOpenChange: handleOpenChange,
-  })
-
   const handleAdd = useCallback((): void => {
     if (isComputing || !complete) {
       return
     }
     onAdd()
-    combobox.focus()
-  }, [combobox, complete, isComputing, onAdd])
-
-  const renderModelItem = useCallback(
-    (item: BindingModelChoice): ReactNode => {
-      const paddingInlineStart = `calc({spacing.${modelChoicePadding}} + ${searching ? 0 : item.depth} * {spacing.${modelChoiceIndent}})`
-      return (
-        <Combobox.Item
-          key={item.id}
-          item={item}
-          position="relative"
-          ps={paddingInlineStart}
-          _disabled={modelChoiceDisabledStyles}
-        >
-          {!searching &&
-            Array.from({ length: item.depth }, (_, depth: number): ReactNode => {
-              const insetInlineStart = `calc({spacing.${modelChoicePadding}} + ${depth} * {spacing.${modelChoiceIndent}} + {spacing.${modelChoiceIndent}} / 2)`
-              return (
-                <Box
-                  key={depth}
-                  position="absolute"
-                  top="0"
-                  bottom="0"
-                  insetInlineStart={insetInlineStart}
-                  borderInlineStartWidth="1px"
-                  borderColor="border"
-                  pointerEvents="none"
-                />
-              )
-            })}
-          <HStack gap="2" minW="0" flex="1" color={item.disabled ? 'fg.muted' : undefined}>
-            <Icon as={getModelIcon(item.model, subProject)} flexShrink="0" />
-            <Combobox.ItemText>{item.label}</Combobox.ItemText>
-          </HStack>
-          <Combobox.ItemIndicator />
-        </Combobox.Item>
-      )
-    },
-    [searching, subProject],
-  )
+    inputRef.current?.focus()
+  }, [complete, isComputing, onAdd])
 
   return (
-    <Combobox.RootProvider value={combobox} size="sm" onExitComplete={handleExitComplete}>
-      <TagsInput.RootProvider value={tags} size="sm" minW="0">
-        <InputGroup
-          minW="0"
-          endAddon={
-            <EditorButton
-              ref={addButtonRef}
-              alignSelf="stretch"
-              borderLeftRadius="0"
-              pr="2"
-              pl="1.5"
-              gap="1"
-              height="auto"
-              size="sm"
-              readOnly={isComputing}
-              disabled={!complete}
-              onClick={handleAdd}
-            >
-              <PiPlus />
-            </EditorButton>
-          }
-          endAddonProps={endAddonProps}
-        >
-          <Combobox.Control asChild>
-            <TagsInput.Control
-              bg="bg.panel"
-              flex="1"
-              flexWrap="nowrap"
-              minW="0"
-              borderRightRadius="0"
-              overflow="hidden"
-            >
-              {isDefined(selectedModel) && (
-                <>
-                  <TagsInput.Item index={0} value={selectedModel.id} flexShrink="1" minW="0">
+    <TreeCombobox
+      items={items}
+      groups={isDefined(selectedModel) ? undefined : groups}
+      value={comboboxValue}
+      inputValue={search}
+      open={open && !complete}
+      readOnly={isComputing}
+      ids={ids}
+      emptyMessage={t.project.editors.sections.bindings.addFields.noMatches}
+      onSelect={handleChoiceChange}
+      onInputValueChange={setSearch}
+      onOpenChange={handleOpenChange}
+      onExitComplete={handleExitComplete}
+      control={
+        <TagsInput.RootProvider value={tags} size="xs" minW="0">
+          <InputGroup
+            minW="0"
+            endAddon={
+              <EditorButton
+                ref={addButtonRef}
+                alignSelf="stretch"
+                borderLeftRadius="0"
+                pr="2"
+                pl="1.5"
+                gap="1"
+                height="auto"
+                size="xs"
+                readOnly={isComputing}
+                disabled={!complete}
+                onClick={handleAdd}
+              >
+                <Icon as={PiPlus} size="sm" />
+              </EditorButton>
+            }
+            endAddonProps={endAddonProps}
+          >
+            <Combobox.Control asChild>
+              <TagsInput.Control
+                bg="bg.panel"
+                flex="1"
+                flexWrap="nowrap"
+                minW="0"
+                borderRightRadius="0"
+                overflow="hidden"
+              >
+                {isDefined(selectedModel) && (
+                  <>
+                    <TagsInput.Item index={0} value={selectedModel.id} flexShrink="1" minW="0">
+                      <TagsInput.ItemPreview>
+                        <TagsInput.ItemText truncate>{selectedModel.label}</TagsInput.ItemText>
+                        <TagsInput.ItemDeleteTrigger />
+                      </TagsInput.ItemPreview>
+                    </TagsInput.Item>
+                    <Icon as={PiArrowRight} flexShrink="0" />
+                  </>
+                )}
+                {isDefined(selectedProperty) && (
+                  <TagsInput.Item index={1} value={selectedProperty.id} flexShrink="1" minW="0">
                     <TagsInput.ItemPreview>
-                      <TagsInput.ItemText truncate>{selectedModel.label}</TagsInput.ItemText>
+                      <TagsInput.ItemText truncate>{selectedProperty.label}</TagsInput.ItemText>
                       <TagsInput.ItemDeleteTrigger />
                     </TagsInput.ItemPreview>
                   </TagsInput.Item>
-                  <Icon as={PiArrowRight} flexShrink="0" />
-                </>
-              )}
-              {isDefined(selectedProperty) && (
-                <TagsInput.Item index={1} value={selectedProperty.id} flexShrink="1" minW="0">
-                  <TagsInput.ItemPreview>
-                    <TagsInput.ItemText truncate>{selectedProperty.label}</TagsInput.ItemText>
-                    <TagsInput.ItemDeleteTrigger />
-                  </TagsInput.ItemPreview>
-                </TagsInput.Item>
-              )}
-              <Combobox.Input unstyled asChild>
-                <TagsInput.Input
-                  css={fieldInputStyles}
-                  readOnly={complete}
-                  placeholder={
-                    complete
-                      ? ''
-                      : isDefined(selectedModel)
-                        ? t.project.editors.sections.bindings.addFields.property.placeholder
-                        : t.project.editors.sections.bindings.addFields.modelId.placeholder
-                  }
-                />
-              </Combobox.Input>
-              <Combobox.Trigger disabled={complete} flexShrink="0" />
-            </TagsInput.Control>
-          </Combobox.Control>
-        </InputGroup>
-        <Portal container={portalRef}>
-          <Combobox.Positioner>
-            <Combobox.Content maxH="72" overflowY="auto">
-              <Combobox.Empty>{t.project.editors.sections.bindings.addFields.noMatches}</Combobox.Empty>
-              <Combobox.List>
-                {isDefined(selectedModel) ? (
-                  filteredProperties.map((item) => (
-                    <Combobox.Item key={item.id} item={item}>
-                      <Icon as={getBindingFieldIcon(item.id)} size="sm" flexShrink="0" />
-                      <Combobox.ItemText>{item.label}</Combobox.ItemText>
-                      <Combobox.ItemIndicator />
-                    </Combobox.Item>
-                  ))
-                ) : (
-                  <>
-                    {filteredComponents.length > 0 && (
-                      <Combobox.ItemGroup>
-                        <Combobox.ItemGroupLabel>
-                          {t.project.editors.sections.bindings.addFields.components}
-                        </Combobox.ItemGroupLabel>
-                        {filteredComponents.map(renderModelItem)}
-                      </Combobox.ItemGroup>
-                    )}
-                    {filteredOpenings.length > 0 && (
-                      <Combobox.ItemGroup>
-                        <Combobox.ItemGroupLabel>
-                          {t.project.editors.sections.bindings.addFields.pocketOpenings}
-                        </Combobox.ItemGroupLabel>
-                        {filteredOpenings.map(renderModelItem)}
-                      </Combobox.ItemGroup>
-                    )}
-                  </>
                 )}
-              </Combobox.List>
-            </Combobox.Content>
-          </Combobox.Positioner>
-        </Portal>
-      </TagsInput.RootProvider>
-    </Combobox.RootProvider>
+                <Combobox.Input unstyled asChild>
+                  <TagsInput.Input
+                    ref={inputRef}
+                    css={fieldInputStyles}
+                    readOnly={complete}
+                    placeholder={complete ? '' : placeholder}
+                  />
+                </Combobox.Input>
+                <Combobox.Trigger disabled={complete} flexShrink="0" />
+              </TagsInput.Control>
+            </Combobox.Control>
+          </InputGroup>
+        </TagsInput.RootProvider>
+      }
+    />
   )
 }

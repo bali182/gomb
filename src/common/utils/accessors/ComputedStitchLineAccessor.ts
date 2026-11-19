@@ -3,7 +3,7 @@ import type {
   ComputedStitchLineAccessorSchema,
   OptionalAccessorSchema,
 } from '../../schemas/accessors'
-import type { ComputedStitchLineSchema } from '../../schemas/computed'
+import type { ComputedStitchLineSchema, ComputedStitchRouteSchema } from '../../schemas/computed'
 import { BaseStrictAccessor } from './BaseStrictAccessor'
 
 export class ComputedStitchLineAccessor extends BaseStrictAccessor implements ComputedStitchLineAccessorSchema {
@@ -16,7 +16,8 @@ export class ComputedStitchLineAccessor extends BaseStrictAccessor implements Co
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.byOwner = this.byOwner.bind(this)
-    this.byOnTop = this.byOnTop.bind(this)
+    this.byEntry = this.byEntry.bind(this)
+    this.byExit = this.byExit.bind(this)
   }
 
   byId(id: string): ComputedStitchLineSchema {
@@ -35,7 +36,11 @@ export class ComputedStitchLineAccessor extends BaseStrictAccessor implements Co
     return this.optional.byOwner(componentId)
   }
 
-  byOnTop(componentId: string): ComputedStitchLineSchema[] {
-    return this.optional.byOnTop(componentId)
+  byEntry(componentId: string): ComputedStitchRouteSchema[] {
+    return this.optional.byEntry(componentId)
+  }
+
+  byExit(componentId: string): ComputedStitchRouteSchema[] {
+    return this.optional.byExit(componentId)
   }
 }

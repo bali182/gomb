@@ -132,7 +132,6 @@ export type ComponentBoundsStitchLineBindingFieldNameSchema = CheckedBindingFiel
   | 'topRightRadius'
   | 'bottomLeftRadius'
   | 'bottomRightRadius'
-  | 'onTop'
 >
 
 export type TPocketStitchLineBindingFieldNameSchema = CheckedBindingFieldNameSchema<
@@ -284,7 +283,6 @@ export type BindingCompatibilityGroupSchema =
   // References
   | 'reference:pocket-opening'
   | 'reference:pocket-item'
-  | 'reference:component'
   // Exact fields
   | 'field:stitch-margin'
   | 'field:stitch-hole-length'

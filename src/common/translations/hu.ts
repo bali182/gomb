@@ -3,7 +3,7 @@ import hu from 'timeago.js/lib/lang/hu'
 import type { BindingFieldAdderState } from '../components/binding-editors/bindingFieldUtils'
 import type { BindingFieldBlockReasonSchema } from '../schemas/bindings'
 import type { RootPanelFaceSideSchema } from '../schemas/components'
-import type { HasCustomRenderTarget } from '../schemas/stitching'
+import type { HasEntryComponentSchema, HasExitComponentSchema } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
@@ -537,12 +537,18 @@ export const HU = {
           },
         },
         stitchLines: {
-          renderTarget: {
-            title: '-',
-            onTop: {
-              label: 'Rajzolási felület',
+          components: {
+            title: 'Átvarrt rétegek',
+            entryComponentId: {
+              label: 'Varrás felülete',
+              tooltip: 'A varrás által elsőként átszúrt anyagréteg.',
             },
-          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
+            exitComponentId: {
+              label: 'Lyukasztás határa',
+              tooltip:
+                'A varrás által utolsóként átszúrt anyagréteg. Ezt és az elsőtől a közbeeső összes réteget is átszúrjuk.',
+            },
+          } satisfies SectionTranslationSchema<HasEntryComponentSchema & HasExitComponentSchema>,
           settings: {
             title: 'Varrás',
             stitchMargin: {
@@ -719,10 +725,6 @@ export const HU = {
           },
           content: {
             title: 'Tartalom',
-            stitchLineMode: {
-              label: 'Varrásvonalak',
-              tooltip: 'Kiválasztja, mely varrásvonalak kerüljenek az exportba.',
-            },
             showNames: {
               label: 'Nevek megjelenítése',
               tooltip: 'A komponensek nevét is belefoglalja az exportált fájlba.',
@@ -819,7 +821,6 @@ export const HU = {
             stitchHoleDistance: 'Öltéslyukak távolsága',
             stitchHoleThickness: 'Öltéslyuk vastagsága',
             stitchLineThickness: 'Varrásvonal vastagsága',
-            onTop: 'Varrás célfelülete',
             startOffset: 'Varrás kezdő eltolása',
             endOffset: 'Varrás végi eltolása',
             stitchDirection: 'Varrás iránya',
@@ -892,11 +893,6 @@ export const HU = {
             svg: 'SVG',
             pdf: 'PDF',
             png: 'PNG',
-          },
-          exportStitchLineModes: {
-            'own-stitch-lines': 'Saját varrásvonalak',
-            'related-stitch-lines': 'Kapcsolódó varrásvonalak',
-            'all-stitch-lines': 'Összes varrásvonal',
           },
           exportOrientation: {
             portrait: 'Álló',

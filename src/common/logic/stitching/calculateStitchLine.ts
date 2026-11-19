@@ -1,12 +1,8 @@
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { getComponentStitchLineTypes } from '../../operations/subProject/utils/componentRules'
+import type { SubProjectAccessorSchema } from '../../schemas/accessors'
 import type { ComponentSchema, PocketClusterSchema, PocketOrientationSchema } from '../../schemas/components'
-import type {
-  ComputedComponentSchema,
-  ComputedStitchLineSchema,
-  ComputedStitchRouteSchema,
-  ComputedTPocketSchema,
-} from '../../schemas/computed'
+import type { ComputedComponentSchema, ComputedTPocketSchema } from '../../schemas/computed'
 import type { PointSchema } from '../../schemas/geometry'
 import type {
   ResolvedComponentBoundsStitchLineSchema,
@@ -14,8 +10,6 @@ import type {
   ResolvedTPocketStitchLineSchema,
   StitchSideSchema,
 } from '../../schemas/stitching'
-import type { SubProjectSchema } from '../../schemas/subProject'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { calculateComponentBoundsStitchLine } from './calculateComponentBoundsStitchLine'
@@ -23,13 +17,14 @@ import { calculateRouteStitches } from './calculateRouteStitches'
 import { calculateStitchLineBoundingRect } from './calculateStitchLineBoundingRect'
 import { calculateTPocketStitchHoles } from './calculateTPocketStitchHoles'
 import { calculateTPocketStitchLine } from './calculateTPocketStitchLine'
+import type { StitchLineGeometry, StitchRouteGeometry } from './helperTypes'
 
 export const calculateStitchLine = (
   stitchLine: ResolvedStitchLineSchema,
-  subProject: SubProjectSchema,
+  accessor: SubProjectAccessorSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedStitchLineSchema | undefined => {
-  const component = accessors.subProject(subProject).optional.component.byId(stitchLine.targetId)
+): StitchLineGeometry | undefined => {
+  const component = accessor.optional.component.byId(stitchLine.targetId)
   const computed = computedComponents[stitchLine.targetId]
   if (!isDefined(component) || !isDefined(computed)) {
     return undefined
@@ -39,34 +34,31 @@ export const calculateStitchLine = (
   }
   switch (stitchLine.type) {
     case 'component-bounds-stitch-line':
-      return calculateStandardStitchLine(stitchLine, computed, computedComponents)
+      return calculateStandardStitchLine(stitchLine, computed)
     case 't-pocket-stitch-line':
-      return calculateComputedTPocketStitchLine(stitchLine, component, computed, subProject, computedComponents)
+      return calculateComputedTPocketStitchLine(stitchLine, component, computed, computedComponents, accessor)
   }
 }
 
 const calculateStandardStitchLine = (
   stitchLine: ResolvedComponentBoundsStitchLineSchema,
   computed: ComputedComponentSchema,
-  components: Record<string, ComputedComponentSchema>,
-): ComputedStitchLineSchema => {
-  return calculateComponentBoundsStitchLine(
-    stitchLine,
-    { componentId: computed.componentId, boundingRect: computed.boundingRect, cornerRadius: computed.cornerRadius },
-    components,
-  )
+): StitchLineGeometry => {
+  return calculateComponentBoundsStitchLine(stitchLine, {
+    componentId: computed.componentId,
+    boundingRect: computed.boundingRect,
+    cornerRadius: computed.cornerRadius,
+  })
 }
 
 const calculateComputedTPocketStitchLine = (
   stitchLine: ResolvedTPocketStitchLineSchema,
   component: ComponentSchema,
   computed: ComputedComponentSchema,
-  subProject: SubProjectSchema,
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedStitchLineSchema | undefined => {
-  const cluster = narrowers.is.pocketCluster(component)
-    ? component
-    : accessors.subProject(subProject).optional.component.parent(component.id)
+  accessor: SubProjectAccessorSchema,
+): StitchLineGeometry | undefined => {
+  const cluster = narrowers.is.pocketCluster(component) ? component : accessor.optional.component.parent(component.id)
   if (!isDefined(cluster) || !narrowers.is.pocketCluster(cluster)) {
     return undefined
   }
@@ -92,7 +84,6 @@ const calculateComputedTPocketStitchLine = (
     targetType: stitchLine.targetType,
     targetId: stitchLine.targetId,
     componentId: component.id,
-    onTop: component.id,
     autoComputedCornerRadius: ZERO_CORNER_RADIUS,
     boundingRect,
     routes,
@@ -103,7 +94,7 @@ const calculatePocketStitchRoute = (
   stitchLine: ResolvedTPocketStitchLineSchema,
   cluster: PocketClusterSchema,
   pocket: ComputedTPocketSchema,
-): ComputedStitchRouteSchema | undefined => {
+): StitchRouteGeometry | undefined => {
   const calculated = calculateTPocketStitchLine(stitchLine, cluster, pocket)
   if (!isDefined(calculated)) {
     return undefined

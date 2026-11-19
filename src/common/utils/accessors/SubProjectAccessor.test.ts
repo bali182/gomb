@@ -18,7 +18,6 @@ describe('SubProjectAccessor', () => {
     expect(accessor.hole.byId('hole')).toBe(accessor.optional.hole.byId('hole'))
     expect(accessor.stitchLine.byId('line')).toBe(accessor.optional.stitchLine.byId('line'))
     expect(accessor.stitchLine.byOwner('root-front')).toBe(accessor.optional.stitchLine.byOwner('root-front'))
-    expect(accessor.stitchLine.byOnTop('root-front')).toBe(accessor.optional.stitchLine.byOnTop('root-front'))
     expect(subProject).toEqual(snapshot)
   })
 })

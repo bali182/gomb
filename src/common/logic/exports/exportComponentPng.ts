@@ -10,7 +10,7 @@ import {
   PNG_SHADOW_PADDING,
   PNG_SHADOW_SPREAD,
 } from '../../constants/pngExport'
-import type { ComputedComponentSchema, ComputedStitchLineSchema } from '../../schemas/computed'
+import type { ComputedComponentSchema, ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
 import type { ProjectSchema } from '../../schemas/project'
@@ -141,7 +141,9 @@ const getComponentBoundingRects = (
 }
 
 const getStitchLineBoundingRects = (
-  stitchLines: readonly ComputedStitchLineSchema[],
+  routes: readonly ComputedStitchRouteSchema[],
+  faceId: string,
+  axisX: BigNumber,
   params: ExportComponentPngParams,
 ): RectSchema[] => {
   const { project, subProject, settings, context } = params
@@ -155,8 +157,8 @@ const getStitchLineBoundingRects = (
 
   const boundingRects: RectSchema[] = []
   const accessor = accessors.subProject(subProject)
-  for (const computedStitchLine of stitchLines) {
-    const stitchLine = accessor.optional.stitchLine.byId(computedStitchLine.stitchLineId)
+  for (const route of routes) {
+    const stitchLine = accessor.optional.stitchLine.byId(route.stitchLineId)
     if (!isDefined(stitchLine)) {
       continue
     }
@@ -171,7 +173,8 @@ const getStitchLineBoundingRects = (
     const threadPadding = view.stitchesVisible ? threadThickness / 2 : 0
     const holePadding = view.stitchHolesVisible ? (holeLength + holeThickness) / 2 : 0
     const padding = Math.max(linePadding, footprintPadding, threadPadding, holePadding)
-    boundingRects.push(padBoundingRect(computedStitchLine.boundingRect, padding))
+    const rect = route.faceId === faceId ? route.boundingRect : reflectRectHorizontally(route.boundingRect, axisX)
+    boundingRects.push(padBoundingRect(rect, padding))
   }
   return boundingRects
 }
@@ -186,9 +189,17 @@ const collectBoundingRects = (
   const accessor = accessors.computedSubProject(computedSubProject)
   const root = accessor.component.rootPanel()
   const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
+  const componentFace = accessors
+    .subProject(params.subProject)
+    .optional.component.rootPanelFaceOf(component.componentId)
+  const faceId = componentFace?.id ?? root.frontFaceId
+  const routes = [
+    ...accessor.stitchLine.byEntry(component.componentId),
+    ...accessor.stitchLine.byExit(component.componentId),
+  ]
   const ownRects = [
     ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
-    ...getStitchLineBoundingRects(accessor.stitchLine.byOnTop(component.componentId), params),
+    ...getStitchLineBoundingRects(routes, faceId, axisX, params),
   ]
   const visibleRects = isReversed ? ownRects.map((rect) => reflectRectHorizontally(rect, axisX)) : ownRects
   const activeFaceId = params.context.rootPanelFaceId === root.backFaceId ? root.backFaceId : root.frontFaceId

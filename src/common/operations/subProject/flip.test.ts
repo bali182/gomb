@@ -342,7 +342,7 @@ describe.each(axes)('flip: %s', (axis) => {
       startOffset: 1,
       endOffset: 2,
       stitchDirection: 'start-to-end',
-      onTop: 'overlay',
+      entryComponentId: 'overlay',
       ...radii,
       autoCornerRadius: false,
       stitchMargin: 7,
@@ -413,7 +413,7 @@ describe.each(axes)('flip: %s', (axis) => {
       id: 'outside-stitch',
       targetType: 'component',
       targetId: 'outside',
-      onTop: 'selected',
+      entryComponentId: 'selected',
       ...radii,
     })
     const outsideHoleStitch = d.componentBoundsStitchLine({

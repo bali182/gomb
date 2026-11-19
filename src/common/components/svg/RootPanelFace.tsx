@@ -24,7 +24,7 @@ export const RootPanelFace: FC<RootPanelFaceProps> = ({ componentId, nestingLeve
         <SvgComponentLayers
           content={
             <>
-              <StitchLines componentId={componentId} />
+              <StitchLines componentId={componentId} surface="front" />
               <HoleHighlights componentId={componentId} />
             </>
           }

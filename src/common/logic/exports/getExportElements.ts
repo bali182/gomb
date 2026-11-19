@@ -72,13 +72,7 @@ const getExportElement = (
   const surface = narrowers.is.computedRootPanel(computed)
     ? accessors.computedSubProject(computedSubProject).component.rootPanelFace(computed.frontFaceId)
     : computed
-  const stitchLines = getExportStitchLines(
-    subProject,
-    computedSubProject,
-    surface,
-    settings.stitchLineMode,
-    stitchingSettings,
-  )
+  const stitchLines = getExportStitchLines(subProject, computedSubProject, surface, stitchingSettings)
   if (narrowers.is.frontPocket(component) && narrowers.is.computedFrontPocket(computed)) {
     const element: ExportFrontPocketSchema = {
       type: 'export-front-pocket',

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { narrowers } from '../../utils/narrowers'
 
 import { defaultStitchingSettings } from '../../defaultStates'
-import type { ExportStitchLineModeSchema } from '../../schemas/settings'
 import { d } from '../../testData'
 import { getComputedSubProject } from '../getComputedSubProject'
 import { isPointInClosedPath } from '../isPointInClosedPath'
@@ -10,22 +9,14 @@ import { getPathSegments } from '../pathSegments'
 import { getPathSegmentMidpoint } from '../pathSegmentUtils'
 import { getExportStitchLines } from './getExportStitchLines'
 
-type StitchLineModeTestCase = {
-  mode: ExportStitchLineModeSchema
-  expectedIds: string[]
-}
-
 const stitchMargins: Record<string, number> = {
   'root-stitch': 4,
   'panel-stitch': 8,
   'child-stitch': 12,
 }
 
-describe.each<StitchLineModeTestCase>([
-  { mode: 'own-stitch-lines', expectedIds: ['panel-stitch'] },
-  { mode: 'related-stitch-lines', expectedIds: ['panel-stitch', 'child-stitch'] },
-  { mode: 'all-stitch-lines', expectedIds: ['root-stitch', 'panel-stitch', 'child-stitch'] },
-])('getExportStitchLines $mode', ({ mode, expectedIds }) => {
+describe('getExportStitchLines', () => {
+  const expectedIds = ['panel-stitch', 'child-stitch']
   it.each([false, true])('selects and clips stitches with a cutout: %s', (withCutout) => {
     const subProject = d.subProject({
       frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
@@ -73,7 +64,7 @@ describe.each<StitchLineModeTestCase>([
       throw new Error('Expected a computed panel')
     }
 
-    const exported = getExportStitchLines(subProject, computed, target, mode, defaultStitchingSettings)
+    const exported = getExportStitchLines(subProject, computed, target, defaultStitchingSettings)
 
     expect(exported.map(({ stitchLine }) => stitchLine.id).sort()).toEqual([...expectedIds].sort())
 
@@ -130,48 +121,80 @@ describe('cluster T-pocket stitching export', () => {
       ],
     })
 
-  it.each<ExportStitchLineModeSchema>(['own-stitch-lines', 'related-stitch-lines'])(
-    'exports only the matching pocket route even when the other route overlaps: %s',
-    (mode) => {
-      const source = fixture()
-      const snapshot = structuredClone(source)
-      const computed = getComputedSubProject(source, defaultStitchingSettings)
-      const shared = computed.stitchLines.shared
-      expect(shared.routes).toHaveLength(2)
-      expect(shared.routes[0].path).toEqual(shared.routes[1].path)
-      for (const id of ['a', 'b']) {
-        const exported = getExportStitchLines(source, computed, computed.components[id], mode, defaultStitchingSettings)
-        expect(exported.map(({ stitchLine }) => stitchLine.id).sort()).toEqual([`local-${id}`, 'shared'])
-        const sharedExport = exported.find(({ stitchLine }) => stitchLine.id === 'shared')
-        expect(sharedExport?.paths).toHaveLength(1)
-        expect(sharedExport?.holes).toHaveLength(shared.routes[0].holes.length)
-      }
-      expect(getExportStitchLines(source, computed, computed.components.front, mode, defaultStitchingSettings)).toEqual(
-        [],
-      )
-      expect(source).toEqual(snapshot)
-    },
-  )
-
-  it('preserves all-route clipping in all mode and includes every route when exporting the root', () => {
+  it('exports every route that crosses the target layer, even when routes overlap', () => {
     const source = fixture()
+    const snapshot = structuredClone(source)
     const computed = getComputedSubProject(source, defaultStitchingSettings)
-    const all = getExportStitchLines(
-      source,
-      computed,
-      computed.components.a,
-      'all-stitch-lines',
-      defaultStitchingSettings,
-    )
-    expect(all.map(({ stitchLine }) => stitchLine.id).sort()).toEqual(['local-a', 'local-b', 'shared'])
-    expect(all.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
-    const related = getExportStitchLines(
-      source,
-      computed,
-      computed.components.root,
-      'related-stitch-lines',
-      defaultStitchingSettings,
-    )
-    expect(related.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
+    const shared = computed.stitchLines.shared
+    expect(shared.routes).toHaveLength(2)
+    expect(shared.routes[0].path).toEqual(shared.routes[1].path)
+    const first = getExportStitchLines(source, computed, computed.components.a, defaultStitchingSettings)
+    expect(first.map(({ stitchLine }) => stitchLine.id).sort()).toEqual(['local-a', 'local-b', 'shared'])
+    expect(first.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
+    const second = getExportStitchLines(source, computed, computed.components.b, defaultStitchingSettings)
+    expect(second.map(({ stitchLine }) => stitchLine.id).sort()).toEqual(['local-b', 'shared'])
+    expect(second.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(1)
+    expect(getExportStitchLines(source, computed, computed.components.front, defaultStitchingSettings)).toEqual([])
+    const root = getExportStitchLines(source, computed, computed.components.root, defaultStitchingSettings)
+    expect(root.find(({ stitchLine }) => stitchLine.id === 'shared')?.paths).toHaveLength(2)
+    expect(source).toEqual(snapshot)
+  })
+})
+
+describe('explicit stitching span', () => {
+  it('uses the entry layer instead of the geometry owner and stops inclusively at exit', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 100 }),
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['lower'] }),
+      components: [d.panel({ id: 'lower', children: ['owner'] }), d.panel({ id: 'owner' })],
+      stitchLines: [
+        d.componentBoundsStitchLine({
+          id: 'stitch',
+          targetType: 'component',
+          targetId: 'owner',
+          entryComponentId: 'lower',
+          exitComponentId: 'lower',
+        }),
+      ],
+    })
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    expect(getExportStitchLines(source, computed, computed.components.lower, defaultStitchingSettings)).toHaveLength(1)
+    expect(getExportStitchLines(source, computed, computed.components.owner, defaultStitchingSettings)).toEqual([])
+    expect(getExportStitchLines(source, computed, computed.components.root, defaultStitchingSettings)).toEqual([])
+  })
+
+  it('reflects opposite-face holes before clipping and exports every physically crossed layer', () => {
+    const source = d.subProject({
+      id: 'sub',
+      root: d.rootPanel({ id: 'root', width: 100, height: 100 }),
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['small'] }),
+      backFace: d.rootPanelFace({ id: 'root-back', children: ['rear'] }),
+      components: [d.panel({ id: 'small', width: 30, autoWidth: false }), d.panel({ id: 'rear' })],
+      stitchLines: [
+        d.componentBoundsStitchLine({
+          id: 'crossing',
+          targetType: 'component',
+          targetId: 'small',
+          exitComponentId: 'rear',
+        }),
+      ],
+    })
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    const route = computed.stitchLines.crossing.routes[0]
+    const rear = getExportStitchLines(source, computed, computed.components.rear, defaultStitchingSettings)
+    expect(rear).toHaveLength(1)
+    expect(rear[0].holes).toHaveLength(route.holes.length)
+    for (let index = 0; index < route.holes.length; index++) {
+      const original = route.holes[index]
+      const reflected = rear[0].holes[index]
+      expect(reflected.center.x.toNumber()).toBeCloseTo(100 - original.center.x.toNumber())
+      expect(reflected.center.y.eq(original.center.y)).toBe(true)
+      expect(reflected.line.start.x.toNumber()).toBeCloseTo(100 - original.line.start.x.toNumber())
+      expect(reflected.line.end.x.toNumber()).toBeCloseTo(100 - original.line.end.x.toNumber())
+      expect(isPointInClosedPath(reflected.center, computed.components.rear.path)).toBe(true)
+    }
+    expect(getExportStitchLines(source, computed, computed.components.root, defaultStitchingSettings)).toHaveLength(1)
+    expect(getExportStitchLines(source, computed, computed.components.small, defaultStitchingSettings)).toHaveLength(1)
   })
 })

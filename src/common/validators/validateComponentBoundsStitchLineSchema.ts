@@ -56,6 +56,7 @@ export const validateComponentBoundsStitchLineSchema = (
     stitchLineThickness: commonConfigResult.issues.stitchLineThickness,
     stitchMargin: commonConfigResult.issues.stitchMargin,
     type: undefined,
+    exitComponentId: undefined,
     top: undefined,
     topLeftCorner: undefined,
     topRightCorner: undefined,
@@ -64,7 +65,7 @@ export const validateComponentBoundsStitchLineSchema = (
     topRightRadius: topRightRadiusResult.issues,
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
-    onTop: undefined,
+    entryComponentId: undefined,
   }
 
   const committedValue: ComponentBoundsStitchLineSchema = {
@@ -85,12 +86,13 @@ export const validateComponentBoundsStitchLineSchema = (
     topLeftCorner: input.topLeftCorner,
     topRightCorner: input.topRightCorner,
     type: currentValue.type,
+    exitComponentId: input.exitComponentId,
     autoCornerRadius: input.autoCornerRadius,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
     topLeftRadius: topLeftRadiusResult.committedValue,
     topRightRadius: topRightRadiusResult.committedValue,
-    onTop: input.onTop,
+    entryComponentId: input.entryComponentId,
   }
 
   if (

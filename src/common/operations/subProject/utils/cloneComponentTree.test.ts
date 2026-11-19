@@ -88,7 +88,7 @@ describe('cloneComponentTree', () => {
     expect(result?.clonedStitchLines).toEqual([])
   })
 
-  it('maps internal onTop references and removes external ones even though both have mappings', () => {
+  it('maps internal entryComponentId references and removes external ones even though both have mappings', () => {
     const source = d.subProject({
       frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'outside'] }),
       id: 'sub',
@@ -96,8 +96,20 @@ describe('cloneComponentTree', () => {
       components: [d.panel({ id: 'panel', children: ['child'] }), d.panel({ id: 'child' }), d.panel({ id: 'outside' })],
       holes: [d.hole({ id: 'hole', componentId: 'child' })],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'internal', targetId: 'panel', targetType: 'component', onTop: 'child' }),
-        d.componentBoundsStitchLine({ id: 'external', targetId: 'hole', targetType: 'hole', onTop: 'outside' }),
+        d.componentBoundsStitchLine({
+          id: 'internal',
+          targetId: 'panel',
+          targetType: 'component',
+          entryComponentId: 'child',
+          exitComponentId: 'panel',
+        }),
+        d.componentBoundsStitchLine({
+          id: 'external',
+          targetId: 'hole',
+          targetType: 'hole',
+          entryComponentId: 'outside',
+          exitComponentId: 'outside',
+        }),
       ],
     })
     const snapshot = structuredClone(source)
@@ -116,8 +128,13 @@ describe('cloneComponentTree', () => {
     ])
     expect(result?.clonedHoles).toMatchObject([{ id: idMappings.hole, componentId: idMappings.child }])
     expect(result?.clonedStitchLines).toMatchObject([
-      { id: idMappings.internal, targetId: idMappings.panel, onTop: idMappings.child },
-      { id: idMappings.external, targetId: idMappings.hole, onTop: undefined },
+      {
+        id: idMappings.internal,
+        targetId: idMappings.panel,
+        entryComponentId: idMappings.child,
+        exitComponentId: idMappings.panel,
+      },
+      { id: idMappings.external, targetId: idMappings.hole, entryComponentId: undefined, exitComponentId: undefined },
     ])
     expect(source).toEqual(snapshot)
   })

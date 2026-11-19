@@ -65,7 +65,12 @@ describe('binding field metadata', () => {
       components: [d.panel({ id: 'panel' })],
       holes: [d.hole({ id: 'hole', componentId: 'panel' })],
       stitchLines: [
-        d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole', onTop: 'root-front' }),
+        d.componentBoundsStitchLine({
+          id: 'stitch',
+          targetId: 'hole',
+          targetType: 'hole',
+          entryComponentId: 'root-front',
+        }),
       ],
       pocketOpenings: [{ id: 'opening', name: 'Opening', type: 'straight' }],
     })

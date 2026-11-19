@@ -19,7 +19,6 @@ import { PocketItem } from './PocketItem'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { SvgComponentLayers } from './SvgComponentLayers'
-import { TPocketStitchLines } from './TPocketStitchLines'
 
 type PocketProps = {
   componentId: string
@@ -63,22 +62,26 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
           isShowingPocketItems && isDefined(computed.item) && <PocketItem owner={pocket} path={computed.item.path} />
         }
         content={
-          <>
-            <path
-              d={pathData}
-              data-component-id={componentId}
-              fill={componentStyles.getBackgroundColor(style)}
-              stroke={componentStyles.getBorderColor(style)}
-              strokeWidth={componentStyles.getBorderThickness(style)}
-              filter={componentStyles.getFilter(style)}
-              onPointerEnter={isInteractive ? enter : undefined}
-              onPointerLeave={isInteractive ? leave : undefined}
-              onClick={isInteractive ? click : undefined}
-            />
-            {narrowers.is.tPocket(pocket) && <TPocketStitchLines componentId={componentId} />}
-            <StitchLines componentId={componentId} />
-            <HoleHighlights componentId={componentId} />
-          </>
+          <SvgComponentLayers
+            before={<StitchLines componentId={componentId} surface="back" />}
+            after={<StitchLines componentId={componentId} surface="front" />}
+            content={
+              <>
+                <path
+                  d={pathData}
+                  data-component-id={componentId}
+                  fill={componentStyles.getBackgroundColor(style)}
+                  stroke={componentStyles.getBorderColor(style)}
+                  strokeWidth={componentStyles.getBorderThickness(style)}
+                  filter={componentStyles.getFilter(style)}
+                  onPointerEnter={isInteractive ? enter : undefined}
+                  onPointerLeave={isInteractive ? leave : undefined}
+                  onClick={isInteractive ? click : undefined}
+                />
+                <HoleHighlights componentId={componentId} />
+              </>
+            }
+          />
         }
         after={orderedChildren.map((child) => {
           switch (child.type) {

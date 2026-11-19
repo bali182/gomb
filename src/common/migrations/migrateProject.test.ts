@@ -333,7 +333,7 @@ it('preserves legacy IDs and references on loading and reloading a current proje
         id: 'legacy-stitch',
         targetId: 'legacy-hole',
         targetType: 'hole',
-        onTop: 'legacy-root',
+        entryComponentId: 'legacy-root-front',
       }),
     ],
     pocketOpenings: [{ id: 'legacy-opening', name: 'Opening', type: 'straight' }],

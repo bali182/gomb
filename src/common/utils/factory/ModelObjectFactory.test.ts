@@ -284,7 +284,7 @@ const cases: FactoryCaseSchema[] = [
         forbiddenIds: params.forbiddenIds,
         type: 'component-bounds-stitch-line-binding-field',
         modelId: 'model',
-        field: 'onTop',
+        field: 'stitchMargin',
       }),
   },
   {
@@ -500,7 +500,7 @@ describe('ReadonlyModelObjectFactory', () => {
     { id: 'unused', type: 'recessed-binding-field', modelId: 'model', field: 'recessDepth' },
     { id: 'unused', type: 'slanted-binding-field', modelId: 'model', field: 'slantSide' },
     { id: 'unused', type: 'optical-illusion-binding-field', modelId: 'model', field: 'illusionSide' },
-    { id: 'unused', type: 'component-bounds-stitch-line-binding-field', modelId: 'model', field: 'onTop' },
+    { id: 'unused', type: 'component-bounds-stitch-line-binding-field', modelId: 'model', field: 'stitchMargin' },
     { id: 'unused', type: 't-pocket-stitch-line-binding-field', modelId: 'model', field: 'stitchMargin' },
   ]
   it.each(members)('dispatches $type with its corresponding field', (member) => {

@@ -15,6 +15,7 @@ import { narrowers } from '../narrowers'
 
 export class OptionalComponentAccessor implements OptionalAccessorSchema<ComponentAccessorSchema> {
   private readonly parents = new Map<string, ComponentSchema>()
+  private readonly layerOrders = new Map<string, readonly string[]>()
   private readonly allComponents: ComponentSchema[]
 
   constructor(private readonly root: SubProjectSchema) {
@@ -26,6 +27,8 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
         }
       }
     }
+    this.layers = this.layers.bind(this)
+    this.layerIds = this.layerIds.bind(this)
     this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.children = this.children.bind(this)
@@ -48,6 +51,32 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
     this.frontPockets = this.frontPockets.bind(this)
     this.panels = this.panels.bind(this)
     this.pocketClusters = this.pocketClusters.bind(this)
+  }
+
+  layers(faceId: string): readonly ComponentSchema[] {
+    return this.layerIds(faceId).map(this.byId).filter(isDefined)
+  }
+
+  layerIds(faceId: string): readonly string[] {
+    const cached = this.layerOrders.get(faceId)
+    if (isDefined(cached)) {
+      return cached
+    }
+    const root = this.rootPanel()
+    const face = this.rootPanelFace(faceId)
+    if (!isDefined(root) || !isDefined(face) || (faceId !== root.frontFaceId && faceId !== root.backFaceId)) {
+      return []
+    }
+    const oppositeFaceId = faceId === root.frontFaceId ? root.backFaceId : root.frontFaceId
+    const own = this.descendants(faceId).filter((component) => !narrowers.is.pocketCluster(component))
+    const opposite = this.descendants(oppositeFaceId).filter((component) => !narrowers.is.pocketCluster(component))
+    const ids = [
+      ...opposite.reverse().map((component) => component.id),
+      root.id,
+      ...own.map((component) => component.id),
+    ]
+    this.layerOrders.set(faceId, ids)
+    return ids
   }
 
   names(): Set<string> {

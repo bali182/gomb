@@ -207,23 +207,9 @@ describe('processSubProjectComputation', () => {
       root: d.rootPanel({ id: 'root' }),
       components: [d.panel({ id: 'panel', autoWidth: false, autoHeight: false })],
       stitchLines: ['first', 'second'].map((id) =>
-        d.componentBoundsStitchLine({ id, targetId: 'root-front', targetType: 'component', onTop: 'panel' }),
+        d.componentBoundsStitchLine({ id, targetId: 'root-front', targetType: 'component', entryComponentId: 'panel' }),
       ),
       bindings: {
-        render: equal('render', [
-          {
-            id: 'first-target',
-            type: 'component-bounds-stitch-line-binding-field',
-            modelId: 'first',
-            field: 'onTop',
-          },
-          {
-            id: 'second-target',
-            type: 'component-bounds-stitch-line-binding-field',
-            modelId: 'second',
-            field: 'onTop',
-          },
-        ]),
         size: equal('size', [{ id: 'panel-width', type: 'panel-binding-field', modelId: 'panel', field: 'width' }]),
       },
     })
@@ -231,7 +217,7 @@ describe('processSubProjectComputation', () => {
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(
       result.subProject.stitchLines.map(
-        (stitchLine) => accessors.subProject(result.subProject).stitchLine.bounds(stitchLine.id).onTop,
+        (stitchLine) => accessors.subProject(result.subProject).stitchLine.bounds(stitchLine.id).entryComponentId,
       ),
     ).toEqual([undefined, undefined])
     expect(result.subProject.bindings.size.fields).toEqual([])

@@ -1,12 +1,15 @@
-import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import type BigNumber from 'bignumber.js'
+import { useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { POCKET_ITEM_STITCH_MASK_ID, POCKET_ITEM_STITCH_MASK_REVERSE_ID } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
+import { useSubProject } from '../../hooks/useSubProject'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
+import { accessors } from '../../utils/accessors'
 import { StitchLineRouteHoles } from './StitchLineRouteHoles'
 import { StitchRouteLabel } from './StitchRouteLabel'
 import { Stitches } from './Stitches'
@@ -19,9 +22,17 @@ type StitchLineRouteProps = {
 export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine }) => {
   const { isInteractive, isShowingPocketItems, selection, stitchLineStyles } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const { direction } = useSvgFace()
+  const { direction, faceId } = useSvgFace()
+  const { computedSubProject } = useSubProject()
+  const reflectionAxisX = useMemo<BigNumber | undefined>(() => {
+    if (route.faceId === faceId) {
+      return undefined
+    }
+    const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+    return root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
+  }, [route.faceId, faceId, computedSubProject])
   const maskId = direction === 'reverse' ? POCKET_ITEM_STITCH_MASK_REVERSE_ID : POCKET_ITEM_STITCH_MASK_ID
-  const pathData = usePath(route.path)
+  const pathData = usePath(route.path, reflectionAxisX)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
   const stitchHoleThickness = stitchLineStyles.getStitchHoleThickness(stitchLine)
   const isStitchLineActive = selection.isSelected(stitchLine) || selection.isHovered(stitchLine)
@@ -76,9 +87,15 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
           strokeWidth={stitchLineThickness}
         />
       )}
-      {settings.view.stitchHolesVisible && <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} />}
-      {settings.view.stitchesVisible && <Stitches stitches={route.stitches} stitchLine={stitchLine} />}
-      {isStitchLineActive && settings.view.stitchCountVisible && <StitchRouteLabel route={route} />}
+      {settings.view.stitchHolesVisible && (
+        <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} reflectionAxisX={reflectionAxisX} />
+      )}
+      {settings.view.stitchesVisible && (
+        <Stitches stitches={route.stitches} stitchLine={stitchLine} reflectionAxisX={reflectionAxisX} />
+      )}
+      {isStitchLineActive && settings.view.stitchCountVisible && (
+        <StitchRouteLabel route={route} reflectionAxisX={reflectionAxisX} />
+      )}
       {isInteractive && (
         <path d={pathData} fill="none" pointerEvents="stroke" stroke="transparent" strokeWidth={hitAreaThickness} />
       )}

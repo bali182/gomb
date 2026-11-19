@@ -82,19 +82,19 @@ describe('stitch line grouping', () => {
       id: 'first',
       targetType: 'component',
       targetId: 'panel',
-      onTop: 'root-front',
+      entryComponentId: 'root-front',
     })
     const second = d.componentBoundsStitchLine({
       id: 'second',
       targetType: 'hole',
       targetId: 'hole',
-      onTop: 'root-front',
+      entryComponentId: 'root-front',
     })
     const fallback = d.componentBoundsStitchLine({
       id: 'fallback',
       targetType: 'component',
       targetId: 'panel',
-      onTop: 'missing',
+      entryComponentId: 'missing',
     })
     const shared = d.tPocketStitchLine({ id: 'shared', targetType: 'component', targetId: 'cluster' })
     const subProject = d.subProject({
@@ -111,12 +111,15 @@ describe('stitch line grouping', () => {
     })
     const accessor = accessors.subProject(subProject)
     expect(accessor.stitchLine.byOwner('panel')).toEqual([first, second, fallback])
-    expect(accessor.stitchLine.byOnTop('root-front')).toEqual([first, second])
-    expect(accessor.stitchLine.byOnTop('panel')).toEqual([fallback])
+    expect(accessor.stitchLine.entryComponent(first.id).id).toBe('root-front')
+    expect(accessor.stitchLine.entryComponent(second.id).id).toBe('root-front')
+    expect(accessor.optional.stitchLine.entryComponent(fallback.id)).toBeUndefined()
+    expect(() => accessor.stitchLine.entryComponent(fallback.id)).toThrow('Missing entry component')
+    expect(accessor.stitchLine.defaultEntryComponentId(fallback.id)).toBe('panel')
     expect(accessor.stitchLine.byOwner('cluster')).toEqual([shared])
     expect(accessor.stitchLine.byOwner('hole')).toEqual([])
     expect(accessor.stitchLine.byOwner('missing')).toEqual([])
-    expect(accessor.optional.stitchLine.byOnTop('missing')).toEqual([])
+    expect(accessor.optional.stitchLine.entryComponent('missing')).toBeUndefined()
   })
 })
 
@@ -137,7 +140,7 @@ describe('stitch line pocket cluster', () => {
           id: 'panel-stitch',
           targetType: 'component',
           targetId: 'panel',
-          onTop: 'root-front',
+          entryComponentId: 'root-front',
         }),
         d.componentBoundsStitchLine({ id: 'cluster-hole-stitch', targetType: 'hole', targetId: 'cluster-hole' }),
         d.componentBoundsStitchLine({ id: 't-hole-stitch', targetType: 'hole', targetId: 't-hole' }),
@@ -194,7 +197,7 @@ describe('stitch line pocket cluster', () => {
           id: 'drawing-layer-cluster',
           targetType: 'component',
           targetId: 'root-front',
-          onTop: 'cluster',
+          entryComponentId: 'cluster',
         }),
       ],
     })

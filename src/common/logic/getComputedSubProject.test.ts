@@ -1860,7 +1860,7 @@ describe('cluster T-pocket stitch routes', () => {
     const accessor = accessors.computedSubProject(computed)
     const shared = accessor.stitchLine.byId('shared')
     expect(Object.values(computed.stitchLines).filter((line) => line.stitchLineId === 'shared')).toEqual([shared])
-    expect(shared).toMatchObject({ targetId: 'cluster', componentId: 'cluster', onTop: 'cluster' })
+    expect(shared).toMatchObject({ targetId: 'cluster', componentId: 'cluster' })
     expect(shared.routes.map(({ targetType, targetId }) => ({ targetType, targetId }))).toEqual([
       { targetType: 'component', targetId: 'a' },
       { targetType: 'component', targetId: 'b' },
@@ -1931,10 +1931,14 @@ describe('cluster T-pocket stitch routes', () => {
     const geometry = getComputedSubProject(source, defaultStitchingSettings)
     const accessor = accessors.computedSubProject(geometry)
     const withoutFirstPath = { ...accessor.component.tPocket('a'), path: { commands: [] } }
-    const computed = calculateStitchLine({ ...defaultStitchingSettings, ...source.stitchLines[0] }, source, {
-      ...geometry.components,
-      a: withoutFirstPath,
-    })
+    const computed = calculateStitchLine(
+      { ...defaultStitchingSettings, ...source.stitchLines[0] },
+      accessors.subProject(source),
+      {
+        ...geometry.components,
+        a: withoutFirstPath,
+      },
+    )
     expect(computed).toBeDefined()
     expect(computed?.routes.map((route) => route.targetId)).toEqual(['b'])
   })
