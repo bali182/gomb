@@ -1,6 +1,7 @@
 import { Combobox, HStack, Icon, InputGroup, type InputAddonProps } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type FC } from 'react'
-import { PiArrowCounterClockwise, PiSelectionForeground } from 'react-icons/pi'
+import { IconType } from 'react-icons'
+import { PiArrowCounterClockwise, PiSelectionBackground, PiSelectionForeground } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -11,6 +12,7 @@ import {
   type NormalizedStitchLineEntryAndExit,
 } from '../../logic/stitching/stitchLineComponentValidation'
 import type { SubProjectAccessorSchema } from '../../schemas/accessors'
+import { HasEntryComponentSchema, HasExitComponentSchema } from '../../schemas/stitching'
 import { accessors } from '../../utils/accessors'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
@@ -22,9 +24,11 @@ import { useComponentTreeCollection } from '../component-tree/utils/useComponent
 const startAddonProps: InputAddonProps = { px: '1.5', size: 'xs' }
 const endAddonProps: InputAddonProps = { px: 0, size: 'xs' }
 
+type EntryOrExitField = keyof HasEntryComponentSchema | keyof HasExitComponentSchema
+
 type StitchLineComponentComboboxProps = {
   stitchLineId: string
-  field: 'entryComponentId' | 'exitComponentId'
+  field: EntryOrExitField
   componentId: string | undefined
   onChange: (componentId: string | undefined) => void
 }
@@ -124,7 +128,7 @@ export const StitchLineComponentCombobox: FC<StitchLineComponentComboboxProps> =
       onOpenChange={handleOpenChange}
       control={
         <InputGroup
-          startAddon={<Icon as={PiSelectionForeground} size="sm" />}
+          startAddon={<Icon as={fieldIcons[field]} size="sm" />}
           startAddonProps={startAddonProps}
           endAddon={
             <HStack alignSelf="stretch" gap="0" height="100%">
@@ -155,4 +159,9 @@ export const StitchLineComponentCombobox: FC<StitchLineComponentComboboxProps> =
       }
     />
   )
+}
+
+const fieldIcons: Record<EntryOrExitField, IconType> = {
+  entryComponentId: PiSelectionForeground,
+  exitComponentId: PiSelectionBackground,
 }

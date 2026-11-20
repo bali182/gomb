@@ -21,7 +21,6 @@ import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
 import type { HasTargetSchema } from '../schemas/common'
-import type { RootPanelFaceSideSchema } from '../schemas/components'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { TreeSectionsSettingsSchema } from '../schemas/settings'
@@ -52,6 +51,7 @@ import { FloatingEditors } from './FloatingEditors'
 import { GlobalSettingsButton } from './GlobalSettingsButton'
 import { CollapseAllIcon } from './icons/CollapseAllIcon'
 import { ExpandAllIcon } from './icons/ExpandAllIcon'
+import { RootPanelTurnIcon } from './icons/RootPanelTurnIcon'
 import { EditorPocketOpeningTree } from './pocket-opening-tree/EditorPocketOpeningTree'
 import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
@@ -80,7 +80,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const { setUISettings, settings } = useGlobalSettings()
   const [treeSections, setTreeSections] = useState<TreeSectionsSettingsSchema>(() => settings.ui.treeSections)
   const accordionRef = useRef<ResizableAccordionHandle>(null)
-  const { selection, rootPanelFaceId, flipRootPanelFace } = useDrawAreaContext()
+  const { selection, flipRootPanelFace } = useDrawAreaContext()
   const { selected, clearSelection } = selection
   const { stopMeasuring } = useMeasurement()
   const { presentation, floatingEditorsVisible } = useDrawAreaTurn()
@@ -130,13 +130,6 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
     [project, subProjectId],
   )
   const accessor = useMemo(() => (isDefined(subProject) ? accessors.subProject(subProject) : undefined), [subProject])
-
-  const activeSide: RootPanelFaceSideSchema | undefined = useMemo(() => {
-    if (!isDefined(accessor)) {
-      return undefined
-    }
-    return rootPanelFaceId === accessor.component.rootPanel().backFaceId ? 'back' : 'front'
-  }, [accessor, rootPanelFaceId])
 
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {
@@ -228,9 +221,6 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                       title={
                         <HStack gap="2">
                           {t.project.tree.sections.components}
-                          {isDefined(activeSide) && (
-                            <Badge>{t.project.editors.enums.components.rootPanelFaceSide[activeSide]}</Badge>
-                          )}
                           {isDefined(itemCounts) && (
                             <Badge bg="bg" variant="surface">
                               {itemCounts.components}
@@ -244,6 +234,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
                             disabled={!isDefined(subProject) || isComputing}
                             onClick={flipRootPanelFace}
                           >
+                            <RootPanelTurnIcon />
                             {t.project.rootPanelFaces.flip}
                           </ResizableAccordionHeaderButton>
                           <ResizableAccordionHeaderIconButton

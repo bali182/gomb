@@ -21,6 +21,7 @@ export type ComponentTreeItemProps = {
   controlProps?: ComponentTreeItemControlProps
   dragHandle?: ReactNode
   dropIndicators?: ReactNode
+  icon?: ReactNode
   renderMenu?: (node: ComponentTreeNode) => ReactNode
 }
 
@@ -32,6 +33,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
   controlProps,
   dragHandle,
   dropIndicators,
+  icon,
   renderMenu,
   subProject,
 }) => {
@@ -78,7 +80,7 @@ export const ComponentTreeItem: FC<ComponentTreeItemProps> = ({
     >
       {dropIndicators}
       <TreeItemVisual
-        icon={<Icon as={ModelIcon} size="sm" />}
+        icon={icon ?? <Icon as={ModelIcon} size="sm" />}
         trigger={<TreeBranchTrigger isExpandable={isExpandable} />}
         isPositioned={true}
         label={

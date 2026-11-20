@@ -1,7 +1,7 @@
-import { Box, IconButton, type TreeViewNodeState } from '@chakra-ui/react'
+import { Box, Icon, IconButton, type TreeViewNodeState } from '@chakra-ui/react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
-import { PiDotsSixVertical } from 'react-icons/pi'
+import { PiDotsSixVertical, PiEyeBold } from 'react-icons/pi'
 import { narrowers } from '../../utils/narrowers'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
@@ -17,6 +17,7 @@ import type {
 } from './types/dropDataTypes'
 
 import { ComponentTreeItem, type ComponentTreeItemProps } from './ComponentTreeItem'
+import { getProjectTreeNodeIcon } from './utils/getProjectTreeNodeIcon'
 
 export type EditorComponentTreeItemProps = ComponentTreeItemProps & {
   indexPath: number[]
@@ -31,9 +32,11 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
   ...props
 }) => {
   const { activeDragData } = useTreeDragAndDropContext()
-  const { selection } = useDrawAreaContext()
+  const { selection, rootPanelFaceId } = useDrawAreaContext()
   const { isComputing } = useEditorContext()
   const { component } = node
+  const ModelIcon = getProjectTreeNodeIcon(node, subProject)
+  const isActiveFace = narrowers.is.rootPanelFace(component) && component.id === rootPanelFaceId
   const isActiveComponent = activeDragData?.kind === 'component' && activeDragData.componentId === component.id
   const isDraggable =
     !narrowers.is.rootPanel(component) && !narrowers.is.rootPanelFace(component) && !narrowers.is.frontPocket(component)
@@ -249,6 +252,12 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
       {...props}
       node={node}
       subProject={subProject}
+      icon={
+        <Box display="inline-flex" flexShrink="0" position="relative" verticalAlign="middle">
+          <Icon as={ModelIcon} size="sm" />
+          {isActiveFace && <Icon as={PiEyeBold} position="absolute" bottom="-0.5" right="-1" boxSize="50%" />}
+        </Box>
+      }
       dropIndicators={
         <>
           {dropAreas}
