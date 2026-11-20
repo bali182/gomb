@@ -1,9 +1,13 @@
+import type BigNumber from 'bignumber.js'
+
 import type { ComputedStitchHoleSchema } from '../../schemas/computed'
 import type {
   ExportElementSchema,
   ExportFormatSchema,
   ExportFrontPocketSchema,
   ExportPanelSchema,
+  ExportPlacementRotation,
+  ExportPlacementSchema,
   ExportStitchLineSchema,
   ExportTPocketSchema,
 } from '../../schemas/export'
@@ -146,3 +150,34 @@ const translateStitchHole = (hole: ComputedStitchHoleSchema, translation: PointS
     },
   }
 }
+
+export const createExportPlacement = (
+  boundingRect: RectSchema,
+  placementBoundingRect: RectSchema,
+  rotation: ExportPlacementRotation,
+): ExportPlacementSchema => {
+  if (rotation === 0) {
+    return {
+      boundingRect,
+      placementBoundingRect,
+      rotation,
+      x: placementBoundingRect.x,
+      y: placementBoundingRect.y,
+    }
+  }
+
+  return {
+    boundingRect,
+    placementBoundingRect,
+    rotation,
+    x: placementBoundingRect.x.plus(placementBoundingRect.width.dividedBy(2)).minus(boundingRect.width.dividedBy(2)),
+    y: placementBoundingRect.y.plus(placementBoundingRect.height.dividedBy(2)).minus(boundingRect.height.dividedBy(2)),
+  }
+}
+
+export const createExportRect = (x: BigNumber, y: BigNumber, width: BigNumber, height: BigNumber): RectSchema => ({
+  x,
+  y,
+  width,
+  height,
+})

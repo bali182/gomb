@@ -9,12 +9,13 @@ import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 
 type ExportContentSectionProps = {
+  disabled: boolean
   editable: EditableSchema<ExportSettingsSchema>
   issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportContentSection({ editable, issues, onChange }: ExportContentSectionProps): ReactNode {
+export function ExportContentSection({ editable, issues, onChange, disabled }: ExportContentSectionProps): ReactNode {
   const { t } = useTranslation()
   const handleShowNamesChange = useCallback(
     (details: Switch.CheckedChangeDetails): void => {
@@ -55,7 +56,7 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
         {t.project.editors.sections.export.content.showNames.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showNames}>
-        <Switch.Root checked={editable.showNames} onCheckedChange={handleShowNamesChange} size="sm">
+        <Switch.Root disabled={disabled} checked={editable.showNames} onCheckedChange={handleShowNamesChange} size="sm">
           <Switch.HiddenInput />
           <Switch.Control>
             <Switch.Thumb />
@@ -67,7 +68,12 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
         {t.project.editors.sections.export.content.showDimensions.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showDimensions}>
-        <Switch.Root checked={editable.showDimensions} onCheckedChange={handleShowDimensionsChange} size="sm">
+        <Switch.Root
+          disabled={disabled}
+          checked={editable.showDimensions}
+          onCheckedChange={handleShowDimensionsChange}
+          size="sm"
+        >
           <Switch.HiddenInput />
           <Switch.Control>
             <Switch.Thumb />
@@ -79,7 +85,12 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
         {t.project.editors.sections.export.content.showParentNames.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.showParentNames}>
-        <Switch.Root checked={editable.showParentNames} onCheckedChange={handleShowParentNamesChange} size="sm">
+        <Switch.Root
+          disabled={disabled}
+          checked={editable.showParentNames}
+          onCheckedChange={handleShowParentNamesChange}
+          size="sm"
+        >
           <Switch.HiddenInput />
           <Switch.Control>
             <Switch.Thumb />
@@ -91,7 +102,12 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
         {t.project.editors.sections.export.content.childMarkers.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.childMarkers}>
-        <Switch.Root checked={editable.childMarkers} onCheckedChange={handleChildMarkersChange} size="sm">
+        <Switch.Root
+          disabled={disabled}
+          checked={editable.childMarkers}
+          onCheckedChange={handleChildMarkersChange}
+          size="sm"
+        >
           <Switch.HiddenInput />
           <Switch.Control>
             <Switch.Thumb />
@@ -104,6 +120,7 @@ export function ExportContentSection({ editable, issues, onChange }: ExportConte
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.cutHelperDistance}>
         <NumberInput
+          disabled={disabled}
           issue={issues.cutHelperDistance}
           onChange={handleCutHelperDistanceChange}
           unit="mm"

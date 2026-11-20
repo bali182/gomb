@@ -11,6 +11,7 @@ import { accessors } from '../utils/accessors'
 import { getEditableSchema } from '../utils/getEditableSchema'
 import { loadProjectFromContents } from '../utils/loadProjectFromContents'
 import { validateRootPanelFaceSchema } from '../validators/validateRootPanelFaceSchema'
+import { applyExportContentSettings } from './exports/applyExportContentSettings'
 import { getExportElements } from './exports/getExportElements'
 import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
@@ -128,9 +129,11 @@ describe('root panel faces', () => {
     expect(clonedAccessor.rootPanelFace(root.backFaceId).name).toBe('root-back')
     expect(clonedAccessor.childIds(root.frontFaceId)).toHaveLength(1)
     expect(clonedAccessor.childIds(root.backFaceId)).toHaveLength(2)
-    const elements = getExportElements(
-      base.project,
-      { ...base.project, subProjects: [getComputedSubProject(subProject, defaultStitchingSettings)] },
+    const elements = applyExportContentSettings(
+      getExportElements(base.project, {
+        ...base.project,
+        subProjects: [getComputedSubProject(subProject, defaultStitchingSettings)],
+      }),
       defaultExportParams,
     )
     expect(elements.map((element) => element.id)).toEqual(['root', 'front-panel', 'back-a', 'back-b'])
@@ -254,9 +257,11 @@ describe('shared root cutouts', () => {
       ),
     ).toBe(true)
     expect(subProject).toEqual(snapshot)
-    const elements = getExportElements(
-      d.project({ id: 'project', subProjects: [subProject] }),
-      { ...d.project({ id: 'project', subProjects: [] }), subProjects: [computed] },
+    const elements = applyExportContentSettings(
+      getExportElements(d.project({ id: 'project', subProjects: [subProject] }), {
+        ...d.project({ id: 'project', subProjects: [] }),
+        subProjects: [computed],
+      }),
       defaultExportParams,
     )
     const rootElement = elements.find((element) => element.id === 'root')

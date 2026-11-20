@@ -798,23 +798,23 @@ export const EN = {
           content: {
             title: 'Content',
             showNames: {
-              label: 'Show names',
+              label: 'Names',
               tooltip: 'Includes component names in the exported file.',
             },
             showDimensions: {
-              label: 'Show dimensions',
+              label: 'Dimensions',
               tooltip: 'Includes component dimensions in the exported file.',
             },
             showParentNames: {
-              label: 'Show parent names',
+              label: 'Parent names',
               tooltip: 'Includes the immediate parent’s name below each component’s other labels.',
             },
             childMarkers: {
-              label: 'Show markers',
+              label: 'Markers',
               tooltip: 'Adds markers where component edges need to connect. Helpful for marking where to glue.',
             },
             cutHelperDistance: {
-              label: 'Cut helper distance',
+              label: 'Cut helpers',
               tooltip:
                 'Sets how far outside each component the cut helper outline is drawn. Set it to 0 to hide the outline.',
             },
@@ -1166,9 +1166,15 @@ export const EN = {
     export: {
       title: 'Export',
       positiveAction: 'Export',
+      preview: 'Preview',
+      preparationFailed: {
+        title: 'Unable to prepare export',
+        description: 'The project could not be calculated. Try preparing the export again.',
+        action: 'Recalculate',
+      },
       errors: {
+        oversizedComponents: 'The following components do not fit on the selected page with the current settings:',
         exportFailed: 'The export failed.',
-        unplaceablePanels: 'One or more panels do not fit on the selected page.',
       },
     },
     license: {

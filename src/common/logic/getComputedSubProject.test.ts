@@ -5,6 +5,7 @@ import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
 import { narrowers } from '../utils/narrowers'
+import { applyExportContentSettings } from './exports/applyExportContentSettings'
 import { getComputedSubProject } from './getComputedSubProject'
 
 import BigNumber from 'bignumber.js'
@@ -154,10 +155,16 @@ describe('empty pocket cluster placeholder', () => {
     const computed = getComputedSubProject(original, defaultStitchingSettings)
     expect(computed.components.cluster.path.commands.length).toBeGreaterThan(0)
     const settings = { ...defaultExportParams, childMarkers: true }
-    expect(getExportElementsForComponent(original, computed, cluster.id, settings, defaultStitchingSettings)).toEqual(
-      [],
+    expect(
+      applyExportContentSettings(
+        getExportElementsForComponent(original, computed, cluster.id, defaultStitchingSettings),
+        settings,
+      ),
+    ).toEqual([])
+    const exported = applyExportContentSettings(
+      getExportElementsForComponent(original, computed, root.id, defaultStitchingSettings),
+      settings,
     )
-    const exported = getExportElementsForComponent(original, computed, root.id, settings, defaultStitchingSettings)
     expect(exported.map((element) => element.id)).toEqual([root.id])
     const exportedRoot = exported[0]
     if (exportedRoot.type !== 'export-panel') {
@@ -601,12 +608,15 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
       10,
     )
     const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-    const elements = getExportElementsForComponent(
-      subProject,
-      computed,
-      ownerType === 'root-panel' ? 'root' : ownerId,
-      { ...defaultExportParams, format },
-      defaultStitchingSettings,
+    const settings = { ...defaultExportParams, format }
+    const elements = applyExportContentSettings(
+      getExportElementsForComponent(
+        subProject,
+        computed,
+        ownerType === 'root-panel' ? 'root' : ownerId,
+        defaultStitchingSettings,
+      ),
+      settings,
     )
     const exported = elements.find((element) => element.id === (ownerType === 'root-panel' ? 'root' : ownerId))
     if (!isDefined(exported) || exported.type !== 'export-panel') {

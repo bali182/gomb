@@ -8,6 +8,7 @@ import type { OpticalIllusionPocketOpeningSchema, SlantedPocketOpeningSchema } f
 import type { SubProjectSchema } from '../schemas/subProject'
 import { d } from '../testData'
 import { accessors } from '../utils/accessors'
+import { applyExportContentSettings } from './exports/applyExportContentSettings'
 import { getExportElementsForComponent } from './exports/getExportElements'
 import { getComputedSubProject } from './getComputedSubProject'
 import { isPointInClosedPath } from './isPointInClosedPath'
@@ -113,12 +114,9 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
       })
       expect(computed.stitchLines.bottom.routes).toHaveLength(1)
       expect(computed.stitchLines.border.type).toBe('component-bounds-stitch-line')
-      const elements = getExportElementsForComponent(
-        subProject,
-        computed,
-        'cluster',
+      const elements = applyExportContentSettings(
+        getExportElementsForComponent(subProject, computed, 'cluster', defaultStitchingSettings),
         { ...defaultExportParams },
-        defaultStitchingSettings,
       )
       expect(elements.map((element) => element.id)).toEqual(['t1', 't2', 'front'])
       expect(elements[0].stitchLines.some((line) => line.stitchLine.id === 'bottom')).toBe(true)
@@ -130,12 +128,9 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
     it('keeps the cluster border on every physically crossed pocket', () => {
       const { subProject } = fixture()
       const computed = getComputedSubProject(subProject, defaultStitchingSettings)
-      const elements = getExportElementsForComponent(
-        subProject,
-        computed,
-        'cluster',
+      const elements = applyExportContentSettings(
+        getExportElementsForComponent(subProject, computed, 'cluster', defaultStitchingSettings),
         { ...defaultExportParams },
-        defaultStitchingSettings,
       )
       expect(elements).toHaveLength(3)
       for (const element of elements) {

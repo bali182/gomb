@@ -1,3 +1,4 @@
+import { getExportPageSize } from '../logic/exports/getExportPageSize'
 import type { EditableSchema } from '../schemas/editable'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { IssuesSchema } from '../schemas/issues'
@@ -33,10 +34,6 @@ export const validateExportSettingsSchema = (
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<ExportSettingsSchema> => {
   const gapResult = validateNumber(input.gap, currentValue.gap, context, { min: 0 })
-  const paddingResult = validateNumber(input.padding, currentValue.padding, context, { min: 0 })
-  const cutHelperDistanceResult = validateNumber(input.cutHelperDistance, currentValue.cutHelperDistance, context, {
-    min: 0,
-  })
   const formatResult = validatePrimitiveUnion(input.format, currentValue.format, exportFormats, context)
   const pageResult = validatePrimitiveUnion(input.page, currentValue.page, pageSchemaIds, context)
   const orientationResult = validatePrimitiveUnion(
@@ -46,6 +43,19 @@ export const validateExportSettingsSchema = (
     context,
   )
   const layoutResult = validatePrimitiveUnion(input.layout, currentValue.layout, pageLayouts, context)
+
+  const pageSize = getExportPageSize(pageResult.committedValue, orientationResult.committedValue)
+  const halfShortSide = Math.min(pageSize.width.toNumber(), pageSize.height.toNumber()) / 2
+  const paddingResult = validateNumber(input.padding, currentValue.padding, context, {
+    min: 0,
+    max: halfShortSide,
+    maxInclusive: false,
+  })
+  const cutHelperDistanceResult = validateNumber(input.cutHelperDistance, currentValue.cutHelperDistance, context, {
+    min: 0,
+    max: paddingResult.isValid ? halfShortSide - paddingResult.value : undefined,
+    maxInclusive: false,
+  })
 
   const issues: IssuesSchema<ExportSettingsSchema> = {
     childMarkers: undefined,
@@ -83,7 +93,8 @@ export const validateExportSettingsSchema = (
     !orientationResult.isValid ||
     !layoutResult.isValid
   ) {
-    return createInvalidValidationResult(issues, committedValue)
+    const leavesUsableArea = committedValue.padding + committedValue.cutHelperDistance < halfShortSide
+    return createInvalidValidationResult(issues, leavesUsableArea ? committedValue : currentValue)
   }
 
   return createValidValidationResult(issues, committedValue)

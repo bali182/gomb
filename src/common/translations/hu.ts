@@ -738,7 +738,7 @@ export const HU = {
               tooltip: 'A komponens feliratai alatt megjeleníti a közvetlen szülő nevét.',
             },
             childMarkers: {
-              label: 'Jelölések',
+              label: 'Illesztések',
               tooltip:
                 'Megjelöli, hol kell illeszkedniük a komponensek éleinek. Segít a ragasztás helyének bejelölésében.',
             },
@@ -1095,9 +1095,15 @@ export const HU = {
     export: {
       title: 'Exportálás',
       positiveAction: 'Exportálás',
+      preview: 'Előnézet',
+      preparationFailed: {
+        title: 'Az export előkészítése sikertelen',
+        description: 'A projektet nem sikerült kiszámítani. Próbáld újra az export előkészítését.',
+        action: 'Újraszámítás',
+      },
       errors: {
+        oversizedComponents: 'A következő komponensek nem férnek el a kiválasztott lapon a jelenlegi beállításokkal:',
         exportFailed: 'Az exportálás nem sikerült.',
-        unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalon.',
       },
     },
     license: {

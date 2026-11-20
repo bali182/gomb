@@ -29,6 +29,8 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const { redo, undo } = useSubProjectHistory()
   const { toggleMeasuring } = useMeasurement()
 
+  const isDialogOpen = isExportDialogOpen || isScalingDialogOpen || isLicenseDialogOpen
+
   const commands = useWebCommands()
 
   const getCommand = useCallback(
@@ -110,7 +112,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
     [getCommand, project, redo, setEditSettings, setViewSettings, settings.view, undo, toggleMeasuring],
   )
 
-  useCommonCommandEmitter({ commands, execute: emitCommand })
+  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: !isDialogOpen })
 
   const value = useMemo<CommandsContextValue<WebCommandIdSchema>>(
     () => ({ emitCommand, getCommand }),

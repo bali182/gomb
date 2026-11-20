@@ -23,12 +23,13 @@ type ExportPageOption = {
 }
 
 type ExportPageSectionProps = {
+  disabled: boolean
   editable: EditableSchema<ExportSettingsSchema>
   issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportPageSection({ editable, issues, onChange }: ExportPageSectionProps): ReactNode {
+export function ExportPageSection({ editable, issues, onChange, disabled }: ExportPageSectionProps): ReactNode {
   const { t } = useTranslation()
   const formatCollection = useMemo<ListCollection<ExportFormatOption>>(
     () =>
@@ -99,6 +100,7 @@ export function ExportPageSection({ editable, issues, onChange }: ExportPageSect
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.format}>
         <Select.Root
+          disabled={disabled}
           collection={formatCollection}
           onValueChange={handleFormatChange}
           size="xs"
@@ -131,6 +133,7 @@ export function ExportPageSection({ editable, issues, onChange }: ExportPageSect
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.page}>
         <Select.Root
+          disabled={disabled}
           aria-invalid={hasPageError}
           collection={pageCollection}
           onValueChange={handlePageChange}
@@ -163,7 +166,12 @@ export function ExportPageSection({ editable, issues, onChange }: ExportPageSect
         {t.project.editors.sections.export.page.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
-        <SegmentGroup.Root onValueChange={handleOrientationChange} size="sm" value={editable.orientation}>
+        <SegmentGroup.Root
+          disabled={disabled}
+          onValueChange={handleOrientationChange}
+          size="sm"
+          value={editable.orientation}
+        >
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="portrait">
             <SegmentGroup.ItemHiddenInput />
@@ -181,7 +189,7 @@ export function ExportPageSection({ editable, issues, onChange }: ExportPageSect
         {t.project.editors.sections.export.page.layout.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layout}>
-        <SegmentGroup.Root onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
+        <SegmentGroup.Root disabled={disabled} onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="vertical">
             <SegmentGroup.ItemHiddenInput />

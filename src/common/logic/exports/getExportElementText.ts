@@ -5,7 +5,10 @@ import type { ExportElementSchema } from '../../schemas/export'
 import { isDefined } from '../../utils/isDefined'
 import { getExportElementBoundingRect } from './exportGeometryUtils'
 
+type ExportTextLineType = 'name' | 'parent-name' | 'dimensions'
+
 type ExportTextLine = {
+  type: ExportTextLineType
   text: string
   color: string | undefined
   fontFamily: string | undefined
@@ -24,18 +27,21 @@ export const getExportElementText = (
 ): ExportTextLinePosition[] => {
   const lines = [
     getExportTextLine(
+      'name',
       exportIdentifiers.getNameText(element),
       exportTextStyles.getNameTextColor(element),
       exportTextStyles.getNameTextFontFamily(element),
       exportTextStyles.getNameTextFontSize(element),
     ),
     getExportTextLine(
+      'parent-name',
       exportIdentifiers.getParentNameText(element),
       exportTextStyles.getDimensionsTextColor(element),
       exportTextStyles.getDimensionsTextFontFamily(element),
       exportTextStyles.getDimensionsTextFontSize(element),
     ),
     getExportTextLine(
+      'dimensions',
       exportTextStyles.getDimensionsText(element),
       exportTextStyles.getDimensionsTextColor(element),
       exportTextStyles.getDimensionsTextFontFamily(element),
@@ -57,6 +63,7 @@ export const getExportElementText = (
 }
 
 const getExportTextLine = (
+  type: ExportTextLineType,
   text: string | undefined,
   color: string | undefined,
   fontFamily: string | undefined,
@@ -64,6 +71,7 @@ const getExportTextLine = (
 ): ExportTextLine | undefined => {
   if (isDefined(text) && isDefined(fontSize)) {
     return {
+      type,
       text,
       color,
       fontFamily,
