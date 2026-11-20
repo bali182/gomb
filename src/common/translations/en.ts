@@ -962,9 +962,9 @@ export const EN = {
         },
         export: {
           exportFormats: {
-            svg: 'SVG',
-            pdf: 'PDF',
-            png: 'PNG',
+            svg: 'SVG (Vector drawing)',
+            pdf: 'PDF (Document)',
+            png: 'PNG (Image)',
           } satisfies EnumTranslationSchema<ExportFormatSchema>,
           exportOrientation: {
             portrait: 'Portrait',

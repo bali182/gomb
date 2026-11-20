@@ -890,9 +890,9 @@ export const HU = {
         },
         export: {
           exportFormats: {
-            svg: 'SVG',
-            pdf: 'PDF',
-            png: 'PNG',
+            svg: 'SVG (Vektoros rajz)',
+            pdf: 'PDF (Dokumentum)',
+            png: 'PNG (Kép)',
           },
           exportOrientation: {
             portrait: 'Álló',

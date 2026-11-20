@@ -1,6 +1,7 @@
-import { SegmentGroup, Select, createListCollection, type ListCollection } from '@chakra-ui/react'
+import { InputGroup, Select, createListCollection, type ListCollection } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
-import { PiColumns, PiFile, PiGridFour, PiRows } from 'react-icons/pi'
+import type { IconType } from 'react-icons'
+import { PiColumns, PiFile, PiFilePdf, PiFilePng, PiFileSvg, PiGridFour, PiRows } from 'react-icons/pi'
 
 import { pages } from '../../data/pages'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -10,14 +11,11 @@ import type { IssuesSchema } from '../../schemas/issues'
 import type { PageSchema, PageSchemaId } from '../../schemas/page'
 import type { ExportSettingsSchema } from '../../schemas/settings'
 import { isDefined } from '../../utils/isDefined'
+import { InputSelect } from '../common/InputSelect'
 import { SectionGroup } from '../common/SectionGroup'
 
-type ExportFormatOption = {
-  label: string
-  value: ExportFormatSchema
-}
-
 type ExportPageOption = {
+  dimensions: string
   label: string
   value: PageSchemaId
 }
@@ -31,26 +29,9 @@ type ExportPageSectionProps = {
 
 export function ExportPageSection({ editable, issues, onChange, disabled }: ExportPageSectionProps): ReactNode {
   const { t } = useTranslation()
-  const formatCollection = useMemo<ListCollection<ExportFormatOption>>(
-    () =>
-      createListCollection<ExportFormatOption>({
-        itemToString: (item) => item.label,
-        itemToValue: (item) => item.value,
-        items: [
-          { label: t.project.editors.enums.export.exportFormats.pdf, value: 'pdf' },
-          { label: t.project.editors.enums.export.exportFormats.svg, value: 'svg' },
-          { label: t.project.editors.enums.export.exportFormats.png, value: 'png' },
-        ],
-      }),
-    [t],
-  )
   const handleFormatChange = useCallback(
-    (details: Select.ValueChangeDetails<ExportFormatOption>): void => {
-      const format = details.value[0]
-      if (!isDefined(format)) {
-        return
-      }
-      onChange({ ...editable, format: format as ExportFormatSchema })
+    (format: ExportFormatSchema): void => {
+      onChange({ ...editable, format })
     },
     [editable, onChange],
   )
@@ -77,19 +58,19 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
     [editable, onChange],
   )
   const handleOrientationChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, orientation: details.value as PageOrientationSchema })
+    (orientation: PageOrientationSchema): void => {
+      onChange({ ...editable, orientation })
     },
     [editable, onChange],
   )
   const handleLayoutChange = useCallback(
-    (details: SegmentGroup.ValueChangeDetails): void => {
-      onChange({ ...editable, layout: details.value as PageLayoutSchema })
+    (layout: PageLayoutSchema): void => {
+      onChange({ ...editable, layout })
     },
     [editable, onChange],
   )
 
-  const hasPageError = isDefined(issues.page) && issues.page.severity === 'error'
+  const selectedPage = pageOptions.find((page) => page.value === editable.page)
 
   return (
     <SectionGroup.Section>
@@ -99,33 +80,15 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
         {t.project.editors.sections.export.page.format.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.format}>
-        <Select.Root
+        <InputSelect
           disabled={disabled}
-          collection={formatCollection}
-          onValueChange={handleFormatChange}
-          size="xs"
-          value={[editable.format]}
-        >
-          <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Select.Positioner>
-            <Select.Content>
-              {formatCollection.items.map((item) => (
-                <Select.Item item={item} key={item.value}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                  <Select.ItemIndicator />
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Positioner>
-        </Select.Root>
+          items={formats}
+          icons={formatIcons}
+          labels={t.project.editors.enums.export.exportFormats}
+          value={editable.format}
+          issue={issues.format}
+          onChange={handleFormatChange}
+        />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.page.tooltip}>
@@ -134,21 +97,23 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
       <SectionGroup.SectionRowEditor issue={issues.page}>
         <Select.Root
           disabled={disabled}
-          aria-invalid={hasPageError}
+          invalid={issues.page?.severity === 'error'}
           collection={pageCollection}
           onValueChange={handlePageChange}
           size="xs"
           value={[editable.page]}
         >
           <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
+          <InputGroup startAddon={editable.page} minW="0">
+            <Select.Control flex="1" minW="0">
+              <Select.Trigger borderLeftRadius="0" justifyContent="flex-start">
+                <Select.ValueText>{selectedPage?.dimensions}</Select.ValueText>
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+          </InputGroup>
           <Select.Positioner>
             <Select.Content>
               {pageCollection.items.map((item) => (
@@ -166,50 +131,61 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
         {t.project.editors.sections.export.page.orientation.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.orientation}>
-        <SegmentGroup.Root
+        <InputSelect
           disabled={disabled}
-          onValueChange={handleOrientationChange}
-          size="sm"
+          items={orientations}
+          icons={orientationIcons}
+          labels={t.project.editors.enums.export.exportOrientation}
           value={editable.orientation}
-        >
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="portrait">
-            <SegmentGroup.ItemHiddenInput />
-            <PiFile /> {t.project.editors.enums.export.exportOrientation.portrait}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="landscape">
-            <SegmentGroup.ItemHiddenInput />
-            <PiFile style={{ transform: 'scaleY(-1) rotate(90deg)' }} />{' '}
-            {t.project.editors.enums.export.exportOrientation.landscape}
-          </SegmentGroup.Item>
-        </SegmentGroup.Root>
+          issue={issues.orientation}
+          onChange={handleOrientationChange}
+        />
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.layout.tooltip}>
         {t.project.editors.sections.export.page.layout.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.layout}>
-        <SegmentGroup.Root disabled={disabled} onValueChange={handleLayoutChange} size="sm" value={editable.layout}>
-          <SegmentGroup.Indicator />
-          <SegmentGroup.Item value="vertical">
-            <SegmentGroup.ItemHiddenInput />
-            <PiRows /> {t.project.editors.enums.export.exportPageLayout.vertical}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="horizontal">
-            <SegmentGroup.ItemHiddenInput />
-            <PiColumns /> {t.project.editors.enums.export.exportPageLayout.horizontal}
-          </SegmentGroup.Item>
-          <SegmentGroup.Item value="compact">
-            <SegmentGroup.ItemHiddenInput />
-            <PiGridFour /> {t.project.editors.enums.export.exportPageLayout.compact}
-          </SegmentGroup.Item>
-        </SegmentGroup.Root>
+        <InputSelect
+          disabled={disabled}
+          items={layouts}
+          icons={layoutIcons}
+          labels={t.project.editors.enums.export.exportPageLayout}
+          value={editable.layout}
+          issue={issues.layout}
+          onChange={handleLayoutChange}
+        />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )
 }
 
 const createExportPageOption = (page: PageSchema): ExportPageOption => ({
+  dimensions: `${page.width} × ${page.height} mm`,
   label: `${page.id} — ${page.width} × ${page.height} mm`,
   value: page.id,
 })
+
+const formats: ExportFormatSchema[] = ['pdf', 'svg', 'png']
+const orientations: PageOrientationSchema[] = ['portrait', 'landscape']
+const layouts: PageLayoutSchema[] = ['vertical', 'horizontal', 'compact']
+
+const formatIcons: Record<ExportFormatSchema, IconType> = {
+  pdf: PiFilePdf,
+  svg: PiFileSvg,
+  png: PiFilePng,
+}
+
+const landscapeIconStyle = { transform: 'scaleY(-1) rotate(90deg)' }
+const LandscapeIcon: IconType = (props) => <PiFile {...props} style={landscapeIconStyle} />
+
+const orientationIcons: Record<PageOrientationSchema, IconType> = {
+  portrait: PiFile,
+  landscape: LandscapeIcon,
+}
+
+const layoutIcons: Record<PageLayoutSchema, IconType> = {
+  vertical: PiRows,
+  horizontal: PiColumns,
+  compact: PiGridFour,
+}
