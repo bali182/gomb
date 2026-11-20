@@ -120,6 +120,8 @@ export const ExportDialog: FC<ExportDialogProps> = ({ isOpen, onOpenChange }) =>
       onSubmit={handleSubmit}
       submit={t.dialogs.export.positiveAction}
       title={t.dialogs.export.title}
+      sectionDividers={true}
+      size="xl"
     >
       <ExportFailureAlert failure={failure} onDismiss={handleFailureDismiss} />
       <ExportEditor editable={localExportSettings} issues={validationResult.issues} onChange={handleParamsChange} />

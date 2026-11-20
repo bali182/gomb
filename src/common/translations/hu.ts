@@ -726,24 +726,24 @@ export const HU = {
           content: {
             title: 'Tartalom',
             showNames: {
-              label: 'Nevek megjelenítése',
+              label: 'Nevek',
               tooltip: 'A komponensek nevét is belefoglalja az exportált fájlba.',
             },
             showDimensions: {
-              label: 'Méretek megjelenítése',
+              label: 'Méretek',
               tooltip: 'A komponensek méreteit is belefoglalja az exportált fájlba.',
             },
             showParentNames: {
-              label: 'Szülőnevek megjelenítése',
+              label: 'Szülőnevek',
               tooltip: 'A komponens feliratai alatt megjeleníti a közvetlen szülő nevét.',
             },
             childMarkers: {
-              label: 'Jelölések megjelenítése',
+              label: 'Jelölések',
               tooltip:
                 'Megjelöli, hol kell illeszkedniük a komponensek éleinek. Segít a ragasztás helyének bejelölésében.',
             },
             cutHelperDistance: {
-              label: 'Vágási segédvonal távolsága',
+              label: 'Segédvonal',
               tooltip: 'A komponens körül rajzolt vágási segédvonal távolságát állítja be. A 0 elrejti a segédvonalat.',
             },
           },
