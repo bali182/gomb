@@ -9,6 +9,7 @@ import {
   threadColors,
 } from './data/colors'
 import type {
+  HasAutoDimensionsSchema,
   HasComponentReferenceSchema,
   HasCornerRadiusSchema,
   HasId,
@@ -20,7 +21,6 @@ import type {
 } from './schemas/common'
 import type {
   FrontPocketSchema,
-  HasAutoDimensionsSchema,
   HasFacesSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
