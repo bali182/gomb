@@ -4,6 +4,7 @@ import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
+import { canAddChild } from './utils/componentRules'
 import { getInsertionIndex } from './utils/getInsertionIndex'
 
 export const addComponent = (
@@ -15,7 +16,10 @@ export const addComponent = (
   if (!isDefined(parent)) {
     throw new Error('Missing parent')
   }
-  if (narrowers.is.rootPanel(parent)) {
+  if (
+    narrowers.is.rootPanel(parent) ||
+    ((type === 'guide' || narrowers.is.guide(parent)) && !canAddChild(parent, type, subProject))
+  ) {
     return subProject
   }
 

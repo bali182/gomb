@@ -42,6 +42,7 @@ const translations: Record<IdPrefixSchema, string> = {
   'root-panel-face-binding-field': 'Face field',
   'root-panel': 'Name',
   'panel': 'Name',
+  'guide': 'Name',
   'pocket-cluster': 'Name',
   'front-pocket': 'Name',
   't-pocket': 'Name',
@@ -55,6 +56,7 @@ const translations: Record<IdPrefixSchema, string> = {
   'equal-binding': 'Name',
   'root-panel-binding-field': 'Name',
   'panel-binding-field': 'Name',
+  'guide-binding-field': 'Name',
   'pocket-cluster-binding-field': 'Name',
   'front-pocket-binding-field': 'Name',
   't-pocket-binding-field': 'Name',
@@ -97,6 +99,12 @@ const cases: FactoryCaseSchema[] = [
     prefix: 'panel',
     type: 'panel',
     create: (factory, params) => factory.createPanel({ ...params }),
+  },
+  {
+    label: 'createGuide',
+    prefix: 'guide',
+    type: 'guide',
+    create: (factory, params) => factory.createGuide({ ...params }),
   },
   {
     label: 'createPocketCluster',
@@ -568,6 +576,7 @@ const getNamedModel = (model: FactoryResultSchema): ModelObjectSchema | undefine
   switch (model.type) {
     case 'root-panel':
     case 'root-panel-face':
+    case 'guide':
     case 'panel':
     case 'pocket-cluster':
     case 'front-pocket':
@@ -583,6 +592,7 @@ const getNamedModel = (model: FactoryResultSchema): ModelObjectSchema | undefine
     case 'equal-binding':
     case 'root-panel-binding-field':
     case 'root-panel-face-binding-field':
+    case 'guide-binding-field':
     case 'panel-binding-field':
     case 'pocket-cluster-binding-field':
     case 'front-pocket-binding-field':

@@ -1,5 +1,12 @@
 import type { IconType } from 'react-icons'
-import { PiCardsThreeDuotone, PiLink, PiNeedleDuotone, PiRectangleDuotone, PiWalletDuotone } from 'react-icons/pi'
+import {
+  PiCardsThreeDuotone,
+  PiLink,
+  PiNeedleDuotone,
+  PiRectangleDuotone,
+  PiSelection,
+  PiWalletDuotone,
+} from 'react-icons/pi'
 import { HoleIcon } from '../components/icons/HoleIcon'
 import { OpticalIllusionFrontPocketIcon } from '../components/icons/OpticalIllusionFrontPocketIcon'
 import { OpticalIllusionPocketOpeningIcon } from '../components/icons/OpticalIllusionPocketOpeningIcon'
@@ -59,6 +66,8 @@ export const getModelIconByType = (type: SubProjectItemSchema['type']): IconType
       return frontPocketIcons.straight
     case 't-pocket':
       return tPocketIcons.straight
+    case 'guide':
+      return PiSelection
     case 'panel':
       return PiRectangleDuotone
     case 'pocket-cluster':

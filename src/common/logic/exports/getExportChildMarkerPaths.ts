@@ -44,6 +44,9 @@ const getChildBoundingRects = (
 
 const collectChildBoundingRects = (componentId: string, accessor: ComputedComponentAccessorSchema): RectSchema[] =>
   accessor.children(componentId).flatMap((child) => {
+    if (narrowers.is.computedGuide(child)) {
+      return collectChildBoundingRects(child.componentId, accessor)
+    }
     return narrowers.is.computedPocketCluster(child)
       ? accessor.children(child.componentId).map((pocket) => pocket.boundingRect)
       : [child.boundingRect]

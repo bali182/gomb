@@ -2,6 +2,7 @@ import type { BindingFieldSchema, BindingSchema } from '../schemas/bindings'
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -102,6 +103,10 @@ export const comparators = {
       return comparators.panel(a, b)
     }
 
+    if (narrowers.is.guide(a) && narrowers.is.guide(b)) {
+      return comparators.guide(a, b)
+    }
+
     if (narrowers.is.pocketCluster(a) && narrowers.is.pocketCluster(b)) {
       return comparators.pocketCluster(a, b)
     }
@@ -149,6 +154,34 @@ export const comparators = {
       a.layoutGap === b.layoutGap &&
       a.autoLayoutGap === b.autoLayoutGap &&
       a.offAxisAnchor === b.offAxisAnchor &&
+      areArraysEqual(a.children, b.children, (first, second) => first === second) &&
+      a.width === b.width &&
+      a.height === b.height &&
+      a.autoWidth === b.autoWidth &&
+      a.autoHeight === b.autoHeight &&
+      a.topStretch === b.topStretch &&
+      a.rightStretch === b.rightStretch &&
+      a.bottomStretch === b.bottomStretch &&
+      a.leftStretch === b.leftStretch &&
+      a.topLeftRadius === b.topLeftRadius &&
+      a.topRightRadius === b.topRightRadius &&
+      a.bottomLeftRadius === b.bottomLeftRadius &&
+      a.bottomRightRadius === b.bottomRightRadius
+    )
+  },
+
+  guide: (a: GuideSchema, b: GuideSchema): boolean => {
+    return (
+      a.xAnchor === b.xAnchor &&
+      a.yAnchor === b.yAnchor &&
+      a.xOffset === b.xOffset &&
+      a.yOffset === b.yOffset &&
+      a.id === b.id &&
+      a.name === b.name &&
+      a.layoutOrientation === b.layoutOrientation &&
+      a.mainAxisAnchor === b.mainAxisAnchor &&
+      a.layoutGap === b.layoutGap &&
+      a.autoLayoutGap === b.autoLayoutGap &&
       areArraysEqual(a.children, b.children, (first, second) => first === second) &&
       a.width === b.width &&
       a.height === b.height &&

@@ -9,8 +9,9 @@ import type { PocketClusterSchema } from '../../schemas/components'
 import type { ComputedPocketClusterSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
-import { PocketClusterSelectionLabel } from './PocketClusterSelectionLabel'
 import { SizeLabel } from './SizeLabel'
+
+const POCKET_CLUSTER_HIT_AREA_THICKNESS = 2
 
 type PocketClusterProps = {
   componentId: string
@@ -49,17 +50,30 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
 
   return (
     <>
-      <g data-component-id={componentId} onClick={isInteractive ? onClick : undefined}>
+      <g data-component-id={componentId} onClick={isInteractive && !isEmpty ? onClick : undefined}>
         {(isEmpty ? isInteractive : active) && (
           <path
             d={pathData}
-            fill={componentStyles.getBackgroundColor(style)}
+            fill={isEmpty ? 'none' : componentStyles.getBackgroundColor(style)}
             stroke={componentStyles.getBorderColor(style)}
             strokeWidth={componentStyles.getBorderThickness(style)}
             strokeDasharray={componentStyles.getBorderDasharray(style)}
             filter={componentStyles.getFilter(style)}
-            onPointerEnter={isInteractive ? onPointerEnter : undefined}
-            onPointerLeave={isInteractive ? onPointerLeave : undefined}
+            pointerEvents={isEmpty ? 'none' : undefined}
+            onPointerEnter={isInteractive && !isEmpty ? onPointerEnter : undefined}
+            onPointerLeave={isInteractive && !isEmpty ? onPointerLeave : undefined}
+          />
+        )}
+        {isInteractive && isEmpty && (
+          <path
+            d={pathData}
+            fill="none"
+            stroke="transparent"
+            strokeWidth={POCKET_CLUSTER_HIT_AREA_THICKNESS}
+            pointerEvents="stroke"
+            onClick={onClick}
+            onPointerEnter={onPointerEnter}
+            onPointerLeave={onPointerLeave}
           />
         )}
         {pocketIds.map((pocketId) => (
@@ -69,7 +83,6 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )
 }

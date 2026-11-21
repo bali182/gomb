@@ -1,10 +1,14 @@
 import BigNumber from 'bignumber.js'
 import { POSITION_EPSILON } from '../constants/layout'
+import type { ComputedGuideSchema } from '../schemas/computed'
 import { accessors } from '../utils/accessors'
+import { applyStretchToBoundingBox } from './applyStretchToBoundingBox'
+import { calculateAnchoredBoundingRect } from './calculateAnchoredBoundingRect'
 
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -107,8 +111,9 @@ const computeComponent = (
     case 'front-pocket':
     case 't-pocket':
       throw new Error('Pockets must be calculated by their cluster')
+    case 'guide':
     case 'panel':
-      return computePanel(
+      return computePanelOrGuide(
         component,
         boundingRect,
         layoutBoundingRect,
@@ -192,15 +197,19 @@ const computeRootPanelFace = (
           bottomLeft: parentCornerRadius.bottomRight,
           bottomRight: parentCornerRadius.bottomLeft,
         }
-  const layoutChildren = assertLayoutChildren(accessor.component.children(rootPanelFace.id))
-  const computedLayoutGap = calculateGap(layoutChildren, boundingRect, rootPanelFace)
-  const children = computeLayoutChildren(
+  const childrenToCompute = assertSupportedChildren(accessor.component.children(rootPanelFace.id))
+  const computedLayoutGap = calculateGap(
+    childrenToCompute.filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child)),
+    boundingRect,
+    rootPanelFace,
+  )
+  const children = computeChildren(
     rootPanelFace,
     boundingRect,
     boundingRect,
     cornerRadius,
     computedLayoutGap,
-    layoutChildren,
+    childrenToCompute,
     subProject,
     resolvedStitchLines,
     computedComponents,
@@ -220,8 +229,8 @@ const computeRootPanelFace = (
   return computed
 }
 
-const computePanel = (
-  panel: PanelSchema,
+const computePanelOrGuide = (
+  component: PanelSchema | GuideSchema,
   boundingRect: RectSchema,
   layoutBoundingRect: RectSchema,
   parentBoundingRect: RectSchema,
@@ -229,8 +238,8 @@ const computePanel = (
   subProject: SubProjectSchema,
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
-): ComputedPanelSchema => {
-  const requestedRadius = getCornerRadius(panel)
+): ComputedPanelSchema | ComputedGuideSchema => {
+  const requestedRadius = getCornerRadius(component)
   const cornerRadius = getAdjustedCornerRadius(
     requestedRadius,
     getCornerRadiusLimits({
@@ -241,22 +250,26 @@ const computePanel = (
     }),
   )
   const path = calculateRectPath(boundingRect, cornerRadius)
-  const layoutChildren = assertLayoutChildren(accessors.subProject(subProject).component.children(panel.id))
-  const computedLayoutGap = calculateGap(layoutChildren, boundingRect, panel)
-  const children = computeLayoutChildren(
-    panel,
+  const childrenToCompute = assertSupportedChildren(accessors.subProject(subProject).component.children(component.id))
+  const computedLayoutGap = calculateGap(
+    childrenToCompute.filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child)),
+    boundingRect,
+    component,
+  )
+  const children = computeChildren(
+    component,
     boundingRect,
     boundingRect,
     cornerRadius,
     computedLayoutGap,
-    layoutChildren,
+    childrenToCompute,
     subProject,
     resolvedStitchLines,
     computedComponents,
   )
-  const computed: ComputedPanelSchema = {
-    type: 'computed-panel',
-    componentId: panel.id,
+  const computed: ComputedPanelSchema | ComputedGuideSchema = {
+    type: component.type === 'guide' ? 'computed-guide' : 'computed-panel',
+    componentId: component.id,
     boundingRect,
     layoutBoundingRect,
     path,
@@ -265,7 +278,7 @@ const computePanel = (
     computedLayoutGap,
   }
 
-  computedComponents[panel.id] = computed
+  computedComponents[component.id] = computed
 
   return computed
 }
@@ -320,42 +333,54 @@ const computePocketCluster = (
   return computed
 }
 
-const computeLayoutChildren = (
-  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+const computeChildren = (
+  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
   layoutBoundingRect: RectSchema,
   parentBoundingRect: RectSchema,
   parentCornerRadius: CornerRadiusSchema,
   computedLayoutGap: BigNumber,
-  children: (PanelSchema | PocketClusterSchema)[],
+  children: (PanelSchema | PocketClusterSchema | GuideSchema)[],
   subProject: SubProjectSchema,
   resolvedStitchLines: ResolvedStitchLineSchema[],
   computedComponents: Record<string, ComputedComponentSchema>,
 ): string[] => {
   const boundingBoxes = calculateLayoutBoundingBoxes({
     component,
-    children,
+    children: children.filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child)),
     computedGap: computedLayoutGap,
     boundingRect: layoutBoundingRect,
   })
 
-  return children.map(
-    (child) =>
+  const childIds: string[] = []
+  for (const child of children) {
+    const anchoredBoundingRect = narrowers.is.guide(child)
+      ? calculateAnchoredBoundingRect(child, layoutBoundingRect)
+      : undefined
+    const boxes = isDefined(anchoredBoundingRect)
+      ? {
+          boundingRect: applyStretchToBoundingBox(narrowers.assert.guide(child), anchoredBoundingRect),
+          layoutBoundingRect: anchoredBoundingRect,
+        }
+      : boundingBoxes[child.id]
+    childIds.push(
       computeComponent(
         child,
-        boundingBoxes[child.id].boundingRect,
-        boundingBoxes[child.id].layoutBoundingRect,
+        boxes.boundingRect,
+        boxes.layoutBoundingRect,
         parentBoundingRect,
         parentCornerRadius,
         subProject,
         resolvedStitchLines,
         computedComponents,
       ).componentId,
-  )
+    )
+  }
+  return childIds
 }
 
-const assertLayoutChildren = (children: ComponentSchema[]): (PanelSchema | PocketClusterSchema)[] => {
+const assertSupportedChildren = (children: ComponentSchema[]): (PanelSchema | PocketClusterSchema | GuideSchema)[] => {
   return children.map((child) => {
-    if (!narrowers.is.panel(child) && !narrowers.is.pocketCluster(child)) {
+    if (!narrowers.is.panel(child) && !narrowers.is.pocketCluster(child) && !narrowers.is.guide(child)) {
       throw new Error(`Unsupported child component type: ${child.type}`)
     }
 
@@ -417,15 +442,19 @@ const completePocketChildren = (
   for (const computedPocket of pockets) {
     if (narrowers.is.computedFrontPocket(computedPocket)) {
       const source = accessor.component.frontPocket(computedPocket.componentId)
-      const layoutChildren = assertLayoutChildren(accessor.component.children(source.id))
-      computedPocket.computedLayoutGap = calculateGap(layoutChildren, computedPocket.boundingRect, source)
-      computedPocket.children = computeLayoutChildren(
+      const childrenToCompute = assertSupportedChildren(accessor.component.children(source.id))
+      computedPocket.computedLayoutGap = calculateGap(
+        childrenToCompute.filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child)),
+        computedPocket.boundingRect,
+        source,
+      )
+      computedPocket.children = computeChildren(
         source,
         computedPocket.boundingRect,
         computedPocket.boundingRect,
         computedPocket.cornerRadius,
         computedPocket.computedLayoutGap,
-        layoutChildren,
+        childrenToCompute,
         subProject,
         resolvedStitchLines,
         computedComponents,

@@ -2,6 +2,7 @@ import type { ComponentAccessorSchema, OptionalAccessorSchema } from '../../sche
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
@@ -38,6 +39,7 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
+    this.guide = this.guide.bind(this)
     this.pocketCluster = this.pocketCluster.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
@@ -50,6 +52,7 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
     this.tPockets = this.tPockets.bind(this)
     this.frontPockets = this.frontPockets.bind(this)
     this.panels = this.panels.bind(this)
+    this.guides = this.guides.bind(this)
     this.pocketClusters = this.pocketClusters.bind(this)
   }
 
@@ -68,8 +71,12 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
       return []
     }
     const oppositeFaceId = faceId === root.frontFaceId ? root.backFaceId : root.frontFaceId
-    const own = this.descendants(faceId).filter((component) => !narrowers.is.pocketCluster(component))
-    const opposite = this.descendants(oppositeFaceId).filter((component) => !narrowers.is.pocketCluster(component))
+    const own = this.descendants(faceId).filter(
+      (component) => !narrowers.is.pocketCluster(component) && !narrowers.is.guide(component),
+    )
+    const opposite = this.descendants(oppositeFaceId).filter(
+      (component) => !narrowers.is.pocketCluster(component) && !narrowers.is.guide(component),
+    )
     const ids = [
       ...opposite.reverse().map((component) => component.id),
       root.id,
@@ -144,6 +151,11 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
   panel(id: string): PanelSchema | undefined {
     const value = this.byId(id)
     return isDefined(value) && narrowers.is.panel(value) ? value : undefined
+  }
+
+  guide(id: string): GuideSchema | undefined {
+    const value = this.byId(id)
+    return isDefined(value) && narrowers.is.guide(value) ? value : undefined
   }
 
   pocketCluster(id: string): PocketClusterSchema | undefined {
@@ -226,6 +238,10 @@ export class OptionalComponentAccessor implements OptionalAccessorSchema<Compone
 
   panels(): readonly PanelSchema[] {
     return this.allComponents.filter(narrowers.is.panel)
+  }
+
+  guides(): readonly GuideSchema[] {
+    return this.allComponents.filter(narrowers.is.guide)
   }
 
   pocketClusters(): readonly PocketClusterSchema[] {

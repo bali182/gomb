@@ -54,7 +54,7 @@ export const isStitchLineEntryComponentAllowed = (
   if (!isDefined(stitchLine) || !isDefined(component) || !isDefined(defaultId)) {
     return false
   }
-  if (narrowers.is.rootPanel(component) || narrowers.is.pocketCluster(component)) {
+  if (narrowers.is.guide(component) || narrowers.is.rootPanel(component) || narrowers.is.pocketCluster(component)) {
     return false
   }
   const ownFace = accessor.optional.component.rootPanelFaceOf(defaultId)
@@ -74,7 +74,7 @@ export const isStitchLineExitComponentAllowed = (
   if (!isDefined(stitchLine) || !isDefined(exit)) {
     return false
   }
-  if (narrowers.is.rootPanel(exit) || narrowers.is.pocketCluster(exit)) {
+  if (narrowers.is.guide(exit) || narrowers.is.rootPanel(exit) || narrowers.is.pocketCluster(exit)) {
     return false
   }
   const cluster = narrowers.is.tPocketStitchLine(stitchLine)

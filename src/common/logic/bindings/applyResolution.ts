@@ -81,6 +81,7 @@ const getBindingModelChange = (
 ): ChangeSchema<ModelObjectSchema> | undefined => {
   switch (field.type) {
     case 'root-panel-binding-field':
+    case 'guide-binding-field':
     case 'panel-binding-field':
     case 'pocket-cluster-binding-field':
     case 'front-pocket-binding-field':

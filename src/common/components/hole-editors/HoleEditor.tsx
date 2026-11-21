@@ -6,10 +6,10 @@ import type { EditableSchema } from '../../schemas/editable'
 import type { HoleSchema } from '../../schemas/hole'
 import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
+import { AnchoredPositionSection } from '../component-editors/sections/AnchoredPositionSection'
 import { AutoSizeSection } from '../component-editors/sections/AutoSizeSection'
 import { CornerRadiusSection } from '../component-editors/sections/CornerRadiusSection'
 import { StretchSection } from '../component-editors/sections/StretchSection'
-import { HolePositionSection } from './sections/HolePositionSection'
 
 type HoleEditorProps = {
   editable: EditableSchema<HoleSchema>
@@ -24,7 +24,12 @@ export const HoleEditor: FC<HoleEditorProps> = ({ editable, hole, issues: incomi
 
   return (
     <SectionGroup.Root>
-      <HolePositionSection<HoleSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
+      <AnchoredPositionSection<HoleSchema>
+        modelId={editable.id}
+        editable={editable}
+        issues={issues}
+        onChange={onChange}
+      />
       <AutoSizeSection<HoleSchema>
         modelId={editable.id}
         component={hole}

@@ -2,6 +2,7 @@ import {
   defaultColorSettings,
   defaultComponentBoundsStitchLine,
   defaultFrontPocket,
+  defaultGuide,
   defaultHole,
   defaultOpticalIllusionPocketOpening,
   defaultPanel,
@@ -16,6 +17,7 @@ import {
 } from '../defaultStates'
 import type {
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -92,6 +94,14 @@ const defaultProjectMigratorSchema: ProjectMigratorSchema = {
     m.requireValue(panel, 'type', 'panel')
 
     return m.applyDefaults<PanelSchema>(panel, defaultPanel)
+  },
+  guide: (input) => {
+    const guide = m.requireObject<GuideSchema>(input)
+    m.requireString(guide, 'id')
+    m.requireString(guide, 'name')
+    m.requireValue(guide, 'type', 'guide')
+
+    return m.applyDefaults<GuideSchema>(guide, defaultGuide)
   },
   pocketCluster: (input) => m.applyDefaults<PocketClusterSchema>(m.requireObject(input), defaultPocketCluster),
   frontPocket: (input) => {

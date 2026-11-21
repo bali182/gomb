@@ -2,6 +2,7 @@ import type { AccessorOwnerSchema, ComponentAccessorSchema, OptionalAccessorSche
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
@@ -28,6 +29,7 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
+    this.guide = this.guide.bind(this)
     this.pocketCluster = this.pocketCluster.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
@@ -40,6 +42,7 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.tPockets = this.tPockets.bind(this)
     this.frontPockets = this.frontPockets.bind(this)
     this.panels = this.panels.bind(this)
+    this.guides = this.guides.bind(this)
     this.pocketClusters = this.pocketClusters.bind(this)
   }
 
@@ -85,6 +88,10 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
 
   panel(id: string): PanelSchema {
     return this.requireResult(this.optional.panel(id), 'panel')
+  }
+
+  guide(id: string): GuideSchema {
+    return this.requireResult(this.optional.guide(id), 'guide')
   }
 
   pocketCluster(id: string): PocketClusterSchema {
@@ -139,6 +146,10 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
 
   panels(): readonly PanelSchema[] {
     return this.optional.panels()
+  }
+
+  guides(): readonly GuideSchema[] {
+    return this.optional.guides()
   }
 
   pocketClusters(): readonly PocketClusterSchema[] {

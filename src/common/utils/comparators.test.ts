@@ -59,6 +59,16 @@ describe('binding comparators', () => {
 })
 
 describe('input model comparators', () => {
+  it('recognizes unchanged Guides through the component comparator used by the editor', () => {
+    const guide = d.guide({ id: 'guide' })
+    expect(comparators.component(guide, guide)).toBe(true)
+    expect(comparators.component(guide, { ...guide, children: [...guide.children] })).toBe(true)
+    expect(comparators.component(guide, { ...guide, xOffset: 10 })).toBe(false)
+    expect(comparators.component(guide, { ...guide, autoWidth: false })).toBe(false)
+    expect(comparators.component(guide, { ...guide, leftStretch: 5 })).toBe(false)
+    expect(comparators.component(guide, { ...guide, children: ['child'] })).toBe(false)
+  })
+
   const cornerFields: (keyof HasCornerRadiusSchema)[] = [
     'topLeftRadius',
     'topRightRadius',

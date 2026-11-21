@@ -1,5 +1,6 @@
 import {
   AnchorSchema,
+  HasAnchorsSchema,
   HasAutoDimensionsSchema,
   HasCornerRadiusSchema,
   HasIdentitySchema,
@@ -7,6 +8,7 @@ import {
   HasSizeSchema,
   HasStretchSchema,
   HasTypeSchema,
+  HasXYOffsetSchema,
 } from './common'
 import { PocketItemIdSchema, PocketItemOrientationSchema } from './pocketItem'
 
@@ -113,7 +115,18 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasStretchSchema &
   PocketsSchema
 
+export type GuideSchema = HasTypeSchema<'guide'> &
+  HasIdentitySchema &
+  HasAnchorsSchema &
+  HasXYOffsetSchema &
+  HasAutoDimensionsSchema &
+  HasStretchSchema &
+  HasCornerRadiusSchema &
+  HasChildrenSchema &
+  HasLayoutSchema
+
 export type ComponentSchema =
+  | GuideSchema
   | RootPanelSchema
   | RootPanelFaceSchema
   | PanelSchema

@@ -9,7 +9,9 @@ import type {
 } from '../schemas/components'
 import type { EditableSchema } from '../schemas/editable'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+import { narrowers } from '../utils/narrowers'
 import { validateFrontPocketSchema } from './validateFrontPocketSchema'
+import { validateGuideSchema } from './validateGuideSchema'
 import { validatePanelSchema } from './validatePanelSchema'
 import { validatePocketClusterSchema } from './validatePocketClusterSchema'
 import { validateRootPanelFaceSchema } from './validateRootPanelFaceSchema'
@@ -30,6 +32,8 @@ export function validateComponentSchema(
       return validateRootPanelFaceSchema(input, currentValue as RootPanelFaceSchema, context)
     case 'root-panel':
       return validateRootPanelSchema(input, currentValue as RootPanelSchema, context)
+    case 'guide':
+      return validateGuideSchema(input, narrowers.assert.guide(currentValue), context)
     case 'panel':
       return validatePanelSchema(input, currentValue as PanelSchema, context)
     case 'pocket-cluster':

@@ -3,6 +3,7 @@ import { SvgFaceContext, type SvgFaceContextValue, type SvgViewDirection } from 
 import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
 import { accessors } from '../../utils/accessors'
+import { Guide } from './Guide'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
@@ -30,6 +31,14 @@ export const RootPanelFace: FC<RootPanelFaceProps> = ({ componentId, nestingLeve
           }
           after={orderedChildren.map((component) => {
             switch (component.type) {
+              case 'computed-guide':
+                return (
+                  <Guide
+                    key={component.componentId}
+                    componentId={component.componentId}
+                    nestingLevel={nestingLevel + 1}
+                  />
+                )
               case 'computed-panel':
                 return (
                   <Panel

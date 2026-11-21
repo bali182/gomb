@@ -30,7 +30,9 @@ const findComponentNestingLevel = (
       componentId,
       child,
       subProject,
-      narrowers.is.pocketCluster(component) ? currentNestingLevel : currentNestingLevel + 1,
+      narrowers.is.pocketCluster(component) || narrowers.is.guide(component)
+        ? currentNestingLevel
+        : currentNestingLevel + 1,
     )
 
     if (isDefined(childNestingLevel)) {

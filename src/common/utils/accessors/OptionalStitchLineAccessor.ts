@@ -97,6 +97,9 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
     if (!isDefined(owner)) {
       return undefined
     }
+    if (narrowers.is.guide(owner)) {
+      return this.getMaterialParent(owner.id)?.id
+    }
     if (!narrowers.is.pocketCluster(owner)) {
       return owner.id
     }
@@ -119,7 +122,7 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
     }
     if (narrowers.is.tPocketStitchLine(stitchLine)) {
       const cluster = this.ownerPocketCluster(stitchLineId)
-      const parent = isDefined(cluster) ? this.component.parent(cluster.id) : undefined
+      const parent = isDefined(cluster) ? this.getMaterialParent(cluster.id) : undefined
       if (!isDefined(parent)) {
         return undefined
       }
@@ -147,6 +150,15 @@ export class OptionalStitchLineAccessor implements OptionalAccessorSchema<Stitch
     }
     const id = stitchLine.exitComponentId ?? this.defaultExitComponentId(stitchLineId)
     return isDefined(id) ? this.component.byId(id) : undefined
+  }
+
+  private getMaterialParent(id: string): ComponentSchema | undefined {
+    return this.component
+      .ancestors(id)
+      .find(
+        (component) =>
+          narrowers.is.panel(component) || narrowers.is.pocket(component) || narrowers.is.rootPanelFace(component),
+      )
   }
 
   private static getOwnerId(

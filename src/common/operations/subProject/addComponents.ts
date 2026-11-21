@@ -4,6 +4,7 @@ import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
+import { canAddChild } from './utils/componentRules'
 import { getInsertionIndex } from './utils/getInsertionIndex'
 
 export const addComponents = (
@@ -28,7 +29,14 @@ export const addComponents = (
   const forbiddenNames = accessors.subProject(subProject).component.names()
   const components = createComponents({ factory, forbiddenIds, forbiddenNames })
 
-  if (components.length === 0) {
+  if (
+    components.length === 0 ||
+    components.some(
+      (component) =>
+        (narrowers.is.guide(component) || narrowers.is.guide(parent)) &&
+        !canAddChild(parent, component.type, subProject),
+    )
+  ) {
     return subProject
   }
 

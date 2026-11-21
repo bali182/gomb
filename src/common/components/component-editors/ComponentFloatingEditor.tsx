@@ -43,7 +43,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
   const Icon = getModelIcon(editedComponent, subProject)
 
   const handleColorReset = useCallback((): void => {
-    if (editableComponent.type === 'root-panel-face') {
+    if (editableComponent.type === 'root-panel-face' || editableComponent.type === 'guide') {
       return
     }
     const updatedEditable = { ...editableComponent }
@@ -65,7 +65,7 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
 
   return (
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
-      {editableComponent.type === 'root-panel-face' ? (
+      {editableComponent.type === 'root-panel-face' || editableComponent.type === 'guide' ? (
         <IdentityFloatingEditorHeader
           icon={<Icon />}
           menu={menu}

@@ -9,6 +9,7 @@ import {
   threadColors,
 } from './data/colors'
 import type {
+  HasAnchorsSchema,
   HasAutoDimensionsSchema,
   HasComponentReferenceSchema,
   HasCornerRadiusSchema,
@@ -21,6 +22,7 @@ import type {
 } from './schemas/common'
 import type {
   FrontPocketSchema,
+  GuideSchema,
   HasFacesSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
@@ -31,7 +33,7 @@ import type {
   RootPanelSchema,
   TPocketSchema,
 } from './schemas/components'
-import type { HasAnchorsSchema, HoleSchema } from './schemas/hole'
+import type { HoleSchema } from './schemas/hole'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   RecessedPocketOpeningOwnSchema,
@@ -227,6 +229,17 @@ export const defaultHole: Omit<HoleSchema, keyof HasId | keyof HasName | keyof H
 
 export const defaultRootPanelFace: Omit<RootPanelFaceSchema, keyof HasIdentitySchema> = {
   type: 'root-panel-face',
+  ...defaultHasLayout,
+  children: [],
+}
+
+export const defaultGuide: Omit<GuideSchema, keyof HasIdentitySchema> = {
+  type: 'guide',
+  ...defaultHasFillableSize,
+  ...defaultHasAnchors,
+  ...defaultHasXYOffsets,
+  ...defaultHasStretch,
+  ...defaultHasCornerRadius,
   ...defaultHasLayout,
   children: [],
 }

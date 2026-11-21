@@ -25,7 +25,10 @@ does not move the target geometry or clip it against the selected component in
 the editor. It changes its position in the material stack. Export determines
 which portions actually lie within each pierced piece.
 
-For component bounds stitch lines, entry defaults to the owner. A hole's stitch
+For component bounds stitch lines, entry defaults to the owner. A Guide is a
+geometric target without material; its entry defaults to its first panel, pocket
+or face ancestor. Its box and effective corner radii define an inset component
+boundary, independently of the resolved physical entry and exit. A hole's stitch
 line therefore defaults to the component containing the hole. When the owner is
 a pocket cluster, entry defaults to its front pocket so the stitch line appears
 above all pockets. Exit defaults to the opposite root face for every component
@@ -34,9 +37,10 @@ defaults are described below.
 
 Entry can be changed to a physical component or the face on the originating
 side, even below the owner in the layer order. Exit can also select components
-on the opposite side. The root and pocket clusters cannot be selected as either
-endpoint. A face endpoint refers to a surface of the root material: entry uses
-the originating face, while exit may use only the opposite face. A face cannot
+on the opposite side. The root, pocket clusters and Guides cannot be selected as
+either endpoint. Guides add no physical layer; their physical descendants retain their
+normal traversal order. A face endpoint refers to a surface of the root material:
+entry uses the originating face, while exit may use only the opposite face. A face cannot
 be pierced independently of the shared root material.
 
 `component.layerIds(faceId)` and `component.layers(faceId)` describe the entire
@@ -226,7 +230,8 @@ negative ones shorten them. A cluster produces
 one independent route for each computed T-pocket, excluding its front pocket.
 
 Each route's entry is its own T-pocket and cannot be overridden. Exit defaults
-to the cluster's parent, attaching the pocket to the piece carrying the cluster.
+to the cluster's first panel, pocket or face ancestor, skipping a Guide parent
+and attaching the pocket to the piece carrying the cluster.
 If that parent is a face, exit defaults to the opposite face instead, piercing
 the root material. An explicit exit may extend piercing farther through the
 stack, but cannot stop before the default exit layer. A cluster-wide T-pocket
@@ -279,14 +284,18 @@ geometry, without adding SVG transforms for the opposite-side stitch lines.
 
 The root is currently exported from its front face. Physical pieces belonging
 to either face are exported in their own face coordinates; faces themselves and
-pocket clusters are not separate exported pieces. Choosing an export viewing
-direction remains deferred.
+pocket clusters and Guides are not separate exported pieces. Guide editor
+contours contribute neither material nor PNG bounds. A Guide with no children
+can still define stitching exported on its resolved physical layers. Choosing an
+export viewing direction remains deferred.
 
 Root placement guides include children from both faces, with back-face bounds
 reflected into the front view. Clusters contribute their pockets' bounds. Guides
 from both sides use the same style; coincident lines are drawn once and lines
-overlapping the root outline are omitted. Other panels retain guides for their
-own children. These guides are separate from the entry/exit stitching span.
+overlapping the root outline are omitted. Other panels retain placement markers
+for their own children. Guides contribute only their physical descendants' placement
+markers; a Guide box itself produces no marker. These placement markers are
+separate from the entry/exit stitching span.
 
 ## Mirroring
 

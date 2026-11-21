@@ -16,6 +16,7 @@ import { normalizePocketCluster } from '../normalizePocketCluster'
 import type { ComponentBoundsStitchLineTarget } from '../stitching/helperTypes'
 import { getComponentBoundsStitchLineLimits } from './getComponentBoundsStitchLineLimits'
 import { getFrontPocketLimits } from './getFrontPocketLimits'
+import { getGuideLimits } from './getGuideLimits'
 import { getHoleLimits } from './getHoleLimits'
 import { getPanelLimits } from './getPanelLimits'
 import { getPocketClusterLimits } from './getPocketClusterLimits'
@@ -142,6 +143,11 @@ const getComponentLimits = (
       return { type: component.type }
     case 'root-panel':
       return getRootPanelLimits(component, narrowers.assert.computedRootPanel(computed))
+    case 'guide':
+      if (!isDefined(parent)) {
+        return undefined
+      }
+      return getGuideLimits(component, narrowers.assert.computedGuide(computed), parent)
     case 'panel':
       if (!isDefined(parent)) {
         return undefined

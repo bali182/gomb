@@ -4,6 +4,7 @@ import type {
   ComponentBoundsStitchLineBindingFieldSchema,
   EqualBindingSchema,
   FrontPocketBindingFieldSchema,
+  GuideBindingFieldSchema,
   HoleBindingFieldSchema,
   OpticalIllusionPocketOpeningBindingFieldSchema,
   PanelBindingFieldSchema,
@@ -18,6 +19,7 @@ import type {
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -79,6 +81,13 @@ export class ModelObjectFactory implements Factory.ModelObjectFactorySchema {
 
   public createPanel(params: Factory.CreatePanelParamsSchema): PanelSchema {
     const model = this.readonlyFactory.createPanel(params)
+    params.forbiddenIds.add(model.id)
+    params.forbiddenNames.add(model.name)
+    return model
+  }
+
+  public createGuide(params: Factory.CreateGuideParamsSchema): GuideSchema {
+    const model = this.readonlyFactory.createGuide(params)
     params.forbiddenIds.add(model.id)
     params.forbiddenNames.add(model.name)
     return model
@@ -206,6 +215,12 @@ export class ModelObjectFactory implements Factory.ModelObjectFactorySchema {
 
   public createPanelBindingField(params: Factory.CreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema {
     const model = this.readonlyFactory.createPanelBindingField(params)
+    params.forbiddenIds.add(model.id)
+    return model
+  }
+
+  public createGuideBindingField(params: Factory.CreateGuideBindingFieldParamsSchema): GuideBindingFieldSchema {
+    const model = this.readonlyFactory.createGuideBindingField(params)
     params.forbiddenIds.add(model.id)
     return model
   }

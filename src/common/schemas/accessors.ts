@@ -2,6 +2,7 @@ import type { BindingFieldNameSchema, BindingFieldSchema, BindingSchema } from '
 import {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
@@ -12,6 +13,7 @@ import {
 import {
   ComputedComponentSchema,
   ComputedFrontPocketSchema,
+  ComputedGuideSchema,
   ComputedHoleSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
@@ -53,6 +55,7 @@ export type ComponentAccessorSchema = {
   rootPanelFaceOf(id: string): RootPanelFaceSchema
   pocket(id: string): PocketSchema
   rootPanel(id?: string): RootPanelSchema
+  guide(id: string): GuideSchema
   panel(id: string): PanelSchema
   pocketCluster(id: string): PocketClusterSchema
   tPocket(id: string): TPocketSchema
@@ -64,6 +67,7 @@ export type ComponentAccessorSchema = {
   frontPockets(): readonly FrontPocketSchema[]
   panels(): readonly PanelSchema[]
   pocketClusters(): readonly PocketClusterSchema[]
+  guides(): readonly GuideSchema[]
   ancestors(id: string, includeSelf?: boolean): readonly ComponentSchema[]
   ancestorIds(id: string, includeSelf?: boolean): readonly string[]
   descendants(id: string, includeSelf?: boolean): readonly ComponentSchema[]
@@ -107,6 +111,7 @@ export type ComputedComponentAccessorSchema = {
   rootPanelFaceOf(id: string): ComputedRootPanelFaceSchema
   pocket(id: string): ComputedPocketSchema
   rootPanel(id?: string): ComputedRootPanelSchema
+  guide(id: string): ComputedGuideSchema
   panel(id: string): ComputedPanelSchema
   pocketCluster(id: string): ComputedPocketClusterSchema
   tPocket(id: string): ComputedTPocketSchema

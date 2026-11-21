@@ -16,7 +16,7 @@ export type GetCornerRadiusLimitsParams = {
  * An edge gives half its length when the other radius exceeds the guaranteed
  * radius, otherwise it gives the space left by that radius. Unlike the former
  * adjustment cap, this reports a real maximum even for currently small radii.
- * Geometric maxima take precedence over parent minima.
+ * Parent minima are discarded when their full radius does not fit the geometry.
  */
 export const getCornerRadiusLimits = ({
   boundingRect,
@@ -24,7 +24,30 @@ export const getCornerRadiusLimits = ({
   parentBoundingRect,
   parentCornerRadius,
 }: GetCornerRadiusLimitsParams): CornerRadiusLimitsSchema => {
-  const minimum = getParentMinimum(boundingRect, parentBoundingRect, parentCornerRadius)
+  const inherited = getParentMinimum(boundingRect, parentBoundingRect, parentCornerRadius)
+  const candidateLimits = calculateCornerLimits(boundingRect, cornerRadius, inherited)
+  const minimum: CornerRadiusSchema = {
+    topLeft: inherited.topLeft.lte(candidateLimits.topLeftRadius?.max?.value ?? 0)
+      ? inherited.topLeft
+      : ZERO_CORNER_RADIUS.topLeft,
+    topRight: inherited.topRight.lte(candidateLimits.topRightRadius?.max?.value ?? 0)
+      ? inherited.topRight
+      : ZERO_CORNER_RADIUS.topRight,
+    bottomLeft: inherited.bottomLeft.lte(candidateLimits.bottomLeftRadius?.max?.value ?? 0)
+      ? inherited.bottomLeft
+      : ZERO_CORNER_RADIUS.bottomLeft,
+    bottomRight: inherited.bottomRight.lte(candidateLimits.bottomRightRadius?.max?.value ?? 0)
+      ? inherited.bottomRight
+      : ZERO_CORNER_RADIUS.bottomRight,
+  }
+  return calculateCornerLimits(boundingRect, cornerRadius, minimum)
+}
+
+const calculateCornerLimits = (
+  boundingRect: RectSchema,
+  cornerRadius: CornerRadiusSchema,
+  minimum: CornerRadiusSchema,
+): CornerRadiusLimitsSchema => {
   const radius: CornerRadiusSchema = {
     topLeft: BigNumber.maximum(cornerRadius.topLeft, minimum.topLeft),
     topRight: BigNumber.maximum(cornerRadius.topRight, minimum.topRight),
@@ -93,9 +116,7 @@ const getCornerLimits = (
 ): NumericFieldLimitsSchema => {
   const max = verticalMaximum.value.lt(horizontalMaximum.value) ? verticalMaximum : horizontalMaximum
   return {
-    min: parentMinimum.gt(0)
-      ? { value: BigNumber.minimum(parentMinimum, max.value), reason: 'parent-corner-radius', severity: 'info' }
-      : undefined,
+    min: parentMinimum.gt(0) ? { value: parentMinimum, reason: 'parent-corner-radius', severity: 'info' } : undefined,
     max,
   }
 }

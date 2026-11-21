@@ -48,6 +48,9 @@ export const exportComponentPng = async (params: ExportComponentPngParams): Prom
   }
 
   const rects = collectBoundingRects(computedComponent, nestingLevel, computedSubProject, params)
+  if (rects.length === 0) {
+    return
+  }
   const boundingRect = addShadowPadding(getBoundingRectUnion(rects))
 
   const svg = renderSvgComponentToString({
@@ -77,7 +80,11 @@ const findNestingLevel = (
       child,
       componentId,
       computedSubProject,
-      narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component) ? level : level + 1,
+      narrowers.is.computedGuide(component) ||
+        narrowers.is.computedPocketCluster(component) ||
+        narrowers.is.computedRootPanel(component)
+        ? level
+        : level + 1,
     )
     if (isDefined(childLevel)) {
       return childLevel
@@ -99,6 +106,9 @@ const getComponentBoundingRects = (
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
 ): RectSchema[] => {
+  if (narrowers.is.computedGuide(component)) {
+    return []
+  }
   const { subProject, context } = params
   const model = accessors.subProject(subProject).component.byId(component.componentId)
   const styleParams = { component: model, nestingLevel }
@@ -124,6 +134,7 @@ const getComponentBoundingRects = (
   if (
     (narrowers.is.computedFrontPocket(component) || narrowers.is.computedTPocket(component)) &&
     !narrowers.is.pocketCluster(model) &&
+    !narrowers.is.guide(model) &&
     !narrowers.is.panel(model) &&
     !narrowers.is.rootPanel(model) &&
     !narrowers.is.rootPanelFace(model) &&
@@ -208,7 +219,9 @@ const collectBoundingRects = (
     .flatMap((child) =>
       collectBoundingRects(
         child,
-        narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component)
+        narrowers.is.computedGuide(component) ||
+          narrowers.is.computedPocketCluster(component) ||
+          narrowers.is.computedRootPanel(component)
           ? nestingLevel
           : nestingLevel + 1,
         computedSubProject,

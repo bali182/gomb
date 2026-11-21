@@ -3,7 +3,7 @@ import type { HoleSchema } from '../schemas/hole'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
-import { validateHolePositionSchema } from './validateHolePositionSchema'
+import { validateAnchoredPositionSchema } from './validateAnchoredPositionSchema'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
 
@@ -13,7 +13,7 @@ export const validateHoleSchema = (
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<HoleSchema> => {
   const nameResult = validateName(input.name, currentValue.name, input.id, context.subProject.holes, context)
-  const positionResult = validateHolePositionSchema(input, currentValue, context)
+  const positionResult = validateAnchoredPositionSchema(input, currentValue, context)
   const widthResult = validateNumber(input.width, currentValue.width, context, { min: 0 })
   const heightResult = validateNumber(input.height, currentValue.height, context, { min: 0 })
   const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context)
