@@ -1,5 +1,6 @@
-import { ComponentSchema, HasAutoDimensionsSchema, HasChildrenSchema, HasLayoutSchema } from '../schemas/components'
-import { ComputedPanelSchema, ComputedPocketClusterSchema, HasComputedLayoutGapSchema } from '../schemas/computed'
+import { HasAutoDimensionsSchema } from '../schemas/common'
+import type { ComponentSchema, HasChildrenSchema, HasLayoutSchema } from '../schemas/components'
+import type { ComputedPanelSchema, ComputedPocketClusterSchema, HasComputedLayoutGapSchema } from '../schemas/computed'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { narrowers } from '../utils/narrowers'
 import { updateComponents } from '../utils/updateComponents'

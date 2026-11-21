@@ -8,6 +8,7 @@ import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../s
 import type {
   AnchorSchema,
   HasAutoCornerRadiusSchema,
+  HasAutoDimensionsSchema,
   HasCornerRadiusSchema,
   HasName,
   HasOffAxisAnchor,
@@ -17,7 +18,6 @@ import type {
 } from '../schemas/common'
 import type {
   AutoDimensionModeSchema,
-  HasAutoDimensionsSchema,
   HasLayoutSchema,
   HasPocketItemSchema,
   LayoutOrientationSchema,

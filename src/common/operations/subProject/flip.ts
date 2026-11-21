@@ -168,6 +168,7 @@ const flipHole = (hole: HoleSchema, axis: FlipAxisSchema): HoleSchema => {
       return {
         ...hole,
         ...flipCornerRadii(hole, axis),
+        ...flipStretch(hole, axis),
         xAnchor: flipAnchor(hole.xAnchor),
         xOffset: hole.xAnchor === 'middle' ? -hole.xOffset : hole.xOffset,
       }
@@ -175,6 +176,7 @@ const flipHole = (hole: HoleSchema, axis: FlipAxisSchema): HoleSchema => {
       return {
         ...hole,
         ...flipCornerRadii(hole, axis),
+        ...flipStretch(hole, axis),
         yAnchor: flipAnchor(hole.yAnchor),
         yOffset: hole.yAnchor === 'middle' ? -hole.yOffset : hole.yOffset,
       }

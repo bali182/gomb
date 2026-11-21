@@ -38,7 +38,7 @@ export const setStretchBinding = (
   }
 
   const accessor = accessors.subProject(subProject)
-  const model = accessor.optional.component.byId(modelId)
+  const model = accessor.optional.component.byId(modelId) ?? accessor.optional.hole.byId(modelId)
   if (!isDefined(model)) {
     return subProject
   }

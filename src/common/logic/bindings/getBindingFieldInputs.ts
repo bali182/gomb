@@ -152,6 +152,10 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
         'yAnchor',
         'xOffset',
         'yOffset',
+        'topStretch',
+        'rightStretch',
+        'bottomStretch',
+        'leftStretch',
       ]
       return fields.map(
         (field): HoleBindingFieldInputSchema => ({ type: 'hole-binding-field', modelId: model.id, field }),

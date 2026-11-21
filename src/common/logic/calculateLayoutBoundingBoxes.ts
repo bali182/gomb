@@ -5,7 +5,7 @@ import type { AnchorSchema } from '../schemas/common'
 import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelFaceSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
-import { getStretchLimits } from './limits/getStretchLimits'
+import { applyStretchToBoundingBox } from './applyStretchToBoundingBox'
 
 type CalculateLayoutBoundingBoxesParams = {
   component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema
@@ -205,24 +205,6 @@ const calculateVerticalCrossAxisPosition = (
       return parentBoundingBox.x.plus(parentBoundingBox.width.minus(childWidth).dividedBy(2))
     case 'end':
       return parentBoundingBox.x.plus(parentBoundingBox.width.minus(childWidth))
-  }
-}
-
-const applyStretchToBoundingBox = (
-  component: PanelSchema | PocketClusterSchema,
-  boundingBox: RectSchema,
-): RectSchema => {
-  const limits = getStretchLimits(component, boundingBox)
-  const leftStretch = clamp(component.leftStretch, limits.leftStretch.min?.value)
-  const rightStretch = clamp(component.rightStretch, limits.rightStretch.min?.value)
-  const topStretch = clamp(component.topStretch, limits.topStretch.min?.value)
-  const bottomStretch = clamp(component.bottomStretch, limits.bottomStretch.min?.value)
-
-  return {
-    x: boundingBox.x.minus(leftStretch),
-    y: boundingBox.y.minus(topStretch),
-    width: boundingBox.width.plus(leftStretch).plus(rightStretch),
-    height: boundingBox.height.plus(topStretch).plus(bottomStretch),
   }
 }
 

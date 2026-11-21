@@ -79,6 +79,10 @@ const definitions: BindingFieldCompatibilityDefinitionsSchema = {
     yAnchor: 'enum:anchor',
     xOffset: 'number',
     yOffset: 'number',
+    topStretch: 'number',
+    rightStretch: 'number',
+    bottomStretch: 'number',
+    leftStretch: 'number',
   },
   'recessed': {
     recessOuterInset: 'number',

@@ -906,3 +906,23 @@ describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('optical
     })
   })
 })
+
+it.each(axes)('mirrors asymmetric hole stretch along %s and restores it with a second flip', (axis) => {
+  const hole = d.hole({
+    id: 'hole',
+    componentId: 'root-front',
+    autoWidth: true,
+    topStretch: 2,
+    rightStretch: -3,
+    bottomStretch: 5,
+    leftStretch: -7,
+  })
+  const source = d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }), holes: [hole] })
+  const result = flip(createBaseOperationParams(source), { model: hole, axis })
+  expect(result.holes[0]).toMatchObject(
+    axis === 'horizontal'
+      ? { topStretch: 2, rightStretch: -7, bottomStretch: 5, leftStretch: -3, autoWidth: true }
+      : { topStretch: 5, rightStretch: -3, bottomStretch: 2, leftStretch: -7, autoWidth: true },
+  )
+  expect(flip(createBaseOperationParams(result), { model: result.holes[0], axis })).toEqual(source)
+})
