@@ -250,6 +250,12 @@ export const comparators = {
 
   hole: (a: HoleSchema, b: HoleSchema): boolean => {
     return (
+      a.autoWidth === b.autoWidth &&
+      a.autoHeight === b.autoHeight &&
+      a.topStretch === b.topStretch &&
+      a.rightStretch === b.rightStretch &&
+      a.bottomStretch === b.bottomStretch &&
+      a.leftStretch === b.leftStretch &&
       a.id === b.id &&
       a.name === b.name &&
       a.componentId === b.componentId &&

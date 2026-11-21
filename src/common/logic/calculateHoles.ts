@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js'
+import { POSITION_EPSILON } from '../constants/layout'
 import { narrowers } from '../utils/narrowers'
+import { applyStretchToBoundingBox } from './applyStretchToBoundingBox'
 
 import type { AnchorSchema } from '../schemas/common'
 import type { ComputedComponentSchema, ComputedHoleSchema } from '../schemas/computed'
@@ -28,12 +30,14 @@ export const calculateHoles = (
 }
 
 const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema): ComputedHoleSchema => {
-  const boundingRect = calculateHoleBoundingRect(
+  const layoutBoundingRect = calculateHoleBoundingRect(
     ownerComponent.boundingRect,
-    new BigNumber(hole.width),
-    new BigNumber(hole.height),
+    BigNumber.maximum(hole.autoWidth ? ownerComponent.boundingRect.width : hole.width, POSITION_EPSILON),
+    BigNumber.maximum(hole.autoHeight ? ownerComponent.boundingRect.height : hole.height, POSITION_EPSILON),
     hole,
   )
+
+  const boundingRect = applyStretchToBoundingBox(hole, layoutBoundingRect)
 
   // Holes have no parent, so parent component is not a limiting factor when calculating the radius
   const requestedRadius = getCornerRadius(hole)
@@ -48,6 +52,7 @@ const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema
     holeId: hole.id,
     componentId: hole.componentId,
     boundingRect,
+    layoutBoundingRect,
     path,
     cornerRadius,
     highlightPath: isClosedPathCoveredBy(path, ownerComponent.path)

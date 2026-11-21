@@ -27,9 +27,9 @@ const createBinding = (id: string, fields: readonly (keyof HasStretchSchema)[]):
 })
 
 describe('getStretchBindingState', () => {
-  it('starts with four available sides on panels and pocket clusters', () => {
+  it('starts with four available sides on panels, pocket clusters and holes', () => {
     const source = fixture()
-    for (const modelId of ['panel', 'cluster']) {
+    for (const modelId of ['panel', 'cluster', 'hole']) {
       expect(getStretchBindingState(source, modelId)).toEqual({
         binding: undefined,
         disabledFields: [],
@@ -115,7 +115,7 @@ describe('getStretchBindingState', () => {
     })
   })
 
-  it.each(['missing', 'root', 'hole', 'pocket'])('returns no state for unsupported model %s', (modelId) => {
+  it.each(['missing', 'root', 'pocket'])('returns no state for unsupported model %s', (modelId) => {
     expect(getStretchBindingState(fixture(), modelId)).toBeUndefined()
   })
 })

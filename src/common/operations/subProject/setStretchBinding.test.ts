@@ -20,6 +20,7 @@ const fixture = (bindings: Record<string, BindingSchema> = {}): SubProjectSchema
       d.panel({ id: 'panel', topStretch: 12, rightStretch: -4, bottomStretch: 6, leftStretch: 2 }),
       d.pocketCluster({ id: 'cluster' }),
     ],
+    holes: [d.hole({ id: 'hole', componentId: 'panel', topStretch: 12, bottomStretch: -4 })],
     bindings,
   })
 
@@ -35,6 +36,33 @@ const binding = (id: string, fields: readonly (keyof HasStretchSchema)[]): Bindi
 })
 
 describe('setStretchBinding', () => {
+  it('creates, resolves and removes internal hole stretch bindings', () => {
+    const source = fixture()
+    const added = setStretchBinding(createBaseOperationParams(source), {
+      modelId: 'hole',
+      fields: ['bottomStretch', 'topStretch'],
+    })
+    const binding = Object.values(added.bindings)[0]
+    expect(binding.fields.map((field) => field.field)).toEqual(['topStretch', 'bottomStretch'])
+    expect(binding.fields.every((field) => field.modelId === 'hole' && field.type === 'hole-binding-field')).toBe(true)
+    const resolved = applyResolution({ input: source, target: added, inputDiff: getSubProjectDiff(source, added) })
+    expect(accessors.subProject(resolved).hole.byId('hole').bottomStretch).toBe(12)
+    const edited: SubProjectSchema = {
+      ...resolved,
+      holes: resolved.holes.map((hole) => ({ ...hole, bottomStretch: -6 })),
+    }
+    const propagated = applyResolution({
+      input: resolved,
+      target: edited,
+      inputDiff: getSubProjectDiff(resolved, edited),
+    })
+    expect(accessors.subProject(propagated).hole.byId('hole').topStretch).toBe(-6)
+    expect(setStretchBinding(createBaseOperationParams(propagated), { modelId: 'hole', fields: [] }).bindings).toEqual(
+      {},
+    )
+    expect(source.holes[0].bottomStretch).toBe(-4)
+  })
+
   it('creates a binding between opposite sides in canonical order without changing values or the input', () => {
     const source = fixture()
     const snapshot = structuredClone(source)

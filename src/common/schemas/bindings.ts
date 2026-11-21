@@ -101,6 +101,10 @@ export type HoleBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   | 'yAnchor'
   | 'xOffset'
   | 'yOffset'
+  | 'topStretch'
+  | 'rightStretch'
+  | 'bottomStretch'
+  | 'leftStretch'
 >
 
 export type RecessedPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<

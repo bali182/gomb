@@ -28,7 +28,10 @@ const definitions: BindingFieldBlockerDefinitionsSchema = {
     bottomRightRadius: (model) =>
       narrowers.assert.componentBoundsStitchLine(model).autoCornerRadius ? 'auto-corner-radius' : undefined,
   },
-  'hole': {},
+  'hole': {
+    width: (model) => (narrowers.is.hole(model) && model.autoWidth ? 'auto-width' : undefined),
+    height: (model) => (narrowers.is.hole(model) && model.autoHeight ? 'auto-height' : undefined),
+  },
   'straight': {},
   'recessed': {},
   'slanted': {},

@@ -14,6 +14,11 @@ const point = (x: BigNumber.Value, y: BigNumber.Value): PointSchema => ({
 })
 
 describe('isPointInClosedPath', () => {
+  it('contains no points when the contour is empty', () => {
+    expect(isPointInClosedPath(point(0, 0), { commands: [] })).toBe(false)
+    expect(isPointInClosedPath(point(50, 40), { commands: [] })).toBe(false)
+  })
+
   it('counts the shared inner-arc junction once, before and after cutting a hole', () => {
     const path = createPocketCalculator(
       d.frontPocket({ id: 'front' }),

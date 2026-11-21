@@ -36,6 +36,11 @@ export type HasSizeSchema = {
   height: number
 }
 
+export type HasAutoDimensionsSchema = HasSizeSchema & {
+  autoWidth: boolean
+  autoHeight: boolean
+}
+
 export type HasComponentReferenceSchema = {
   componentId: string
 }

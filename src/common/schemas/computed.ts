@@ -102,6 +102,7 @@ export type ComputedComponentSchema =
   | ComputedTPocketSchema
 
 export type ComputedHoleSchema = BaseComputedSchema &
+  HasLayoutBoundingRectSchema &
   HasComputedCornerRadiusSchema & {
     holeId: string
     highlightPath: PathSchema

@@ -1,5 +1,6 @@
 import {
   AnchorSchema,
+  HasAutoDimensionsSchema,
   HasCornerRadiusSchema,
   HasIdentitySchema,
   HasOffAxisAnchor,
@@ -29,11 +30,6 @@ export type HasLayoutSchema = {
   mainAxisAnchor: AnchorSchema
   layoutGap: number
   autoLayoutGap: boolean
-}
-
-export type HasAutoDimensionsSchema = HasSizeSchema & {
-  autoWidth: boolean
-  autoHeight: boolean
 }
 
 export type LayoutOrientationSchema = 'horizontal' | 'vertical'
