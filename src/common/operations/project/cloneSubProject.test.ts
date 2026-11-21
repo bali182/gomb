@@ -5,6 +5,7 @@ import { d } from '../../testData'
 import { EN } from '../../translations/en'
 import { accessors } from '../../utils/accessors'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
+import { narrowers } from '../../utils/narrowers'
 import { cloneSubProject } from './cloneSubProject'
 
 import { getProjectIds } from '../../utils/idCollectorUtils'
@@ -13,7 +14,7 @@ const nameGenerator = new NameGenerator(EN.defaultNames)
 
 describe('cloneSubProject', () => {
   it('builds a complete cloned subproject from the component tree result', () => {
-    const root = d.rootPanel({ id: 'root', children: ['panel'], name: 'Wallet' })
+    const root = d.rootPanel({ id: 'root', name: 'Wallet' })
     const panel = d.panel({ id: 'panel', name: 'Panel' })
     const hole = d.hole({ id: 'hole', componentId: panel.id, name: 'Hole' })
     const stitchLine = d.componentBoundsStitchLine({
@@ -23,6 +24,7 @@ describe('cloneSubProject', () => {
       targetType: 'hole',
     })
     const sourceSubProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       components: [panel],
       holes: [hole],
       id: 'source-sub-project',
@@ -40,11 +42,13 @@ describe('cloneSubProject', () => {
     const clonedSubProject = result.subProjects[result.subProjects.length - 1]
 
     const copiedRoot = clonedSubProject.components[clonedSubProject.root]
-    const copiedPanelId = copiedRoot.children[0]
+    const copiedPanelId = accessors
+      .subProject(clonedSubProject)
+      .component.childIds(accessors.subProject(clonedSubProject).component.rootPanel().frontFaceId)[0]
     const copiedHole = clonedSubProject.holes[0]
     expect(clonedSubProject.id).toMatch(/^sub-project-/)
     expect(copiedRoot).toMatchObject({ id: expect.stringMatching(/^root-panel-/), name: 'Wallet 2' })
-    expect(clonedSubProject.components[copiedPanelId].name).toBe('Panel')
+    expect(narrowers.assert.panel(clonedSubProject.components[copiedPanelId]).name).toBe('Panel')
     expect(copiedHole).toMatchObject({ componentId: copiedPanelId, id: expect.stringMatching(/^hole-/), name: 'Hole' })
     expect(clonedSubProject.stitchLines).toMatchObject([
       {
@@ -61,8 +65,9 @@ describe('cloneSubProject', () => {
   })
   it('remaps cluster and pocket stitch owners while retaining one computed object per source', () => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
         d.tPocket({ id: 't' }),
@@ -81,7 +86,7 @@ describe('cloneSubProject', () => {
     })
     const cloned = result.subProjects[1]
     const accessor = accessors.subProject(cloned)
-    const clusterId = accessor.component.rootPanel().children[0]
+    const clusterId = accessor.component.rootPanelFace(accessor.component.rootPanel().frontFaceId).children[0]
     const pocketId = accessor.component.pocketCluster(clusterId).children[0]
     expect(cloned.stitchLines).toHaveLength(2)
     expect(cloned.stitchLines.map((line) => line.targetId)).toEqual([clusterId, pocketId])
@@ -94,33 +99,51 @@ describe('cloneSubProject', () => {
   })
 })
 
-it('maps onTop references inside a full subproject clone', () => {
+it('maps entryComponentId references inside a full subproject clone', () => {
   const source = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' })],
     stitchLines: [
-      d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component', onTop: 'root' }),
+      d.componentBoundsStitchLine({
+        id: 'stitch',
+        targetId: 'panel',
+        targetType: 'component',
+        entryComponentId: 'root-front',
+        exitComponentId: 'root-back',
+      }),
     ],
   })
   const project = d.project({ id: 'project', subProjects: [source] })
   const cloned = cloneSubProject(project, { subProject: source, nameGenerator }).subProjects[1]
   expect(cloned.stitchLines[0]).toMatchObject({
-    targetId: cloned.components[cloned.root].children[0],
-    onTop: cloned.root,
+    targetId: accessors
+      .subProject(cloned)
+      .component.childIds(accessors.subProject(cloned).component.rootPanel().frontFaceId)[0],
+    entryComponentId: accessors.subProject(cloned).component.rootPanel().frontFaceId,
+    exitComponentId: accessors.subProject(cloned).component.rootPanel().backFaceId,
   })
 })
 
 it.each(['missing-root', 'missing-child', 'cycle'])('does not clone an invalid subproject: %s', (invalidity) => {
   const source = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' })],
   })
   if (invalidity === 'missing-root') {
     source.root = 'missing'
   } else {
-    source.components.panel.children = [invalidity === 'cycle' ? 'root' : 'missing']
+    accessors
+      .subProject(source)
+      .component.childIds('panel')
+      .splice(
+        0,
+        accessors.subProject(source).component.childIds('panel').length,
+        ...[invalidity === 'cycle' ? 'root' : 'missing'],
+      )
   }
   const project = d.project({ id: 'project', subProjects: [source] })
   expect(cloneSubProject(project, { subProject: source, nameGenerator })).toBe(project)
@@ -128,8 +151,9 @@ it.each(['missing-root', 'missing-child', 'cycle'])('does not clone an invalid s
 
 it('clones the complete binding structure with fresh IDs and remapped models', () => {
   const source = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel' }),
       d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
@@ -137,7 +161,15 @@ it('clones the complete binding structure with fresh IDs and remapped models', (
       d.frontPocket({ id: 'front', openingId: 'shared-opening' }),
     ],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
-    stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole', onTop: 'root' })],
+    stitchLines: [
+      d.componentBoundsStitchLine({
+        id: 'stitch',
+        targetId: 'hole',
+        targetType: 'hole',
+        entryComponentId: 'root-front',
+        exitComponentId: 'root-back',
+      }),
+    ],
     pocketOpenings: [
       { id: 'shared-opening', type: 'slanted', name: 'Shared', slantOffset: 4, slantSide: 'start' },
       { id: 'unused-opening', type: 'slanted', name: 'Unused', slantOffset: 4, slantSide: 'start' },
@@ -179,13 +211,15 @@ it('clones the complete binding structure with fresh IDs and remapped models', (
   const unusedOpening = Object.values(cloned.pocketOpenings).find((opening) => opening.name === 'Unused')
   expect(dimensions.fields.map((field) => field.modelId)).toEqual([
     cloned.root,
-    cloned.components[cloned.root].children[0],
+    accessors.subProject(cloned).component.childIds(accessors.subProject(cloned).component.rootPanel().frontFaceId)[0],
     cloned.holes[0].id,
     cloned.stitchLines[0].id,
   ])
   expect(openings.fields.map((field) => field.modelId)).toEqual([copiedOpening?.id, unusedOpening?.id])
   const accessor = accessors.subProject(cloned)
-  const cluster = accessor.component.pocketCluster(cloned.components[cloned.root].children[1])
+  const cluster = accessor.component.pocketCluster(
+    accessors.subProject(cloned).component.childIds(accessor.component.rootPanel().frontFaceId)[1],
+  )
   expect(accessor.component.tPocket(cluster.children[0]).openingId).toBe(copiedOpening?.id)
   expect(accessor.component.frontPocket(cluster.children[1]).openingId).toBe(copiedOpening?.id)
   const originalBindings = Object.values(source.bindings)
@@ -218,11 +252,12 @@ const openingFixture = () => {
     offset: 1000,
   }
   const defaultOpening = { id: 'custom-default', name: 'Default', type: 'straight' } as const
-  const root = d.rootPanel({ id: 'root', children: ['cluster'], width: 100, height: 100 })
+  const root = d.rootPanel({ id: 'root', width: 100, height: 100 })
   const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })
   const t = d.tPocket({ id: 't', openingId: opening.id })
   const front = d.frontPocket({ id: 'front', openingId: opening.id })
   const original = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
     id: 'sub',
     root,
     components: [cluster, t, front],

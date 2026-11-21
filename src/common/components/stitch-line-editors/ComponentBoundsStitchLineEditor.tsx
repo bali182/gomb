@@ -9,6 +9,7 @@ import type { IssuesSchema } from '../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import { SectionGroup } from '../common/SectionGroup'
 import { CornerRadiusSection } from '../component-editors/sections/CornerRadiusSection'
+import { StitchLineComponentsSection } from './sections/StitchLineComponentsSection'
 import { StitchSidesAndCornersSection } from './sections/StitchSidesAndCornersSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 
@@ -45,6 +46,7 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
       </Tabs.List>
       <Tabs.Content value={StitchLineEditorTabs.settings} pt={0}>
         <SectionGroup.Root>
+          <StitchLineComponentsSection editable={editable} onChange={onChange} />
           <StitchSidesAndCornersSection value={value} editable={editable} issues={issues} onChange={onChange} />
           <CornerRadiusSection modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
         </SectionGroup.Root>

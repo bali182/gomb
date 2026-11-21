@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { POSITION_EPSILON, ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultComponentBoundsStitchLine, defaultStitchingSettings } from '../../defaultStates'
-import type { ComputedStitchHoleSchema, ComputedStitchLineSchema } from '../../schemas/computed'
+import type { ComputedStitchHoleSchema } from '../../schemas/computed'
 import type { ResolvedComponentBoundsStitchLineSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -15,7 +15,7 @@ import {
 } from './adjustStitchLineHoleRotations'
 import { calculateComponentBoundsStitchLine } from './calculateComponentBoundsStitchLine'
 import { getStitchHoleLine } from './getStitchHoleLine'
-import type { ComponentBoundsStitchLineTarget } from './helperTypes'
+import type { ComponentBoundsStitchLineTarget, StitchLineGeometry } from './helperTypes'
 import { getStitchPathFragmentsLength } from './stitchLineFragmentGeometry'
 
 const { featureFlags } = vi.hoisted(() => ({ featureFlags: { roundedStitchHoleRotationAdjustment: true } }))
@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 
 const target: ComponentBoundsStitchLineTarget = {
-  componentId: 'root',
+  componentId: 'root-front',
   boundingRect: { x: new BigNumber(0), y: new BigNumber(0), width: new BigNumber(100), height: new BigNumber(80) },
   cornerRadius: ZERO_CORNER_RADIUS,
 }
@@ -40,7 +40,7 @@ const stitchLine = (
   id: 'stitch',
   name: 'Stitch',
   type: 'component-bounds-stitch-line',
-  targetId: 'root',
+  targetId: 'root-front',
   targetType: 'component',
   stitchMargin: 0,
   stitchHoleDistance: 30,
@@ -55,8 +55,8 @@ const stitchLine = (
   bottomRightCorner: false,
   ...overrides,
 })
-const calculate = (overrides: Partial<ResolvedComponentBoundsStitchLineSchema> = {}): ComputedStitchLineSchema => {
-  return calculateComponentBoundsStitchLine(stitchLine(overrides), target, {})
+const calculate = (overrides: Partial<ResolvedComponentBoundsStitchLineSchema> = {}): StitchLineGeometry => {
+  return calculateComponentBoundsStitchLine(stitchLine(overrides), target)
 }
 const centers = (holes: ComputedStitchHoleSchema[]): number[][] =>
   holes.map((hole) => [hole.center.x.toNumber(), hole.center.y.toNumber()])

@@ -82,6 +82,8 @@ export type DrawAreaMarkerStyles = {
 }
 
 export type DrawAreaContextValue = {
+  rootPanelFaceId?: string
+  flipRootPanelFace?: () => void
   isInteractive: boolean
   isShowingPocketItems: boolean
   selection: SubProjectSelectionContextValue

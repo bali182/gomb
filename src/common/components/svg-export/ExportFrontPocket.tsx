@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useExportPreview } from '../../contexts/ExportPreviewContext'
 
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -11,9 +12,11 @@ import { ExportStitchLine } from './ExportStitchLine'
 
 type ExportFrontPocketProps = {
   element: ExportFrontPocketSchema
+  isOversized: boolean
 }
 
-export const ExportFrontPocket: FC<ExportFrontPocketProps> = ({ element }) => {
+export const ExportFrontPocket: FC<ExportFrontPocketProps> = ({ element, isOversized }) => {
+  const preview = useExportPreview()
   const { componentStyles, exportIdentifiers } = useExportDrawAreaContext()
   const pathData = usePath(element.pocket.path)
   const styleParams: DrawAreaComponentStyleParams = {
@@ -21,14 +24,17 @@ export const ExportFrontPocket: FC<ExportFrontPocketProps> = ({ element }) => {
     nestingLevel: 0,
   }
 
+  const strokeColor =
+    preview.isPreview && isOversized ? preview.errorStrokeColor : componentStyles.getBorderColor(styleParams)
+
   return (
     <g data-element-id={exportIdentifiers.getElementId(element)}>
       {isDefined(element.cutHelper) && <ExportMarkerPath path={element.cutHelper} />}
       <path
         d={pathData}
-        fill={componentStyles.getBackgroundColor(styleParams)}
-        stroke={componentStyles.getBorderColor(styleParams)}
-        strokeWidth={componentStyles.getBorderThickness(styleParams)}
+        fill={preview.isPreview ? 'none' : componentStyles.getBackgroundColor(styleParams)}
+        stroke={strokeColor}
+        strokeWidth={preview.isPreview ? preview.strokeWidth : componentStyles.getBorderThickness(styleParams)}
       />
 
       {element.stitchLines.map((stitchLine) => (

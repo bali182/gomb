@@ -149,9 +149,6 @@ const isValidReference = (
   const accessor = accessors.subProject(subProject)
   const model = accessor.binding.model(bindingField)
   const group = bindingFieldCompatibility[model.type][bindingField.field]
-  if (group === 'reference:component') {
-    return !isDefined(value) || (typeof value === 'string' && isDefined(accessor.optional.component.byId(value)))
-  }
   if (group === 'reference:pocket-opening') {
     return typeof value === 'string' && isDefined(accessor.optional.pocketOpening.byId(value))
   }

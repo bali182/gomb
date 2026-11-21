@@ -5,6 +5,7 @@ import type { ComponentInsertionPositionSchema } from '../../schemas/operations'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
 import { EN } from '../../translations/en'
+import { accessors } from '../../utils/accessors'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { IdGenerator } from '../../utils/random/IdGenerator'
@@ -21,8 +22,9 @@ const fixture = () => {
   const first = d.pocketCluster({ id: 'first', children: ['a', 'front-a'] })
   const second = d.pocketCluster({ id: 'second', children: ['b', 'front-b'] })
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['first', 'second'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       first,
       second,
@@ -47,12 +49,14 @@ describe('addComponent', () => {
     const before = structuredClone(source)
     const component = d.panel({ id: 'new' })
     const result = addComponent(createBaseOperationParams(source, { readonlyFactory: createFactory(component) }), {
-      parentId: 'root',
+      parentId: 'root-front',
       type: component.type,
       position,
     })
 
-    expect(result.components.root.children).toEqual(expected)
+    expect(
+      accessors.subProject(result).component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId),
+    ).toEqual(expected)
     expect(result.components.new).toBe(component)
     expect(source).toEqual(before)
   })
@@ -61,7 +65,7 @@ describe('addComponent', () => {
     const source = fixture()
     const result = addComponent(
       createBaseOperationParams(source, { readonlyFactory: createFactory(d.panel({ id: 'new' })) }),
-      { parentId: 'root', type: 'panel', position },
+      { parentId: 'root-front', type: 'panel', position },
     )
 
     expect(result).toBe(source)
@@ -74,7 +78,7 @@ describe('addComponent', () => {
       createBaseOperationParams(source, { readonlyFactory: createFactory(d.tPocket({ id: 'new' })) }),
       { parentId: 'first', type: 't-pocket', position: 'start' },
     )
-    expect(added.components.first.children).toEqual(['new', 'a', 'front-a'])
+    expect(accessors.subProject(added).component.childIds('first')).toEqual(['new', 'a', 'front-a'])
   })
 
   it('inserts a T-pocket at the requested index', () => {
@@ -84,7 +88,7 @@ describe('addComponent', () => {
       { parentId: 'first', type: 't-pocket', position: 1 },
     )
 
-    expect(result.components.first.children).toEqual(['a', 'new', 'front-a'])
+    expect(accessors.subProject(result).component.childIds('first')).toEqual(['a', 'new', 'front-a'])
   })
 
   it.each<ComponentInsertionPositionSchema>(['end', 2])(
@@ -96,7 +100,7 @@ describe('addComponent', () => {
         { parentId: 'first', type: 't-pocket', position },
       )
 
-      expect(result.components.first.children).toEqual(['a', 'front-a', 'new'])
+      expect(accessors.subProject(result).component.childIds('first')).toEqual(['a', 'front-a', 'new'])
     },
   )
 
@@ -107,14 +111,17 @@ describe('addComponent', () => {
     { position: 0, expected: ['recovered', 'a'] },
   ])('inserts a front pocket at the requested position: $position', ({ position, expected }) => {
     const source = fixture()
-    source.components.first.children = ['a']
+    accessors
+      .subProject(source)
+      .component.childIds('first')
+      .splice(0, accessors.subProject(source).component.childIds('first').length, ...['a'])
     const before = structuredClone(source)
     const result = addComponent(
       createBaseOperationParams(source, { readonlyFactory: createFactory(d.frontPocket({ id: 'recovered' })) }),
       { parentId: 'first', type: 'front-pocket', position },
     )
 
-    expect(result.components.first.children).toEqual(expected)
+    expect(accessors.subProject(result).component.childIds('first')).toEqual(expected)
     expect(source).toEqual(before)
   })
 
@@ -123,13 +130,15 @@ describe('addComponent', () => {
     const before = structuredClone(source)
     const cluster = d.pocketCluster({ id: 'empty' })
     const result = addComponent(createBaseOperationParams(source, { readonlyFactory: createFactory(cluster) }), {
-      parentId: 'root',
+      parentId: 'root-front',
       type: cluster.type,
       position: 'end',
     })
-    expect(result.components.root.children).toEqual(['first', 'second', 'empty'])
+    expect(
+      accessors.subProject(result).component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId),
+    ).toEqual(['first', 'second', 'empty'])
     expect(result.components.empty).toBe(cluster)
-    expect(result.components.empty.children).toEqual([])
+    expect(accessors.subProject(result).component.childIds('empty')).toEqual([])
     expect(Object.keys(result.components)).toEqual([...Object.keys(source.components), 'empty'])
     expect(source).toEqual(before)
   })
@@ -140,7 +149,7 @@ describe('addComponent', () => {
     const pockets = [d.tPocket({ id: 'new-t1' }), d.tPocket({ id: 'new-t2' }), d.frontPocket({ id: 'new-front' })]
     const cluster = d.pocketCluster({ id: 'new-cluster', children: [] })
     const withCluster = addComponent(createBaseOperationParams(source, { readonlyFactory: createFactory(cluster) }), {
-      parentId: 'root',
+      parentId: 'root-front',
       type: cluster.type,
       position: 'end',
     })
@@ -154,11 +163,13 @@ describe('addComponent', () => {
       withCluster,
     )
 
-    expect(result.components.root.children).toEqual(['first', 'second', 'new-cluster'])
-    expect(result.components['new-cluster'].children).toEqual(['new-t1', 'new-t2', 'new-front'])
+    expect(
+      accessors.subProject(result).component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId),
+    ).toEqual(['first', 'second', 'new-cluster'])
+    expect(accessors.subProject(result).component.childIds('new-cluster')).toEqual(['new-t1', 'new-t2', 'new-front'])
     pockets.forEach((pocket) => expect(result.components[pocket.id]).toBe(pocket))
     expect(source).toEqual(before)
-    expect(withCluster.components['new-cluster'].children).toEqual([])
+    expect(accessors.subProject(withCluster).component.childIds('new-cluster')).toEqual([])
     pockets.forEach((pocket) => expect(withCluster.components[pocket.id]).toBeUndefined())
   })
 
@@ -169,10 +180,14 @@ describe('addComponent', () => {
       components: { ...source.components, first: d.pocketCluster({ id: 'first', children: [] }) },
     }
     expect(
-      addComponent(
-        createBaseOperationParams(empty, { readonlyFactory: createFactory(d.frontPocket({ id: 'recovered' })) }),
-        { parentId: 'first', type: 'front-pocket', position: 'end' },
-      ).components.first.children,
+      accessors
+        .subProject(
+          addComponent(
+            createBaseOperationParams(empty, { readonlyFactory: createFactory(d.frontPocket({ id: 'recovered' })) }),
+            { parentId: 'first', type: 'front-pocket', position: 'end' },
+          ),
+        )
+        .component.childIds('first'),
     ).toEqual(['recovered'])
   })
 })

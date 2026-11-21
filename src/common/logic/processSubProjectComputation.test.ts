@@ -23,11 +23,11 @@ const offsetFixture = (): SubProjectSchema =>
   d.subProject({
     id: 'sub',
     root: d.rootPanel({ id: 'root', width: 100, height: 80 }),
-    holes: [d.hole({ id: 'hole', componentId: 'root', width: 20, height: 20 })],
+    holes: [d.hole({ id: 'hole', componentId: 'root-front', width: 20, height: 20 })],
     stitchLines: [
       d.componentBoundsStitchLine({
         id: 'stitch',
-        targetId: 'root',
+        targetId: 'root-front',
         targetType: 'component',
         top: false,
         topLeftCorner: false,
@@ -52,8 +52,9 @@ const offsetFixture = (): SubProjectSchema =>
 describe('processSubProjectComputation', () => {
   it('patches the supplied subproject and returns matching geometry without mutating the input', () => {
     const selected = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'selected',
-      root: d.rootPanel({ id: 'root', width: 130, height: 80, children: ['panel'] }),
+      root: d.rootPanel({ id: 'root', width: 130, height: 80 }),
       components: [d.panel({ id: 'panel', width: 100, height: 50, autoWidth: true, autoHeight: true })],
     })
     const before = structuredClone(selected)
@@ -73,7 +74,7 @@ describe('processSubProjectComputation', () => {
       stitchLines: [
         d.componentBoundsStitchLine({
           id: 'stitch',
-          targetId: 'root',
+          targetId: 'root-front',
           targetType: 'component',
           autoCornerRadius: true,
         }),
@@ -126,7 +127,7 @@ describe('processSubProjectComputation', () => {
       holes: [
         d.hole({
           id: 'large',
-          componentId: 'root',
+          componentId: 'root-front',
           width: 60,
           height: 60,
           xAnchor: 'start',
@@ -135,7 +136,7 @@ describe('processSubProjectComputation', () => {
         }),
         d.hole({
           id: 'small',
-          componentId: 'root',
+          componentId: 'root-front',
           width: 20,
           height: 20,
           xAnchor: 'start',
@@ -160,8 +161,9 @@ describe('processSubProjectComputation', () => {
 
   it('resolves a multi-field mirror from the first post-operation value', () => {
     const before = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['a', 'b'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', width: 200, height: 150, children: ['a', 'b'] }),
+      root: d.rootPanel({ id: 'root', width: 200, height: 150 }),
       components: [
         d.panel({
           id: 'a',
@@ -190,7 +192,7 @@ describe('processSubProjectComputation', () => {
       },
     })
     const mirrored = flip(createBaseOperationParams(before), {
-      model: accessors.subProject(before).component.rootPanel(),
+      model: accessors.subProject(before).component.rootPanelFace('root-front'),
       axis: 'horizontal',
     })
     const result = processSubProjectComputation(mirrored, defaultStitchingSettings, before)
@@ -200,27 +202,14 @@ describe('processSubProjectComputation', () => {
 
   it('retains reference cleanup and removes orphaned binding fields without deleting bindings', () => {
     const before = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.panel({ id: 'panel', autoWidth: false, autoHeight: false })],
       stitchLines: ['first', 'second'].map((id) =>
-        d.componentBoundsStitchLine({ id, targetId: 'root', targetType: 'component', onTop: 'panel' }),
+        d.componentBoundsStitchLine({ id, targetId: 'root-front', targetType: 'component', entryComponentId: 'panel' }),
       ),
       bindings: {
-        render: equal('render', [
-          {
-            id: 'first-target',
-            type: 'component-bounds-stitch-line-binding-field',
-            modelId: 'first',
-            field: 'onTop',
-          },
-          {
-            id: 'second-target',
-            type: 'component-bounds-stitch-line-binding-field',
-            modelId: 'second',
-            field: 'onTop',
-          },
-        ]),
         size: equal('size', [{ id: 'panel-width', type: 'panel-binding-field', modelId: 'panel', field: 'width' }]),
       },
     })
@@ -228,7 +217,7 @@ describe('processSubProjectComputation', () => {
     const result = processSubProjectComputation(input, defaultStitchingSettings, before)
     expect(
       result.subProject.stitchLines.map(
-        (stitchLine) => accessors.subProject(result.subProject).stitchLine.bounds(stitchLine.id).onTop,
+        (stitchLine) => accessors.subProject(result.subProject).stitchLine.bounds(stitchLine.id).entryComponentId,
       ),
     ).toEqual([undefined, undefined])
     expect(result.subProject.bindings.size.fields).toEqual([])
@@ -237,8 +226,9 @@ describe('processSubProjectComputation', () => {
 
   it('keeps linked pockets on the replacement opening after an opening is deleted', () => {
     const before = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', children: ['a', 'b'] }),
         d.tPocket({ id: 'a', openingId: 'removed' }),

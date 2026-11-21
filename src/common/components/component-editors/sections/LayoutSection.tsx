@@ -21,6 +21,7 @@ import { HorizontalGapIcon } from '../../icons/HorizontalGapIcon'
 import { VerticalGapIcon } from '../../icons/VerticalGapIcon'
 
 type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
+  title?: string
   modelId: string
   component: T
   editable: EditableSchema<T>
@@ -29,6 +30,7 @@ type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
 }
 
 export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
+  title,
   modelId,
   component,
   editable,
@@ -101,7 +103,7 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
           ) : undefined
         }
       >
-        {t.project.editors.sections.components.layout.title}
+        {title ?? t.project.editors.sections.components.layout.title}
       </SectionGroup.SectionHeader>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.layout.layoutOrientation.tooltip}>
         {t.project.editors.sections.components.layout.layoutOrientation.label}

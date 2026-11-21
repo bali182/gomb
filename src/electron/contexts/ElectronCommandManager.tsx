@@ -28,6 +28,8 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const { setEditSettings, setViewSettings, settings } = useGlobalSettings()
   const { redo, undo } = useSubProjectHistory()
 
+  const isDialogOpen = isExportDialogOpen || isScalingDialogOpen || isLicenseDialogOpen
+
   const commands = useElectronCommands()
 
   const getCommand = useCallback(
@@ -111,7 +113,7 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
     ],
   )
 
-  useCommonCommandEmitter({ commands, execute: emitCommand })
+  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: !isDialogOpen })
 
   const value = useMemo<CommandsContextValue<ElectronCommandIdSchema>>(
     () => ({ emitCommand, getCommand }),

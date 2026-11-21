@@ -9,7 +9,7 @@ type SvgExportElementProps = {
   element: ExportPageElementSchema
 }
 
-export const SvgExportElement: FC<SvgExportElementProps> = ({ element: { element, placement } }) => {
+export const SvgExportElement: FC<SvgExportElementProps> = ({ element: { element, placement, isOversized } }) => {
   const { boundingRect } = placement
   const centerX = boundingRect.x.plus(boundingRect.width.dividedBy(2))
   const centerY = boundingRect.y.plus(boundingRect.height.dividedBy(2))
@@ -22,18 +22,18 @@ export const SvgExportElement: FC<SvgExportElementProps> = ({ element: { element
           : undefined
       }
     >
-      {renderSvgExportElement(element)}
+      {renderSvgExportElement(element, isOversized)}
     </g>
   )
 }
 
-const renderSvgExportElement = (element: ExportElementSchema): ReactNode => {
+const renderSvgExportElement = (element: ExportElementSchema, isOversized: boolean): ReactNode => {
   switch (element.type) {
     case 'export-panel':
-      return <ExportPanel element={element} />
+      return <ExportPanel element={element} isOversized={isOversized} />
     case 'export-front-pocket':
-      return <ExportFrontPocket element={element} />
+      return <ExportFrontPocket element={element} isOversized={isOversized} />
     case 'export-t-pocket':
-      return <ExportTPocket element={element} />
+      return <ExportTPocket element={element} isOversized={isOversized} />
   }
 }

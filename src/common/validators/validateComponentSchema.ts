@@ -3,6 +3,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -11,6 +12,7 @@ import type { ComponentBasedValidationContextSchema, ValidationResultSchema } fr
 import { validateFrontPocketSchema } from './validateFrontPocketSchema'
 import { validatePanelSchema } from './validatePanelSchema'
 import { validatePocketClusterSchema } from './validatePocketClusterSchema'
+import { validateRootPanelFaceSchema } from './validateRootPanelFaceSchema'
 import { validateRootPanelSchema } from './validateRootPanelSchema'
 import { validateTPocketSchema } from './validateTPocketSchema'
 
@@ -24,6 +26,8 @@ export function validateComponentSchema(
       return validateFrontPocketSchema(input, currentValue as FrontPocketSchema, context)
     case 't-pocket':
       return validateTPocketSchema(input, currentValue as TPocketSchema, context)
+    case 'root-panel-face':
+      return validateRootPanelFaceSchema(input, currentValue as RootPanelFaceSchema, context)
     case 'root-panel':
       return validateRootPanelSchema(input, currentValue as RootPanelSchema, context)
     case 'panel':

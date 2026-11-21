@@ -8,6 +8,7 @@ import type {
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../schemas/components'
@@ -16,6 +17,7 @@ import type {
   ComputedFrontPocketSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
+  ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedTPocketSchema,
   StitchCornerPathFragment,
@@ -47,8 +49,11 @@ export const narrowers = {
     binding: (input: SubProjectItemSchema): input is BindingSchema => hasType(input, 'equal-binding'),
     // Component
     component: (input: SubProjectItemSchema): input is ComponentSchema => {
-      return hasOneOfType(input, 'root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')
+      return hasOneOfType(input, 'root-panel', 'root-panel-face', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')
     },
+    rootPanelFace: (input: SubProjectItemSchema): input is RootPanelFaceSchema => hasType(input, 'root-panel-face'),
+    computedRootPanelFace: (input: ComputedComponentSchema): input is ComputedRootPanelFaceSchema =>
+      hasType(input, 'computed-root-panel-face'),
     rootPanel: (input: SubProjectItemSchema): input is RootPanelSchema => {
       return hasType(input, 'root-panel')
     },
@@ -154,6 +159,9 @@ export const narrowers = {
   },
   assert: {
     // Component
+    rootPanelFace: (input: SubProjectItemSchema): RootPanelFaceSchema => assertType(input, 'root-panel-face'),
+    computedRootPanelFace: (input: ComputedComponentSchema): ComputedRootPanelFaceSchema =>
+      assertType(input, 'computed-root-panel-face'),
     rootPanel: (input: SubProjectItemSchema): RootPanelSchema => {
       return assertType(input, 'root-panel')
     },

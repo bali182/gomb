@@ -47,30 +47,6 @@ const panels: Splitter.PanelData[] = [
 ]
 const defaultSplitterSizes: (number | string)[] = ['300px', 'auto']
 
-const getProjectTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
-  switch (node.kind) {
-    case 'component':
-      return node.component
-    case 'hole':
-      return node.hole
-    case 'stitch-line':
-      return node.stitchLine
-  }
-}
-
-const getSourceNodeId = (source: ModelObjectSchema): string => {
-  if (narrowers.is.component(source)) {
-    return getComponentNodeId(source.id)
-  }
-  if (narrowers.is.hole(source)) {
-    return getHoleNodeId(source.id)
-  }
-  if (narrowers.is.stitchLine(source)) {
-    return getStitchLineNodeId(source.id)
-  }
-  return getPocketOpeningNodeId(source.id)
-}
-
 export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, subProject, isOpen, onOpenChange }) => {
   const { t } = useTranslation()
   const { addBindings } = useSubProjectOperations()
@@ -122,8 +98,8 @@ export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, su
 
   const handleSelectionChange = useCallback(
     (nodeIds: string[]): void => {
-      const models: ModelObjectSchema[] = [source]
-      const nextNodeIds: string[] = [sourceNodeId]
+      const models: ModelObjectSchema[] = []
+      const nextNodeIds: string[] = []
       for (const nodeId of nodeIds) {
         if (nextNodeIds.includes(nodeId)) {
           continue
@@ -142,23 +118,21 @@ export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, su
         }),
       )
     },
-    [modelsByNodeId, source, sourceNodeId, subProject],
+    [modelsByNodeId, subProject],
   )
 
   const isComponentNodeSelectable = useCallback(
     (node: ProjectTreeNode): boolean =>
-      node.id !== sourceNodeId &&
-      (selection.nodeIds.includes(node.id) ||
-        getCommonBindingProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0),
-    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
+      selection.nodeIds.includes(node.id) ||
+      getCommonBindingProperties(subProject, [...selectedModels, getProjectTreeModel(node)]).length > 0,
+    [selection.nodeIds, selectedModels, subProject],
   )
   const isOpeningNodeSelectable = useCallback(
     (node: PocketOpeningTreeNode): boolean =>
       node.kind === 'pocket-opening' &&
-      node.id !== sourceNodeId &&
       (selection.nodeIds.includes(node.id) ||
         getCommonBindingProperties(subProject, [...selectedModels, node.opening]).length > 0),
-    [selection.nodeIds, selectedModels, sourceNodeId, subProject],
+    [selection.nodeIds, selectedModels, subProject],
   )
 
   const handlePropertySelectionChange = useCallback(
@@ -261,4 +235,28 @@ export const CreateBindingsDialog: FC<CreateBindingsDialogProps> = ({ source, su
       </Splitter.Root>
     </EditDialog>
   )
+}
+
+const getProjectTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
+  switch (node.kind) {
+    case 'component':
+      return node.component
+    case 'hole':
+      return node.hole
+    case 'stitch-line':
+      return node.stitchLine
+  }
+}
+
+const getSourceNodeId = (source: ModelObjectSchema): string => {
+  if (narrowers.is.component(source)) {
+    return getComponentNodeId(source.id)
+  }
+  if (narrowers.is.hole(source)) {
+    return getHoleNodeId(source.id)
+  }
+  if (narrowers.is.stitchLine(source)) {
+    return getStitchLineNodeId(source.id)
+  }
+  return getPocketOpeningNodeId(source.id)
 }

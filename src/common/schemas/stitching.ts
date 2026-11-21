@@ -35,8 +35,12 @@ export type HasStitchedCornersSchema = {
   bottomLeftCorner: boolean
 }
 
-export type HasCustomRenderTarget = {
-  onTop?: string
+export type HasEntryComponentSchema = {
+  entryComponentId?: string
+}
+
+export type HasExitComponentSchema = {
+  exitComponentId?: string
 }
 
 export type HasStitchDirectionSchema = {
@@ -48,7 +52,8 @@ export type ComponentBoundsStitchLineOwnSchema = HasBasicOffsetsSchema &
   HasCornerRadiusSchema &
   HasStitchedCornersSchema &
   HasStitchedSidesSchema &
-  HasCustomRenderTarget &
+  HasEntryComponentSchema &
+  HasExitComponentSchema &
   HasStitchDirectionSchema
 
 export type ComponentBoundsStitchLineSchema = HasTypeSchema<'component-bounds-stitch-line'> &
@@ -62,7 +67,7 @@ export type HasBasicOffsetsSchema = {
   endOffset: number
 }
 
-export type TPocketStitchLineOwnSchema = HasBasicOffsetsSchema & HasStitchDirectionSchema
+export type TPocketStitchLineOwnSchema = HasBasicOffsetsSchema & HasStitchDirectionSchema & HasExitComponentSchema
 
 export type TPocketStitchLineSchema = HasTypeSchema<'t-pocket-stitch-line'> &
   HasIdentitySchema &

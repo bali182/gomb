@@ -30,7 +30,7 @@ export const useCommonCommands = ({
       // File - Exports
       export: {
         id: 'export',
-        disabled: !hasOpenProject,
+        disabled: isComputing || !hasOpenProject,
         shortcut: getShortcut('export'),
       },
       // Edit - Undo/Redo

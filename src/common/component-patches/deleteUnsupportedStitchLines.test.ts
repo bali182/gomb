@@ -10,8 +10,9 @@ describe('deleteUnsupportedStitchLines', () => {
     { children: ['t', 'front'], keepsClusterLine: true },
   ])('keeps cluster stitching only with a front pocket: $children', ({ children, keepsClusterLine }) => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster', 'panel'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster', 'panel'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', children }),
         d.tPocket({ id: 't' }),
@@ -23,7 +24,7 @@ describe('deleteUnsupportedStitchLines', () => {
         d.componentBoundsStitchLine({ id: 'cluster-line', targetId: 'cluster', targetType: 'component' }),
         d.tPocketStitchLine({ id: 'shared', targetId: 'cluster', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'panel-line', targetId: 'panel', targetType: 'component' }),
-        d.componentBoundsStitchLine({ id: 'root-line', targetId: 'root', targetType: 'component' }),
+        d.componentBoundsStitchLine({ id: 'root-line', targetId: 'root-front', targetType: 'component' }),
         d.componentBoundsStitchLine({ id: 'hole-line', targetId: 'hole', targetType: 'hole' }),
         d.componentBoundsStitchLine({ id: 'missing-line', targetId: 'missing', targetType: 'component' }),
         d.tPocketStitchLine({ id: 't-line', targetId: 't', targetType: 'component' }),
@@ -51,8 +52,9 @@ describe('deleteUnsupportedStitchLines', () => {
 
   it('only removes the unsupported data it owns and is idempotent', () => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),
         d.tPocket({ id: 't' }),

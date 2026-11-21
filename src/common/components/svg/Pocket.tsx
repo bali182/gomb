@@ -1,5 +1,6 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
+import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
@@ -17,7 +18,7 @@ import { PocketCluster } from './PocketCluster'
 import { PocketItem } from './PocketItem'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
-import { TPocketStitchLines } from './TPocketStitchLines'
+import { SvgComponentLayers } from './SvgComponentLayers'
 
 type PocketProps = {
   componentId: string
@@ -31,6 +32,9 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const computed = useComputedComponent<ComputedPocketSchema>(componentId)
   const { computedSubProject } = useSubProject()
   const accessor = accessors.computedSubProject(computedSubProject)
+  const { direction } = useSvgFace()
+  const children = narrowers.is.computedFrontPocket(computed) ? accessor.component.children(componentId) : []
+  const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const pathData = usePath(computed.path)
 
   const style: DrawAreaComponentStyleParams = {
@@ -53,26 +57,33 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
 
   return (
     <>
-      {isShowingPocketItems && isDefined(computed.item) && <PocketItem owner={pocket} path={computed.item.path} />}
-      <path
-        d={pathData}
-        data-component-id={componentId}
-        fill={componentStyles.getBackgroundColor(style)}
-        stroke={componentStyles.getBorderColor(style)}
-        strokeWidth={componentStyles.getBorderThickness(style)}
-        filter={componentStyles.getFilter(style)}
-        onPointerEnter={isInteractive ? enter : undefined}
-        onPointerLeave={isInteractive ? leave : undefined}
-        onClick={isInteractive ? click : undefined}
-      />
-      {narrowers.is.tPocket(pocket) && <TPocketStitchLines componentId={componentId} />}
-      <StitchLines componentId={componentId} />
-      <HoleHighlights componentId={componentId} />
-      {settings.view.componentDimensionsVisible && active && (
-        <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
-      )}
-      {narrowers.is.computedFrontPocket(computed) &&
-        accessor.component.children(componentId).map((child) => {
+      <SvgComponentLayers
+        before={
+          isShowingPocketItems && isDefined(computed.item) && <PocketItem owner={pocket} path={computed.item.path} />
+        }
+        content={
+          <SvgComponentLayers
+            before={<StitchLines componentId={componentId} surface="back" />}
+            after={<StitchLines componentId={componentId} surface="front" />}
+            content={
+              <>
+                <path
+                  d={pathData}
+                  data-component-id={componentId}
+                  fill={componentStyles.getBackgroundColor(style)}
+                  stroke={componentStyles.getBorderColor(style)}
+                  strokeWidth={componentStyles.getBorderThickness(style)}
+                  filter={componentStyles.getFilter(style)}
+                  onPointerEnter={isInteractive ? enter : undefined}
+                  onPointerLeave={isInteractive ? leave : undefined}
+                  onClick={isInteractive ? click : undefined}
+                />
+                <HoleHighlights componentId={componentId} />
+              </>
+            }
+          />
+        }
+        after={orderedChildren.map((child) => {
           switch (child.type) {
             case 'computed-panel':
               return <Panel key={child.componentId} componentId={child.componentId} nestingLevel={nestingLevel + 1} />
@@ -88,6 +99,10 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
               return undefined
           }
         })}
+      />
+      {settings.view.componentDimensionsVisible && active && (
+        <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
+      )}
     </>
   )
 }

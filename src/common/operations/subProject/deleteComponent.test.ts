@@ -8,8 +8,9 @@ const fixture = () => {
   const first = d.pocketCluster({ id: 'first', children: ['a', 'front-a'] })
   const second = d.pocketCluster({ id: 'second', children: ['b', 'front-b'] })
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['first', 'second'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       first,
       second,
@@ -35,7 +36,10 @@ describe('deleteComponent', () => {
 
   it('deletes a front pocket and its descendants when no T-pockets remain in its cluster', () => {
     const alone = fixture()
-    alone.components.first.children = ['front-a']
+    accessors
+      .subProject(alone)
+      .component.childIds('first')
+      .splice(0, accessors.subProject(alone).component.childIds('first').length, ...['front-a'])
     delete alone.components.a
     const before = structuredClone(alone)
     const front = accessors.subProject(alone).component.frontPocket('front-a')

@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useExportPreview } from '../../contexts/ExportPreviewContext'
 
 import { useExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -11,9 +12,11 @@ import { ExportStitchLine } from './ExportStitchLine'
 
 type ExportPanelProps = {
   element: ExportPanelSchema
+  isOversized: boolean
 }
 
-export const ExportPanel: FC<ExportPanelProps> = ({ element }) => {
+export const ExportPanel: FC<ExportPanelProps> = ({ element, isOversized }) => {
+  const preview = useExportPreview()
   const { componentStyles, exportIdentifiers } = useExportDrawAreaContext()
   const pathData = usePath(element.path)
   const styleParams: DrawAreaComponentStyleParams = {
@@ -21,14 +24,17 @@ export const ExportPanel: FC<ExportPanelProps> = ({ element }) => {
     nestingLevel: 0,
   }
 
+  const strokeColor =
+    preview.isPreview && isOversized ? preview.errorStrokeColor : componentStyles.getBorderColor(styleParams)
+
   return (
     <g data-element-id={exportIdentifiers.getElementId(element)}>
       {isDefined(element.cutHelper) && <ExportMarkerPath path={element.cutHelper} />}
       <path
         d={pathData}
-        fill={componentStyles.getBackgroundColor(styleParams)}
-        stroke={componentStyles.getBorderColor(styleParams)}
-        strokeWidth={componentStyles.getBorderThickness(styleParams)}
+        fill={preview.isPreview ? 'none' : componentStyles.getBackgroundColor(styleParams)}
+        stroke={strokeColor}
+        strokeWidth={preview.isPreview ? preview.strokeWidth : componentStyles.getBorderThickness(styleParams)}
       />
 
       {element.childMarkerPaths.map((path, index) => (

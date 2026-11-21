@@ -3,13 +3,13 @@ import type { FC } from 'react'
 
 import { ExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { ExportSuccessfulLayoutSchema } from '../../schemas/export'
+import type { ExportLayoutSchema } from '../../schemas/export'
 import type { SizeSchema } from '../../schemas/geometry'
 import { PdfPageRoot } from './PdfPageRoot'
 
 type PdfDocumentProps = {
   drawAreaContextValue: DrawAreaContextValue
-  layout: ExportSuccessfulLayoutSchema
+  layout: ExportLayoutSchema
   pageSize: SizeSchema
 }
 

@@ -5,6 +5,7 @@ import type {
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
@@ -16,8 +17,14 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.layers = this.layers.bind(this)
+    this.layerIds = this.layerIds.bind(this)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.children = this.children.bind(this)
+    this.childIds = this.childIds.bind(this)
+    this.rootPanelFace = this.rootPanelFace.bind(this)
+    this.rootPanelFaceOf = this.rootPanelFaceOf.bind(this)
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
@@ -25,6 +32,10 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
     this.parent = this.parent.bind(this)
+    this.ancestors = this.ancestors.bind(this)
+    this.ancestorIds = this.ancestorIds.bind(this)
+    this.descendants = this.descendants.bind(this)
+    this.descendantIds = this.descendantIds.bind(this)
     this.pockets = this.pockets.bind(this)
     this.tPockets = this.tPockets.bind(this)
     this.frontPockets = this.frontPockets.bind(this)
@@ -32,12 +43,36 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
     this.pocketClusters = this.pocketClusters.bind(this)
   }
 
+  layers(faceId: string): readonly ComponentSchema[] {
+    return this.layerIds(faceId).map(this.byId)
+  }
+
+  layerIds(faceId: string): readonly string[] {
+    this.rootPanelFace(faceId)
+    return this.optional.layerIds(faceId)
+  }
+
+  names(): Set<string> {
+    return this.optional.names()
+  }
+
   byId(id: string): ComponentSchema {
     return this.requireResult(this.optional.byId(id), 'component')
   }
 
   children(id: string): ComponentSchema[] {
-    return this.byId(id).children.map(this.byId)
+    return this.childIds(id).map(this.byId)
+  }
+
+  childIds(id: string): string[] {
+    this.byId(id)
+    return this.optional.childIds(id)
+  }
+  rootPanelFace(id: string): RootPanelFaceSchema {
+    return this.requireResult(this.optional.rootPanelFace(id), 'root panel face')
+  }
+  rootPanelFaceOf(id: string): RootPanelFaceSchema {
+    return this.requireResult(this.optional.rootPanelFaceOf(id), 'root panel face')
   }
 
   pocket(id: string): PocketSchema {
@@ -66,6 +101,24 @@ export class ComponentAccessor extends BaseStrictAccessor implements ComponentAc
 
   parent(id: string): ComponentSchema {
     return this.requireResult(this.optional.parent(id), 'parent')
+  }
+
+  ancestors(id: string, includeSelf = false): readonly ComponentSchema[] {
+    this.byId(id)
+    return this.ancestorIds(id, includeSelf).map(this.byId)
+  }
+
+  ancestorIds(id: string, includeSelf = false): readonly string[] {
+    return this.optional.ancestorIds(id, includeSelf)
+  }
+
+  descendants(id: string, includeSelf = false): readonly ComponentSchema[] {
+    this.byId(id)
+    return this.descendantIds(id, includeSelf).map(this.byId)
+  }
+
+  descendantIds(id: string, includeSelf = false): readonly string[] {
+    return this.optional.descendantIds(id, includeSelf)
   }
 
   components(): readonly ComponentSchema[] {

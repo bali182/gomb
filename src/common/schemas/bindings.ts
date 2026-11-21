@@ -1,4 +1,11 @@
-import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelSchema, TPocketSchema } from './components'
+import type {
+  FrontPocketSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  RootPanelFaceSchema,
+  RootPanelSchema,
+  TPocketSchema,
+} from './components'
 import type { HoleSchema } from './hole'
 import type { ModelObjectSchema, ModelObjectTypeSchema } from './modelObject'
 import type {
@@ -12,15 +19,12 @@ type CheckedBindingFieldNameSchema<Model, Field extends keyof Model> = Field
 
 export type RootPanelBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   RootPanelSchema,
-  | 'width'
-  | 'height'
-  | 'topLeftRadius'
-  | 'topRightRadius'
-  | 'bottomLeftRadius'
-  | 'bottomRightRadius'
-  | 'layoutOrientation'
-  | 'mainAxisAnchor'
-  | 'layoutGap'
+  'width' | 'height' | 'topLeftRadius' | 'topRightRadius' | 'bottomLeftRadius' | 'bottomRightRadius'
+>
+
+export type RootPanelFaceBindingFieldNameSchema = CheckedBindingFieldNameSchema<
+  RootPanelFaceSchema,
+  'layoutOrientation' | 'mainAxisAnchor' | 'layoutGap'
 >
 
 export type PanelBindingFieldNameSchema = CheckedBindingFieldNameSchema<
@@ -128,7 +132,6 @@ export type ComponentBoundsStitchLineBindingFieldNameSchema = CheckedBindingFiel
   | 'topRightRadius'
   | 'bottomLeftRadius'
   | 'bottomRightRadius'
-  | 'onTop'
 >
 
 export type TPocketStitchLineBindingFieldNameSchema = CheckedBindingFieldNameSchema<
@@ -145,6 +148,7 @@ export type TPocketStitchLineBindingFieldNameSchema = CheckedBindingFieldNameSch
 
 export type BindingFieldNameSchema =
   | RootPanelBindingFieldNameSchema
+  | RootPanelFaceBindingFieldNameSchema
   | PanelBindingFieldNameSchema
   | PocketClusterBindingFieldNameSchema
   | FrontPocketBindingFieldNameSchema
@@ -161,6 +165,13 @@ export type RootPanelBindingFieldSchema = {
   type: 'root-panel-binding-field'
   modelId: string
   field: RootPanelBindingFieldNameSchema
+}
+
+export type RootPanelFaceBindingFieldSchema = {
+  id: string
+  type: 'root-panel-face-binding-field'
+  modelId: string
+  field: RootPanelFaceBindingFieldNameSchema
 }
 
 export type PanelBindingFieldSchema = {
@@ -235,6 +246,7 @@ export type TPocketStitchLineBindingFieldSchema = {
 
 export type BindingFieldSchema =
   | RootPanelBindingFieldSchema
+  | RootPanelFaceBindingFieldSchema
   | PanelBindingFieldSchema
   | PocketClusterBindingFieldSchema
   | FrontPocketBindingFieldSchema
@@ -271,7 +283,6 @@ export type BindingCompatibilityGroupSchema =
   // References
   | 'reference:pocket-opening'
   | 'reference:pocket-item'
-  | 'reference:component'
   // Exact fields
   | 'field:stitch-margin'
   | 'field:stitch-hole-length'
@@ -284,6 +295,7 @@ export type ModelBindingFieldCompatibilitySchema<Fields extends BindingFieldName
 
 export type BindingFieldCompatibilityDefinitionsSchema = {
   'root-panel': ModelBindingFieldCompatibilitySchema<RootPanelBindingFieldNameSchema>
+  'root-panel-face': ModelBindingFieldCompatibilitySchema<RootPanelFaceBindingFieldNameSchema>
   'panel': ModelBindingFieldCompatibilitySchema<PanelBindingFieldNameSchema>
   'pocket-cluster': ModelBindingFieldCompatibilitySchema<PocketClusterBindingFieldNameSchema>
   'front-pocket': ModelBindingFieldCompatibilitySchema<FrontPocketBindingFieldNameSchema>
@@ -311,6 +323,7 @@ export type ModelBindingFieldBlockersSchema<Fields extends BindingFieldNameSchem
 
 export type BindingFieldBlockerDefinitionsSchema = {
   'root-panel': ModelBindingFieldBlockersSchema<RootPanelBindingFieldNameSchema>
+  'root-panel-face': ModelBindingFieldBlockersSchema<RootPanelFaceBindingFieldNameSchema>
   'panel': ModelBindingFieldBlockersSchema<PanelBindingFieldNameSchema>
   'pocket-cluster': ModelBindingFieldBlockersSchema<PocketClusterBindingFieldNameSchema>
   'front-pocket': ModelBindingFieldBlockersSchema<FrontPocketBindingFieldNameSchema>

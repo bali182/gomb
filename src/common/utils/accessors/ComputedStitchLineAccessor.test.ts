@@ -9,19 +9,25 @@ describe('ComputedStitchLineAccessor', () => {
       id: 'first',
       targetType: 'component',
       targetId: 'panel',
-      onTop: 'root',
+      entryComponentId: 'root-front',
     })
-    const second = d.componentBoundsStitchLine({ id: 'second', targetType: 'hole', targetId: 'hole', onTop: 'root' })
+    const second = d.componentBoundsStitchLine({
+      id: 'second',
+      targetType: 'hole',
+      targetId: 'hole',
+      entryComponentId: 'root-front',
+    })
     const fallback = d.componentBoundsStitchLine({
       id: 'fallback',
       targetType: 'component',
       targetId: 'panel',
-      onTop: 'missing',
+      entryComponentId: 'missing',
     })
     const shared = d.tPocketStitchLine({ id: 'shared', targetType: 'component', targetId: 'cluster' })
     const subProject = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.panel({ id: 'panel' }),
         d.pocketCluster({ id: 'cluster', children: ['t'] }),
@@ -49,11 +55,14 @@ describe('ComputedStitchLineAccessor', () => {
       computed.stitchLines.second,
       computed.stitchLines.fallback,
     ])
-    expect(accessor.stitchLine.byOnTop('root')).toEqual([computed.stitchLines.first, computed.stitchLines.second])
-    expect(accessor.stitchLine.byOnTop('panel')).toEqual([computed.stitchLines.fallback])
+    expect(accessor.stitchLine.byEntry('root-front')).toEqual([
+      ...computed.stitchLines.first.routes,
+      ...computed.stitchLines.second.routes,
+    ])
+    expect(accessor.stitchLine.byEntry('panel')).toEqual(computed.stitchLines.fallback.routes)
     expect(accessor.stitchLine.byOwner('cluster')).toEqual([computed.stitchLines.shared])
     expect(accessor.stitchLine.byOwner('hole')).toEqual([])
     expect(accessor.stitchLine.byOwner('missing')).toEqual([])
-    expect(accessor.optional.stitchLine.byOnTop('missing')).toEqual([])
+    expect(accessor.optional.stitchLine.byEntry('missing')).toEqual([])
   })
 })

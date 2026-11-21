@@ -8,8 +8,9 @@ import { getSubProjectDiff } from './getSubProjectDiff'
 
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel', width: 10 })],
     holes: [d.hole({ id: 'first', componentId: 'panel' }), d.hole({ id: 'second', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component' })],

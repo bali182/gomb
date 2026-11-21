@@ -7,6 +7,7 @@ import {
   defaultPocketCluster,
   defaultRecessedPocketOpening,
   defaultRootPanel,
+  defaultRootPanelFace,
   defaultSlantedPocketOpening,
   defaultTPocket,
   defaultTPocketStitchLine,
@@ -24,6 +25,7 @@ import type {
   PocketClusterBindingFieldSchema,
   RecessedPocketOpeningBindingFieldSchema,
   RootPanelBindingFieldSchema,
+  RootPanelFaceBindingFieldSchema,
   SlantedPocketOpeningBindingFieldSchema,
   TPocketBindingFieldSchema,
   TPocketStitchLineBindingFieldSchema,
@@ -33,6 +35,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
@@ -61,8 +64,18 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createComponent(params: Factory.ReadonlyCreateComponentParamsSchema): ComponentSchema {
     switch (params.type) {
-      case 'root-panel':
-        return this.createRootPanel(params)
+      case 'root-panel': {
+        if (!isDefined(params.frontFaceId) || !isDefined(params.backFaceId)) {
+          throw new Error('Root panel face IDs are required')
+        }
+        return this.createRootPanel({ ...params, frontFaceId: params.frontFaceId, backFaceId: params.backFaceId })
+      }
+      case 'root-panel-face': {
+        if (!isDefined(params.name)) {
+          throw new Error('A name is required to create a root panel face')
+        }
+        return this.createRootPanelFace({ ...params, name: params.name })
+      }
       case 'panel':
         return this.createPanel(params)
       case 'pocket-cluster':
@@ -81,7 +94,8 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
   public createRootPanel(params: Factory.ReadonlyCreateRootPanelParamsSchema): RootPanelSchema {
     return {
       ...defaultRootPanel,
-      children: [],
+      frontFaceId: params.frontFaceId,
+      backFaceId: params.backFaceId,
       id: this.id.get('root-panel', params.forbiddenIds),
       name: this.name.get('root-panel', params.forbiddenNames),
       ...getClosestRootDimensions(defaultRootPanel, params.stitchingSettings),
@@ -89,6 +103,24 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
     }
   }
 
+  public createRootPanelFace(params: Factory.ReadonlyCreateRootPanelFaceParamsSchema): RootPanelFaceSchema {
+    return {
+      ...defaultRootPanelFace,
+      children: [],
+      id: this.id.get('root-panel-face', params.forbiddenIds),
+      name: params.name,
+    }
+  }
+  public createRootPanelFaceBindingField(
+    params: Factory.ReadonlyCreateRootPanelFaceBindingFieldParamsSchema,
+  ): RootPanelFaceBindingFieldSchema {
+    return {
+      type: 'root-panel-face-binding-field',
+      id: this.id.get('root-panel-face-binding-field', params.forbiddenIds),
+      modelId: params.modelId,
+      field: params.field,
+    }
+  }
   public createPanel(params: Factory.ReadonlyCreatePanelParamsSchema): PanelSchema {
     return {
       ...defaultPanel,
@@ -246,6 +278,8 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
 
   public createBindingField(params: Factory.ReadonlyCreateBindingFieldParamsSchema): BindingFieldSchema {
     switch (params.type) {
+      case 'root-panel-face-binding-field':
+        return this.createRootPanelFaceBindingField(params)
       case 'root-panel-binding-field':
         return this.createRootPanelBindingField(params)
       case 'panel-binding-field':

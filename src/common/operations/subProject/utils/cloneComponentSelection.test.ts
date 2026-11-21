@@ -8,8 +8,9 @@ import {
 
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'outside'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'outside'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel', children: ['child'] }),
       d.panel({ id: 'child', children: ['grandchild'] }),
@@ -32,8 +33,9 @@ const fixture = () =>
 
 const pocketFixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel', children: ['cluster'] }),
       d.pocketCluster({ id: 'cluster', children: ['t', 'front'] }),

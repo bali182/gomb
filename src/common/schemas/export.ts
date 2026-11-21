@@ -52,7 +52,7 @@ export type ExportElementSchema = ExportPanelSchema | ExportFrontPocketSchema | 
 export type ExportFormatSchema = 'svg' | 'pdf' | 'png'
 
 export type ExportParamsSchema = {
-  layout: ExportSuccessfulLayoutSchema
+  layout: ExportLayoutSchema
   pageSize: SizeSchema
   context: DrawAreaContextValue
   projectName: string
@@ -73,6 +73,7 @@ export type ExportPlacementSchema = {
 }
 
 export type ExportPageElementSchema = {
+  isOversized: boolean
   element: ExportElementSchema
   placement: ExportPlacementSchema
 }
@@ -82,12 +83,6 @@ export type ExportPageSchema = {
   elements: ExportPageElementSchema[]
 }
 
-export type ExportSuccessfulLayoutSchema = HasTypeSchema<'successful-export'> & {
+export type ExportLayoutSchema = {
   pages: ExportPageSchema[]
 }
-
-export type ExportUnsuccessfulLayoutSchema = HasTypeSchema<'unsuccessful-export'> & {
-  unplaceables: ExportPanelSchema[]
-}
-
-export type ExportLayoutSchema = ExportSuccessfulLayoutSchema | ExportUnsuccessfulLayoutSchema

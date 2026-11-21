@@ -1,5 +1,5 @@
 import type { AccessorOwnerSchema, OptionalAccessorSchema, StitchLineAccessorSchema } from '../../schemas/accessors'
-import type { PocketClusterSchema } from '../../schemas/components'
+import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
 import type {
   ComponentBoundsStitchLineSchema,
   StitchLineSchema,
@@ -13,12 +13,20 @@ export class StitchLineAccessor extends BaseStrictAccessor implements StitchLine
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
     this.bounds = this.bounds.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.ownerPocketCluster = this.ownerPocketCluster.bind(this)
     this.byOwner = this.byOwner.bind(this)
-    this.byOnTop = this.byOnTop.bind(this)
+    this.defaultEntryComponentId = this.defaultEntryComponentId.bind(this)
+    this.defaultExitComponentId = this.defaultExitComponentId.bind(this)
+    this.entryComponent = this.entryComponent.bind(this)
+    this.exitComponent = this.exitComponent.bind(this)
+  }
+
+  names(): Set<string> {
+    return this.optional.names()
   }
 
   byId(id: string): StitchLineSchema {
@@ -41,7 +49,19 @@ export class StitchLineAccessor extends BaseStrictAccessor implements StitchLine
     return this.optional.byOwner(componentId)
   }
 
-  byOnTop(componentId: string): StitchLineSchema[] {
-    return this.optional.byOnTop(componentId)
+  defaultEntryComponentId(stitchLineId: string, pocketId?: string): string {
+    return this.requireResult(this.optional.defaultEntryComponentId(stitchLineId, pocketId), 'default entry component')
+  }
+
+  defaultExitComponentId(stitchLineId: string): string {
+    return this.requireResult(this.optional.defaultExitComponentId(stitchLineId), 'default exit component')
+  }
+
+  entryComponent(stitchLineId: string, pocketId?: string): ComponentSchema {
+    return this.requireResult(this.optional.entryComponent(stitchLineId, pocketId), 'entry component')
+  }
+
+  exitComponent(stitchLineId: string): ComponentSchema {
+    return this.requireResult(this.optional.exitComponent(stitchLineId), 'exit component')
   }
 }

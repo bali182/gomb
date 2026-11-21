@@ -8,6 +8,7 @@ import { deleteOrphanedStitchLines } from './deleteOrphanedStitchLines'
 import { deletePocketClusterHoles } from './deletePocketClusterHoles'
 import { deleteTPocketChildren } from './deleteTPocketChildren'
 import { deleteUnsupportedStitchLines } from './deleteUnsupportedStitchLines'
+import { normalizeStitchLineComponents } from './normalizeStitchLineComponents'
 
 type PatcherFunctionSchema = (
   subProject: SubProjectSchema,
@@ -21,6 +22,7 @@ const patchers: PatcherFunctionSchema[] = [
   deleteUnsupportedStitchLines,
   deleteOrphanedHoles,
   deleteOrphanedStitchLines,
+  normalizeStitchLineComponents,
   adjustStitchLines,
   addAutoStitchLineRadii,
   deleteOrphanedBindingFields,

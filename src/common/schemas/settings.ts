@@ -28,15 +28,12 @@ export type ColorSettingsSchema = ComponentColorSettingsSchema &
   StitchingColorSettingsSchema &
   SelectionColorSettingsSchema
 
-export type ExportStitchLineModeSchema = 'own-stitch-lines' | 'all-stitch-lines' | 'related-stitch-lines'
-
 export type ExportLayoutSettingsSchema = {
   gap: number
   padding: number
 }
 
 export type ExportContentSettingsSchema = {
-  stitchLineMode: ExportStitchLineModeSchema
   showNames: boolean
   showDimensions: boolean
   showParentNames: boolean

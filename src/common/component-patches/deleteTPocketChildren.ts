@@ -1,8 +1,6 @@
-import { getComponentDescendants } from '../operations/subProject/utils/getComponentDescendants'
 import { ComponentSchema } from '../schemas/components'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { accessors } from '../utils/accessors'
-import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 
 export const deleteTPocketChildren = (
@@ -17,12 +15,8 @@ export const deleteTPocketChildren = (
       continue
     }
     parents.add(component.id)
-    for (const childId of component.children) {
-      const child = accessor.optional.component.byId(childId)
+    for (const childId of accessor.component.descendantIds(component.id)) {
       deleted.add(childId)
-      if (isDefined(child)) {
-        getComponentDescendants(child, subProject).forEach((id) => deleted.add(id))
-      }
     }
   }
   if (parents.size === 0) {
@@ -35,7 +29,7 @@ export const deleteTPocketChildren = (
         .filter(([id]) => !deleted.has(id))
         .map(([id, component]): [string, ComponentSchema] => [
           id,
-          parents.has(id) ? { ...component, children: [] } : component,
+          parents.has(id) && narrowers.is.tPocket(component) ? { ...component, children: [] } : component,
         ]),
     ),
   }

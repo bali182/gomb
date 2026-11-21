@@ -1,18 +1,13 @@
+import { getExportPageSize } from '../logic/exports/getExportPageSize'
 import type { EditableSchema } from '../schemas/editable'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
 import type { IssuesSchema } from '../schemas/issues'
 import type { PageSchemaId } from '../schemas/page'
-import type { ExportSettingsSchema, ExportStitchLineModeSchema } from '../schemas/settings'
+import type { ExportSettingsSchema } from '../schemas/settings'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
-
-export const exportStitchLineModes: Record<ExportStitchLineModeSchema, boolean> = {
-  'all-stitch-lines': true,
-  'own-stitch-lines': true,
-  'related-stitch-lines': true,
-}
 
 const exportFormats: Record<ExportFormatSchema, boolean> = { svg: true, pdf: true, png: true }
 
@@ -39,16 +34,6 @@ export const validateExportSettingsSchema = (
   context: BaseValidationContextSchema,
 ): ValidationResultSchema<ExportSettingsSchema> => {
   const gapResult = validateNumber(input.gap, currentValue.gap, context, { min: 0 })
-  const paddingResult = validateNumber(input.padding, currentValue.padding, context, { min: 0 })
-  const cutHelperDistanceResult = validateNumber(input.cutHelperDistance, currentValue.cutHelperDistance, context, {
-    min: 0,
-  })
-  const stitchLineModeResult = validatePrimitiveUnion(
-    input.stitchLineMode,
-    currentValue.stitchLineMode,
-    exportStitchLineModes,
-    context,
-  )
   const formatResult = validatePrimitiveUnion(input.format, currentValue.format, exportFormats, context)
   const pageResult = validatePrimitiveUnion(input.page, currentValue.page, pageSchemaIds, context)
   const orientationResult = validatePrimitiveUnion(
@@ -59,6 +44,19 @@ export const validateExportSettingsSchema = (
   )
   const layoutResult = validatePrimitiveUnion(input.layout, currentValue.layout, pageLayouts, context)
 
+  const pageSize = getExportPageSize(pageResult.committedValue, orientationResult.committedValue)
+  const halfShortSide = Math.min(pageSize.width.toNumber(), pageSize.height.toNumber()) / 2
+  const paddingResult = validateNumber(input.padding, currentValue.padding, context, {
+    min: 0,
+    max: halfShortSide,
+    maxInclusive: false,
+  })
+  const cutHelperDistanceResult = validateNumber(input.cutHelperDistance, currentValue.cutHelperDistance, context, {
+    min: 0,
+    max: paddingResult.isValid ? halfShortSide - paddingResult.value : undefined,
+    maxInclusive: false,
+  })
+
   const issues: IssuesSchema<ExportSettingsSchema> = {
     childMarkers: undefined,
     cutHelperDistance: cutHelperDistanceResult.issues,
@@ -67,7 +65,6 @@ export const validateExportSettingsSchema = (
     showDimensions: undefined,
     showNames: undefined,
     showParentNames: undefined,
-    stitchLineMode: stitchLineModeResult.issues,
     format: formatResult.issues,
     layout: layoutResult.issues,
     orientation: orientationResult.issues,
@@ -81,7 +78,6 @@ export const validateExportSettingsSchema = (
     showDimensions: input.showDimensions,
     showNames: input.showNames,
     showParentNames: input.showParentNames,
-    stitchLineMode: stitchLineModeResult.committedValue,
     format: formatResult.committedValue,
     layout: layoutResult.committedValue,
     orientation: orientationResult.committedValue,
@@ -92,13 +88,13 @@ export const validateExportSettingsSchema = (
     !gapResult.isValid ||
     !paddingResult.isValid ||
     !cutHelperDistanceResult.isValid ||
-    !stitchLineModeResult.isValid ||
     !formatResult.isValid ||
     !pageResult.isValid ||
     !orientationResult.isValid ||
     !layoutResult.isValid
   ) {
-    return createInvalidValidationResult(issues, committedValue)
+    const leavesUsableArea = committedValue.padding + committedValue.cutHelperDistance < halfShortSide
+    return createInvalidValidationResult(issues, leavesUsableArea ? committedValue : currentValue)
   }
 
   return createValidValidationResult(issues, committedValue)

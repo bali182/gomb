@@ -14,7 +14,7 @@ export const clonePocketOpening = (
     return subProject
   }
   const idMappings = getCloneIdMappings(subProject, idGenerator)
-  const usedNames = new Set(Object.values(subProject.pocketOpenings).map((opening) => opening.name))
+  const usedNames = accessors.subProject(subProject).pocketOpening.names()
   const cloned: PocketOpeningSchema = {
     ...source,
     id: idMappings[source.id],

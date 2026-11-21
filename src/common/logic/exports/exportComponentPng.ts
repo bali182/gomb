@@ -10,7 +10,7 @@ import {
   PNG_SHADOW_PADDING,
   PNG_SHADOW_SPREAD,
 } from '../../constants/pngExport'
-import type { ComputedComponentSchema, ComputedStitchLineSchema } from '../../schemas/computed'
+import type { ComputedComponentSchema, ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
 import type { ProjectSchema } from '../../schemas/project'
@@ -20,6 +20,7 @@ import type { TranslationSchema } from '../../translations/translationSchema'
 import { accessors } from '../../utils/accessors'
 import { downloadBlob } from '../../utils/downloadBlob'
 import { isDefined } from '../../utils/isDefined'
+import { reflectRectHorizontally } from '../geometryUtils'
 import { getComputedSubProject } from '../getComputedSubProject'
 import { renderSvgComponentToString } from './renderSvgComponentToString'
 import { renderSvgToPng } from './renderSvgToPng'
@@ -76,7 +77,7 @@ const findNestingLevel = (
       child,
       componentId,
       computedSubProject,
-      narrowers.is.computedPocketCluster(component) ? level : level + 1,
+      narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component) ? level : level + 1,
     )
     if (isDefined(childLevel)) {
       return childLevel
@@ -125,6 +126,7 @@ const getComponentBoundingRects = (
     !narrowers.is.pocketCluster(model) &&
     !narrowers.is.panel(model) &&
     !narrowers.is.rootPanel(model) &&
+    !narrowers.is.rootPanelFace(model) &&
     context.isShowingPocketItems &&
     isDefined(component.item)
   ) {
@@ -139,7 +141,9 @@ const getComponentBoundingRects = (
 }
 
 const getStitchLineBoundingRects = (
-  stitchLines: readonly ComputedStitchLineSchema[],
+  routes: readonly ComputedStitchRouteSchema[],
+  faceId: string,
+  axisX: BigNumber,
   params: ExportComponentPngParams,
 ): RectSchema[] => {
   const { project, subProject, settings, context } = params
@@ -153,8 +157,8 @@ const getStitchLineBoundingRects = (
 
   const boundingRects: RectSchema[] = []
   const accessor = accessors.subProject(subProject)
-  for (const computedStitchLine of stitchLines) {
-    const stitchLine = accessor.optional.stitchLine.byId(computedStitchLine.stitchLineId)
+  for (const route of routes) {
+    const stitchLine = accessor.optional.stitchLine.byId(route.stitchLineId)
     if (!isDefined(stitchLine)) {
       continue
     }
@@ -169,7 +173,8 @@ const getStitchLineBoundingRects = (
     const threadPadding = view.stitchesVisible ? threadThickness / 2 : 0
     const holePadding = view.stitchHolesVisible ? (holeLength + holeThickness) / 2 : 0
     const padding = Math.max(linePadding, footprintPadding, threadPadding, holePadding)
-    boundingRects.push(padBoundingRect(computedStitchLine.boundingRect, padding))
+    const rect = route.faceId === faceId ? route.boundingRect : reflectRectHorizontally(route.boundingRect, axisX)
+    boundingRects.push(padBoundingRect(rect, padding))
   }
   return boundingRects
 }
@@ -179,24 +184,40 @@ const collectBoundingRects = (
   nestingLevel: number,
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
-): RectSchema[] => [
-  ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
-  ...getStitchLineBoundingRects(
-    accessors.computedSubProject(computedSubProject).stitchLine.byOnTop(component.componentId),
-    params,
-  ),
-  ...accessors
-    .computedSubProject(computedSubProject)
-    .component.children(component.componentId)
+  isReversed = false,
+): RectSchema[] => {
+  const accessor = accessors.computedSubProject(computedSubProject)
+  const root = accessor.component.rootPanel()
+  const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
+  const componentFace = accessors
+    .subProject(params.subProject)
+    .optional.component.rootPanelFaceOf(component.componentId)
+  const faceId = componentFace?.id ?? root.frontFaceId
+  const routes = [
+    ...accessor.stitchLine.byEntry(component.componentId),
+    ...accessor.stitchLine.byExit(component.componentId),
+  ]
+  const ownRects = [
+    ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
+    ...getStitchLineBoundingRects(routes, faceId, axisX, params),
+  ]
+  const visibleRects = isReversed ? ownRects.map((rect) => reflectRectHorizontally(rect, axisX)) : ownRects
+  const activeFaceId = params.context.rootPanelFaceId === root.backFaceId ? root.backFaceId : root.frontFaceId
+  const childrenRects = accessor.component
+    .children(component.componentId)
     .flatMap((child) =>
       collectBoundingRects(
         child,
-        narrowers.is.computedPocketCluster(component) ? nestingLevel : nestingLevel + 1,
+        narrowers.is.computedPocketCluster(component) || narrowers.is.computedRootPanel(component)
+          ? nestingLevel
+          : nestingLevel + 1,
         computedSubProject,
         params,
+        narrowers.is.computedRootPanel(component) ? child.componentId !== activeFaceId : isReversed,
       ),
-    ),
-]
+    )
+  return [...visibleRects, ...childrenRects]
+}
 
 const getBoundingRectUnion = (rects: readonly RectSchema[]): RectSchema => {
   const first = rects[0]

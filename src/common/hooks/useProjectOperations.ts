@@ -70,12 +70,13 @@ export const useProjectOperations = (): UseProjectOperationsOutput => {
     const currentProject = ensureProject(project)
     const result = addSubProjectPure(currentProject, {
       modelFactory,
+      faceNames: t.project.editors.enums.components.rootPanelFaceName,
     })
 
     setProject(result.project)
 
     return result.subProject
-  }, [modelFactory, project, setProject])
+  }, [modelFactory, project, setProject, t.project.editors.enums.components.rootPanelFaceName])
 
   const cloneSubProject = useCallback(
     (sourceSubProject: SubProjectSchema): void => {

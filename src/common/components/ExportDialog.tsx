@@ -1,50 +1,33 @@
-import { Alert, Box, CloseButton } from '@chakra-ui/react'
-import { useCallback, useMemo, useState, type FC } from 'react'
-import { accessors } from '../utils/accessors'
+import { Box, Text } from '@chakra-ui/react'
+import { useCallback, useEffect, useMemo, useState, type FC } from 'react'
 
+import { EXPORT_PREVIEW_BORDER_WIDTH, EXPORT_PREVIEW_PADDING, EXPORT_PREVIEW_WIDTH } from '../constants/exportPreview'
 import { LANGUAGE } from '../constants/language'
-import { useExportDrawArea } from '../hooks/useExportDrawArea'
+import { useExportProject } from '../hooks/useExportProject'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useProject } from '../hooks/useProject'
 import { useTranslation } from '../hooks/useTranslation'
-import { exportProject } from '../logic/exports/exportProject'
 import type { EditableSchema } from '../schemas/editable'
-import type { ExportUnsuccessfulLayoutSchema } from '../schemas/export'
 import type { ExportSettingsSchema } from '../schemas/settings'
 import type { BaseValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { getEditableSchema } from '../utils/getEditableSchema'
-import { hasValidationErrors } from '../utils/hasValidationErrors'
-import { isDefined } from '../utils/isDefined'
 import { validateExportSettingsSchema } from '../validators/validateExportSettingsSchema'
 import { EditDialog } from './EditDialog'
 import { ExportEditor } from './export/ExportEditor'
+import { ExportPreview } from './export/ExportPreview'
 
 type ExportDialogProps = {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
-type ExportUnplaceableFailure = {
-  type: 'unplaceable'
-  layout: ExportUnsuccessfulLayoutSchema
-}
-
-type ExportRuntimeFailure = {
-  type: 'runtime'
-}
-
-type ExportFailure = ExportUnplaceableFailure | ExportRuntimeFailure
-
 export const ExportDialog: FC<ExportDialogProps> = ({ isOpen, onOpenChange }) => {
   const { project } = useProject()
   const { setExportSettings, settings } = useGlobalSettings()
   const [exportParams, setExportParams] = useState<ExportSettingsSchema>(settings.export)
-  const drawAreaContextValue = useExportDrawArea(project.stitchingSettings, exportParams)
   const [localExportSettings, setLocalExportSettings] = useState<EditableSchema<ExportSettingsSchema>>(() =>
     getEditableSchema(settings.export, { language: LANGUAGE }),
   )
-  const [failure, setFailure] = useState<ExportFailure | undefined>(undefined)
-  const [isExporting, setIsExporting] = useState<boolean>(false)
   const { t } = useTranslation()
   const context = useMemo<BaseValidationContextSchema>(() => ({ language: LANGUAGE, t: t.validation }), [t.validation])
 
@@ -53,114 +36,94 @@ export const ExportDialog: FC<ExportDialogProps> = ({ isOpen, onOpenChange }) =>
     [context, localExportSettings, exportParams],
   )
 
-  const hasErrors = useMemo<boolean>(
-    () => hasValidationErrors<ExportSettingsSchema>(validationResult.issues),
-    [validationResult.issues],
-  )
+  const {
+    layout,
+    exportStatus,
+    export: exportProject,
+    reset,
+    retryPreparation,
+    controlsDisabled,
+    exportDisabled,
+    errorMessage,
+    pageSize,
+    drawAreaContext,
+  } = useExportProject({ project, settings: exportParams, disabled: !isOpen, isValid: validationResult.isValid })
+
+  // Save the export settings and close the dialog after a successful file export.
+  useEffect(() => {
+    if (!isOpen || exportStatus.type !== 'loaded') {
+      return
+    }
+    setExportSettings(exportParams)
+    onOpenChange(false)
+  }, [exportStatus, exportParams, setExportSettings, onOpenChange, isOpen])
 
   const resetDraft = useCallback((): void => {
     setLocalExportSettings(getEditableSchema(settings.export, context))
     setExportParams(settings.export)
-    setFailure(undefined)
-  }, [context, settings.export])
+    reset()
+  }, [context, settings.export, reset])
 
   const handleParamsChange = useCallback(
     (updatedEditableParams: EditableSchema<ExportSettingsSchema>): void => {
       const updatedValidationResult = validateExportSettingsSchema(updatedEditableParams, exportParams, context)
 
+      reset()
       setLocalExportSettings(updatedEditableParams)
       setExportParams(updatedValidationResult.committedValue)
     },
-    [context, exportParams],
+    [context, exportParams, reset],
   )
-
-  const handleFailureDismiss = useCallback((): void => {
-    setFailure(undefined)
-  }, [])
-
-  const handleSubmit = useCallback(async (): Promise<void> => {
-    const submitValidationResult = validateExportSettingsSchema(localExportSettings, exportParams, context)
-
-    if (!submitValidationResult.isValid) {
-      return
-    }
-
-    setIsExporting(true)
-
-    try {
-      const layout = await exportProject({
-        project,
-        settings: submitValidationResult.value,
-        context: drawAreaContextValue,
-        translation: t,
-      })
-
-      if (layout.type === 'unsuccessful-export') {
-        setFailure({ layout, type: 'unplaceable' })
-        return
-      }
-
-      setExportSettings(submitValidationResult.value)
-      onOpenChange(false)
-    } catch (error) {
-      console.error('Unable to export project:', error)
-      setFailure({ type: 'runtime' })
-    } finally {
-      setIsExporting(false)
-    }
-  }, [context, drawAreaContextValue, localExportSettings, exportParams, onOpenChange, project, setExportSettings, t])
 
   return (
     <EditDialog
-      canSubmit={!hasErrors && !isExporting}
+      canSubmit={!exportDisabled}
       isOpen={isOpen}
-      loading={isExporting}
+      loading={exportStatus.type === 'loading'}
       onOpenChange={onOpenChange}
       onResetData={resetDraft}
-      onSubmit={handleSubmit}
+      onSubmit={exportProject}
       submit={t.dialogs.export.positiveAction}
       title={t.dialogs.export.title}
+      errorMessage={errorMessage}
+      sectionDividers={true}
+      size="xl"
+      scrollable={false}
     >
-      <ExportFailureAlert failure={failure} onDismiss={handleFailureDismiss} />
-      <ExportEditor editable={localExportSettings} issues={validationResult.issues} onChange={handleParamsChange} />
+      <Box
+        display="grid"
+        gridTemplateColumns={`minmax(0, 1fr) ${EXPORT_PREVIEW_WIDTH}px`}
+        flex="1"
+        minHeight="0"
+        minWidth="0"
+      >
+        <Box minHeight="0" minWidth="0" overflow="auto">
+          <ExportEditor
+            editable={localExportSettings}
+            issues={validationResult.issues}
+            onChange={handleParamsChange}
+            disabled={controlsDisabled}
+          />
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="column"
+          minHeight="0"
+          minWidth="0"
+          bg="bg.subtle"
+          borderLeftWidth={`${EXPORT_PREVIEW_BORDER_WIDTH}px`}
+          borderColor="border"
+        >
+          <Box flexShrink="0" bg="bg.emphasized/55" px="4" py="1" height="8" display="flex" alignItems="center">
+            <Text color="fg.muted" fontWeight="bold" textStyle="sm">
+              {t.dialogs.export.preview}
+            </Text>
+          </Box>
+          <Box flex="1" minHeight="0" minWidth="0" overflow="auto" padding={`${EXPORT_PREVIEW_PADDING}px`} pt="4">
+            <ExportPreview layout={layout} pageSize={pageSize} context={drawAreaContext} onRetry={retryPreparation} />
+          </Box>
+        </Box>
+      </Box>
     </EditDialog>
-  )
-}
-
-type ExportFailureAlertProps = {
-  failure: ExportFailure | undefined
-  onDismiss: () => void
-}
-
-const ExportFailureAlert: FC<ExportFailureAlertProps> = ({ failure, onDismiss }) => {
-  const { t } = useTranslation()
-
-  if (!isDefined(failure)) {
-    return null
-  }
-
-  return (
-    <Box pb="3" pt="3" px="4">
-      <Alert.Root position="relative" status="error">
-        <Alert.Indicator />
-        <Alert.Content pe="8">
-          <Alert.Title>
-            {failure.type === 'unplaceable'
-              ? t.dialogs.export.errors.unplaceablePanels
-              : t.dialogs.export.errors.exportFailed}
-          </Alert.Title>
-          {failure.type === 'unplaceable' && (
-            <Alert.Description as="ul" mt="2" ps="4">
-              {failure.layout.unplaceables.map((panel) => {
-                const root = accessors.subProject(panel.subProject).optional.component.rootPanel()
-                const text = isDefined(root) ? `${root.name} → ${panel.component.name}` : panel.component.name
-                return <li key={`${panel.subProject.id}:${panel.component.id}`}>{text}</li>
-              })}
-            </Alert.Description>
-          )}
-        </Alert.Content>
-        <CloseButton onClick={onDismiss} position="absolute" size="sm" top="2" insetEnd="2" />
-      </Alert.Root>
-    </Box>
   )
 }

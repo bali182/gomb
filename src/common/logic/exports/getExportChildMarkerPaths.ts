@@ -1,9 +1,11 @@
+import type { ComputedComponentAccessorSchema } from '../../schemas/accessors'
 import type { ComputedComponentSchema } from '../../schemas/computed'
 import type { ComputedSubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { narrowers } from '../../utils/narrowers'
 
 import type { PathSchema, PointSchema, RectSchema } from '../../schemas/geometry'
+import { reflectRectHorizontally } from '../geometryUtils'
 import { createPathFromConnectedSegments } from '../pathSegments'
 import type { LinePathSegment } from '../pathSegmentTypes'
 import { doLinePathSegmentsOverlap } from '../pathSegmentUtils'
@@ -14,11 +16,7 @@ export const getExportChildMarkerPaths = (
 ): PathSchema[] => {
   const accessor = accessors.computedSubProject(computedSubProject)
   const parentMarkerLines = getBoundingRectMarkerLines(component.boundingRect)
-  const boundingRects = accessor.component.children(component.componentId).flatMap((child) => {
-    return narrowers.is.computedPocketCluster(child)
-      ? accessor.component.children(child.componentId).map((pocket) => pocket.boundingRect)
-      : [child.boundingRect]
-  })
+  const boundingRects = getChildBoundingRects(component, accessor.component)
 
   const markerLines = boundingRects.flatMap((boundingRect) => {
     return getBoundingRectMarkerLines(boundingRect).filter(
@@ -28,6 +26,28 @@ export const getExportChildMarkerPaths = (
 
   return removeDuplicates(markerLines).map((markerLine) => createPathFromConnectedSegments([markerLine]))
 }
+
+const getChildBoundingRects = (
+  component: ComputedComponentSchema,
+  accessor: ComputedComponentAccessorSchema,
+): RectSchema[] => {
+  if (narrowers.is.computedRootPanel(component)) {
+    const axisX = component.boundingRect.x.plus(component.boundingRect.width.dividedBy(2))
+    return [
+      ...collectChildBoundingRects(component.frontFaceId, accessor),
+      ...collectChildBoundingRects(component.backFaceId, accessor).map((rect) => reflectRectHorizontally(rect, axisX)),
+    ]
+  }
+
+  return collectChildBoundingRects(component.componentId, accessor)
+}
+
+const collectChildBoundingRects = (componentId: string, accessor: ComputedComponentAccessorSchema): RectSchema[] =>
+  accessor.children(componentId).flatMap((child) => {
+    return narrowers.is.computedPocketCluster(child)
+      ? accessor.children(child.componentId).map((pocket) => pocket.boundingRect)
+      : [child.boundingRect]
+  })
 
 const getBoundingRectMarkerLines = (boundingRect: RectSchema): LinePathSegment[] => {
   const right = boundingRect.x.plus(boundingRect.width)

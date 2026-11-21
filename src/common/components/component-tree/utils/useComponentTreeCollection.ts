@@ -18,7 +18,7 @@ export const useComponentTreeCollection = (
     return createTreeCollection<ProjectTreeNode>({
       nodeToChildren: (node) => node.children,
       nodeToChildrenCount: (node) => (node.kind === 'stitch-line' ? undefined : node.children.length),
-      nodeToString: getProjectTreeNodeLabel,
+      nodeToString: (node) => getProjectTreeNodeLabel(node),
       nodeToValue: (node) => node.id,
       rootNode: createTreeRootNode(subProject, showStitchLines, showHoles),
     })

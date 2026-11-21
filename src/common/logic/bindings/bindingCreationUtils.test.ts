@@ -7,8 +7,9 @@ import { getCommonBindingProperties, getValidBindingPropertySelection } from './
 const first = d.panel({ id: 'first', name: 'First', autoWidth: false, autoHeight: false, autoLayoutGap: false })
 const second = d.panel({ id: 'second', name: 'Second', autoWidth: false, autoHeight: false, autoLayoutGap: false })
 const source = d.subProject({
+  frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second'] }),
   id: 'sub',
-  root: d.rootPanel({ id: 'root', children: ['first', 'second'] }),
+  root: d.rootPanel({ id: 'root' }),
   components: [first, second],
 })
 

@@ -11,6 +11,7 @@ import { accessors } from '../../utils/accessors'
 import { NameGenerator } from '../../utils/factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from '../../utils/factory/ReadonlyModelObjectFactory'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
+import { narrowers } from '../../utils/narrowers'
 import { IdGenerator } from '../../utils/random/IdGenerator'
 import { addSubProject } from '../project/addSubProject'
 import { addBinding } from './addBinding'
@@ -23,8 +24,9 @@ import { createBaseOperationParams } from './testUtils'
 const createFactory = () => new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 const fixture = () =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel', 'cluster'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel', 'cluster'], name: 'Panel 1' }),
+    root: d.rootPanel({ id: 'root', name: 'Panel 1' }),
     components: [d.panel({ id: 'panel', name: 'Panel 2' }), d.pocketCluster({ id: 'cluster' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel', name: 'Hole 1' })],
     stitchLines: [
@@ -39,9 +41,16 @@ describe('model creation in add operations', () => {
     const base = createBaseOperationParams(source)
     base.settings.edit.addBaseColor = addBaseColor
     base.project.colorSettings.leatherColor = 'blue'
-    const result = addComponent(base, { parentId: 'root', type: 'panel', position: 'end' })
-    const added = result.components[result.components.root.children[result.components.root.children.length - 1]]
-    expect(added.color).toBe(addBaseColor ? 'blue' : undefined)
+    const result = addComponent(base, { parentId: 'root-front', type: 'panel', position: 'end' })
+    const added =
+      result.components[
+        accessors.subProject(result).component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId)[
+          accessors
+            .subProject(result)
+            .component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId).length - 1
+        ]
+      ]
+    expect(narrowers.assert.panel(added).color).toBe(addBaseColor ? 'blue' : undefined)
   })
 
   it('gives an explicit color precedence over the default leather color', () => {
@@ -49,26 +58,48 @@ describe('model creation in add operations', () => {
     const base = createBaseOperationParams(source)
     base.settings.edit.addBaseColor = true
     base.project.colorSettings.leatherColor = 'blue'
-    const result = addComponent(base, { parentId: 'root', type: 'panel', position: 'end', color: 'red' })
-    expect(result.components[result.components.root.children[result.components.root.children.length - 1]].color).toBe(
-      'red',
-    )
+    const result = addComponent(base, { parentId: 'root-front', type: 'panel', position: 'end', color: 'red' })
+    expect(
+      narrowers.assert.panel(
+        result.components[
+          accessors
+            .subProject(result)
+            .component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId)[
+            accessors
+              .subProject(result)
+              .component.childIds(accessors.subProject(result).component.rootPanel().frontFaceId).length - 1
+          ]
+        ],
+      ).color,
+    ).toBe('red')
   })
 
   it('generates component names from the current snapshot when reusing a readonly factory', () => {
     const source = fixture()
     const snapshot = structuredClone(source)
     const modelFactory = createFactory()
-    const params = { type: 'panel' as const, parentId: 'root', position: 'end' as const }
+    const params = { type: 'panel' as const, parentId: 'root-front', position: 'end' as const }
     const first = addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), params)
     const second = addComponent(createBaseOperationParams(first, { readonlyFactory: modelFactory }), params)
-    const firstId = first.components.root.children[first.components.root.children.length - 1]
-    const secondId = second.components.root.children[second.components.root.children.length - 1]
+    const firstId = accessors
+      .subProject(first)
+      .component.childIds(accessors.subProject(first).component.rootPanel().frontFaceId)[
+      accessors.subProject(first).component.childIds(accessors.subProject(first).component.rootPanel().frontFaceId)
+        .length - 1
+    ]
+    const secondId = accessors
+      .subProject(second)
+      .component.childIds(accessors.subProject(second).component.rootPanel().frontFaceId)[
+      accessors.subProject(second).component.childIds(accessors.subProject(second).component.rootPanel().frontFaceId)
+        .length - 1
+    ]
     expect(first.components[firstId]).toMatchObject({ type: 'panel', name: 'Panel 3' })
     expect(second.components[secondId]).toMatchObject({ type: 'panel', name: 'Panel 4' })
     expect(firstId).not.toBe(secondId)
     expect(source).toEqual(snapshot)
-    expect(first.components.root.children).not.toContain(secondId)
+    expect(
+      accessors.subProject(first).component.childIds(accessors.subProject(first).component.rootPanel().frontFaceId),
+    ).not.toContain(secondId)
   })
 
   it('supplies the default opening, project stitching settings and requested color to the factory', () => {
@@ -81,7 +112,9 @@ describe('model creation in add operations', () => {
       position: 'end',
       color: 'red',
     })
-    const pocket = accessors.subProject(result).component.tPocket(result.components.cluster.children[0])
+    const pocket = accessors
+      .subProject(result)
+      .component.tPocket(accessors.subProject(result).component.childIds('cluster')[0])
     expect(pocket).toMatchObject({ openingId: source.defaultPocketOpening, color: 'red', name: 'T-pocket 3' })
     expect(createComponent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -95,7 +128,7 @@ describe('model creation in add operations', () => {
     const source = fixture()
     const modelFactory = createFactory()
     const createComponent = vi.spyOn(modelFactory, 'createComponent')
-    const params = { parentId: 'root', type: 'panel' as const, position: -1 }
+    const params = { parentId: 'root-front', type: 'panel' as const, position: -1 }
     expect(addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), params)).toBe(source)
     expect(() =>
       addComponent(createBaseOperationParams(source, { readonlyFactory: modelFactory }), {
@@ -150,8 +183,9 @@ describe('model creation in add operations', () => {
     (orientation) => {
       it.each(['cluster', 'front'])('leaves the opening edge and its corners unstitched on %s', (targetId) => {
         const source = d.subProject({
+          frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
           id: 'sub',
-          root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+          root: d.rootPanel({ id: 'root' }),
           components: [
             d.pocketCluster({ id: 'cluster', orientation, children: ['front'] }),
             d.frontPocket({ id: 'front', openingId: 'opening' }),
@@ -194,8 +228,9 @@ describe('model creation in add operations', () => {
 
   it('keeps every side and corner enabled when creating stitching on a front pocket hole', () => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', orientation: 'right', children: ['front'] }),
         d.frontPocket({ id: 'front', openingId: 'opening' }),
@@ -211,8 +246,9 @@ describe('model creation in add operations', () => {
 
   it.each(['cluster', 't-pocket'])('keeps T-pocket stitching defaults when creating stitching on %s', (targetId) => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', orientation: 'right', children: ['t-pocket', 'front'] }),
         d.tPocket({ id: 't-pocket', openingId: 'opening' }),
@@ -264,9 +300,12 @@ describe('model creation in add operations', () => {
   it('adds and returns the new subproject while preserving the project snapshot', () => {
     const project = d.project({ id: 'project', subProjects: [fixture()] })
     const snapshot = structuredClone(project)
-    const result = addSubProject(project, { modelFactory: createFactory() })
+    const result = addSubProject(project, {
+      modelFactory: createFactory(),
+      faceNames: EN.project.editors.enums.components.rootPanelFaceName,
+    })
     expect(result.project.subProjects).toEqual([...project.subProjects, result.subProject])
-    expect(result.subProject.components[result.subProject.root].name).toBe('Module 2')
+    expect(accessors.subProject(result.subProject).component.rootPanel().name).toBe('Module 2')
     expect(project).toEqual(snapshot)
   })
 })

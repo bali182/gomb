@@ -10,6 +10,7 @@ type EditDialogProps = PropsWithChildren & {
   isOpen: boolean
   title: string
   description?: string
+  errorMessage?: string
   submit: string
   canSubmit: boolean
   size?: DialogRootProps['size']
@@ -37,12 +38,14 @@ export const EditDialog: FC<EditDialogProps> = ({
   sectionDividers = false,
   loading = false,
   description,
+  errorMessage,
   hasCancel = true,
   onResetData,
   onOpenChange,
   onSubmit,
 }) => {
   const { t } = useTranslation()
+  const headerMessage = errorMessage ?? description
 
   useEffect(() => {
     if (!isOpen) {
@@ -80,7 +83,11 @@ export const EditDialog: FC<EditDialogProps> = ({
             <Dialog.Header borderBottomWidth={sectionDividers ? '1px' : undefined} borderColor="border" flexShrink="0">
               <VStack align="stretch" gap="2">
                 <Dialog.Title>{title}</Dialog.Title>
-                {isDefined(description) && <Dialog.Description>{description}</Dialog.Description>}
+                {isDefined(headerMessage) && (
+                  <Dialog.Description color={isDefined(errorMessage) ? 'fg.error' : undefined}>
+                    {headerMessage}
+                  </Dialog.Description>
+                )}
               </VStack>
             </Dialog.Header>
             <form onSubmit={handleSubmit} style={formStyle}>

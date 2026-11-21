@@ -2,7 +2,8 @@ import { format, register } from 'timeago.js'
 import hu from 'timeago.js/lib/lang/hu'
 import type { BindingFieldAdderState } from '../components/binding-editors/bindingFieldUtils'
 import type { BindingFieldBlockReasonSchema } from '../schemas/bindings'
-import type { HasCustomRenderTarget } from '../schemas/stitching'
+import type { RootPanelFaceSideSchema } from '../schemas/components'
+import type { HasEntryComponentSchema, HasExitComponentSchema } from '../schemas/stitching'
 import type { EnumTranslationSchema, SectionTranslationSchema } from '../schemas/translation'
 
 import { GOMB_EXTENSION } from '../constants/fileExtensions'
@@ -66,6 +67,9 @@ export const HU = {
     },
   },
   project: {
+    rootPanelFaces: {
+      flip: 'Fordítás',
+    },
     computing: 'Számítás folyamatban…',
     tree: {
       sections: {
@@ -180,6 +184,7 @@ export const HU = {
       },
     },
     editors: {
+      faceLayoutTitle: (name: string): string => `${name} elrendezése`,
       tabs: {
         components: {
           layout: 'Elrendezés',
@@ -532,12 +537,18 @@ export const HU = {
           },
         },
         stitchLines: {
-          renderTarget: {
-            title: '-',
-            onTop: {
-              label: 'Rajzolási felület',
+          components: {
+            title: 'Átvarrt rétegek',
+            entryComponentId: {
+              label: 'Varrás felülete',
+              tooltip: 'A varrás által elsőként átszúrt anyagréteg.',
             },
-          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
+            exitComponentId: {
+              label: 'Lyukasztás határa',
+              tooltip:
+                'A varrás által utolsóként átszúrt anyagréteg. Ezt és az elsőtől a közbeeső összes réteget is átszúrjuk.',
+            },
+          } satisfies SectionTranslationSchema<HasEntryComponentSchema & HasExitComponentSchema>,
           settings: {
             title: 'Varrás',
             stitchMargin: {
@@ -714,29 +725,25 @@ export const HU = {
           },
           content: {
             title: 'Tartalom',
-            stitchLineMode: {
-              label: 'Varrásvonalak',
-              tooltip: 'Kiválasztja, mely varrásvonalak kerüljenek az exportba.',
-            },
             showNames: {
-              label: 'Nevek megjelenítése',
+              label: 'Nevek',
               tooltip: 'A komponensek nevét is belefoglalja az exportált fájlba.',
             },
             showDimensions: {
-              label: 'Méretek megjelenítése',
+              label: 'Méretek',
               tooltip: 'A komponensek méreteit is belefoglalja az exportált fájlba.',
             },
             showParentNames: {
-              label: 'Szülőnevek megjelenítése',
+              label: 'Szülőnevek',
               tooltip: 'A komponens feliratai alatt megjeleníti a közvetlen szülő nevét.',
             },
             childMarkers: {
-              label: 'Jelölések megjelenítése',
+              label: 'Illesztések',
               tooltip:
                 'Megjelöli, hol kell illeszkedniük a komponensek éleinek. Segít a ragasztás helyének bejelölésében.',
             },
             cutHelperDistance: {
-              label: 'Vágási segédvonal távolsága',
+              label: 'Segédvonal',
               tooltip: 'A komponens körül rajzolt vágási segédvonal távolságát állítja be. A 0 elrejti a segédvonalat.',
             },
           },
@@ -814,7 +821,6 @@ export const HU = {
             stitchHoleDistance: 'Öltéslyukak távolsága',
             stitchHoleThickness: 'Öltéslyuk vastagsága',
             stitchLineThickness: 'Varrásvonal vastagsága',
-            onTop: 'Varrás célfelülete',
             startOffset: 'Varrás kezdő eltolása',
             endOffset: 'Varrás végi eltolása',
             stitchDirection: 'Varrás iránya',
@@ -849,6 +855,14 @@ export const HU = {
           },
         },
         components: {
+          rootPanelFaceSide: {
+            front: 'eleje',
+            back: 'hátulja',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
+          rootPanelFaceName: {
+            front: 'Előoldal',
+            back: 'Hátoldal',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
           pocketOpening: {
             straight: 'Egyenes',
             recessed: 'Ívelt',
@@ -876,14 +890,9 @@ export const HU = {
         },
         export: {
           exportFormats: {
-            svg: 'SVG',
-            pdf: 'PDF',
-            png: 'PNG',
-          },
-          exportStitchLineModes: {
-            'own-stitch-lines': 'Saját varrásvonalak',
-            'related-stitch-lines': 'Kapcsolódó varrásvonalak',
-            'all-stitch-lines': 'Összes varrásvonal',
+            svg: 'SVG (Vektoros rajz)',
+            pdf: 'PDF (Dokumentum)',
+            png: 'PNG (Kép)',
           },
           exportOrientation: {
             portrait: 'Álló',
@@ -1086,9 +1095,15 @@ export const HU = {
     export: {
       title: 'Exportálás',
       positiveAction: 'Exportálás',
+      preview: 'Előnézet',
+      preparationFailed: {
+        title: 'Az export előkészítése sikertelen',
+        description: 'A projektet nem sikerült kiszámítani. Próbáld újra az export előkészítését.',
+        action: 'Újraszámítás',
+      },
       errors: {
+        oversizedComponents: 'A következő komponensek nem férnek el a kiválasztott lapon a jelenlegi beállításokkal:',
         exportFailed: 'Az exportálás nem sikerült.',
-        unplaceablePanels: 'Egy vagy több panel nem fér el a kiválasztott oldalon.',
       },
     },
     license: {
@@ -1143,6 +1158,8 @@ export const HU = {
   defaultNames: {
     'project': 'Projekt',
     'sub-project': 'Alprojekt',
+    'root-panel-face': 'Face',
+    'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Modul',
     'panel': 'Panel',
     'pocket-cluster': 'Zsebcsoport',

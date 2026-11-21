@@ -7,6 +7,7 @@ import { OpticalIllusionTPocketIcon } from '../components/icons/OpticalIllusionT
 import { RecessedFrontPocketIcon } from '../components/icons/RecessedFrontPocketIcon'
 import { RecessedPocketOpeningIcon } from '../components/icons/RecessedPocketOpeningIcon'
 import { RecessedTPocketIcon } from '../components/icons/RecessedTPocketIcon'
+import { RootPanelBackFaceIcon } from '../components/icons/RootPanelBackFaceIcon'
 import { SlantedFrontPocketIcon } from '../components/icons/SlantedFrontPocketIcon'
 import { SlantedPocketOpeningIcon } from '../components/icons/SlantedPocketOpeningIcon'
 import { SlantedTPocketIcon } from '../components/icons/SlantedTPocketIcon'
@@ -33,6 +34,10 @@ const tPocketIcons: Record<PocketOpeningSchema['type'], IconType> = {
 
 export const getModelIcon = (model: SubProjectItemSchema, subProject: SubProjectSchema): IconType => {
   switch (model.type) {
+    case 'root-panel-face':
+      return accessors.subProject(subProject).component.rootPanel().backFaceId === model.id
+        ? RootPanelBackFaceIcon
+        : PiRectangleDuotone
     case 'front-pocket':
       return frontPocketIcons[accessors.subProject(subProject).pocketOpening.byId(model.openingId).type]
     case 't-pocket':
@@ -46,6 +51,8 @@ export const getModelIconByType = (type: SubProjectItemSchema['type']): IconType
   switch (type) {
     case 'equal-binding':
       return PiLink
+    case 'root-panel-face':
+      return PiRectangleDuotone
     case 'root-panel':
       return PiWalletDuotone
     case 'front-pocket':

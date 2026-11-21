@@ -8,8 +8,9 @@ import { CORNER_RADIUS_FIELD_ORDER, getCornerRadiusBindingState } from './corner
 
 const fixture = (bindings: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'panel', targetType: 'component' })],
@@ -98,8 +99,9 @@ describe('getCornerRadiusBindingState', () => {
   }
   it.each(orientations)('disables opening-side corners for a cluster and its front pocket facing %s', (orientation) => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [
         d.pocketCluster({ id: 'cluster', orientation, children: ['front'] }),
         d.frontPocket({ id: 'front' }),
@@ -113,8 +115,9 @@ describe('getCornerRadiusBindingState', () => {
     const source = fixture()
     expect(getCornerRadiusBindingState(source, 'missing')).toBeUndefined()
     const unsupported = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['pocket'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['pocket'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.tPocket({ id: 'pocket' })],
     })
     expect(getCornerRadiusBindingState(unsupported, 'pocket')).toBeUndefined()

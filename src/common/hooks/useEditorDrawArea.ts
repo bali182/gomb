@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react'
+import { useCallback, useLayoutEffect, useMemo } from 'react'
 import {
   EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY,
   STITCH_LINE_LABEL_BACKGROUND_COLOR,
@@ -12,6 +12,7 @@ import { narrowers } from '../utils/narrowers'
 import { produce } from '../utils/produce'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useProject } from './useProject'
+import { useRootPanelFace } from './useRootPanelFace'
 import { useSubProject } from './useSubProject'
 
 import { formatHex8, parse } from 'culori'
@@ -45,7 +46,15 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   const { project } = useProject()
   const { settings } = useGlobalSettings()
   const { subProject } = useSubProject()
+  const { face, side, setSide } = useRootPanelFace()
   const drawAreaSelection = useSubProjectSelection(subProject)
+
+  const flipRootPanelFace = useCallback((): void => {
+    drawAreaSelection.clearSelection()
+    drawAreaSelection.clearHover()
+    setSide(side === 'front' ? 'back' : 'front')
+  }, [drawAreaSelection, setSide, side])
+
   const { isHovered, isSelected, selected } = drawAreaSelection
   const { clearSelection, clearHover } = drawAreaSelection
 
@@ -87,7 +96,10 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
-      if (narrowers.is.pocketCluster(component) && component.children.length === 0) {
+      if (
+        narrowers.is.rootPanelFace(component) ||
+        (narrowers.is.pocketCluster(component) && component.children.length === 0)
+      ) {
         return 'transparent'
       }
       return applyOpacity(
@@ -231,6 +243,8 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 
   const drawAreaContextValue = useMemo<DrawAreaContextValue>(
     () => ({
+      rootPanelFaceId: face.id,
+      flipRootPanelFace,
       isInteractive,
       isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
@@ -244,6 +258,8 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       labelStyles,
     }),
     [
+      face.id,
+      flipRootPanelFace,
       pocketItemStyles,
       componentStyles,
       drawAreaSelection,

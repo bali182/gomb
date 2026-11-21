@@ -53,9 +53,10 @@ const createClusterSubProject = ({
   const panelIds = Array.from({ length: clusterCount }, (_, index) => `panel-${index}`)
   const clusterIds = Array.from({ length: clusterCount }, (_, index) => `cluster-${index}`)
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: panelIds }),
     id: 'benchmark',
     pocketOpenings: [opening],
-    root: d.rootPanel({ id: 'root', width: clusterCount * 120, height: 160, children: panelIds }),
+    root: d.rootPanel({ id: 'root', width: clusterCount * 120, height: 160 }),
     components: panelIds.flatMap((panelId, index) => {
       const pocketIds = Array.from({ length: pocketCount }, (_, number) => clusterIds[index] + '-pocket-' + number)
       return [
@@ -100,8 +101,9 @@ const createClusterSubProject = ({
 const createPanelSubProject = (): SubProjectSchema => {
   const panelIds = ['panel-0', 'panel-1', 'panel-2']
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: panelIds }),
     id: 'benchmark',
-    root: d.rootPanel({ id: 'root', width: 360, height: 160, children: panelIds }),
+    root: d.rootPanel({ id: 'root', width: 360, height: 160 }),
     components: panelIds.map((id) => d.panel({ id, topLeftRadius: 8 })),
     holes: panelIds.flatMap((componentId) =>
       Array.from({ length: 4 }, (_, index) => ({

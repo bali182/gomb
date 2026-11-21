@@ -76,18 +76,19 @@ describe('input model comparators', () => {
   })
 
   it('detects layout anchor changes', () => {
-    const root = d.rootPanel({ id: 'root', mainAxisAnchor: 'start' })
+    const root = d.rootPanelFace({ id: 'root-front', mainAxisAnchor: 'start' })
     const panel = d.panel({ id: 'panel', mainAxisAnchor: 'start' })
     const front = d.frontPocket({ id: 'front', mainAxisAnchor: 'start' })
-    expect(comparators.rootPanel(root, { ...root, mainAxisAnchor: 'end' })).toBe(false)
+    expect(comparators.rootPanelFace(root, { ...root, mainAxisAnchor: 'end' })).toBe(false)
     expect(comparators.panel(panel, { ...panel, mainAxisAnchor: 'end' })).toBe(false)
     expect(comparators.frontPocket(front, { ...front, mainAxisAnchor: 'end' })).toBe(false)
   })
 
   it('detects render-target, offset and route direction changes', () => {
-    const stitchLine = d.componentBoundsStitchLine({ id: 'stitch', targetId: 'root', targetType: 'component' })
+    const stitchLine = d.componentBoundsStitchLine({ id: 'stitch', targetId: 'root-front', targetType: 'component' })
     const variants = [
-      { ...stitchLine, onTop: 'panel' },
+      { ...stitchLine, entryComponentId: 'panel' },
+      { ...stitchLine, exitComponentId: 'panel' },
       { ...stitchLine, startOffset: 1 },
       { ...stitchLine, endOffset: 2 },
       { ...stitchLine, stitchDirection: 'end-to-start' as const },

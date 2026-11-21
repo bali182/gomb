@@ -10,6 +10,7 @@ import type {
   PocketClusterBindingFieldSchema,
   RecessedPocketOpeningBindingFieldSchema,
   RootPanelBindingFieldSchema,
+  RootPanelFaceBindingFieldSchema,
   SlantedPocketOpeningBindingFieldSchema,
   TPocketBindingFieldSchema,
   TPocketStitchLineBindingFieldSchema,
@@ -19,6 +20,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
@@ -57,6 +59,21 @@ export class ModelObjectFactory implements Factory.ModelObjectFactorySchema {
     const model = this.readonlyFactory.createRootPanel(params)
     params.forbiddenIds.add(model.id)
     params.forbiddenNames.add(model.name)
+    return model
+  }
+
+  public createRootPanelFace(params: Factory.CreateRootPanelFaceParamsSchema): RootPanelFaceSchema {
+    const model = this.readonlyFactory.createRootPanelFace(params)
+    params.forbiddenIds.add(model.id)
+    params.forbiddenNames.add(model.name)
+    return model
+  }
+
+  public createRootPanelFaceBindingField(
+    params: Factory.CreateRootPanelFaceBindingFieldParamsSchema,
+  ): RootPanelFaceBindingFieldSchema {
+    const model = this.readonlyFactory.createRootPanelFaceBindingField(params)
+    params.forbiddenIds.add(model.id)
     return model
   }
 

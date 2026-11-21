@@ -86,7 +86,7 @@ export const BindingFieldAdder: FC<BindingFieldAdderProps> = ({ binding }) => {
       }),
     )
     return [...components, ...openings]
-  }, [componentTree, getFields, subProject.pocketOpenings])
+  }, [componentTree, getFields, subProject])
 
   const properties = useMemo<BindingPropertyChoice[]>(() => {
     const selected = modelChoices.find((item) => item.id === selection.modelId)

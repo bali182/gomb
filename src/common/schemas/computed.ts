@@ -1,10 +1,16 @@
 import type BigNumber from 'bignumber.js'
 
-import { HasComponentReferenceSchema, HasTargetSchema, HasTypeSchema } from './common'
+import { HasComponentReferenceSchema, HasStitchLineReferenceSchema, HasTargetSchema, HasTypeSchema } from './common'
 import type { HasChildrenSchema } from './components'
 import { CornerRadiusSchema, LineSchema, PathSchema, PointSchema, RectSchema } from './geometry'
 import { PocketItemSchema } from './pocketItem'
-import { StitchCornerSchema, StitchLineSchema, StitchSideSchema } from './stitching'
+import {
+  HasEntryComponentSchema,
+  HasExitComponentSchema,
+  StitchCornerSchema,
+  StitchLineSchema,
+  StitchSideSchema,
+} from './stitching'
 
 export type ComputedStitchHoleSchema = {
   center: PointSchema
@@ -43,6 +49,10 @@ export type HasComputedPocketItemSchema = {
 export type BaseComputedSchema = HasComponentReferenceSchema & HasPathSchema & HasBoundingRectSchema
 
 export type ComputedRootPanelSchema = HasTypeSchema<'computed-root-panel'> &
+  BaseComputedSchema &
+  HasComputedCornerRadiusSchema & { frontFaceId: string; backFaceId: string }
+
+export type ComputedRootPanelFaceSchema = HasTypeSchema<'computed-root-panel-face'> &
   BaseComputedSchema &
   HasComputedCornerRadiusSchema &
   HasComputedLayoutGapSchema &
@@ -85,6 +95,7 @@ export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster
 
 export type ComputedComponentSchema =
   | ComputedRootPanelSchema
+  | ComputedRootPanelFaceSchema
   | ComputedPanelSchema
   | ComputedPocketClusterSchema
   | ComputedFrontPocketSchema
@@ -115,8 +126,12 @@ export type StitchCornerPathFragment = {
 export type StitchPathFragment = StitchSidePathFragment | StitchCornerPathFragment
 
 export type ComputedStitchRouteSchema = HasTargetSchema &
-  HasBoundingRectSchema & {
-    path: PathSchema
+  HasBoundingRectSchema &
+  HasPathSchema &
+  HasStitchLineReferenceSchema &
+  Required<HasEntryComponentSchema> &
+  Required<HasExitComponentSchema> & {
+    faceId: string
     fragments: StitchPathFragment[]
     holes: ComputedStitchHoleSchema[]
     isClosed: boolean
@@ -125,11 +140,10 @@ export type ComputedStitchRouteSchema = HasTargetSchema &
   }
 
 export type ComputedStitchLineSchema = HasTargetSchema &
-  HasBoundingRectSchema & {
-    stitchLineId: string
+  HasBoundingRectSchema &
+  HasStitchLineReferenceSchema &
+  HasComponentReferenceSchema & {
     type: StitchLineSchema['type']
-    componentId: string
-    onTop: string
     autoComputedCornerRadius: CornerRadiusSchema
     routes: ComputedStitchRouteSchema[]
   }

@@ -2,6 +2,7 @@ import type { FC } from 'react'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
 import { narrowers } from '../../utils/narrowers'
+import { RootPanelFaceEditor } from './RootPanelFaceEditor'
 
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
 import type {
@@ -9,6 +10,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
@@ -62,10 +64,18 @@ export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
         />
       )
     }
+    case 'root-panel-face':
+      return (
+        <RootPanelFaceEditor
+          component={narrowers.assert.rootPanelFace(props.component)}
+          editable={props.editable}
+          issues={issues as IssuesSchema<RootPanelFaceSchema>}
+          onChange={props.onChange}
+        />
+      )
     case 'root-panel':
       return (
         <RootPanelEditor
-          component={props.component as RootPanelSchema}
           editable={props.editable}
           issues={issues as IssuesSchema<RootPanelSchema>}
           onChange={props.onChange}

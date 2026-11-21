@@ -7,9 +7,18 @@ import { d } from '../testData'
 import { updateComponents } from './updateComponents'
 
 const fixture = () => {
-  const root = d.rootPanel({ id: 'root', children: ['panel'] })
+  const root = d.rootPanel({ id: 'root' })
   const panel = d.panel({ id: 'panel' })
-  return { root, panel, subProject: d.subProject({ id: 'sub', root, components: [panel] }) }
+  return {
+    root,
+    panel,
+    subProject: d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
+      id: 'sub',
+      root,
+      components: [panel],
+    }),
+  }
 }
 
 describe('updateComponents', () => {
@@ -18,7 +27,7 @@ describe('updateComponents', () => {
     const mapper = vi.fn((_id: string, component: ComponentSchema): ComponentSchema => component)
     const result = updateComponents({ subProject, mapper })
     expect(result).toBe(subProject)
-    expect(mapper).toHaveBeenCalledTimes(2)
+    expect(mapper).toHaveBeenCalledTimes(4)
     expect(mapper).toHaveBeenCalledWith(root.id, root, undefined)
     expect(mapper).toHaveBeenCalledWith(panel.id, panel, undefined)
   })
@@ -46,7 +55,7 @@ describe('updateComponents', () => {
         component,
     )
     expect(updateComponents({ subProject, computedSubProject, mapper })).toBe(subProject)
-    expect(mapper).toHaveBeenCalledTimes(2)
+    expect(mapper).toHaveBeenCalledTimes(4)
     expect(mapper).toHaveBeenCalledWith(root.id, root, computedSubProject.components.root)
     expect(mapper).toHaveBeenCalledWith(panel.id, panel, computedSubProject.components.panel)
   })

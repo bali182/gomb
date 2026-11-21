@@ -2,11 +2,11 @@ import { renderToString } from 'react-dom/server'
 
 import { SvgExportRoot } from '../../components/svg-export/SvgExportRoot'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { ExportSuccessfulLayoutSchema } from '../../schemas/export'
+import type { ExportLayoutSchema } from '../../schemas/export'
 import type { SizeSchema } from '../../schemas/geometry'
 
 type RenderSvgToStringParams = {
-  layout: ExportSuccessfulLayoutSchema
+  layout: ExportLayoutSchema
   pageSize: SizeSchema
   context: DrawAreaContextValue
 }

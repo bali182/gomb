@@ -20,7 +20,7 @@ export const addStitchLine = (
   params: AddStitchLineParamsSchema,
 ): SubProjectSchema => {
   const forbiddenIds = getSubProjectIds(subProject)
-  const forbiddenNames = new Set(subProject.stitchLines.map((stitchLine) => stitchLine.name))
+  const forbiddenNames = accessors.subProject(subProject).stitchLine.names()
   let stitchLine: StitchLineSchema
   switch (params.targetType) {
     case 'hole':

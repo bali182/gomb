@@ -3,6 +3,7 @@ import { SubProjectSchema } from '../../schemas/subProject'
 import { accessors } from '../../utils/accessors'
 import { getSubProjectIds } from '../../utils/idCollectorUtils'
 import { isDefined } from '../../utils/isDefined'
+import { narrowers } from '../../utils/narrowers'
 import { getInsertionIndex } from './utils/getInsertionIndex'
 
 export const addComponent = (
@@ -13,6 +14,9 @@ export const addComponent = (
 
   if (!isDefined(parent)) {
     throw new Error('Missing parent')
+  }
+  if (narrowers.is.rootPanel(parent)) {
+    return subProject
   }
 
   const insertionIndex = getInsertionIndex(position, parent.children.length)
@@ -25,7 +29,7 @@ export const addComponent = (
     stitchingSettings: project.stitchingSettings,
     openingId: subProject.defaultPocketOpening,
     forbiddenIds: getSubProjectIds(subProject),
-    forbiddenNames: new Set(Object.values(subProject.components).map((component) => component.name)),
+    forbiddenNames: accessors.subProject(subProject).component.names(),
   })
   return {
     ...subProject,

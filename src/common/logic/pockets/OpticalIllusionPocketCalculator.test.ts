@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { describe, expect, it } from 'vitest'
 import { narrowers } from '../../utils/narrowers'
+import { applyExportContentSettings } from '../exports/applyExportContentSettings'
 
 import { ZERO_CORNER_RADIUS } from '../../constants/layout'
 import { defaultExportParams, defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../../defaultStates'
@@ -212,8 +213,9 @@ describe('OpticalIllusionPocketCalculator', () => {
     })
     const front = d.frontPocket({ id: 'front', openingId: opening.id })
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', width: 150, height: 150, children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root', width: 150, height: 150 }),
       components: [cluster, t, front],
       pocketOpenings: [
         opening,
@@ -224,12 +226,9 @@ describe('OpticalIllusionPocketCalculator', () => {
     })
     const snapshot = structuredClone(source)
     const computed = getComputedSubProject(source, defaultStitchingSettings)
-    const exports = getExportElementsForComponent(
-      source,
-      computed,
-      'cluster',
+    const exports = applyExportContentSettings(
+      getExportElementsForComponent(source, computed, 'cluster', defaultStitchingSettings),
       defaultExportParams,
-      defaultStitchingSettings,
     )
     expect(exports).toHaveLength(2)
     expect(source).toEqual(snapshot)

@@ -8,8 +8,9 @@ const fixture = () => {
   const first = d.pocketCluster({ id: 'first', children: ['a', 'front-a'] })
   const second = d.pocketCluster({ id: 'second', children: ['b', 'front-b'] })
   return d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['first', 'second'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       first,
       second,
@@ -30,7 +31,7 @@ describe('moveStitchLine', () => {
     const source: SubProjectSchema = {
       ...fixtureSource,
       components: { ...fixtureSource.components, empty, 'without-front': withoutFront },
-      stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root', targetType: 'component' })],
+      stitchLines: [d.componentBoundsStitchLine({ id: 'line', targetId: 'root-front', targetType: 'component' })],
     }
     const snapshot = structuredClone(source)
     for (const targetId of ['empty', 'without-front', 'a']) {

@@ -10,17 +10,18 @@ import { ExportLayoutSection } from './ExportLayoutSection'
 import { ExportPageSection } from './ExportPageSection'
 
 type ExportEditorProps = {
+  disabled: boolean
   editable: EditableSchema<ExportSettingsSchema>
   issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export const ExportEditor: FC<ExportEditorProps> = ({ editable, issues, onChange }) => {
+export const ExportEditor: FC<ExportEditorProps> = ({ editable, issues, onChange, disabled }) => {
   return (
     <SectionGroup.Root>
-      <ExportPageSection editable={editable} issues={issues} onChange={onChange} />
-      <ExportLayoutSection editable={editable} issues={issues} onChange={onChange} />
-      <ExportContentSection editable={editable} issues={issues} onChange={onChange} />
+      <ExportPageSection editable={editable} issues={issues} onChange={onChange} disabled={disabled} />
+      <ExportLayoutSection editable={editable} issues={issues} onChange={onChange} disabled={disabled} />
+      <ExportContentSection editable={editable} issues={issues} onChange={onChange} disabled={disabled} />
     </SectionGroup.Root>
   )
 }

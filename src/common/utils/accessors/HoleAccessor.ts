@@ -8,7 +8,12 @@ export class HoleAccessor extends BaseStrictAccessor implements HoleAccessorSche
     owner: AccessorOwnerSchema,
   ) {
     super(owner)
+    this.names = this.names.bind(this)
     this.byId = this.byId.bind(this)
+  }
+
+  names(): Set<string> {
+    return this.optional.names()
   }
 
   byId(id: string): HoleSchema {

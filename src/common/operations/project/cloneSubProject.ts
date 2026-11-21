@@ -40,7 +40,7 @@ export const cloneSubProject = (
     return project
   }
 
-  const clonedRoot = cloneResult.clonedComponents[cloneResult.clonedRootId]
+  const clonedRoot = narrowers.assert.rootPanel(cloneResult.clonedComponents[cloneResult.clonedRootId])
 
   if (!isDefined(clonedRoot)) {
     return project

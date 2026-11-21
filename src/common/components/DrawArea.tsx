@@ -1,11 +1,16 @@
 import { Box } from '@chakra-ui/react'
 import { type FC } from 'react'
-
+import type { DrawAreaTurnPresentation } from '../hooks/useDrawAreaTurn'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { SvgRoot } from './svg/SvgRoot'
 
-export const DrawArea: FC = () => {
+type DrawAreaProps = {
+  presentation: DrawAreaTurnPresentation
+}
+
+export const DrawArea: FC<DrawAreaProps> = ({ presentation }) => {
   const { settings } = useGlobalSettings()
+  const { perspectiveProps, animationProps, faceIdAboveRoot, overlaysVisible } = presentation
 
   return (
     <Box boxSizing="border-box" height="100%" overflow="auto" width="100%">
@@ -18,8 +23,10 @@ export const DrawArea: FC = () => {
         py="5"
         width="max-content"
       >
-        <Box style={{ zoom: settings.view.scale }}>
-          <SvgRoot />
+        <Box style={{ zoom: settings.view.scale }} {...perspectiveProps}>
+          <Box {...animationProps}>
+            <SvgRoot faceIdAboveRoot={faceIdAboveRoot} overlaysVisible={overlaysVisible} />
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -1,6 +1,7 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
+import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
@@ -14,6 +15,7 @@ import { HoleHighlights } from './HoleHighlights'
 import { PocketCluster } from './PocketCluster'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
+import { SvgComponentLayers } from './SvgComponentLayers'
 
 type PanelProps = {
   componentId: string
@@ -27,6 +29,9 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
   const computedPanel = useComputedComponent<ComputedPanelSchema>(componentId)
   const { computedSubProject } = useSubProject()
   const accessor = accessors.computedSubProject(computedSubProject)
+  const { direction } = useSvgFace()
+  const children = accessor.component.children(componentId)
+  const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const pathData = usePath(computedPanel.path)
   const isActive = selection.isSelected(panel) || selection.isHovered(panel)
   const styleParams: DrawAreaComponentStyleParams = {
@@ -50,43 +55,55 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
 
   return (
     <>
-      <path
-        d={pathData}
-        fill={componentStyles.getBackgroundColor(styleParams)}
-        filter={componentStyles.getFilter(styleParams)}
-        stroke={componentStyles.getBorderColor(styleParams)}
-        strokeWidth={componentStyles.getBorderThickness(styleParams)}
-        data-component-id={panel.id}
-        onPointerEnter={isInteractive ? handlePointerEnter : undefined}
-        onPointerLeave={isInteractive ? handlePointerLeave : undefined}
-        onClick={isInteractive ? handleClick : undefined}
+      <SvgComponentLayers
+        content={
+          <SvgComponentLayers
+            before={<StitchLines componentId={panel.id} surface="back" />}
+            after={<StitchLines componentId={panel.id} surface="front" />}
+            content={
+              <>
+                <path
+                  d={pathData}
+                  fill={componentStyles.getBackgroundColor(styleParams)}
+                  filter={componentStyles.getFilter(styleParams)}
+                  stroke={componentStyles.getBorderColor(styleParams)}
+                  strokeWidth={componentStyles.getBorderThickness(styleParams)}
+                  data-component-id={panel.id}
+                  onPointerEnter={isInteractive ? handlePointerEnter : undefined}
+                  onPointerLeave={isInteractive ? handlePointerLeave : undefined}
+                  onClick={isInteractive ? handleClick : undefined}
+                />
+                <HoleHighlights componentId={panel.id} />
+              </>
+            }
+          />
+        }
+        after={orderedChildren.map((component) => {
+          switch (component.type) {
+            case 'computed-panel':
+              return (
+                <Panel
+                  componentId={component.componentId}
+                  key={component.componentId}
+                  nestingLevel={nestingLevel + 1}
+                />
+              )
+            case 'computed-pocket-cluster':
+              return (
+                <PocketCluster
+                  componentId={component.componentId}
+                  key={component.componentId}
+                  nestingLevel={nestingLevel + 1}
+                />
+              )
+            case 'computed-root-panel':
+              throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
+          }
+        })}
       />
-
       {settings.view.componentDimensionsVisible && isActive && (
         <SizeLabel reference="bottom-right" boundingRect={computedPanel.boundingRect} />
       )}
-
-      <StitchLines componentId={panel.id} />
-
-      <HoleHighlights componentId={panel.id} />
-      {accessor.component.children(componentId).map((component) => {
-        switch (component.type) {
-          case 'computed-panel':
-            return (
-              <Panel componentId={component.componentId} key={component.componentId} nestingLevel={nestingLevel + 1} />
-            )
-          case 'computed-pocket-cluster':
-            return (
-              <PocketCluster
-                componentId={component.componentId}
-                key={component.componentId}
-                nestingLevel={nestingLevel + 1}
-              />
-            )
-          case 'computed-root-panel':
-            throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
-        }
-      })}
     </>
   )
 }

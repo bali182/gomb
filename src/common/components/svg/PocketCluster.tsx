@@ -1,5 +1,6 @@
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
+import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
@@ -10,7 +11,6 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
 import { PocketClusterSelectionLabel } from './PocketClusterSelectionLabel'
 import { SizeLabel } from './SizeLabel'
-import { StitchLines } from './StitchLines'
 
 type PocketClusterProps = {
   componentId: string
@@ -23,6 +23,8 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
 
   const cluster = useComponent<PocketClusterSchema>(componentId)
   const computed = useComputedComponent<ComputedPocketClusterSchema>(componentId)
+  const { direction } = useSvgFace()
+  const pocketIds = direction === 'reverse' ? [...computed.children].reverse() : computed.children
   const pathData = usePath(computed.path)
   const active = selection.isSelected(cluster) || selection.isHovered(cluster)
   const isEmpty = computed.children.length === 0
@@ -60,14 +62,13 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
             onPointerLeave={isInteractive ? onPointerLeave : undefined}
           />
         )}
-        {computed.children.map((pocketId) => (
+        {pocketIds.map((pocketId) => (
           <Pocket key={pocketId} componentId={pocketId} nestingLevel={nestingLevel} />
         ))}
       </g>
       {settings.view.componentDimensionsVisible && active && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
-      <StitchLines componentId={componentId} />
       <PocketClusterSelectionLabel clusterId={componentId} />
     </>
   )

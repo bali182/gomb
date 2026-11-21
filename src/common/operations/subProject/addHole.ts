@@ -15,7 +15,7 @@ export const addHole = (
   const hole = readonlyFactory.createHole({
     componentId: params.targetId,
     forbiddenIds: getSubProjectIds(subProject),
-    forbiddenNames: new Set(subProject.holes.map((hole) => hole.name)),
+    forbiddenNames: accessors.subProject(subProject).hole.names(),
   })
   return {
     ...subProject,

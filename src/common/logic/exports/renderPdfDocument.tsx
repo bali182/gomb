@@ -1,10 +1,10 @@
 import { PdfDocument } from '../../components/pdf-export/PdfDocument'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { ExportSuccessfulLayoutSchema } from '../../schemas/export'
+import type { ExportLayoutSchema } from '../../schemas/export'
 import type { SizeSchema } from '../../schemas/geometry'
 
 export const renderPdfDocument = (
-  layout: ExportSuccessfulLayoutSchema,
+  layout: ExportLayoutSchema,
   pageSize: SizeSchema,
   drawAreaContextValue: DrawAreaContextValue,
 ) => {

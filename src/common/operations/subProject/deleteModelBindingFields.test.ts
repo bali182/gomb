@@ -7,8 +7,9 @@ import { createBaseOperationParams } from './testUtils'
 
 const fixture = (): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [d.panel({ id: 'panel', children: ['child'] }), d.panel({ id: 'child' })],
     holes: [d.hole({ id: 'hole', componentId: 'panel' })],
     stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetType: 'component', targetId: 'panel' })],

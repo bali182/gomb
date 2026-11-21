@@ -16,13 +16,12 @@ export const createComponentTreeNode = (
 ): ComponentTreeNode => {
   const accessor = accessors.subProject(subProject)
   const parent = accessor.optional.component.parent(component.id)
-  const siblingIds = isDefined(parent) ? parent.children : []
+  const siblingIds = isDefined(parent) ? accessor.component.childIds(parent.id) : []
   const componentIndex = siblingIds.indexOf(component.id)
   const nextSiblingId = componentIndex < 0 ? undefined : siblingIds[componentIndex + 1]
 
-  const childComponentNodes = component.children
-    .map((childId) => accessor.optional.component.byId(childId))
-    .filter(isDefined)
+  const childComponentNodes = accessor.component
+    .children(component.id)
     .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
 
   const holeNodes = showHoles

@@ -3,6 +3,7 @@ import type { LayoutOrientationSchema, PanelSchema } from '../schemas/components
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
+import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
@@ -26,7 +27,7 @@ export const validatePanelSchema = (
     input.name,
     currentValue.name,
     input.id,
-    Object.values(context.subProject.components),
+    accessors.subProject(context.subProject).component.components(),
     context,
   )
   const colorResult = validateOptionalHexColor(input.color, currentValue.color, context)

@@ -8,12 +8,13 @@ import { NumberInput } from '../common/NumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 
 type ExportLayoutSectionProps = {
+  disabled: boolean
   editable: EditableSchema<ExportSettingsSchema>
   issues: IssuesSchema<ExportSettingsSchema>
   onChange: (updated: EditableSchema<ExportSettingsSchema>) => void
 }
 
-export function ExportLayoutSection({ editable, issues, onChange }: ExportLayoutSectionProps): ReactNode {
+export function ExportLayoutSection({ editable, issues, onChange, disabled }: ExportLayoutSectionProps): ReactNode {
   const { t } = useTranslation()
   const handleGapChange = useCallback(
     (gap: string): void => {
@@ -35,13 +36,19 @@ export function ExportLayoutSection({ editable, issues, onChange }: ExportLayout
         {t.project.editors.sections.export.layout.gap.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.gap}>
-        <NumberInput issue={issues.gap} onChange={handleGapChange} unit="mm" value={editable.gap} />
+        <NumberInput disabled={disabled} issue={issues.gap} onChange={handleGapChange} unit="mm" value={editable.gap} />
       </SectionGroup.SectionRowEditor>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.layout.padding.tooltip}>
         {t.project.editors.sections.export.layout.padding.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.padding}>
-        <NumberInput issue={issues.padding} onChange={handlePaddingChange} unit="mm" value={editable.padding} />
+        <NumberInput
+          disabled={disabled}
+          issue={issues.padding}
+          onChange={handlePaddingChange}
+          unit="mm"
+          value={editable.padding}
+        />
       </SectionGroup.SectionRowEditor>
     </SectionGroup.Section>
   )

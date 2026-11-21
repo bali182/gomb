@@ -13,7 +13,7 @@ const limits = (overrides: Partial<ResolvedComponentBoundsStitchLineSchema> = {}
     id: 'stitch',
     name: 'Stitch',
     type: 'component-bounds-stitch-line',
-    targetId: 'root',
+    targetId: 'root-front',
     targetType: 'component',
     top: true,
     right: false,
@@ -27,7 +27,7 @@ const limits = (overrides: Partial<ResolvedComponentBoundsStitchLineSchema> = {}
     ...overrides,
   }
   const geometry = getComponentBoundsStitchLineGeometry(stitchLine, {
-    componentId: 'root',
+    componentId: 'root-front',
     cornerRadius: ZERO_CORNER_RADIUS,
     boundingRect: { x: new BigNumber(0), y: new BigNumber(0), width: new BigNumber(100), height: new BigNumber(80) },
   })

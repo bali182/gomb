@@ -17,8 +17,13 @@ type ValidationFixture = {
 
 const createFixture = (): ValidationFixture => {
   const component = d.pocketCluster({ id: 'child', width: 40, height: 60 })
-  const root = d.rootPanel({ id: 'root', children: [component.id] })
-  const subProject = d.subProject({ id: 'sub-project', root, components: [component] })
+  const root = d.rootPanel({ id: 'root' })
+  const subProject = d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: [component.id] }),
+    id: 'sub-project',
+    root,
+    components: [component],
+  })
   const project = d.project({ id: 'project', subProjects: [subProject] })
   return {
     component,

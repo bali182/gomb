@@ -14,6 +14,8 @@ export const STROKE_THICKNESS = 0.3
 export const EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY = '2 1'
 export const VIEWBOX_PADDING = 10
 export const POCKET_ITEM_STITCH_MASK_ID = 'pocket-item-stitch-mask'
+export const POCKET_ITEM_STITCH_MASK_REVERSE_ID = 'pocket-item-stitch-mask-reverse'
+export const POCKET_ITEM_STITCH_MASK_CONTENT_ID = 'pocket-item-stitch-mask-content'
 
 export const COMPONENT_NAME_COLOR = '#000000'
 export const COMPONENT_DIMENSIONS_COLOR = '#666666'

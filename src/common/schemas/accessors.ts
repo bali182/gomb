@@ -5,6 +5,7 @@ import {
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from './components'
@@ -15,8 +16,10 @@ import {
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedPocketSchema,
+  ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
+  ComputedStitchRouteSchema,
   ComputedTPocketSchema,
 } from './computed'
 import { HoleSchema } from './hole'
@@ -34,7 +37,7 @@ export type AccessorOwnerSchema = {
 
 export type OptionalAccessorSchema<T> = {
   [K in keyof T]: T[K] extends (...args: infer Args) => infer Result
-    ? (...args: Args) => Result extends readonly unknown[] ? Result : Result | undefined
+    ? (...args: Args) => Result extends readonly unknown[] | Set<unknown> ? Result : Result | undefined
     : T[K]
 }
 
@@ -44,7 +47,10 @@ export type AccessorWithOptionalSchema<T> = T & {
 
 export type ComponentAccessorSchema = {
   byId(id: string): ComponentSchema
+  childIds(id: string): string[]
   children(id: string): ComponentSchema[]
+  rootPanelFace(id: string): RootPanelFaceSchema
+  rootPanelFaceOf(id: string): RootPanelFaceSchema
   pocket(id: string): PocketSchema
   rootPanel(id?: string): RootPanelSchema
   panel(id: string): PanelSchema
@@ -58,6 +64,13 @@ export type ComponentAccessorSchema = {
   frontPockets(): readonly FrontPocketSchema[]
   panels(): readonly PanelSchema[]
   pocketClusters(): readonly PocketClusterSchema[]
+  ancestors(id: string, includeSelf?: boolean): readonly ComponentSchema[]
+  ancestorIds(id: string, includeSelf?: boolean): readonly string[]
+  descendants(id: string, includeSelf?: boolean): readonly ComponentSchema[]
+  descendantIds(id: string, includeSelf?: boolean): readonly string[]
+  layers(faceId: string): readonly ComponentSchema[]
+  layerIds(faceId: string): readonly string[]
+  names(): Set<string>
 }
 
 export type StitchLineAccessorSchema = {
@@ -66,23 +79,32 @@ export type StitchLineAccessorSchema = {
   tPocket(id: string): TPocketStitchLineSchema
   ownerPocketCluster(id: string): PocketClusterSchema
   byOwner(componentId: string): StitchLineSchema[]
-  byOnTop(componentId: string): StitchLineSchema[]
+  defaultEntryComponentId(stitchLineId: string, pocketId?: string): string
+  defaultExitComponentId(stitchLineId: string): string
+  entryComponent(stitchLineId: string, pocketId?: string): ComponentSchema
+  exitComponent(stitchLineId: string): ComponentSchema
+  names(): Set<string>
 }
 
 export type PocketOpeningAccessorSchema = {
   byId(id: string): PocketOpeningSchema
   defaultOpening(): PocketOpeningSchema
   pocketOpenings(): readonly PocketOpeningSchema[]
+  names(): Set<string>
 }
 
 export type HoleAccessorSchema = {
   // Do we need anything else?
   byId(id: string): HoleSchema
+  names(): Set<string>
 }
 
 export type ComputedComponentAccessorSchema = {
   byId(id: string): ComputedComponentSchema
+  childIds(id: string): string[]
   children(id: string): ComputedComponentSchema[]
+  rootPanelFace(id: string): ComputedRootPanelFaceSchema
+  rootPanelFaceOf(id: string): ComputedRootPanelFaceSchema
   pocket(id: string): ComputedPocketSchema
   rootPanel(id?: string): ComputedRootPanelSchema
   panel(id: string): ComputedPanelSchema
@@ -97,7 +119,8 @@ export type ComputedStitchLineAccessorSchema = {
   bounds(id: string): ComputedStitchLineSchema
   tPocket(id: string): ComputedStitchLineSchema
   byOwner(componentId: string): ComputedStitchLineSchema[]
-  byOnTop(componentId: string): ComputedStitchLineSchema[]
+  byEntry(componentId: string): ComputedStitchRouteSchema[]
+  byExit(componentId: string): ComputedStitchRouteSchema[]
 }
 
 export type ComputedHoleAccessorSchema = {

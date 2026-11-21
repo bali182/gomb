@@ -21,7 +21,7 @@ const fixture = () =>
       },
     },
     root: d.rootPanel({ id: 'root' }),
-    holes: [d.hole({ id: 'hole', componentId: 'root', name: 'Hole' })],
+    holes: [d.hole({ id: 'hole', componentId: 'root-front', name: 'Hole' })],
   })
 describe('cloneHole', () => {
   it('copies only the hole, retaining its owner and inserting after the source', () => {

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
+import { RootPanelFace } from '../../components/svg/RootPanelFace'
 import { accessors } from '../../utils/accessors'
 
 import { Panel } from '../../components/svg/Panel'
@@ -18,6 +19,7 @@ import {
 import { DrawAreaContext } from '../../contexts/DrawAreaContext'
 import { EditorContext, EditorContextDefaultOperations, EditorContextDefaultValues } from '../../contexts/EditorContext'
 import { DefaultGlobalSettingsOperations, GlobalSettingsContext } from '../../contexts/GlobalSettingsContext'
+import { SvgFaceContext, type SvgFaceContextValue } from '../../contexts/SvgFaceContext'
 import { Loadable } from '../../loadable'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { RectSchema } from '../../schemas/geometry'
@@ -25,6 +27,7 @@ import type { ProjectSchema } from '../../schemas/project'
 import type { GlobalSettingsSchema } from '../../schemas/settings'
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../../schemas/subProject'
 import { getViewBox } from '../../utils/getViewBox'
+import { narrowers } from '../../utils/narrowers'
 
 type RenderSvgComponentToStringParams = {
   editorValues: {
@@ -47,7 +50,17 @@ export const renderSvgComponentToString = ({
   nestingLevel,
   boundingRect,
 }: RenderSvgComponentToStringParams): string => {
-  const component = accessors.subProject(editorValues.subProject).component.byId(componentId)
+  const accessor = accessors.subProject(editorValues.subProject)
+  const component = accessor.component.byId(componentId)
+  const root = accessor.component.rootPanel()
+  let faceIdAboveRoot: string
+  // TODO there must be a better way to figure this out.
+  if (narrowers.is.rootPanel(component)) {
+    faceIdAboveRoot = context.rootPanelFaceId === root.backFaceId ? root.backFaceId : root.frontFaceId
+  } else {
+    faceIdAboveRoot = accessor.component.rootPanelFaceOf(componentId).id
+  }
+  const faceContext: SvgFaceContextValue = { faceId: faceIdAboveRoot, direction: 'forward' }
 
   let content: ReactNode
   switch (component.type) {
@@ -55,8 +68,11 @@ export const renderSvgComponentToString = ({
     case 't-pocket':
       content = <Pocket componentId={componentId} nestingLevel={nestingLevel} />
       break
+    case 'root-panel-face':
+      content = <RootPanelFace componentId={componentId} nestingLevel={nestingLevel} />
+      break
     case 'root-panel':
-      content = <RootPanel componentId={componentId} nestingLevel={nestingLevel} />
+      content = <RootPanel componentId={componentId} nestingLevel={nestingLevel} faceIdAboveRoot={faceIdAboveRoot} />
       break
     case 'panel':
       content = <Panel componentId={componentId} nestingLevel={nestingLevel} />
@@ -68,6 +84,46 @@ export const renderSvgComponentToString = ({
 
   const millimetersPerPixel = MILLIMETERS_PER_INCH / PNG_DPI
 
+  const svg = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={`${boundingRect.width.toString()}mm`}
+      height={`${boundingRect.height.toString()}mm`}
+      viewBox={getViewBox(boundingRect, 0)}
+    >
+      <defs>
+        {context.isShowingPocketItems && (
+          <PocketItemStitchMask componentId={componentId} faceIdAboveRoot={faceIdAboveRoot} />
+        )}
+        <filter
+          id="export-shadow"
+          filterUnits="userSpaceOnUse"
+          primitiveUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+          x={boundingRect.x.toString()}
+          y={boundingRect.y.toString()}
+          width={boundingRect.width.toString()}
+          height={boundingRect.height.toString()}
+        >
+          <feDropShadow
+            dx={0}
+            dy={PNG_SHADOW_OFFSET_Y * millimetersPerPixel}
+            stdDeviation={PNG_SHADOW_BLUR * millimetersPerPixel}
+            floodColor={PNG_SHADOW_COLOR}
+            floodOpacity={PNG_SHADOW_OPACITY}
+          />
+        </filter>
+      </defs>
+      <g filter="url(#export-shadow)">{content}</g>
+    </svg>
+  )
+  const exportContent =
+    narrowers.is.rootPanel(component) || narrowers.is.rootPanelFace(component) ? (
+      svg
+    ) : (
+      <SvgFaceContext.Provider value={faceContext}>{svg}</SvgFaceContext.Provider>
+    )
+
   return renderToString(
     <EditorContext.Provider
       value={{
@@ -78,37 +134,7 @@ export const renderSvgComponentToString = ({
       }}
     >
       <GlobalSettingsContext.Provider value={{ ...DefaultGlobalSettingsOperations, settings }}>
-        <DrawAreaContext.Provider value={context}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={`${boundingRect.width.toString()}mm`}
-            height={`${boundingRect.height.toString()}mm`}
-            viewBox={getViewBox(boundingRect, 0)}
-          >
-            <defs>
-              {context.isShowingPocketItems && <PocketItemStitchMask componentId={componentId} />}
-              <filter
-                id="export-shadow"
-                filterUnits="userSpaceOnUse"
-                primitiveUnits="userSpaceOnUse"
-                colorInterpolationFilters="sRGB"
-                x={boundingRect.x.toString()}
-                y={boundingRect.y.toString()}
-                width={boundingRect.width.toString()}
-                height={boundingRect.height.toString()}
-              >
-                <feDropShadow
-                  dx={0}
-                  dy={PNG_SHADOW_OFFSET_Y * millimetersPerPixel}
-                  stdDeviation={PNG_SHADOW_BLUR * millimetersPerPixel}
-                  floodColor={PNG_SHADOW_COLOR}
-                  floodOpacity={PNG_SHADOW_OPACITY}
-                />
-              </filter>
-            </defs>
-            <g filter="url(#export-shadow)">{content}</g>
-          </svg>
-        </DrawAreaContext.Provider>
+        <DrawAreaContext.Provider value={context}>{exportContent}</DrawAreaContext.Provider>
       </GlobalSettingsContext.Provider>
     </EditorContext.Provider>,
   )

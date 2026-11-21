@@ -5,14 +5,14 @@ import { STROKE_THICKNESS } from '../../constants/drawing'
 import { ZERO } from '../../constants/layout'
 import { ExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
-import type { ExportSuccessfulLayoutSchema } from '../../schemas/export'
+import type { ExportLayoutSchema } from '../../schemas/export'
 import type { RectSchema, SizeSchema } from '../../schemas/geometry'
 import { getViewBox } from '../../utils/getViewBox'
 import { SvgExportPage } from './SvgExportPage'
 
 type SvgExportRootProps = {
   context: DrawAreaContextValue
-  layout: ExportSuccessfulLayoutSchema
+  layout: ExportLayoutSchema
   pageSize: SizeSchema
 }
 

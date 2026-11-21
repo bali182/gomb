@@ -19,8 +19,16 @@ describe('createSubProject', () => {
     const snapshot = structuredClone(project)
     const forbid = vi.spyOn(IdGenerator.prototype, 'getAndForbid')
     try {
-      const subProject = createSubProject({ project, modelFactory })
+      const subProject = createSubProject({
+        project,
+        modelFactory,
+        faceNames: EN.project.editors.enums.components.rootPanelFaceName,
+      })
       expect(subProject.bindings).toEqual({})
+      const accessor = accessors.subProject(subProject).component
+      const root = accessor.rootPanel()
+      expect(accessor.rootPanelFace(root.frontFaceId).name).toBe('Front face')
+      expect(accessor.rootPanelFace(root.backFaceId).name).toBe('Back face')
       expect(subProject.id).toMatch(/^sub-project-/)
       expect(subProject.root).toMatch(/^root-panel-/)
       expect(subProject.defaultPocketOpening).toMatch(/^straight-pocket-opening-/)
@@ -47,8 +55,12 @@ describe('createSubProject', () => {
     })
     const createRoot = vi.spyOn(modelFactory, 'createRootPanel')
     try {
-      const subProject = createSubProject({ project, modelFactory })
-      expect(subProject.components[subProject.root].name).toBe('Module 3')
+      const subProject = createSubProject({
+        project,
+        modelFactory,
+        faceNames: EN.project.editors.enums.components.rootPanelFaceName,
+      })
+      expect(accessors.subProject(subProject).component.rootPanel().name).toBe('Module 3')
       expect(createRoot).toHaveBeenCalledWith(expect.objectContaining({ stitchingSettings: project.stitchingSettings }))
     } finally {
       createRoot.mockRestore()
@@ -60,10 +72,12 @@ it('creates independent straight defaults using the factory language', () => {
   const first = createSubProject({
     project: createProject('Project'),
     modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(HU.defaultNames)),
+    faceNames: HU.project.editors.enums.components.rootPanelFaceName,
   })
   const second = createSubProject({
     project: createProject('Project'),
     modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames)),
+    faceNames: EN.project.editors.enums.components.rootPanelFaceName,
   })
   expect(first.defaultPocketOpening).not.toBe(second.defaultPocketOpening)
   expect(accessors.subProject(first).pocketOpening.defaultOpening()).toEqual({
@@ -72,4 +86,16 @@ it('creates independent straight defaults using the factory language', () => {
     type: 'straight',
   })
   expect(first.pocketOpenings[first.defaultPocketOpening]).not.toBe(second.pocketOpenings[second.defaultPocketOpening])
+})
+
+it('uses localized face names without root names or numbering', () => {
+  const subProject = createSubProject({
+    project: createProject('Project'),
+    modelFactory: new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(HU.defaultNames)),
+    faceNames: HU.project.editors.enums.components.rootPanelFaceName,
+  })
+  const accessor = accessors.subProject(subProject).component
+  const root = accessor.rootPanel()
+  expect(accessor.rootPanelFace(root.frontFaceId).name).toBe('Előoldal')
+  expect(accessor.rootPanelFace(root.backFaceId).name).toBe('Hátoldal')
 })

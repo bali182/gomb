@@ -13,8 +13,9 @@ import { createBaseOperationParams } from './testUtils'
 
 const fixture = (bindings: Record<string, BindingSchema> = {}): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['panel'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'panel', topLeftRadius: 10, topRightRadius: 20, bottomLeftRadius: 30, bottomRightRadius: 40 }),
     ],
@@ -148,14 +149,15 @@ describe('setCornerRadiusBinding', () => {
 
   it('rejects automatic radii and corners disabled by the opening orientation', () => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['cluster'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.pocketCluster({ id: 'cluster', orientation: 'up' })],
       stitchLines: [
         d.componentBoundsStitchLine({
           id: 'stitch',
           targetType: 'component',
-          targetId: 'root',
+          targetId: 'root-front',
           autoCornerRadius: true,
         }),
       ],

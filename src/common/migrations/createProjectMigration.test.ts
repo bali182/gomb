@@ -15,6 +15,7 @@ const createMigrator = (): ProjectMigratorSchema => ({
   subProject: (input) => input,
   colorSettings: (input) => input,
   stitchingSettings: (input) => input,
+  rootPanelFace: (input) => input,
   rootPanel: (input) => input,
   panel: (input) => input,
   pocketCluster: (input) => input,

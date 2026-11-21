@@ -12,8 +12,9 @@ import { createBaseOperationParams } from './testUtils'
 
 const fixture = (): SubProjectSchema =>
   d.subProject({
+    frontFace: d.rootPanelFace({ id: 'root-front', children: ['first', 'second', 'auto'] }),
     id: 'sub',
-    root: d.rootPanel({ id: 'root', children: ['first', 'second', 'auto'] }),
+    root: d.rootPanel({ id: 'root' }),
     components: [
       d.panel({ id: 'first', width: 100, height: 50, autoWidth: false, autoHeight: false }),
       d.panel({ id: 'second', width: 200, height: 75, autoWidth: false, autoHeight: false }),

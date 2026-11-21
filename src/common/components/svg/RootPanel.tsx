@@ -1,48 +1,40 @@
-import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
-
+import { useCallback, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
-import { useSubProject } from '../../hooks/useSubProject'
 import type { RootPanelSchema } from '../../schemas/components'
-import type { ComputedRootPanelSchema } from '../../schemas/computed'
+import type { ComputedRootPanelFaceSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import { accessors } from '../../utils/accessors'
-import { HoleHighlights } from './HoleHighlights'
-import { Panel } from './Panel'
-import { PocketCluster } from './PocketCluster'
+import { RootPanelFace } from './RootPanelFace'
 import { SizeLabel } from './SizeLabel'
-import { StitchLines } from './StitchLines'
 
 type RootPanelProps = {
   componentId: string
   nestingLevel: number
+  faceIdAboveRoot: string
 }
-
-export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => {
+export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceIdAboveRoot }) => {
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const rootPanel = useComponent<RootPanelSchema>(componentId)
-  const computedRootPanel = useComputedComponent<ComputedRootPanelSchema>(componentId)
-  const { computedSubProject } = useSubProject()
-  const accessor = accessors.computedSubProject(computedSubProject)
-  const pathData = usePath(computedRootPanel.path)
+  const inactiveFaceId = faceIdAboveRoot === rootPanel.frontFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
+  const computedFace = useComputedComponent<ComputedRootPanelFaceSchema>(faceIdAboveRoot)
+  const pathData = usePath(computedFace.path)
   const isActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
-  const styleParams: DrawAreaComponentStyleParams = {
-    component: rootPanel,
-    nestingLevel,
-  }
+  const styleParams: DrawAreaComponentStyleParams = { component: rootPanel, nestingLevel }
 
-  const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
+  const handlePointerEnter = useCallback((): void => {
     selection.hover(rootPanel)
   }, [rootPanel, selection])
-  const handlePointerLeave = useCallback<PointerEventHandler<SVGPathElement>>(() => {
+
+  const handlePointerLeave = useCallback((): void => {
     selection.clearHover()
   }, [selection])
-  const handleClick = useCallback<MouseEventHandler<SVGPathElement>>(
-    (event) => {
+
+  const handleClick = useCallback(
+    (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
       selection.select(rootPanel)
     },
@@ -51,6 +43,12 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
 
   return (
     <>
+      <RootPanelFace
+        key={inactiveFaceId}
+        componentId={inactiveFaceId}
+        nestingLevel={nestingLevel}
+        direction="reverse"
+      />
       <path
         d={pathData}
         fill={componentStyles.getBackgroundColor(styleParams)}
@@ -62,32 +60,10 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel }) => 
         onPointerLeave={isInteractive ? handlePointerLeave : undefined}
         onClick={isInteractive ? handleClick : undefined}
       />
-
       {settings.view.componentDimensionsVisible && isActive && (
-        <SizeLabel reference="bottom-right" boundingRect={computedRootPanel.boundingRect} />
+        <SizeLabel reference="bottom-right" boundingRect={computedFace.boundingRect} />
       )}
-
-      <StitchLines componentId={rootPanel.id} />
-
-      <HoleHighlights componentId={rootPanel.id} />
-      {accessor.component.children(componentId).map((component) => {
-        switch (component.type) {
-          case 'computed-panel':
-            return (
-              <Panel componentId={component.componentId} key={component.componentId} nestingLevel={nestingLevel + 1} />
-            )
-          case 'computed-pocket-cluster':
-            return (
-              <PocketCluster
-                componentId={component.componentId}
-                key={component.componentId}
-                nestingLevel={nestingLevel + 1}
-              />
-            )
-          case 'computed-root-panel':
-            throw new Error(`Root panel cannot be rendered as a child: ${component.componentId}`)
-        }
-      })}
+      <RootPanelFace key={faceIdAboveRoot} componentId={faceIdAboveRoot} nestingLevel={nestingLevel} />
     </>
   )
 }

@@ -15,6 +15,7 @@ import type {
 import { ExportSettingsSchema } from '../schemas/settings'
 import type { StitchLineCommonConfigSchema } from '../schemas/stitching'
 import { accessors } from '../utils/accessors'
+import { isDefined } from '../utils/isDefined'
 import { produce } from '../utils/produce'
 import { useTranslation } from './useTranslation'
 
@@ -76,7 +77,8 @@ export const useExportDrawArea = (
         if (!settings.showParentNames) {
           return undefined
         }
-        return accessors.subProject(element.subProject).optional.component.parent(element.component.id)?.name
+        const parent = accessors.subProject(element.subProject).optional.component.parent(element.component.id)
+        return isDefined(parent) ? parent.name : undefined
       },
       getNameText: (element) => {
         if (!settings.showNames) {

@@ -7,6 +7,7 @@ import type {
   PocketClusterBindingFieldNameSchema,
   RecessedPocketOpeningBindingFieldNameSchema,
   RootPanelBindingFieldNameSchema,
+  RootPanelFaceBindingFieldNameSchema,
   SlantedPocketOpeningBindingFieldNameSchema,
   TPocketBindingFieldNameSchema,
   TPocketStitchLineBindingFieldNameSchema,
@@ -21,6 +22,7 @@ import type {
   PocketClusterBindingFieldInputSchema,
   RecessedPocketOpeningBindingFieldInputSchema,
   RootPanelBindingFieldInputSchema,
+  RootPanelFaceBindingFieldInputSchema,
   SlantedPocketOpeningBindingFieldInputSchema,
   TPocketBindingFieldInputSchema,
   TPocketStitchLineBindingFieldInputSchema,
@@ -29,6 +31,16 @@ import type { ModelObjectSchema } from '../../schemas/modelObject'
 
 export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInputSchema[] => {
   switch (model.type) {
+    case 'root-panel-face': {
+      const fields: RootPanelFaceBindingFieldNameSchema[] = ['layoutOrientation', 'mainAxisAnchor', 'layoutGap']
+      return fields.map(
+        (field): RootPanelFaceBindingFieldInputSchema => ({
+          type: 'root-panel-face-binding-field',
+          modelId: model.id,
+          field,
+        }),
+      )
+    }
     case 'root-panel': {
       const fields: RootPanelBindingFieldNameSchema[] = [
         'width',
@@ -37,9 +49,6 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
         'topRightRadius',
         'bottomLeftRadius',
         'bottomRightRadius',
-        'layoutOrientation',
-        'mainAxisAnchor',
-        'layoutGap',
       ]
       return fields.map(
         (field): RootPanelBindingFieldInputSchema => ({
@@ -204,7 +213,6 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
         'topRightRadius',
         'bottomLeftRadius',
         'bottomRightRadius',
-        'onTop',
       ]
       return fields.map(
         (field): ComponentBoundsStitchLineBindingFieldInputSchema => ({

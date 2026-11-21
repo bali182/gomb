@@ -15,7 +15,11 @@ import { getBindingFieldLabel, getBindingLabel, getBindingModelPath } from './bi
 
 const modelFactory = new ReadonlyModelObjectFactory(new IdGenerator(), new NameGenerator(EN.defaultNames))
 const models: ModelObjectSchema[] = [
-  modelFactory.createRootPanel({ stitchingSettings: defaultStitchingSettings }),
+  modelFactory.createRootPanel({
+    frontFaceId: 'factory-front',
+    backFaceId: 'factory-back',
+    stitchingSettings: defaultStitchingSettings,
+  }),
   modelFactory.createPanel({}),
   modelFactory.createPocketCluster({ stitchingSettings: defaultStitchingSettings }),
   modelFactory.createFrontPocket({ openingId: 'opening' }),
@@ -55,20 +59,30 @@ describe('binding field metadata', () => {
 
   it('resolves root-to-model paths, including hole-owned stitching and standalone openings', () => {
     const source = d.subProject({
+      frontFace: d.rootPanelFace({ id: 'root-front', children: ['panel'] }),
       id: 'sub',
-      root: d.rootPanel({ id: 'root', children: ['panel'] }),
+      root: d.rootPanel({ id: 'root' }),
       components: [d.panel({ id: 'panel' })],
       holes: [d.hole({ id: 'hole', componentId: 'panel' })],
-      stitchLines: [d.componentBoundsStitchLine({ id: 'stitch', targetId: 'hole', targetType: 'hole', onTop: 'root' })],
+      stitchLines: [
+        d.componentBoundsStitchLine({
+          id: 'stitch',
+          targetId: 'hole',
+          targetType: 'hole',
+          entryComponentId: 'root-front',
+        }),
+      ],
       pocketOpenings: [{ id: 'opening', name: 'Opening', type: 'straight' }],
     })
     const accessor = accessors.subProject(source)
     expect(getBindingModelPath(accessor.component.byId('panel'), source).map((model) => model.id)).toEqual([
       'root',
+      'root-front',
       'panel',
     ])
     expect(getBindingModelPath(accessor.stitchLine.byId('stitch'), source).map((model) => model.id)).toEqual([
       'root',
+      'root-front',
       'panel',
       'hole',
       'stitch',

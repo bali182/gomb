@@ -13,6 +13,7 @@ import type {
   ComponentSchema,
   FrontPocketSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
   TPocketSchema,
 } from '../../schemas/components'
@@ -98,7 +99,7 @@ export const PocketOpeningEditorPreview: FC<PocketOpeningEditorPreviewProps> = (
   const geometry = useMemo<PocketClusterGeometry>(() => {
     const accessor = accessors.subProject(previewSubProject)
     const root = accessor.component.rootPanel()
-    const cluster = accessor.component.pocketCluster(root.children[0])
+    const cluster = accessor.component.pocketCluster(accessor.component.rootPanelFace(root.frontFaceId).children[0])
     const pockets = accessor.component.children(cluster.id).filter(narrowers.is.pocket)
     return calculatePocketClusterGeometry(
       normalizePocketCluster(cluster, previewRect),
@@ -244,14 +245,22 @@ const createPreviewSubProject = (
     pocketStep: PREVIEW_POCKET_STEP,
     children: pockets.map((pocket): string => pocket.id),
   }
+  const frontFace: RootPanelFaceSchema = {
+    ...modelFactory.createRootPanelFace({ name: 'Front face' }),
+    children: [cluster.id],
+  }
+  const backFace = modelFactory.createRootPanelFace({ name: 'Back face' })
   const root: RootPanelSchema = {
-    ...modelFactory.createRootPanel({ stitchingSettings: defaultStitchingSettings }),
+    ...modelFactory.createRootPanel({
+      stitchingSettings: defaultStitchingSettings,
+      frontFaceId: frontFace.id,
+      backFaceId: backFace.id,
+    }),
     name: 'Preview root',
     width: PREVIEW_WIDTH,
     height: PREVIEW_CLUSTER_HEIGHT,
-    children: [cluster.id],
   }
-  const components: ComponentSchema[] = [root, cluster, ...pockets]
+  const components: ComponentSchema[] = [root, frontFace, backFace, cluster, ...pockets]
   return {
     id: new IdGenerator().get('sub-project'),
     root: root.id,

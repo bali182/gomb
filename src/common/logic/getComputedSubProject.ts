@@ -7,6 +7,7 @@ import type {
   FrontPocketSchema,
   PanelSchema,
   PocketClusterSchema,
+  RootPanelFaceSchema,
   RootPanelSchema,
 } from '../schemas/components'
 import type {
@@ -15,6 +16,7 @@ import type {
   ComputedPocketClusterSchema,
   ComputedPocketItemSchema,
   ComputedPocketSchema,
+  ComputedRootPanelFaceSchema,
   ComputedRootPanelSchema,
   ComputedStitchLineSchema,
   HasBoundingRectSchema,
@@ -37,6 +39,7 @@ import { calculatePocketClusterGeometry } from './calculatePocketClusterGeometry
 import { calculateRectPath } from './calculateRectPath'
 import { unionClosedPaths } from './closedPathBooleanUtils'
 import { getCornerRadius } from './cornerRadiusUtils'
+import { reflectRectHorizontally } from './geometryUtils'
 import { getAdjustedCornerRadius } from './getAdjustedCornerRadius'
 import { getCornerRadiusLimits } from './limits/getCornerRadiusLimits'
 import { getPocketClusterCornerRadiusLimits } from './limits/getPocketClusterCornerRadiusLimits'
@@ -73,7 +76,7 @@ export const getComputedSubProject = (
     components: computedComponents,
     holes,
     stitchLines,
-    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines)),
+    viewBox: getSubProjectViewBox(Object.values(computedComponents), Object.values(stitchLines), root.boundingRect),
   }
   return { ...geometry, limits: getSubProjectLimits(subProject, geometry, stitchingSettings) }
 }
@@ -92,6 +95,15 @@ const computeComponent = (
     throw new Error('Unexpected parameters')
   }
   switch (component.type) {
+    case 'root-panel-face':
+      return computeRootPanelFace(
+        component,
+        boundingRect,
+        parentCornerRadius,
+        subProject,
+        resolvedStitchLines,
+        computedComponents,
+      )
     case 'front-pocket':
     case 't-pocket':
       throw new Error('Pockets must be calculated by their cluster')
@@ -133,10 +145,57 @@ const computeRootPanel = (
     getCornerRadiusLimits({ boundingRect, cornerRadius: requestedRadius }),
   )
   const path = calculateRectPath(boundingRect, cornerRadius)
-  const layoutChildren = assertLayoutChildren(accessors.subProject(subProject).component.children(rootPanel.id))
-  const computedLayoutGap = calculateGap(layoutChildren, boundingRect, rootPanel)
+  const accessor = accessors.subProject(subProject)
+  for (const face of accessor.component.children(rootPanel.id)) {
+    computeComponent(
+      face,
+      boundingRect,
+      boundingRect,
+      boundingRect,
+      cornerRadius,
+      subProject,
+      resolvedStitchLines,
+      computedComponents,
+    )
+  }
+  const computed: ComputedRootPanelSchema = {
+    type: 'computed-root-panel',
+    componentId: rootPanel.id,
+    boundingRect,
+    path,
+    frontFaceId: rootPanel.frontFaceId,
+    backFaceId: rootPanel.backFaceId,
+    cornerRadius,
+  }
+
+  computedComponents[rootPanel.id] = computed
+
+  return computed
+}
+
+const computeRootPanelFace = (
+  rootPanelFace: RootPanelFaceSchema,
+  boundingRect: RectSchema,
+  parentCornerRadius: CornerRadiusSchema,
+  subProject: SubProjectSchema,
+  resolvedStitchLines: ResolvedStitchLineSchema[],
+  computedComponents: Record<string, ComputedComponentSchema>,
+): ComputedRootPanelFaceSchema => {
+  const accessor = accessors.subProject(subProject)
+  const rootPanel = accessor.component.rootPanel()
+  const cornerRadius =
+    rootPanelFace.id === rootPanel.frontFaceId
+      ? parentCornerRadius
+      : {
+          topLeft: parentCornerRadius.topRight,
+          topRight: parentCornerRadius.topLeft,
+          bottomLeft: parentCornerRadius.bottomRight,
+          bottomRight: parentCornerRadius.bottomLeft,
+        }
+  const layoutChildren = assertLayoutChildren(accessor.component.children(rootPanelFace.id))
+  const computedLayoutGap = calculateGap(layoutChildren, boundingRect, rootPanelFace)
   const children = computeLayoutChildren(
-    rootPanel,
+    rootPanelFace,
     boundingRect,
     boundingRect,
     cornerRadius,
@@ -146,17 +205,17 @@ const computeRootPanel = (
     resolvedStitchLines,
     computedComponents,
   )
-  const computed: ComputedRootPanelSchema = {
-    type: 'computed-root-panel',
-    componentId: rootPanel.id,
+  const computed: ComputedRootPanelFaceSchema = {
+    type: 'computed-root-panel-face',
+    componentId: rootPanelFace.id,
     boundingRect,
-    path,
-    children,
+    path: calculateRectPath(boundingRect, cornerRadius),
     cornerRadius,
+    children,
     computedLayoutGap,
   }
 
-  computedComponents[rootPanel.id] = computed
+  computedComponents[rootPanelFace.id] = computed
 
   return computed
 }
@@ -262,7 +321,7 @@ const computePocketCluster = (
 }
 
 const computeLayoutChildren = (
-  component: RootPanelSchema | PanelSchema | FrontPocketSchema,
+  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
   layoutBoundingRect: RectSchema,
   parentBoundingRect: RectSchema,
   parentCornerRadius: CornerRadiusSchema,
@@ -307,12 +366,17 @@ const assertLayoutChildren = (children: ComponentSchema[]): (PanelSchema | Pocke
 const getSubProjectViewBox = (
   components: ComputedComponentSchema[],
   stitchLines: ComputedStitchLineSchema[],
+  rootBoundingRect: RectSchema,
 ): RectSchema => {
   const items = components
     .filter((component) => narrowers.is.computedFrontPocket(component) || narrowers.is.computedTPocket(component))
     .flatMap((pocket): ComputedPocketItemSchema[] => (isDefined(pocket.item) ? [pocket.item] : []))
   const withBoundingRects: HasBoundingRectSchema[] = [...components, ...stitchLines, ...items]
-  const boundingRects: RectSchema[] = withBoundingRects.map((e) => e.boundingRect)
+  const axisX = rootBoundingRect.x.plus(rootBoundingRect.width.dividedBy(2))
+  const boundingRects: RectSchema[] = withBoundingRects.flatMap((element) => [
+    element.boundingRect,
+    reflectRectHorizontally(element.boundingRect, axisX),
+  ])
 
   const firstBoundingRect = boundingRects[0]
 

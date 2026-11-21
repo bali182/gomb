@@ -19,6 +19,11 @@ export type HasChildrenSchema = {
   children: string[]
 }
 
+export type HasFacesSchema = {
+  frontFaceId: string
+  backFaceId: string
+}
+
 export type HasLayoutSchema = {
   layoutOrientation: LayoutOrientationSchema
   mainAxisAnchor: AnchorSchema
@@ -39,10 +44,16 @@ export type AutoDimensionModeSchema = 'auto' | 'manual'
 /** A plain panel. Can have children (stuff placed on top of it) */
 export type RootPanelSchema = HasTypeSchema<'root-panel'> &
   BaseComponentSchema &
-  HasLayoutSchema &
-  HasChildrenSchema &
   HasCornerRadiusSchema &
-  HasSizeSchema
+  HasSizeSchema &
+  HasFacesSchema
+
+export type RootPanelFaceSideSchema = 'front' | 'back'
+
+export type RootPanelFaceSchema = HasTypeSchema<'root-panel-face'> &
+  HasIdentitySchema &
+  HasLayoutSchema &
+  HasChildrenSchema
 
 /** A plain panel. Can have children (stuff placed on top of it) */
 export type PanelSchema = HasTypeSchema<'panel'> &
@@ -106,4 +117,10 @@ export type PocketClusterSchema = HasTypeSchema<'pocket-cluster'> &
   HasStretchSchema &
   PocketsSchema
 
-export type ComponentSchema = RootPanelSchema | PanelSchema | PocketClusterSchema | FrontPocketSchema | TPocketSchema
+export type ComponentSchema =
+  | RootPanelSchema
+  | RootPanelFaceSchema
+  | PanelSchema
+  | PocketClusterSchema
+  | FrontPocketSchema
+  | TPocketSchema

@@ -67,6 +67,8 @@ export class OptionalBindingAccessor implements OptionalAccessorSchema<BindingAc
 
   model(field: BindingFieldSchema): ModelObjectSchema | undefined {
     switch (field.type) {
+      case 'root-panel-face-binding-field':
+        return this.component.rootPanelFace(field.modelId)
       case 'root-panel-binding-field':
         return this.component.rootPanel(field.modelId)
       case 'panel-binding-field':

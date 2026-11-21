@@ -7,6 +7,7 @@ import type { StitchLineSchema } from '../schemas/stitching'
 import type { SubProjectSchema } from '../schemas/subProject'
 import { accessors } from './accessors'
 import { isDefined } from './isDefined'
+import { narrowers } from './narrowers'
 
 export type FloatingEditorAnchor = {
   contextElement: Element
@@ -25,11 +26,12 @@ const getStitchLineRouteElements = (stitchLineId: string): SVGGElement[] => {
   return Array.from(document.querySelectorAll<SVGGElement>(`[data-stitch-line-id="${CSS.escape(stitchLineId)}"]`))
 }
 
-const getComponentAnchor = (
-  model: ComponentSchema,
-  _subProject: SubProjectSchema,
-): FloatingEditorAnchor | undefined => {
-  const componentElement = getComponentSvgElement(model.id)
+const getComponentAnchor = (model: ComponentSchema, subProject: SubProjectSchema): FloatingEditorAnchor | undefined => {
+  const accessor = accessors.subProject(subProject)
+  const component = narrowers.is.rootPanelFace(model)
+    ? narrowers.assert.rootPanel(accessor.component.parent(model.id))
+    : model
+  const componentElement = getComponentSvgElement(component.id)
   return isDefined(componentElement) ? getSvgElementAnchor(componentElement) : undefined
 }
 

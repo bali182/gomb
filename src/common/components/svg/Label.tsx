@@ -13,8 +13,12 @@ import { createPortal } from 'react-dom'
 import type { IconType } from 'react-icons'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
+import { useOptionalSvgFace } from '../../contexts/SvgFaceContext'
+import { useSubProject } from '../../hooks/useSubProject'
+import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
 import type { PointSchema, RectSchema, SizeSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
+import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
@@ -74,6 +78,10 @@ export const Label: FC<LabelProps> = ({
   gap = DEFAULT_GAP,
 }) => {
   const { labelStyles } = useDrawAreaContext()
+  const direction = useOptionalSvgFace()?.direction ?? 'forward'
+  const { computedSubProject } = useSubProject()
+  const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+  const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
   const textRef = useRef<SVGTextElement>(null)
   const [textBounds, setTextBounds] = useState<RectSchema | undefined>(undefined)
   const backgroundColor = labelStyles.getLabelBackgroundColor()
@@ -160,37 +168,45 @@ export const Label: FC<LabelProps> = ({
       transform={isDefined(position) ? `translate(${position.x.toNumber()} ${position.y.toNumber()})` : undefined}
     >
       <g transform={rotationTransform}>
-        {isDefined(backgroundBounds) && isDefined(backgroundCornerRadius) && (
-          <rect
-            fill={backgroundColor}
-            height={backgroundBounds.height.toNumber()}
-            rx={backgroundCornerRadius.toNumber()}
-            width={backgroundBounds.width.toNumber()}
-            x={backgroundBounds.x.toNumber()}
-            y={backgroundBounds.y.toNumber()}
-          />
-        )}
-        {isDefined(textBounds) && isDefined(iconPosition) && (
-          <Icon
-            color={color}
-            size={textBounds.height.toNumber()}
-            x={iconPosition.x.toNumber()}
-            y={iconPosition.y.toNumber()}
-          />
-        )}
-        <text
-          ref={textRef}
-          alignmentBaseline="middle"
-          fill={color}
-          fontFamily={fontFamily}
-          fontSize={fontSize}
-          textAnchor="start"
-          x={0}
-          y={0}
-          style={textStyle}
+        <g
+          transform={
+            direction === 'reverse' && isDefined(backgroundBounds)
+              ? getHorizontalReflectionTransform(backgroundBounds.x.plus(backgroundBounds.width.dividedBy(2)))
+              : undefined
+          }
         >
-          {label}
-        </text>
+          {isDefined(backgroundBounds) && isDefined(backgroundCornerRadius) && (
+            <rect
+              fill={backgroundColor}
+              height={backgroundBounds.height.toNumber()}
+              rx={backgroundCornerRadius.toNumber()}
+              width={backgroundBounds.width.toNumber()}
+              x={backgroundBounds.x.toNumber()}
+              y={backgroundBounds.y.toNumber()}
+            />
+          )}
+          {isDefined(textBounds) && isDefined(iconPosition) && (
+            <Icon
+              color={color}
+              size={textBounds.height.toNumber()}
+              x={iconPosition.x.toNumber()}
+              y={iconPosition.y.toNumber()}
+            />
+          )}
+          <text
+            ref={textRef}
+            alignmentBaseline="middle"
+            fill={color}
+            fontFamily={fontFamily}
+            fontSize={fontSize}
+            textAnchor="start"
+            x={0}
+            y={0}
+            style={textStyle}
+          >
+            {label}
+          </text>
+        </g>
       </g>
     </g>
   )
@@ -201,7 +217,10 @@ export const Label: FC<LabelProps> = ({
   if (!isDefined(svgLabelsPortalRef.current)) {
     return null
   }
-  return createPortal(content, svgLabelsPortalRef.current)
+  return createPortal(
+    <g transform={direction === 'reverse' ? getHorizontalReflectionTransform(axisX) : undefined}>{content}</g>,
+    svgLabelsPortalRef.current,
+  )
 }
 
 const getBackgroundBounds = (textBounds: RectSchema, paddingX: number, paddingY: number, gap: number): RectSchema => {

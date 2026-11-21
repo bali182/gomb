@@ -23,6 +23,7 @@ import type {
   LayoutOrientationSchema,
   PocketOrientationSchema,
   PocketsSchema,
+  RootPanelFaceSideSchema,
   TPocketSchema,
 } from '../schemas/components'
 import type { CurrencyIdSchema } from '../schemas/currency'
@@ -55,19 +56,18 @@ import type {
   ExportContentSettingsSchema,
   ExportLayoutSettingsSchema,
   ExportPageSettingsSchema,
-  ExportStitchLineModeSchema,
   LanguageSchema,
   SelectionColorSettingsSchema,
   StitchingColorSettingsSchema,
 } from '../schemas/settings'
 import type {
   HasBasicOffsetsSchema,
-  HasCustomRenderTarget,
+  HasEntryComponentSchema,
+  HasExitComponentSchema,
   HasStitchDirectionSchema,
   HasStitchedCornersSchema,
   HasStitchedSidesSchema,
   StitchLineCommonConfigSchema,
-  TPocketStitchLineOwnSchema,
 } from '../schemas/stitching'
 import type { ThemeSchema } from '../schemas/theme'
 import type {
@@ -136,6 +136,9 @@ export const EN = {
     },
   },
   project: {
+    rootPanelFaces: {
+      flip: 'Turn over',
+    },
     computing: 'Computing…',
     tree: {
       sections: {
@@ -250,6 +253,7 @@ export const EN = {
       },
     },
     editors: {
+      faceLayoutTitle: (name: string): string => `${name} layout`,
       tabs: {
         components: {
           layout: 'Layout',
@@ -603,12 +607,18 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasPocketItemSchema>,
         },
         stitchLines: {
-          renderTarget: {
-            title: '-',
-            onTop: {
-              label: 'Render target',
+          components: {
+            title: 'Stitching layers',
+            entryComponentId: {
+              label: 'First pierced',
+              tooltip: 'The first material layer pierced by the stitching.',
             },
-          } satisfies SectionTranslationSchema<HasCustomRenderTarget>,
+            exitComponentId: {
+              label: 'Last pierced',
+              tooltip:
+                'The last material layer pierced by the stitching. This layer and all layers between it and the first are included.',
+            },
+          } satisfies SectionTranslationSchema<HasEntryComponentSchema & HasExitComponentSchema>,
           settings: {
             title: 'Stitching',
             stitchMargin: {
@@ -648,7 +658,7 @@ export const EN = {
               label: 'Punching direction',
               tooltip: 'Changes which way the stitch line runs along the pocket.',
             },
-          } satisfies SectionTranslationSchema<TPocketStitchLineOwnSchema>,
+          } satisfies SectionTranslationSchema<HasBasicOffsetsSchema & HasStitchDirectionSchema>,
           sidesAndCorners: {
             title: 'Seam line',
             startOffset: {
@@ -787,28 +797,24 @@ export const EN = {
           } satisfies SectionTranslationSchema<ExportLayoutSettingsSchema>,
           content: {
             title: 'Content',
-            stitchLineMode: {
-              label: 'Stitch lines',
-              tooltip: 'Chooses which stitch lines are included in the export.',
-            },
             showNames: {
-              label: 'Show names',
+              label: 'Names',
               tooltip: 'Includes component names in the exported file.',
             },
             showDimensions: {
-              label: 'Show dimensions',
+              label: 'Dimensions',
               tooltip: 'Includes component dimensions in the exported file.',
             },
             showParentNames: {
-              label: 'Show parent names',
+              label: 'Parent names',
               tooltip: 'Includes the immediate parent’s name below each component’s other labels.',
             },
             childMarkers: {
-              label: 'Show markers',
+              label: 'Markers',
               tooltip: 'Adds markers where component edges need to connect. Helpful for marking where to glue.',
             },
             cutHelperDistance: {
-              label: 'Cut helper distance',
+              label: 'Cut helpers',
               tooltip:
                 'Sets how far outside each component the cut helper outline is drawn. Set it to 0 to hide the outline.',
             },
@@ -887,7 +893,6 @@ export const EN = {
             stitchHoleDistance: 'Stitch hole spacing',
             stitchHoleThickness: 'Stitch hole thickness',
             stitchLineThickness: 'Stitch line thickness',
-            onTop: 'Stitch line target',
             startOffset: 'Stitch start offset',
             endOffset: 'Stitch end offset',
             stitchDirection: 'Stitch direction',
@@ -922,6 +927,14 @@ export const EN = {
           } satisfies EnumTranslationSchema<boolean>,
         },
         components: {
+          rootPanelFaceSide: {
+            front: 'front',
+            back: 'back',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
+          rootPanelFaceName: {
+            front: 'Front face',
+            back: 'Back face',
+          } satisfies EnumTranslationSchema<RootPanelFaceSideSchema>,
           pocketOpening: {
             straight: 'Straight',
             recessed: 'Recessed',
@@ -949,15 +962,10 @@ export const EN = {
         },
         export: {
           exportFormats: {
-            svg: 'SVG',
-            pdf: 'PDF',
-            png: 'PNG',
+            svg: 'SVG (Vector drawing)',
+            pdf: 'PDF (Document)',
+            png: 'PNG (Image)',
           } satisfies EnumTranslationSchema<ExportFormatSchema>,
-          exportStitchLineModes: {
-            'own-stitch-lines': 'Own stitch lines',
-            'related-stitch-lines': 'Related stitch lines',
-            'all-stitch-lines': 'All stitch lines',
-          } satisfies EnumTranslationSchema<ExportStitchLineModeSchema>,
           exportOrientation: {
             portrait: 'Portrait',
             landscape: 'Landscape',
@@ -1158,9 +1166,15 @@ export const EN = {
     export: {
       title: 'Export',
       positiveAction: 'Export',
+      preview: 'Preview',
+      preparationFailed: {
+        title: 'Unable to prepare export',
+        description: 'The project could not be calculated. Try preparing the export again.',
+        action: 'Recalculate',
+      },
       errors: {
+        oversizedComponents: 'The following components do not fit on the selected page with the current settings:',
         exportFailed: 'The export failed.',
-        unplaceablePanels: 'One or more panels do not fit on the selected page.',
       },
     },
     license: {
@@ -1215,6 +1229,8 @@ export const EN = {
   defaultNames: {
     'project': 'Project',
     'sub-project': 'Subproject',
+    'root-panel-face': 'Face',
+    'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Module',
     'panel': 'Panel',
     'pocket-cluster': 'Pocket cluster',
