@@ -8,8 +8,10 @@ export const addHole = (
   { subProject, readonlyFactory }: BaseSubProjectOperationParamsSchema,
   params: AddHoleParamsSchema,
 ): SubProjectSchema => {
-  const cluster = accessors.subProject(subProject).optional.component.pocketCluster(params.targetId)
-  if (isDefined(cluster)) {
+  const accessor = accessors.subProject(subProject)
+  const unsupportedOwner =
+    accessor.optional.component.pocketCluster(params.targetId) ?? accessor.optional.component.guide(params.targetId)
+  if (isDefined(unsupportedOwner)) {
     return subProject
   }
   const hole = readonlyFactory.createHole({

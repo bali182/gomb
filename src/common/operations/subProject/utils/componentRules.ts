@@ -16,6 +16,8 @@ export const canAddChild = (
       return false
     case 't-pocket':
       return false
+    case 'guide':
+      return type === 'panel' || type === 'pocket-cluster'
     case 'pocket-cluster': {
       const accessor = accessors.subProject(subProject)
       const hasFrontPocket = parent.children.some((id) => {
@@ -24,7 +26,7 @@ export const canAddChild = (
       return (type === 't-pocket' && hasFrontPocket) || (type === 'front-pocket' && !hasFrontPocket)
     }
     default:
-      return type === 'panel' || type === 'pocket-cluster'
+      return type === 'panel' || type === 'pocket-cluster' || type === 'guide'
   }
 }
 
@@ -48,12 +50,13 @@ export const canCloneComponent = (component: ComponentSchema): boolean =>
   !narrowers.is.rootPanel(component) && !narrowers.is.rootPanelFace(component) && !narrowers.is.frontPocket(component)
 
 export const canAddHole = (component: ComponentSchema): boolean =>
-  !narrowers.is.pocketCluster(component) && !narrowers.is.rootPanel(component)
+  !narrowers.is.guide(component) && !narrowers.is.pocketCluster(component) && !narrowers.is.rootPanel(component)
 
 const componentStitchLineTypes: Record<ComponentSchema['type'], readonly StitchLineSchema['type'][]> = {
   'root-panel': [],
   'root-panel-face': ['component-bounds-stitch-line'],
   panel: ['component-bounds-stitch-line'],
+  guide: ['component-bounds-stitch-line'],
   'front-pocket': ['component-bounds-stitch-line'],
   't-pocket': ['t-pocket-stitch-line'],
   'pocket-cluster': ['component-bounds-stitch-line', 't-pocket-stitch-line'],

@@ -6,6 +6,7 @@ import type {
 import type {
   ComputedComponentSchema,
   ComputedFrontPocketSchema,
+  ComputedGuideSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedPocketSchema,
@@ -29,6 +30,7 @@ export class ComputedComponentAccessor extends BaseStrictAccessor implements Com
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
+    this.guide = this.guide.bind(this)
     this.pocketCluster = this.pocketCluster.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
@@ -64,6 +66,10 @@ export class ComputedComponentAccessor extends BaseStrictAccessor implements Com
 
   panel(id: string): ComputedPanelSchema {
     return this.requireResult(this.optional.panel(id), 'panel')
+  }
+
+  guide(id: string): ComputedGuideSchema {
+    return this.requireResult(this.optional.guide(id), 'guide')
   }
 
   pocketCluster(id: string): ComputedPocketClusterSchema {

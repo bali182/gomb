@@ -6,8 +6,8 @@ import { adjustStitchLines } from './adjustStitchLines'
 import { deleteOrphanedBindingFields } from './deleteOrphanedBindingFields'
 import { deleteOrphanedHoles } from './deleteOrphanedHoles'
 import { deleteOrphanedStitchLines } from './deleteOrphanedStitchLines'
-import { deletePocketClusterHoles } from './deletePocketClusterHoles'
 import { deleteTPocketChildren } from './deleteTPocketChildren'
+import { deleteUnsupportedHoles } from './deleteUnsupportedHoles'
 import { deleteUnsupportedStitchLines } from './deleteUnsupportedStitchLines'
 import { normalizeStitchLineComponents } from './normalizeStitchLineComponents'
 
@@ -19,7 +19,7 @@ type PatcherFunctionSchema = (
 const patchers: PatcherFunctionSchema[] = [
   deleteTPocketChildren,
   addComputedSizes,
-  deletePocketClusterHoles,
+  deleteUnsupportedHoles,
   deleteUnsupportedStitchLines,
   deleteOrphanedHoles,
   addComputedHoleSizes,

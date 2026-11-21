@@ -93,7 +93,15 @@ export type ComputedPocketClusterSchema = HasTypeSchema<'computed-pocket-cluster
   HasComputedCornerRadiusSchema &
   HasChildrenSchema
 
+export type ComputedGuideSchema = BaseComputedSchema &
+  HasTypeSchema<'computed-guide'> &
+  HasLayoutBoundingRectSchema &
+  HasComputedCornerRadiusSchema &
+  HasChildrenSchema &
+  HasComputedLayoutGapSchema
+
 export type ComputedComponentSchema =
+  | ComputedGuideSchema
   | ComputedRootPanelSchema
   | ComputedRootPanelFaceSchema
   | ComputedPanelSchema

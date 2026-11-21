@@ -1,6 +1,7 @@
 import { defaultStitchingSettings } from './defaultStates'
 import type { BindingSchema } from './schemas/bindings'
 import { HasComponentReferenceSchema, HasComponentTargetSchema, HasId, HasTargetSchema } from './schemas/common'
+import type { GuideSchema } from './schemas/components'
 import {
   ComponentSchema,
   FrontPocketSchema,
@@ -186,6 +187,13 @@ export const d = {
     ...rest
   }: Partial<TPocketSchema> & HasId & HasStitchingSettings): TPocketSchema => ({
     ...modelFactory.createTPocket({ openingId }),
+    id,
+    name: id,
+    ...rest,
+  }),
+
+  guide: ({ id, ...rest }: Partial<GuideSchema> & HasId): GuideSchema => ({
+    ...modelFactory.createGuide({}),
     id,
     name: id,
     ...rest,

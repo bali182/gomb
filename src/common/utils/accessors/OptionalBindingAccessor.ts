@@ -71,6 +71,8 @@ export class OptionalBindingAccessor implements OptionalAccessorSchema<BindingAc
         return this.component.rootPanelFace(field.modelId)
       case 'root-panel-binding-field':
         return this.component.rootPanel(field.modelId)
+      case 'guide-binding-field':
+        return this.component.guide(field.modelId)
       case 'panel-binding-field':
         return this.component.panel(field.modelId)
       case 'pocket-cluster-binding-field':

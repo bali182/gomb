@@ -1,11 +1,8 @@
-import BigNumber from 'bignumber.js'
-import { POSITION_EPSILON } from '../constants/layout'
 import { narrowers } from '../utils/narrowers'
 import { applyStretchToBoundingBox } from './applyStretchToBoundingBox'
+import { calculateAnchoredBoundingRect } from './calculateAnchoredBoundingRect'
 
-import type { AnchorSchema } from '../schemas/common'
 import type { ComputedComponentSchema, ComputedHoleSchema } from '../schemas/computed'
-import type { RectSchema } from '../schemas/geometry'
 import type { HoleSchema } from '../schemas/hole'
 import { isDefined } from '../utils/isDefined'
 import { calculateRectPath } from './calculateRectPath'
@@ -21,7 +18,11 @@ export const calculateHoles = (
   const computedHoles: Record<string, ComputedHoleSchema> = {}
   for (const hole of holes) {
     const ownerComponent = computedComponents[hole.componentId]
-    if (!isDefined(ownerComponent) || narrowers.is.computedPocketCluster(ownerComponent)) {
+    if (
+      !isDefined(ownerComponent) ||
+      narrowers.is.computedPocketCluster(ownerComponent) ||
+      narrowers.is.computedGuide(ownerComponent)
+    ) {
       continue
     }
     computedHoles[hole.id] = calculateHole(hole, ownerComponent)
@@ -30,12 +31,7 @@ export const calculateHoles = (
 }
 
 const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema): ComputedHoleSchema => {
-  const layoutBoundingRect = calculateHoleBoundingRect(
-    ownerComponent.boundingRect,
-    BigNumber.maximum(hole.autoWidth ? ownerComponent.boundingRect.width : hole.width, POSITION_EPSILON),
-    BigNumber.maximum(hole.autoHeight ? ownerComponent.boundingRect.height : hole.height, POSITION_EPSILON),
-    hole,
-  )
+  const layoutBoundingRect = calculateAnchoredBoundingRect(hole, ownerComponent.boundingRect)
 
   const boundingRect = applyStretchToBoundingBox(hole, layoutBoundingRect)
 
@@ -58,35 +54,5 @@ const calculateHole = (hole: HoleSchema, ownerComponent: ComputedComponentSchema
     highlightPath: isClosedPathCoveredBy(path, ownerComponent.path)
       ? path
       : intersectClosedPaths(path, ownerComponent.path),
-  }
-}
-const calculateHoleBoundingRect = (
-  ownerBoundingRect: RectSchema,
-  width: BigNumber,
-  height: BigNumber,
-  hole: HoleSchema,
-): RectSchema => {
-  return {
-    x: calculateAnchoredAxisStart(ownerBoundingRect.x, ownerBoundingRect.width, width, hole.xAnchor, hole.xOffset),
-    y: calculateAnchoredAxisStart(ownerBoundingRect.y, ownerBoundingRect.height, height, hole.yAnchor, hole.yOffset),
-    width,
-    height,
-  }
-}
-
-const calculateAnchoredAxisStart = (
-  ownerStart: BigNumber,
-  ownerLength: BigNumber,
-  holeLength: BigNumber,
-  anchor: AnchorSchema,
-  offset: number,
-): BigNumber => {
-  switch (anchor) {
-    case 'start':
-      return ownerStart.plus(offset)
-    case 'middle':
-      return ownerStart.plus(ownerLength.dividedBy(2)).plus(offset).minus(holeLength.dividedBy(2))
-    case 'end':
-      return ownerStart.plus(ownerLength).minus(offset).minus(holeLength)
   }
 }

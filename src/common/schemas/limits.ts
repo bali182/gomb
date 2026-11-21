@@ -2,6 +2,7 @@ import type BigNumber from 'bignumber.js'
 import type { HasCornerRadiusSchema, HasStretchSchema, HasTypeSchema } from './common'
 import type {
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketsSchema,
@@ -94,6 +95,7 @@ export type NumericLimitsSchema<T extends HasTypeSchema<string>> = Pick<T, 'type
 
 export type RootPanelFaceLimitsSchema = NumericLimitsSchema<RootPanelFaceSchema>
 export type RootPanelLimitsSchema = NumericLimitsSchema<RootPanelSchema>
+export type GuideLimitsSchema = NumericLimitsSchema<GuideSchema>
 export type PanelLimitsSchema = NumericLimitsSchema<PanelSchema>
 export type HoleLimitsSchema = NumericLimitsSchema<HoleSchema>
 export type StraightPocketOpeningLimitsSchema = NumericLimitsSchema<StraightPocketOpeningSchema>
@@ -109,6 +111,7 @@ export type PocketClusterLimitsSchema = NumericLimitsSchema<PocketClusterSchema>
 export type FrontPocketLimitsSchema = NumericLimitsSchema<FrontPocketSchema> & { opening: PocketOpeningLimitsSchema }
 export type TPocketLimitsSchema = NumericLimitsSchema<TPocketSchema> & { opening: PocketOpeningLimitsSchema }
 export type ComponentLimitsSchema =
+  | GuideLimitsSchema
   | RootPanelLimitsSchema
   | RootPanelFaceLimitsSchema
   | PanelLimitsSchema

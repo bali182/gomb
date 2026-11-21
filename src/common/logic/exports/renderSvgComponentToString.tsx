@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
+import { Guide } from '../../components/svg/Guide'
 import { RootPanelFace } from '../../components/svg/RootPanelFace'
 import { accessors } from '../../utils/accessors'
 
@@ -73,6 +74,9 @@ export const renderSvgComponentToString = ({
       break
     case 'root-panel':
       content = <RootPanel componentId={componentId} nestingLevel={nestingLevel} faceIdAboveRoot={faceIdAboveRoot} />
+      break
+    case 'guide':
+      content = <Guide componentId={componentId} nestingLevel={nestingLevel} />
       break
     case 'panel':
       content = <Panel componentId={componentId} nestingLevel={nestingLevel} />

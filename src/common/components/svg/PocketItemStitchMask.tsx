@@ -47,6 +47,7 @@ export const PocketItemStitchMask: FC<PocketItemStitchMaskProps> = ({ componentI
     case 'root-panel-face':
       content = <PocketItemStitchMaskFace componentId={componentId} direction="forward" />
       break
+    case 'guide':
     case 'panel':
     case 'pocket-cluster':
     case 'front-pocket':
@@ -156,6 +157,7 @@ const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskComponentProps> = ({
   const children = childIds.map((childId) => <PocketItemStitchMaskComponent key={childId} componentId={childId} />)
 
   switch (computed.type) {
+    case 'computed-guide':
     case 'computed-root-panel-face':
       return <>{children}</>
     case 'computed-panel':

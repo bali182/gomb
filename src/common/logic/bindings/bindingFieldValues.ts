@@ -23,6 +23,8 @@ export const getBindingFieldValue = (
       return narrowers.assert.rootPanelFace(model)[bindingField.field]
     case 'root-panel-binding-field':
       return narrowers.assert.rootPanel(model)[bindingField.field]
+    case 'guide-binding-field':
+      return narrowers.assert.guide(model)[bindingField.field]
     case 'panel-binding-field':
       return narrowers.assert.panel(model)[bindingField.field]
     case 'pocket-cluster-binding-field':
@@ -133,6 +135,9 @@ export const setBindingFieldValue = (
     case 'root-panel-binding-field':
       updated = setField(narrowers.assert.rootPanel(model), bindingField.field, value)
       break
+    case 'guide-binding-field':
+      updated = setField(narrowers.assert.guide(model), bindingField.field, value)
+      break
     case 'panel-binding-field':
       updated = setField(narrowers.assert.panel(model), bindingField.field, value)
       break
@@ -183,6 +188,7 @@ const replaceModel = (subProject: SubProjectSchema, updated: ModelObjectSchema):
   switch (updated.type) {
     case 'root-panel-face':
     case 'root-panel':
+    case 'guide':
     case 'panel':
     case 'pocket-cluster':
     case 'front-pocket':

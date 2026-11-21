@@ -26,7 +26,10 @@ export const getStretchBindingState = (
   const model = accessor.optional.component.byId(modelId) ?? accessor.optional.hole.byId(modelId)
   if (
     !isDefined(model) ||
-    (!narrowers.is.panel(model) && !narrowers.is.pocketCluster(model) && !narrowers.is.hole(model))
+    (!narrowers.is.guide(model) &&
+      !narrowers.is.panel(model) &&
+      !narrowers.is.pocketCluster(model) &&
+      !narrowers.is.hole(model))
   ) {
     return undefined
   }

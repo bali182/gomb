@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { defaultStitchingSettings } from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import { d } from '../testData'
-import { deletePocketClusterHoles } from './deletePocketClusterHoles'
-describe('deletePocketClusterHoles', () => {
+import { deleteUnsupportedHoles } from './deleteUnsupportedHoles'
+describe('deleteUnsupportedHoles', () => {
   it('only removes the unsupported data it owns and is idempotent', () => {
     const source = d.subProject({
       frontFace: d.rootPanelFace({ id: 'root-front', children: ['cluster'] }),
@@ -14,10 +14,10 @@ describe('deletePocketClusterHoles', () => {
     })
     const before = structuredClone(source)
     const computed = getComputedSubProject(source, defaultStitchingSettings)
-    const result = deletePocketClusterHoles(source, computed)
+    const result = deleteUnsupportedHoles(source, computed)
     expect(result.holes.map((hole) => hole.id)).toEqual(['valid'])
     expect(result.components).toBe(source.components)
-    expect(deletePocketClusterHoles(result, computed)).toBe(result)
+    expect(deleteUnsupportedHoles(result, computed)).toBe(result)
     expect(source).toEqual(before)
   })
 })

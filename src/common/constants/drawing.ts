@@ -11,7 +11,7 @@ export const SELECTED_HOLE_FILL_COLOR = '#0f6cbd7b'
 export const SELECTED_HOLE_STROKE_COLOR = '#0f6cbd'
 
 export const STROKE_THICKNESS = 0.3
-export const EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY = '2 1'
+export const LAYOUT_COMPONENT_BORDER_DASHARRAY = '2 1'
 export const VIEWBOX_PADDING = 10
 export const POCKET_ITEM_STITCH_MASK_ID = 'pocket-item-stitch-mask'
 export const POCKET_ITEM_STITCH_MASK_REVERSE_ID = 'pocket-item-stitch-mask-reverse'

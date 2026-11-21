@@ -1,6 +1,7 @@
 import type {
   ComponentBoundsStitchLineBindingFieldNameSchema,
   FrontPocketBindingFieldNameSchema,
+  GuideBindingFieldNameSchema,
   HoleBindingFieldNameSchema,
   OpticalIllusionPocketOpeningBindingFieldNameSchema,
   PanelBindingFieldNameSchema,
@@ -16,6 +17,7 @@ import type {
   BindingFieldInputSchema,
   ComponentBoundsStitchLineBindingFieldInputSchema,
   FrontPocketBindingFieldInputSchema,
+  GuideBindingFieldInputSchema,
   HoleBindingFieldInputSchema,
   OpticalIllusionPocketOpeningBindingFieldInputSchema,
   PanelBindingFieldInputSchema,
@@ -77,6 +79,30 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
       ]
       return fields.map(
         (field): PanelBindingFieldInputSchema => ({ type: 'panel-binding-field', modelId: model.id, field }),
+      )
+    }
+    case 'guide': {
+      const fields: GuideBindingFieldNameSchema[] = [
+        'width',
+        'height',
+        'topLeftRadius',
+        'topRightRadius',
+        'bottomLeftRadius',
+        'bottomRightRadius',
+        'layoutOrientation',
+        'mainAxisAnchor',
+        'layoutGap',
+        'xAnchor',
+        'yAnchor',
+        'xOffset',
+        'yOffset',
+        'topStretch',
+        'rightStretch',
+        'bottomStretch',
+        'leftStretch',
+      ]
+      return fields.map(
+        (field): GuideBindingFieldInputSchema => ({ type: 'guide-binding-field', modelId: model.id, field }),
       )
     }
     case 'pocket-cluster': {

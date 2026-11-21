@@ -37,6 +37,7 @@ export const AddComponentMenuItem: FC<AddComponentMenuItemProps> = ({ type, disa
       'front-pocket': t.project.editors.actions.components.addFrontPocket,
       't-pocket': t.project.editors.actions.components.addTPocket,
       panel: t.project.editors.actions.components.addPanel,
+      guide: t.project.editors.actions.components.addGuide,
       'root-panel-face': t.defaultNames['root-panel-face'],
       'root-panel': t.project.editors.actions.components.addRootPanel,
       'pocket-cluster': t.project.editors.actions.components.addPocketCluster,

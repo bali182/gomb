@@ -107,6 +107,7 @@ const getRelatedComponentIds = (
     case 'front-pocket':
     case 't-pocket':
       return new Set([selection.id])
+    case 'guide':
     case 'pocket-cluster':
       return new Set(accessor.component.descendantIds(selection.id, true))
     case 'hole':

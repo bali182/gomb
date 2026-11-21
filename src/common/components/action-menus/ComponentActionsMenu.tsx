@@ -56,7 +56,7 @@ type ComponentActionsProps = {
   onDelete?: (componentId: string) => void
 }
 
-const childTypes: ComponentSchema['type'][] = ['panel', 'pocket-cluster', 't-pocket', 'front-pocket']
+const childTypes: ComponentSchema['type'][] = ['panel', 'guide', 'pocket-cluster', 't-pocket', 'front-pocket']
 
 export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
   component,
@@ -161,6 +161,7 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
         break
       }
       case 't-pocket':
+      case 'guide':
       case 'panel':
       case 'pocket-cluster': {
         openDialog({ type: 'clone-component', component, subProject })
@@ -253,7 +254,10 @@ export const ComponentActionsMenu: FC<ComponentActionsProps> = ({
               <ActionsMenuSection>
                 {!subProjectOnly && (
                   <ExportComponentPngMenuItem
-                    disabled={narrowers.is.pocketCluster(component) && component.children.length === 0}
+                    disabled={
+                      (narrowers.is.pocketCluster(component) || narrowers.is.guide(component)) &&
+                      component.children.length === 0
+                    }
                     onSelect={handleExportPng}
                   />
                 )}

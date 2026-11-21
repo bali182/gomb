@@ -2,6 +2,7 @@ import type { AnchorSchema, FlipAxisSchema, HasCornerRadiusSchema, HasStretchSch
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketOrientationSchema,
@@ -32,6 +33,8 @@ export const flip = (
       return subProject
     case 'root-panel-face':
       return flipComponentSubtree(subProject, accessor.component.rootPanelFace(model.id), axis)
+    case 'guide':
+      return flipComponentSubtree(subProject, accessor.component.guide(model.id), axis)
     case 'panel':
       return flipComponentSubtree(subProject, accessor.component.panel(model.id), axis)
     case 'pocket-cluster':
@@ -125,6 +128,21 @@ const flipComponent = (
         mainAxisAnchor:
           component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
         offAxisAnchor: flipOffAxisAnchor(component, subProject, axis, flippedComponentIds),
+      }
+      return flipped
+    }
+    case 'guide': {
+      const flipped: GuideSchema = {
+        ...component,
+        ...flipCornerRadii(component, axis),
+        ...flipStretch(component, axis),
+        children: flipChildOrder(component, axis),
+        mainAxisAnchor:
+          component.layoutOrientation === axis ? flipAnchor(component.mainAxisAnchor) : component.mainAxisAnchor,
+        xAnchor: axis === 'horizontal' ? flipAnchor(component.xAnchor) : component.xAnchor,
+        yAnchor: axis === 'vertical' ? flipAnchor(component.yAnchor) : component.yAnchor,
+        xOffset: axis === 'horizontal' && component.xAnchor === 'middle' ? -component.xOffset : component.xOffset,
+        yOffset: axis === 'vertical' && component.yAnchor === 'middle' ? -component.yOffset : component.yOffset,
       }
       return flipped
     }
@@ -274,7 +292,7 @@ const flipStretch = (value: HasStretchSchema, axis: FlipAxisSchema): HasStretchS
 }
 
 const flipChildOrder = (
-  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
   axis: FlipAxisSchema,
 ): string[] => {
   return component.layoutOrientation === axis ? [...component.children].reverse() : component.children
@@ -294,6 +312,7 @@ const flipOffAxisAnchor = (
     case 'root-panel':
       return component.offAxisAnchor
     case 'root-panel-face':
+    case 'guide':
     case 'panel':
     case 'front-pocket':
       return parent.layoutOrientation !== axis ? flipAnchor(component.offAxisAnchor) : component.offAxisAnchor

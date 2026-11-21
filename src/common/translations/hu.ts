@@ -222,6 +222,7 @@ export const HU = {
         },
         components: {
           addPanel: 'Panel hozzáadása',
+          addGuide: 'Pozícionáló hozzáadása',
           addRootPanel: 'Modul hozzáadása',
           addPocketCluster: 'Zsebcsoport hozzáadása',
           addFrontPocket: 'Elülső zseb hozzáadása',
@@ -305,6 +306,26 @@ export const HU = {
           },
         },
         components: {
+          position: {
+            title: 'Pozíció',
+            xAnchor: {
+              label: 'Vízszintes igazítás',
+              tooltip: 'Beállítja, hogy az elem a szülőkomponens bal, középső vagy jobb oldalához igazodjon.',
+            },
+            xOffset: {
+              label: 'X eltolás',
+              tooltip: 'A kiválasztott igazítástól vízszintesen mozdítja el az elemat.',
+            },
+            yAnchor: {
+              label: 'Függőleges igazítás',
+              tooltip: 'Beállítja, hogy az elem a szülőkomponens felső, középső vagy alsó oldalához igazodjon.',
+            },
+            yOffset: {
+              label: 'Y eltolás',
+              tooltip: 'A kiválasztott igazítástól függőlegesen mozdítja el az elemat.',
+            },
+          },
+
           anchor: {
             title: 'Igazítás',
             heightFill: {
@@ -637,27 +658,6 @@ export const HU = {
             bottomLeftCorner: {
               label: 'Bal alsó sarok',
               tooltip: 'Be vagy kikapcsolja a varrást a bal alsó sarokban.',
-            },
-          },
-        },
-        holes: {
-          position: {
-            title: 'Pozíció',
-            xAnchor: {
-              label: 'Vízszintes igazítás',
-              tooltip: 'Beállítja, hogy a lyuk a szülőkomponens bal, középső vagy jobb oldalához igazodjon.',
-            },
-            xOffset: {
-              label: 'X eltolás',
-              tooltip: 'A kiválasztott igazítástól vízszintesen mozdítja el a lyukat.',
-            },
-            yAnchor: {
-              label: 'Függőleges igazítás',
-              tooltip: 'Beállítja, hogy a lyuk a szülőkomponens felső, középső vagy alsó oldalához igazodjon.',
-            },
-            yOffset: {
-              label: 'Y eltolás',
-              tooltip: 'A kiválasztott igazítástól függőlegesen mozdítja el a lyukat.',
             },
           },
         },
@@ -1162,6 +1162,7 @@ export const HU = {
     'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Modul',
     'panel': 'Panel',
+    'guide': 'Pozícionáló',
     'pocket-cluster': 'Zsebcsoport',
     'front-pocket': 'Elülső zseb',
     't-pocket': 'T-zseb',
@@ -1175,6 +1176,7 @@ export const HU = {
     'equal-binding': 'Értékkövetés',
     'root-panel-binding-field': 'Mező',
     'panel-binding-field': 'Mező',
+    'guide-binding-field': 'Mező',
     'pocket-cluster-binding-field': 'Mező',
     'front-pocket-binding-field': 'Mező',
     't-pocket-binding-field': 'Mező',

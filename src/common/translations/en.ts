@@ -7,6 +7,7 @@ import type { ColorKey } from '../data/colors'
 import type { BindingFieldBlockReasonSchema, BindingFieldNameSchema } from '../schemas/bindings'
 import type {
   AnchorSchema,
+  HasAnchorsSchema,
   HasAutoCornerRadiusSchema,
   HasAutoDimensionsSchema,
   HasCornerRadiusSchema,
@@ -28,7 +29,6 @@ import type {
 } from '../schemas/components'
 import type { CurrencyIdSchema } from '../schemas/currency'
 import type { ExportFormatSchema, PageLayoutSchema, PageOrientationSchema } from '../schemas/export'
-import type { HasAnchorsSchema } from '../schemas/hole'
 import type { IdPrefixSchema } from '../schemas/idGenerator'
 import type { LimitReasonSchema } from '../schemas/limits'
 import {
@@ -291,6 +291,7 @@ export const EN = {
         },
         components: {
           addPanel: 'Add panel',
+          addGuide: 'Add guide',
           addRootPanel: 'Add module',
           addPocketCluster: 'Add pocket cluster',
           addFrontPocket: 'Add front pocket',
@@ -374,6 +375,26 @@ export const EN = {
           } satisfies SectionTranslationSchema<HasSizeSchema>,
         },
         components: {
+          position: {
+            title: 'Position',
+            xAnchor: {
+              label: 'Horizontal alignment',
+              tooltip: 'Sets whether the element is aligned to the left, centre, or right side of its parent.',
+            },
+            xOffset: {
+              label: 'X offset',
+              tooltip: 'Moves the element horizontally from its selected alignment.',
+            },
+            yAnchor: {
+              label: 'Vertical alignment',
+              tooltip: 'Sets whether the element is aligned to the top, centre, or bottom side of its parent.',
+            },
+            yOffset: {
+              label: 'Y offset',
+              tooltip: 'Moves the element vertically from its selected alignment.',
+            },
+          } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
+
           anchor: {
             title: 'Alignment',
             heightFill: {
@@ -711,27 +732,6 @@ export const EN = {
           } satisfies SectionTranslationSchema<
             HasStitchedSidesSchema & HasStitchedCornersSchema & HasBasicOffsetsSchema & HasStitchDirectionSchema
           >,
-        },
-        holes: {
-          position: {
-            title: 'Position',
-            xAnchor: {
-              label: 'Horizontal alignment',
-              tooltip: 'Sets whether the hole is aligned to the left, centre, or right side of its parent.',
-            },
-            xOffset: {
-              label: 'X offset',
-              tooltip: 'Moves the hole horizontally from its selected alignment.',
-            },
-            yAnchor: {
-              label: 'Vertical alignment',
-              tooltip: 'Sets whether the hole is aligned to the top, centre, or bottom side of its parent.',
-            },
-            yOffset: {
-              label: 'Y offset',
-              tooltip: 'Moves the hole vertically from its selected alignment.',
-            },
-          } satisfies SectionTranslationSchema<HasAnchorsSchema & HasXYOffsetSchema>,
         },
         project: {
           basic: {
@@ -1233,6 +1233,7 @@ export const EN = {
     'root-panel-face-binding-field': 'Face binding field',
     'root-panel': 'Module',
     'panel': 'Panel',
+    'guide': 'Guide',
     'pocket-cluster': 'Pocket cluster',
     'front-pocket': 'Front pocket',
     't-pocket': 'T-pocket',
@@ -1246,6 +1247,7 @@ export const EN = {
     'equal-binding': 'Equality',
     'root-panel-binding-field': 'Field',
     'panel-binding-field': 'Field',
+    'guide-binding-field': 'Field',
     'pocket-cluster-binding-field': 'Field',
     'front-pocket-binding-field': 'Field',
     't-pocket-binding-field': 'Field',

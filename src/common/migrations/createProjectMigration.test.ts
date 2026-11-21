@@ -18,6 +18,7 @@ const createMigrator = (): ProjectMigratorSchema => ({
   rootPanelFace: (input) => input,
   rootPanel: (input) => input,
   panel: (input) => input,
+  guide: (input) => input,
   pocketCluster: (input) => input,
   frontPocket: (input) => input,
   tPocket: (input) => input,

@@ -4,6 +4,7 @@ import type {
   ComponentBoundsStitchLineBindingFieldSchema,
   EqualBindingSchema,
   FrontPocketBindingFieldSchema,
+  GuideBindingFieldSchema,
   HoleBindingFieldSchema,
   OpticalIllusionPocketOpeningBindingFieldSchema,
   PanelBindingFieldSchema,
@@ -20,6 +21,7 @@ import type { HasComponentReferenceSchema, HasComponentTargetSchema, HasName, Ha
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   HasColorSchema,
   PanelSchema,
   PocketClusterSchema,
@@ -87,6 +89,7 @@ export type ReadonlyCreateRootPanelFaceParamsSchema = HasReadonlyForbiddenIdsSch
 export type ReadonlyCreatePanelParamsSchema = HasReadonlyForbiddenIdsSchema &
   HasReadonlyForbiddenNamesSchema &
   HasColorSchema
+export type ReadonlyCreateGuideParamsSchema = HasReadonlyForbiddenIdsSchema & HasReadonlyForbiddenNamesSchema
 export type ReadonlyCreatePocketClusterParamsSchema = HasReadonlyForbiddenIdsSchema &
   HasReadonlyForbiddenNamesSchema &
   HasColorSchema &
@@ -128,6 +131,8 @@ export type RootPanelFaceBindingFieldInputSchema = {
 
 export type PanelBindingFieldInputSchema = Omit<PanelBindingFieldSchema, 'id'>
 
+export type GuideBindingFieldInputSchema = Omit<GuideBindingFieldSchema, 'id'>
+
 export type PocketClusterBindingFieldInputSchema = Omit<PocketClusterBindingFieldSchema, 'id'>
 
 export type FrontPocketBindingFieldInputSchema = Omit<FrontPocketBindingFieldSchema, 'id'>
@@ -153,6 +158,7 @@ export type BindingFieldInputSchema =
   | RootPanelBindingFieldInputSchema
   | RootPanelFaceBindingFieldInputSchema
   | PanelBindingFieldInputSchema
+  | GuideBindingFieldInputSchema
   | PocketClusterBindingFieldInputSchema
   | FrontPocketBindingFieldInputSchema
   | TPocketBindingFieldInputSchema
@@ -172,6 +178,8 @@ export type ReadonlyCreateRootPanelFaceBindingFieldParamsSchema = HasReadonlyFor
   RootPanelFaceBindingFieldInputSchema
 
 export type ReadonlyCreatePanelBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema & PanelBindingFieldInputSchema
+
+export type ReadonlyCreateGuideBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema & GuideBindingFieldInputSchema
 
 export type ReadonlyCreatePocketClusterBindingFieldParamsSchema = HasReadonlyForbiddenIdsSchema &
   PocketClusterBindingFieldInputSchema
@@ -229,6 +237,8 @@ export type CreateRootPanelFaceParamsSchema = HasForbiddenIdsSchema & HasForbidd
 
 export type CreatePanelParamsSchema = ReadonlyCreatePanelParamsSchema & HasForbiddenIdsSchema & HasForbiddenNamesSchema
 
+export type CreateGuideParamsSchema = ReadonlyCreateGuideParamsSchema & HasForbiddenIdsSchema & HasForbiddenNamesSchema
+
 export type CreatePocketClusterParamsSchema = ReadonlyCreatePocketClusterParamsSchema &
   HasForbiddenIdsSchema &
   HasForbiddenNamesSchema
@@ -265,6 +275,8 @@ export type CreateRootPanelBindingFieldParamsSchema = ReadonlyCreateRootPanelBin
 export type CreateRootPanelFaceBindingFieldParamsSchema = HasForbiddenIdsSchema & RootPanelFaceBindingFieldInputSchema
 
 export type CreatePanelBindingFieldParamsSchema = ReadonlyCreatePanelBindingFieldParamsSchema & HasForbiddenIdsSchema
+
+export type CreateGuideBindingFieldParamsSchema = ReadonlyCreateGuideBindingFieldParamsSchema & HasForbiddenIdsSchema
 
 export type CreatePocketClusterBindingFieldParamsSchema = ReadonlyCreatePocketClusterBindingFieldParamsSchema &
   HasForbiddenIdsSchema
@@ -323,6 +335,7 @@ export type ReadonlyModelObjectFactorySchema = {
   createRootPanel(params: ReadonlyCreateRootPanelParamsSchema): RootPanelSchema
   createRootPanelFace(params: ReadonlyCreateRootPanelFaceParamsSchema): RootPanelFaceSchema
   createPanel(params: ReadonlyCreatePanelParamsSchema): PanelSchema
+  createGuide(params: ReadonlyCreateGuideParamsSchema): GuideSchema
   createPocketCluster(params: ReadonlyCreatePocketClusterParamsSchema): PocketClusterSchema
   createFrontPocket(params: ReadonlyCreateFrontPocketParamsSchema): FrontPocketSchema
   createTPocket(params: ReadonlyCreateTPocketParamsSchema): TPocketSchema
@@ -347,6 +360,7 @@ export type ReadonlyModelObjectFactorySchema = {
     params: ReadonlyCreateRootPanelFaceBindingFieldParamsSchema,
   ): RootPanelFaceBindingFieldSchema
   createPanelBindingField(params: ReadonlyCreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema
+  createGuideBindingField(params: ReadonlyCreateGuideBindingFieldParamsSchema): GuideBindingFieldSchema
   createPocketClusterBindingField(
     params: ReadonlyCreatePocketClusterBindingFieldParamsSchema,
   ): PocketClusterBindingFieldSchema
@@ -377,6 +391,7 @@ export type ModelObjectFactorySchema = {
   createRootPanel(params: CreateRootPanelParamsSchema): RootPanelSchema
   createRootPanelFace(params: CreateRootPanelFaceParamsSchema): RootPanelFaceSchema
   createPanel(params: CreatePanelParamsSchema): PanelSchema
+  createGuide(params: CreateGuideParamsSchema): GuideSchema
   createPocketCluster(params: CreatePocketClusterParamsSchema): PocketClusterSchema
   createFrontPocket(params: CreateFrontPocketParamsSchema): FrontPocketSchema
   createTPocket(params: CreateTPocketParamsSchema): TPocketSchema
@@ -397,6 +412,7 @@ export type ModelObjectFactorySchema = {
   createRootPanelBindingField(params: CreateRootPanelBindingFieldParamsSchema): RootPanelBindingFieldSchema
   createRootPanelFaceBindingField(params: CreateRootPanelFaceBindingFieldParamsSchema): RootPanelFaceBindingFieldSchema
   createPanelBindingField(params: CreatePanelBindingFieldParamsSchema): PanelBindingFieldSchema
+  createGuideBindingField(params: CreateGuideBindingFieldParamsSchema): GuideBindingFieldSchema
   createPocketClusterBindingField(params: CreatePocketClusterBindingFieldParamsSchema): PocketClusterBindingFieldSchema
   createFrontPocketBindingField(params: CreateFrontPocketBindingFieldParamsSchema): FrontPocketBindingFieldSchema
   createTPocketBindingField(params: CreateTPocketBindingFieldParamsSchema): TPocketBindingFieldSchema

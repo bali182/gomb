@@ -1,6 +1,7 @@
 import {
   defaultComponentBoundsStitchLine,
   defaultFrontPocket,
+  defaultGuide,
   defaultHole,
   defaultOpticalIllusionPocketOpening,
   defaultPanel,
@@ -19,6 +20,7 @@ import type {
   ComponentBoundsStitchLineBindingFieldSchema,
   EqualBindingSchema,
   FrontPocketBindingFieldSchema,
+  GuideBindingFieldSchema,
   HoleBindingFieldSchema,
   OpticalIllusionPocketOpeningBindingFieldSchema,
   PanelBindingFieldSchema,
@@ -33,6 +35,7 @@ import type {
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -76,6 +79,8 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
         }
         return this.createRootPanelFace({ ...params, name: params.name })
       }
+      case 'guide':
+        return this.createGuide(params)
       case 'panel':
         return this.createPanel(params)
       case 'pocket-cluster':
@@ -128,6 +133,15 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
       id: this.id.get('panel', params.forbiddenIds),
       name: this.name.get('panel', params.forbiddenNames),
       ...(isDefined(params.color) ? { color: params.color } : {}),
+    }
+  }
+
+  public createGuide(params: Factory.ReadonlyCreateGuideParamsSchema): GuideSchema {
+    return {
+      ...defaultGuide,
+      children: [],
+      id: this.id.get('guide', params.forbiddenIds),
+      name: this.name.get('guide', params.forbiddenNames),
     }
   }
 
@@ -282,6 +296,8 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
         return this.createRootPanelFaceBindingField(params)
       case 'root-panel-binding-field':
         return this.createRootPanelBindingField(params)
+      case 'guide-binding-field':
+        return this.createGuideBindingField(params)
       case 'panel-binding-field':
         return this.createPanelBindingField(params)
       case 'pocket-cluster-binding-field':
@@ -320,6 +336,15 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
     return {
       id: this.id.get('panel-binding-field', params.forbiddenIds),
       type: 'panel-binding-field',
+      modelId: params.modelId,
+      field: params.field,
+    }
+  }
+
+  public createGuideBindingField(params: Factory.ReadonlyCreateGuideBindingFieldParamsSchema): GuideBindingFieldSchema {
+    return {
+      id: this.id.get('guide-binding-field', params.forbiddenIds),
+      type: 'guide-binding-field',
       modelId: params.modelId,
       field: params.field,
     }

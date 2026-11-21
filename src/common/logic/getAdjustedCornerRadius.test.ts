@@ -131,7 +131,7 @@ describe('getAdjustedCornerRadius', () => {
     expectCornerRadius(result, { topLeft: 50, topRight: 50, bottomLeft: 5, bottomRight: 0 })
   })
 
-  it('calculates the geometric cap after applying parent radii', () => {
+  it('drops inherited radii that cannot fit without imposing a smaller minimum', () => {
     const boundingRect = rect(100, 60)
     const params = {
       boundingRect,
@@ -141,7 +141,7 @@ describe('getAdjustedCornerRadius', () => {
     }
     const result = getAdjustedCornerRadius(params.cornerRadius, getCornerRadiusLimits(params))
 
-    expectCornerRadius(result, { topLeft: 50, topRight: 50, bottomLeft: 0, bottomRight: 0 })
+    expectCornerRadius(result, { topLeft: 0, topRight: 50, bottomLeft: 0, bottomRight: 0 })
   })
 
   it('applies parent radii to every touching corner before calculating caps', () => {

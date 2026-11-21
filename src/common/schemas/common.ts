@@ -76,3 +76,8 @@ export type HasStretchSchema = {
 export type HasOffAxisAnchor = {
   offAxisAnchor: AnchorSchema
 }
+
+export type HasAnchorsSchema = {
+  xAnchor: AnchorSchema
+  yAnchor: AnchorSchema
+}

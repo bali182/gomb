@@ -1,7 +1,9 @@
 import type { FC } from 'react'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
+import type { GuideSchema } from '../../schemas/components'
 import { narrowers } from '../../utils/narrowers'
+import { GuideEditor } from './GuideEditor'
 import { RootPanelFaceEditor } from './RootPanelFaceEditor'
 
 import type { ImmediateUpdater } from '../../hooks/useEditableModel'
@@ -78,6 +80,15 @@ export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
         <RootPanelEditor
           editable={props.editable}
           issues={issues as IssuesSchema<RootPanelSchema>}
+          onChange={props.onChange}
+        />
+      )
+    case 'guide':
+      return (
+        <GuideEditor
+          component={narrowers.assert.guide(props.component)}
+          editable={props.editable}
+          issues={issues as IssuesSchema<GuideSchema>}
           onChange={props.onChange}
         />
       )

@@ -2,6 +2,7 @@ import type { ComputedComponentAccessorSchema, OptionalAccessorSchema } from '..
 import type {
   ComputedComponentSchema,
   ComputedFrontPocketSchema,
+  ComputedGuideSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedPocketSchema,
@@ -32,6 +33,7 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
     this.pocket = this.pocket.bind(this)
     this.rootPanel = this.rootPanel.bind(this)
     this.panel = this.panel.bind(this)
+    this.guide = this.guide.bind(this)
     this.pocketCluster = this.pocketCluster.bind(this)
     this.tPocket = this.tPocket.bind(this)
     this.frontPocket = this.frontPocket.bind(this)
@@ -101,6 +103,11 @@ export class OptionalComputedComponentAccessor implements OptionalAccessorSchema
   panel(id: string): ComputedPanelSchema | undefined {
     const value = this.byId(id)
     return isDefined(value) && narrowers.is.computedPanel(value) ? value : undefined
+  }
+
+  guide(id: string): ComputedGuideSchema | undefined {
+    const value = this.byId(id)
+    return isDefined(value) && narrowers.is.computedGuide(value) ? value : undefined
   }
 
   pocketCluster(id: string): ComputedPocketClusterSchema | undefined {

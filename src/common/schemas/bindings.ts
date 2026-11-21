@@ -1,5 +1,6 @@
 import type {
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -39,6 +40,27 @@ export type PanelBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   | 'mainAxisAnchor'
   | 'layoutGap'
   | 'offAxisAnchor'
+  | 'topStretch'
+  | 'rightStretch'
+  | 'bottomStretch'
+  | 'leftStretch'
+>
+
+export type GuideBindingFieldNameSchema = CheckedBindingFieldNameSchema<
+  GuideSchema,
+  | 'width'
+  | 'height'
+  | 'topLeftRadius'
+  | 'topRightRadius'
+  | 'bottomLeftRadius'
+  | 'bottomRightRadius'
+  | 'layoutOrientation'
+  | 'mainAxisAnchor'
+  | 'layoutGap'
+  | 'xAnchor'
+  | 'yAnchor'
+  | 'xOffset'
+  | 'yOffset'
   | 'topStretch'
   | 'rightStretch'
   | 'bottomStretch'
@@ -154,6 +176,7 @@ export type BindingFieldNameSchema =
   | RootPanelBindingFieldNameSchema
   | RootPanelFaceBindingFieldNameSchema
   | PanelBindingFieldNameSchema
+  | GuideBindingFieldNameSchema
   | PocketClusterBindingFieldNameSchema
   | FrontPocketBindingFieldNameSchema
   | TPocketBindingFieldNameSchema
@@ -183,6 +206,13 @@ export type PanelBindingFieldSchema = {
   type: 'panel-binding-field'
   modelId: string
   field: PanelBindingFieldNameSchema
+}
+
+export type GuideBindingFieldSchema = {
+  id: string
+  type: 'guide-binding-field'
+  modelId: string
+  field: GuideBindingFieldNameSchema
 }
 
 export type PocketClusterBindingFieldSchema = {
@@ -252,6 +282,7 @@ export type BindingFieldSchema =
   | RootPanelBindingFieldSchema
   | RootPanelFaceBindingFieldSchema
   | PanelBindingFieldSchema
+  | GuideBindingFieldSchema
   | PocketClusterBindingFieldSchema
   | FrontPocketBindingFieldSchema
   | TPocketBindingFieldSchema
@@ -301,6 +332,7 @@ export type BindingFieldCompatibilityDefinitionsSchema = {
   'root-panel': ModelBindingFieldCompatibilitySchema<RootPanelBindingFieldNameSchema>
   'root-panel-face': ModelBindingFieldCompatibilitySchema<RootPanelFaceBindingFieldNameSchema>
   'panel': ModelBindingFieldCompatibilitySchema<PanelBindingFieldNameSchema>
+  'guide': ModelBindingFieldCompatibilitySchema<GuideBindingFieldNameSchema>
   'pocket-cluster': ModelBindingFieldCompatibilitySchema<PocketClusterBindingFieldNameSchema>
   'front-pocket': ModelBindingFieldCompatibilitySchema<FrontPocketBindingFieldNameSchema>
   't-pocket': ModelBindingFieldCompatibilitySchema<TPocketBindingFieldNameSchema>
@@ -329,6 +361,7 @@ export type BindingFieldBlockerDefinitionsSchema = {
   'root-panel': ModelBindingFieldBlockersSchema<RootPanelBindingFieldNameSchema>
   'root-panel-face': ModelBindingFieldBlockersSchema<RootPanelFaceBindingFieldNameSchema>
   'panel': ModelBindingFieldBlockersSchema<PanelBindingFieldNameSchema>
+  'guide': ModelBindingFieldBlockersSchema<GuideBindingFieldNameSchema>
   'pocket-cluster': ModelBindingFieldBlockersSchema<PocketClusterBindingFieldNameSchema>
   'front-pocket': ModelBindingFieldBlockersSchema<FrontPocketBindingFieldNameSchema>
   't-pocket': ModelBindingFieldBlockersSchema<TPocketBindingFieldNameSchema>

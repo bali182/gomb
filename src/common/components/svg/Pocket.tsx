@@ -12,6 +12,7 @@ import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
+import { Guide } from './Guide'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
@@ -85,6 +86,8 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
         }
         after={orderedChildren.map((child) => {
           switch (child.type) {
+            case 'computed-guide':
+              return <Guide key={child.componentId} componentId={child.componentId} nestingLevel={nestingLevel + 1} />
             case 'computed-panel':
               return <Panel key={child.componentId} componentId={child.componentId} nestingLevel={nestingLevel + 1} />
             case 'computed-pocket-cluster':

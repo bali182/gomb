@@ -448,3 +448,46 @@ describe('hole dimension defaults', () => {
     })
   })
 })
+
+describe('Guide migration', () => {
+  it('fills Guide defaults and preserves configured anchored and layout fields', () => {
+    const original = d.project({
+      id: 'project',
+      subProjects: [
+        d.subProject({
+          id: 'sub',
+          root: d.rootPanel({ id: 'root' }),
+          frontFace: d.rootPanelFace({ id: 'root-front', children: ['guide'] }),
+        }),
+      ],
+    })
+    const subProject = original.subProjects[0]
+    const legacy = {
+      ...original,
+      subProjects: [
+        {
+          ...subProject,
+          components: {
+            ...subProject.components,
+            guide: { id: 'guide', name: 'Guide', type: 'guide' as const, xOffset: -7, rightStretch: 12, layoutGap: 3 },
+          },
+        },
+      ],
+    }
+    const snapshot = structuredClone(legacy)
+    const result = migrateProject(legacy, context)
+    expect(result.subProjects?.[0]?.components?.guide).toMatchObject({
+      autoWidth: true,
+      autoHeight: true,
+      xOffset: -7,
+      yOffset: 0,
+      rightStretch: 12,
+      leftStretch: 0,
+      layoutGap: 3,
+      children: [],
+    })
+    expect(typia.is<ProjectSchema>(result)).toBe(true)
+    expect(migrateProject(result, context)).toEqual(result)
+    expect(legacy).toEqual(snapshot)
+  })
+})

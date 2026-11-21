@@ -3,27 +3,26 @@ import { useCallback, type ReactNode } from 'react'
 import { PiArrowsHorizontal, PiArrowsVertical } from 'react-icons/pi'
 
 import { useTranslation } from '../../../hooks/useTranslation'
-import type { AnchorSchema, HasXYOffsetSchema } from '../../../schemas/common'
+import type { AnchorSchema, HasAnchorsSchema, HasXYOffsetSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
-import type { HasAnchorsSchema } from '../../../schemas/hole'
 import type { IssuesSchema } from '../../../schemas/issues'
 import { AnchorSelect } from '../../common/AnchorSelect'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 
-type HolePositionSectionProps<T> = {
+type AnchoredPositionSectionProps<T> = {
   modelId: string
   editable: EditableSchema<T>
   issues: IssuesSchema<T>
   onChange: (updated: EditableSchema<T>) => void
 }
 
-export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSchema>({
+export function AnchoredPositionSection<T extends HasAnchorsSchema & HasXYOffsetSchema>({
   modelId,
   editable,
   issues,
   onChange,
-}: HolePositionSectionProps<T>): ReactNode {
+}: AnchoredPositionSectionProps<T>): ReactNode {
   const { t } = useTranslation()
   const handleXAnchorChange = useCallback(
     (xAnchor: AnchorSchema): void => {
@@ -52,15 +51,15 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.project.editors.sections.holes.position.title}</SectionGroup.SectionHeader>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xAnchor.tooltip}>
-        {t.project.editors.sections.holes.position.xAnchor.label}
+      <SectionGroup.SectionHeader>{t.project.editors.sections.components.position.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.position.xAnchor.tooltip}>
+        {t.project.editors.sections.components.position.xAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xAnchor}>
         <AnchorSelect onChange={handleXAnchorChange} value={editable.xAnchor} orientation="horizontal" />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.xOffset.tooltip}>
-        {t.project.editors.sections.holes.position.xOffset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.position.xOffset.tooltip}>
+        {t.project.editors.sections.components.position.xOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.xOffset}>
         <EditorNumberInput
@@ -73,14 +72,14 @@ export function HolePositionSection<T extends HasAnchorsSchema & HasXYOffsetSche
           value={editable.xOffset}
         />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yAnchor.tooltip}>
-        {t.project.editors.sections.holes.position.yAnchor.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.position.yAnchor.tooltip}>
+        {t.project.editors.sections.components.position.yAnchor.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yAnchor}>
         <AnchorSelect onChange={handleYAnchorChange} value={editable.yAnchor} orientation="vertical" />
       </SectionGroup.SectionRowEditor>
-      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.holes.position.yOffset.tooltip}>
-        {t.project.editors.sections.holes.position.yOffset.label}
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.components.position.yOffset.tooltip}>
+        {t.project.editors.sections.components.position.yOffset.label}
       </SectionGroup.SectionRowTitle>
       <SectionGroup.SectionRowEditor issue={issues.yOffset}>
         <EditorNumberInput

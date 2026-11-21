@@ -1,14 +1,20 @@
 import BigNumber from 'bignumber.js'
+import type {
+  FrontPocketSchema,
+  GuideSchema,
+  PanelSchema,
+  PocketClusterSchema,
+  RootPanelFaceSchema,
+} from '../schemas/components'
 
 import { POSITION_EPSILON, ZERO } from '../constants/layout'
 import type { AnchorSchema } from '../schemas/common'
-import type { FrontPocketSchema, PanelSchema, PocketClusterSchema, RootPanelFaceSchema } from '../schemas/components'
 import type { RectSchema } from '../schemas/geometry'
 import { clamp } from '../utils/clamp'
 import { applyStretchToBoundingBox } from './applyStretchToBoundingBox'
 
 type CalculateLayoutBoundingBoxesParams = {
-  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema
+  component: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema
   children: (PanelSchema | PocketClusterSchema)[]
   computedGap: BigNumber
   boundingRect: RectSchema
@@ -129,7 +135,7 @@ const getMainAxisStart = (
 const calculateMainAxisSizes = (
   children: (PanelSchema | PocketClusterSchema)[],
   parentBoundingBox: RectSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
   computedGap: BigNumber,
 ): Record<string, BigNumber> => {
   const parentSpace = parent.layoutOrientation === 'horizontal' ? parentBoundingBox.width : parentBoundingBox.height
@@ -167,7 +173,7 @@ const calculateMainAxisSizes = (
 const calculateCrossAxisSize = (
   child: PanelSchema | PocketClusterSchema,
   parentBoundingBox: RectSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
 ): BigNumber => {
   const parentSpace = parent.layoutOrientation === 'horizontal' ? parentBoundingBox.height : parentBoundingBox.width
 
@@ -210,28 +216,28 @@ const calculateVerticalCrossAxisPosition = (
 
 const isMainAxisAuto = (
   child: PanelSchema | PocketClusterSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
 ): boolean => {
   return parent.layoutOrientation === 'horizontal' ? child.autoWidth : child.autoHeight
 }
 
 const getMainAxisSize = (
   child: PanelSchema | PocketClusterSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
 ): number => {
   return parent.layoutOrientation === 'horizontal' ? child.width : child.height
 }
 
 const isCrossAxisAuto = (
   child: PanelSchema | PocketClusterSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
 ): boolean => {
   return parent.layoutOrientation === 'horizontal' ? child.autoHeight : child.autoWidth
 }
 
 const getCrossAxisSize = (
   child: PanelSchema | PocketClusterSchema,
-  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema,
+  parent: RootPanelFaceSchema | PanelSchema | FrontPocketSchema | GuideSchema,
 ): number => {
   return parent.layoutOrientation === 'horizontal' ? child.height : child.width
 }

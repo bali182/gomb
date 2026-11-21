@@ -41,7 +41,11 @@ export const getExportElementsForComponent = (
       return []
     }
     const children = computedAccessor.component.childIds(id).flatMap(visit)
-    if (narrowers.is.pocketCluster(component) || narrowers.is.rootPanelFace(component)) {
+    if (
+      narrowers.is.guide(component) ||
+      narrowers.is.pocketCluster(component) ||
+      narrowers.is.rootPanelFace(component)
+    ) {
       return children
     }
     if (narrowers.is.computedPocketCluster(computed)) {

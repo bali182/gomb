@@ -5,6 +5,7 @@ import type { HasTypeSchema } from '../schemas/common'
 import type {
   ComponentSchema,
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   PocketSchema,
@@ -15,6 +16,7 @@ import type {
 import type {
   ComputedComponentSchema,
   ComputedFrontPocketSchema,
+  ComputedGuideSchema,
   ComputedPanelSchema,
   ComputedPocketClusterSchema,
   ComputedRootPanelFaceSchema,
@@ -49,7 +51,16 @@ export const narrowers = {
     binding: (input: SubProjectItemSchema): input is BindingSchema => hasType(input, 'equal-binding'),
     // Component
     component: (input: SubProjectItemSchema): input is ComponentSchema => {
-      return hasOneOfType(input, 'root-panel', 'root-panel-face', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket')
+      return hasOneOfType(
+        input,
+        'root-panel',
+        'root-panel-face',
+        'guide',
+        'panel',
+        'pocket-cluster',
+        'front-pocket',
+        't-pocket',
+      )
     },
     rootPanelFace: (input: SubProjectItemSchema): input is RootPanelFaceSchema => hasType(input, 'root-panel-face'),
     computedRootPanelFace: (input: ComputedComponentSchema): input is ComputedRootPanelFaceSchema =>
@@ -59,6 +70,9 @@ export const narrowers = {
     },
     panel: (input: SubProjectItemSchema): input is PanelSchema => {
       return hasType(input, 'panel')
+    },
+    guide: (input: SubProjectItemSchema): input is GuideSchema => {
+      return hasType(input, 'guide')
     },
     pocketCluster: (input: SubProjectItemSchema): input is PocketClusterSchema => {
       return hasType(input, 'pocket-cluster')
@@ -93,6 +107,9 @@ export const narrowers = {
     },
     computedPanel: (input: ComputedComponentSchema): input is ComputedPanelSchema => {
       return hasType(input, 'computed-panel')
+    },
+    computedGuide: (input: ComputedComponentSchema): input is ComputedGuideSchema => {
+      return hasType(input, 'computed-guide')
     },
     computedPocketCluster: (input: ComputedComponentSchema): input is ComputedPocketClusterSchema => {
       return hasType(input, 'computed-pocket-cluster')
@@ -168,6 +185,9 @@ export const narrowers = {
     panel: (input: SubProjectItemSchema): PanelSchema => {
       return assertType(input, 'panel')
     },
+    guide: (input: SubProjectItemSchema): GuideSchema => {
+      return assertType(input, 'guide')
+    },
     pocketCluster: (input: SubProjectItemSchema): PocketClusterSchema => {
       return assertType(input, 'pocket-cluster')
     },
@@ -186,6 +206,9 @@ export const narrowers = {
     },
     computedPanel: (input: ComputedComponentSchema): ComputedPanelSchema => {
       return assertType(input, 'computed-panel')
+    },
+    computedGuide: (input: ComputedComponentSchema): ComputedGuideSchema => {
+      return assertType(input, 'computed-guide')
     },
     computedPocketCluster: (input: ComputedComponentSchema): ComputedPocketClusterSchema => {
       return assertType(input, 'computed-pocket-cluster')

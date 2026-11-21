@@ -29,7 +29,12 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   const { t } = useTranslation()
 
   const isOffAxisFill = useMemo<boolean>(() => {
-    if (narrowers.is.rootPanelFace(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)) {
+    if (
+      narrowers.is.rootPanelFace(parent) ||
+      narrowers.is.panel(parent) ||
+      narrowers.is.frontPocket(parent) ||
+      narrowers.is.guide(parent)
+    ) {
       if (parent.layoutOrientation === 'vertical') {
         return editable.autoWidth
       }
@@ -38,7 +43,12 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   }, [parent, editable.autoHeight, editable.autoWidth])
 
   const fillTranslation = useMemo<EditorFieldTranslationSchema>(() => {
-    if (narrowers.is.rootPanelFace(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)) {
+    if (
+      narrowers.is.rootPanelFace(parent) ||
+      narrowers.is.panel(parent) ||
+      narrowers.is.frontPocket(parent) ||
+      narrowers.is.guide(parent)
+    ) {
       if (parent.layoutOrientation === 'vertical') {
         return t.project.editors.sections.components.anchor.widthFill
       }
@@ -54,7 +64,12 @@ export function AnchorSection<T extends HasOffAxisAnchor & HasAutoDimensionsSche
   )
 
   const orientation = useMemo<LayoutOrientationSchema>(() => {
-    if (narrowers.is.rootPanelFace(parent) || narrowers.is.panel(parent) || narrowers.is.frontPocket(parent)) {
+    if (
+      narrowers.is.rootPanelFace(parent) ||
+      narrowers.is.panel(parent) ||
+      narrowers.is.frontPocket(parent) ||
+      narrowers.is.guide(parent)
+    ) {
       return parent.layoutOrientation === 'horizontal' ? 'vertical' : 'horizontal'
     }
     throw new TypeError('Parent must be a layoutable component')

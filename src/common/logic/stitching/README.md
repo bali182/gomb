@@ -5,6 +5,68 @@ hole boundary. T-pocket stitch lines stitch the closed edge of one T-pocket or
 each T-pocket in a cluster. Both retain the common computed `routes` array:
 component bounds produces zero or one route; a cluster can produce several.
 
+## Entry, exit and material layers
+
+The target determines the stitch line's geometry. Its owner is the targeted
+component, or the component containing the targeted hole. Each owner belongs to
+one root face, which determines the stitch line's originating side. A face is a
+layout surface of the shared root material, not an additional material layer.
+
+`HasEntryComponentSchema` provides optional `entryComponentId` and
+`HasExitComponentSchema` provides optional `exitComponentId`. Component bounds
+stitch lines combine both; T-pocket stitch lines expose only exit. References
+remain plain component IDs. An undefined field means use the implicit default;
+defaults are not copied into the saved fields. Resetting a field restores
+`undefined`. Neither field can be linked by bindings.
+
+Entry selects the component above which the stitch line appears. Exit selects
+the last material layer pierced, including that layer itself. Moving entry
+does not move the target geometry or clip it against the selected component in
+the editor. It changes its position in the material stack. Export determines
+which portions actually lie within each pierced piece.
+
+For component bounds stitch lines, entry defaults to the owner. A Guide is a
+geometric target without material; its entry defaults to its first panel, pocket
+or face ancestor. Its box and effective corner radii define an inset component
+boundary, independently of the resolved physical entry and exit. A hole's stitch
+line therefore defaults to the component containing the hole. When the owner is
+a pocket cluster, entry defaults to its front pocket so the stitch line appears
+above all pockets. Exit defaults to the opposite root face for every component
+bounds stitch line, including those owned by a face or cluster. T-pocket
+defaults are described below.
+
+Entry can be changed to a physical component or the face on the originating
+side, even below the owner in the layer order. Exit can also select components
+on the opposite side. The root, pocket clusters and Guides cannot be selected as
+either endpoint. Guides add no physical layer; their physical descendants retain their
+normal traversal order. A face endpoint refers to a surface of the root material:
+entry uses the originating face, while exit may use only the opposite face. A face cannot
+be pierced independently of the shared root material.
+
+`component.layerIds(faceId)` and `component.layers(faceId)` describe the entire
+physical stack from the given face's viewpoint, ordered from farthest to
+nearest. The opposite face's descendants appear in reversed traversal order,
+followed by the root, then the originating face's descendants in normal
+traversal order. Faces and pocket clusters do not add physical layers. Face
+endpoints are mapped to the root's layer for comparisons. Exit cannot be nearer
+than entry. Equal physical-component endpoints are allowed and pierce just that
+piece; equal-face endpoints are not allowed.
+
+The stitch line accessor's `defaultEntryComponentId` and
+`defaultExitComponentId` determine implicit defaults. `entryComponent` and
+`exitComponent` resolve the explicit reference when present, otherwise the
+default. These accessors do not validate layer choices. Optional accessors
+return `undefined` for missing references; strict accessors throw.
+
+`isStitchLineEntryComponentAllowed` and `isStitchLineExitComponentAllowed`
+check the side and layer rules. `normalizeStitchLineEntryAndExit` combines those
+checks with endpoint resolution, returning effective components and flags
+indicating whether the saved choices are valid. Invalid explicit choices fall
+back to defaults. The shared patcher pipeline's `normalizeStitchLineComponents`
+clears invalid saved overrides to `undefined`; calculation also uses the shared
+normalizer without changing the saved model. There is no additional patcher
+stage or separate set of calculation-only validation rules.
+
 ## Stitched sides and corners
 
 `HasStitchedSidesSchema` and `HasStitchedCornersSchema` describe the boundary in
@@ -166,6 +228,74 @@ canonical endpoints. `stitchDirection` determines which endpoint receives
 semantics as component bounds. Positive offsets extend those endpoints and
 negative ones shorten them. A cluster produces
 one independent route for each computed T-pocket, excluding its front pocket.
+
+Each route's entry is its own T-pocket and cannot be overridden. Exit defaults
+to the cluster's first panel, pocket or face ancestor, skipping a Guide parent
+and attaching the pocket to the piece carrying the cluster.
+If that parent is a face, exit defaults to the opposite face instead, piercing
+the root material. An explicit exit may extend piercing farther through the
+stack, but cannot stop before the default exit layer. A cluster-wide T-pocket
+stitch line shares this exit choice across its independent pocket routes.
+
+## Computed routes and display
+
+Geometry is calculated once in the owner's face coordinates, including the
+route, holes and connecting stitches. `StitchRouteGeometry` and
+`StitchLineGeometry` in `helperTypes.ts` are local calculation results.
+`calculateStitchLines` enriches them into the application-facing
+`ComputedStitchRouteSchema` and `ComputedStitchLineSchema`. Each computed route
+records its `stitchLineId`, originating `faceId`, and resolved, required
+`entryComponentId` and `exitComponentId`. A cluster's T-pocket routes can
+therefore have different entries under the same stitch line.
+
+Computed stitch line accessors index routes by entry and exit. The editor draws
+the endpoint appearances at those components, rather than duplicating a route
+on every material layer between them. A component need not own the stitch line
+to display an endpoint appearance. Entry and exit appearances share the same
+computed geometry; showing the other side does not regenerate the hole spacing.
+
+`StitchLines.surface` selects the group drawn before (`back`) or after (`front`)
+the component's material. It is distinct from `SvgFaceContext`, which identifies
+the face and viewing direction of the surrounding component tree. Entry routes
+are drawn in front of their entry component. Exit routes originating on the same
+face are drawn behind the exit material; exit routes originating on the other
+face are drawn in front. The material between these groups hides the back
+appearance except through cutouts or transparency.
+
+When a route's originating face differs from its surrounding face context,
+`StitchLineRoute` reflects the path, hole lines, stitches and label coordinates
+around the root's vertical centerline. The existing face-level viewing direction
+then determines how that whole face is viewed. These are changes of viewpoint,
+separate from the model-editing mirroring operation described below. Selecting
+a stitch line or component does not automatically turn the root.
+
+## Export
+
+`getExportStitchLines` uses the resolved entry and exit layers to find every
+physical piece pierced by each route, including both endpoints. This replaces
+inference from ownership or separate stitch export modes. A route exported on an
+intermediate piece does not require an editor appearance on that piece.
+
+Routes from the other face are reflected into the exported piece's coordinates.
+Their paths are clipped to the piece's closed material path, including cutouts;
+holes are included when their centers lie inside that path. Hole endpoints and
+orientation are reflected together. The resulting export data contains explicit
+geometry, without adding SVG transforms for the opposite-side stitch lines.
+
+The root is currently exported from its front face. Physical pieces belonging
+to either face are exported in their own face coordinates; faces themselves and
+pocket clusters and Guides are not separate exported pieces. Guide editor
+contours contribute neither material nor PNG bounds. A Guide with no children
+can still define stitching exported on its resolved physical layers. Choosing an
+export viewing direction remains deferred.
+
+Root placement guides include children from both faces, with back-face bounds
+reflected into the front view. Clusters contribute their pockets' bounds. Guides
+from both sides use the same style; coincident lines are drawn once and lines
+overlapping the root outline are omitted. Other panels retain placement markers
+for their own children. Guides contribute only their physical descendants' placement
+markers; a Guide box itself produces no marker. These placement markers are
+separate from the entry/exit stitching span.
 
 ## Mirroring
 

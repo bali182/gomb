@@ -11,6 +11,11 @@ const definitions: BindingFieldBlockerDefinitionsSchema = {
     height: (model) => (narrowers.assert.panel(model).autoHeight ? 'auto-height' : undefined),
     layoutGap: (model) => (narrowers.assert.panel(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
   },
+  'guide': {
+    width: (model) => (narrowers.assert.guide(model).autoWidth ? 'auto-width' : undefined),
+    height: (model) => (narrowers.assert.guide(model).autoHeight ? 'auto-height' : undefined),
+    layoutGap: (model) => (narrowers.assert.guide(model).autoLayoutGap ? 'auto-layout-gap' : undefined),
+  },
   'pocket-cluster': {
     width: (model) => (narrowers.assert.pocketCluster(model).autoWidth ? 'auto-width' : undefined),
     height: (model) => (narrowers.assert.pocketCluster(model).autoHeight ? 'auto-height' : undefined),

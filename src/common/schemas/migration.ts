@@ -1,6 +1,7 @@
 import type { TranslationSchema } from '../translations/translationSchema'
 import type {
   FrontPocketSchema,
+  GuideSchema,
   PanelSchema,
   PocketClusterSchema,
   RootPanelFaceSchema,
@@ -68,6 +69,10 @@ export type ProjectMigratorSchema = {
     input: DeepPartialSchema<PanelSchema>,
     context: ProjectMigrationContextSchema,
   ) => DeepPartialSchema<PanelSchema>
+  guide: (
+    input: DeepPartialSchema<GuideSchema>,
+    context: ProjectMigrationContextSchema,
+  ) => DeepPartialSchema<GuideSchema>
   pocketCluster: (
     input: DeepPartialSchema<PocketClusterSchema>,
     context: ProjectMigrationContextSchema,

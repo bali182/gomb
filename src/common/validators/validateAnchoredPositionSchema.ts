@@ -1,25 +1,24 @@
-import type { AnchorSchema, HasXYOffsetSchema } from '../schemas/common'
+import type { AnchorSchema, HasAnchorsSchema, HasXYOffsetSchema } from '../schemas/common'
 import type { EditableSchema } from '../schemas/editable'
-import type { HasAnchorsSchema } from '../schemas/hole'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateNumber } from './validateNumber'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
-const holeAnchorValues: Record<AnchorSchema, boolean> = {
+const anchorValues: Record<AnchorSchema, boolean> = {
   start: true,
   middle: true,
   end: true,
 }
 
-export const validateHolePositionSchema = (
+export const validateAnchoredPositionSchema = (
   input: EditableSchema<HasAnchorsSchema & HasXYOffsetSchema>,
   currentValue: HasAnchorsSchema & HasXYOffsetSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<HasAnchorsSchema & HasXYOffsetSchema> => {
-  const xAnchorResult = validatePrimitiveUnion(input.xAnchor, currentValue.xAnchor, holeAnchorValues, context)
-  const yAnchorResult = validatePrimitiveUnion(input.yAnchor, currentValue.yAnchor, holeAnchorValues, context)
+  const xAnchorResult = validatePrimitiveUnion(input.xAnchor, currentValue.xAnchor, anchorValues, context)
+  const yAnchorResult = validatePrimitiveUnion(input.yAnchor, currentValue.yAnchor, anchorValues, context)
   const xOffsetResult = validateNumber(input.xOffset, currentValue.xOffset, context)
   const yOffsetResult = validateNumber(input.yOffset, currentValue.yOffset, context)
 

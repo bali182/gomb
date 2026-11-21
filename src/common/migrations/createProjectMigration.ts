@@ -101,6 +101,8 @@ const migrateComponent = (
       return migrator.rootPanelFace(component, context)
     case 'root-panel':
       return migrator.rootPanel(component, context)
+    case 'guide':
+      return migrator.guide(component, context)
     case 'panel':
       return migrator.panel(component, context)
     case 'pocket-cluster':

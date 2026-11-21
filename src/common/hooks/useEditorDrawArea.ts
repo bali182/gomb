@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react'
 import {
-  EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY,
+  LAYOUT_COMPONENT_BORDER_DASHARRAY,
   STITCH_LINE_LABEL_BACKGROUND_COLOR,
   STITCH_LINE_LABEL_COLOR,
   STROKE_THICKNESS,
@@ -97,6 +97,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
     const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
       if (
+        narrowers.is.guide(component) ||
         narrowers.is.rootPanelFace(component) ||
         (narrowers.is.pocketCluster(component) && component.children.length === 0)
       ) {
@@ -128,8 +129,11 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return STROKE_THICKNESS
       },
       getBorderDasharray: ({ component }) => {
-        if (narrowers.is.pocketCluster(component) && component.children.length === 0) {
-          return EMPTY_POCKET_CLUSTER_BORDER_DASHARRAY
+        if (
+          narrowers.is.guide(component) ||
+          (narrowers.is.pocketCluster(component) && component.children.length === 0)
+        ) {
+          return LAYOUT_COMPONENT_BORDER_DASHARRAY
         }
         return undefined
       },

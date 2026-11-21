@@ -1,4 +1,5 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { Guide } from './Guide'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
@@ -80,6 +81,14 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
         }
         after={orderedChildren.map((component) => {
           switch (component.type) {
+            case 'computed-guide':
+              return (
+                <Guide
+                  key={component.componentId}
+                  componentId={component.componentId}
+                  nestingLevel={nestingLevel + 1}
+                />
+              )
             case 'computed-panel':
               return (
                 <Panel
