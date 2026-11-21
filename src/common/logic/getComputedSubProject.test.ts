@@ -591,6 +591,42 @@ describe.each(['root-panel', 'panel'] as const)('getComputedSubProject %s cutout
     expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
   })
 
+  it.each([0, 10])('allows an automatic hole with %s stretch to remove the whole component', (stretch) => {
+    const hole = {
+      ...createHole('cover', [0, 0, 20, 20]),
+      autoWidth: true,
+      autoHeight: true,
+      topStretch: stretch,
+      rightStretch: stretch,
+      bottomStretch: stretch,
+      leftStretch: stretch,
+    }
+    const source = createFixture([hole])
+    const computed = getComputedSubProject(source, defaultStitchingSettings)
+    expect(computed.components[ownerId].path.commands).toEqual([])
+    expect(getClosedPathArea(computed.holes.cover.highlightPath)).toBeCloseTo(area, 7)
+    expect(getClosedPathArea(computed.components[otherId].path)).toBeCloseTo(otherArea, 7)
+    for (const format of ['svg', 'pdf', 'png'] as const) {
+      const settings = { ...defaultExportParams, format }
+      const elements = applyExportContentSettings(
+        getExportElementsForComponent(
+          source,
+          computed,
+          ownerType === 'root-panel' ? 'root' : ownerId,
+          defaultStitchingSettings,
+        ),
+        settings,
+      )
+      for (const element of elements) {
+        if (element.type === 'export-panel' && element.id === (ownerType === 'root-panel' ? 'root' : ownerId)) {
+          expect(element.path.commands).toEqual([])
+          expect(element.stitchLines.flatMap((stitchLine) => stitchLine.holes)).toEqual([])
+          expect(element.stitchLines.flatMap((stitchLine) => stitchLine.paths)).toEqual([])
+        }
+      }
+    }
+  })
+
   it.each(['start', 'middle', 'end'] as const)('places and cuts %s-anchored holes in owner coordinates', (xAnchor) => {
     const hole = { ...createHole('anchored', [10, 10, 20, 10]), xAnchor, yAnchor: 'end' as const }
     const computed = getComputedSubProject(createFixture([hole]), defaultStitchingSettings)

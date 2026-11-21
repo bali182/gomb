@@ -113,3 +113,24 @@ describe('getValidBindingPropertySelection', () => {
     expect(getValidBindingPropertySelection(properties, [])).toEqual([])
   })
 })
+
+it.each(['width', 'height'] as const)('blocks automatic hole %s and allows stretch bindings to panels', (field) => {
+  const hole = d.hole({
+    id: 'hole',
+    componentId: 'first',
+    autoWidth: field === 'width',
+    autoHeight: field === 'height',
+  })
+  const properties = getCommonBindingProperties(source, [first, hole])
+  expect(properties.find((property) => property.field === field)?.blockers).toEqual([
+    { model: hole, alreadyBound: false, autoReason: field === 'width' ? 'auto-width' : 'auto-height' },
+  ])
+  expect(properties.find((property) => property.field === (field === 'width' ? 'height' : 'width'))?.blockers).toEqual(
+    [],
+  )
+  expect(properties.find((property) => property.field === 'leftStretch')?.fields.map((field) => field.type)).toEqual([
+    'panel-binding-field',
+    'hole-binding-field',
+  ])
+  expect(properties.find((property) => property.field === 'leftStretch')?.blockers).toEqual([])
+})

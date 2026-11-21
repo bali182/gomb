@@ -217,7 +217,10 @@ export const defaultHole: Omit<HoleSchema, keyof HasId | keyof HasName | keyof H
   ...defaultHasAnchors,
   ...defaultHasXYOffsets,
   ...defaultHasCornerRadius,
+  ...defaultHasStretch,
   type: 'hole',
+  autoWidth: false,
+  autoHeight: false,
   height: 20,
   width: 20,
 }

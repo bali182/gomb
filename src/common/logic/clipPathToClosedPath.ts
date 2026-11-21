@@ -5,6 +5,9 @@ import { createPathsFromConnectedSegments, getPathSegments } from './pathSegment
 import { getPathSegmentMidpoint, splitPathSegment } from './pathSegmentUtils'
 
 export const clipPathToClosedPath = (path: PathSchema, clippingPath: PathSchema): PathSchema[] => {
+  if (clippingPath.commands.length === 0) {
+    return []
+  }
   const clippingSegments = getPathSegments(clippingPath, true)
   const segments = getPathSegments(path)
   const clippedSegments = segments.flatMap((segment) => {

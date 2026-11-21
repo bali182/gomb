@@ -6,6 +6,9 @@ import type { ArcPathSegment, PathSegment } from './pathSegmentTypes'
 import { isPointOnPathSegment } from './pathSegmentUtils'
 
 export const isPointInClosedPath = (point: PointSchema, path: PathSchema): boolean => {
+  if (path.commands.length === 0) {
+    return false
+  }
   const segments = getPathSegments(path, true)
 
   if (segments.some((segment) => isPointOnPathSegment(point, segment))) {

@@ -374,3 +374,77 @@ it('defaults missing bindings and preserves existing bindings through save and r
   expect(loadProjectFromContents(JSON.stringify(oldProject), context).subProjects[0].bindings).toEqual({})
   expect(project).toEqual(snapshot)
 })
+
+describe('hole dimension defaults', () => {
+  it('preserves legacy manual sizes and supplies manual auto flags and zero stretch', () => {
+    const original = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) })],
+    })
+    const subProject = original.subProjects[0]
+    const legacy = {
+      ...original,
+      subProjects: [
+        {
+          ...subProject,
+          holes: [
+            { id: 'hole', name: 'Hole', type: 'hole' as const, componentId: 'root-front', width: 37, height: 42 },
+          ],
+        },
+      ],
+    }
+    const snapshot = structuredClone(legacy)
+    const migrated = migrateProject(legacy, context)
+    expect(migrated.subProjects?.[0]?.holes?.[0]).toMatchObject({
+      width: 37,
+      height: 42,
+      autoWidth: false,
+      autoHeight: false,
+      topStretch: 0,
+      rightStretch: 0,
+      bottomStretch: 0,
+      leftStretch: 0,
+    })
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
+    expect(legacy).toEqual(snapshot)
+    expect(migrateProject(migrated, context)).toEqual(migrated)
+  })
+
+  it('preserves supplied auto flags and signed stretch and supplies default dimensions', () => {
+    const original = d.project({
+      id: 'project',
+      subProjects: [d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }) })],
+    })
+    const subProject = original.subProjects[0]
+    const configured = {
+      ...original,
+      subProjects: [
+        {
+          ...subProject,
+          holes: [
+            {
+              id: 'hole',
+              name: 'Hole',
+              type: 'hole' as const,
+              componentId: 'root-front',
+              autoWidth: true,
+              autoHeight: true,
+              topStretch: -7,
+              rightStretch: 12,
+            },
+          ],
+        },
+      ],
+    }
+    expect(migrateProject(configured, context).subProjects?.[0]?.holes?.[0]).toMatchObject({
+      width: 20,
+      height: 20,
+      autoWidth: true,
+      autoHeight: true,
+      topStretch: -7,
+      rightStretch: 12,
+      bottomStretch: 0,
+      leftStretch: 0,
+    })
+  })
+})

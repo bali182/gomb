@@ -14,14 +14,24 @@ export const validateHoleSchema = (
 ): ValidationResultSchema<HoleSchema> => {
   const nameResult = validateName(input.name, currentValue.name, input.id, context.subProject.holes, context)
   const positionResult = validateHolePositionSchema(input, currentValue, context)
-  const widthResult = validateNumber(input.width, currentValue.width, context, { min: 1 })
-  const heightResult = validateNumber(input.height, currentValue.height, context, { min: 1 })
+  const widthResult = validateNumber(input.width, currentValue.width, context, { min: 0 })
+  const heightResult = validateNumber(input.height, currentValue.height, context, { min: 0 })
   const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context)
   const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context)
   const bottomLeftRadiusResult = validateNumber(input.bottomLeftRadius, currentValue.bottomLeftRadius, context)
   const bottomRightRadiusResult = validateNumber(input.bottomRightRadius, currentValue.bottomRightRadius, context)
+  const topStretchResult = validateNumber(input.topStretch, currentValue.topStretch, context)
+  const rightStretchResult = validateNumber(input.rightStretch, currentValue.rightStretch, context)
+  const bottomStretchResult = validateNumber(input.bottomStretch, currentValue.bottomStretch, context)
+  const leftStretchResult = validateNumber(input.leftStretch, currentValue.leftStretch, context)
   const issues: IssuesSchema<HoleSchema> = {
     type: undefined,
+    autoWidth: undefined,
+    autoHeight: undefined,
+    topStretch: topStretchResult.issues,
+    rightStretch: rightStretchResult.issues,
+    bottomStretch: bottomStretchResult.issues,
+    leftStretch: leftStretchResult.issues,
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
     componentId: undefined,
@@ -37,6 +47,12 @@ export const validateHoleSchema = (
     yOffset: positionResult.issues.yOffset,
   }
   const committedValue: HoleSchema = {
+    autoWidth: input.autoWidth,
+    autoHeight: input.autoHeight,
+    topStretch: topStretchResult.committedValue,
+    rightStretch: rightStretchResult.committedValue,
+    bottomStretch: bottomStretchResult.committedValue,
+    leftStretch: leftStretchResult.committedValue,
     type: input.type,
     bottomLeftRadius: bottomLeftRadiusResult.committedValue,
     bottomRightRadius: bottomRightRadiusResult.committedValue,
@@ -51,6 +67,10 @@ export const validateHoleSchema = (
   }
 
   if (
+    !topStretchResult.isValid ||
+    !rightStretchResult.isValid ||
+    !bottomStretchResult.isValid ||
+    !leftStretchResult.isValid ||
     !nameResult.isValid ||
     !positionResult.isValid ||
     !widthResult.isValid ||
@@ -64,6 +84,12 @@ export const validateHoleSchema = (
   }
 
   return createValidValidationResult(issues, {
+    autoWidth: input.autoWidth,
+    autoHeight: input.autoHeight,
+    topStretch: topStretchResult.value,
+    rightStretch: rightStretchResult.value,
+    bottomStretch: bottomStretchResult.value,
+    leftStretch: leftStretchResult.value,
     type: input.type,
     bottomLeftRadius: bottomLeftRadiusResult.value,
     bottomRightRadius: bottomRightRadiusResult.value,

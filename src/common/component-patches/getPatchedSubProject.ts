@@ -1,5 +1,6 @@
 import type { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
 import { addAutoStitchLineRadii } from './addAutoStitchLineRadii'
+import { addComputedHoleSizes } from './addComputedHoleSizes'
 import { addComputedSizes } from './addComputedSizes'
 import { adjustStitchLines } from './adjustStitchLines'
 import { deleteOrphanedBindingFields } from './deleteOrphanedBindingFields'
@@ -21,6 +22,7 @@ const patchers: PatcherFunctionSchema[] = [
   deletePocketClusterHoles,
   deleteUnsupportedStitchLines,
   deleteOrphanedHoles,
+  addComputedHoleSizes,
   deleteOrphanedStitchLines,
   normalizeStitchLineComponents,
   adjustStitchLines,
