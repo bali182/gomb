@@ -1,8 +1,10 @@
 import { useCallback, type FC } from 'react'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
+import { usePocketOpeningLimitIssues } from '../../hooks/usePocketOpeningLimitIssues'
 
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { isDefined } from '../../utils/isDefined'
@@ -10,21 +12,20 @@ import { EditorNumberInput } from '../common/EditorNumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
 
-type RecessedPocketOpeningEditorProps = {
-  opening: RecessedPocketOpeningSchema
-  referencePocket: PocketSchema | undefined
-  editable: EditableSchema<RecessedPocketOpeningSchema>
-  issues: IssuesSchema<RecessedPocketOpeningSchema>
-  onChange: (updated: EditableSchema<RecessedPocketOpeningSchema>) => void
-}
+export const RecessedPocketOpeningEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<RecessedPocketOpeningSchema>()
 
-export const RecessedPocketOpeningEditor: FC<RecessedPocketOpeningEditorProps> = ({
-  opening,
-  referencePocket,
-  editable,
-  issues,
-  onChange,
-}) => {
+  const opening = models[selectedModelId]
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(selectedModelId)
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+
+  const limitIssues = usePocketOpeningLimitIssues(opening, referencePocket)
+  const issues = useCombinedIssues<RecessedPocketOpeningSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<RecessedPocketOpeningSchema>,
+  )
   const { t } = useTranslation()
 
   const handleOuterInsetChange = useCallback(

@@ -1,14 +1,9 @@
-import { useCallback, type FC, type MouseEvent, type PointerEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent, type PointerEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { GuideSchema } from '../../schemas/components'
-import type { ComputedGuideSchema } from '../../schemas/computed'
-import { accessors } from '../../utils/accessors'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
 import { SizeLabel } from './SizeLabel'
@@ -20,17 +15,20 @@ type GuideProps = { componentId: string; nestingLevel: number }
 export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
   const { isInteractive, selection, componentStyles } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const guide = useComponent<GuideSchema>(componentId)
-  const computed = useComputedComponent<ComputedGuideSchema>(componentId)
-  const { computedSubProject } = useSubProject()
+  const { accessor, computedAccessor } = useSubProject()
+  const computed = computedAccessor.component.guide(componentId)
   const { direction } = useSvgFace()
-  const children = accessors.computedSubProject(computedSubProject).component.children(componentId)
+  const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const pathData = usePath(computed.path)
   const isEmpty = children.length === 0
+
+  const guide = useMemo(() => accessor.component.guide(componentId), [accessor.component, componentId])
+
   const isActive = selection.isSelected(guide) || selection.isHovered(guide)
   const isSelectable = isInteractive && isEmpty
   const style = { component: guide, nestingLevel }
+
   const handleClick = useCallback(
     (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
@@ -38,6 +36,7 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
     },
     [guide, selection],
   )
+
   const handlePointerEnter = useCallback(
     (_event: PointerEvent<SVGPathElement>): void => {
       selection.hover(guide)

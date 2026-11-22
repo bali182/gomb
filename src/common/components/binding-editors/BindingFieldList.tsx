@@ -6,7 +6,6 @@ import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { BindingFieldNameSchema, BindingFieldSchema, BindingSchema } from '../../schemas/bindings'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from '../common/EditorIconButton'
 import { getBindingFieldLabel, getBindingModelPath } from './bindingFieldUtils'
@@ -17,10 +16,9 @@ type BindingFieldListProps = {
 }
 
 export const BindingFieldList: FC<BindingFieldListProps> = ({ binding }) => {
-  const { subProject } = useSubProject()
+  const { accessor } = useSubProject()
 
   const groups = useMemo<Map<BindingFieldNameSchema, BindingFieldSchema[]>>(() => {
-    const accessor = accessors.subProject(subProject)
     const groups = new Map<BindingFieldNameSchema, BindingFieldSchema[]>()
     for (const field of binding.fields) {
       if (!isDefined(accessor.optional.binding.model(field))) {
@@ -34,7 +32,7 @@ export const BindingFieldList: FC<BindingFieldListProps> = ({ binding }) => {
       }
     }
     return groups
-  }, [binding.fields, subProject])
+  }, [binding.fields, accessor])
 
   return (
     <VStack align="stretch" gap="2">
@@ -77,10 +75,9 @@ type BindingFieldBindingProps = {
 }
 
 const BindingFieldBinding: FC<BindingFieldBindingProps> = ({ bindingId, field }) => {
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { isComputing } = useEditorContext()
   const { deleteBindingField } = useSubProjectOperations()
-  const accessor = accessors.subProject(subProject)
   const model = accessor.optional.binding.model(field)
   const handleDelete = useCallback(() => {
     deleteBindingField({ bindingId, id: field.id })

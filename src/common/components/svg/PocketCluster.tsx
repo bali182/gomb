@@ -1,12 +1,9 @@
-import { useCallback, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
-import type { PocketClusterSchema } from '../../schemas/components'
-import type { ComputedPocketClusterSchema } from '../../schemas/computed'
+import { useSubProject } from '../../hooks/useSubProject'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
 import { SizeLabel } from './SizeLabel'
@@ -22,11 +19,14 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
 
-  const cluster = useComponent<PocketClusterSchema>(componentId)
-  const computed = useComputedComponent<ComputedPocketClusterSchema>(componentId)
+  const { accessor, computedAccessor } = useSubProject()
+  const computed = computedAccessor.component.pocketCluster(componentId)
   const { direction } = useSvgFace()
   const pocketIds = direction === 'reverse' ? [...computed.children].reverse() : computed.children
   const pathData = usePath(computed.path)
+
+  const cluster = useMemo(() => accessor.component.pocketCluster(componentId), [accessor.component, componentId])
+
   const active = selection.isSelected(cluster) || selection.isHovered(cluster)
   const isEmpty = computed.children.length === 0
 

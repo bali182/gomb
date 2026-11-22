@@ -6,6 +6,11 @@ import { EditorContext, type EditorContextType } from '../../common/contexts/Edi
 import { useClearSubProjectHistory } from '../../common/hooks/useClearSubProjectHistory'
 import { useEditorComputation } from '../../common/hooks/useEditorComputation'
 import { Loadable } from '../../common/loadable'
+import type {
+  ComputedSubProjectAccessorSchema,
+  ProjectAccessorSchema,
+  SubProjectAccessorSchema,
+} from '../../common/schemas/accessors'
 import type { EditorComputationControlSchema } from '../../common/schemas/editorComputation'
 import type { LoadableSchema } from '../../common/schemas/loadable'
 import type { ProjectSchema } from '../../common/schemas/project'
@@ -49,17 +54,38 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
   }, [storedProject?.id, subProjectId])
   const result = Loadable.get(state.result)
   const project = result?.project ?? storedProject
+
+  const projectAccessor = useMemo<ProjectAccessorSchema | undefined>(
+    () => (isDefined(project) ? accessors.project(project) : undefined),
+    [project],
+  )
+
   const computedSubProject = useMemo<LoadableSchema<ComputedSubProjectSchema>>(
     () => Loadable.map(state.result, (result) => result.computedSubProject),
     [state.result],
   )
+
+  // DO NOT USE THIS WHERE LOADABLE STATUS MATTERS!!!!!! THIS NOT BEING UNDEFINED DOESNT MEAN ITS GOOD TO GO FOR ALL USE CASES!
+  const computedSubProjectValue = Loadable.get(computedSubProject)
+
+  const computedSubProjectAccessor = useMemo<ComputedSubProjectAccessorSchema | undefined>(
+    () => (isDefined(computedSubProjectValue) ? accessors.computedSubProject(computedSubProjectValue) : undefined),
+    [computedSubProjectValue],
+  )
+
   const subProject = useMemo<SubProjectSchema | undefined>(
     () =>
-      isDefined(project) && isDefined(subProjectId)
-        ? accessors.project(project).optional.subProject(subProjectId)
+      isDefined(projectAccessor) && isDefined(subProjectId)
+        ? projectAccessor.optional.subProject(subProjectId)
         : undefined,
-    [project, subProjectId],
+    [projectAccessor, subProjectId],
   )
+
+  const subProjectAccessor = useMemo<SubProjectAccessorSchema | undefined>(
+    () => (isDefined(subProject) ? accessors.subProject(subProject) : undefined),
+    [subProject],
+  )
+
   const hasSelectedSubProject = isDefined(subProject)
 
   useEffect(() => {
@@ -155,6 +181,7 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
     () => ({
       retryComputation,
       computedSubProject,
+      computedSubProjectAccessor,
       editingInputId,
       isComputing,
       setEditingInputId,
@@ -162,13 +189,16 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
       navigateToProjects,
       navigateToSubProject,
       project,
+      projectAccessor,
       setProject,
       setSubProject,
       subProject,
+      subProjectAccessor,
     }),
     [
       retryComputation,
       computedSubProject,
+      computedSubProjectAccessor,
       editingInputId,
       isComputing,
       setEditingInputId,
@@ -176,9 +206,11 @@ export const ElectronEditorContextProvider: FC<PropsWithChildren> = ({ children 
       navigateToProjects,
       navigateToSubProject,
       project,
+      projectAccessor,
       setProject,
       setSubProject,
       subProject,
+      subProjectAccessor,
     ],
   )
 

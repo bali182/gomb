@@ -1,10 +1,11 @@
 import { useMemo, type FC } from 'react'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { HasCornerRadiusSchema } from '../../schemas/common'
-import type { ComponentSchema, PocketClusterSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
+import type { PocketClusterSchema } from '../../schemas/components'
 import type { IssuesSchema } from '../../schemas/issues'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketClusterEmptyState } from './PocketClusterEmptyState'
@@ -14,23 +15,23 @@ import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { PocketsSection } from './sections/PocketsSection'
 import { StretchSection } from './sections/StretchSection'
 
-type PocketClusterEditorProps = {
-  component: PocketClusterSchema
-  editable: EditableSchema<PocketClusterSchema>
-  issues: IssuesSchema<PocketClusterSchema>
-  onChange: (value: EditableSchema<PocketClusterSchema>) => void
-  parent: ComponentSchema
-}
+export const PocketClusterEditor: FC = () => {
+  const { accessor } = useSubProject()
 
-export const PocketClusterEditor: FC<PocketClusterEditorProps> = ({
-  component,
-  editable,
-  issues,
-  onChange,
-  parent,
-}) => {
-  const { subProject } = useSubProject()
-  const accessor = accessors.subProject(subProject)
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<PocketClusterSchema>()
+
+  const component = models[selectedModelId]
+  const parent = accessor.component.parent(component.id)
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = useComponentLimitIssues(component)
+
+  const issues = useCombinedIssues<PocketClusterSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<PocketClusterSchema>,
+  )
+
   const disabledFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(() => {
     switch (component.orientation) {
       case 'up':

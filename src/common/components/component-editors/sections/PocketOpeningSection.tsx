@@ -7,7 +7,6 @@ import { usePocketOpeningEditorReference } from '../../../hooks/usePocketOpening
 import { useSubProject } from '../../../hooks/useSubProject'
 import { useTranslation } from '../../../hooks/useTranslation'
 import { portalRef } from '../../../portalRef'
-import { accessors } from '../../../utils/accessors'
 import { getModelIconByType } from '../../../utils/getModelIcon'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorButton } from '../../common/EditorButton'
@@ -21,11 +20,11 @@ type PocketOpeningSectionProps = {
 }
 
 export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({ pocketId, openingId, onOpeningIdChange }) => {
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { selection } = useDrawAreaContext()
   const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
-  const opening = accessors.subProject(subProject).pocketOpening.byId(openingId)
+  const opening = accessor.pocketOpening.byId(openingId)
   const { setPocketReference } = usePocketOpeningEditorReference(openingId)
 
   const OpeningIcon = getModelIconByType(opening.type)
@@ -38,12 +37,12 @@ export const PocketOpeningSection: FC<PocketOpeningSectionProps> = ({ pocketId, 
 
   const handleOpeningChange = useCallback(
     (details: MenuValueChangeDetails): void => {
-      if (isDefined(accessors.subProject(subProject).optional.pocketOpening.byId(details.value))) {
+      if (isDefined(accessor.optional.pocketOpening.byId(details.value))) {
         setEditingInputId(undefined)
         onOpeningIdChange(details.value)
       }
     },
-    [onOpeningIdChange, setEditingInputId, subProject],
+    [onOpeningIdChange, setEditingInputId, accessor],
   )
   return (
     <SectionGroup.Section>

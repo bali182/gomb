@@ -11,7 +11,6 @@ import type { EditableSchema } from '../../../schemas/editable'
 import type { CornerRadiusSchema } from '../../../schemas/geometry'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchDirectionSchema } from '../../../schemas/stitching'
-import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
@@ -41,25 +40,23 @@ export const StitchSidesAndCornersSection = ({
   onChange,
 }: StitchSidesAndCornersSectionProps): ReactNode => {
   const { t } = useTranslation()
-  const { computedSubProject } = useSubProject()
-  const accessor = accessors.computedSubProject(computedSubProject)
-  const route = accessor.optional.stitchLine.bounds(value.id)?.routes[0]
+  const { computedAccessor } = useSubProject()
+  const route = computedAccessor.optional.stitchLine.bounds(value.id)?.routes[0]
   const hasStitchedSidesOrCorners = STITCH_LINE_SIDE_AND_CORNER_ORDER.some((field) => editable[field])
   const isClosed = useMemo<boolean>(
     () => STITCH_LINE_SIDE_AND_CORNER_ORDER.every((field) => editable[field]),
     [editable],
   )
   const cornerRadius = useMemo<CornerRadiusSchema | undefined>(() => {
-    const accessor = accessors.computedSubProject(computedSubProject)
-    const computedStitchLine = accessor.optional.stitchLine.bounds(value.id)
-    const limits = accessor.optional.limits.stitchLine(value.id)
+    const computedStitchLine = computedAccessor.optional.stitchLine.bounds(value.id)
+    const limits = computedAccessor.optional.limits.stitchLine(value.id)
     return getStitchLineOffsetCornerRadius(
       editable.autoCornerRadius,
       value,
       computedStitchLine?.autoComputedCornerRadius,
       limits?.type === value.type ? limits : undefined,
     )
-  }, [computedSubProject, editable.autoCornerRadius, value])
+  }, [computedAccessor, editable.autoCornerRadius, value])
 
   const startDisabled =
     !hasStitchedSidesOrCorners ||

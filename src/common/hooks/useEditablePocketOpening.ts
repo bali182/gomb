@@ -5,7 +5,6 @@ import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
-import { accessors } from '../utils/accessors'
 import { optionalComparators } from '../utils/comparators'
 import { validatePocketOpeningSchema } from '../validators/validatePocketOpeningSchema'
 import { useEditableModel } from './useEditableModel'
@@ -22,11 +21,11 @@ export type UseEditablePocketOpeningResult = {
 }
 
 export const useEditablePocketOpening = (openingId: string): UseEditablePocketOpeningResult => {
-  const { subProject, computedSubProject } = useSubProject()
+  const { subProject, computedSubProject, accessor } = useSubProject()
   const { project } = useProject()
   const { t } = useTranslation()
   const { updatePocketOpening } = useSubProjectOperations()
-  const opening = accessors.subProject(subProject).pocketOpening.byId(openingId)
+  const opening = accessor.pocketOpening.byId(openingId)
   const context = useMemo<ComponentBasedValidationContextSchema>(
     () => ({ project, subProject, computedSubProject, language: LANGUAGE, t: t.validation }),
     [project, subProject, computedSubProject, t.validation],

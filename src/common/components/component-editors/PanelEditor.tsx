@@ -1,6 +1,9 @@
 import { FC } from 'react'
-import type { ComponentSchema, PanelSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
+import { useSubProject } from '../../hooks/useSubProject'
+import type { PanelSchema } from '../../schemas/components'
 import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchorSection } from './sections/AnchorSection'
@@ -9,15 +12,22 @@ import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { StretchSection } from './sections/StretchSection'
 
-type PanelEditorProps = {
-  component: PanelSchema
-  editable: EditableSchema<PanelSchema>
-  issues: IssuesSchema<PanelSchema>
-  onChange: (updated: EditableSchema<PanelSchema>) => void
-  parent: ComponentSchema
-}
+export const PanelEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<PanelSchema>()
 
-export const PanelEditor: FC<PanelEditorProps> = ({ component, editable, issues, onChange, parent }) => {
+  const component = models[selectedModelId]
+  const { accessor } = useSubProject()
+  const parent = accessor.component.parent(component.id)
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = useComponentLimitIssues(component)
+
+  const issues = useCombinedIssues<PanelSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<PanelSchema>,
+  )
+
   return (
     <SectionGroup.Root>
       <AutoSizeSection

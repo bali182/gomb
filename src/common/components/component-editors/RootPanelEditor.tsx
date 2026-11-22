@@ -1,9 +1,9 @@
 import { FC } from 'react'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
-import { useEditableComponent } from '../../hooks/useEditableComponent'
 import { useRootPanelFace } from '../../hooks/useRootPanelFace'
-import type { RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
+import type { ComponentSchema, RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import { narrowers } from '../../utils/narrowers'
@@ -12,38 +12,48 @@ import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { SizeSection } from './sections/SizeSection'
 
-type RootPanelEditorProps = {
-  editable: EditableSchema<RootPanelSchema>
-  issues: IssuesSchema<RootPanelSchema>
-  onChange: (updated: EditableSchema<RootPanelSchema>) => void
-}
+export const RootPanelEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<ComponentSchema>()
 
-export const RootPanelEditor: FC<RootPanelEditorProps> = ({ editable, issues, onChange }) => {
+  const root = narrowers.assert.rootPanel(models[selectedModelId])
+  const rootEditable = editableModels[root.id] as EditableSchema<RootPanelSchema>
+  const onChange = setModel[root.id]
+  const rootLimitIssues = useComponentLimitIssues(root)
+  const rootIssues = useCombinedIssues<RootPanelSchema>(
+    validationIssues[root.id] as IssuesSchema<RootPanelSchema>,
+    rootLimitIssues as IssuesSchema<RootPanelSchema>,
+  )
+
   const { face } = useRootPanelFace()
-  const faceEditor = useEditableComponent(face.id)
-  const editedFace = narrowers.assert.rootPanelFace(faceEditor.component)
+  const editedFace = narrowers.assert.rootPanelFace(models[face.id])
   const faceLimitIssues = useComponentLimitIssues(editedFace)
   const faceIssues = useCombinedIssues<RootPanelFaceSchema>(
-    faceEditor.validationIssues as IssuesSchema<RootPanelFaceSchema>,
+    validationIssues[face.id] as IssuesSchema<RootPanelFaceSchema>,
     faceLimitIssues as IssuesSchema<RootPanelFaceSchema>,
   )
 
   return (
     <SectionGroup.Root>
-      <SizeSection<RootPanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
+      <SizeSection<RootPanelSchema>
+        modelId={rootEditable.id}
+        editable={rootEditable}
+        issues={rootIssues}
+        onChange={onChange}
+      />
       <CornerRadiusSection<RootPanelSchema>
-        modelId={editable.id}
-        editable={editable}
-        issues={issues}
+        modelId={rootEditable.id}
+        editable={rootEditable}
+        issues={rootIssues}
         onChange={onChange}
       />
       <LayoutSection<RootPanelFaceSchema>
         tag={editedFace.name}
         modelId={face.id}
         component={editedFace}
-        editable={faceEditor.editableComponent as EditableSchema<RootPanelFaceSchema>}
+        editable={editableModels[face.id] as EditableSchema<RootPanelFaceSchema>}
         issues={faceIssues}
-        onChange={faceEditor.setComponent}
+        onChange={setModel[face.id]}
       />
     </SectionGroup.Root>
   )

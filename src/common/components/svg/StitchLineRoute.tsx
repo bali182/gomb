@@ -9,7 +9,6 @@ import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
-import { accessors } from '../../utils/accessors'
 import { StitchLineRouteHoles } from './StitchLineRouteHoles'
 import { StitchRouteLabel } from './StitchRouteLabel'
 import { Stitches } from './Stitches'
@@ -23,14 +22,14 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
   const { isInteractive, isShowingPocketItems, selection, stitchLineStyles } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const { direction, faceId } = useSvgFace()
-  const { computedSubProject } = useSubProject()
+  const { computedAccessor } = useSubProject()
   const reflectionAxisX = useMemo<BigNumber | undefined>(() => {
     if (route.faceId === faceId) {
       return undefined
     }
-    const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+    const root = computedAccessor.component.rootPanel()
     return root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
-  }, [route.faceId, faceId, computedSubProject])
+  }, [route.faceId, faceId, computedAccessor])
   const maskId = direction === 'reverse' ? POCKET_ITEM_STITCH_MASK_REVERSE_ID : POCKET_ITEM_STITCH_MASK_ID
   const pathData = usePath(route.path, reflectionAxisX)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)

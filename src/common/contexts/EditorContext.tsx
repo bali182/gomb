@@ -1,5 +1,10 @@
 import { createContext, SetStateAction, useContext } from 'react'
 import { Loadable } from '../loadable'
+import type {
+  ComputedSubProjectAccessorSchema,
+  ProjectAccessorSchema,
+  SubProjectAccessorSchema,
+} from '../schemas/accessors'
 import type { LoadableSchema } from '../schemas/loadable'
 import { ProjectSchema } from '../schemas/project'
 import { ComputedSubProjectSchema, SubProjectSchema } from '../schemas/subProject'
@@ -26,8 +31,11 @@ export type EditorContextValues = {
   editingInputId: string | undefined
   isComputing: boolean
   project?: ProjectSchema
+  projectAccessor?: ProjectAccessorSchema
   subProject?: SubProjectSchema
+  subProjectAccessor?: SubProjectAccessorSchema
   computedSubProject: LoadableSchema<ComputedSubProjectSchema>
+  computedSubProjectAccessor?: ComputedSubProjectAccessorSchema
 }
 
 export type EditorContextType = EditorContextOperations & EditorContextValues
@@ -46,8 +54,11 @@ export const EditorContextDefaultValues: EditorContextValues = {
   editingInputId: undefined,
   isComputing: false,
   project: undefined,
+  projectAccessor: undefined,
   subProject: undefined,
+  subProjectAccessor: undefined,
   computedSubProject: Loadable.uninitialized(),
+  computedSubProjectAccessor: undefined,
 }
 
 export const EditorContext = createContext<EditorContextType>({

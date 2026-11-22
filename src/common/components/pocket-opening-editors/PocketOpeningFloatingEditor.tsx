@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import { useEditablePocketOpening } from '../../hooks/useEditablePocketOpening'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
@@ -13,14 +13,20 @@ import { PocketOpeningIcon } from './PocketOpeningIcon'
 import { PocketOpeningTargetCombobox } from './PocketOpeningTargetCombobox'
 
 type PocketOpeningFloatingEditorProps = {
-  opening: PocketOpeningSchema
   onClose: () => void
 }
 
-export const PocketOpeningFloatingEditor: FC<PocketOpeningFloatingEditorProps> = ({ opening, onClose }) => {
+export const PocketOpeningFloatingEditor: FC<PocketOpeningFloatingEditorProps> = ({ onClose }) => {
   const { subProject } = useSubProject()
-  const { opening: editedOpening, editableOpening, validationIssues, setOpening } = useEditablePocketOpening(opening.id)
-  const { pocket: referencePocket, pockets, setPocketReference } = usePocketOpeningEditorReference(opening.id)
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<PocketOpeningSchema>()
+
+  const editedOpening = models[selectedModelId]
+  const editableOpening = editableModels[selectedModelId]
+  const issues = validationIssues[selectedModelId]
+  const setOpening = setModel[selectedModelId]
+
+  const { pocket: referencePocket, pockets, setPocketReference } = usePocketOpeningEditorReference(selectedModelId)
 
   const pocketAnchor = isDefined(referencePocket)
     ? floatingEditorAnchors.component(referencePocket, subProject)
@@ -46,20 +52,14 @@ export const PocketOpeningFloatingEditor: FC<PocketOpeningFloatingEditorProps> =
             isDefault={subProject.defaultPocketOpening === editedOpening.id}
           />
         }
-        issues={validationIssues}
+        issues={issues}
         menu={<PocketOpeningActionsMenu opening={editedOpening} size="xs" onDelete={onClose} />}
         onChange={setOpening}
         rightAddon={
           <PocketOpeningTargetCombobox pockets={pockets} pocket={referencePocket} onChange={setPocketReference} />
         }
       />
-      <PocketOpeningEditor
-        opening={editedOpening}
-        referencePocket={referencePocket}
-        editable={editableOpening}
-        issues={validationIssues}
-        onChange={setOpening}
-      />
+      <PocketOpeningEditor />
     </FloatingEditor>
   )
 }

@@ -1,11 +1,8 @@
-import { useCallback, type FC, type MouseEvent } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
-import type { RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
-import type { ComputedRootPanelFaceSchema } from '../../schemas/computed'
+import { useSubProject } from '../../hooks/useSubProject'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { RootPanelFace } from './RootPanelFace'
 import { SizeLabel } from './SizeLabel'
@@ -18,10 +15,13 @@ type RootPanelProps = {
 export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceIdAboveRoot }) => {
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const rootPanel = useComponent<RootPanelSchema>(componentId)
-  const visibleFace = useComponent<RootPanelFaceSchema>(faceIdAboveRoot)
+  const { accessor, computedAccessor } = useSubProject()
+  const visibleFace = accessor.component.rootPanelFace(faceIdAboveRoot)
+
+  const rootPanel = useMemo(() => accessor.component.rootPanel(componentId), [accessor.component, componentId])
+
   const inactiveFaceId = faceIdAboveRoot === rootPanel.frontFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
-  const computedFace = useComputedComponent<ComputedRootPanelFaceSchema>(faceIdAboveRoot)
+  const computedFace = computedAccessor.component.rootPanelFace(faceIdAboveRoot)
   const pathData = usePath(computedFace.path)
   const isRootActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
   const isActive = isRootActive || selection.isSelected(visibleFace) || selection.isHovered(visibleFace)

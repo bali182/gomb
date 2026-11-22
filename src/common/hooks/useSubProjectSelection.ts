@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import type { SubProjectSelectionContextValue } from '../contexts/SubProjectSelectionContext'
+import type { SubProjectAccessorSchema } from '../schemas/accessors'
 import type { HasTypeSchema } from '../schemas/common'
-import type { SubProjectItemSchema, SubProjectSchema } from '../schemas/subProject'
-import { accessors } from '../utils/accessors'
+import type { SubProjectItemSchema } from '../schemas/subProject'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
+import { useSubProject } from './useSubProject'
 
 type ComponentSelectionSchema = HasTypeSchema<'component'> & { componentId: string }
 type StitchLineSelectionSchema = HasTypeSchema<'stitch-line'> & { stitchLineId: string }
@@ -20,17 +21,18 @@ type SelectionSchema =
   | HoleSelectionSchema
   | PocketOpeningSelectionSchema
 
-export const useSubProjectSelection = (subProject: SubProjectSchema): SubProjectSelectionContextValue => {
+export const useSubProjectSelection = (): SubProjectSelectionContextValue => {
+  const { accessor } = useSubProject()
   const [selectionInternal, setSelectionInternal] = useState<SelectionSchema | undefined>()
   const [hoveredInternal, setHoveredInternal] = useState<SelectionSchema | undefined>()
 
   const selected = useMemo<SubProjectItemSchema | undefined>(() => {
-    return getModelObject(selectionInternal, subProject)
-  }, [selectionInternal, subProject])
+    return getModelObject(selectionInternal, accessor)
+  }, [selectionInternal, accessor])
 
   const hovered = useMemo<SubProjectItemSchema | undefined>(() => {
-    return getModelObject(hoveredInternal, subProject)
-  }, [hoveredInternal, subProject])
+    return getModelObject(hoveredInternal, accessor)
+  }, [hoveredInternal, accessor])
 
   const select = useCallback((model: SubProjectItemSchema): void => {
     setSelectionInternal(getSelectionSchema(model))
@@ -98,13 +100,13 @@ const getSelectionSchema = (model: SubProjectItemSchema): SelectionSchema | unde
 
 const getModelObject = (
   selection: SelectionSchema | undefined,
-  subProject: SubProjectSchema,
+  accessor: SubProjectAccessorSchema,
 ): SubProjectItemSchema | undefined => {
   if (!isDefined(selection)) {
     return undefined
   }
 
-  const optional = accessors.subProject(subProject).optional
+  const optional = accessor.optional
 
   switch (selection.type) {
     case 'binding':

@@ -9,7 +9,6 @@ import type { ComponentSchema, HasLayoutSchema, LayoutOrientationSchema } from '
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { EditorFieldTranslationSchema } from '../../../schemas/translation'
-import { accessors } from '../../../utils/accessors'
 import { isDefined } from '../../../utils/isDefined'
 import { narrowers } from '../../../utils/narrowers'
 import { AnchorSelect } from '../../common/AnchorSelect'
@@ -40,11 +39,10 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
   onChange,
 }: LayoutSectionProps<T>): ReactNode {
   const { t } = useTranslation()
-  const { subProject } = useSubProject()
+  const { accessor } = useSubProject()
   const fillTranslation = useMemo<EditorFieldTranslationSchema | undefined>(() => {
-    const children = accessors
-      .subProject(subProject)
-      .component.children(component.id)
+    const children = accessor.component
+      .children(component.id)
       .filter((child) => narrowers.is.panel(child) || narrowers.is.pocketCluster(child))
     const hasFillChild = children.some((child) =>
       editable.layoutOrientation === 'horizontal' ? child.autoWidth : child.autoHeight,
@@ -60,7 +58,7 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
       return t.project.editors.sections.components.layout.fillGap
     }
     return undefined
-  }, [component, subProject, editable.layoutOrientation, editable.autoLayoutGap, t])
+  }, [component, accessor, editable.layoutOrientation, editable.autoLayoutGap, t])
 
   const handleMainAxisAnchorChange = useCallback(
     (mainAxisAnchor: AnchorSchema): void => {

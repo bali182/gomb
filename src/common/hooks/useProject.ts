@@ -1,17 +1,17 @@
+import type { ProjectAccessorSchema } from '../schemas/accessors'
 import type { ProjectSchema } from '../schemas/project'
-import { isDefined } from '../utils/isDefined'
+import { required } from '../utils/required'
 import { useOptionalProject } from './useOptionalProject'
 
 type UseProjectResult = {
   project: ProjectSchema
+  accessor: ProjectAccessorSchema
 }
 
 export const useProject = (): UseProjectResult => {
-  const { project } = useOptionalProject()
-
-  if (!isDefined(project)) {
-    throw new Error('useProject requires a valid project route')
+  const { project, accessor } = useOptionalProject()
+  return {
+    project: required(project, 'useProject requires a valid project route'),
+    accessor: required(accessor, 'useProject requires a project accessor'),
   }
-
-  return { project }
 }

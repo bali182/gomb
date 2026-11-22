@@ -11,9 +11,9 @@ import {
 } from '@dnd-kit/core'
 import { useCallback, useMemo, useState, type FC, type ReactNode } from 'react'
 import { useEditorContext } from '../../contexts/EditorContext'
+import { useOptionalSubProject } from '../../hooks/useOptionalSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { isTreeDragData, isTreeDropData } from '../../typia'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { TreeDragAndDropContext, type TreeDragAndDropContextValue } from './TreeDragAndDropContext'
@@ -27,7 +27,8 @@ type EditorTreeDragAndDropProps = {
 }
 
 export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children }) => {
-  const { subProject, isComputing, setEditingInputId } = useEditorContext()
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const { subProject, accessor } = useOptionalSubProject()
   const operations = useSubProjectOperations()
   const [activeDragData, setActiveDragData] = useState<TreeDragData | undefined>(undefined)
   const { dropTargetRectRef, handleDropAnimation } = useTreeDropAnimation()
@@ -63,10 +64,9 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
               })
               return true
             case 'pocket-opening': {
-              if (!isDefined(subProject)) {
+              if (!isDefined(accessor)) {
                 return false
               }
-              const accessor = accessors.subProject(subProject)
               const component = accessor.optional.component.byId(dropData.componentId)
               const opening = accessor.optional.pocketOpening.byId(dragData.openingId)
               if (!isDefined(component) || !narrowers.is.pocket(component) || !isDefined(opening)) {
@@ -88,7 +88,7 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
         }
       }
     },
-    [operations, subProject],
+    [operations, accessor],
   )
 
   const handleDragStart = useCallback(

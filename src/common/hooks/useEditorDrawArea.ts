@@ -6,7 +6,6 @@ import {
   STROKE_THICKNESS,
 } from '../constants/drawing'
 import { PocketEditorTabs } from '../constants/editorTabs'
-import { accessors } from '../utils/accessors'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -46,9 +45,9 @@ type UseEditorDrawAreaParams = {
 export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAreaParams): DrawAreaContextValue => {
   const { project } = useProject()
   const { settings } = useGlobalSettings()
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { face, side, setSide } = useRootPanelFace()
-  const drawAreaSelection = useSubProjectSelection(subProject)
+  const drawAreaSelection = useSubProjectSelection()
 
   const flipRootPanelFace = useCallback((): void => {
     drawAreaSelection.clearSelection()
@@ -107,7 +106,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       let color: string | undefined
       if (narrowers.is.rootPanel(component)) {
         if (isDefined(faceIdAboveRoot)) {
-          color = accessors.subProject(subProject).component.rootPanelFace(faceIdAboveRoot).color
+          color = accessor.component.rootPanelFace(faceIdAboveRoot).color
         }
       } else {
         color = component.color
@@ -150,7 +149,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, subProject])
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, accessor])
 
   const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {

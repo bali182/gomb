@@ -1,26 +1,37 @@
 import { Icon, Tabs } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PocketEditorTabs } from '../../constants/editorTabs'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketClusterSchema, TPocketSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
+import type { TPocketSchema } from '../../schemas/components'
 import type { IssuesSchema } from '../../schemas/issues'
+import { narrowers } from '../../utils/narrowers'
 import { EditorNumberInput } from '../common/EditorNumberInput'
 import { SectionGroup } from '../common/SectionGroup'
 import { TPocketTabWidthIcon } from '../icons/TPocketTabWidthIcon'
 import { TPocketTaperIcon } from '../icons/TPocketTaperIcon'
 import { ContentsSection } from './sections/ContentsSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
-type TPocketEditorProps = {
-  component: TPocketSchema
-  editable: EditableSchema<TPocketSchema>
-  issues: IssuesSchema<TPocketSchema>
-  parent: PocketClusterSchema
-  onChange: (value: EditableSchema<TPocketSchema>) => void
-}
+export const TPocketEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<TPocketSchema>()
 
-export const TPocketEditor: FC<TPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
+  const component = models[selectedModelId]
+  const { accessor } = useSubProject()
+  const parent = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = useComponentLimitIssues(component)
+
+  const issues = useCombinedIssues<TPocketSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<TPocketSchema>,
+  )
+
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: component.id,

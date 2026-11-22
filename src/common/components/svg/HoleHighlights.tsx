@@ -1,5 +1,4 @@
 import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
-import { accessors } from '../../utils/accessors'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -18,14 +17,13 @@ type HoleHighlightProps = {
 }
 
 export const HoleHighlights: FC<HoleHighlightsProps> = ({ componentId }) => {
-  const { computedSubProject: computedProject, subProject } = useSubProject()
+  const { computedAccessor, subProject } = useSubProject()
   const holes = subProject.holes.filter((hole) => hole.componentId === componentId)
-  const accessor = accessors.computedSubProject(computedProject)
 
   return (
     <>
       {holes.map((hole) => {
-        const computedHole = accessor.hole.byId(hole.id)
+        const computedHole = computedAccessor.hole.byId(hole.id)
 
         return <HoleHighlight computedHole={computedHole} hole={hole} key={hole.id} />
       })}

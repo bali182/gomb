@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useEditorContext } from '../../../contexts/EditorContext'
-import { accessors } from '../../../utils/accessors'
+import { useOptionalSubProject } from '../../../hooks/useOptionalSubProject'
 import { isDefined } from '../../../utils/isDefined'
 
 import { PiCar, PiLink, PiPencilLine } from 'react-icons/pi'
@@ -58,7 +58,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   onChange,
 }: CornerRadiusSectionProps<T>): ReactNode {
   const { t } = useTranslation()
-  const { subProject, isComputing, setEditingInputId } = useEditorContext()
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const { subProject, accessor } = useOptionalSubProject()
   const [radiusBinderOpen, setRadiusBinderOpen] = useState<boolean>(false)
   const radiusBindingState = useMemo<CornerRadiusBindingState | undefined>(
     () => (isDefined(subProject) ? getCornerRadiusBindingState(subProject, modelId) : undefined),
@@ -82,7 +83,6 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const handleRadiusBinderClose = useCallback((): void => {
     setRadiusBinderOpen(false)
   }, [])
-  const accessor = isDefined(subProject) ? accessors.subProject(subProject) : undefined
   const autoDisabled =
     !Boolean(editable.autoCornerRadius) &&
     isDefined(accessor) &&

@@ -12,15 +12,11 @@ import {
   type SvgFaceContextValue,
   type SvgViewDirection,
 } from '../../contexts/SvgFaceContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
-import type { RootPanelSchema } from '../../schemas/components'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { SvgComponentLayers } from './SvgComponentLayers'
@@ -31,9 +27,9 @@ type PocketItemStitchMaskProps = {
 }
 
 export const PocketItemStitchMask: FC<PocketItemStitchMaskProps> = ({ componentId, faceIdAboveRoot }) => {
-  const component = useComponent(componentId)
-  const { computedSubProject } = useSubProject()
-  const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+  const { computedSubProject, accessor, computedAccessor } = useSubProject()
+  const component = accessor.component.byId(componentId)
+  const root = computedAccessor.component.rootPanel()
   const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
   const x = computedSubProject.viewBox.x.minus(VIEWBOX_PADDING).toNumber()
   const y = computedSubProject.viewBox.y.minus(VIEWBOX_PADDING).toNumber()
@@ -95,9 +91,9 @@ type PocketItemStitchMaskComponentProps = {
 
 const PocketItemStitchMaskRoot: FC<PocketItemStitchMaskProps> = ({ componentId, faceIdAboveRoot }) => {
   const { componentStyles } = useDrawAreaContext()
-  const component = useComponent<RootPanelSchema>(componentId)
-  const { computedSubProject } = useSubProject()
-  const face = accessors.computedSubProject(computedSubProject).component.rootPanelFace(faceIdAboveRoot)
+  const { accessor, computedAccessor } = useSubProject()
+  const component = accessor.component.rootPanel(componentId)
+  const face = computedAccessor.component.rootPanelFace(faceIdAboveRoot)
   const faceIdBelowRoot = faceIdAboveRoot === component.frontFaceId ? component.backFaceId : component.frontFaceId
   const componentStyleParams: DrawAreaComponentStyleParams = { component, nestingLevel: 0 }
 
@@ -121,8 +117,8 @@ type PocketItemStitchMaskFaceProps = PocketItemStitchMaskComponentProps & {
 
 const PocketItemStitchMaskFace: FC<PocketItemStitchMaskFaceProps> = ({ componentId, direction }) => {
   const view = useMemo<SvgFaceContextValue>(() => ({ faceId: componentId, direction }), [componentId, direction])
-  const { computedSubProject } = useSubProject()
-  const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+  const { computedAccessor } = useSubProject()
+  const root = computedAccessor.component.rootPanel()
   const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
   return (
     <SvgFaceContext.Provider value={view}>
@@ -136,9 +132,9 @@ const PocketItemStitchMaskFace: FC<PocketItemStitchMaskFaceProps> = ({ component
 const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskComponentProps> = ({ componentId }) => {
   const { pocketItemStyles, componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { direction } = useSvgFace()
-  const component = useComponent(componentId)
-  const computed = useComputedComponent(componentId)
-  const { subProject } = useSubProject()
+  const { accessor, computedAccessor } = useSubProject()
+  const component = accessor.component.byId(componentId)
+  const computed = computedAccessor.component.byId(componentId)
   const componentStyleParams: DrawAreaComponentStyleParams = { component, nestingLevel: 0 }
 
   if (narrowers.is.computedRootPanel(computed)) {
@@ -174,7 +170,7 @@ const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskComponentProps> = ({
     }
     case 'computed-front-pocket':
     case 'computed-t-pocket': {
-      const itemStyleParams = { owner: accessors.subProject(subProject).component.pocket(componentId) }
+      const itemStyleParams = { owner: accessor.component.pocket(componentId) }
       return (
         <SvgComponentLayers
           content={componentPath}

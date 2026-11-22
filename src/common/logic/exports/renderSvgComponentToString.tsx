@@ -134,6 +134,9 @@ export const renderSvgComponentToString = ({
         ...EditorContextDefaultValues,
         ...EditorContextDefaultOperations,
         ...editorValues,
+        projectAccessor: accessors.project(editorValues.project),
+        subProjectAccessor: accessor,
+        computedSubProjectAccessor: accessors.computedSubProject(editorValues.computedSubProject),
         computedSubProject: Loadable.loaded(editorValues.computedSubProject),
       }}
     >

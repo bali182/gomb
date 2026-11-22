@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import type { PocketSchema } from '../schemas/components'
 import type { IssuesSchema } from '../schemas/issues'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
-import { accessors } from '../utils/accessors'
 import { getLimitIssues } from '../utils/getLimitIssues'
 import { isDefined } from '../utils/isDefined'
 import { noIssues } from '../utils/issueUtils'
@@ -13,10 +12,10 @@ export const usePocketOpeningLimitIssues = (
   opening: PocketOpeningSchema,
   pocket: PocketSchema | undefined,
 ): IssuesSchema<PocketOpeningSchema> => {
-  const { computedSubProject } = useSubProject()
+  const { computedAccessor } = useSubProject()
   const translation = useTranslation()
   const limits = isDefined(pocket)
-    ? accessors.computedSubProject(computedSubProject).optional.limits.component(pocket.id)
+    ? computedAccessor.optional.limits.component(pocket.id)
     : undefined
 
   return useMemo<IssuesSchema<PocketOpeningSchema>>(() => {

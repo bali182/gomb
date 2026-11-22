@@ -7,7 +7,6 @@ import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
-import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
@@ -29,7 +28,7 @@ type HoleActionsMenuProps = {
 
 export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddStitchLine = noop, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { deleteModelBindingFields, addStitchLine, cloneHole, deleteHole, flip } = useSubProjectOperations()
 
   const handleClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -41,10 +40,7 @@ export const HoleActionsMenu: FC<HoleActionsMenuProps> = ({ hole, size, onAddSti
     onAddStitchLine({ targetId: hole.id, targetType: 'hole' })
   }, [addStitchLine, hole.id, onAddStitchLine])
 
-  const hasBindings = useMemo<boolean>(
-    () => accessors.subProject(subProject).binding.byModel(hole.id).length > 0,
-    [subProject, hole.id],
-  )
+  const hasBindings = useMemo<boolean>(() => accessor.binding.byModel(hole.id).length > 0, [accessor, hole.id])
 
   const handleDeleteBindings = useCallback((): void => {
     deleteModelBindingFields({ modelId: hole.id })

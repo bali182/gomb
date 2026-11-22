@@ -16,7 +16,7 @@ import { useEditorContext } from '../contexts/EditorContext'
 import { useDrawAreaTurn } from '../hooks/useDrawAreaTurn'
 import { useGlobalSettings } from '../hooks/useGlobalSettings'
 import { useMeasurement } from '../hooks/useMeasurement'
-import { useProject } from '../hooks/useProject'
+import { useOptionalSubProject } from '../hooks/useOptionalSubProject'
 import { useProjectOperations } from '../hooks/useProjectOperations'
 import { useSubProjectOperations } from '../hooks/useSubProjectOperations'
 import { useTranslation } from '../hooks/useTranslation'
@@ -24,8 +24,6 @@ import type { HasTargetSchema } from '../schemas/common'
 import type { PocketOpeningSchema } from '../schemas/pocketOpening'
 import type { ProjectSchema } from '../schemas/project'
 import type { TreeSectionsSettingsSchema } from '../schemas/settings'
-import type { SubProjectSchema } from '../schemas/subProject'
-import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
 import { AddPocketOpeningMenu } from './action-menus/AddPocketOpeningMenu'
@@ -76,7 +74,7 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   const { t } = useTranslation()
   const { isComputing, setEditingInputId } = useEditorContext()
   const { addBinding, addPocketOpening } = useSubProjectOperations()
-  const { project } = useProject()
+  const { subProject, accessor } = useOptionalSubProject()
   const { setUISettings, settings } = useGlobalSettings()
   const [treeSections, setTreeSections] = useState<TreeSectionsSettingsSchema>(() => settings.ui.treeSections)
   const accordionRef = useRef<ResizableAccordionHandle>(null)
@@ -125,11 +123,6 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
   }, [selected])
 
   const componentTreeRef = useRef<EditorComponentTreeHandle>(null)
-  const subProject = useMemo<SubProjectSchema | undefined>(
-    () => (isDefined(subProjectId) ? accessors.project(project).optional.subProject(subProjectId) : undefined),
-    [project, subProjectId],
-  )
-  const accessor = useMemo(() => (isDefined(subProject) ? accessors.subProject(subProject) : undefined), [subProject])
 
   const handleResizeEnd = useCallback(
     ({ size }: SplitterResizeEndDetails): void => {

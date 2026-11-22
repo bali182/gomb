@@ -9,7 +9,6 @@ import type { ComponentBasedValidationContextSchema } from '../schemas/validatio
 import { optionalComparators } from '../utils/comparators'
 import { validateHoleSchema } from '../validators/validateHoleSchema'
 import { useEditableModel } from './useEditableModel'
-import { useHole } from './useHole'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
 import { useSubProjectOperations } from './useSubProjectOperations'
@@ -23,9 +22,9 @@ export type UseEditableHoleResult = {
 }
 
 export const useEditableHole = (holeId: string): UseEditableHoleResult => {
-  const hole = useHole(holeId)
   const { project } = useProject()
-  const { computedSubProject, subProject } = useSubProject()
+  const { computedSubProject, subProject, accessor } = useSubProject()
+  const hole = accessor.hole.byId(holeId)
   const { updateHole } = useSubProjectOperations()
   const { t } = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(
