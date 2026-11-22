@@ -971,8 +971,7 @@ export const EN = {
             landscape: 'Landscape',
           } satisfies EnumTranslationSchema<PageOrientationSchema>,
           exportPageLayout: {
-            vertical: 'Vertical',
-            horizontal: 'Horizontal',
+            stacked: 'Stacked',
             compact: 'Compact',
           } satisfies EnumTranslationSchema<PageLayoutSchema>,
         },

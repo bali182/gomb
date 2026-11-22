@@ -72,7 +72,7 @@ const expectSeparated = (page: ExportPageSchema, gap: number): void => {
 describe('export page layout', () => {
   it('places oversized elements first without forcing a page break before ordinary elements', () => {
     const result = layout([panel('ordinary', 20, 30), panel('wide-a', 160, 30), panel('wide-b', 170, 30)], {
-      layout: 'vertical',
+      layout: 'stacked',
     })
     expect(oversizedIds(result)).toEqual(['wide-a', 'wide-b'])
     expect(result.pages).toHaveLength(1)
@@ -82,18 +82,8 @@ describe('export page layout', () => {
     expectSeparated(result.pages[0], 10)
   })
 
-  it('places tall elements horizontally, followed by ordinary elements on the same page', () => {
-    const result = layout([panel('ordinary', 20, 30), panel('tall-a', 20, 240), panel('tall-b', 20, 250)], {
-      layout: 'horizontal',
-    })
-    expect(result.pages).toHaveLength(1)
-    expect(result.pages[0].elements.map(({ element }) => element.id)).toEqual(['tall-a', 'tall-b', 'ordinary'])
-    expect(result.pages[0].elements.map(({ placement }) => placement.x.toNumber())).toEqual([0, 30, 60])
-    expectSeparated(result.pages[0], 10)
-  })
-
   it('does not create an empty page before an element exceeding the flow dimension', () => {
-    const result = layout([panel('tall', 20, 240), panel('small', 20, 20)], { layout: 'vertical' })
+    const result = layout([panel('tall', 20, 240), panel('small', 20, 20)], { layout: 'stacked' })
     expect(result.pages.map((page) => page.elements.map(({ element }) => element.id))).toEqual([['tall'], ['small']])
   })
 
@@ -122,7 +112,7 @@ describe('export page layout', () => {
     expect(result.pages.every((page) => page.elements.length === 1)).toBe(true)
   })
 
-  const layouts: PageLayoutSchema[] = ['vertical', 'horizontal', 'compact']
+  const layouts: PageLayoutSchema[] = ['stacked', 'compact']
   it.each(layouts)('keeps large gaps valid and puts elements on separate pages in %s layout', (mode) => {
     const result = layout([panel('a', 20, 20), panel('b', 20, 20)], { layout: mode, gap: 1000 })
     expect(oversizedIds(result)).toEqual([])
@@ -147,7 +137,7 @@ describe('export page layout', () => {
   })
 
   it('accounts for padding, cut helpers and physical border thickness', () => {
-    const options = settings({ padding: 10, cutHelperDistance: 5, layout: 'vertical' })
+    const options = settings({ padding: 10, cutHelperDistance: 5, layout: 'stacked' })
     const source = panel('edge', 118, 30)
     const elements = applyExportContentSettings([source], options)
     const context = {
@@ -179,7 +169,7 @@ describe('export page layout', () => {
       },
       stitchLines: [],
     }
-    const result = layout([element], { layout: 'vertical' })
+    const result = layout([element], { layout: 'stacked' })
     expect(oversizedIds(result)).toEqual([element.id])
     expect(result.pages[0].elements[0].isOversized).toBe(true)
   })
@@ -187,8 +177,8 @@ describe('export page layout', () => {
   it('retains the same page placements across export formats and preserves the source', () => {
     const source = [panel('a', 50, 120), panel('b', 50, 120)]
     const before = structuredClone(source)
-    const svg = layout(source, { layout: 'vertical', format: 'svg', padding: 5 })
-    const pdf = layout(source, { layout: 'vertical', format: 'pdf', padding: 5 })
+    const svg = layout(source, { layout: 'stacked', format: 'svg', padding: 5 })
+    const pdf = layout(source, { layout: 'stacked', format: 'pdf', padding: 5 })
     expect(svg.pages).toHaveLength(2)
     expect(pdf.pages).toHaveLength(2)
     expect(svg.pages[1].boundingRect.y.toNumber()).toBe(220)

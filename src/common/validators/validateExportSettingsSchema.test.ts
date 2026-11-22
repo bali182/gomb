@@ -12,6 +12,23 @@ const current: ExportSettingsSchema = { ...defaultExportParams, page: 'A4', padd
 const validate = (changes: Partial<EditableSchema<ExportSettingsSchema>>) =>
   validateExportSettingsSchema({ ...getEditableSchema(current, context), ...changes }, current, context)
 
+describe('export layout settings', () => {
+  it.each(['stacked', 'compact'] as const)('accepts the %s layout', (layout) => {
+    const result = validate({ layout })
+    expect(result.isValid).toBe(true)
+    expect(result.committedValue.layout).toBe(layout)
+  })
+
+  it.each(['vertical', 'horizontal'])('rejects the removed %s layout', (layout) => {
+    const input = getEditableSchema(current, context)
+    Reflect.set(input, 'layout', layout)
+    const result = validateExportSettingsSchema(input, current, context)
+    expect(result.isValid).toBe(false)
+    expect(result.issues.layout?.severity).toBe('error')
+    expect(result.committedValue.layout).toBe(current.layout)
+  })
+})
+
 describe('export settings page limits', () => {
   it.each(['105', '106', '1000'])('rejects padding %s that consumes the short page dimension', (padding) => {
     const result = validate({ padding })

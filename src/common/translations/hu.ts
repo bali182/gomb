@@ -899,8 +899,7 @@ export const HU = {
             landscape: 'Fekvő',
           },
           exportPageLayout: {
-            vertical: 'Függőleges',
-            horizontal: 'Vízszintes',
+            stacked: 'Egymás alatt',
             compact: 'Helytakarékos',
           },
         },

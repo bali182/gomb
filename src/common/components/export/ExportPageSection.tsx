@@ -1,7 +1,7 @@
 import { InputGroup, Select, createListCollection, type ListCollection } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import type { IconType } from 'react-icons'
-import { PiColumns, PiFile, PiFilePdf, PiFilePng, PiFileSvg, PiGridFour, PiRows } from 'react-icons/pi'
+import { PiFile, PiFilePdf, PiFilePng, PiFileSvg, PiGridFour, PiRows } from 'react-icons/pi'
 
 import { pages } from '../../data/pages'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -168,7 +168,7 @@ const createExportPageOption = (page: PageSchema): ExportPageOption => ({
 
 const formats: ExportFormatSchema[] = ['pdf', 'svg', 'png']
 const orientations: PageOrientationSchema[] = ['portrait', 'landscape']
-const layouts: PageLayoutSchema[] = ['vertical', 'horizontal', 'compact']
+const layouts: PageLayoutSchema[] = ['stacked', 'compact']
 
 const formatIcons: Record<ExportFormatSchema, IconType> = {
   pdf: PiFilePdf,
@@ -185,7 +185,6 @@ const orientationIcons: Record<PageOrientationSchema, IconType> = {
 }
 
 const layoutIcons: Record<PageLayoutSchema, IconType> = {
-  vertical: PiRows,
-  horizontal: PiColumns,
+  stacked: PiRows,
   compact: PiGridFour,
 }

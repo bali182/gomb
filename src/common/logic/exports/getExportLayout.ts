@@ -18,7 +18,7 @@ import {
 } from './exportGeometryUtils'
 import { getExportPageSize } from './getExportPageSize'
 import type { ExportLayoutElement } from './helperTypes'
-import { layoutExportElementsHorizontally, layoutExportElementsVertically } from './layoutExportElements'
+import { layoutExportElementsStacked } from './layoutExportElementsStacked'
 import { layoutExportElementsCompactly } from './layoutExportElementsCompactly'
 
 export const getExportLayout = (
@@ -99,10 +99,8 @@ const layoutElements = (
   layout: ExportSettingsSchema['layout'],
 ): ExportPageElementSchema[][] => {
   switch (layout) {
-    case 'vertical':
-      return layoutExportElementsVertically(elements, usableRect, gap)
-    case 'horizontal':
-      return layoutExportElementsHorizontally(elements, usableRect, gap)
+    case 'stacked':
+      return layoutExportElementsStacked(elements, usableRect, gap)
     case 'compact':
       return layoutExportElementsCompactly(elements, usableRect, gap)
   }

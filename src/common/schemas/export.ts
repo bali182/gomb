@@ -60,7 +60,7 @@ export type ExportParamsSchema = {
 }
 
 export type PageOrientationSchema = 'portrait' | 'landscape'
-export type PageLayoutSchema = 'vertical' | 'horizontal' | 'compact'
+export type PageLayoutSchema = 'stacked' | 'compact'
 export type ExportPlacementRotation = 0 | 90
 
 export type ExportPlacementSchema = {

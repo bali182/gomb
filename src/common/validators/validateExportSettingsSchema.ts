@@ -24,8 +24,7 @@ const pageOrientations: Record<PageOrientationSchema, boolean> = {
 
 const pageLayouts: Record<PageLayoutSchema, boolean> = {
   compact: true,
-  horizontal: true,
-  vertical: true,
+  stacked: true,
 }
 
 export const validateExportSettingsSchema = (
