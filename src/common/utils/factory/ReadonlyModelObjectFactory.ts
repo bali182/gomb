@@ -104,7 +104,6 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
       id: this.id.get('root-panel', params.forbiddenIds),
       name: this.name.get('root-panel', params.forbiddenNames),
       ...getClosestRootDimensions(defaultRootPanel, params.stitchingSettings),
-      ...(isDefined(params.color) ? { color: params.color } : {}),
     }
   }
 

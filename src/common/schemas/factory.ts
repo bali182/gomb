@@ -76,8 +76,7 @@ export type ReadonlyCreateComponentParamsSchema = HasReadonlyForbiddenIdsSchema 
   }
 export type ReadonlyCreateRootPanelParamsSchema = HasReadonlyForbiddenIdsSchema &
   HasReadonlyForbiddenNamesSchema &
-  HasStitchingSettingsSchema &
-  HasColorSchema & {
+  HasStitchingSettingsSchema & {
     frontFaceId: string
     backFaceId: string
   }

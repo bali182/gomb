@@ -1,16 +1,18 @@
-import { Icon } from '@chakra-ui/react'
+import { Badge, Icon } from '@chakra-ui/react'
 import { useCallback, type ReactNode } from 'react'
 
 import { useTranslation } from '../../../hooks/useTranslation'
 import type { HasSizeSchema } from '../../../schemas/common'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
+import { isDefined } from '../../../utils/isDefined'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import { SectionGroup } from '../../common/SectionGroup'
 import { HeightIcon } from '../../icons/HeightIcon'
 import { WidthIcon } from '../../icons/WidthIcon'
 
 type SizeSectionProps<T> = {
+  tag?: string
   modelId: string
   editable: EditableSchema<T>
   issues: IssuesSchema<HasSizeSchema>
@@ -18,6 +20,7 @@ type SizeSectionProps<T> = {
 }
 
 export function SizeSection<T extends HasSizeSchema>({
+  tag,
   modelId,
   editable,
   issues,
@@ -40,7 +43,17 @@ export function SizeSection<T extends HasSizeSchema>({
 
   return (
     <SectionGroup.Section>
-      <SectionGroup.SectionHeader>{t.project.editors.sections.common.size.title}</SectionGroup.SectionHeader>
+      <SectionGroup.SectionHeader
+        leftAddon={
+          isDefined(tag) ? (
+            <Badge bg="bg" variant="surface">
+              {tag}
+            </Badge>
+          ) : undefined
+        }
+      >
+        {t.project.editors.sections.common.size.title}
+      </SectionGroup.SectionHeader>
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.common.size.width.tooltip}>
         {t.project.editors.sections.common.size.width.label}
       </SectionGroup.SectionRowTitle>

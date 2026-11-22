@@ -1,7 +1,8 @@
 import { FC } from 'react'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
 import { useEditableComponent } from '../../hooks/useEditableComponent'
 import { useRootPanelFace } from '../../hooks/useRootPanelFace'
-import { useTranslation } from '../../hooks/useTranslation'
 import type { RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
 import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
@@ -19,9 +20,14 @@ type RootPanelEditorProps = {
 
 export const RootPanelEditor: FC<RootPanelEditorProps> = ({ editable, issues, onChange }) => {
   const { face } = useRootPanelFace()
-  const { t } = useTranslation()
   const faceEditor = useEditableComponent(face.id)
   const editedFace = narrowers.assert.rootPanelFace(faceEditor.component)
+  const faceLimitIssues = useComponentLimitIssues(editedFace)
+  const faceIssues = useCombinedIssues<RootPanelFaceSchema>(
+    faceEditor.validationIssues as IssuesSchema<RootPanelFaceSchema>,
+    faceLimitIssues as IssuesSchema<RootPanelFaceSchema>,
+  )
+
   return (
     <SectionGroup.Root>
       <SizeSection<RootPanelSchema> modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
@@ -31,12 +37,12 @@ export const RootPanelEditor: FC<RootPanelEditorProps> = ({ editable, issues, on
         issues={issues}
         onChange={onChange}
       />
-      <LayoutSection
-        title={t.project.editors.faceLayoutTitle(editedFace.name)}
+      <LayoutSection<RootPanelFaceSchema>
+        tag={editedFace.name}
         modelId={face.id}
         component={editedFace}
         editable={faceEditor.editableComponent as EditableSchema<RootPanelFaceSchema>}
-        issues={faceEditor.validationIssues as IssuesSchema<RootPanelFaceSchema>}
+        issues={faceIssues}
         onChange={faceEditor.setComponent}
       />
     </SectionGroup.Root>

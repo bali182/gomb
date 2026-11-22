@@ -4,7 +4,7 @@ import { useComponent } from '../../hooks/useComponent'
 import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
-import type { RootPanelSchema } from '../../schemas/components'
+import type { RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
 import type { ComputedRootPanelFaceSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { RootPanelFace } from './RootPanelFace'
@@ -19,15 +19,21 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
   const rootPanel = useComponent<RootPanelSchema>(componentId)
+  const visibleFace = useComponent<RootPanelFaceSchema>(faceIdAboveRoot)
   const inactiveFaceId = faceIdAboveRoot === rootPanel.frontFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
   const computedFace = useComputedComponent<ComputedRootPanelFaceSchema>(faceIdAboveRoot)
   const pathData = usePath(computedFace.path)
-  const isActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
-  const styleParams: DrawAreaComponentStyleParams = { component: rootPanel, nestingLevel }
+  const isRootActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
+  const isActive = isRootActive || selection.isSelected(visibleFace) || selection.isHovered(visibleFace)
+  const styleParams: DrawAreaComponentStyleParams = { component: rootPanel, nestingLevel, faceIdAboveRoot }
+  const outlineStyleParams: DrawAreaComponentStyleParams = {
+    component: isRootActive ? rootPanel : visibleFace,
+    nestingLevel,
+  }
 
   const handlePointerEnter = useCallback((): void => {
-    selection.hover(rootPanel)
-  }, [rootPanel, selection])
+    selection.hover(visibleFace)
+  }, [visibleFace, selection])
 
   const handlePointerLeave = useCallback((): void => {
     selection.clearHover()
@@ -36,9 +42,9 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
   const handleClick = useCallback(
     (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
-      selection.select(rootPanel)
+      selection.select(visibleFace)
     },
-    [rootPanel, selection],
+    [visibleFace, selection],
   )
 
   return (
@@ -52,9 +58,9 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
       <path
         d={pathData}
         fill={componentStyles.getBackgroundColor(styleParams)}
-        filter={componentStyles.getFilter(styleParams)}
-        stroke={componentStyles.getBorderColor(styleParams)}
-        strokeWidth={componentStyles.getBorderThickness(styleParams)}
+        filter={componentStyles.getFilter(outlineStyleParams)}
+        stroke={componentStyles.getBorderColor(outlineStyleParams)}
+        strokeWidth={componentStyles.getBorderThickness(outlineStyleParams)}
         data-component-id={rootPanel.id}
         onPointerEnter={isInteractive ? handlePointerEnter : undefined}
         onPointerLeave={isInteractive ? handlePointerLeave : undefined}

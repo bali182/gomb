@@ -122,6 +122,8 @@ export const comparators = {
   rootPanelFace: (a: RootPanelFaceSchema, b: RootPanelFaceSchema): boolean => {
     return (
       a.id === b.id &&
+      a.name === b.name &&
+      a.color === b.color &&
       a.layoutOrientation === b.layoutOrientation &&
       a.mainAxisAnchor === b.mainAxisAnchor &&
       a.layoutGap === b.layoutGap &&
@@ -133,7 +135,6 @@ export const comparators = {
     return (
       a.id === b.id &&
       a.name === b.name &&
-      a.color === b.color &&
       a.frontFaceId === b.frontFaceId &&
       a.backFaceId === b.backFaceId &&
       a.width === b.width &&

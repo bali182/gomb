@@ -28,7 +28,7 @@ const numberFormats = {
 export const HU = {
   app: {
     title: 'Gomb',
-    subtitle: 'Egyszerű alkalmazás bőrműves projektek tervezéséhez.',
+    subtitle: 'Egyszerű alkalmazás bőrdíszműves projektek tervezéséhez.',
   },
   projects: {
     dropzone: {

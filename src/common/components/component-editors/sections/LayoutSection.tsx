@@ -1,4 +1,4 @@
-import { HStack, Text } from '@chakra-ui/react'
+import { Badge, HStack, Text } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import { PiInfo } from 'react-icons/pi'
 
@@ -22,6 +22,7 @@ import { VerticalGapIcon } from '../../icons/VerticalGapIcon'
 
 type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
   title?: string
+  tag?: string
   modelId: string
   component: T
   editable: EditableSchema<T>
@@ -31,6 +32,7 @@ type LayoutSectionProps<T extends ComponentSchema & HasLayoutSchema> = {
 
 export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
   title,
+  tag,
   modelId,
   component,
   editable,
@@ -90,6 +92,13 @@ export function LayoutSection<T extends ComponentSchema & HasLayoutSchema>({
   return (
     <SectionGroup.Section>
       <SectionGroup.SectionHeader
+        leftAddon={
+          isDefined(tag) ? (
+            <Badge bg="bg" variant="surface">
+              {tag}
+            </Badge>
+          ) : undefined
+        }
         rightAddon={
           isDefined(fillTranslation) ? (
             <Tooltip content={fillTranslation.tooltip}>

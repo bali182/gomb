@@ -5,6 +5,7 @@ import { HoleSchema } from './hole'
 import { ResolvedStitchLineSchema, StitchLineSchema } from './stitching'
 
 export type DrawAreaComponentStyleParams = {
+  faceIdAboveRoot?: string
   component: ComponentSchema
   nestingLevel: number
 }

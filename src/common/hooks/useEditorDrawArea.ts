@@ -6,6 +6,7 @@ import {
   STROKE_THICKNESS,
 } from '../constants/drawing'
 import { PocketEditorTabs } from '../constants/editorTabs'
+import { accessors } from '../utils/accessors'
 import { getComponentColor } from '../utils/getComponentColor'
 import { isDefined } from '../utils/isDefined'
 import { narrowers } from '../utils/narrowers'
@@ -95,7 +96,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   )
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
-    const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
+    const getBackgroundColor = ({ component, nestingLevel, faceIdAboveRoot }: DrawAreaComponentStyleParams): string => {
       if (
         narrowers.is.guide(component) ||
         narrowers.is.rootPanelFace(component) ||
@@ -103,8 +104,16 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       ) {
         return 'transparent'
       }
+      let color: string | undefined
+      if (narrowers.is.rootPanel(component)) {
+        if (isDefined(faceIdAboveRoot)) {
+          color = accessors.subProject(subProject).component.rootPanelFace(faceIdAboveRoot).color
+        }
+      } else {
+        color = component.color
+      }
       return applyOpacity(
-        component.color ?? getComponentColor(leatherColor, nestingLevel),
+        color ?? getComponentColor(leatherColor, nestingLevel),
         selectionOpacities.components[component.id].fill,
       )
     }
@@ -141,7 +150,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities])
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, subProject])
 
   const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
