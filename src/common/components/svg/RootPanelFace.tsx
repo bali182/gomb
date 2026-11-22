@@ -2,7 +2,6 @@ import { useMemo, type FC } from 'react'
 import { SvgFaceContext, type SvgFaceContextValue, type SvgViewDirection } from '../../contexts/SvgFaceContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
-import { accessors } from '../../utils/accessors'
 import { Guide } from './Guide'
 import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
@@ -12,11 +11,10 @@ import { SvgComponentLayers } from './SvgComponentLayers'
 
 type RootPanelFaceProps = { componentId: string; nestingLevel: number; direction?: SvgViewDirection }
 export const RootPanelFace: FC<RootPanelFaceProps> = ({ componentId, nestingLevel, direction = 'forward' }) => {
-  const { computedSubProject } = useSubProject()
-  const accessor = accessors.computedSubProject(computedSubProject)
-  const root = accessor.component.rootPanel()
+  const { computedAccessor } = useSubProject()
+  const root = computedAccessor.component.rootPanel()
   const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
-  const children = accessor.component.children(componentId)
+  const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const view = useMemo<SvgFaceContextValue>(() => ({ faceId: componentId, direction }), [componentId, direction])
   return (

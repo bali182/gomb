@@ -7,7 +7,6 @@ import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
-import { validateOptionalHexColor } from './validateOptionalHexColor'
 
 export const validateRootPanelSchema = (
   input: EditableSchema<RootPanelSchema>,
@@ -25,7 +24,6 @@ export const validateRootPanelSchema = (
     [...accessors.subProject(context.subProject).component.components(), ...otherRootPanels],
     context,
   )
-  const colorResult = validateOptionalHexColor(input.color, currentValue.color, context)
   const topLeftRadiusResult = validateNumber(input.topLeftRadius, currentValue.topLeftRadius, context, { min: 0 })
   const topRightRadiusResult = validateNumber(input.topRightRadius, currentValue.topRightRadius, context, { min: 0 })
   const bottomLeftRadiusResult = validateNumber(input.bottomLeftRadius, currentValue.bottomLeftRadius, context, {
@@ -40,7 +38,6 @@ export const validateRootPanelSchema = (
   const issues: IssuesSchema<RootPanelSchema> = {
     bottomLeftRadius: bottomLeftRadiusResult.issues,
     bottomRightRadius: bottomRightRadiusResult.issues,
-    color: colorResult.issues,
     height: heightResult.issues,
     id: undefined,
     name: nameResult.issues,
@@ -66,13 +63,8 @@ export const validateRootPanelSchema = (
     width: widthResult.committedValue,
   }
 
-  if (isDefined(colorResult.committedValue)) {
-    committedValue.color = colorResult.committedValue
-  }
-
   if (
     !nameResult.isValid ||
-    !colorResult.isValid ||
     !topLeftRadiusResult.isValid ||
     !topRightRadiusResult.isValid ||
     !bottomLeftRadiusResult.isValid ||
@@ -95,10 +87,6 @@ export const validateRootPanelSchema = (
     frontFaceId: currentValue.frontFaceId,
     backFaceId: currentValue.backFaceId,
     width: widthResult.value,
-  }
-
-  if (isDefined(colorResult.value)) {
-    value.color = colorResult.value
   }
 
   return createValidValidationResult(issues, value, committedValue)

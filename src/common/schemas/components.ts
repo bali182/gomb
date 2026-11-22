@@ -41,7 +41,7 @@ export type AutoDimensionModeSchema = 'auto' | 'manual'
 
 /** A plain panel. Can have children (stuff placed on top of it) */
 export type RootPanelSchema = HasTypeSchema<'root-panel'> &
-  BaseComponentSchema &
+  HasIdentitySchema &
   HasCornerRadiusSchema &
   HasSizeSchema &
   HasFacesSchema
@@ -49,7 +49,7 @@ export type RootPanelSchema = HasTypeSchema<'root-panel'> &
 export type RootPanelFaceSideSchema = 'front' | 'back'
 
 export type RootPanelFaceSchema = HasTypeSchema<'root-panel-face'> &
-  HasIdentitySchema &
+  BaseComponentSchema &
   HasLayoutSchema &
   HasChildrenSchema
 

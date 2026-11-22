@@ -352,7 +352,7 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
   )
 
   it.each(['root-panel', 'panel', 'pocket-cluster', 'front-pocket', 't-pocket'] as const)(
-    'dispatches %s components and preserves supplied references and color',
+    'dispatches %s components and preserves supplied references and supported color',
     (type) => {
       const factory = build()
       const component = factory.createComponent({
@@ -366,7 +366,11 @@ describe.each(['readonly', 'forbidding'])('%s model object factory', (mode) => {
         forbiddenNames: new Set(),
       })
       expect(component.type).toBe(type)
-      expect(component).toHaveProperty('color', '#123456')
+      if (component.type === 'root-panel') {
+        expect(component).not.toHaveProperty('color')
+      } else {
+        expect(component).toHaveProperty('color', '#123456')
+      }
       if (component.type === 'front-pocket' || component.type === 't-pocket') {
         expect(component.openingId).toBe('opening')
       } else {

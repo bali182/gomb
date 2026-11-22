@@ -6,7 +6,6 @@ import { useSubProject } from '../../hooks/useSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { PocketOpeningSchema } from '../../schemas/pocketOpening'
-import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import { CloneMenuItem, CreateBindingsMenuItem, DeleteBindingsMenuItem, DeleteMenuItem } from './CommonActionsMenuItems'
@@ -20,7 +19,7 @@ type PocketOpeningActionsMenuProps = {
 
 export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ opening, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { deleteModelBindingFields, clonePocketOpening, deletePocketOpening, setDefaultPocketOpening } =
     useSubProjectOperations()
   const isDefault = subProject.defaultPocketOpening === opening.id
@@ -38,10 +37,7 @@ export const PocketOpeningActionsMenu: FC<PocketOpeningActionsMenuProps> = ({ op
     onDelete(opening.id)
   }, [deletePocketOpening, onDelete, opening.id])
 
-  const hasBindings = useMemo<boolean>(
-    () => accessors.subProject(subProject).binding.byModel(opening.id).length > 0,
-    [subProject, opening.id],
-  )
+  const hasBindings = useMemo<boolean>(() => accessor.binding.byModel(opening.id).length > 0, [accessor, opening.id])
 
   const handleDeleteBindings = useCallback((): void => {
     deleteModelBindingFields({ modelId: opening.id })

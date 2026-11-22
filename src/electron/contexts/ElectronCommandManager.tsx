@@ -1,3 +1,4 @@
+import { useAtomValue } from 'jotai'
 import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { ExportDialog } from '../../common/components/ExportDialog'
 import { LicenseDialog } from '../../common/components/LicenseDialog'
@@ -13,6 +14,7 @@ import { useCommonCommandEmitter } from '../../common/hooks/useCommonCommandEmit
 import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
 import { useMeasurement } from '../../common/hooks/useMeasurement'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
+import { commandBlockersAtom } from '../../common/state/commandBlockersAtom'
 import { isDefined } from '../../common/utils/isDefined'
 import { electronApi } from '../electronApi'
 import { useElectronCommands } from '../hooks/useElectronCommands'
@@ -28,7 +30,7 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const { setEditSettings, setViewSettings, settings } = useGlobalSettings()
   const { redo, undo } = useSubProjectHistory()
 
-  const isDialogOpen = isExportDialogOpen || isScalingDialogOpen || isLicenseDialogOpen
+  const commandBlockers = useAtomValue(commandBlockersAtom)
 
   const commands = useElectronCommands()
 
@@ -113,7 +115,7 @@ export const ElectronCommandManager: FC<PropsWithChildren> = ({ children }) => {
     ],
   )
 
-  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: !isDialogOpen })
+  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: commandBlockers.size === 0 })
 
   const value = useMemo<CommandsContextValue<ElectronCommandIdSchema>>(
     () => ({ emitCommand, getCommand }),

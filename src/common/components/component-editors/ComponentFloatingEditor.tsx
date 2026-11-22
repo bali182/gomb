@@ -1,9 +1,7 @@
-import { useCallback, type FC } from 'react'
-import { accessors } from '../../utils/accessors'
+import type { FC, ReactElement } from 'react'
 import { IdentityFloatingEditorHeader } from '../common/IdentityFloatingEditorHeader'
 
-import { useEditableComponent } from '../../hooks/useEditableComponent'
-import { useProject } from '../../hooks/useProject'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { BaseComponentSchema, ComponentSchema } from '../../schemas/components'
@@ -13,43 +11,19 @@ import { ComponentActionsMenu } from '../action-menus/ComponentActionsMenu'
 import { FloatingEditor } from '../common/FloatingEditor'
 import { ComponentEditor } from './ComponentEditor'
 import { ComponentFloatingEditorHeader } from './ComponentFloatingEditorHeader'
+import { RootPanelFloatingEditorHeader } from './RootPanelFloatingEditorHeader'
 
 type ComponentFloatingEditorProps = {
   anchorElement: FloatingEditorAnchor
-  component: ComponentSchema
   onAdd: (target: HasTargetSchema) => void
   onClose: () => void
 }
 
-export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
-  anchorElement,
-  component,
-  onAdd,
-  onClose,
-}) => {
-  const { project } = useProject()
+export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({ anchorElement, onAdd, onClose }) => {
   const { subProject } = useSubProject()
 
-  const parent = accessors.subProject(subProject).optional.component.parent(component.id)
-
-  const {
-    component: editedComponent,
-    editableComponent,
-    setComponent,
-    setComponentImmediately,
-    validationIssues,
-  } = useEditableComponent(component.id)
-
-  const Icon = getModelIcon(editedComponent, subProject)
-
-  const handleColorReset = useCallback((): void => {
-    if (editableComponent.type === 'root-panel-face' || editableComponent.type === 'guide') {
-      return
-    }
-    const updatedEditable = { ...editableComponent }
-    delete updatedEditable.color
-    setComponent(updatedEditable)
-  }, [editableComponent, setComponent])
+  const { selectedModelId, models } = useEditableModelsContext<ComponentSchema>()
+  const editedComponent = models[selectedModelId]
 
   const menu = (
     <ComponentActionsMenu
@@ -65,33 +39,51 @@ export const ComponentFloatingEditor: FC<ComponentFloatingEditorProps> = ({
 
   return (
     <FloatingEditor anchorElement={anchorElement} onClose={onClose}>
-      {editableComponent.type === 'root-panel-face' || editableComponent.type === 'guide' ? (
-        <IdentityFloatingEditorHeader
-          icon={<Icon />}
-          menu={menu}
-          editable={editableComponent}
-          issues={validationIssues}
-          onChange={setComponent}
-        />
-      ) : (
-        <ComponentFloatingEditorHeader<ComponentSchema & BaseComponentSchema>
-          baseColor={project.colorSettings.leatherColor}
-          editable={editableComponent}
-          icon={<Icon />}
-          issues={validationIssues}
-          menu={menu}
-          onChange={setComponent}
-          onResetColor={handleColorReset}
-        />
-      )}
-      <ComponentEditor
-        component={editedComponent}
-        editable={editableComponent}
-        issues={validationIssues}
-        onChange={setComponent}
-        onChangeImmediately={setComponentImmediately}
-        parent={parent}
-      />
+      <ComponentHeader menu={menu} />
+      <ComponentEditor />
     </FloatingEditor>
   )
+}
+
+type ComponentHeaderProps = {
+  menu: ReactElement
+}
+
+const ComponentHeader: FC<ComponentHeaderProps> = ({ menu }) => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<ComponentSchema>()
+  const { subProject } = useSubProject()
+  const editableComponent = editableModels[selectedModelId]
+  const issues = validationIssues[selectedModelId]
+  const setComponent = setModel[selectedModelId]
+  const Icon = getModelIcon(models[selectedModelId], subProject)
+
+  switch (editableComponent.type) {
+    case 'root-panel':
+      return <RootPanelFloatingEditorHeader icon={<Icon />} menu={menu} />
+    case 'guide':
+      return (
+        <IdentityFloatingEditorHeader<ComponentSchema>
+          icon={<Icon />}
+          menu={menu}
+          editable={editableComponent}
+          issues={issues}
+          onChange={setComponent}
+        />
+      )
+    case 'root-panel-face':
+    case 'panel':
+    case 'pocket-cluster':
+    case 'front-pocket':
+    case 't-pocket':
+      return (
+        <ComponentFloatingEditorHeader<ComponentSchema & BaseComponentSchema>
+          editable={editableComponent}
+          icon={<Icon />}
+          issues={issues}
+          menu={menu}
+          onChange={setComponent}
+        />
+      )
+  }
 }

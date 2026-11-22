@@ -1,20 +1,19 @@
 import { EmptyState } from '@chakra-ui/react'
 import { type FC } from 'react'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
 
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketSchema } from '../../schemas/components'
 import type { StraightPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { isDefined } from '../../utils/isDefined'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
 
-type StraightPocketOpeningEditorProps = {
-  opening: StraightPocketOpeningSchema
-  referencePocket: PocketSchema | undefined
-}
-
-export const StraightPocketOpeningEditor: FC<StraightPocketOpeningEditorProps> = ({ opening, referencePocket }) => {
+export const StraightPocketOpeningEditor: FC = () => {
   const { t } = useTranslation()
+  const { selectedModelId, models } = useEditableModelsContext<StraightPocketOpeningSchema>()
+  const opening = models[selectedModelId]
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(selectedModelId)
 
   return (
     <SectionGroup.Root>

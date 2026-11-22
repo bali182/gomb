@@ -1,36 +1,49 @@
 import { Tabs } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC } from 'react'
 import { PocketEditorTabs } from '../../constants/editorTabs'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { HasCornerRadiusSchema } from '../../schemas/common'
-import type { FrontPocketSchema, PocketClusterSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
+import type { FrontPocketSchema } from '../../schemas/components'
 import type { IssuesSchema } from '../../schemas/issues'
+import { narrowers } from '../../utils/narrowers'
 import { SectionGroup } from '../common/SectionGroup'
 import { ContentsSection } from './sections/ContentsSection'
 import { CornerRadiusSection } from './sections/CornerRadiusSection'
 import { LayoutSection } from './sections/LayoutSection'
 import { PocketOpeningSection } from './sections/PocketOpeningSection'
-type FrontPocketEditorProps = {
-  component: FrontPocketSchema
-  editable: EditableSchema<FrontPocketSchema>
-  issues: IssuesSchema<FrontPocketSchema>
-  parent: PocketClusterSchema
-  onChange: (value: EditableSchema<FrontPocketSchema>) => void
-}
 
-export const FrontPocketEditor: FC<FrontPocketEditorProps> = ({ component, editable, issues, parent, onChange }) => {
+export const FrontPocketEditor: FC = () => {
+  const { t } = useTranslation()
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<FrontPocketSchema>()
+  const component = models[selectedModelId]
+  const { accessor } = useSubProject()
+  const parent = narrowers.assert.pocketCluster(accessor.component.parent(component.id))
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = useComponentLimitIssues(component)
+
+  const issues = useCombinedIssues<FrontPocketSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<FrontPocketSchema>,
+  )
+
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: component.id,
     defaultTab: PocketEditorTabs.layout,
     tabs: PocketEditorTabs,
   })
-  const { t } = useTranslation()
+
   const handleOpeningIdChange = useCallback(
     (openingId: string): void => onChange({ ...editable, openingId }),
     [editable, onChange],
   )
+
   const disabledFields = useMemo<readonly (keyof HasCornerRadiusSchema)[]>(() => {
     switch (parent.orientation) {
       case 'up':

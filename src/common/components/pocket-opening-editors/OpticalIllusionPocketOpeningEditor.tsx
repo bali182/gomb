@@ -1,10 +1,12 @@
 import { HStack, Link, Text } from '@chakra-ui/react'
 import { useCallback, type FC } from 'react'
 import { PiYoutubeLogoFill } from 'react-icons/pi'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
+import { usePocketOpeningLimitIssues } from '../../hooks/usePocketOpeningLimitIssues'
 
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { OpticalIllusionPocketOpeningSchema, PocketOpeningSideSchema } from '../../schemas/pocketOpening'
 import { isDefined } from '../../utils/isDefined'
@@ -13,22 +15,21 @@ import { PocketOpeningSideSelect } from '../common/PocketOpeningSideSelect'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
 
-type OpticalIllusionPocketOpeningEditorProps = {
-  opening: OpticalIllusionPocketOpeningSchema
-  referencePocket: PocketSchema | undefined
-  editable: EditableSchema<OpticalIllusionPocketOpeningSchema>
-  issues: IssuesSchema<OpticalIllusionPocketOpeningSchema>
-  onChange: (updated: EditableSchema<OpticalIllusionPocketOpeningSchema>) => void
-}
-
-export const OpticalIllusionPocketOpeningEditor: FC<OpticalIllusionPocketOpeningEditorProps> = ({
-  opening,
-  referencePocket,
-  editable,
-  issues,
-  onChange,
-}) => {
+export const OpticalIllusionPocketOpeningEditor: FC = () => {
   const { t } = useTranslation()
+
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<OpticalIllusionPocketOpeningSchema>()
+  const opening = models[selectedModelId]
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(selectedModelId)
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = usePocketOpeningLimitIssues(opening, referencePocket)
+
+  const issues = useCombinedIssues<OpticalIllusionPocketOpeningSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<OpticalIllusionPocketOpeningSchema>,
+  )
 
   const handleStartInsetChange = useCallback(
     (startInset: string): void => {

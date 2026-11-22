@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import type { IssuesSchema } from '../schemas/issues'
 import type { StitchLineSchema } from '../schemas/stitching'
-import { accessors } from '../utils/accessors'
 import { getLimitIssues } from '../utils/getLimitIssues'
 import { getResolvedStitchLine } from '../utils/getResolvedStitchLine'
 import { isDefined } from '../utils/isDefined'
@@ -11,10 +10,10 @@ import { useSubProject } from './useSubProject'
 import { useTranslation } from './useTranslation'
 
 export const useStitchLineLimitIssues = (stitchLine: StitchLineSchema): IssuesSchema<StitchLineSchema> => {
-  const { computedSubProject } = useSubProject()
+  const { computedAccessor } = useSubProject()
   const { project } = useProject()
   const translation = useTranslation()
-  const limits = accessors.computedSubProject(computedSubProject).optional.limits.stitchLine(stitchLine.id)
+  const limits = computedAccessor.optional.limits.stitchLine(stitchLine.id)
   return useMemo<IssuesSchema<StitchLineSchema>>(() => {
     if (!isDefined(limits) || limits.type !== stitchLine.type) {
       return noIssues<StitchLineSchema>()

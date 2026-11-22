@@ -1,10 +1,13 @@
 import { useCallback, type FC } from 'react'
 import { StitchLineEditorTabs } from '../../constants/editorTabs'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useResolvedEditableStitchLine } from '../../hooks/useResolvedEditableStitchLine'
+import { useStitchLineLimitIssues } from '../../hooks/useStitchLineLimitIssues'
 
 import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type {
   HasExitComponentSchema,
@@ -16,21 +19,30 @@ import { PocketStitchingSection } from './sections/PocketStitchingSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 import { TPocketStitchLineComponentsSection } from './sections/TPocketStitchLineComponentsSection'
 
-type TPocketStitchLineEditorProps = {
-  editable: EditableSchema<TPocketStitchLineSchema>
-  issues: IssuesSchema<TPocketStitchLineSchema>
-  onChange: (updated: EditableSchema<TPocketStitchLineSchema>) => void
-  onReset: (key: keyof StitchLineCommonConfigSchema) => void
-  resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<TPocketStitchLineSchema>
-}
+export const TPocketStitchLineEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<TPocketStitchLineSchema>()
 
-export const TPocketStitchLineEditor: FC<TPocketStitchLineEditorProps> = ({
-  editable,
-  issues,
-  onChange,
-  onReset,
-  resolvedEditable,
-}) => {
+  const stitchLine = models[selectedModelId]
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+  const limitIssues = useStitchLineLimitIssues(stitchLine)
+
+  const issues = useCombinedIssues<TPocketStitchLineSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<TPocketStitchLineSchema>,
+  )
+
+  const resolvedEditable = useResolvedEditableStitchLine<TPocketStitchLineSchema>(editable)
+
+  const onReset = useCallback(
+    (key: keyof StitchLineCommonConfigSchema): void => {
+      const updatedEditable = { ...editable }
+      delete updatedEditable[key]
+      onChange(updatedEditable)
+    },
+    [editable, onChange],
+  )
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: editable.id,

@@ -8,7 +8,6 @@ import { useEditorContext } from '../contexts/EditorContext'
 import type { ComputedRootPanelSchema } from '../schemas/computed'
 import type { ProjectSchema } from '../schemas/project'
 import type { SubProjectItemSchema } from '../schemas/subProject'
-import { accessors } from '../utils/accessors'
 import { isDefined } from '../utils/isDefined'
 import { useGlobalSettings } from './useGlobalSettings'
 import { useMeasurement } from './useMeasurement'
@@ -87,7 +86,7 @@ const DRAW_AREA_TURN_KEYFRAMES: Record<DrawAreaTurnPhase, Record<DrawAreaTurnDir
 export const useDrawAreaTurn = (): UseDrawAreaTurnResult => {
   const { rootPanelFaceId, selection } = useDrawAreaContext()
   const { project } = useProject()
-  const { subProject, computedSubProject } = useOptionalSubProject()
+  const { subProject, computedSubProject, computedAccessor } = useOptionalSubProject()
   const { isComputing } = useEditorContext()
   const { isMeasuring } = useMeasurement()
   const { settings } = useGlobalSettings()
@@ -96,11 +95,16 @@ export const useDrawAreaTurn = (): UseDrawAreaTurnResult => {
   const scale = settings.view.scale
 
   const root = useMemo<ComputedRootPanelSchema | undefined>(() => {
-    if (!isDefined(subProject) || !isDefined(computedSubProject) || subProject.id !== computedSubProject.id) {
+    if (
+      !isDefined(subProject) ||
+      !isDefined(computedSubProject) ||
+      !isDefined(computedAccessor) ||
+      subProject.id !== computedSubProject.id
+    ) {
       return undefined
     }
-    return accessors.computedSubProject(computedSubProject).component.rootPanel()
-  }, [subProject, computedSubProject])
+    return computedAccessor.component.rootPanel()
+  }, [subProject, computedSubProject, computedAccessor])
 
   const targetFaceId = useMemo<string | undefined>(() => {
     if (!isDefined(root)) {

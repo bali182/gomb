@@ -13,7 +13,7 @@ import {
   defaultTPocket,
   defaultTPocketStitchLine,
 } from '../../defaultStates'
-import { getClosestPocketStepSize, getClosestRootDimensions } from '../../operations/subProject/utils/dimensionUtils'
+import { getClosestPocketStepSize } from '../../operations/subProject/utils/dimensionUtils'
 import type {
   BindingFieldSchema,
   BindingSchema,
@@ -103,8 +103,8 @@ export class ReadonlyModelObjectFactory implements Factory.ReadonlyModelObjectFa
       backFaceId: params.backFaceId,
       id: this.id.get('root-panel', params.forbiddenIds),
       name: this.name.get('root-panel', params.forbiddenNames),
-      ...getClosestRootDimensions(defaultRootPanel, params.stitchingSettings),
-      ...(isDefined(params.color) ? { color: params.color } : {}),
+      width: 180,
+      height: 110,
     }
   }
 

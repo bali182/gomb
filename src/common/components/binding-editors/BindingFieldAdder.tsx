@@ -7,11 +7,9 @@ import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { useTranslation } from '../../hooks/useTranslation'
 import { bindingFieldBlockers } from '../../logic/bindings/bindingFieldBlockers'
 import { getBindingFieldInputs } from '../../logic/bindings/getBindingFieldInputs'
-import type { SubProjectAccessorSchema } from '../../schemas/accessors'
 import type { BindingSchema } from '../../schemas/bindings'
 import type { BindingFieldInputSchema } from '../../schemas/factory'
 import type { ModelObjectSchema } from '../../schemas/modelObject'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import type { ProjectTreeNode } from '../component-tree/types/nodeTypes'
 import { useComponentTreeCollection } from '../component-tree/utils/useComponentTreeCollection'
@@ -35,12 +33,11 @@ const getBindingTreeModel = (node: ProjectTreeNode): ModelObjectSchema => {
 }
 
 export const BindingFieldAdder: FC<BindingFieldAdderProps> = ({ binding }) => {
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { isComputing, setEditingInputId } = useEditorContext()
   const { addBindingFields } = useSubProjectOperations()
   const { t } = useTranslation()
   const [selection, setSelection] = useState<BindingFieldAdderState>({ modelId: undefined, property: undefined })
-  const accessor = useMemo<SubProjectAccessorSchema>(() => accessors.subProject(subProject), [subProject])
   const componentTree = useComponentTreeCollection(subProject)
 
   const getFields = useCallback(

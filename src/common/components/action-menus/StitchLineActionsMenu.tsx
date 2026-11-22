@@ -7,7 +7,6 @@ import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { portalRef } from '../../portalRef'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'
-import { accessors } from '../../utils/accessors'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'
 import {
@@ -29,7 +28,7 @@ type StitchLineActionsMenuProps = {
 
 export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLine, size, onDelete = noop }) => {
   const { openDialog } = useEditorDialogsContext()
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { deleteModelBindingFields, cloneStitchLine, deleteStitchLine, flip } = useSubProjectOperations()
 
   const handleActionsClick = useCallback((event: MouseEvent<HTMLDivElement>): void => {
@@ -42,8 +41,8 @@ export const StitchLineActionsMenu: FC<StitchLineActionsMenuProps> = ({ stitchLi
   }, [deleteStitchLine, stitchLine.id, onDelete])
 
   const hasBindings = useMemo<boolean>(
-    () => accessors.subProject(subProject).binding.byModel(stitchLine.id).length > 0,
-    [subProject, stitchLine.id],
+    () => accessor.binding.byModel(stitchLine.id).length > 0,
+    [accessor, stitchLine.id],
   )
 
   const handleDeleteBindings = useCallback((): void => {

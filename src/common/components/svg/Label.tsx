@@ -18,7 +18,6 @@ import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
 import type { PointSchema, RectSchema, SizeSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
@@ -79,8 +78,8 @@ export const Label: FC<LabelProps> = ({
 }) => {
   const { labelStyles } = useDrawAreaContext()
   const direction = useOptionalSvgFace()?.direction ?? 'forward'
-  const { computedSubProject } = useSubProject()
-  const root = accessors.computedSubProject(computedSubProject).component.rootPanel()
+  const { computedAccessor } = useSubProject()
+  const root = computedAccessor.component.rootPanel()
   const axisX = root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
   const textRef = useRef<SVGTextElement>(null)
   const [textBounds, setTextBounds] = useState<RectSchema | undefined>(undefined)

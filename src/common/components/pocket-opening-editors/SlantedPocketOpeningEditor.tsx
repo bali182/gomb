@@ -1,8 +1,10 @@
 import { useCallback, type FC } from 'react'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
+import { usePocketOpeningLimitIssues } from '../../hooks/usePocketOpeningLimitIssues'
 
 import { useTranslation } from '../../hooks/useTranslation'
-import type { PocketSchema } from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { PocketOpeningSideSchema, SlantedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { isDefined } from '../../utils/isDefined'
@@ -11,21 +13,20 @@ import { PocketOpeningSideSelect } from '../common/PocketOpeningSideSelect'
 import { SectionGroup } from '../common/SectionGroup'
 import { PocketOpeningEditorPreview } from './PocketOpeningEditorPreview'
 
-type SlantedPocketOpeningEditorProps = {
-  opening: SlantedPocketOpeningSchema
-  referencePocket: PocketSchema | undefined
-  editable: EditableSchema<SlantedPocketOpeningSchema>
-  issues: IssuesSchema<SlantedPocketOpeningSchema>
-  onChange: (updated: EditableSchema<SlantedPocketOpeningSchema>) => void
-}
+export const SlantedPocketOpeningEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<SlantedPocketOpeningSchema>()
 
-export const SlantedPocketOpeningEditor: FC<SlantedPocketOpeningEditorProps> = ({
-  opening,
-  referencePocket,
-  editable,
-  issues,
-  onChange,
-}) => {
+  const opening = models[selectedModelId]
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(selectedModelId)
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+
+  const limitIssues = usePocketOpeningLimitIssues(opening, referencePocket)
+  const issues = useCombinedIssues<SlantedPocketOpeningSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<SlantedPocketOpeningSchema>,
+  )
   const { t } = useTranslation()
 
   const handleOffsetChange = useCallback(

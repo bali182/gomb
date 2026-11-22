@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 
-import { useEditableHole } from '../../hooks/useEditableHole'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import type { HasTargetSchema } from '../../schemas/common'
 import type { HoleSchema } from '../../schemas/hole'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
@@ -12,13 +12,18 @@ import { HoleEditor } from './HoleEditor'
 
 type HoleFloatingEditorProps = {
   anchorElement: FloatingEditorAnchor
-  hole: HoleSchema
   onAdd: (target: HasTargetSchema) => void
   onClose: () => void
 }
 
-export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement, hole, onAdd, onClose }) => {
-  const { editableHole, hole: editedHole, setHole, validationIssues } = useEditableHole(hole.id)
+export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement, onAdd, onClose }) => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } = useEditableModelsContext<HoleSchema>()
+
+  const editedHole = models[selectedModelId]
+  const editableHole = editableModels[selectedModelId]
+  const issues = validationIssues[selectedModelId]
+  const setHole = setModel[selectedModelId]
+
   const Icon = getModelIconByType(editedHole.type)
 
   return (
@@ -26,11 +31,11 @@ export const HoleFloatingEditor: FC<HoleFloatingEditorProps> = ({ anchorElement,
       <IdentityFloatingEditorHeader<HoleSchema>
         editable={editableHole}
         icon={<Icon />}
-        issues={validationIssues}
+        issues={issues}
         menu={<HoleActionsMenu hole={editedHole} onAddStitchLine={onAdd} size="xs" />}
         onChange={setHole}
       />
-      <HoleEditor editable={editableHole} hole={editedHole} issues={validationIssues} onChange={setHole} />
+      <HoleEditor />
     </FloatingEditor>
   )
 }

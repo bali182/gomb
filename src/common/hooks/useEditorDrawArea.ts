@@ -45,9 +45,9 @@ type UseEditorDrawAreaParams = {
 export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAreaParams): DrawAreaContextValue => {
   const { project } = useProject()
   const { settings } = useGlobalSettings()
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { face, side, setSide } = useRootPanelFace()
-  const drawAreaSelection = useSubProjectSelection(subProject)
+  const drawAreaSelection = useSubProjectSelection()
 
   const flipRootPanelFace = useCallback((): void => {
     drawAreaSelection.clearSelection()
@@ -95,7 +95,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
   )
 
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
-    const getBackgroundColor = ({ component, nestingLevel }: DrawAreaComponentStyleParams): string => {
+    const getBackgroundColor = ({ component, nestingLevel, faceIdAboveRoot }: DrawAreaComponentStyleParams): string => {
       if (
         narrowers.is.guide(component) ||
         narrowers.is.rootPanelFace(component) ||
@@ -103,8 +103,16 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       ) {
         return 'transparent'
       }
+      let color: string | undefined
+      if (narrowers.is.rootPanel(component)) {
+        if (isDefined(faceIdAboveRoot)) {
+          color = accessor.component.rootPanelFace(faceIdAboveRoot).color
+        }
+      } else {
+        color = component.color
+      }
       return applyOpacity(
-        component.color ?? getComponentColor(leatherColor, nestingLevel),
+        color ?? getComponentColor(leatherColor, nestingLevel),
         selectionOpacities.components[component.id].fill,
       )
     }
@@ -141,7 +149,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities])
+  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, accessor])
 
   const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {

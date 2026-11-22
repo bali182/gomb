@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 
-import { useEditableStitchLine } from '../../hooks/useEditableStitchLine'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import type { StitchLineSchema } from '../../schemas/stitching'
 import type { FloatingEditorAnchor } from '../../utils/floatingEditorAnchorUtils'
 import { getModelIconByType } from '../../utils/getModelIcon'
@@ -12,17 +12,16 @@ import { StitchLineEditor } from './StitchLineEditor'
 type StitchLineFloatingEditorProps = {
   anchorElement: FloatingEditorAnchor
   onClose: () => void
-  stitchLine: StitchLineSchema
 }
 
-export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ anchorElement, onClose, stitchLine }) => {
-  const {
-    editableStitchLine,
-    resolvedEditableStitchLine,
-    setStitchLine,
-    stitchLine: editedStitchLine,
-    validationIssues,
-  } = useEditableStitchLine(stitchLine.id)
+export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ anchorElement, onClose }) => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<StitchLineSchema>()
+
+  const editedStitchLine = models[selectedModelId]
+  const editableStitchLine = editableModels[selectedModelId]
+  const issues = validationIssues[selectedModelId]
+  const setStitchLine = setModel[selectedModelId]
   const Icon = getModelIconByType(editedStitchLine.type)
 
   return (
@@ -30,17 +29,11 @@ export const StitchLineFloatingEditor: FC<StitchLineFloatingEditorProps> = ({ an
       <IdentityFloatingEditorHeader<StitchLineSchema>
         editable={editableStitchLine}
         icon={<Icon />}
-        issues={validationIssues}
+        issues={issues}
         menu={<StitchLineActionsMenu size="xs" stitchLine={editedStitchLine} />}
         onChange={setStitchLine}
       />
-      <StitchLineEditor
-        editable={editableStitchLine}
-        issues={validationIssues}
-        onChange={setStitchLine}
-        resolvedEditable={resolvedEditableStitchLine}
-        stitchLine={editedStitchLine}
-      />
+      <StitchLineEditor />
     </FloatingEditor>
   )
 }

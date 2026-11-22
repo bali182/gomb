@@ -1,26 +1,22 @@
 import { type FC } from 'react'
 
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
 import { useCombinedIssues } from '../../hooks/useCombinedIssues'
 import { useHoleLimitIssues } from '../../hooks/useHoleLimitIssues'
-import type { EditableSchema } from '../../schemas/editable'
 import type { HoleSchema } from '../../schemas/hole'
-import type { IssuesSchema } from '../../schemas/issues'
 import { SectionGroup } from '../common/SectionGroup'
 import { AnchoredPositionSection } from '../component-editors/sections/AnchoredPositionSection'
 import { AutoSizeSection } from '../component-editors/sections/AutoSizeSection'
 import { CornerRadiusSection } from '../component-editors/sections/CornerRadiusSection'
 import { StretchSection } from '../component-editors/sections/StretchSection'
 
-type HoleEditorProps = {
-  editable: EditableSchema<HoleSchema>
-  hole: HoleSchema
-  issues: IssuesSchema<HoleSchema>
-  onChange: (updated: EditableSchema<HoleSchema>) => void
-}
-
-export const HoleEditor: FC<HoleEditorProps> = ({ editable, hole, issues: incomingIssues, onChange }) => {
+export const HoleEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } = useEditableModelsContext<HoleSchema>()
+  const hole = models[selectedModelId]
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
   const limitIssues = useHoleLimitIssues(hole)
-  const issues = useCombinedIssues<HoleSchema>(incomingIssues, limitIssues)
+  const issues = useCombinedIssues<HoleSchema>(validationIssues[selectedModelId], limitIssues)
 
   return (
     <SectionGroup.Root>

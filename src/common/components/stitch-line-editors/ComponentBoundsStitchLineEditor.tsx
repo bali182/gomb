@@ -1,10 +1,13 @@
-import { type FC } from 'react'
+import { useCallback, type FC } from 'react'
 import { StitchLineEditorTabs } from '../../constants/editorTabs'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import { useCombinedIssues } from '../../hooks/useCombinedIssues'
+import { useResolvedEditableStitchLine } from '../../hooks/useResolvedEditableStitchLine'
+import { useStitchLineLimitIssues } from '../../hooks/useStitchLineLimitIssues'
 
 import { Tabs } from '@chakra-ui/react'
 import { useFloatingEditorTab } from '../../hooks/useFloatingEditorTab'
 import { useTranslation } from '../../hooks/useTranslation'
-import type { EditableSchema } from '../../schemas/editable'
 import type { IssuesSchema } from '../../schemas/issues'
 import type { ComponentBoundsStitchLineSchema, StitchLineCommonConfigSchema } from '../../schemas/stitching'
 import { SectionGroup } from '../common/SectionGroup'
@@ -13,23 +16,29 @@ import { StitchLineComponentsSection } from './sections/StitchLineComponentsSect
 import { StitchSidesAndCornersSection } from './sections/StitchSidesAndCornersSection'
 import { StitchingSettingsSection } from './sections/StitchingSettingsSection'
 
-type ComponentBoundsStitchLineEditorProps = {
-  value: ComponentBoundsStitchLineSchema
-  editable: EditableSchema<ComponentBoundsStitchLineSchema>
-  issues: IssuesSchema<ComponentBoundsStitchLineSchema>
-  onChange: (updated: EditableSchema<ComponentBoundsStitchLineSchema>) => void
-  onReset: (key: keyof StitchLineCommonConfigSchema) => void
-  resolvedEditable: EditableSchema<StitchLineCommonConfigSchema> & EditableSchema<ComponentBoundsStitchLineSchema>
-}
+export const ComponentBoundsStitchLineEditor: FC = () => {
+  const { selectedModelId, models, editableModels, validationIssues, setModel } =
+    useEditableModelsContext<ComponentBoundsStitchLineSchema>()
 
-export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditorProps> = ({
-  value,
-  editable,
-  issues,
-  onChange,
-  onReset,
-  resolvedEditable,
-}) => {
+  const value = models[selectedModelId]
+  const editable = editableModels[selectedModelId]
+  const onChange = setModel[selectedModelId]
+
+  const limitIssues = useStitchLineLimitIssues(value)
+  const issues = useCombinedIssues<ComponentBoundsStitchLineSchema>(
+    validationIssues[selectedModelId],
+    limitIssues as IssuesSchema<ComponentBoundsStitchLineSchema>,
+  )
+  const resolvedEditable = useResolvedEditableStitchLine<ComponentBoundsStitchLineSchema>(editable)
+
+  const onReset = useCallback(
+    (key: keyof StitchLineCommonConfigSchema): void => {
+      const updatedEditable = { ...editable }
+      delete updatedEditable[key]
+      onChange(updatedEditable)
+    },
+    [editable, onChange],
+  )
   const { t } = useTranslation()
   const { activeTab, onTabChange } = useFloatingEditorTab({
     modelId: value.id,
@@ -48,7 +57,12 @@ export const ComponentBoundsStitchLineEditor: FC<ComponentBoundsStitchLineEditor
         <SectionGroup.Root>
           <StitchLineComponentsSection editable={editable} onChange={onChange} />
           <StitchSidesAndCornersSection value={value} editable={editable} issues={issues} onChange={onChange} />
-          <CornerRadiusSection modelId={editable.id} editable={editable} issues={issues} onChange={onChange} />
+          <CornerRadiusSection<ComponentBoundsStitchLineSchema>
+            modelId={editable.id}
+            editable={editable}
+            issues={issues}
+            onChange={onChange}
+          />
         </SectionGroup.Root>
       </Tabs.Content>
       <Tabs.Content value={StitchLineEditorTabs.overrides} pt={0}>

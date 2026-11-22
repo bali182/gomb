@@ -11,9 +11,7 @@ import {
   normalizeStitchLineEntryAndExit,
   type NormalizedStitchLineEntryAndExit,
 } from '../../logic/stitching/stitchLineComponentValidation'
-import type { SubProjectAccessorSchema } from '../../schemas/accessors'
 import { HasEntryComponentSchema, HasExitComponentSchema } from '../../schemas/stitching'
-import { accessors } from '../../utils/accessors'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -39,12 +37,11 @@ export const StitchLineComponentCombobox: FC<StitchLineComponentComboboxProps> =
   componentId,
   onChange,
 }) => {
-  const { subProject } = useSubProject()
+  const { subProject, accessor } = useSubProject()
   const { isComputing, setEditingInputId } = useEditorContext()
   const { t } = useTranslation()
   const [search, setSearch] = useState<string>('')
   const [open, setOpen] = useState<boolean>(false)
-  const accessor = useMemo<SubProjectAccessorSchema>(() => accessors.subProject(subProject), [subProject])
   const tree = useComponentTreeCollection(subProject, { showHoles: false, showStitchLines: false })
   const cluster = accessor.optional.stitchLine.ownerPocketCluster(stitchLineId)
 

@@ -108,3 +108,31 @@ describe('input model comparators', () => {
     }
   })
 })
+
+describe('root panel face identity and color comparison', () => {
+  const face = d.rootPanelFace({ id: 'root-front', color: '#123456' })
+
+  it('recognizes unchanged faces independently of object identity', () => {
+    const unchanged = { ...face, children: [...face.children] }
+    expect(comparators.rootPanelFace(face, unchanged)).toBe(true)
+    expect(comparators.component(face, unchanged)).toBe(true)
+  })
+
+  const withoutColor = d.rootPanelFace({ id: face.id })
+  const changes = [
+    { name: 'name', before: face, after: { ...face, name: 'Renamed face' } },
+    { name: 'added color', before: withoutColor, after: face },
+    { name: 'changed color', before: face, after: { ...face, color: '#abcdef' } },
+    { name: 'removed color', before: face, after: withoutColor },
+  ]
+
+  it.each(changes)('detects $name changes through every enclosing comparator', ({ before, after }) => {
+    const subProject = d.subProject({ id: 'sub-project', root: d.rootPanel({ id: 'root' }), frontFace: before })
+    const updatedSubProject = { ...subProject, components: { ...subProject.components, [after.id]: after } }
+    const project = d.project({ id: 'project', subProjects: [subProject] })
+    expect(comparators.rootPanelFace(before, after)).toBe(false)
+    expect(comparators.component(before, after)).toBe(false)
+    expect(comparators.subProject(subProject, updatedSubProject)).toBe(false)
+    expect(comparators.project(project, { ...project, subProjects: [updatedSubProject] })).toBe(false)
+  })
+})

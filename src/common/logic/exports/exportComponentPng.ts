@@ -36,18 +36,29 @@ type ExportComponentPngParams = {
 
 export const exportComponentPng = async (params: ExportComponentPngParams): Promise<void> => {
   const { project, subProject, componentId, settings, context } = params
-  const component = accessors.subProject(subProject).component.byId(componentId)
+  const accessor = accessors.subProject(subProject)
+  const component = accessor.component.byId(componentId)
+  const exportComponent = narrowers.is.rootPanelFace(component)
+    ? accessor.component.rootPanel(accessor.component.parent(component.id).id)
+    : component
+  const exportContext: DrawAreaContextValue = narrowers.is.rootPanelFace(component)
+    ? { ...context, rootPanelFaceId: component.id }
+    : context
   const computedSubProject = getComputedSubProject(subProject, project.stitchingSettings)
   const computedAccessor = accessors.computedSubProject(computedSubProject)
   const computedRoot = computedAccessor.component.rootPanel()
-  const computedComponent = computedAccessor.component.byId(componentId)
+  const computedComponent = computedAccessor.component.byId(exportComponent.id)
 
-  const nestingLevel = findNestingLevel(computedRoot, componentId, computedSubProject)
+  const nestingLevel = findNestingLevel(computedRoot, exportComponent.id, computedSubProject)
   if (!isDefined(nestingLevel)) {
-    throw new Error(`Component not found in tree: ${componentId}`)
+    throw new Error(`Component not found in tree: ${exportComponent.id}`)
   }
 
-  const rects = collectBoundingRects(computedComponent, nestingLevel, computedSubProject, params)
+  const rects = collectBoundingRects(computedComponent, nestingLevel, computedSubProject, {
+    ...params,
+    componentId: exportComponent.id,
+    context: exportContext,
+  })
   if (rects.length === 0) {
     return
   }
@@ -56,8 +67,8 @@ export const exportComponentPng = async (params: ExportComponentPngParams): Prom
   const svg = renderSvgComponentToString({
     editorValues: { project, subProject, computedSubProject },
     settings,
-    context,
-    componentId,
+    context: exportContext,
+    componentId: exportComponent.id,
     nestingLevel,
     boundingRect,
   })

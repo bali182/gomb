@@ -8,7 +8,6 @@ import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema } from '../schemas/validation'
 import { optionalComparators } from '../utils/comparators'
 import { validateComponentSchema } from '../validators/validateComponentSchema'
-import { useComponent } from './useComponent'
 import { ImmediateUpdater, useEditableModel } from './useEditableModel'
 import { useProject } from './useProject'
 import { useSubProject } from './useSubProject'
@@ -24,10 +23,9 @@ export type UseEditableComponentResult = {
 }
 
 export const useEditableComponent = (componentId: string): UseEditableComponentResult => {
-  const component = useComponent(componentId)
-
   const { project } = useProject()
-  const { computedSubProject, subProject } = useSubProject()
+  const { computedSubProject, subProject, accessor } = useSubProject()
+  const component = accessor.component.byId(componentId)
   const { updateComponent } = useSubProjectOperations()
   const { t } = useTranslation()
   const context = useMemo<ComponentBasedValidationContextSchema>(

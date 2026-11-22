@@ -4,12 +4,12 @@ import type { IconType } from 'react-icons'
 
 import { PiHand } from 'react-icons/pi'
 import { useEditorContext } from '../../contexts/EditorContext'
+import { useSubProject } from '../../hooks/useSubProject'
 import { useTranslation } from '../../hooks/useTranslation'
 import { portalRef } from '../../portalRef'
 import type { BindingFieldNameSchema } from '../../schemas/bindings'
 import { AutoDimensionModeSchema } from '../../schemas/components'
 import type { IssueSchema } from '../../schemas/issues'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { EditorNumberInput } from './EditorNumberInput'
 import { EditorSelectWrapper } from './EditorSelectWrapper'
@@ -42,7 +42,8 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   onAutoChange,
   onValueChange,
 }) => {
-  const { isComputing, subProject } = useEditorContext()
+  const { isComputing } = useEditorContext()
+  const { accessor } = useSubProject()
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   const groupRef = useRef<HTMLDivElement>(null)
@@ -50,8 +51,8 @@ export const AutoDimensionEditor: FC<AutoDimensionEditorProps> = ({
   const focusRequested = useRef(false)
 
   const autoDisabled = useMemo<boolean>(() => {
-    return !auto && isDefined(subProject) && accessors.subProject(subProject).binding.byField(modelId, field).length > 0
-  }, [auto, field, modelId, subProject])
+    return !auto && accessor.binding.byField(modelId, field).length > 0
+  }, [auto, field, modelId, accessor])
 
   const collection = useMemo<ListCollection<AutoDimensionModeSchema>>(
     () =>

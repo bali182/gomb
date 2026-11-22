@@ -3,7 +3,6 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useProject } from '../../hooks/useProject'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
-import { accessors } from '../../utils/accessors'
 import { getResolvedStitchLine } from '../../utils/getResolvedStitchLine'
 import { isDefined } from '../../utils/isDefined'
 import { StitchLineRoute } from './StitchLineRoute'
@@ -21,16 +20,14 @@ type StitchLinesProps = {
 
 export const StitchLines: FC<StitchLinesProps> = ({ componentId, surface }) => {
   const { project } = useProject()
-  const { subProject, computedSubProject } = useSubProject()
+  const { accessor, computedAccessor } = useSubProject()
   const { faceId } = useSvgFace()
   const routes = useMemo<ComputedStitchRouteSchema[]>(() => {
-    const accessor = accessors.computedSubProject(computedSubProject)
-    const exitRoutes = accessor.stitchLine
+    const exitRoutes = computedAccessor.stitchLine
       .byExit(componentId)
       .filter((route) => (surface === 'front' ? route.faceId !== faceId : route.faceId === faceId))
-    return surface === 'front' ? [...accessor.stitchLine.byEntry(componentId), ...exitRoutes] : exitRoutes
-  }, [computedSubProject, componentId, faceId, surface])
-  const accessor = accessors.subProject(subProject)
+    return surface === 'front' ? [...computedAccessor.stitchLine.byEntry(componentId), ...exitRoutes] : exitRoutes
+  }, [computedAccessor, componentId, faceId, surface])
 
   return (
     <>

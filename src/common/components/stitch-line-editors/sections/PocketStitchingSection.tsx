@@ -7,7 +7,6 @@ import type { PocketOrientationSchema } from '../../../schemas/components'
 import type { EditableSchema } from '../../../schemas/editable'
 import type { IssuesSchema } from '../../../schemas/issues'
 import type { StitchDirectionSchema, TPocketStitchLineSchema } from '../../../schemas/stitching'
-import { accessors } from '../../../utils/accessors'
 import { EditorNumberInput } from '../../common/EditorNumberInput'
 import type { NumberInputArrowPosition } from '../../common/NumberInputArrow'
 import { SectionGroup } from '../../common/SectionGroup'
@@ -25,8 +24,7 @@ type PocketStitchingSectionProps = {
 
 export const PocketStitchingSection = ({ editable, issues, onChange }: PocketStitchingSectionProps): ReactNode => {
   const { t } = useTranslation()
-  const { subProject } = useSubProject()
-  const accessor = accessors.subProject(subProject)
+  const { accessor } = useSubProject()
   const { orientation } = accessor.stitchLine.ownerPocketCluster(editable.id)
   const isVertical = orientation === 'left' || orientation === 'right'
   const isReversed = editable.stitchDirection === 'end-to-start'

@@ -1,17 +1,12 @@
-import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 import { Guide } from './Guide'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { PanelSchema } from '../../schemas/components'
-import type { ComputedPanelSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import { accessors } from '../../utils/accessors'
 import { HoleHighlights } from './HoleHighlights'
 import { PocketCluster } from './PocketCluster'
 import { SizeLabel } from './SizeLabel'
@@ -26,14 +21,15 @@ type PanelProps = {
 export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const panel = useComponent<PanelSchema>(componentId)
-  const computedPanel = useComputedComponent<ComputedPanelSchema>(componentId)
-  const { computedSubProject } = useSubProject()
-  const accessor = accessors.computedSubProject(computedSubProject)
+  const { accessor, computedAccessor } = useSubProject()
+  const computedPanel = computedAccessor.component.panel(componentId)
   const { direction } = useSvgFace()
-  const children = accessor.component.children(componentId)
+  const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const pathData = usePath(computedPanel.path)
+
+  const panel = useMemo(() => accessor.component.panel(componentId), [accessor.component, componentId])
+
   const isActive = selection.isSelected(panel) || selection.isHovered(panel)
   const styleParams: DrawAreaComponentStyleParams = {
     component: panel,
@@ -43,9 +39,11 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
   const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
     selection.hover(panel)
   }, [panel, selection])
+
   const handlePointerLeave = useCallback<PointerEventHandler<SVGPathElement>>(() => {
     selection.clearHover()
   }, [selection])
+
   const handleClick = useCallback<MouseEventHandler<SVGPathElement>>(
     (event) => {
       event.stopPropagation()

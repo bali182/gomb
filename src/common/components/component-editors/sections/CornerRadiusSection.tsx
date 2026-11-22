@@ -1,6 +1,8 @@
 import {
+  Badge,
   Box,
   Grid,
+  HStack,
   Icon,
   Popover,
   type PopoverOpenChangeDetails,
@@ -9,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useEditorContext } from '../../../contexts/EditorContext'
-import { accessors } from '../../../utils/accessors'
+import { useOptionalSubProject } from '../../../hooks/useOptionalSubProject'
 import { isDefined } from '../../../utils/isDefined'
 
 import { PiCar, PiLink, PiPencilLine } from 'react-icons/pi'
@@ -39,6 +41,7 @@ const RADIUS_BINDER_POSITIONING: PopoverRootProps['positioning'] = { placement: 
 const RADIUS_BINDER_TRIGGER_STYLE: SystemStyleObject = { bg: 'bg.emphasized' }
 
 type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>> = {
+  tag?: string
   modelId: string
   disabledFields?: readonly (keyof HasCornerRadiusSchema)[]
   editable: EditableSchema<T>
@@ -47,6 +50,7 @@ type CornerRadiusSectionProps<T extends HasCornerRadiusSchema & Partial<HasAutoC
 }
 
 export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<HasAutoCornerRadiusSchema>>({
+  tag,
   modelId,
   disabledFields,
   editable,
@@ -54,7 +58,8 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   onChange,
 }: CornerRadiusSectionProps<T>): ReactNode {
   const { t } = useTranslation()
-  const { subProject, isComputing, setEditingInputId } = useEditorContext()
+  const { isComputing, setEditingInputId } = useEditorContext()
+  const { subProject, accessor } = useOptionalSubProject()
   const [radiusBinderOpen, setRadiusBinderOpen] = useState<boolean>(false)
   const radiusBindingState = useMemo<CornerRadiusBindingState | undefined>(
     () => (isDefined(subProject) ? getCornerRadiusBindingState(subProject, modelId) : undefined),
@@ -78,7 +83,6 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
   const handleRadiusBinderClose = useCallback((): void => {
     setRadiusBinderOpen(false)
   }, [])
-  const accessor = isDefined(subProject) ? accessors.subProject(subProject) : undefined
   const autoDisabled =
     !Boolean(editable.autoCornerRadius) &&
     isDefined(accessor) &&
@@ -114,18 +118,25 @@ export function CornerRadiusSection<T extends HasCornerRadiusSchema & Partial<Ha
     <SectionGroup.Section>
       <SectionGroup.SectionHeader
         leftAddon={
-          hasAuto ? (
-            <SectionHeaderToggle
-              disabled={autoDisabled}
-              tooltip={autoDisabled ? t.project.editors.sections.bindings.linkedAuto : undefined}
-              onIcon={PiPencilLine}
-              offIcon={PiCar}
-              onLabel={t.project.editors.enums.common.autoCornerRadius.false}
-              offLabel={t.project.editors.enums.common.autoCornerRadius.true}
-              value={!Boolean(editable.autoCornerRadius)}
-              onChange={handleAutoChange}
-            />
-          ) : undefined
+          <HStack gap="2">
+            {isDefined(tag) && (
+              <Badge bg="bg" variant="surface">
+                {tag}
+              </Badge>
+            )}
+            {hasAuto && (
+              <SectionHeaderToggle
+                disabled={autoDisabled}
+                tooltip={autoDisabled ? t.project.editors.sections.bindings.linkedAuto : undefined}
+                onIcon={PiPencilLine}
+                offIcon={PiCar}
+                onLabel={t.project.editors.enums.common.autoCornerRadius.false}
+                offLabel={t.project.editors.enums.common.autoCornerRadius.true}
+                value={!Boolean(editable.autoCornerRadius)}
+                onChange={handleAutoChange}
+              />
+            )}
+          </HStack>
         }
         rightAddon={
           <Popover.Root

@@ -1,15 +1,10 @@
-import { useCallback, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
-import { useComponent } from '../../hooks/useComponent'
-import { useComputedComponent } from '../../hooks/useComputedComponent'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { PocketSchema } from '../../schemas/components'
-import type { ComputedPocketSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
-import { accessors } from '../../utils/accessors'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { Guide } from './Guide'
@@ -29,14 +24,14 @@ type PocketProps = {
 export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
   const { settings } = useGlobalSettings()
-  const pocket = useComponent<PocketSchema>(componentId)
-  const computed = useComputedComponent<ComputedPocketSchema>(componentId)
-  const { computedSubProject } = useSubProject()
-  const accessor = accessors.computedSubProject(computedSubProject)
+  const { accessor, computedAccessor } = useSubProject()
+  const computed = computedAccessor.component.pocket(componentId)
   const { direction } = useSvgFace()
-  const children = narrowers.is.computedFrontPocket(computed) ? accessor.component.children(componentId) : []
+  const children = narrowers.is.computedFrontPocket(computed) ? computedAccessor.component.children(componentId) : []
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const pathData = usePath(computed.path)
+
+  const pocket = useMemo(() => accessor.component.pocket(componentId), [accessor.component, componentId])
 
   const style: DrawAreaComponentStyleParams = {
     component: pocket,

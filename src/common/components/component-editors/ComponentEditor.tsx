@@ -1,122 +1,32 @@
 import type { FC } from 'react'
-import { useCombinedIssues } from '../../hooks/useCombinedIssues'
-import { useComponentLimitIssues } from '../../hooks/useComponentLimitIssues'
-import type { GuideSchema } from '../../schemas/components'
-import { narrowers } from '../../utils/narrowers'
-import { GuideEditor } from './GuideEditor'
-import { RootPanelFaceEditor } from './RootPanelFaceEditor'
-
-import type { ImmediateUpdater } from '../../hooks/useEditableModel'
-import type {
-  ComponentSchema,
-  FrontPocketSchema,
-  PanelSchema,
-  PocketClusterSchema,
-  RootPanelFaceSchema,
-  RootPanelSchema,
-  TPocketSchema,
-} from '../../schemas/components'
-import type { EditableSchema } from '../../schemas/editable'
-import type { IssuesSchema } from '../../schemas/issues'
-import { isDefined } from '../../utils/isDefined'
+import { useEditableModelsContext } from '../../contexts/EditableModelsContext'
+import type { ComponentSchema } from '../../schemas/components'
 import { FrontPocketEditor } from './FrontPocketEditor'
+import { GuideEditor } from './GuideEditor'
 import { PanelEditor } from './PanelEditor'
 import { PocketClusterEditor } from './PocketClusterEditor'
 import { RootPanelEditor } from './RootPanelEditor'
+import { RootPanelFaceEditor } from './RootPanelFaceEditor'
 import { TPocketEditor } from './TPocketEditor'
 
-type ComponentEditorProps = {
-  component: ComponentSchema
-  editable: EditableSchema<ComponentSchema>
-  issues: IssuesSchema<ComponentSchema>
-  onChange: (updated: EditableSchema<ComponentSchema>) => void
-  onChangeImmediately: (update: ImmediateUpdater<ComponentSchema>) => void
-  parent: ComponentSchema | undefined
-}
+export const ComponentEditor: FC = () => {
+  const { selectedModelId, models } = useEditableModelsContext<ComponentSchema>()
+  const component = models[selectedModelId]
 
-export const ComponentEditor: FC<ComponentEditorProps> = (props) => {
-  const limitIssues = useComponentLimitIssues(props.component)
-  const issues = useCombinedIssues<ComponentSchema>(props.issues, limitIssues)
-
-  switch (props.editable.type) {
+  switch (component.type) {
     case 'front-pocket':
-      if (!isDefined(props.parent) || !narrowers.is.pocketCluster(props.parent)) {
-        return undefined
-      }
-      return (
-        <FrontPocketEditor
-          component={props.component as FrontPocketSchema}
-          editable={props.editable}
-          issues={issues as IssuesSchema<FrontPocketSchema>}
-          parent={props.parent}
-          onChange={props.onChange}
-        />
-      )
-    case 't-pocket': {
-      if (!isDefined(props.parent) || !narrowers.is.pocketCluster(props.parent)) {
-        return undefined
-      }
-      return (
-        <TPocketEditor
-          component={props.component as TPocketSchema}
-          editable={props.editable}
-          issues={issues as IssuesSchema<TPocketSchema>}
-          parent={props.parent}
-          onChange={props.onChange}
-        />
-      )
-    }
+      return <FrontPocketEditor />
+    case 't-pocket':
+      return <TPocketEditor />
     case 'root-panel-face':
-      return (
-        <RootPanelFaceEditor
-          component={narrowers.assert.rootPanelFace(props.component)}
-          editable={props.editable}
-          issues={issues as IssuesSchema<RootPanelFaceSchema>}
-          onChange={props.onChange}
-        />
-      )
+      return <RootPanelFaceEditor />
     case 'root-panel':
-      return (
-        <RootPanelEditor
-          editable={props.editable}
-          issues={issues as IssuesSchema<RootPanelSchema>}
-          onChange={props.onChange}
-        />
-      )
+      return <RootPanelEditor />
     case 'guide':
-      return (
-        <GuideEditor
-          component={narrowers.assert.guide(props.component)}
-          editable={props.editable}
-          issues={issues as IssuesSchema<GuideSchema>}
-          onChange={props.onChange}
-        />
-      )
+      return <GuideEditor />
     case 'panel':
-      if (!isDefined(props.parent)) {
-        throw new Error('Panel parent not found')
-      }
-      return (
-        <PanelEditor
-          component={props.component as PanelSchema}
-          editable={props.editable}
-          issues={issues as IssuesSchema<PanelSchema>}
-          onChange={props.onChange}
-          parent={props.parent}
-        />
-      )
+      return <PanelEditor />
     case 'pocket-cluster':
-      if (!isDefined(props.parent)) {
-        throw new Error('Pocket cluster parent not found')
-      }
-      return (
-        <PocketClusterEditor
-          component={props.component as PocketClusterSchema}
-          editable={props.editable}
-          issues={issues as IssuesSchema<PocketClusterSchema>}
-          onChange={props.onChange}
-          parent={props.parent}
-        />
-      )
+      return <PocketClusterEditor />
   }
 }

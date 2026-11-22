@@ -3,9 +3,11 @@ import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type { ComponentBasedValidationContextSchema, ValidationResultSchema } from '../schemas/validation'
 import { accessors } from '../utils/accessors'
+import { isDefined } from '../utils/isDefined'
 import { createInvalidValidationResult, createValidValidationResult } from './createValidationResult'
 import { validateName } from './validateName'
 import { validateNumber } from './validateNumber'
+import { validateOptionalHexColor } from './validateOptionalHexColor'
 import { validatePrimitiveUnion } from './validatePrimitiveUnion'
 
 export const validateRootPanelFaceSchema = (
@@ -20,6 +22,7 @@ export const validateRootPanelFaceSchema = (
     accessors.subProject(context.subProject).component.components(),
     context,
   )
+  const color = validateOptionalHexColor(input.color, currentValue.color, context)
   const orientation = validatePrimitiveUnion(
     input.layoutOrientation,
     currentValue.layoutOrientation,
@@ -36,6 +39,7 @@ export const validateRootPanelFaceSchema = (
   const issues: IssuesSchema<RootPanelFaceSchema> = {
     id: undefined,
     name: name.issues,
+    color: color.issues,
     type: undefined,
     children: input.children.map(() => undefined),
     layoutOrientation: orientation.issues,
@@ -44,25 +48,30 @@ export const validateRootPanelFaceSchema = (
     autoLayoutGap: undefined,
   }
   const committedValue: RootPanelFaceSchema = {
-    ...currentValue,
+    id: currentValue.id,
+    type: currentValue.type,
+    children: currentValue.children,
     name: name.committedValue,
     layoutOrientation: orientation.committedValue,
     mainAxisAnchor: anchor.committedValue,
     layoutGap: gap.committedValue,
     autoLayoutGap: input.autoLayoutGap,
   }
-  if (!name.isValid || !orientation.isValid || !anchor.isValid || !gap.isValid) {
+  if (isDefined(color.committedValue)) {
+    committedValue.color = color.committedValue
+  }
+  if (!name.isValid || !color.isValid || !orientation.isValid || !anchor.isValid || !gap.isValid) {
     return createInvalidValidationResult(issues, committedValue)
   }
-  return createValidValidationResult(
-    issues,
-    {
-      ...committedValue,
-      name: name.value,
-      layoutOrientation: orientation.value,
-      mainAxisAnchor: anchor.value,
-      layoutGap: gap.value,
-    },
-    committedValue,
-  )
+  const value: RootPanelFaceSchema = {
+    ...committedValue,
+    name: name.value,
+    layoutOrientation: orientation.value,
+    mainAxisAnchor: anchor.value,
+    layoutGap: gap.value,
+  }
+  if (isDefined(color.value)) {
+    value.color = color.value
+  }
+  return createValidValidationResult(issues, value, committedValue)
 }
