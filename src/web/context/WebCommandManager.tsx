@@ -1,3 +1,4 @@
+import { useAtomValue } from 'jotai'
 import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { ExportDialog } from '../../common/components/ExportDialog'
 import { LicenseDialog } from '../../common/components/LicenseDialog'
@@ -15,6 +16,7 @@ import { useGlobalSettings } from '../../common/hooks/useGlobalSettings'
 import { useMeasurement } from '../../common/hooks/useMeasurement'
 import { useOptionalProject } from '../../common/hooks/useOptionalProject'
 import { useSubProjectHistory } from '../../common/hooks/useSubProjectHistory'
+import { commandBlockersAtom } from '../../common/state/commandBlockersAtom'
 import { downloadFile } from '../../common/utils/downloadFile'
 import { isDefined } from '../../common/utils/isDefined'
 import { useWebCommands } from '../hooks/useWebCommands'
@@ -29,7 +31,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
   const { redo, undo } = useSubProjectHistory()
   const { toggleMeasuring } = useMeasurement()
 
-  const isDialogOpen = isExportDialogOpen || isScalingDialogOpen || isLicenseDialogOpen
+  const commandBlockers = useAtomValue(commandBlockersAtom)
 
   const commands = useWebCommands()
 
@@ -112,7 +114,7 @@ export const WebCommandManager: FC<PropsWithChildren> = ({ children }) => {
     [getCommand, project, redo, setEditSettings, setViewSettings, settings.view, undo, toggleMeasuring],
   )
 
-  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: !isDialogOpen })
+  useCommonCommandEmitter({ commands, execute: emitCommand, enabled: commandBlockers.size === 0 })
 
   const value = useMemo<CommandsContextValue<WebCommandIdSchema>>(
     () => ({ emitCommand, getCommand }),

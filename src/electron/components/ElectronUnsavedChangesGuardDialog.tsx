@@ -1,9 +1,10 @@
 import { Button, Dialog, IconButton, Portal } from '@chakra-ui/react'
 import { useSetAtom } from 'jotai'
-import { useCallback, useEffect, useRef, useState, type FC } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type FC } from 'react'
 import { PiX } from 'react-icons/pi'
 import { useBlocker, type BlockerFunction } from 'react-router'
 
+import { useCommandBlocker } from '../../common/hooks/useCommandBlocker'
 import { useTranslation } from '../../common/hooks/useTranslation'
 import { Loadable } from '../../common/loadable'
 import { portalRef } from '../../common/portalRef'
@@ -13,6 +14,8 @@ import { useElectronProject } from '../hooks/useElectronProject'
 import { electronProjectAtom } from '../state/electronProjectAtom'
 
 export const ElectronUnsavedChangesGuardDialog: FC = () => {
+  const id = useId()
+  const { block, unblock } = useCommandBlocker()
   const [isWindowCloseRequested, setWindowCloseRequested] = useState(false)
   const isClosing = useRef(false)
   const { electronProject, saveProject } = useElectronProject()
@@ -37,6 +40,14 @@ export const ElectronUnsavedChangesGuardDialog: FC = () => {
   const blocker = useBlocker(shouldBlockNavigation)
 
   const isDialogOpen = isWindowCloseRequested || blocker.state === 'blocked'
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      return
+    }
+    block(id)
+    return () => unblock(id)
+  }, [block, id, isDialogOpen, unblock])
 
   const closeDialog = useCallback((): void => {
     setWindowCloseRequested(false)

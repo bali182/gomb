@@ -1,8 +1,9 @@
 import { Button, Dialog, DialogRootProps, IconButton, Portal, VStack } from '@chakra-ui/react'
-import { CSSProperties, PropsWithChildren, useCallback, useEffect, type FC, type SubmitEvent } from 'react'
+import { CSSProperties, PropsWithChildren, useCallback, useEffect, useId, type FC, type SubmitEvent } from 'react'
 
 import { PiX } from 'react-icons/pi'
 import { portalRef } from '../../common/portalRef'
+import { useCommandBlocker } from '../hooks/useCommandBlocker'
 import { useTranslation } from '../hooks/useTranslation'
 import { isDefined } from '../utils/isDefined'
 
@@ -44,8 +45,18 @@ export const EditDialog: FC<EditDialogProps> = ({
   onOpenChange,
   onSubmit,
 }) => {
+  const id = useId()
+  const { block, unblock } = useCommandBlocker()
   const { t } = useTranslation()
   const headerMessage = errorMessage ?? description
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    block(id)
+    return () => unblock(id)
+  }, [block, id, isOpen, unblock])
 
   useEffect(() => {
     if (!isOpen) {
