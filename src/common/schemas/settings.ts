@@ -42,6 +42,7 @@ export type ExportContentSettingsSchema = {
 }
 
 export type ExportPageSettingsSchema = {
+  pageless: boolean
   format: ExportFormatSchema
   page: PageSchemaId
   orientation: PageOrientationSchema

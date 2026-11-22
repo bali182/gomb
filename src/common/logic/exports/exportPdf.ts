@@ -5,7 +5,7 @@ import type { ExportParamsSchema } from '../../schemas/export'
 import { has } from '../../utils/has'
 import { renderPdfDocument } from './renderPdfDocument'
 
-export const exportPdf = async ({ layout, pageSize, context, projectName }: ExportParamsSchema): Promise<void> => {
+export const exportPdf = async ({ layout, context, projectName }: ExportParamsSchema): Promise<void> => {
   const openSans = await import('open-sans-fonts/open-sans/Regular/OpenSans-Regular.ttf?inline')
 
   const registeredFonts = Font.getRegisteredFonts()
@@ -17,7 +17,7 @@ export const exportPdf = async ({ layout, pageSize, context, projectName }: Expo
     })
   }
 
-  const blob = await pdf(renderPdfDocument(layout, pageSize, context)).toBlob()
+  const blob = await pdf(renderPdfDocument(layout, context)).toBlob()
 
   downloadPdf(blob, `${projectName}.${PDF_EXTENSION}`)
 }

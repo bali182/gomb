@@ -4,7 +4,7 @@ import type { RectSchema } from '../../schemas/geometry'
 import { createExportPlacement, createExportRect } from './exportGeometryUtils'
 import type { ExportLayoutElement } from './helperTypes'
 
-export const layoutExportElementsVertically = (
+export const layoutExportElementsStacked = (
   elements: readonly ExportLayoutElement[],
   usableRect: RectSchema,
   gap: number,
@@ -31,42 +31,6 @@ export const layoutExportElementsVertically = (
       ),
     })
     nextY = nextY.plus(sourceRect.height).plus(gapValue)
-  })
-
-  if (page.length > 0) {
-    pages.push(page)
-  }
-
-  return pages
-}
-
-export const layoutExportElementsHorizontally = (
-  elements: readonly ExportLayoutElement[],
-  usableRect: RectSchema,
-  gap: number,
-): ExportPageElementSchema[][] => {
-  const pages: ExportPageElementSchema[][] = []
-  const gapValue = new BigNumber(gap)
-  let page: ExportPageElementSchema[] = []
-  let nextX = usableRect.x
-
-  elements.forEach(({ element, boundingRect: sourceRect, isOversized }) => {
-    if (page.length > 0 && nextX.plus(sourceRect.width).isGreaterThan(usableRect.x.plus(usableRect.width))) {
-      pages.push(page)
-      page = []
-      nextX = usableRect.x
-    }
-
-    page.push({
-      element,
-      isOversized,
-      placement: createExportPlacement(
-        sourceRect,
-        createExportRect(nextX, usableRect.y, sourceRect.width, sourceRect.height),
-        0,
-      ),
-    })
-    nextX = nextX.plus(sourceRect.width).plus(gapValue)
   })
 
   if (page.length > 0) {

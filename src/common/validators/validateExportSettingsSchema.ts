@@ -15,6 +15,12 @@ const pageSchemaIds: Record<PageSchemaId, boolean> = {
   A3: true,
   A4: true,
   A5: true,
+  'JIS-B5': false,
+  'JIS-B4': false,
+  Letter: false,
+  Legal: false,
+  Tabloid: false,
+  Executive: false,
 }
 
 const pageOrientations: Record<PageOrientationSchema, boolean> = {
@@ -24,8 +30,7 @@ const pageOrientations: Record<PageOrientationSchema, boolean> = {
 
 const pageLayouts: Record<PageLayoutSchema, boolean> = {
   compact: true,
-  horizontal: true,
-  vertical: true,
+  stacked: true,
 }
 
 export const validateExportSettingsSchema = (
@@ -45,19 +50,21 @@ export const validateExportSettingsSchema = (
   const layoutResult = validatePrimitiveUnion(input.layout, currentValue.layout, pageLayouts, context)
 
   const pageSize = getExportPageSize(pageResult.committedValue, orientationResult.committedValue)
-  const halfShortSide = Math.min(pageSize.width.toNumber(), pageSize.height.toNumber()) / 2
+  const halfConstrainedSide =
+    (input.pageless ? pageSize.width.toNumber() : Math.min(pageSize.width.toNumber(), pageSize.height.toNumber())) / 2
   const paddingResult = validateNumber(input.padding, currentValue.padding, context, {
     min: 0,
-    max: halfShortSide,
+    max: halfConstrainedSide,
     maxInclusive: false,
   })
   const cutHelperDistanceResult = validateNumber(input.cutHelperDistance, currentValue.cutHelperDistance, context, {
     min: 0,
-    max: paddingResult.isValid ? halfShortSide - paddingResult.value : undefined,
+    max: paddingResult.isValid ? halfConstrainedSide - paddingResult.value : undefined,
     maxInclusive: false,
   })
 
   const issues: IssuesSchema<ExportSettingsSchema> = {
+    pageless: undefined,
     childMarkers: undefined,
     cutHelperDistance: cutHelperDistanceResult.issues,
     gap: gapResult.issues,
@@ -71,6 +78,7 @@ export const validateExportSettingsSchema = (
     page: pageResult.issues,
   }
   const committedValue: ExportSettingsSchema = {
+    pageless: input.pageless,
     childMarkers: input.childMarkers,
     cutHelperDistance: cutHelperDistanceResult.committedValue,
     gap: gapResult.committedValue,
@@ -93,7 +101,7 @@ export const validateExportSettingsSchema = (
     !orientationResult.isValid ||
     !layoutResult.isValid
   ) {
-    const leavesUsableArea = committedValue.padding + committedValue.cutHelperDistance < halfShortSide
+    const leavesUsableArea = committedValue.padding + committedValue.cutHelperDistance < halfConstrainedSide
     return createInvalidValidationResult(issues, leavesUsableArea ? committedValue : currentValue)
   }
 
