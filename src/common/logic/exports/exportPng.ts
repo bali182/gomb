@@ -4,13 +4,7 @@ import { downloadBlob } from '../../utils/downloadBlob'
 import { renderSvgPageToString } from './renderSvgPageToString'
 import { renderSvgToPng } from './renderSvgToPng'
 
-export const exportPng = async ({
-  layout,
-  pageSize,
-  context,
-  projectName,
-  translation,
-}: ExportParamsSchema): Promise<void> => {
+export const exportPng = async ({ layout, context, projectName, translation }: ExportParamsSchema): Promise<void> => {
   if (layout.pages.length === 0) {
     throw new Error('Cannot export PNG without pages')
   }
@@ -18,8 +12,8 @@ export const exportPng = async ({
   const images: Uint8Array[] = []
 
   for (const page of layout.pages) {
-    const svg = renderSvgPageToString({ page, pageSize, context })
-    images.push(await renderSvgToPng({ svg, size: pageSize, background: '#ffffff' }))
+    const svg = renderSvgPageToString({ page, context })
+    images.push(await renderSvgToPng({ svg, size: page.boundingRect, background: '#ffffff' }))
   }
 
   if (images.length === 1) {

@@ -821,6 +821,10 @@ export const EN = {
           } satisfies SectionTranslationSchema<ExportContentSettingsSchema>,
           page: {
             title: 'Page',
+            pageless: {
+              label: 'Pageless',
+              tooltip: 'Keeps all components on one continuous sheet that grows downward.',
+            },
             format: {
               label: 'Format',
               tooltip: 'Chooses the exported file format.',

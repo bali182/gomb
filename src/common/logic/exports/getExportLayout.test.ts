@@ -188,3 +188,107 @@ describe('export page layout', () => {
     expect(source).toEqual(before)
   })
 })
+
+describe('pageless export layout', () => {
+  const layouts: PageLayoutSchema[] = ['stacked', 'compact']
+
+  it.each(layouts)('grows one %s sheet and excludes the final gap', (mode) => {
+    const result = layout([panel('a', 120, 180), panel('b', 120, 180)], {
+      pageless: true,
+      layout: mode,
+      padding: 10,
+      gap: 15,
+    })
+    expect(result.pages).toHaveLength(1)
+    expect(result.pages[0].boundingRect.height.toNumber()).toBe(395)
+    expect(oversizedIds(result)).toEqual([])
+    expectSeparated(result.pages[0], 15)
+  })
+
+  it.each(layouts)('uses oriented paper dimensions as the minimum in %s layout', (mode) => {
+    for (const orientation of ['portrait', 'landscape'] as const) {
+      const result = layout([panel('small', 20, 20)], { pageless: true, layout: mode, page: 'A4', orientation })
+      expect(result.pages[0].boundingRect.width.toNumber()).toBe(orientation === 'portrait' ? 210 : 297)
+      expect(result.pages[0].boundingRect.height.toNumber()).toBe(orientation === 'portrait' ? 297 : 210)
+    }
+  })
+
+  it.each(layouts)('permits unlimited height but reports excessive width in %s layout', (mode) => {
+    const result = layout([panel('tall', 30, 1000), panel('too-wide', 160, 1000)], {
+      pageless: true,
+      layout: mode,
+    })
+    expect(result.pages).toHaveLength(1)
+    expect(oversizedIds(result)).toEqual(['too-wide'])
+    expectSeparated(result.pages[0], 10)
+  })
+
+  it('keeps stacked elements unrotated even when rotation would reduce height', () => {
+    const result = layout([panel('tall', 60, 400)], { pageless: true, layout: 'stacked' })
+    expect(result.pages[0].elements[0].placement.rotation).toBe(0)
+    expect(result.pages[0].boundingRect.height.toNumber()).toBe(400)
+  })
+
+  it('rotates compact elements to reduce content height even below the paper minimum', () => {
+    const source = [panel('tall', 60, 120)]
+    const result = layout(source, { pageless: true, layout: 'compact' })
+    expect(result.pages[0].elements[0].placement.rotation).toBe(90)
+    expect(result.pages[0].elements[0].placement.placementBoundingRect.height.toNumber()).toBe(60)
+    expect(layout(source, { layout: 'compact' }).pages[0].elements[0].placement.rotation).toBe(0)
+  })
+
+  it('keeps the original rotation when both candidates are identical', () => {
+    const result = layout([panel('square', 50, 50)], { pageless: true, layout: 'compact' })
+    expect(result.pages[0].elements[0].placement.rotation).toBe(0)
+  })
+
+  it('rotates a compact element when only its rotated width fits', () => {
+    const result = layout([panel('wide', 400, 60)], { pageless: true, layout: 'compact' })
+    expect(oversizedIds(result)).toEqual([])
+    expect(result.pages[0].elements[0].placement.rotation).toBe(90)
+    expect(result.pages[0].boundingRect.height.toNumber()).toBe(400)
+  })
+
+  it('reuses compact free space beside an existing element', () => {
+    const result = layout([panel('large', 70, 300), panel('small', 50, 100)], {
+      pageless: true,
+      layout: 'compact',
+    })
+    expect(result.pages).toHaveLength(1)
+    expect(result.pages[0].elements.map(({ placement }) => placement.y.toNumber())).toEqual([0, 0])
+    expect(result.pages[0].boundingRect.height.toNumber()).toBe(300)
+    expectSeparated(result.pages[0], 10)
+  })
+
+  it.each(layouts)('includes cut helpers and stroke thickness in the final %s height', (mode) => {
+    const options = settings({ pageless: true, layout: mode, padding: 10, cutHelperDistance: 5 })
+    const elements = applyExportContentSettings([panel('tall', 60, 300)], options)
+    const context = {
+      ...defaultDrawAreaContext,
+      componentStyles: { ...defaultDrawAreaContext.componentStyles, getBorderThickness: (): number => 0.2 },
+    }
+    const result = getExportLayout(elements, options, context)
+    expect(result.pages[0].boundingRect.height.toNumber()).toBeCloseTo(330.2)
+    expect(oversizedIds(result)).toEqual([])
+  })
+
+  it.each(layouts)('keeps very large gaps on a single %s sheet', (mode) => {
+    const result = layout([panel('a', 20, 20), panel('b', 20, 20)], {
+      pageless: true,
+      layout: mode,
+      gap: 1000,
+    })
+    expect(result.pages).toHaveLength(1)
+    expect(result.pages[0].boundingRect.height.toNumber()).toBe(1040)
+    expectSeparated(result.pages[0], 1000)
+  })
+
+  it.each(layouts)('returns identical pageless geometry for all export formats in %s layout', (mode) => {
+    const source = [panel('a', 120, 180), panel('b', 120, 180)]
+    const before = structuredClone(source)
+    const pdf = layout(source, { pageless: true, layout: mode, format: 'pdf' })
+    expect(layout(source, { pageless: true, layout: mode, format: 'svg' })).toEqual(pdf)
+    expect(layout(source, { pageless: true, layout: mode, format: 'png' })).toEqual(pdf)
+    expect(source).toEqual(before)
+  })
+})

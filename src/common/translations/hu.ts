@@ -749,6 +749,10 @@ export const HU = {
           },
           page: {
             title: 'Oldal',
+            pageless: {
+              label: 'Végtelenített papír',
+              tooltip: 'Minden komponenst egyetlen, lefelé növekvő papírra rendez, oldalelválasztás nélkül.',
+            },
             format: {
               label: 'Formátum',
               tooltip: 'Az exportált fájl formátumát választja ki.',

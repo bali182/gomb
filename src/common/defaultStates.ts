@@ -62,6 +62,7 @@ export const defaultExportParams: ExportSettingsSchema = {
   showDimensions: true,
   showParentNames: true,
   childMarkers: true,
+  pageless: false,
   cutHelperDistance: 0,
   format: 'pdf',
   page: 'A4',

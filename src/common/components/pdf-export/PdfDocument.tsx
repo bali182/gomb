@@ -4,23 +4,21 @@ import type { FC } from 'react'
 import { ExportDrawAreaContext } from '../../contexts/ExportDrawAreaContext'
 import type { DrawAreaContextValue } from '../../schemas/drawArea'
 import type { ExportLayoutSchema } from '../../schemas/export'
-import type { SizeSchema } from '../../schemas/geometry'
 import { PdfPageRoot } from './PdfPageRoot'
 
 type PdfDocumentProps = {
   drawAreaContextValue: DrawAreaContextValue
   layout: ExportLayoutSchema
-  pageSize: SizeSchema
 }
 
-export const PdfDocument: FC<PdfDocumentProps> = ({ drawAreaContextValue, layout, pageSize }) => {
+export const PdfDocument: FC<PdfDocumentProps> = ({ drawAreaContextValue, layout }) => {
   return (
     <ExportDrawAreaContext.Provider value={drawAreaContextValue}>
       <Document>
         {layout.pages.map((page, pageIndex) => (
           <Page
             key={pageIndex}
-            size={[`${pageSize.width.toString()}mm`, `${pageSize.height.toString()}mm`]}
+            size={[`${page.boundingRect.width.toString()}mm`, `${page.boundingRect.height.toString()}mm`]}
             style={{ padding: 0 }}
           >
             <PdfPageRoot page={page} />

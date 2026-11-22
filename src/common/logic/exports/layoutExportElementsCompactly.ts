@@ -9,6 +9,7 @@ import type { ExportLayoutElement } from './helperTypes'
 type CompactPlacementCandidate = {
   pageIndex: number
   rotation: ExportPlacementRotation
+  contentHeight: BigNumber
   overflowArea: BigNumber
   scoreLongSide: BigNumber
   scoreShortSide: BigNumber
@@ -24,6 +25,7 @@ export const layoutExportElementsCompactly = (
   elements: readonly ExportLayoutElement[],
   usableRect: RectSchema,
   gap: number,
+  pageless: boolean,
 ): ExportPageElementSchema[][] => {
   const gapValue = new BigNumber(gap)
   const compactPages: CompactPage[] = []
@@ -39,7 +41,7 @@ export const layoutExportElementsCompactly = (
   })
 
   for (const input of elementsByArea) {
-    let placement = findCompactPlacement(compactPages, input, usableRect, gapValue)
+    let placement = findCompactPlacement(compactPages, input, usableRect, gapValue, pageless)
     if (!isDefined(placement)) {
       compactPages.push({
         freeRects: [
@@ -52,7 +54,7 @@ export const layoutExportElementsCompactly = (
         ],
         page: [],
       })
-      placement = findCompactPlacement(compactPages, input, usableRect, gapValue)
+      placement = findCompactPlacement(compactPages, input, usableRect, gapValue, pageless)
     }
     if (!isDefined(placement)) {
       throw new Error(`Unable to place export element: ${input.element.id}`)
@@ -73,12 +75,13 @@ const findCompactPlacement = (
   input: ExportLayoutElement,
   usableRect: RectSchema,
   gap: BigNumber,
+  pageless: boolean,
 ): CompactPlacementCandidate | undefined => {
-  const unrotated = findCompactPlacementForRotation(pages, input, usableRect, gap, 0)
-  if (!input.isOversized && isDefined(unrotated)) {
+  const unrotated = findCompactPlacementForRotation(pages, input, usableRect, gap, 0, pageless)
+  if (!pageless && !input.isOversized && isDefined(unrotated)) {
     return unrotated
   }
-  const rotated = findCompactPlacementForRotation(pages, input, usableRect, gap, 90)
+  const rotated = findCompactPlacementForRotation(pages, input, usableRect, gap, 90, pageless)
   if (!isDefined(unrotated)) {
     return rotated
   }
@@ -94,6 +97,7 @@ const findCompactPlacementForRotation = (
   usableRect: RectSchema,
   gap: BigNumber,
   rotation: ExportPlacementRotation,
+  pageless: boolean,
 ): CompactPlacementCandidate | undefined => {
   let best: CompactPlacementCandidate | undefined
   const width = rotation === 0 ? input.boundingRect.width : input.boundingRect.height
@@ -113,6 +117,16 @@ const findCompactPlacementForRotation = (
         pageIndex,
         rotation,
         boundingRect,
+        contentHeight: pageless
+          ? page.page.reduce(
+              (bottom, { placement }) =>
+                BigNumber.maximum(
+                  bottom,
+                  placement.placementBoundingRect.y.plus(placement.placementBoundingRect.height),
+                ),
+              boundingRect.y.plus(height),
+            )
+          : ZERO,
         overflowArea: width.times(height).minus(visibleWidth.times(visibleHeight)),
         scoreShortSide: BigNumber.minimum(horizontalRemainder, verticalRemainder),
         scoreLongSide: BigNumber.maximum(horizontalRemainder, verticalRemainder),
@@ -166,6 +180,10 @@ const compareCompactPlacementCandidates = (
   const overflowComparison = compareBigNumbers(left.overflowArea, right.overflowArea)
   if (overflowComparison !== 0) {
     return overflowComparison
+  }
+  const heightComparison = compareBigNumbers(left.contentHeight, right.contentHeight)
+  if (heightComparison !== 0) {
+    return heightComparison
   }
   const shortSideComparison = compareBigNumbers(left.scoreShortSide, right.scoreShortSide)
 

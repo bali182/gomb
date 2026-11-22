@@ -1,4 +1,4 @@
-import { InputGroup, Select, createListCollection, type ListCollection } from '@chakra-ui/react'
+import { InputGroup, Select, Switch, createListCollection, type ListCollection } from '@chakra-ui/react'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 import { PiFile, PiFilePdf, PiFilePng, PiFileSvg, PiGridFour, PiRows } from 'react-icons/pi'
@@ -66,6 +66,13 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
   const handleLayoutChange = useCallback(
     (layout: PageLayoutSchema): void => {
       onChange({ ...editable, layout })
+    },
+    [editable, onChange],
+  )
+
+  const handlePagelessChange = useCallback(
+    (details: Switch.CheckedChangeDetails): void => {
+      onChange({ ...editable, pageless: details.checked })
     },
     [editable, onChange],
   )
@@ -140,6 +147,18 @@ export function ExportPageSection({ editable, issues, onChange, disabled }: Expo
           issue={issues.orientation}
           onChange={handleOrientationChange}
         />
+      </SectionGroup.SectionRowEditor>
+
+      <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.pageless.tooltip}>
+        {t.project.editors.sections.export.page.pageless.label}
+      </SectionGroup.SectionRowTitle>
+      <SectionGroup.SectionRowEditor issue={issues.pageless}>
+        <Switch.Root disabled={disabled} checked={editable.pageless} onCheckedChange={handlePagelessChange} size="sm">
+          <Switch.HiddenInput />
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch.Root>
       </SectionGroup.SectionRowEditor>
 
       <SectionGroup.SectionRowTitle tooltip={t.project.editors.sections.export.page.layout.tooltip}>
