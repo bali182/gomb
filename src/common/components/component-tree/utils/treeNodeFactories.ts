@@ -1,3 +1,4 @@
+import { SubProjectAccessorSchema } from '../../../schemas/accessors'
 import { ComponentSchema } from '../../../schemas/components'
 import { HoleSchema } from '../../../schemas/hole'
 import { StitchLineSchema } from '../../../schemas/stitching'
@@ -8,13 +9,31 @@ import { narrowers } from '../../../utils/narrowers'
 import { ComponentTreeNode, HoleTreeNode, StitchLineTreeNode } from '../types/nodeTypes'
 import { getComponentNodeId, getHoleNodeId, getStitchLineNodeId } from './treeNodeIds'
 
-export const createComponentTreeNode = (
+export const createTreeRootNode = (
   subProject: SubProjectSchema,
-  component: ComponentSchema,
   showStitchLines: boolean,
   showHoles: boolean,
 ): ComponentTreeNode => {
   const accessor = accessors.subProject(subProject)
+  const rootComponent = accessor.component.byId(subProject.root)
+
+  return {
+    children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles, accessor)],
+    component: rootComponent,
+    id: 'component-tree-root',
+    kind: 'component',
+    nextSiblingId: undefined,
+    parentId: undefined,
+  }
+}
+
+const createComponentTreeNode = (
+  subProject: SubProjectSchema,
+  component: ComponentSchema,
+  showStitchLines: boolean,
+  showHoles: boolean,
+  accessor: SubProjectAccessorSchema,
+): ComponentTreeNode => {
   const parent = accessor.optional.component.parent(component.id)
   const siblingIds = isDefined(parent) ? accessor.component.childIds(parent.id) : []
   const componentIndex = siblingIds.indexOf(component.id)
@@ -22,18 +41,18 @@ export const createComponentTreeNode = (
 
   const childComponentNodes = accessor.component
     .children(component.id)
-    .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles))
+    .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles, accessor))
 
   const holeNodes = showHoles
     ? subProject.holes
         .filter((hole) => hole.componentId === component.id)
-        .map((hole) => createHoleTreeNode(subProject, hole))
+        .map((hole) => createHoleTreeNode(subProject, hole, accessor))
     : []
 
   const stitchLineNodes = showStitchLines
     ? subProject.stitchLines
         .filter((stitchLine) => stitchLine.targetType === 'component' && stitchLine.targetId === component.id)
-        .map((stitchLine) => createStitchLineTreeNode(subProject, stitchLine))
+        .map((stitchLine) => createStitchLineTreeNode(subProject, stitchLine, accessor))
     : []
 
   return {
@@ -46,7 +65,11 @@ export const createComponentTreeNode = (
   }
 }
 
-export const createHoleTreeNode = (subProject: SubProjectSchema, hole: HoleSchema): HoleTreeNode => {
+const createHoleTreeNode = (
+  subProject: SubProjectSchema,
+  hole: HoleSchema,
+  accessor: SubProjectAccessorSchema,
+): HoleTreeNode => {
   const stitchLineNodes = subProject.stitchLines
     .filter(
       (stitchLine) =>
@@ -54,7 +77,7 @@ export const createHoleTreeNode = (subProject: SubProjectSchema, hole: HoleSchem
         stitchLine.targetType === 'hole' &&
         stitchLine.targetId === hole.id,
     )
-    .map((stitchLine) => createStitchLineTreeNode(subProject, stitchLine))
+    .map((stitchLine) => createStitchLineTreeNode(subProject, stitchLine, accessor))
 
   return {
     children: stitchLineNodes,
@@ -64,31 +87,15 @@ export const createHoleTreeNode = (subProject: SubProjectSchema, hole: HoleSchem
   }
 }
 
-export const createStitchLineTreeNode = (
+const createStitchLineTreeNode = (
   _subProject: SubProjectSchema,
   stitchLine: StitchLineSchema,
+  _accessor: SubProjectAccessorSchema,
 ): StitchLineTreeNode => {
   return {
     children: [],
     id: getStitchLineNodeId(stitchLine.id),
     kind: 'stitch-line',
     stitchLine,
-  }
-}
-
-export const createTreeRootNode = (
-  subProject: SubProjectSchema,
-  showStitchLines: boolean,
-  showHoles: boolean,
-): ComponentTreeNode => {
-  const rootComponent = accessors.subProject(subProject).component.byId(subProject.root)
-
-  return {
-    children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles)],
-    component: rootComponent,
-    id: 'component-tree-root',
-    kind: 'component',
-    nextSiblingId: undefined,
-    parentId: undefined,
   }
 }
