@@ -16,10 +16,12 @@ export const createTreeRootNode = (
 ): ComponentTreeNode => {
   const accessor = accessors.subProject(subProject)
   const rootComponent = accessor.component.byId(subProject.root)
+  const hasPockets = collectPocketParentIds(rootComponent.id, accessor)
 
   return {
-    children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles, accessor)],
+    children: [createComponentTreeNode(subProject, rootComponent, showStitchLines, showHoles, accessor, hasPockets)],
     component: rootComponent,
+    hasPocketInSubtree: hasPockets.has(rootComponent.id),
     id: 'component-tree-root',
     kind: 'component',
     nextSiblingId: undefined,
@@ -33,6 +35,7 @@ const createComponentTreeNode = (
   showStitchLines: boolean,
   showHoles: boolean,
   accessor: SubProjectAccessorSchema,
+  hasPockets: ReadonlySet<string>,
 ): ComponentTreeNode => {
   const parent = accessor.optional.component.parent(component.id)
   const siblingIds = isDefined(parent) ? accessor.component.childIds(parent.id) : []
@@ -41,7 +44,7 @@ const createComponentTreeNode = (
 
   const childComponentNodes = accessor.component
     .children(component.id)
-    .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles, accessor))
+    .map((child) => createComponentTreeNode(subProject, child, showStitchLines, showHoles, accessor, hasPockets))
 
   const holeNodes = showHoles
     ? subProject.holes
@@ -58,6 +61,7 @@ const createComponentTreeNode = (
   return {
     children: [...childComponentNodes, ...holeNodes, ...stitchLineNodes],
     component,
+    hasPocketInSubtree: hasPockets.has(component.id),
     id: getComponentNodeId(component.id),
     kind: 'component',
     nextSiblingId,
@@ -98,4 +102,23 @@ const createStitchLineTreeNode = (
     kind: 'stitch-line',
     stitchLine,
   }
+}
+
+const collectPocketParentIds = (rootComponentId: string, accessor: SubProjectAccessorSchema): ReadonlySet<string> => {
+  const pocketOpeningTargetIds = new Set<string>()
+  const visitComponent = (componentId: string): boolean => {
+    const component = accessor.component.byId(componentId)
+    let hasPocketInSubtree = narrowers.is.pocket(component)
+    for (const childId of accessor.component.childIds(componentId)) {
+      if (visitComponent(childId)) {
+        hasPocketInSubtree = true
+      }
+    }
+    if (hasPocketInSubtree) {
+      pocketOpeningTargetIds.add(componentId)
+    }
+    return hasPocketInSubtree
+  }
+  visitComponent(rootComponentId)
+  return pocketOpeningTargetIds
 }
