@@ -66,9 +66,9 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
       case 'stitch-line':
         return canAddStitchLine(component, subProject, activeDragData.stitchLineType)
       case 'pocket-opening':
-        return narrowers.is.pocket(component)
+        return node.hasPocketInSubtree
     }
-  }, [activeDragData, component, subProject])
+  }, [activeDragData, component, subProject, node.hasPocketInSubtree])
 
   const isDisabledForActiveDrag = useMemo<boolean>(() => {
     if (!isDefined(activeDragData) || isActiveComponent) {
@@ -82,9 +82,9 @@ export const EditorComponentTreeItem: FC<EditorComponentTreeItemProps> = ({
       case 'stitch-line':
         return !canAddStitchLine(component, subProject, activeDragData.stitchLineType)
       case 'pocket-opening':
-        return !narrowers.is.pocket(component)
+        return !node.hasPocketInSubtree
     }
-  }, [activeDragData, component, isActiveComponent, subProject])
+  }, [activeDragData, component, isActiveComponent, subProject, node.hasPocketInSubtree])
 
   const insideBeforeComponentId = useMemo<string | undefined>(() => {
     if (!narrowers.is.pocketCluster(component)) {

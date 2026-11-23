@@ -8,6 +8,7 @@ import { addComponents as addComponentsPure } from '../operations/subProject/add
 import { addHole as addHolePure } from '../operations/subProject/addHole'
 import { addPocketOpening as addPocketOpeningPure } from '../operations/subProject/addPocketOpening'
 import { addStitchLine as addStitchLinePure } from '../operations/subProject/addStitchLine'
+import { attachPocketOpening as attachPocketOpeningPure } from '../operations/subProject/attachPocketOpening'
 import { cloneComponent as cloneComponentPure } from '../operations/subProject/cloneComponent'
 import { cloneHole as cloneHolePure } from '../operations/subProject/cloneHole'
 import { clonePocketOpening as clonePocketOpeningPure } from '../operations/subProject/clonePocketOpening'
@@ -41,6 +42,7 @@ import type {
   AddHoleParamsSchema,
   AddPocketOpeningParamsSchema,
   AddStitchLineParamsSchema,
+  AttachPocketOpeningParamsSchema,
   BaseSubProjectOperationParamsSchema,
   CloneComponentParamsSchema,
   CloneHoleParamsSchema,
@@ -87,6 +89,7 @@ export type UseSubProjectOperationsOutput = {
   addHole: (params: AddHoleParamsSchema) => void
   addPocketOpening: (params: AddPocketOpeningParamsSchema) => void
   addStitchLine: (params: AddStitchLineParamsSchema) => void
+  attachPocketOpening: (params: AttachPocketOpeningParamsSchema) => void
   cloneComponent: (params: CloneComponentParamsSchema) => void
   cloneHole: (params: CloneHoleParamsSchema) => void
   cloneStitchLine: (params: CloneStitchLineParamsSchema) => void
@@ -315,6 +318,13 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
     [executeOperation],
   )
 
+  const attachPocketOpening = useCallback(
+    (params: AttachPocketOpeningParamsSchema): void => {
+      executeOperation(attachPocketOpeningPure, params)
+    },
+    [executeOperation],
+  )
+
   const setDefaultPocketOpening = useCallback(
     (params: SetDefaultPocketOpeningParamsSchema): void => {
       executeOperation(setDefaultPocketOpeningPure, params)
@@ -388,6 +398,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addHole,
       addPocketOpening,
       addStitchLine,
+      attachPocketOpening,
       cloneComponent,
       cloneHole,
       cloneStitchLine,
@@ -420,6 +431,7 @@ export const useSubProjectOperations = (): UseSubProjectOperationsOutput => {
       addHole,
       addPocketOpening,
       addStitchLine,
+      attachPocketOpening,
       cloneComponent,
       cloneHole,
       cloneStitchLine,

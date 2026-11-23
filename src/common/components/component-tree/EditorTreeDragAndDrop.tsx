@@ -15,7 +15,6 @@ import { useOptionalSubProject } from '../../hooks/useOptionalSubProject'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
 import { isTreeDragData, isTreeDropData } from '../../typia'
 import { isDefined } from '../../utils/isDefined'
-import { narrowers } from '../../utils/narrowers'
 import { TreeDragAndDropContext, type TreeDragAndDropContextValue } from './TreeDragAndDropContext'
 import { TreeDragPreview } from './TreeDragPreview'
 import type { TreeDragData } from './types/dragDataTypes'
@@ -69,12 +68,10 @@ export const EditorTreeDragAndDrop: FC<EditorTreeDragAndDropProps> = ({ children
               }
               const component = accessor.optional.component.byId(dropData.componentId)
               const opening = accessor.optional.pocketOpening.byId(dragData.openingId)
-              if (!isDefined(component) || !narrowers.is.pocket(component) || !isDefined(opening)) {
+              if (!isDefined(component) || !isDefined(opening)) {
                 return false
               }
-              if (component.openingId !== opening.id) {
-                operations.updateComponent({ component: { ...component, openingId: opening.id } })
-              }
+              operations.attachPocketOpening({ openingId: opening.id, componentId: component.id })
               return true
             }
           }

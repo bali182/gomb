@@ -6,6 +6,7 @@ export type ComponentTreeNode = {
   kind: 'component'
   id: string
   component: ComponentSchema
+  hasPocketInSubtree: boolean
   parentId: string | undefined
   nextSiblingId: string | undefined
   children: ProjectTreeNode[]

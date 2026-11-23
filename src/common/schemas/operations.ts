@@ -77,6 +77,11 @@ export type AddPocketOpeningParamsSchema = {
   type: PocketOpeningSchema['type']
 }
 
+export type AttachPocketOpeningParamsSchema = {
+  openingId: string
+  componentId: string
+}
+
 export type AddStitchLineToHoleParamsSchema = {
   targetType: 'hole'
   targetId: string

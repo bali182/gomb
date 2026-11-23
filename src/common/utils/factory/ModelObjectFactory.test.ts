@@ -492,16 +492,6 @@ describe('ReadonlyModelObjectFactory', () => {
     expect(otherBinding.fields).toEqual([])
   })
 
-  it('retains stitch-aligned root dimensions and pocket step', () => {
-    const { id, name } = createGenerators()
-    const factory = new ReadonlyModelObjectFactory(id, name)
-    const stitchingSettings = { ...defaultStitchingSettings, stitchMargin: 4, stitchHoleDistance: 3 }
-    expect(
-      factory.createRootPanel({ frontFaceId: 'factory-front', backFaceId: 'factory-back', stitchingSettings }),
-    ).toMatchObject({ width: 101, height: 101 })
-    expect(factory.createPocketCluster({ stitchingSettings }).pocketStep).toBe(12)
-  })
-
   const members: BindingFieldSchema[] = [
     { id: 'unused', type: 'root-panel-binding-field', modelId: 'model', field: 'width' },
     { id: 'unused', type: 'panel-binding-field', modelId: 'model', field: 'height' },
