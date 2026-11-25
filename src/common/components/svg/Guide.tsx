@@ -55,10 +55,10 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
         {isSelectable && (
           <path
             d={pathData}
-            fill="none"
+            fill="transparent"
             stroke="transparent"
             strokeWidth={GUIDE_HIT_AREA_THICKNESS}
-            pointerEvents="stroke"
+            pointerEvents="all"
             onClick={handleClick}
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}

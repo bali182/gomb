@@ -118,7 +118,10 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     }
 
     const getBorderColor = ({ component }: DrawAreaComponentStyleParams): string => {
-      if (isSelected(component) || isHovered(component)) {
+      if (isHovered(component)) {
+        return selectionColor
+      }
+      if (isSelected(component)) {
         return applyOpacity(selectionColor, selectionOpacities.components[component.id].stroke)
       }
       return applyOpacity(strokeColor, selectionOpacities.components[component.id].stroke)

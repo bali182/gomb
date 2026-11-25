@@ -67,10 +67,10 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
         {isInteractive && isEmpty && (
           <path
             d={pathData}
-            fill="none"
+            fill="transparent"
             stroke="transparent"
             strokeWidth={POCKET_CLUSTER_HIT_AREA_THICKNESS}
-            pointerEvents="stroke"
+            pointerEvents="all"
             onClick={onClick}
             onPointerEnter={onPointerEnter}
             onPointerLeave={onPointerLeave}

@@ -14,9 +14,7 @@ export const usePocketOpeningLimitIssues = (
 ): IssuesSchema<PocketOpeningSchema> => {
   const { computedAccessor } = useSubProject()
   const translation = useTranslation()
-  const limits = isDefined(pocket)
-    ? computedAccessor.optional.limits.component(pocket.id)
-    : undefined
+  const limits = isDefined(pocket) ? computedAccessor.optional.limits.component(pocket.id) : undefined
 
   return useMemo<IssuesSchema<PocketOpeningSchema>>(() => {
     if (
