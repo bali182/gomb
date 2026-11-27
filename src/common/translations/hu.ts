@@ -959,12 +959,14 @@ export const HU = {
         },
         missingFrontPocket: {
           title: 'Üres zsebzsoport',
+          amountPlaceholder: 'Darabszám',
           description:
             'Egy üres zsebcsoport nem tartalmaz anyagdarabot. Adj hozzá tetszőleges számú zsebet a rendeltetésszerű használathoz.',
           actions: {
             one: '1 Zseb',
             two: '2 Zseb',
             three: '3 Zseb',
+            pockets: 'Zsebek',
           },
           additionalDescription: 'A zsebek száma később bármikor módosítható a fában vagy ebben a szerkesztőben.',
         },
