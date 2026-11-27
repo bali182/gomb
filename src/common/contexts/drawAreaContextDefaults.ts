@@ -7,6 +7,7 @@ import type {
   DrawAreaLabelStyles,
   DrawAreaMarkerStyles,
   DrawAreaPocketItemStyles,
+  DrawAreaSelectionStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { produce } from '../utils/produce'
@@ -36,7 +37,10 @@ const drawAreaDefaultComponentStyles: DrawAreaComponentStyles = {
   getMaskStrokeColor: produce(undefined),
   getBorderThickness: produce(undefined),
   getBorderDasharray: produce(undefined),
-  getFilter: produce(undefined),
+}
+
+const drawAreaDefaultSelectionStyles: DrawAreaSelectionStyles = {
+  getSelectionColor: produce('transparent'),
 }
 
 const drawAreaDefaultPocketItemStyles: DrawAreaPocketItemStyles = {
@@ -80,6 +84,7 @@ export const defaultDrawAreaContext: DrawAreaContextValue = {
   isInteractive: false,
   isShowingPocketItems: false,
   selection: defaultSubProjectSelection,
+  selectionStyles: drawAreaDefaultSelectionStyles,
   holeStyles: drawAreaDefaultHoleStyles,
   stitchLineStyles: drawAreaDefaultStitchLineStyles,
   componentStyles: drawAreaDefaultComponentStyles,

@@ -19,6 +19,7 @@ import { formatHex8, parse } from 'culori'
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { getSelectionOpacities, type SelectionOpacitiesSchema } from '../logic/getSelectionOpacities'
 import type {
+  DrawAreaComponentBackgroundStyleParams,
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -27,6 +28,7 @@ import type {
   DrawAreaMarkerStyles,
   DrawAreaPocketItemStyleParams,
   DrawAreaPocketItemStyles,
+  DrawAreaSelectionStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { StitchLineSchema } from '../schemas/stitching'
@@ -94,8 +96,17 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     [selected, subProject, isEditingPocketContents],
   )
 
+  const selectionStyles = useMemo<DrawAreaSelectionStyles>(
+    () => ({ getSelectionColor: produce(selectionColor) }),
+    [selectionColor],
+  )
+
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
-    const getBackgroundColor = ({ component, nestingLevel, faceIdAboveRoot }: DrawAreaComponentStyleParams): string => {
+    const getBackgroundColor = ({
+      component,
+      nestingLevel,
+      faceIdAboveRoot,
+    }: DrawAreaComponentBackgroundStyleParams): string => {
       if (
         narrowers.is.guide(component) ||
         narrowers.is.rootPanelFace(component) ||
@@ -147,9 +158,6 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
           return LAYOUT_COMPONENT_BORDER_DASHARRAY
         }
         return undefined
-      },
-      getFilter: ({ component }) => {
-        return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
       },
     }
   }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, accessor])
@@ -263,6 +271,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       isInteractive,
       isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
+      selectionStyles,
       holeStyles,
       componentStyles,
       pocketItemStyles,
@@ -278,6 +287,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       pocketItemStyles,
       componentStyles,
       drawAreaSelection,
+      selectionStyles,
       holeStyles,
       labelStyles,
       stitchLineStyles,

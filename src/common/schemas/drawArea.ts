@@ -4,10 +4,14 @@ import type { ExportElementSchema } from './export'
 import { HoleSchema } from './hole'
 import { ResolvedStitchLineSchema, StitchLineSchema } from './stitching'
 
-export type DrawAreaComponentStyleParams = {
+export type DrawAreaComponentBackgroundStyleParams = {
   faceIdAboveRoot?: string
   component: ComponentSchema
   nestingLevel: number
+}
+
+export type DrawAreaComponentStyleParams = {
+  component: ComponentSchema
 }
 
 export type DrawAreaPocketItemStyleParams = {
@@ -19,13 +23,16 @@ export type DrawAreaHoleStyleParams = {
 }
 
 export type DrawAreaComponentStyles = {
-  getBackgroundColor: (params: DrawAreaComponentStyleParams) => string | undefined
+  getBackgroundColor: (params: DrawAreaComponentBackgroundStyleParams) => string | undefined
   getBorderColor: (params: DrawAreaComponentStyleParams) => string | undefined
-  getMaskFillColor: (params: DrawAreaComponentStyleParams) => string | undefined
+  getMaskFillColor: (params: DrawAreaComponentBackgroundStyleParams) => string | undefined
   getMaskStrokeColor: (params: DrawAreaComponentStyleParams) => string | undefined
   getBorderThickness: (params: DrawAreaComponentStyleParams) => number | undefined
   getBorderDasharray: (params: DrawAreaComponentStyleParams) => string | undefined
-  getFilter: (params: DrawAreaComponentStyleParams) => string | undefined
+}
+
+export type DrawAreaSelectionStyles = {
+  getSelectionColor: () => string
 }
 
 export type DrawAreaPocketItemStyles = {
@@ -88,6 +95,7 @@ export type DrawAreaContextValue = {
   isInteractive: boolean
   isShowingPocketItems: boolean
   selection: SubProjectSelectionContextValue
+  selectionStyles: DrawAreaSelectionStyles
   holeStyles: DrawAreaHoleStyles
   stitchLineStyles: DrawAreaStitchLineStyles
   componentStyles: DrawAreaComponentStyles

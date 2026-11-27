@@ -4,8 +4,12 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
+import type { GuideSchema } from '../../schemas/components'
+import type { ComputedGuideSchema } from '../../schemas/computed'
+import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { SizeLabel } from './SizeLabel'
 
 const GUIDE_HIT_AREA_THICKNESS = 2
@@ -20,14 +24,14 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
   const { direction } = useSvgFace()
   const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
-  const pathData = usePath(computed.path)
+  const path = usePath(computed.path)
   const isEmpty = children.length === 0
 
   const guide = useMemo(() => accessor.component.guide(componentId), [accessor.component, componentId])
 
   const isActive = selection.isSelected(guide) || selection.isHovered(guide)
   const isSelectable = isInteractive && isEmpty
-  const style = { component: guide, nestingLevel }
+  const style: DrawAreaComponentStyleParams = { component: guide }
 
   const handleClick = useCallback(
     (event: MouseEvent<SVGPathElement>): void => {
@@ -54,7 +58,7 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
       <g data-component-id={componentId}>
         {isSelectable && (
           <path
-            d={pathData}
+            d={path}
             fill="transparent"
             stroke="transparent"
             strokeWidth={GUIDE_HIT_AREA_THICKNESS}
@@ -81,20 +85,50 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
           }
         })}
         {isInteractive && (isEmpty || isActive) && (
-          <path
-            d={pathData}
-            fill="none"
-            stroke={componentStyles.getBorderColor(style)}
-            strokeWidth={componentStyles.getBorderThickness(style)}
-            strokeDasharray={componentStyles.getBorderDasharray(style)}
-            filter={componentStyles.getFilter(style)}
-            pointerEvents="none"
-          />
+          <>
+            {isActive && <GuideSelectionShadow model={guide} computedModel={computed} path={path} />}
+            <path
+              d={path}
+              fill="none"
+              stroke={componentStyles.getBorderColor(style)}
+              strokeWidth={componentStyles.getBorderThickness(style)}
+              strokeDasharray={componentStyles.getBorderDasharray(style)}
+              pointerEvents="none"
+            />
+          </>
         )}
       </g>
       {isInteractive && isActive && settings.view.componentDimensionsVisible && (
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
     </>
+  )
+}
+
+type GuideSelectionShadowProps = {
+  model: GuideSchema
+  computedModel: ComputedGuideSchema
+  path: string
+}
+
+const GuideSelectionShadow: FC<GuideSelectionShadowProps> = ({ model, computedModel, path }) => {
+  const { componentStyles, selectionStyles } = useDrawAreaContext()
+  const paths = useMemo<SelectionShadowPath[]>(() => {
+    const params: DrawAreaComponentStyleParams = { component: model }
+    return [
+      {
+        path,
+        strokeWidth: componentStyles.getBorderThickness(params) ?? 1,
+        strokeDasharray: componentStyles.getBorderDasharray(params),
+      },
+    ]
+  }, [path, componentStyles, model])
+
+  return (
+    <SelectionShadow
+      paths={paths}
+      boundingRect={computedModel.boundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
   )
 }

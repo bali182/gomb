@@ -3,8 +3,11 @@ import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { RootPanelFaceSchema, RootPanelSchema } from '../../schemas/components'
+import type { ComputedRootPanelFaceSchema } from '../../schemas/computed'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { RootPanelFace } from './RootPanelFace'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { SizeLabel } from './SizeLabel'
 
 type RootPanelProps = {
@@ -22,13 +25,16 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
 
   const inactiveFaceId = faceIdAboveRoot === rootPanel.frontFaceId ? rootPanel.backFaceId : rootPanel.frontFaceId
   const computedFace = computedAccessor.component.rootPanelFace(faceIdAboveRoot)
-  const pathData = usePath(computedFace.path)
+  const path = usePath(computedFace.path)
   const isRootActive = selection.isSelected(rootPanel) || selection.isHovered(rootPanel)
   const isActive = isRootActive || selection.isSelected(visibleFace) || selection.isHovered(visibleFace)
-  const styleParams: DrawAreaComponentStyleParams = { component: rootPanel, nestingLevel, faceIdAboveRoot }
+  const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = {
+    component: rootPanel,
+    nestingLevel,
+    faceIdAboveRoot,
+  }
   const outlineStyleParams: DrawAreaComponentStyleParams = {
     component: isRootActive ? rootPanel : visibleFace,
-    nestingLevel,
   }
 
   const handlePointerEnter = useCallback((): void => {
@@ -55,10 +61,16 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
         nestingLevel={nestingLevel}
         direction="reverse"
       />
+      {isActive && (
+        <RootPanelSelectionShadow
+          model={isRootActive ? rootPanel : visibleFace}
+          computedModel={computedFace}
+          path={path}
+        />
+      )}
       <path
-        d={pathData}
-        fill={componentStyles.getBackgroundColor(styleParams)}
-        filter={componentStyles.getFilter(outlineStyleParams)}
+        d={path}
+        fill={componentStyles.getBackgroundColor(backgroundStyleParams)}
         stroke={componentStyles.getBorderColor(outlineStyleParams)}
         strokeWidth={componentStyles.getBorderThickness(outlineStyleParams)}
         data-component-id={rootPanel.id}
@@ -71,5 +83,27 @@ export const RootPanel: FC<RootPanelProps> = ({ componentId, nestingLevel, faceI
       )}
       <RootPanelFace key={faceIdAboveRoot} componentId={faceIdAboveRoot} nestingLevel={nestingLevel} />
     </>
+  )
+}
+
+type RootPanelSelectionShadowProps = {
+  model: RootPanelSchema | RootPanelFaceSchema
+  computedModel: ComputedRootPanelFaceSchema
+  path: string
+}
+
+const RootPanelSelectionShadow: FC<RootPanelSelectionShadowProps> = ({ model, computedModel, path }) => {
+  const { componentStyles, selectionStyles } = useDrawAreaContext()
+  const paths = useMemo<SelectionShadowPath[]>(
+    () => [{ path, strokeWidth: componentStyles.getBorderThickness({ component: model }) ?? 1 }],
+    [path, componentStyles, model],
+  )
+
+  return (
+    <SelectionShadow
+      paths={paths}
+      boundingRect={computedModel.boundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
   )
 }

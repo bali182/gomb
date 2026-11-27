@@ -54,7 +54,7 @@ export const exportComponentPng = async (params: ExportComponentPngParams): Prom
     throw new Error(`Component not found in tree: ${exportComponent.id}`)
   }
 
-  const rects = collectBoundingRects(computedComponent, nestingLevel, computedSubProject, {
+  const rects = collectBoundingRects(computedComponent, computedSubProject, {
     ...params,
     componentId: exportComponent.id,
     context: exportContext,
@@ -113,7 +113,6 @@ const padBoundingRect = (rect: RectSchema, padding: number): RectSchema => ({
 
 const getComponentBoundingRects = (
   component: ComputedComponentSchema,
-  nestingLevel: number,
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
 ): RectSchema[] => {
@@ -122,7 +121,7 @@ const getComponentBoundingRects = (
   }
   const { subProject, context } = params
   const model = accessors.subProject(subProject).component.byId(component.componentId)
-  const styleParams = { component: model, nestingLevel }
+  const styleParams = { component: model }
   const borderPadding = (context.componentStyles.getBorderThickness(styleParams) ?? 0) / 2
   const boundingRects = [padBoundingRect(component.boundingRect, borderPadding)]
 
@@ -203,7 +202,6 @@ const getStitchLineBoundingRects = (
 
 const collectBoundingRects = (
   component: ComputedComponentSchema,
-  nestingLevel: number,
   computedSubProject: ComputedSubProjectSchema,
   params: ExportComponentPngParams,
   isReversed = false,
@@ -220,7 +218,7 @@ const collectBoundingRects = (
     ...accessor.stitchLine.byExit(component.componentId),
   ]
   const ownRects = [
-    ...getComponentBoundingRects(component, nestingLevel, computedSubProject, params),
+    ...getComponentBoundingRects(component, computedSubProject, params),
     ...getStitchLineBoundingRects(routes, faceId, axisX, params),
   ]
   const visibleRects = isReversed ? ownRects.map((rect) => reflectRectHorizontally(rect, axisX)) : ownRects
@@ -230,11 +228,6 @@ const collectBoundingRects = (
     .flatMap((child) =>
       collectBoundingRects(
         child,
-        narrowers.is.computedGuide(component) ||
-          narrowers.is.computedPocketCluster(component) ||
-          narrowers.is.computedRootPanel(component)
-          ? nestingLevel
-          : nestingLevel + 1,
         computedSubProject,
         params,
         narrowers.is.computedRootPanel(component) ? child.componentId !== activeFaceId : isReversed,

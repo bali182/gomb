@@ -4,7 +4,9 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { PocketSchema } from '../../schemas/components'
+import type { ComputedPocketSchema } from '../../schemas/computed'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { Guide } from './Guide'
@@ -12,6 +14,7 @@ import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
 import { PocketItem } from './PocketItem'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { SvgComponentLayers } from './SvgComponentLayers'
@@ -29,14 +32,15 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const { direction } = useSvgFace()
   const children = narrowers.is.computedFrontPocket(computed) ? computedAccessor.component.children(componentId) : []
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
-  const pathData = usePath(computed.path)
+  const path = usePath(computed.path)
 
   const pocket = useMemo(() => accessor.component.pocket(componentId), [accessor.component, componentId])
 
-  const style: DrawAreaComponentStyleParams = {
+  const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = {
     component: pocket,
     nestingLevel,
   }
+  const style: DrawAreaComponentStyleParams = { component: pocket }
 
   const enter = useCallback<PointerEventHandler<SVGPathElement>>(() => selection.hover(pocket), [pocket, selection])
 
@@ -63,13 +67,13 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
             after={<StitchLines componentId={componentId} surface="front" />}
             content={
               <>
+                {active && <PocketSelectionShadow model={pocket} computedModel={computed} path={path} />}
                 <path
-                  d={pathData}
+                  d={path}
                   data-component-id={componentId}
-                  fill={componentStyles.getBackgroundColor(style)}
+                  fill={componentStyles.getBackgroundColor(backgroundStyleParams)}
                   stroke={componentStyles.getBorderColor(style)}
                   strokeWidth={componentStyles.getBorderThickness(style)}
-                  filter={componentStyles.getFilter(style)}
                   onPointerEnter={isInteractive ? enter : undefined}
                   onPointerLeave={isInteractive ? leave : undefined}
                   onClick={isInteractive ? click : undefined}
@@ -102,5 +106,27 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
     </>
+  )
+}
+
+type PocketSelectionShadowProps = {
+  model: PocketSchema
+  computedModel: ComputedPocketSchema
+  path: string
+}
+
+const PocketSelectionShadow: FC<PocketSelectionShadowProps> = ({ model, computedModel, path }) => {
+  const { componentStyles, selectionStyles } = useDrawAreaContext()
+  const paths = useMemo<SelectionShadowPath[]>(
+    () => [{ path, strokeWidth: componentStyles.getBorderThickness({ component: model }) ?? 1 }],
+    [path, componentStyles, model],
+  )
+
+  return (
+    <SelectionShadow
+      paths={paths}
+      boundingRect={computedModel.boundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
   )
 }

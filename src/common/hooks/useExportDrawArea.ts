@@ -33,7 +33,6 @@ export const useExportDrawArea = (
       getMaskStrokeColor: produce(undefined),
       getBorderThickness: produce(STROKE_THICKNESS),
       getBorderDasharray: produce(undefined),
-      getFilter: produce(undefined),
     }),
     [],
   )
@@ -135,6 +134,7 @@ export const useExportDrawArea = (
       isInteractive: false,
       isShowingPocketItems: false,
       selection: defaultSubProjectSelection,
+      selectionStyles: defaultDrawAreaContext.selectionStyles,
       holeStyles,
       componentStyles,
       pocketItemStyles: defaultDrawAreaContext.pocketItemStyles,

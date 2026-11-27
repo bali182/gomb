@@ -4,8 +4,11 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { PocketClusterSchema } from '../../schemas/components'
+import type { ComputedPocketClusterSchema } from '../../schemas/computed'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Pocket } from './Pocket'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { SizeLabel } from './SizeLabel'
 
 const POCKET_CLUSTER_HIT_AREA_THICKNESS = 2
@@ -23,7 +26,7 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
   const computed = computedAccessor.component.pocketCluster(componentId)
   const { direction } = useSvgFace()
   const pocketIds = direction === 'reverse' ? [...computed.children].reverse() : computed.children
-  const pathData = usePath(computed.path)
+  const path = usePath(computed.path)
 
   const cluster = useMemo(() => accessor.component.pocketCluster(componentId), [accessor.component, componentId])
 
@@ -38,7 +41,8 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
     selection.clearHover()
   }, [selection])
 
-  const style: DrawAreaComponentStyleParams = { component: cluster, nestingLevel }
+  const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = { component: cluster, nestingLevel }
+  const style: DrawAreaComponentStyleParams = { component: cluster }
 
   const onClick = useCallback(
     (event: MouseEvent): void => {
@@ -52,21 +56,23 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
     <>
       <g data-component-id={componentId} onClick={isInteractive && !isEmpty ? onClick : undefined}>
         {(isEmpty ? isInteractive : active) && (
-          <path
-            d={pathData}
-            fill={isEmpty ? 'none' : componentStyles.getBackgroundColor(style)}
-            stroke={componentStyles.getBorderColor(style)}
-            strokeWidth={componentStyles.getBorderThickness(style)}
-            strokeDasharray={componentStyles.getBorderDasharray(style)}
-            filter={componentStyles.getFilter(style)}
-            pointerEvents={isEmpty ? 'none' : undefined}
-            onPointerEnter={isInteractive && !isEmpty ? onPointerEnter : undefined}
-            onPointerLeave={isInteractive && !isEmpty ? onPointerLeave : undefined}
-          />
+          <>
+            {active && <PocketClusterSelectionShadow model={cluster} computedModel={computed} path={path} />}
+            <path
+              d={path}
+              fill={isEmpty ? 'none' : componentStyles.getBackgroundColor(backgroundStyleParams)}
+              stroke={componentStyles.getBorderColor(style)}
+              strokeWidth={componentStyles.getBorderThickness(style)}
+              strokeDasharray={componentStyles.getBorderDasharray(style)}
+              pointerEvents={isEmpty ? 'none' : undefined}
+              onPointerEnter={isInteractive && !isEmpty ? onPointerEnter : undefined}
+              onPointerLeave={isInteractive && !isEmpty ? onPointerLeave : undefined}
+            />
+          </>
         )}
         {isInteractive && isEmpty && (
           <path
-            d={pathData}
+            d={path}
             fill="transparent"
             stroke="transparent"
             strokeWidth={POCKET_CLUSTER_HIT_AREA_THICKNESS}
@@ -84,5 +90,33 @@ export const PocketCluster: FC<PocketClusterProps> = ({ componentId, nestingLeve
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
     </>
+  )
+}
+
+type PocketClusterSelectionShadowProps = {
+  model: PocketClusterSchema
+  computedModel: ComputedPocketClusterSchema
+  path: string
+}
+
+const PocketClusterSelectionShadow: FC<PocketClusterSelectionShadowProps> = ({ model, computedModel, path }) => {
+  const { componentStyles, selectionStyles } = useDrawAreaContext()
+  const paths = useMemo<SelectionShadowPath[]>(() => {
+    const params: DrawAreaComponentStyleParams = { component: model }
+    return [
+      {
+        path,
+        strokeWidth: componentStyles.getBorderThickness(params) ?? 1,
+        strokeDasharray: componentStyles.getBorderDasharray(params),
+      },
+    ]
+  }, [path, componentStyles, model])
+
+  return (
+    <SelectionShadow
+      paths={paths}
+      boundingRect={computedModel.boundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
   )
 }

@@ -6,9 +6,12 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { PanelSchema } from '../../schemas/components'
+import type { ComputedPanelSchema } from '../../schemas/computed'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { HoleHighlights } from './HoleHighlights'
 import { PocketCluster } from './PocketCluster'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { SvgComponentLayers } from './SvgComponentLayers'
@@ -26,15 +29,16 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
   const { direction } = useSvgFace()
   const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
-  const pathData = usePath(computedPanel.path)
+  const path = usePath(computedPanel.path)
 
   const panel = useMemo(() => accessor.component.panel(componentId), [accessor.component, componentId])
 
   const isActive = selection.isSelected(panel) || selection.isHovered(panel)
-  const styleParams: DrawAreaComponentStyleParams = {
+  const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = {
     component: panel,
     nestingLevel,
   }
+  const styleParams: DrawAreaComponentStyleParams = { component: panel }
 
   const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
     selection.hover(panel)
@@ -61,10 +65,10 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
             after={<StitchLines componentId={panel.id} surface="front" />}
             content={
               <>
+                {isActive && <PanelSelectionShadow model={panel} computedModel={computedPanel} path={path} />}
                 <path
-                  d={pathData}
-                  fill={componentStyles.getBackgroundColor(styleParams)}
-                  filter={componentStyles.getFilter(styleParams)}
+                  d={path}
+                  fill={componentStyles.getBackgroundColor(backgroundStyleParams)}
                   stroke={componentStyles.getBorderColor(styleParams)}
                   strokeWidth={componentStyles.getBorderThickness(styleParams)}
                   data-component-id={panel.id}
@@ -112,5 +116,27 @@ export const Panel: FC<PanelProps> = ({ componentId, nestingLevel }) => {
         <SizeLabel reference="bottom-right" boundingRect={computedPanel.boundingRect} />
       )}
     </>
+  )
+}
+
+type PanelSelectionShadowProps = {
+  model: PanelSchema
+  computedModel: ComputedPanelSchema
+  path: string
+}
+
+const PanelSelectionShadow: FC<PanelSelectionShadowProps> = ({ model, computedModel, path }) => {
+  const { componentStyles, selectionStyles } = useDrawAreaContext()
+  const paths = useMemo<SelectionShadowPath[]>(
+    () => [{ path, strokeWidth: componentStyles.getBorderThickness({ component: model }) ?? 1 }],
+    [path, componentStyles, model],
+  )
+
+  return (
+    <SelectionShadow
+      paths={paths}
+      boundingRect={computedModel.boundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
   )
 }

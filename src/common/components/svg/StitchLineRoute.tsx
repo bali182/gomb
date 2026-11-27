@@ -7,11 +7,14 @@ import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
+import { reflectRectHorizontally } from '../../logic/geometryUtils'
+import { getSvgLinePathData } from '../../logic/getSvgPathData'
 import type { ComputedStitchRouteSchema } from '../../schemas/computed'
+import type { RectSchema } from '../../schemas/geometry'
 import type { ResolvedStitchLineSchema } from '../../schemas/stitching'
-import { StitchLineRouteHoles } from './StitchLineRouteHoles'
+import { isDefined } from '../../utils/isDefined'
+import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
 import { StitchRouteLabel } from './StitchRouteLabel'
-import { Stitches } from './Stitches'
 
 type StitchLineRouteProps = {
   route: ComputedStitchRouteSchema
@@ -31,7 +34,7 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
     return root.boundingRect.x.plus(root.boundingRect.width.dividedBy(2))
   }, [route.faceId, faceId, computedAccessor])
   const maskId = direction === 'reverse' ? POCKET_ITEM_STITCH_MASK_REVERSE_ID : POCKET_ITEM_STITCH_MASK_ID
-  const pathData = usePath(route.path, reflectionAxisX)
+  const { stitchLinePath, stitchHolesPath, threadPath } = useStitchLineRoutePaths(route, reflectionAxisX)
   const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
   const stitchHoleThickness = stitchLineStyles.getStitchHoleThickness(stitchLine)
   const isStitchLineActive = selection.isSelected(stitchLine) || selection.isHovered(stitchLine)
@@ -68,9 +71,19 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
       onPointerEnter={isInteractive ? handlePointerEnter : undefined}
       onPointerLeave={isInteractive ? handlePointerLeave : undefined}
     >
+      {isStitchLineActive && (
+        <StitchLineRouteSelectionShadow
+          model={stitchLine}
+          computedModel={route}
+          stitchLinePath={stitchLinePath}
+          stitchHolesPath={stitchHolesPath}
+          threadPath={threadPath}
+          reflectionAxisX={reflectionAxisX}
+        />
+      )}
       {settings.view.stitchHoleFootprintVisible && (
         <path
-          d={pathData}
+          d={stitchLinePath}
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -80,23 +93,41 @@ export const StitchLineRoute: FC<StitchLineRouteProps> = ({ route, stitchLine })
       )}
       {settings.view.stitchLinesVisible && (
         <path
-          d={pathData}
+          d={stitchLinePath}
           fill="none"
           stroke={stitchLineStyles.getLineColor(stitchLine)}
           strokeWidth={stitchLineThickness}
         />
       )}
-      {settings.view.stitchHolesVisible && (
-        <StitchLineRouteHoles holes={route.holes} stitchLine={stitchLine} reflectionAxisX={reflectionAxisX} />
+      {isDefined(stitchHolesPath) && (
+        <path
+          d={stitchHolesPath}
+          fill="none"
+          strokeLinecap="round"
+          stroke={stitchLineStyles.getStitchHoleColor(stitchLine)}
+          strokeWidth={stitchHoleThickness}
+        />
       )}
-      {settings.view.stitchesVisible && (
-        <Stitches stitches={route.stitches} stitchLine={stitchLine} reflectionAxisX={reflectionAxisX} />
+      {isDefined(threadPath) && (
+        <path
+          d={threadPath}
+          fill="none"
+          stroke={stitchLineStyles.getThreadColor(stitchLine)}
+          strokeLinecap="round"
+          strokeWidth={stitchLineStyles.getThreadThickness(stitchLine)}
+        />
       )}
       {isStitchLineActive && settings.view.stitchCountVisible && (
         <StitchRouteLabel route={route} reflectionAxisX={reflectionAxisX} />
       )}
       {isInteractive && (
-        <path d={pathData} fill="none" pointerEvents="stroke" stroke="transparent" strokeWidth={hitAreaThickness} />
+        <path
+          d={stitchLinePath}
+          fill="none"
+          pointerEvents="stroke"
+          stroke="transparent"
+          strokeWidth={hitAreaThickness}
+        />
       )}
     </g>
   )
@@ -108,4 +139,114 @@ const isSameStitchLineRoute = (target: EventTarget | null, stitchLineId: string)
   }
 
   return target.closest(`[data-stitch-line-id="${CSS.escape(stitchLineId)}"]`) !== null
+}
+
+type StitchLineRouteSelectionShadowProps = {
+  model: ResolvedStitchLineSchema
+  computedModel: ComputedStitchRouteSchema
+  stitchLinePath: string
+  stitchHolesPath?: string
+  threadPath?: string
+  reflectionAxisX?: BigNumber
+}
+
+const StitchLineRouteSelectionShadow: FC<StitchLineRouteSelectionShadowProps> = ({
+  model: stitchLine,
+  computedModel: route,
+  stitchLinePath,
+  stitchHolesPath,
+  threadPath,
+  reflectionAxisX,
+}) => {
+  const { selectionStyles, stitchLineStyles } = useDrawAreaContext()
+  const { settings } = useGlobalSettings()
+  const stitchLineThickness = stitchLineStyles.getLineThickness(stitchLine)
+  const stitchHoleThickness = stitchLineStyles.getStitchHoleThickness(stitchLine)
+  const threadThickness = stitchLineStyles.getThreadThickness(stitchLine)
+
+  const shadowPaths = useMemo<SelectionShadowPath[]>(() => {
+    const paths: SelectionShadowPath[] = []
+    if (settings.view.stitchLinesVisible) {
+      paths.push({ path: stitchLinePath, strokeWidth: stitchLineThickness ?? 1 })
+    }
+    if (isDefined(stitchHolesPath)) {
+      paths.push({
+        path: stitchHolesPath,
+        strokeWidth: stitchLineThickness ?? 1,
+        strokeLinecap: 'round',
+      })
+    }
+    if (isDefined(threadPath)) {
+      paths.push({
+        path: threadPath,
+        strokeWidth: stitchLineThickness ?? 1,
+        strokeLinecap: 'round',
+      })
+    }
+    return paths
+  }, [settings.view.stitchLinesVisible, stitchLinePath, stitchHolesPath, threadPath, stitchLineThickness])
+
+  const shadowBoundingRect = useMemo<RectSchema>(() => {
+    const padding =
+      Math.max(
+        stitchLineThickness ?? 1,
+        stitchLine.stitchHoleLength + Math.max(stitchHoleThickness ?? 1, threadThickness ?? 1),
+      ) / 2
+    const boundingRect: RectSchema = {
+      x: route.boundingRect.x.minus(padding),
+      y: route.boundingRect.y.minus(padding),
+      width: route.boundingRect.width.plus(padding * 2),
+      height: route.boundingRect.height.plus(padding * 2),
+    }
+    return isDefined(reflectionAxisX) ? reflectRectHorizontally(boundingRect, reflectionAxisX) : boundingRect
+  }, [
+    route.boundingRect,
+    stitchLine.stitchHoleLength,
+    stitchLineThickness,
+    stitchHoleThickness,
+    threadThickness,
+    reflectionAxisX,
+  ])
+
+  if (shadowPaths.length === 0) {
+    return null
+  }
+
+  return (
+    <SelectionShadow
+      paths={shadowPaths}
+      boundingRect={shadowBoundingRect}
+      color={selectionStyles.getSelectionColor()}
+    />
+  )
+}
+
+type StitchLineRoutePaths = {
+  stitchLinePath: string
+  stitchHolesPath?: string
+  threadPath?: string
+}
+
+const useStitchLineRoutePaths = (
+  route: ComputedStitchRouteSchema,
+  reflectionAxisX?: BigNumber,
+): StitchLineRoutePaths => {
+  const { settings } = useGlobalSettings()
+  const stitchLinePath = usePath(route.path, reflectionAxisX)
+
+  const stitchHolesPath = useMemo<string | undefined>(() => {
+    if (!settings.view.stitchHolesVisible || route.holes.length === 0) {
+      return undefined
+    }
+    return route.holes.map(({ line }) => getSvgLinePathData(line, reflectionAxisX)).join(' ')
+  }, [route.holes, reflectionAxisX, settings.view.stitchHolesVisible])
+
+  const threadPath = useMemo<string | undefined>(() => {
+    if (!settings.view.stitchesVisible || route.stitches.length === 0) {
+      return undefined
+    }
+    return route.stitches.map(({ line }) => getSvgLinePathData(line, reflectionAxisX)).join(' ')
+  }, [route.stitches, reflectionAxisX, settings.view.stitchesVisible])
+
+  return { stitchLinePath, stitchHolesPath, threadPath }
 }
