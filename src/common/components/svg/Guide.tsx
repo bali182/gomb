@@ -26,7 +26,7 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
   const children = computedAccessor.component.children(componentId)
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
   const path = usePath(computed.path)
-  const isEmpty = children.length === 0
+  const isEmpty = children.length === 0 && accessor.stitchLine.byOwner(componentId).length === 0
 
   const guide = useMemo<GuideSchema>(() => accessor.component.guide(componentId), [accessor.component, componentId])
 

@@ -3,6 +3,7 @@ import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { PocketSchema } from '../../schemas/components'
 import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
@@ -26,7 +27,7 @@ type PocketProps = {
 
 export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const { componentStyles, selectionStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
-  const { hover, clearHover, select } = selection
+  const { hover, clearHover, select, selected, hovered } = selection
   const { settings } = useGlobalSettings()
   const { accessor, computedAccessor } = useSubProject()
   const computed = computedAccessor.component.pocket(componentId)
@@ -36,6 +37,7 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
   const path = usePath(computed.path)
 
   const pocket = useMemo<PocketSchema>(() => accessor.component.pocket(componentId), [accessor.component, componentId])
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(pocket.openingId)
 
   const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = {
     component: pocket,
@@ -55,11 +57,12 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
     [pocket, select],
   )
   const active = selection.isSelected(pocket) || selection.isHovered(pocket)
-  const isHighlighted =
-    active ||
-    [selection.selected, selection.hovered].some((item): boolean => {
-      return isDefined(item) && narrowers.is.pocketOpening(item) && item.id === pocket.openingId
-    })
+  const isReferencePocket = isDefined(referencePocket) && referencePocket.id === pocket.id
+  const isOpeningSelected =
+    isDefined(selected) && narrowers.is.pocketOpening(selected) && selected.id === pocket.openingId
+  const isOpeningHovered = isDefined(hovered) && narrowers.is.pocketOpening(hovered) && hovered.id === pocket.openingId
+
+  const isHighlighted = active || (isReferencePocket && (isOpeningSelected || isOpeningHovered))
 
   return (
     <>
