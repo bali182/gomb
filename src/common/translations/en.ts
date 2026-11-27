@@ -1031,12 +1031,14 @@ export const EN = {
         },
         missingFrontPocket: {
           title: 'Empty pocket cluster',
+          amountPlaceholder: 'Amount',
           description:
             'An empty pocket cluster has no physical parts. Add as many pockets as you like to create a functional pocket layout.',
           actions: {
             one: '1 Pocket',
             two: '2 Pockets',
             three: '3 Pockets',
+            pockets: 'Pockets',
           },
           additionalDescription: 'You can change the number of pockets at any time in the tree or this editor.',
         },

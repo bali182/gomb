@@ -20,6 +20,7 @@ export type NumberInputProps = {
   disabled?: boolean
   readOnly?: boolean
   startAddon?: ReactNode
+  endAddon?: ReactNode
   unit?: string
   step?: number
   size?: InputProps['size']
@@ -41,6 +42,7 @@ export const NumberInput: FC<NumberInputProps> = ({
   onReset,
   size = 'xs',
   startAddon,
+  endAddon,
   step: overwriteStep,
   unit,
   value,
@@ -100,7 +102,7 @@ export const NumberInput: FC<NumberInputProps> = ({
 
   const unitEl = isDefined(unit) ? <Box px="1.5">{unit}</Box> : undefined
 
-  const resolvedEndAddon =
+  const defaultEndAddon =
     isDefined(resetButtonEl) || isDefined(unitEl) ? (
       <HStack alignSelf="stretch" gap="0" height="100%">
         {isDefined(resetButtonEl) && isDefined(unitEl) ? (
@@ -114,6 +116,8 @@ export const NumberInput: FC<NumberInputProps> = ({
         )}
       </HStack>
     ) : undefined
+
+  const resolvedEndAddon = endAddon ?? defaultEndAddon
 
   if (isDefined(arrowPosition)) {
     return (
