@@ -2,7 +2,7 @@ import { Button, Dialog, DialogRootProps, IconButton, Portal, VStack } from '@ch
 import { CSSProperties, PropsWithChildren, useCallback, useEffect, useId, type FC, type SubmitEvent } from 'react'
 
 import { PiX } from 'react-icons/pi'
-import { portalRef } from '../../common/portalRef'
+import { portalRef } from '../../common/portalRefs'
 import { useCommandBlocker } from '../hooks/useCommandBlocker'
 import { useTranslation } from '../hooks/useTranslation'
 import { isDefined } from '../utils/isDefined'

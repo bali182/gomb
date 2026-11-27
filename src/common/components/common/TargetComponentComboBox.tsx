@@ -12,7 +12,7 @@ import { PiArrowCounterClockwise, PiTarget } from 'react-icons/pi'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useSubProject } from '../../hooks/useSubProject'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import type { ComponentSchema } from '../../schemas/components'
 import { getModelIcon } from '../../utils/getModelIcon'
 import { isDefined } from '../../utils/isDefined'

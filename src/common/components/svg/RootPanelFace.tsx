@@ -9,7 +9,12 @@ import { PocketCluster } from './PocketCluster'
 import { StitchLines } from './StitchLines'
 import { SvgComponentLayers } from './SvgComponentLayers'
 
-type RootPanelFaceProps = { componentId: string; nestingLevel: number; direction?: SvgViewDirection }
+type RootPanelFaceProps = {
+  componentId: string
+  nestingLevel: number
+  direction?: SvgViewDirection
+}
+
 export const RootPanelFace: FC<RootPanelFaceProps> = ({ componentId, nestingLevel, direction = 'forward' }) => {
   const { computedAccessor } = useSubProject()
   const root = computedAccessor.component.rootPanel()

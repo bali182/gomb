@@ -16,10 +16,10 @@ import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useOptionalSvgFace } from '../../contexts/SvgFaceContext'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
+import { svgLabelsPortalRef } from '../../portalRefs'
 import type { PointSchema, RectSchema, SizeSchema } from '../../schemas/geometry'
 import type { StitchCornerSchema, StitchSideSchema } from '../../schemas/stitching'
 import { isDefined } from '../../utils/isDefined'
-import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
 type LabelCommonProps = {
   icon: IconType

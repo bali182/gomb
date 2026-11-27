@@ -14,7 +14,7 @@ import { PiArrowCounterClockwise } from 'react-icons/pi'
 
 import { useEditorContext } from '../../contexts/EditorContext'
 import { useTranslation } from '../../hooks/useTranslation'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import type { IssueSchema } from '../../schemas/issues'
 import { isDefined } from '../../utils/isDefined'
 import { EditorIconButton } from '../common/EditorIconButton'

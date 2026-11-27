@@ -15,7 +15,7 @@ import {
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import { getHorizontalReflectionTransform } from '../../logic/geometryUtils'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import type { PathSchema } from '../../schemas/geometry'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
@@ -95,14 +95,15 @@ const PocketItemStitchMaskRoot: FC<PocketItemStitchMaskProps> = ({ componentId, 
   const component = accessor.component.rootPanel(componentId)
   const face = computedAccessor.component.rootPanelFace(faceIdAboveRoot)
   const faceIdBelowRoot = faceIdAboveRoot === component.frontFaceId ? component.backFaceId : component.frontFaceId
-  const componentStyleParams: DrawAreaComponentStyleParams = { component, nestingLevel: 0 }
+  const componentStyleParams: DrawAreaComponentStyleParams = { component }
+  const componentBackgroundStyleParams: DrawAreaComponentBackgroundStyleParams = { component, nestingLevel: 0 }
 
   return (
     <>
       <PocketItemStitchMaskFace componentId={faceIdBelowRoot} direction="reverse" />
       <PocketItemStitchMaskPath
         path={face.path}
-        fill={componentStyles.getMaskFillColor(componentStyleParams)}
+        fill={componentStyles.getMaskFillColor(componentBackgroundStyleParams)}
         stroke={componentStyles.getMaskStrokeColor(componentStyleParams)}
         strokeWidth={componentStyles.getBorderThickness(componentStyleParams)}
       />
@@ -135,7 +136,8 @@ const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskComponentProps> = ({
   const { accessor, computedAccessor } = useSubProject()
   const component = accessor.component.byId(componentId)
   const computed = computedAccessor.component.byId(componentId)
-  const componentStyleParams: DrawAreaComponentStyleParams = { component, nestingLevel: 0 }
+  const componentStyleParams: DrawAreaComponentStyleParams = { component }
+  const componentBackgroundStyleParams: DrawAreaComponentBackgroundStyleParams = { component, nestingLevel: 0 }
 
   if (narrowers.is.computedRootPanel(computed)) {
     throw new Error(`Root panel cannot be rendered inside a face mask: ${componentId}`)
@@ -144,7 +146,7 @@ const PocketItemStitchMaskComponent: FC<PocketItemStitchMaskComponentProps> = ({
   const componentPath = (
     <PocketItemStitchMaskPath
       path={computed.path}
-      fill={componentStyles.getMaskFillColor(componentStyleParams)}
+      fill={componentStyles.getMaskFillColor(componentBackgroundStyleParams)}
       stroke={componentStyles.getMaskStrokeColor(componentStyleParams)}
       strokeWidth={componentStyles.getBorderThickness(componentStyleParams)}
     />

@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react'
 import {
   LAYOUT_COMPONENT_BORDER_DASHARRAY,
+  STITCH_HOLE_FOOTPRINT_OPACITY,
   STITCH_LINE_LABEL_BACKGROUND_COLOR,
   STITCH_LINE_LABEL_COLOR,
   STROKE_THICKNESS,
@@ -19,6 +20,7 @@ import { formatHex8, parse } from 'culori'
 import { defaultDrawAreaContext } from '../contexts/drawAreaContextDefaults'
 import { getSelectionOpacities, type SelectionOpacitiesSchema } from '../logic/getSelectionOpacities'
 import type {
+  DrawAreaComponentBackgroundStyleParams,
   DrawAreaComponentStyleParams,
   DrawAreaComponentStyles,
   DrawAreaContextValue,
@@ -27,6 +29,7 @@ import type {
   DrawAreaMarkerStyles,
   DrawAreaPocketItemStyleParams,
   DrawAreaPocketItemStyles,
+  DrawAreaSelectionStyles,
   DrawAreaStitchLineStyles,
 } from '../schemas/drawArea'
 import { StitchLineSchema } from '../schemas/stitching'
@@ -55,7 +58,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     setSide(side === 'front' ? 'back' : 'front')
   }, [drawAreaSelection, setSide, side])
 
-  const { isHovered, isSelected, selected } = drawAreaSelection
+  const { isSelected, selected } = drawAreaSelection
   const { clearSelection, clearHover } = drawAreaSelection
 
   const isEditingPocketContents = useMemo<boolean>(() => {
@@ -94,8 +97,17 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     [selected, subProject, isEditingPocketContents],
   )
 
+  const selectionStyles = useMemo<DrawAreaSelectionStyles>(
+    () => ({ getSelectionColor: produce(selectionColor) }),
+    [selectionColor],
+  )
+
   const componentStyles = useMemo<DrawAreaComponentStyles>(() => {
-    const getBackgroundColor = ({ component, nestingLevel, faceIdAboveRoot }: DrawAreaComponentStyleParams): string => {
+    const getBackgroundColor = ({
+      component,
+      nestingLevel,
+      faceIdAboveRoot,
+    }: DrawAreaComponentBackgroundStyleParams): string => {
       if (
         narrowers.is.guide(component) ||
         narrowers.is.rootPanelFace(component) ||
@@ -118,9 +130,6 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
     }
 
     const getBorderColor = ({ component }: DrawAreaComponentStyleParams): string => {
-      if (isSelected(component) || isHovered(component)) {
-        return applyOpacity(selectionColor, selectionOpacities.components[component.id].stroke)
-      }
       return applyOpacity(strokeColor, selectionOpacities.components[component.id].stroke)
     }
 
@@ -145,11 +154,8 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         }
         return undefined
       },
-      getFilter: ({ component }) => {
-        return isSelected(component) || isHovered(component) ? `drop-shadow(0px 0px 2px ${selectionColor})` : undefined
-      },
     }
-  }, [isHovered, isSelected, leatherColor, selectionColor, strokeColor, selectionOpacities, accessor])
+  }, [leatherColor, strokeColor, selectionOpacities, accessor])
 
   const pocketItemStyles = useMemo<DrawAreaPocketItemStyles>(() => {
     const getBackgroundColor = ({ owner }: DrawAreaPocketItemStyleParams): string => {
@@ -179,32 +185,29 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       getFillColor: ({ hole }) => {
         return isSelected(hole) ? applyOpacity(selectionColor, 0.3) : 'transparent'
       },
-      getStrokeColor: ({ hole }) => {
-        return isSelected(hole) || isHovered(hole) ? selectionColor : 'transparent'
-      },
+      getStrokeColor: produce('transparent'),
       getStrokeThickness: () => {
         return STROKE_THICKNESS
       },
     }),
-    [isHovered, isSelected, selectionColor],
+    [isSelected, selectionColor],
   )
 
   const stitchLineStyles = useMemo<DrawAreaStitchLineStyles>(() => {
     const getLineColor = (stitchLine: StitchLineSchema): string => {
-      return applyOpacity(
-        isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchLineColor,
-        selectionOpacities.stitchLines[stitchLine.id].stroke,
-      )
+      return applyOpacity(stitchLineColor, selectionOpacities.stitchLines[stitchLine.id].stroke)
     }
     return {
       getLineColor,
       getStitchHoleFootprintColor: (stitchLine) => {
-        const color = isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchLineColor
-        const parsed = parse(color)
+        const parsed = parse(stitchLineColor)
         if (!isDefined(parsed)) {
           return undefined
         }
-        return applyOpacity(formatHex8({ ...parsed, alpha: 0.2 }), selectionOpacities.stitchLines[stitchLine.id].stroke)
+        return applyOpacity(
+          formatHex8({ ...parsed, alpha: STITCH_HOLE_FOOTPRINT_OPACITY }),
+          selectionOpacities.stitchLines[stitchLine.id].stroke,
+        )
       },
       getStitchHoleFootprintThickness: (stitchLine) => {
         const length = stitchLine.stitchHoleLength ?? stitchHoleLength
@@ -215,10 +218,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
         return stitchLine.stitchLineThickness ?? stitchLineThickness
       },
       getStitchHoleColor: (stitchLine) => {
-        return applyOpacity(
-          isSelected(stitchLine) || isHovered(stitchLine) ? selectionColor : stitchHoleColor,
-          selectionOpacities.stitchLines[stitchLine.id].stroke,
-        )
+        return applyOpacity(stitchHoleColor, selectionOpacities.stitchLines[stitchLine.id].stroke)
       },
       getStitchHoleThickness: (stitchLine) => {
         return stitchLine.stitchHoleThickness ?? stitchHoleThickness
@@ -231,10 +231,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       },
     }
   }, [
-    isHovered,
-    isSelected,
     stitchLineColor,
-    selectionColor,
     stitchLineThickness,
     stitchHoleColor,
     stitchHoleThickness,
@@ -260,6 +257,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       isInteractive,
       isShowingPocketItems: settings.view.pocketItemsVisible,
       selection: drawAreaSelection,
+      selectionStyles,
       holeStyles,
       componentStyles,
       pocketItemStyles,
@@ -275,6 +273,7 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
       pocketItemStyles,
       componentStyles,
       drawAreaSelection,
+      selectionStyles,
       holeStyles,
       labelStyles,
       stitchLineStyles,
@@ -287,6 +286,9 @@ export const useEditorDrawArea = ({ isInteractive, editorTabs }: UseEditorDrawAr
 }
 
 const applyOpacity = (color: string, opacity: number): string => {
+  if (opacity === 0) {
+    return 'transparent'
+  }
   if (opacity === 1) {
     return color
   }

@@ -1,7 +1,7 @@
 import { Button, Menu, Portal } from '@chakra-ui/react'
 import { Children, FC, ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import { PiCaretDown } from 'react-icons/pi'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import { intersperse } from '../../utils/intersperse'
 
 export type BaseMenuProps = {

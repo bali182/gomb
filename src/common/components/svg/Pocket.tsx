@@ -1,10 +1,12 @@
-import { useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, useMemo, type FC, type MouseEvent } from 'react'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
+import { usePocketOpeningEditorReference } from '../../hooks/usePocketOpeningEditorReference'
 import { useSubProject } from '../../hooks/useSubProject'
-import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
+import type { PocketSchema } from '../../schemas/components'
+import type { DrawAreaComponentBackgroundStyleParams, DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { isDefined } from '../../utils/isDefined'
 import { narrowers } from '../../utils/narrowers'
 import { Guide } from './Guide'
@@ -12,6 +14,8 @@ import { HoleHighlights } from './HoleHighlights'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
 import { PocketItem } from './PocketItem'
+import { PureSvgComponent } from './PureSvgComponent'
+import { SelectionPortal } from './SelectionPortal'
 import { SizeLabel } from './SizeLabel'
 import { StitchLines } from './StitchLines'
 import { SvgComponentLayers } from './SvgComponentLayers'
@@ -22,34 +26,43 @@ type PocketProps = {
 }
 
 export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
-  const { componentStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
+  const { componentStyles, selectionStyles, isInteractive, isShowingPocketItems, selection } = useDrawAreaContext()
+  const { hover, clearHover, select, selected, hovered } = selection
   const { settings } = useGlobalSettings()
   const { accessor, computedAccessor } = useSubProject()
   const computed = computedAccessor.component.pocket(componentId)
   const { direction } = useSvgFace()
   const children = narrowers.is.computedFrontPocket(computed) ? computedAccessor.component.children(componentId) : []
   const orderedChildren = direction === 'reverse' ? [...children].reverse() : children
-  const pathData = usePath(computed.path)
+  const path = usePath(computed.path)
 
-  const pocket = useMemo(() => accessor.component.pocket(componentId), [accessor.component, componentId])
+  const pocket = useMemo<PocketSchema>(() => accessor.component.pocket(componentId), [accessor.component, componentId])
+  const { pocket: referencePocket } = usePocketOpeningEditorReference(pocket.openingId)
 
-  const style: DrawAreaComponentStyleParams = {
+  const backgroundStyleParams: DrawAreaComponentBackgroundStyleParams = {
     component: pocket,
     nestingLevel,
   }
+  const style: DrawAreaComponentStyleParams = { component: pocket }
 
-  const enter = useCallback<PointerEventHandler<SVGPathElement>>(() => selection.hover(pocket), [pocket, selection])
+  const enter = useCallback((): void => hover(pocket), [pocket, hover])
 
-  const leave = useCallback<PointerEventHandler<SVGPathElement>>(() => selection.clearHover(), [selection])
+  const leave = useCallback((): void => clearHover(), [clearHover])
 
-  const click = useCallback<MouseEventHandler<SVGPathElement>>(
-    (event) => {
+  const click = useCallback(
+    (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
-      selection.select(pocket)
+      select(pocket)
     },
-    [pocket, selection],
+    [pocket, select],
   )
   const active = selection.isSelected(pocket) || selection.isHovered(pocket)
+  const isReferencePocket = isDefined(referencePocket) && referencePocket.id === pocket.id
+  const isOpeningSelected =
+    isDefined(selected) && narrowers.is.pocketOpening(selected) && selected.id === pocket.openingId
+  const isOpeningHovered = isDefined(hovered) && narrowers.is.pocketOpening(hovered) && hovered.id === pocket.openingId
+
+  const isHighlighted = active || (isReferencePocket && (isOpeningSelected || isOpeningHovered))
 
   return (
     <>
@@ -63,17 +76,34 @@ export const Pocket: FC<PocketProps> = ({ componentId, nestingLevel }) => {
             after={<StitchLines componentId={componentId} surface="front" />}
             content={
               <>
-                <path
-                  d={pathData}
-                  data-component-id={componentId}
-                  fill={componentStyles.getBackgroundColor(style)}
-                  stroke={componentStyles.getBorderColor(style)}
+                <PureSvgComponent
+                  mode={isHighlighted ? 'hit-area' : 'normal'}
+                  componentId={pocket.id}
+                  path={path}
+                  boundingRect={computed.boundingRect}
+                  fillColor={componentStyles.getBackgroundColor(backgroundStyleParams)}
+                  strokeColor={componentStyles.getBorderColor(style)}
                   strokeWidth={componentStyles.getBorderThickness(style)}
-                  filter={componentStyles.getFilter(style)}
+                  selectionColor={selectionStyles.getSelectionColor()}
+                  disablePointerEvents={!isInteractive}
                   onPointerEnter={isInteractive ? enter : undefined}
                   onPointerLeave={isInteractive ? leave : undefined}
                   onClick={isInteractive ? click : undefined}
                 />
+                {isHighlighted && (
+                  <SelectionPortal>
+                    <PureSvgComponent
+                      mode="selected"
+                      componentId={pocket.id}
+                      path={path}
+                      boundingRect={computed.boundingRect}
+                      fillColor={componentStyles.getBackgroundColor(backgroundStyleParams)}
+                      strokeColor={componentStyles.getBorderColor(style)}
+                      strokeWidth={componentStyles.getBorderThickness(style)}
+                      selectionColor={selectionStyles.getSelectionColor()}
+                    />
+                  </SelectionPortal>
+                )}
                 <HoleHighlights componentId={componentId} />
               </>
             }

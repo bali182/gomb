@@ -51,6 +51,7 @@ import { CollapseAllIcon } from './icons/CollapseAllIcon'
 import { ExpandAllIcon } from './icons/ExpandAllIcon'
 import { RootPanelTurnIcon } from './icons/RootPanelTurnIcon'
 import { EditorPocketOpeningTree } from './pocket-opening-tree/EditorPocketOpeningTree'
+import { SelectionBreadcrumb } from './SelectionBreadcrumb'
 import { SubProjectComputationFeedback } from './SubProjectComputationFeedback'
 
 const panels: SplitterPanelData[] = [
@@ -196,6 +197,13 @@ export const EditorContent: FC<EditorContentProps> = ({ menu, projects, subProje
               </Box>
 
               {floatingEditorsVisible && <FloatingEditors onAdd={handleAdd} />}
+              {isDefined(subProject) && (
+                <Box position="absolute" left="3" right="3" bottom="3" zIndex="popover" pointerEvents="none">
+                  <Box width="fit-content" maxWidth="full" pointerEvents="auto">
+                    <SelectionBreadcrumb />
+                  </Box>
+                </Box>
+              )}
               <SubProjectComputationFeedback />
             </Box>
           </Splitter.Panel>

@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { useCallback, useMemo, type FC, type ReactNode } from 'react'
 import type { IconType } from 'react-icons'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import { isDefined } from '../../utils/isDefined'
 
 export type TreeComboboxItem = {
