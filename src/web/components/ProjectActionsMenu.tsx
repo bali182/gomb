@@ -4,7 +4,7 @@ import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useNavigate } from 'react-router'
 
 import { ActionsMenuSection } from '../../common/components/action-menus/ActionsMenuSection'
-import { portalRef } from '../../common/portalRef'
+import { portalRef } from '../../common/portalRefs'
 import { useProjects } from '../hooks/useProjects'
 import { webAppRoutes } from '../webAppRoutes'
 import { DeleteProjectMenuItem } from './ProjectActionsMenuItems'

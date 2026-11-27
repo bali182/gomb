@@ -1,6 +1,6 @@
 import { Tooltip as ChakraTooltip, Portal, type SystemStyleObject } from '@chakra-ui/react'
 import type { FC, Ref } from 'react'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 
 export type TooltipProps = ChakraTooltip.RootProps & {
   content: React.ReactNode

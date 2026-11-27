@@ -2,7 +2,7 @@ import { Box, IconButton, Menu, Portal, type IconButtonProps } from '@chakra-ui/
 import { useCallback, type FC, type MouseEvent } from 'react'
 import { PiDotsThreeVertical } from 'react-icons/pi'
 import { useSubProjectOperations } from '../../hooks/useSubProjectOperations'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import type { BindingSchema } from '../../schemas/bindings'
 import { noop } from '../../utils/noop'
 import { ActionsMenuSection } from './ActionsMenuSection'

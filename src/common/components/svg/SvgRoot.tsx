@@ -3,11 +3,11 @@ import { VIEWBOX_PADDING } from '../../constants/drawing'
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { useMeasurement } from '../../hooks/useMeasurement'
 import { useSubProject } from '../../hooks/useSubProject'
+import { svgLabelsPortalRef, svgSelectionPortalRef } from '../../portalRefs'
 import { getViewBox } from '../../utils/getViewBox'
 import { MeasurementOverlay } from './MeasurementOverlay'
 import { PocketItemStitchMask } from './PocketItemStitchMask'
 import { RootPanel } from './RootPanel'
-import { svgLabelsPortalRef } from './svgLabelsPortalRef'
 
 const noOutline: CSSProperties = {
   outline: 'none',
@@ -40,6 +40,7 @@ export const SvgRoot = ({ faceIdAboveRoot, overlaysVisible = true }: SvgRootProp
         )}
       </defs>
       <RootPanel componentId={computedProject.root} nestingLevel={0} faceIdAboveRoot={faceIdAboveRoot} />
+      <g ref={svgSelectionPortalRef} visibility={overlaysVisible ? undefined : 'hidden'} pointerEvents="none" />
       <g
         ref={svgLabelsPortalRef}
         pointerEvents="none"

@@ -19,7 +19,7 @@ import {
   canDeleteComponent,
   getComponentStitchLineTypes,
 } from '../../operations/subProject/utils/componentRules'
-import { portalRef } from '../../portalRef'
+import { portalRef } from '../../portalRefs'
 import type { HasComponentTargetSchema, HasTargetSchema } from '../../schemas/common'
 import type { ComponentSchema } from '../../schemas/components'
 import type { StitchLineSchema } from '../../schemas/stitching'

@@ -9,7 +9,7 @@ import {
   CORNER_RADIUS_FIELD_ORDER,
   getCornerRadiusBindingState,
 } from '../../../logic/bindings/cornerRadiusBindingUtils'
-import { portalRef } from '../../../portalRef'
+import { portalRef } from '../../../portalRefs'
 import type { HasCornerRadiusSchema } from '../../../schemas/common'
 import { isDefined } from '../../../utils/isDefined'
 import { EditorButton } from '../../common/EditorButton'

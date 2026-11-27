@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import type { IconType } from 'react-icons'
 import { PiCheckCircle, PiInfo, PiWarningCircle, PiX } from 'react-icons/pi'
 
-import { portalRef } from '../portalRef'
+import { portalRef } from '../portalRefs'
 import { isDefined } from '../utils/isDefined'
 
 export const toaster = createToaster({
