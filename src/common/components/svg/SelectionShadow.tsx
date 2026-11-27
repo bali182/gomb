@@ -17,13 +17,19 @@ type SelectionShadowProps = {
   color: string
   paths: readonly SelectionShadowPath[]
   boundingRect: RectSchema
+  maskInside?: boolean
 }
 
-export const SelectionShadow: FC<SelectionShadowProps> = ({ color, paths, boundingRect }) => {
+export const SelectionShadow: FC<SelectionShadowProps> = ({ color, paths, boundingRect, maskInside = false }) => {
   const filterId = useId()
+  const maskId = useId()
   const maxStrokeWidth = Math.max(0, ...paths.map((shadowPath) => shadowPath.strokeWidth))
   // Include the default miter limit as well as the blur's three-sigma extent.
   const padding = maxStrokeWidth * 2 + SELECTION_SHADOW_BLUR * 3
+  const x = boundingRect.x.minus(padding).toNumber()
+  const y = boundingRect.y.minus(padding).toNumber()
+  const width = boundingRect.width.plus(padding * 2).toNumber()
+  const height = boundingRect.height.plus(padding * 2).toNumber()
 
   return (
     <>
@@ -31,10 +37,10 @@ export const SelectionShadow: FC<SelectionShadowProps> = ({ color, paths, boundi
         id={filterId}
         filterUnits="userSpaceOnUse"
         primitiveUnits="userSpaceOnUse"
-        x={boundingRect.x.minus(padding).toNumber()}
-        y={boundingRect.y.minus(padding).toNumber()}
-        width={boundingRect.width.plus(padding * 2).toNumber()}
-        height={boundingRect.height.plus(padding * 2).toNumber()}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
         colorInterpolationFilters="sRGB"
       >
         <feGaussianBlur in="SourceAlpha" stdDeviation={SELECTION_SHADOW_BLUR} result="blur" />
@@ -44,7 +50,30 @@ export const SelectionShadow: FC<SelectionShadowProps> = ({ color, paths, boundi
         <feFlood floodColor={color} result="color" />
         <feComposite in="color" in2="shadowAlpha" operator="in" />
       </filter>
-      <g filter={`url(#${filterId})`} fill="none" stroke="white" pointerEvents="none">
+      {maskInside && (
+        <mask
+          id={maskId}
+          maskUnits="userSpaceOnUse"
+          maskContentUnits="userSpaceOnUse"
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          style={{ maskType: 'luminance' }}
+        >
+          <rect x={x} y={y} width={width} height={height} fill="white" />
+          {paths.map((shadowPath, index) => (
+            <path key={index} d={shadowPath.path} fill="black" stroke="none" />
+          ))}
+        </mask>
+      )}
+      <g
+        filter={`url(#${filterId})`}
+        mask={maskInside ? `url(#${maskId})` : undefined}
+        fill="none"
+        stroke="white"
+        pointerEvents="none"
+      >
         {paths.map((shadowPath, index) => (
           <path
             key={index}

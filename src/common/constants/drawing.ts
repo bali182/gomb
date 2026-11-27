@@ -10,6 +10,7 @@ export const SELECTED_STITCH_LINE_HOLE_COLOR = '#0f6cbd'
 export const SELECTED_HOLE_FILL_COLOR = '#0f6cbd7b'
 export const SELECTED_HOLE_STROKE_COLOR = '#0f6cbd'
 
+export const STITCH_HOLE_FOOTPRINT_OPACITY = 0.2
 export const STROKE_THICKNESS = 0.3
 export const LAYOUT_COMPONENT_BORDER_DASHARRAY = '2 1'
 export const VIEWBOX_PADDING = 10

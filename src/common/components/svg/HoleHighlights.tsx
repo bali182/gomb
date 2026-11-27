@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type FC, type MouseEventHandler, type PointerEventHandler } from 'react'
+import { useCallback, type FC, type MouseEvent } from 'react'
 
 import { useDrawAreaContext } from '../../contexts/DrawAreaContext'
 import { usePath } from '../../hooks/usePath'
@@ -6,7 +6,8 @@ import { useSubProject } from '../../hooks/useSubProject'
 import type { ComputedHoleSchema } from '../../schemas/computed'
 import type { DrawAreaHoleStyleParams } from '../../schemas/drawArea'
 import type { HoleSchema } from '../../schemas/hole'
-import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
+import { PureSvgHole } from './PureSvgHole'
+import { SelectionPortal } from './SelectionPortal'
 
 type HoleHighlightsProps = {
   componentId: string
@@ -33,25 +34,26 @@ export const HoleHighlights: FC<HoleHighlightsProps> = ({ componentId }) => {
 }
 
 const HoleHighlight: FC<HoleHighlightProps> = ({ computedHole, hole }) => {
-  const { holeStyles, isInteractive, selection } = useDrawAreaContext()
+  const { holeStyles, selectionStyles, isInteractive, selection } = useDrawAreaContext()
+  const { hover, clearHover, select } = selection
   const path = usePath(computedHole.highlightPath)
   const styleParams: DrawAreaHoleStyleParams = { hole }
   const isActive = selection.isSelected(hole) || selection.isHovered(hole)
 
-  const handlePointerEnter = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    selection.hover(hole)
-  }, [hole, selection])
+  const handlePointerEnter = useCallback((): void => {
+    hover(hole)
+  }, [hole, hover])
 
-  const handlePointerLeave = useCallback<PointerEventHandler<SVGPathElement>>(() => {
-    selection.clearHover()
-  }, [selection])
+  const handlePointerLeave = useCallback((): void => {
+    clearHover()
+  }, [clearHover])
 
-  const handleClick = useCallback<MouseEventHandler<SVGPathElement>>(
-    (event) => {
+  const handleClick = useCallback(
+    (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
-      selection.select(hole)
+      select(hole)
     },
-    [hole, selection],
+    [hole, select],
   )
 
   if (computedHole.highlightPath.commands.length === 0) {
@@ -60,41 +62,35 @@ const HoleHighlight: FC<HoleHighlightProps> = ({ computedHole, hole }) => {
 
   return (
     <>
-      {isActive && <HoleSelectionShadow model={hole} computedModel={computedHole} path={path} />}
-      <path
+      <PureSvgHole
+        mode={isActive ? 'hit-area' : 'normal'}
+        holeId={hole.id}
+        path={path}
+        boundingRect={computedHole.boundingRect}
+        fillColor={holeStyles.getFillColor(styleParams)}
+        strokeColor={holeStyles.getStrokeColor(styleParams)}
+        strokeWidth={holeStyles.getStrokeThickness(styleParams)}
+        selectionColor={selectionStyles.getSelectionColor()}
+        disablePointerEvents={!isInteractive}
         cursor={isInteractive ? 'pointer' : undefined}
-        d={path}
-        data-hole-id={hole.id}
-        fill={holeStyles.getFillColor(styleParams)}
         onClick={isInteractive ? handleClick : undefined}
         onPointerEnter={isInteractive ? handlePointerEnter : undefined}
         onPointerLeave={isInteractive ? handlePointerLeave : undefined}
-        pointerEvents={isInteractive ? 'fill' : 'none'}
-        stroke={holeStyles.getStrokeColor(styleParams)}
-        strokeWidth={holeStyles.getStrokeThickness(styleParams)}
       />
+      {isActive && (
+        <SelectionPortal>
+          <PureSvgHole
+            mode="selected"
+            holeId={hole.id}
+            path={path}
+            boundingRect={computedHole.boundingRect}
+            fillColor={holeStyles.getFillColor(styleParams)}
+            strokeColor={holeStyles.getStrokeColor(styleParams)}
+            strokeWidth={holeStyles.getStrokeThickness(styleParams)}
+            selectionColor={selectionStyles.getSelectionColor()}
+          />
+        </SelectionPortal>
+      )}
     </>
-  )
-}
-
-type HoleSelectionShadowProps = {
-  model: HoleSchema
-  computedModel: ComputedHoleSchema
-  path: string
-}
-
-const HoleSelectionShadow: FC<HoleSelectionShadowProps> = ({ model, computedModel, path }) => {
-  const { holeStyles, selectionStyles } = useDrawAreaContext()
-  const paths = useMemo<SelectionShadowPath[]>(
-    () => [{ path, strokeWidth: holeStyles.getStrokeThickness({ hole: model }) ?? 1 }],
-    [path, holeStyles, model],
-  )
-
-  return (
-    <SelectionShadow
-      paths={paths}
-      boundingRect={computedModel.boundingRect}
-      color={selectionStyles.getSelectionColor()}
-    />
   )
 }

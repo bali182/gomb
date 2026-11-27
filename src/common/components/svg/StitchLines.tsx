@@ -1,4 +1,4 @@
-import { useMemo, type FC } from 'react'
+import { useMemo, type FC, type ReactNode } from 'react'
 import { useSvgFace } from '../../contexts/SvgFaceContext'
 import { useProject } from '../../hooks/useProject'
 import { useSubProject } from '../../hooks/useSubProject'
@@ -22,28 +22,32 @@ export const StitchLines: FC<StitchLinesProps> = ({ componentId, surface }) => {
   const { project } = useProject()
   const { accessor, computedAccessor } = useSubProject()
   const { faceId } = useSvgFace()
-  const routes = useMemo<ComputedStitchRouteSchema[]>(() => {
-    const exitRoutes = computedAccessor.stitchLine
+  const entryRoutes = surface === 'front' ? computedAccessor.stitchLine.byEntry(componentId) : []
+  const exitRoutes = useMemo<ComputedStitchRouteSchema[]>(() => {
+    return computedAccessor.stitchLine
       .byExit(componentId)
       .filter((route) => (surface === 'front' ? route.faceId !== faceId : route.faceId === faceId))
-    return surface === 'front' ? [...computedAccessor.stitchLine.byEntry(componentId), ...exitRoutes] : exitRoutes
   }, [computedAccessor, componentId, faceId, surface])
+
+  const renderRoute = (route: ComputedStitchRouteSchema, index: number, portalSelection: boolean): ReactNode => {
+    const stitchLine = accessor.optional.stitchLine.byId(route.stitchLineId)
+    if (!isDefined(stitchLine)) {
+      return null
+    }
+    return (
+      <StitchLineRoute
+        key={`${portalSelection ? 'entry' : 'exit'}:${route.stitchLineId}:${index}`}
+        route={route}
+        stitchLine={getResolvedStitchLine(stitchLine, project.stitchingSettings)}
+        portalSelection={portalSelection}
+      />
+    )
+  }
 
   return (
     <>
-      {routes.map((route, index) => {
-        const stitchLine = accessor.optional.stitchLine.byId(route.stitchLineId)
-        if (!isDefined(stitchLine)) {
-          return null
-        }
-        return (
-          <StitchLineRoute
-            key={`${route.stitchLineId}:${index}`}
-            route={route}
-            stitchLine={getResolvedStitchLine(stitchLine, project.stitchingSettings)}
-          />
-        )
-      })}
+      {entryRoutes.map((route, index) => renderRoute(route, index, true))}
+      {exitRoutes.map((route, index) => renderRoute(route, index, false))}
     </>
   )
 }

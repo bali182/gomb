@@ -5,11 +5,11 @@ import { useGlobalSettings } from '../../hooks/useGlobalSettings'
 import { usePath } from '../../hooks/usePath'
 import { useSubProject } from '../../hooks/useSubProject'
 import type { GuideSchema } from '../../schemas/components'
-import type { ComputedGuideSchema } from '../../schemas/computed'
 import type { DrawAreaComponentStyleParams } from '../../schemas/drawArea'
 import { Panel } from './Panel'
 import { PocketCluster } from './PocketCluster'
-import { SelectionShadow, type SelectionShadowPath } from './SelectionShadow'
+import { PureSvgComponent } from './PureSvgComponent'
+import { SelectionPortal } from './SelectionPortal'
 import { SizeLabel } from './SizeLabel'
 
 const GUIDE_HIT_AREA_THICKNESS = 2
@@ -17,7 +17,8 @@ const GUIDE_HIT_AREA_THICKNESS = 2
 type GuideProps = { componentId: string; nestingLevel: number }
 
 export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
-  const { isInteractive, selection, componentStyles } = useDrawAreaContext()
+  const { isInteractive, selection, componentStyles, selectionStyles } = useDrawAreaContext()
+  const { hover, clearHover, select } = selection
   const { settings } = useGlobalSettings()
   const { accessor, computedAccessor } = useSubProject()
   const computed = computedAccessor.component.guide(componentId)
@@ -27,7 +28,7 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
   const path = usePath(computed.path)
   const isEmpty = children.length === 0
 
-  const guide = useMemo(() => accessor.component.guide(componentId), [accessor.component, componentId])
+  const guide = useMemo<GuideSchema>(() => accessor.component.guide(componentId), [accessor.component, componentId])
 
   const isActive = selection.isSelected(guide) || selection.isHovered(guide)
   const isSelectable = isInteractive && isEmpty
@@ -36,38 +37,26 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
   const handleClick = useCallback(
     (event: MouseEvent<SVGPathElement>): void => {
       event.stopPropagation()
-      selection.select(guide)
+      select(guide)
     },
-    [guide, selection],
+    [guide, select],
   )
 
   const handlePointerEnter = useCallback(
     (_event: PointerEvent<SVGPathElement>): void => {
-      selection.hover(guide)
+      hover(guide)
     },
-    [guide, selection],
+    [guide, hover],
   )
   const handlePointerLeave = useCallback(
     (_event: PointerEvent<SVGPathElement>): void => {
-      selection.clearHover()
+      clearHover()
     },
-    [selection],
+    [clearHover],
   )
   return (
     <>
       <g data-component-id={componentId}>
-        {isSelectable && (
-          <path
-            d={path}
-            fill="transparent"
-            stroke="transparent"
-            strokeWidth={GUIDE_HIT_AREA_THICKNESS}
-            pointerEvents="all"
-            onClick={handleClick}
-            onPointerEnter={handlePointerEnter}
-            onPointerLeave={handlePointerLeave}
-          />
-        )}
         {orderedChildren.map((child) => {
           switch (child.type) {
             case 'computed-panel':
@@ -86,15 +75,37 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
         })}
         {isInteractive && (isEmpty || isActive) && (
           <>
-            {isActive && <GuideSelectionShadow model={guide} computedModel={computed} path={path} />}
-            <path
-              d={path}
-              fill="none"
-              stroke={componentStyles.getBorderColor(style)}
+            <PureSvgComponent
+              mode={isActive ? 'hit-area' : 'normal'}
+              componentId={guide.id}
+              path={path}
+              boundingRect={computed.boundingRect}
+              fillColor="none"
+              strokeColor={componentStyles.getBorderColor(style)}
               strokeWidth={componentStyles.getBorderThickness(style)}
               strokeDasharray={componentStyles.getBorderDasharray(style)}
-              pointerEvents="none"
+              selectionColor={selectionStyles.getSelectionColor()}
+              disablePointerEvents={!isSelectable}
+              hitAreaStrokeWidth={isEmpty ? GUIDE_HIT_AREA_THICKNESS : undefined}
+              onClick={isSelectable ? handleClick : undefined}
+              onPointerEnter={isSelectable ? handlePointerEnter : undefined}
+              onPointerLeave={isSelectable ? handlePointerLeave : undefined}
             />
+            {isActive && (
+              <SelectionPortal>
+                <PureSvgComponent
+                  mode="selected"
+                  componentId={guide.id}
+                  path={path}
+                  boundingRect={computed.boundingRect}
+                  fillColor="none"
+                  strokeColor={componentStyles.getBorderColor(style)}
+                  strokeWidth={componentStyles.getBorderThickness(style)}
+                  strokeDasharray={componentStyles.getBorderDasharray(style)}
+                  selectionColor={selectionStyles.getSelectionColor()}
+                />
+              </SelectionPortal>
+            )}
           </>
         )}
       </g>
@@ -102,33 +113,5 @@ export const Guide: FC<GuideProps> = ({ componentId, nestingLevel }) => {
         <SizeLabel reference="bottom-right" boundingRect={computed.boundingRect} />
       )}
     </>
-  )
-}
-
-type GuideSelectionShadowProps = {
-  model: GuideSchema
-  computedModel: ComputedGuideSchema
-  path: string
-}
-
-const GuideSelectionShadow: FC<GuideSelectionShadowProps> = ({ model, computedModel, path }) => {
-  const { componentStyles, selectionStyles } = useDrawAreaContext()
-  const paths = useMemo<SelectionShadowPath[]>(() => {
-    const params: DrawAreaComponentStyleParams = { component: model }
-    return [
-      {
-        path,
-        strokeWidth: componentStyles.getBorderThickness(params) ?? 1,
-        strokeDasharray: componentStyles.getBorderDasharray(params),
-      },
-    ]
-  }, [path, componentStyles, model])
-
-  return (
-    <SelectionShadow
-      paths={paths}
-      boundingRect={computedModel.boundingRect}
-      color={selectionStyles.getSelectionColor()}
-    />
   )
 }
