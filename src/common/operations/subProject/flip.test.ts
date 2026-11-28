@@ -819,6 +819,8 @@ describe.each(orientationCases)(
           id: 'opening',
           name: 'Opening',
           type: 'recessed',
+          recessStartMargin: 0,
+          recessEndMargin: 0,
           recessOuterInset: 15,
           recessInnerOffset: 8,
           recessDepth: 10,

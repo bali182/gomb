@@ -130,6 +130,8 @@ export const defaultPanel: Omit<PanelSchema, keyof HasId | keyof HasName> = {
 }
 
 export const defaultRecessedPocketOpening: RecessedPocketOpeningOwnSchema = {
+  recessStartMargin: 0,
+  recessEndMargin: 0,
   recessOuterInset: 15,
   recessInnerOffset: 15,
   recessDepth: 10,

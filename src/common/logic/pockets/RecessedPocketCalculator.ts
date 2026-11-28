@@ -7,12 +7,28 @@ import { StandardTPocketCalculator } from './StandardTPocketCalculator'
 
 export class RecessedPocketCalculator extends StandardTPocketCalculator<RecessedPocketOpeningSchema> {
   getPocketOpeningPath(): PathSchema {
-    return { commands: this.removeZeroLengthLines(this.getOpeningCommands()) }
+    const zero = new BigNumber(0)
+    const commands: PathCommand[] = [
+      { type: 'moveTo', point: { x: zero, y: zero } },
+      ...this.getOpeningCommands().map((command): PathCommand => {
+        if (narrowers.path.is.close(command)) {
+          return command
+        }
+        const point: PointSchema = { x: command.point.x.plus(this.opening.recessStartMargin), y: command.point.y }
+        return narrowers.path.is.moveTo(command) ? { type: 'lineTo', point } : { ...command, point }
+      }),
+      { type: 'lineTo', point: { x: this.width, y: zero } },
+    ]
+    return { commands: this.removeZeroLengthLines(commands) }
+  }
+
+  private getOpeningWidth(): BigNumber {
+    return this.width.minus(this.opening.recessStartMargin).minus(this.opening.recessEndMargin)
   }
 
   private getOpeningCommands(): PathCommand[] {
     const opening = this.opening
-    const width = this.width
+    const width = this.getOpeningWidth()
     const zero = new BigNumber(0)
     const halfWidth = width.dividedBy(2)
 
@@ -37,7 +53,7 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
 
   private getSeparatedTransitionCommands(angleFactor: BigNumber): PathCommand[] {
     const opening = this.opening
-    const width = this.width
+    const width = this.getOpeningWidth()
     const zero = new BigNumber(0)
     const outerRadius = new BigNumber(opening.recessOuterRadius)
     const innerRadius = new BigNumber(opening.recessInnerRadius)
@@ -78,7 +94,7 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
 
   private getTouchingTransitionCommands(angleFactor: BigNumber): PathCommand[] {
     const opening = this.opening
-    const width = this.width
+    const width = this.getOpeningWidth()
     const zero = new BigNumber(0)
     const outerRadius = new BigNumber(opening.recessOuterRadius)
     const innerRadius = new BigNumber(opening.recessInnerRadius)
@@ -110,7 +126,7 @@ export class RecessedPocketCalculator extends StandardTPocketCalculator<Recessed
   }
 
   private getSymmetricOpeningCommands(leftTransition: PathCommand[]): PathCommand[] {
-    const width = this.width
+    const width = this.getOpeningWidth()
     const zero = new BigNumber(0)
     const commands: PathCommand[] = [{ type: 'moveTo', point: { x: zero, y: zero } }]
     const rightTransition: PathCommand[] = []

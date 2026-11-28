@@ -37,6 +37,8 @@ const recessed: PocketOpeningSchema = {
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
+  recessStartMargin: 0,
+  recessEndMargin: 0,
   recessOuterInset: 18,
   recessInnerOffset: 15,
   recessDepth: 8,

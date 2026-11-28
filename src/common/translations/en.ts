@@ -48,6 +48,7 @@ import type {
   PocketOpeningSideSchema,
   RecessedPocketOpeningCornerRadiusSchema,
   RecessedPocketOpeningGeometrySchema,
+  RecessedPocketOpeningMarginSchema,
   SlantedPocketOpeningOwnSchema,
 } from '../schemas/pocketOpening'
 import type {
@@ -525,16 +526,29 @@ export const EN = {
             straightDescription: 'Straight pocket openings have no additional settings.',
           },
           recessedPocketOpening: {
+            margins: {
+              title: 'Margins',
+              recessStartMargin: {
+                label: 'Start margin',
+                tooltip:
+                  'Straight length reserved at the start of the opening, in mm. The recess is calculated between the margins.',
+              },
+              recessEndMargin: {
+                label: 'End margin',
+                tooltip:
+                  'Straight length reserved at the end of the opening, in mm. The recess is calculated between the margins.',
+              },
+            } satisfies SectionTranslationSchema<RecessedPocketOpeningMarginSchema>,
             geometry: {
               title: 'Geometry',
               recessOuterInset: {
                 label: 'Outer inset',
-                tooltip: 'Distance from either opening edge to the outer corner, in mm.',
+                tooltip: 'Distance from either edge of the opening between its margins to the outer corner, in mm.',
               },
               recessInnerOffset: {
                 label: 'Inner offset',
                 tooltip:
-                  'Distance outward from the opening center to each inner corner, symmetrically on both sides, in mm.',
+                  'Distance outward from the center between the opening margins to each inner corner, symmetrically on both sides, in mm.',
               },
               recessDepth: {
                 label: 'Depth',
@@ -880,6 +894,8 @@ export const EN = {
             yAnchor: 'Vertical alignment',
             xOffset: 'X offset',
             yOffset: 'Y offset',
+            recessStartMargin: 'Recess start margin',
+            recessEndMargin: 'Recess end margin',
             recessOuterInset: 'Recess outer inset',
             recessInnerOffset: 'Recess inner offset',
             recessOuterRadius: 'Recess outer radius',
@@ -1511,6 +1527,8 @@ export const EN = {
         `The available edge length limits the radius to ${value} mm.`,
       'corner-radii-share-edge': (value: string): string => `The adjacent corner limits the radius to ${value} mm.`,
       'pocket-opening-corner-radius-ignored': (): string => 'Corner rounding is ignored on the pocket opening side.',
+      'recessed-pocket-opening-margins-share-width': (value: string): string =>
+        `The opening width and the opposite margin limit this margin to ${value} mm.`,
       'pocket-opening-width': (value: string): string =>
         `The available opening width limits this value to ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `The pocket outline limits this value to ${value} mm.`,

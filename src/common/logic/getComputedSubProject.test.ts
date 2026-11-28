@@ -94,6 +94,8 @@ describe('empty pocket cluster placeholder', () => {
       id: 'recessed',
       name: 'Recessed',
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
       recessOuterInset: 10,
       recessInnerOffset: 15,
       recessDepth: 12,

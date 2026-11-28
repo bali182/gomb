@@ -23,6 +23,8 @@ const createOpening = (overrides: Partial<RecessedPocketOpeningSchema> = {}): Re
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
+  recessStartMargin: 0,
+  recessEndMargin: 0,
   recessOuterInset: 29,
   recessInnerOffset: 15,
   recessDepth: 8,
@@ -156,10 +158,42 @@ describe('RecessedPocketCalculator', () => {
   })
 
   it.each<RecessedPocketOpeningOwnSchema>([
-    { recessOuterInset: 15, recessInnerOffset: 15, recessDepth: 10, recessOuterRadius: 5, recessInnerRadius: 5 },
-    { recessOuterInset: 20, recessInnerOffset: 15, recessDepth: 2, recessOuterRadius: 100, recessInnerRadius: 50 },
-    { recessOuterInset: 35, recessInnerOffset: 15, recessDepth: 2, recessOuterRadius: 100, recessInnerRadius: 15 },
-    { recessOuterInset: 25, recessInnerOffset: 15, recessDepth: 30, recessOuterRadius: 5, recessInnerRadius: 5 },
+    {
+      recessStartMargin: 0,
+      recessEndMargin: 0,
+      recessOuterInset: 15,
+      recessInnerOffset: 15,
+      recessDepth: 10,
+      recessOuterRadius: 5,
+      recessInnerRadius: 5,
+    },
+    {
+      recessStartMargin: 0,
+      recessEndMargin: 0,
+      recessOuterInset: 20,
+      recessInnerOffset: 15,
+      recessDepth: 2,
+      recessOuterRadius: 100,
+      recessInnerRadius: 50,
+    },
+    {
+      recessStartMargin: 0,
+      recessEndMargin: 0,
+      recessOuterInset: 35,
+      recessInnerOffset: 15,
+      recessDepth: 2,
+      recessOuterRadius: 100,
+      recessInnerRadius: 15,
+    },
+    {
+      recessStartMargin: 0,
+      recessEndMargin: 0,
+      recessOuterInset: 25,
+      recessInnerOffset: 15,
+      recessDepth: 30,
+      recessOuterRadius: 5,
+      recessInnerRadius: 5,
+    },
   ])('keeps shallow and steep transitions smooth: %o', (parameters) => {
     const path = createOpeningPath(createOpening(parameters), rect, 'up')
     expect(getArcs(path).map((arc) => arc.radius.toNumber())).toEqual([
@@ -227,6 +261,113 @@ describe('RecessedPocketCalculator', () => {
     expect(segments[0].type).toBe('line')
     expectPoint(segments[0].start, 0, 0)
     expectPoint(segments[0].end, 100, 0)
+  })
+})
+
+describe('recessed opening margins', () => {
+  it('reserves 5 and 10 mm straight ends and centers the recess at 47.5 mm', () => {
+    const path = createOpeningPath(
+      createOpening({
+        recessStartMargin: 5,
+        recessEndMargin: 10,
+        recessOuterInset: 10,
+        recessInnerOffset: 7.5,
+        recessDepth: 10,
+        recessOuterRadius: 0,
+        recessInnerRadius: 0,
+      }),
+      rect,
+      'up',
+    )
+    expect(
+      path.commands.flatMap((command) =>
+        narrowers.path.is.close(command) ? [] : [[command.point.x.toNumber(), command.point.y.toNumber()]],
+      ),
+    ).toEqual([
+      [0, 0],
+      [5, 0],
+      [15, 0],
+      [40, 10],
+      [55, 10],
+      [80, 0],
+      [90, 0],
+      [100, 0],
+    ])
+  })
+
+  it.each([2, 50])('preserves rounded transition geometry for outer radius %s', (outerRadius) => {
+    const opening = createOpening({
+      recessOuterInset: 20,
+      recessInnerOffset: 10,
+      recessDepth: 10,
+      recessOuterRadius: outerRadius,
+      recessInnerRadius: 5,
+    })
+    const reference = createOpeningPath(opening, { ...rect, width: new BigNumber(85) }, 'up')
+    const shifted = createOpeningPath({ ...opening, recessStartMargin: 5, recessEndMargin: 10 }, rect, 'up')
+    const referenceArcs = getArcs(reference)
+    const shiftedArcs = getArcs(shifted)
+    expect(shiftedArcs).toHaveLength(4)
+    for (const [index, arc] of shiftedArcs.entries()) {
+      expectPoint(
+        arc.center,
+        referenceArcs[index].center.x.plus(5).toNumber(),
+        referenceArcs[index].center.y.toNumber(),
+      )
+      expect(arc.radius.eq(referenceArcs[index].radius)).toBe(true)
+      expect(Math.min(arc.start.x.toNumber(), arc.end.x.toNumber())).toBeGreaterThanOrEqual(5)
+      expect(Math.max(arc.start.x.toNumber(), arc.end.x.toNumber())).toBeLessThanOrEqual(90)
+    }
+    expectSmoothJoins(shifted)
+  })
+
+  describe.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])('facing %s', (orientation) => {
+    it.each(['front', 't'] as const)(
+      'rotates the shifted %s opening and retains straight T-pocket lower edges',
+      (kind) => {
+        const opening = createOpening({
+          recessStartMargin: 5,
+          recessEndMargin: 10,
+          recessOuterInset: 10,
+          recessInnerOffset: 0,
+          recessDepth: 10,
+          recessOuterRadius: 0,
+          recessInnerRadius: 0,
+        })
+        const pocket = kind === 'front' ? d.frontPocket({ id: 'front' }) : d.tPocket({ id: 't', tPocketTabWidth: 15 })
+        const calculator = new RecessedPocketCalculator(
+          pocket,
+          d.pocketCluster({ id: 'cluster', orientation, pocketStep: 20 }),
+          opening,
+          rect,
+          ZERO_CORNER_RADIUS,
+        )
+        const path = kind === 'front' ? calculator.getFrontPocketPath() : calculator.getTPocketPath()
+        const segments = getPathSegments(path)
+        const expectedBottom: Record<PocketOrientationSchema, [number, number]> = {
+          up: [47.5, 10],
+          right: [90, 47.5],
+          down: [52.5, 90],
+          left: [10, 52.5],
+        }
+        expect(
+          segments.some(
+            (segment) =>
+              segment.end.x.eq(expectedBottom[orientation][0]) && segment.end.y.eq(expectedBottom[orientation][1]),
+          ),
+        ).toBe(true)
+        if (kind === 't') {
+          const horizontal = orientation === 'up' || orientation === 'down'
+          const expectedDepth = orientation === 'up' || orientation === 'left' ? 20 : 80
+          const lowerEdges = segments.filter((segment) =>
+            horizontal
+              ? segment.start.y.eq(expectedDepth) && segment.end.y.eq(expectedDepth)
+              : segment.start.x.eq(expectedDepth) && segment.end.x.eq(expectedDepth),
+          )
+          expect(lowerEdges).toHaveLength(2)
+        }
+      },
+    )
   })
 })
 

@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { defaultOpticalIllusionPocketOpening, defaultStitchingSettings } from '../defaultStates'
+import {
+  defaultOpticalIllusionPocketOpening,
+  defaultRecessedPocketOpening,
+  defaultStitchingSettings,
+} from '../defaultStates'
 import { getComputedSubProject } from '../logic/getComputedSubProject'
 import type { EditableSchema } from '../schemas/editable'
 import type { IssuesSchema } from '../schemas/issues'
 import type {
   OpticalIllusionPocketOpeningOwnSchema,
   OpticalIllusionPocketOpeningSchema,
+  RecessedPocketOpeningSchema,
   SlantedPocketOpeningSchema,
   StraightPocketOpeningSchema,
 } from '../schemas/pocketOpening'
@@ -38,6 +43,38 @@ const slanted: SlantedPocketOpeningSchema = {
   slantOffset: 15,
   slantSide: 'end',
 }
+
+describe('recessed opening margin validation', () => {
+  const recessed: RecessedPocketOpeningSchema = {
+    ...defaultRecessedPocketOpening,
+    id: 'recessed',
+    name: 'Recessed',
+    type: 'recessed',
+  }
+
+  it.each([0, 5, 10.5])('accepts margins of %s mm', (margin) => {
+    const value: RecessedPocketOpeningSchema = { ...recessed, recessStartMargin: margin, recessEndMargin: margin }
+    const result = validatePocketOpeningSchema(getEditableSchema(value, { language: 'en-GB' }), recessed, context)
+    expect(result.isValid).toBe(true)
+    expect(result.value).toEqual(value)
+    expect(result.committedValue).toEqual(value)
+  })
+
+  describe.each([
+    ['recessStartMargin', 'recessEndMargin'],
+    ['recessEndMargin', 'recessStartMargin'],
+  ] as const)('%s', (invalidField, validField) => {
+    it.each(['-1', '', '-', 'abc'])('rejects %s and still commits the other margin', (invalidValue) => {
+      const input: EditableSchema<RecessedPocketOpeningSchema> = getEditableSchema(recessed, { language: 'en-GB' })
+      input[invalidField] = invalidValue
+      input[validField] = '12.5'
+      const result = validatePocketOpeningSchema(input, recessed, context)
+      expect(result.isValid).toBe(false)
+      expect(result.issues).toMatchObject({ [invalidField]: { severity: 'error' } })
+      expect(result.committedValue).toEqual({ ...recessed, [validField]: 12.5 })
+    })
+  })
+})
 
 describe('validatePocketOpeningSchema', () => {
   it('rejects changing an opening type', () => {

@@ -1,6 +1,6 @@
 import typia from 'typia'
 import { describe, expect, it } from 'vitest'
-import { defaultOpticalIllusionPocketOpening } from '../defaultStates'
+import { defaultOpticalIllusionPocketOpening, defaultRecessedPocketOpening } from '../defaultStates'
 import { NameGenerator } from '../utils/factory/NameGenerator'
 import { ReadonlyModelObjectFactory } from '../utils/factory/ReadonlyModelObjectFactory'
 import { loadProjectFromContents } from '../utils/loadProjectFromContents'
@@ -273,6 +273,29 @@ describe('migrateProject', () => {
 })
 
 describe('standalone opening migration', () => {
+  it('fills missing recessed margins with zero and preserves supplied margins on reload', () => {
+    const opening = { ...defaultRecessedPocketOpening, id: 'recessed', name: 'Recessed', type: 'recessed' } as const
+    const configured = { ...opening, id: 'configured', recessStartMargin: 5, recessEndMargin: 10 }
+    const project: DeepPartialSchema<ProjectSchema> = d.project({
+      id: 'project',
+      subProjects: [
+        d.subProject({ id: 'sub', root: d.rootPanel({ id: 'root' }), pocketOpenings: [opening, configured] }),
+      ],
+    })
+    const legacyOpening = project.subProjects?.[0]?.pocketOpenings?.recessed
+    if (!isDefined(legacyOpening) || legacyOpening.type !== 'recessed') {
+      throw new Error('Missing recessed opening')
+    }
+    const expectedOpening = { ...opening }
+    delete legacyOpening.recessStartMargin
+    delete legacyOpening.recessEndMargin
+    const migrated = migrateProject(project, context)
+    expect(migrated.subProjects?.[0]?.pocketOpenings?.recessed).toEqual(expectedOpening)
+    expect(migrated.subProjects?.[0]?.pocketOpenings?.configured).toEqual(configured)
+    expect(migrateProject(migrated, context)).toEqual(migrated)
+    expect(typia.is<ProjectSchema>(migrated)).toBe(true)
+  })
+
   it('fills missing parameters and preserves standalone identities, references and unused openings', () => {
     const root = d.rootPanel({ id: 'root' })
     const cluster = d.pocketCluster({ id: 'cluster', children: ['t', 'front'] })

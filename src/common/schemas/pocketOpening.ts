@@ -4,10 +4,15 @@ export type PocketOpeningSideSchema = 'start' | 'end'
 
 export type StraightPocketOpeningSchema = HasTypeSchema<'straight'> & HasIdentitySchema
 
+export type RecessedPocketOpeningMarginSchema = {
+  recessStartMargin: number
+  recessEndMargin: number
+}
+
 export type RecessedPocketOpeningGeometrySchema = {
-  /** Distance inward from either opening edge, in mm. */
+  /** Distance inward from either edge of the opening between its margins, in mm. */
   recessOuterInset: number
-  /** Distance outward from the opening center, in mm. */
+  /** Distance outward from the center between the opening margins, in mm. */
   recessInnerOffset: number
   recessDepth: number
 }
@@ -17,7 +22,8 @@ export type RecessedPocketOpeningCornerRadiusSchema = {
   recessInnerRadius: number
 }
 
-export type RecessedPocketOpeningOwnSchema = RecessedPocketOpeningGeometrySchema &
+export type RecessedPocketOpeningOwnSchema = RecessedPocketOpeningMarginSchema &
+  RecessedPocketOpeningGeometrySchema &
   RecessedPocketOpeningCornerRadiusSchema
 
 export type RecessedPocketOpeningSchema = HasTypeSchema<'recessed'> & HasIdentitySchema & RecessedPocketOpeningOwnSchema

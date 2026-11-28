@@ -189,6 +189,8 @@ export const getBindingFieldInputs = (model: ModelObjectSchema): BindingFieldInp
     }
     case 'recessed': {
       const fields: RecessedPocketOpeningBindingFieldNameSchema[] = [
+        'recessStartMargin',
+        'recessEndMargin',
         'recessOuterInset',
         'recessInnerOffset',
         'recessOuterRadius',

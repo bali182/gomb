@@ -31,6 +31,8 @@ const createFixture = (
     id: 'opening',
     name: 'Opening',
     type: 'recessed',
+    recessStartMargin: 0,
+    recessEndMargin: 0,
     recessOuterInset: 35,
     recessInnerOffset: 15,
     recessDepth: 15,
@@ -66,6 +68,176 @@ const createFixture = (
   }
 }
 describe('getRecessedPocketOpeningLimits', () => {
+  it.each([
+    [80, 10, 80, 10],
+    [80, 30, 70 - POSITION_EPSILON, 30],
+    [30, 80, 30, 70 - POSITION_EPSILON],
+    [80, 70, 50 - POSITION_EPSILON / 2, 50 - POSITION_EPSILON / 2],
+    [100, 0, 100 - POSITION_EPSILON, 0],
+  ])('shares opening width for margins %s / %s', (start, end, expectedStart, expectedEnd) => {
+    const { opening, limits } = createFixture({ recessStartMargin: start, recessEndMargin: end })
+    const adjusted = getAdjustedPocketOpening(opening, limits)
+    if (!narrowers.is.recessedPocketOpening(adjusted)) {
+      throw new Error('Expected a recessed opening')
+    }
+    expect(adjusted.recessStartMargin).toBeCloseTo(expectedStart, 12)
+    expect(adjusted.recessEndMargin).toBeCloseTo(expectedEnd, 12)
+    expect(limits.recessStartMargin?.max?.reason).toBe('recessed-pocket-opening-margins-share-width')
+    expect(limits.recessEndMargin?.max?.reason).toBe('recessed-pocket-opening-margins-share-width')
+    expect(opening.recessStartMargin).toBe(start)
+    expect(opening.recessEndMargin).toBe(end)
+  })
+
+  it('reserves margins before bounding inner offset and outer inset', () => {
+    const { limits } = createFixture({
+      recessStartMargin: 5,
+      recessEndMargin: 10,
+      recessInnerOffset: 15,
+      recessOuterInset: 45,
+    })
+    expect(limits.recessInnerOffset?.max?.value.toNumber()).toBe(42.5)
+    expect(limits.recessOuterInset?.max?.value.toNumber()).toBe(27.5)
+    const { opening, limits: narrowLimits } = createFixture({
+      recessStartMargin: 40,
+      recessEndMargin: 30,
+      recessInnerOffset: 100,
+      recessOuterInset: 100,
+    })
+    expect(getAdjustedPocketOpening(opening, narrowLimits)).toMatchObject({
+      recessStartMargin: 40,
+      recessEndMargin: 30,
+      recessInnerOffset: 15,
+      recessOuterInset: 0,
+    })
+  })
+
+  it.each<PocketOrientationSchema>(['up', 'right', 'down', 'left'])(
+    'checks both front-pocket corners with asymmetric margins facing %s',
+    (orientation) => {
+      const radii: Record<PocketOrientationSchema, Partial<FrontPocketSchema>> = {
+        up: { bottomLeftRadius: 40, bottomRightRadius: 30 },
+        right: { topLeftRadius: 40, bottomLeftRadius: 30 },
+        down: { topRightRadius: 40, topLeftRadius: 30 },
+        left: { bottomRightRadius: 40, topRightRadius: 30 },
+      }
+      const first = createFixture(
+        { recessStartMargin: 5, recessEndMargin: 15, recessOuterInset: 5, recessInnerOffset: 30, recessDepth: 100 },
+        {},
+        orientation,
+        radii[orientation],
+      )
+      expect(first.limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(60 + Math.sqrt(975), 7)
+      const second = createFixture(
+        { recessStartMargin: 15, recessEndMargin: 5, recessOuterInset: 5, recessInnerOffset: 30, recessDepth: 100 },
+        {},
+        orientation,
+        radii[orientation],
+      )
+      expect(second.limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(70 + Math.sqrt(675), 7)
+    },
+  )
+
+  it.each([
+    [5, 15],
+    [15, 5],
+  ])('checks both T-pocket boundaries for margins %s / %s', (start, end) => {
+    const shoulder = createFixture(
+      {
+        recessStartMargin: start,
+        recessEndMargin: end,
+        recessOuterInset: 10,
+        recessInnerOffset: 15,
+        recessDepth: 60,
+        recessOuterRadius: 0,
+        recessInnerRadius: 0,
+      },
+      { tPocketTabWidth: 20, tPocketTaper: 20 },
+    )
+    expect(shoulder.limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(30, 5)
+    const taper = createFixture(
+      {
+        recessStartMargin: start,
+        recessEndMargin: end,
+        recessOuterInset: 15,
+        recessInnerOffset: 25,
+        recessDepth: 60,
+        recessOuterRadius: 0,
+        recessInnerRadius: 0,
+      },
+      { tPocketTabWidth: 10, tPocketTaper: 40 },
+    )
+    expect(taper.limits.recessDepth?.max?.value.toNumber()).toBeCloseTo(10 + 70 / 3, 5)
+  })
+
+  it.each([0, POSITION_EPSILON / 2, 100])(
+    'keeps corrected geometry finite with excessive margins at width %s',
+    (width) => {
+      const { opening, source, cluster, computed } = createFixture({ recessStartMargin: 100, recessEndMargin: 100 })
+      const resized = { ...computed, boundingRect: { ...computed.boundingRect, width: new BigNumber(width) } }
+      const limits = getRecessedPocketOpeningLimits(opening, source, cluster, resized)
+      const adjusted = getAdjustedPocketOpening(opening, limits)
+      const path = createPocketCalculator(
+        source,
+        cluster,
+        adjusted,
+        resized.boundingRect,
+        resized.cornerRadius,
+      ).getPocketOpeningPath()
+      for (const command of path.commands) {
+        if (!narrowers.path.is.close(command)) {
+          expect(command.point.x.isFinite() && command.point.y.isFinite()).toBe(true)
+        }
+      }
+      if (!narrowers.is.recessedPocketOpening(adjusted)) {
+        throw new Error('Expected a recessed opening')
+      }
+      expect(new BigNumber(width).minus(adjusted.recessStartMargin).minus(adjusted.recessEndMargin).gte(0)).toBe(true)
+    },
+  )
+
+  it.each([
+    [5, 15],
+    [15, 5],
+  ])('keeps outer arcs out of margins %s / %s and clear of both T-pocket lower edges', (start, end) => {
+    const { opening, source, cluster, computed, limits } = createFixture(
+      {
+        recessStartMargin: start,
+        recessEndMargin: end,
+        recessOuterInset: 30,
+        recessInnerOffset: 10,
+        recessDepth: 25,
+        recessInnerRadius: 7,
+        recessOuterRadius: 100,
+      },
+      { tPocketTabWidth: 30, tPocketTaper: 10 },
+    )
+    const path = createPocketCalculator(
+      source,
+      cluster,
+      getAdjustedPocketOpening(opening, limits),
+      computed.boundingRect,
+      computed.cornerRadius,
+    ).getPocketOpeningPath()
+    const segments = getPathSegments(path)
+    for (const segment of segments) {
+      if (narrowers.path.is.arcSegment(segment)) {
+        expect(BigNumber.minimum(segment.start.x, segment.end.x).gte(start)).toBe(true)
+        expect(BigNumber.maximum(segment.start.x, segment.end.x).lte(100 - end)).toBe(true)
+      }
+    }
+    const boundary: LinePathSegment = {
+      type: 'line',
+      start: { x: new BigNumber(0), y: new BigNumber(10) },
+      end: { x: new BigNumber(100), y: new BigNumber(10) },
+    }
+    const crossings = segments.flatMap((segment) => getPathSegmentIntersections(segment, boundary))
+    expect(crossings).toHaveLength(2)
+    for (const crossing of crossings) {
+      expect(crossing.point.x.gt(30)).toBe(true)
+      expect(crossing.point.x.lt(70)).toBe(true)
+    }
+  })
+
   it('preserves the inner offset and bounds the outer inset', () => {
     const { limits } = createFixture({ recessOuterInset: 45, recessInnerOffset: 15 })
     expect(limits.recessOuterInset?.max?.value.toNumber()).toBe(35)

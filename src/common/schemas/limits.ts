@@ -32,6 +32,8 @@ export type CornerRadiusLimitReasonSchema =
   | 'pocket-opening-corner-radius-ignored'
 
 export type RecessedPocketOpeningLimitsReasonSchema =
+  /** Opening margins share the width before the remaining opening geometry is limited. */
+  | 'recessed-pocket-opening-margins-share-width'
   /** The opening parameters share the available width. */
   | 'pocket-opening-width'
   /** The recess must remain inside the pocket outline. */

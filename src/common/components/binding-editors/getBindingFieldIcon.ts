@@ -67,6 +67,8 @@ const bindingFieldIcons: Record<BindingFieldNameSchema, IconType> = {
   xOffset: PiArrowsHorizontal,
   yOffset: PiArrowsVertical,
   recessOuterInset: RecessedPocketOpeningIcon,
+  recessStartMargin: RecessedPocketOpeningIcon,
+  recessEndMargin: RecessedPocketOpeningIcon,
   recessInnerOffset: RecessedPocketOpeningIcon,
   recessOuterRadius: RecessedPocketOpeningIcon,
   recessInnerRadius: RecessedPocketOpeningIcon,

@@ -13,6 +13,8 @@ const opening: RecessedPocketOpeningSchema = {
   id: 'opening',
   name: 'Opening',
   type: 'recessed',
+  recessStartMargin: 0,
+  recessEndMargin: 0,
   recessOuterInset: 5,
   recessInnerOffset: 25,
   recessDepth: 100,
@@ -31,11 +33,31 @@ const limits: RecessedPocketOpeningLimitsSchema = {
 }
 
 describe('getAdjustedPocketOpening', () => {
+  it('bounds both recessed margins without changing the requested opening', () => {
+    const requested: RecessedPocketOpeningSchema = { ...opening, recessStartMargin: 80, recessEndMargin: 70 }
+    const snapshot = { ...requested }
+    const bound = {
+      value: new BigNumber(50),
+      reason: 'recessed-pocket-opening-margins-share-width',
+      severity: 'warning',
+    } as const
+    expect(
+      getAdjustedPocketOpening(requested, {
+        type: 'recessed',
+        recessStartMargin: { max: bound },
+        recessEndMargin: { max: bound },
+      }),
+    ).toEqual({ ...requested, recessStartMargin: 50, recessEndMargin: 50 })
+    expect(requested).toEqual(snapshot)
+  })
+
   it('applies the supplied bounds and preserves unbound fields', () => {
     expect(getAdjustedPocketOpening(opening, limits)).toEqual({
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
       recessOuterInset: 10,
       recessInnerOffset: 20,
       recessDepth: 79,
@@ -46,6 +68,8 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
       recessOuterInset: 5,
       recessInnerOffset: 25,
       recessDepth: 100,
@@ -59,6 +83,8 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
       recessOuterInset: 30,
       recessInnerOffset: 20,
       recessDepth: 79,
@@ -72,6 +98,8 @@ describe('getAdjustedPocketOpening', () => {
       id: 'opening',
       name: 'Opening',
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
       recessOuterInset: 20,
       recessInnerOffset: 15,
       recessDepth: 10,

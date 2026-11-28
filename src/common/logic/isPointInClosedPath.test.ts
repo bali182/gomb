@@ -27,6 +27,8 @@ describe('isPointInClosedPath', () => {
         id: 'opening',
         name: 'Opening',
         type: 'recessed',
+        recessStartMargin: 0,
+        recessEndMargin: 0,
         recessOuterInset: 43.3,
         recessInnerOffset: 8,
         recessDepth: 10,
