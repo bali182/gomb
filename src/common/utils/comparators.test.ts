@@ -1,8 +1,25 @@
 import { describe, expect, it } from 'vitest'
+import { defaultRecessedPocketOpening } from '../defaultStates'
 import type { BindingFieldSchema, BindingSchema } from '../schemas/bindings'
 import type { HasCornerRadiusSchema } from '../schemas/common'
+import type { RecessedPocketOpeningSchema } from '../schemas/pocketOpening'
 import { d } from '../testData'
 import { comparators } from './comparators'
+
+describe('recessed opening margin comparison', () => {
+  const opening: RecessedPocketOpeningSchema = {
+    ...defaultRecessedPocketOpening,
+    id: 'opening',
+    name: 'Opening',
+    type: 'recessed',
+  }
+  it('compares equal values independently of identity', () => {
+    expect(comparators.pocketOpening(opening, { ...opening })).toBe(true)
+  })
+  it.each(['recessStartMargin', 'recessEndMargin'] as const)('detects a changed %s', (field) => {
+    expect(comparators.pocketOpening(opening, { ...opening, [field]: 5 })).toBe(false)
+  })
+})
 
 const field: BindingFieldSchema = { id: 'field', type: 'panel-binding-field', modelId: 'panel', field: 'width' }
 const binding: BindingSchema = {

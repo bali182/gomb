@@ -28,6 +28,20 @@ export const RecessedPocketOpeningEditor: FC = () => {
   )
   const { t } = useTranslation()
 
+  const handleStartMarginChange = useCallback(
+    (value: string): void => {
+      onChange({ ...editable, recessStartMargin: value })
+    },
+    [editable, onChange],
+  )
+
+  const handleEndMarginChange = useCallback(
+    (value: string): void => {
+      onChange({ ...editable, recessEndMargin: value })
+    },
+    [editable, onChange],
+  )
+
   const handleOuterInsetChange = useCallback(
     (outerInset: string): void => {
       onChange({ ...editable, recessOuterInset: outerInset })
@@ -66,6 +80,41 @@ export const RecessedPocketOpeningEditor: FC = () => {
   return (
     <SectionGroup.Root>
       {!isDefined(referencePocket) && <PocketOpeningEditorPreview opening={opening} />}
+      <SectionGroup.Section>
+        <SectionGroup.SectionHeader>
+          {t.project.editors.sections.components.recessedPocketOpening.margins.title}
+        </SectionGroup.SectionHeader>
+        <SectionGroup.SectionRowTitle
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.margins.recessStartMargin.tooltip}
+        >
+          {t.project.editors.sections.components.recessedPocketOpening.margins.recessStartMargin.label}
+        </SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowEditor issue={issues.recessStartMargin}>
+          <EditorNumberInput
+            modelId={editable.id}
+            field="startMargin"
+            value={editable.recessStartMargin}
+            issue={issues.recessStartMargin}
+            onChange={handleStartMarginChange}
+            unit="mm"
+          />
+        </SectionGroup.SectionRowEditor>
+        <SectionGroup.SectionRowTitle
+          tooltip={t.project.editors.sections.components.recessedPocketOpening.margins.recessEndMargin.tooltip}
+        >
+          {t.project.editors.sections.components.recessedPocketOpening.margins.recessEndMargin.label}
+        </SectionGroup.SectionRowTitle>
+        <SectionGroup.SectionRowEditor issue={issues.recessEndMargin}>
+          <EditorNumberInput
+            modelId={editable.id}
+            field="endMargin"
+            value={editable.recessEndMargin}
+            issue={issues.recessEndMargin}
+            onChange={handleEndMarginChange}
+            unit="mm"
+          />
+        </SectionGroup.SectionRowEditor>
+      </SectionGroup.Section>
       <SectionGroup.Section>
         <SectionGroup.SectionHeader>
           {t.project.editors.sections.components.recessedPocketOpening.geometry.title}

@@ -104,6 +104,8 @@ const definitions: BindingFieldCompatibilityDefinitionsSchema = {
     leftStretch: 'number',
   },
   'recessed': {
+    recessStartMargin: 'number',
+    recessEndMargin: 'number',
     recessOuterInset: 'number',
     recessInnerOffset: 'number',
     recessOuterRadius: 'number',

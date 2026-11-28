@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { bindingFieldCompatibility } from '../../data/bindingFieldCompatibility'
 import { createBaseOperationParams } from '../../operations/subProject/testUtils'
 import type { SubProjectSchema } from '../../schemas/subProject'
 import { d } from '../../testData'
@@ -14,6 +15,24 @@ const source = d.subProject({
 })
 
 describe('getCommonBindingProperties', () => {
+  it('offers both recessed margins as compatible numeric binding properties', () => {
+    const factory = createBaseOperationParams(source).readonlyFactory
+    const firstOpening = factory.createRecessedPocketOpening({})
+    const secondOpening = factory.createRecessedPocketOpening({})
+    const properties = getCommonBindingProperties(source, [firstOpening, secondOpening])
+    for (const field of ['recessStartMargin', 'recessEndMargin'] as const) {
+      expect(properties.find((property) => property.field === field)).toEqual({
+        field,
+        fields: [firstOpening, secondOpening].map((opening) => ({
+          type: 'recessed-binding-field',
+          modelId: opening.id,
+          field,
+        })),
+        blockers: [],
+      })
+      expect(bindingFieldCompatibility.recessed[field]).toBe(bindingFieldCompatibility.panel.width)
+    }
+  })
   it('returns no properties for an empty selection and the source properties for one model', () => {
     expect(getCommonBindingProperties(source, [])).toEqual([])
     expect(getCommonBindingProperties(source, [first]).map((property) => property.field)).toContain('width')

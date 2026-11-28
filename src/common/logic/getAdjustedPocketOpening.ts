@@ -28,6 +28,8 @@ export const getAdjustedPocketOpening = (
       }
       return {
         ...opening,
+        recessStartMargin: clamp(opening.recessStartMargin, 0, limits.recessStartMargin?.max?.value).toNumber(),
+        recessEndMargin: clamp(opening.recessEndMargin, 0, limits.recessEndMargin?.max?.value).toNumber(),
         recessOuterInset: clamp(
           opening.recessOuterInset,
           limits.recessOuterInset?.min?.value,

@@ -15,6 +15,8 @@ const openings: PocketOpeningSchema[] = [
   {
     id: 'recessed-source',
     type: 'recessed',
+    recessStartMargin: 5,
+    recessEndMargin: 10,
     name: 'Opening',
     recessOuterInset: 17,
     recessInnerOffset: 11,

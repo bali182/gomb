@@ -24,6 +24,8 @@ const fields: BindingFieldSchema[] = [
   },
   { id: 'stitch-field', type: 't-pocket-stitch-line-binding-field', modelId: 'stitch', field: 'startOffset' },
   { id: 'recessed-field', type: 'recessed-binding-field', modelId: 'recessed', field: 'recessDepth' },
+  { id: 'recessed-start-margin', type: 'recessed-binding-field', modelId: 'recessed', field: 'recessStartMargin' },
+  { id: 'recessed-end-margin', type: 'recessed-binding-field', modelId: 'recessed', field: 'recessEndMargin' },
   { id: 'slanted-field', type: 'slanted-binding-field', modelId: 'slanted', field: 'slantOffset' },
   { id: 'optical-field', type: 'optical-illusion-binding-field', modelId: 'optical', field: 'illusionStartInset' },
 ]
@@ -44,7 +46,13 @@ const fixture = () =>
       d.tPocketStitchLine({ id: 'stitch', targetId: 'pocket', targetType: 'component', startOffset: 10 }),
     ],
     pocketOpenings: [
-      { ...modelFactory.createRecessedPocketOpening({}), id: 'recessed', recessDepth: 10 },
+      {
+        ...modelFactory.createRecessedPocketOpening({}),
+        id: 'recessed',
+        recessDepth: 10,
+        recessStartMargin: 10,
+        recessEndMargin: 10,
+      },
       { ...modelFactory.createSlantedPocketOpening({}), id: 'slanted', slantOffset: 10 },
       { ...modelFactory.createOpticalIllusionPocketOpening({}), id: 'optical', illusionStartInset: 10 },
     ],

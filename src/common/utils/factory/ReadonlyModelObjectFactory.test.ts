@@ -16,6 +16,8 @@ describe('createPocketOpening', () => {
   it('initializes recessed opening dimensions and radii', () => {
     expect(modelFactory.createPocketOpening({ type: 'recessed' })).toMatchObject({
       type: 'recessed',
+      recessStartMargin: 0,
+      recessEndMargin: 0,
 
       recessOuterInset: 15,
       recessInnerOffset: 15,

@@ -131,7 +131,13 @@ export type HoleBindingFieldNameSchema = CheckedBindingFieldNameSchema<
 
 export type RecessedPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<
   RecessedPocketOpeningSchema,
-  'recessOuterInset' | 'recessInnerOffset' | 'recessOuterRadius' | 'recessInnerRadius' | 'recessDepth'
+  | 'recessStartMargin'
+  | 'recessEndMargin'
+  | 'recessOuterInset'
+  | 'recessInnerOffset'
+  | 'recessOuterRadius'
+  | 'recessInnerRadius'
+  | 'recessDepth'
 >
 
 export type SlantedPocketOpeningBindingFieldNameSchema = CheckedBindingFieldNameSchema<

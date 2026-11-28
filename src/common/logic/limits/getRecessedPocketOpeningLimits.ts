@@ -13,9 +13,10 @@ import type { NumericBoundSchema, RecessedPocketOpeningLimitsSchema } from '../.
 import type { RecessedPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { clamp } from '../../utils/clamp'
 import { getTPocketTabDepth } from '../pocketUtils'
+import { getSharedLengthMaximum } from './getSharedLengthMaximum'
 
 /**
- * Preserves the inner offset before adjusting the outer inset.
+ * Reserves the opening margins, then preserves the inner offset before adjusting the outer inset.
  * Depth is bounded using the unrounded recess. Inner rounding stays inside that recess, while outer
  * rounding can expand it. The inner radius is therefore fixed before finding the outer radius limit.
  * Only bounds are returned. The source opening is never changed.
@@ -28,7 +29,13 @@ export const getRecessedPocketOpeningLimits = (
 ): RecessedPocketOpeningLimitsSchema => {
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
   const width = isVertical ? computedPocket.boundingRect.width : computedPocket.boundingRect.height
-  const halfWidth = width.dividedBy(2)
+  const marginWidth = BigNumber.maximum(width.minus(POSITION_EPSILON), 0)
+  const startMarginMaximum = getSharedLengthMaximum(new BigNumber(opening.recessEndMargin), marginWidth)
+  const endMarginMaximum = getSharedLengthMaximum(new BigNumber(opening.recessStartMargin), marginWidth)
+  const startMargin = clamp(opening.recessStartMargin, 0, startMarginMaximum).toNumber()
+  const endMargin = clamp(opening.recessEndMargin, 0, endMarginMaximum).toNumber()
+  const openingWidth = width.minus(startMargin).minus(endMargin)
+  const halfWidth = openingWidth.dividedBy(2)
   const innerOffsetMaximum: NumericBoundSchema = {
     value: halfWidth,
     reason: 'pocket-opening-width',
@@ -36,6 +43,8 @@ export const getRecessedPocketOpeningLimits = (
   }
   const adjusted: RecessedPocketOpeningSchema = {
     ...opening,
+    recessStartMargin: startMargin,
+    recessEndMargin: endMargin,
     recessInnerOffset: clamp(opening.recessInnerOffset, 0, innerOffsetMaximum.value).toNumber(),
   }
   const outerInsetMaximum: NumericBoundSchema = {
@@ -55,6 +64,12 @@ export const getRecessedPocketOpeningLimits = (
   }
   const limits: RecessedPocketOpeningLimitsSchema = {
     type: 'recessed',
+    recessStartMargin: {
+      max: { value: startMarginMaximum, reason: 'recessed-pocket-opening-margins-share-width', severity: 'warning' },
+    },
+    recessEndMargin: {
+      max: { value: endMarginMaximum, reason: 'recessed-pocket-opening-margins-share-width', severity: 'warning' },
+    },
     recessInnerOffset: { max: innerOffsetMaximum },
     recessOuterInset: { max: outerInsetMaximum },
     recessDepth: { max: depthMaximum },
@@ -64,7 +79,7 @@ export const getRecessedPocketOpeningLimits = (
     return limits
   }
 
-  const innerRadiusMaximum = getInnerRadiusMaximum(adjusted, width)
+  const innerRadiusMaximum = getInnerRadiusMaximum(adjusted, openingWidth)
   limits.recessInnerRadius = { max: innerRadiusMaximum }
   adjusted.recessInnerRadius = clamp(opening.recessInnerRadius, 0, innerRadiusMaximum.value).toNumber()
 
@@ -80,7 +95,8 @@ const getFrontPocketDepthMaximum = (
   const isVertical = orientation === 'up' || orientation === 'down'
   const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
   const pocketDepth = isVertical ? pocket.boundingRect.height : pocket.boundingRect.width
-  const innerCornerX = width.dividedBy(2).minus(opening.recessInnerOffset)
+  const openingWidth = width.minus(opening.recessStartMargin).minus(opening.recessEndMargin)
+  const innerCornerX = openingWidth.dividedBy(2).minus(opening.recessInnerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
     reason: 'pocket-opening-depth',
@@ -93,22 +109,24 @@ const getFrontPocketDepthMaximum = (
       closedCornerRadii = [radius.bottomLeft, radius.bottomRight]
       break
     case 'down':
-      closedCornerRadii = [radius.topLeft, radius.topRight]
+      closedCornerRadii = [radius.topRight, radius.topLeft]
       break
     case 'left':
-      closedCornerRadii = [radius.topRight, radius.bottomRight]
+      closedCornerRadii = [radius.bottomRight, radius.topRight]
       break
     case 'right':
       closedCornerRadii = [radius.topLeft, radius.bottomLeft]
       break
   }
-  for (const cornerRadius of closedCornerRadii) {
-    if (innerCornerX.isGreaterThanOrEqualTo(cornerRadius)) {
+  const margins = [opening.recessStartMargin, opening.recessEndMargin]
+  for (const [index, cornerRadius] of closedCornerRadii.entries()) {
+    const distanceFromEdge = innerCornerX.plus(margins[index])
+    if (distanceFromEdge.isGreaterThanOrEqualTo(cornerRadius)) {
       continue
     }
     const availableDepth = pocketDepth
       .minus(cornerRadius)
-      .plus(BigNumber.maximum(cornerRadius.pow(2).minus(cornerRadius.minus(innerCornerX).pow(2)), 0).sqrt())
+      .plus(BigNumber.maximum(cornerRadius.pow(2).minus(cornerRadius.minus(distanceFromEdge).pow(2)), 0).sqrt())
     if (availableDepth.isLessThan(maximum.value)) {
       maximum = { value: BigNumber.maximum(availableDepth, 0), reason: 'pocket-opening-boundary', severity: 'warning' }
     }
@@ -128,7 +146,8 @@ const getTPocketDepthMaximum = (
   const tabDepth = getTPocketTabDepth(pocketCluster, pocket.boundingRect)
   const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
   const taper = new BigNumber(sourcePocket.tPocketTaper).plus(POSITION_EPSILON)
-  const innerCornerX = width.dividedBy(2).minus(opening.recessInnerOffset)
+  const openingWidth = width.minus(opening.recessStartMargin).minus(opening.recessEndMargin)
+  const innerCornerX = openingWidth.dividedBy(2).minus(opening.recessInnerOffset)
   let maximum: NumericBoundSchema = {
     value: BigNumber.maximum(pocketDepth.minus(1), 0),
     reason: 'pocket-opening-depth',
@@ -142,18 +161,22 @@ const getTPocketDepthMaximum = (
   // clear the shoulder endpoint and its bottom corner must clear the tapered edge.
   let boundaryMaximum = maximum.value
   const aboveShoulderMaximum = BigNumber.maximum(tabDepth.minus(POSITION_EPSILON), 0)
-  if (tabWidth.isGreaterThan(opening.recessOuterInset)) {
-    const shoulderMaximum = innerCornerX
-      .minus(opening.recessOuterInset)
-      .times(tabDepth)
-      .dividedBy(tabWidth.minus(opening.recessOuterInset))
-    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, shoulderMaximum))
-  }
-  if (taper.isGreaterThan(tabWidth)) {
-    const taperMaximum = tabDepth.plus(
-      pocketDepth.minus(tabDepth).times(innerCornerX.minus(tabWidth)).dividedBy(taper.minus(tabWidth)),
-    )
-    boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, taperMaximum))
+  for (const margin of [opening.recessStartMargin, opening.recessEndMargin]) {
+    const outerCornerFromEdge = new BigNumber(margin).plus(opening.recessOuterInset)
+    const innerCornerFromEdge = innerCornerX.plus(margin)
+    if (tabWidth.isGreaterThan(outerCornerFromEdge)) {
+      const shoulderMaximum = innerCornerFromEdge
+        .minus(outerCornerFromEdge)
+        .times(tabDepth)
+        .dividedBy(tabWidth.minus(outerCornerFromEdge))
+      boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, shoulderMaximum))
+    }
+    if (taper.isGreaterThan(tabWidth)) {
+      const taperMaximum = tabDepth.plus(
+        pocketDepth.minus(tabDepth).times(innerCornerFromEdge.minus(tabWidth)).dividedBy(taper.minus(tabWidth)),
+      )
+      boundaryMaximum = BigNumber.minimum(boundaryMaximum, BigNumber.maximum(aboveShoulderMaximum, taperMaximum))
+    }
   }
   if (boundaryMaximum.isLessThan(maximum.value)) {
     maximum = { value: boundaryMaximum, reason: 'pocket-opening-boundary', severity: 'warning' }
@@ -180,7 +203,9 @@ const getOuterRadiusMaximum = (
   sourcePocket: PocketSchema,
 ): NumericBoundSchema => {
   const isVertical = pocketCluster.orientation === 'up' || pocketCluster.orientation === 'down'
-  const width = isVertical ? pocket.boundingRect.width : pocket.boundingRect.height
+  const width = (isVertical ? pocket.boundingRect.width : pocket.boundingRect.height)
+    .minus(opening.recessStartMargin)
+    .minus(opening.recessEndMargin)
   const horizontalDistance = width.dividedBy(2).minus(opening.recessInnerOffset).minus(opening.recessOuterInset)
   const depth = new BigNumber(opening.recessDepth)
   const sideLength = horizontalDistance.pow(2).plus(depth.pow(2)).sqrt()
@@ -205,12 +230,11 @@ const getOuterRadiusMaximum = (
     return maximum
   }
   const tabWidth = new BigNumber(sourcePocket.tPocketTabWidth).plus(POSITION_EPSILON)
+  const minimumMargin = BigNumber.minimum(opening.recessStartMargin, opening.recessEndMargin)
   if (
-    getOuterTransitionX(
-      { ...opening, recessOuterRadius: upperBound.toNumber() },
-      width,
-      tabDepth,
-    ).isGreaterThanOrEqualTo(tabWidth)
+    getOuterTransitionX({ ...opening, recessOuterRadius: upperBound.toNumber() }, width, tabDepth)
+      .plus(minimumMargin)
+      .isGreaterThanOrEqualTo(tabWidth)
   ) {
     return maximum
   }
@@ -221,7 +245,7 @@ const getOuterRadiusMaximum = (
   while (upperBound.minus(lowerBound).isGreaterThan(OUTER_RADIUS_SEARCH_PRECISION)) {
     const candidate = upperBound.plus(lowerBound).dividedBy(2)
     const candidateOpening: RecessedPocketOpeningSchema = { ...opening, recessOuterRadius: candidate.toNumber() }
-    if (getOuterTransitionX(candidateOpening, width, tabDepth).isGreaterThanOrEqualTo(tabWidth)) {
+    if (getOuterTransitionX(candidateOpening, width, tabDepth).plus(minimumMargin).isGreaterThanOrEqualTo(tabWidth)) {
       lowerBound = candidate
     } else {
       upperBound = candidate

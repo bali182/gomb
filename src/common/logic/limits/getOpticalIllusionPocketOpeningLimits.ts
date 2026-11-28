@@ -10,6 +10,7 @@ import type {
 } from '../../schemas/limits'
 import type { OpticalIllusionPocketOpeningSchema } from '../../schemas/pocketOpening'
 import { clamp } from '../../utils/clamp'
+import { getSharedLengthMaximum } from './getSharedLengthMaximum'
 
 export const getOpticalIllusionPocketOpeningLimits = (
   opening: OpticalIllusionPocketOpeningSchema,
@@ -82,11 +83,6 @@ export const getOpticalIllusionPocketOpeningLimits = (
       ),
     },
   }
-}
-
-const getSharedLengthMaximum = (otherLength: BigNumber, totalLength: BigNumber): BigNumber => {
-  const halfLength = totalLength.dividedBy(2)
-  return BigNumber.maximum(otherLength.gt(halfLength) ? halfLength : totalLength.minus(otherLength), 0)
 }
 
 const getRadiusLimit = (

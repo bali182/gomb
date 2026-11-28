@@ -115,6 +115,8 @@ const validateRecessedPocketOpeningSchema = (
   currentValue: RecessedPocketOpeningSchema,
   context: ComponentBasedValidationContextSchema,
 ): ValidationResultSchema<RecessedPocketOpeningSchema> => {
+  const startMargin = validateNumber(input.recessStartMargin, currentValue.recessStartMargin, context, { min: 0 })
+  const endMargin = validateNumber(input.recessEndMargin, currentValue.recessEndMargin, context, { min: 0 })
   const outerInset = validateNumber(input.recessOuterInset, currentValue.recessOuterInset, context, { min: 0 })
   const innerOffset = validateNumber(input.recessInnerOffset, currentValue.recessInnerOffset, context, { min: 0 })
   const depth = validateNumber(input.recessDepth, currentValue.recessDepth, context, { min: 0 })
@@ -122,6 +124,8 @@ const validateRecessedPocketOpeningSchema = (
   const innerRadius = validateNumber(input.recessInnerRadius, currentValue.recessInnerRadius, context, { min: 0 })
   const issues: IssuesSchema<RecessedPocketOpeningSchema> = {
     type: undefined,
+    recessStartMargin: startMargin.issues,
+    recessEndMargin: endMargin.issues,
     recessOuterInset: outerInset.issues,
     recessInnerOffset: innerOffset.issues,
     recessDepth: depth.issues,
@@ -131,6 +135,8 @@ const validateRecessedPocketOpeningSchema = (
   const committedValue: RecessedPocketOpeningSchema = {
     ...currentValue,
     type: 'recessed',
+    recessStartMargin: startMargin.committedValue,
+    recessEndMargin: endMargin.committedValue,
     recessOuterInset: outerInset.committedValue,
     recessInnerOffset: innerOffset.committedValue,
     recessDepth: depth.committedValue,
@@ -138,7 +144,15 @@ const validateRecessedPocketOpeningSchema = (
     recessInnerRadius: innerRadius.committedValue,
   }
 
-  if (!outerInset.isValid || !innerOffset.isValid || !depth.isValid || !outerRadius.isValid || !innerRadius.isValid) {
+  if (
+    !startMargin.isValid ||
+    !endMargin.isValid ||
+    !outerInset.isValid ||
+    !innerOffset.isValid ||
+    !depth.isValid ||
+    !outerRadius.isValid ||
+    !innerRadius.isValid
+  ) {
     return createInvalidValidationResult<RecessedPocketOpeningSchema>(issues, committedValue)
   }
 
@@ -147,6 +161,8 @@ const validateRecessedPocketOpeningSchema = (
     {
       ...currentValue,
       type: 'recessed',
+      recessStartMargin: startMargin.value,
+      recessEndMargin: endMargin.value,
       recessOuterInset: outerInset.value,
       recessInnerOffset: innerOffset.value,
       recessDepth: depth.value,

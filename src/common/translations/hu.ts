@@ -455,16 +455,29 @@ export const HU = {
             straightDescription: 'Az egyenes zsebnyílásnak nincsenek további beállításai.',
           },
           recessedPocketOpening: {
+            margins: {
+              title: 'Margók',
+              recessStartMargin: {
+                label: 'Kezdő margó',
+                tooltip:
+                  'A nyílás elején fenntartott egyenes rész hossza, mm-ben. A kivágás a margók közötti tartományból számolódik.',
+              },
+              recessEndMargin: {
+                label: 'Záró margó',
+                tooltip:
+                  'A nyílás végén fenntartott egyenes rész hossza, mm-ben. A kivágás a margók közötti tartományból számolódik.',
+              },
+            },
             geometry: {
               title: 'Geometria',
               recessOuterInset: {
                 label: 'Külső betolás',
-                tooltip: 'A külső töréspont távolsága a nyílás két szélétől, mm-ben.',
+                tooltip: 'A külső töréspont távolsága a margók közötti tartomány két szélétől, mm-ben.',
               },
               recessInnerOffset: {
                 label: 'Belső eltolás',
                 tooltip:
-                  'A belső töréspont távolsága a nyílás közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
+                  'A belső töréspont távolsága a margók közötti tartomány közepétől kifelé, mindkét oldalon szimmetrikusan, mm-ben.',
               },
               recessDepth: {
                 label: 'Mélység',
@@ -808,6 +821,8 @@ export const HU = {
             yAnchor: 'Függőleges igazítás',
             xOffset: 'X eltolás',
             yOffset: 'Y eltolás',
+            recessStartMargin: 'Ívelt: kezdő margó',
+            recessEndMargin: 'Ívelt: záró margó',
             recessOuterInset: 'Ívelt: külső betolás',
             recessInnerOffset: 'Ívelt: belső eltolás',
             recessOuterRadius: 'Ívelt: külső lekerekítés',
@@ -1441,6 +1456,8 @@ export const HU = {
       'corner-radii-share-edge': (value: string): string => `A szomszédos sarok miatt a sugár legfeljebb ${value} mm.`,
       'pocket-opening-corner-radius-ignored': (): string =>
         'A nyílás felőli oldalon a saroklekerekítést figyelmen kívül hagyjuk.',
+      'recessed-pocket-opening-margins-share-width': (value: string): string =>
+        `A nyílás szélessége és a szemközti margó miatt ez a margó legfeljebb ${value} mm.`,
       'pocket-opening-width': (value: string): string =>
         `A nyílás rendelkezésre álló szélessége miatt az érték legfeljebb ${value} mm.`,
       'pocket-opening-boundary': (value: string): string => `A zseb körvonala miatt az érték legfeljebb ${value} mm.`,

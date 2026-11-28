@@ -219,6 +219,8 @@ export const comparators = {
     }
     if (narrowers.is.recessedPocketOpening(a) && narrowers.is.recessedPocketOpening(b)) {
       return (
+        a.recessStartMargin === b.recessStartMargin &&
+        a.recessEndMargin === b.recessEndMargin &&
         a.recessOuterInset === b.recessOuterInset &&
         a.recessInnerOffset === b.recessInnerOffset &&
         a.recessDepth === b.recessDepth &&
